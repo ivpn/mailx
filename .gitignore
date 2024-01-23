@@ -1,0 +1,4 @@
+.env
+.env.test
+vendor
+.DS_Store

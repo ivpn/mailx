@@ -1,28 +1,34 @@
 # Email Service
 
-## Inbound SMPT service
+## MTA package
 
-Inbound SMPT service is an incoming message handler. It should be used to route/forward or drop mail messages as defined by filters and rules.
+MTA (message transport agent) package is used for accepting, processing and forwarding emails:
+
+1. Accept incoming emails from other SMTP servers
+2. Process emails based on defined rules and filters
+3. Transport filtered emails to an outbound SMTP server
+
+## API package
+
+## Run locally
 
 ### Config
 ```bash
-cp services/inbound/.env.sample services/inbound/.env
+cp .env.sample .env
 ```
 
 ### Run
 ```bash
-go run services/inbound/main.go
+go run cmd/main.go
 ```
 
 ### Test
 Run unit tests:  
 ```bash
-go test ./services/inbound/... --timeout 5s
+go test ./... --timeout 5s
 ```
 
 Send test email:  
 ```bash
-go run services/inbound/test/send_test_mail.go
+go run test/send_test_mail.go
 ```
-
-## API service

@@ -3,13 +3,13 @@ package server
 import (
 	"testing"
 
-	"ivpn.net/email-service/services/inbound/config"
+	"ivpn.net/email-service/config"
 )
 
 var (
 	cfg = config.Config{
-		ServerHost: "127.0.0.1",
-		ServerPort: "8025",
+		MTAHost: "127.0.0.1",
+		MTAPort: "8025",
 	}
 )
 

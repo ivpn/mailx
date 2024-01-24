@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"ivpn.net/email-service/services/inbound/config"
-	"ivpn.net/email-service/services/inbound/server"
+	"ivpn.net/email-service/config"
+	"ivpn.net/email-service/internal/mta/server"
 )
 
 func main() {

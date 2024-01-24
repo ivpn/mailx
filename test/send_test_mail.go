@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"gopkg.in/gomail.v2"
-	"ivpn.net/email-service/services/inbound/config"
+	"ivpn.net/email-service/config"
 )
 
 func main() {
@@ -18,8 +18,8 @@ func main() {
 }
 
 func send(cfg config.Config) {
-	host := cfg.ServerHost
-	port, err := strconv.Atoi(cfg.ServerPort)
+	host := cfg.MTAHost
+	port, err := strconv.Atoi(cfg.MTAPort)
 	if err != nil {
 		log.Panic(err)
 	}

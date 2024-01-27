@@ -7,13 +7,18 @@ import (
 	"ivpn.net/email-service/internal/mta/server"
 )
 
-func main() {
+func Run() error {
 	cfg, err := config.New()
 	if err != nil {
-		log.Println(err)
+		return err
 	}
 
 	err = server.Start(cfg)
+	return err
+}
+
+func main() {
+	err := Run()
 	if err != nil {
 		log.Println(err)
 	}

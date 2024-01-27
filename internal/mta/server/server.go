@@ -9,7 +9,7 @@ import (
 )
 
 func Start(cfg config.Config) error {
-	log.Printf("Inbound server starting on %s", cfg.MTAPort)
+	log.Printf("MTA server starting on port %s", cfg.MTAPort)
 	srv := &smtpd.Server{
 		Addr:         cfg.MTAHost + ":" + cfg.MTAPort,
 		Handler:      handler.InboundHandler,
@@ -17,5 +17,6 @@ func Start(cfg config.Config) error {
 		AuthRequired: true,
 	}
 
-	return srv.ListenAndServe()
+	err := srv.ListenAndServe()
+	return err
 }

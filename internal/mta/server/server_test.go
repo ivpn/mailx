@@ -8,8 +8,8 @@ import (
 
 var (
 	cfg = config.Config{
-		MTAHost: "127.0.0.1",
-		MTAPort: "8025",
+		SMTPHost: "127.0.0.1",
+		SMTPPort: "8025",
 	}
 )
 

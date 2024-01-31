@@ -18,8 +18,8 @@ func main() {
 }
 
 func send(cfg config.Config) {
-	host := cfg.MTAHost
-	port, err := strconv.Atoi(cfg.MTAPort)
+	host := cfg.SMTPHost
+	port, err := strconv.Atoi(cfg.SMTPPort)
 	if err != nil {
 		log.Panic(err)
 	}

@@ -9,11 +9,11 @@ import (
 )
 
 func Start(cfg config.Config) error {
-	log.Printf("MTA server starting on port %s", cfg.MTAPort)
+	log.Printf("SMTP server starting on port %s", cfg.SMTPPort)
 	srv := &smtpd.Server{
-		Addr:         cfg.MTAHost + ":" + cfg.MTAPort,
+		Addr:         cfg.SMTPHost + ":" + cfg.SMTPPort,
 		Handler:      handler.InboundHandler,
-		Hostname:     cfg.MTAHostname,
+		Hostname:     cfg.SMTPHostname,
 		AuthRequired: true,
 	}
 

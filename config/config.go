@@ -7,18 +7,20 @@ import (
 )
 
 type Config struct {
-	MTAHost     string
-	MTAPort     string
-	MTAHostname string
+	SMTPHost     string
+	SMTPPort     string
+	SMTPHostname string
 }
 
 func New() (Config, error) {
 	err := godotenv.Load("./.env")
-	cfg := Config{
-		MTAHost:     os.Getenv("MTA_HOST"),
-		MTAPort:     os.Getenv("MTA_PORT"),
-		MTAHostname: os.Getenv("MTA_HOSTNAME"),
+	if err != nil {
+		return Config{}, err
 	}
 
-	return cfg, err
+	return Config{
+		SMTPHost:     os.Getenv("SMTP_HOST"),
+		SMTPPort:     os.Getenv("SMTP_PORT"),
+		SMTPHostname: os.Getenv("SMTP_HOSTNAME"),
+	}, nil
 }

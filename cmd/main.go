@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"ivpn.net/email-service/config"
-	"ivpn.net/email-service/internal/mta/server"
+	"ivpn.net/email-service/internal/transport/smpt"
 )
 
 func Run() error {
@@ -13,7 +13,7 @@ func Run() error {
 		return err
 	}
 
-	err = server.Start(cfg)
+	err = smpt.Start(cfg)
 	return err
 }
 

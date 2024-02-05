@@ -1,0 +1,15 @@
+version: "3"
+
+tasks:
+  config:
+    cmds:
+      - cp .env.sample .env
+  build:
+    cmds:
+      - docker build -t email-service .
+  run:
+    cmds:
+      - docker run -it email-service
+  test:
+    cmds:
+      - go test ./... --timeout 5s

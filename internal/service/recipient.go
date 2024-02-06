@@ -15,6 +15,7 @@ var (
 
 type Recipient struct {
 	ID           string `json:"id"`
+	UserID       string `json:"user_id"`
 	Email        string `json:"email"`
 	Verification string `json:"verification"`
 }

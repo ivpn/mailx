@@ -8,6 +8,7 @@ import (
 
 var (
 	ErrGetRecipient    = errors.New("could not get recipient by ID")
+	ErrGetRecipients   = errors.New("could not get recipients by user ID")
 	ErrPostRecipient   = errors.New("could not post recipient")
 	ErrUpdateRecipient = errors.New("could not update recipient")
 	ErrDeleteRecipient = errors.New("could not delete recipient")
@@ -28,6 +29,16 @@ func (s *Service) GetRecipient(ctx context.Context, ID string) (Recipient, error
 	}
 
 	return rcp, nil
+}
+
+func (s *Service) GetRecipients(ctx context.Context, userID string) ([]Recipient, error) {
+	rcps, err := s.Store.GetRecipients(ctx, userID)
+	if err != nil {
+		log.Printf("an error occured fetching the recipients: %s", err.Error())
+		return []Recipient{}, ErrGetRecipients
+	}
+
+	return rcps, nil
 }
 
 func (s *Service) PostRecipient(ctx context.Context, rcp Recipient) (Recipient, error) {

@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"log"
+	"math/rand"
+	"time"
 )
 
 var (
@@ -68,4 +70,16 @@ func (s *Service) DeleteAlias(ctx context.Context, ID string) error {
 	}
 
 	return nil
+}
+
+func generateSlug() string {
+	rand.Seed(time.Now().UnixNano())
+
+	const charset = "abcdefghijklmnopqrstuvwxyz0123456789"
+	result := make([]byte, 8)
+	for i := range result {
+		result[i] = charset[rand.Intn(len(charset))]
+	}
+
+	return string(result)
 }

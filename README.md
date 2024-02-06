@@ -4,12 +4,17 @@
 
 ### Config
 ```bash
-cp .env.sample .env
+cp ./config/.env.sample ./config/.env
+```
+
+### Build
+```bash
+docker build -t email-service .
 ```
 
 ### Run
 ```bash
-go run cmd/main.go
+docker run -it --publish 8025:8025 email-service
 ```
 
 ### Test

@@ -3,7 +3,7 @@ version: "3"
 tasks:
   config:
     cmds:
-      - cp .env.sample .env
+      - cp config/.env.sample config/.env
   build:
     cmds:
       - docker build -t email-service .

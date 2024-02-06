@@ -9,7 +9,7 @@ tasks:
       - docker build -t email-service .
   run:
     cmds:
-      - docker run -it email-service
+      - docker run -it --publish 8025:8025 email-service
   test:
     cmds:
       - go test ./... --timeout 5s

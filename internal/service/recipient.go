@@ -12,6 +12,7 @@ var (
 	ErrPostRecipient   = errors.New("could not post recipient")
 	ErrUpdateRecipient = errors.New("could not update recipient")
 	ErrDeleteRecipient = errors.New("could not delete recipient")
+	ErrVerifyRecipient = errors.New("could not verify recipient")
 )
 
 type Recipient struct {
@@ -19,6 +20,7 @@ type Recipient struct {
 	UserID       string `json:"user_id"`
 	Email        string `json:"email"`
 	Verification string `json:"verification"`
+	Verified     bool   `json:"verified"`
 }
 
 func (s *Service) GetRecipient(ctx context.Context, ID string) (Recipient, error) {
@@ -69,4 +71,14 @@ func (s *Service) DeleteRecipient(ctx context.Context, ID string) error {
 	}
 
 	return nil
+}
+
+func (s *Service) VerifyRecipient(ctx context.Context, ID string, verification string) (Recipient, error) {
+	rcp, err := s.Store.VerifyRecipient(ctx, ID, verification)
+	if err != nil {
+		log.Printf("an error occurred verifying the recipient: %s", err.Error())
+		return Recipient{}, ErrVerifyRecipient
+	}
+
+	return rcp, nil
 }

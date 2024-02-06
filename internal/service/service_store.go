@@ -8,6 +8,7 @@ type RecipienteStore interface {
 	PostRecipient(context.Context, Recipient) (Recipient, error)
 	UpdateRecipient(context.Context, string, Recipient) (Recipient, error)
 	DeleteRecipient(context.Context, string) error
+	VerifyRecipient(context.Context, string, string) (Recipient, error)
 }
 
 type AliasStore interface {

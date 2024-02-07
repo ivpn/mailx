@@ -14,12 +14,12 @@ func main() {
 		log.Panic(err)
 	}
 
-	send(cfg)
+	send(cfg.SMTP)
 }
 
-func send(cfg config.Config) {
-	host := cfg.SMTPHost
-	port, err := strconv.Atoi(cfg.SMTPPort)
+func send(cfg config.SMTPConfig) {
+	host := cfg.Host
+	port, err := strconv.Atoi(cfg.Port)
 	if err != nil {
 		log.Panic(err)
 	}

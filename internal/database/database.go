@@ -11,9 +11,9 @@ type Database struct {
 }
 
 func New() (*Database, error) {
-	db, err := connect()
+	db, err := Connect()
 	if err != nil {
-		log.Printf("an error occured initializing DB: %s", err.Error())
+		log.Printf("an error occured connecting DB: %s", err.Error())
 		return nil, err
 	}
 
@@ -26,16 +26,4 @@ func New() (*Database, error) {
 	return &Database{
 		Client: db,
 	}, nil
-}
-
-func connect() (*gorm.DB, error) {
-	dsn := ""
-	db, err := gorm.Open("mysql", dsn)
-	if err != nil {
-		return nil, err
-	}
-
-	log.Println("DB connection successful")
-
-	return db, nil
 }

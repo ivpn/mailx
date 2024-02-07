@@ -11,9 +11,15 @@ type Database struct {
 }
 
 func New() (*Database, error) {
-	db, err := connectDB()
+	db, err := connect()
 	if err != nil {
 		log.Printf("an error occured initializing DB: %s", err.Error())
+		return nil, err
+	}
+
+	err = Migrate(db)
+	if err != nil {
+		log.Printf("an error occured migrating DB: %s", err.Error())
 		return nil, err
 	}
 
@@ -22,12 +28,14 @@ func New() (*Database, error) {
 	}, nil
 }
 
-func connectDB() (*gorm.DB, error) {
+func connect() (*gorm.DB, error) {
 	dsn := ""
 	db, err := gorm.Open("mysql", dsn)
 	if err != nil {
 		return nil, err
 	}
+
+	log.Println("DB connection successful")
 
 	return db, nil
 }

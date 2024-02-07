@@ -1,10 +1,11 @@
 package model
 
-import "github.com/jinzhu/gorm"
+import "time"
 
 type Recipient struct {
-	gorm.Model
-	ID           string `gorm:"primaryKey" json:"id"`
+	ID           string `json:"id"`
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 	UserID       string `json:"user_id"`
 	Email        string `json:"email"`
 	Verification string `json:"verification"`

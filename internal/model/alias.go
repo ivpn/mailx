@@ -3,13 +3,12 @@ package model
 import (
 	"math/rand"
 	"time"
-
-	"github.com/jinzhu/gorm"
 )
 
 type Alias struct {
-	gorm.Model
-	ID          string `gorm:"primaryKey" json:"id"`
+	ID          string `json:"id"`
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 	RecipientID string `json:"recipient_id"`
 	Slug        string `json:"slug"`
 }

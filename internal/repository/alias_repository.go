@@ -1,0 +1,33 @@
+package database
+
+import (
+	"context"
+
+	uuid "github.com/satori/go.uuid"
+	"ivpn.net/email-service/internal/model"
+)
+
+func (d *Database) GetAlias(ctx context.Context, ID string) (model.Alias, error) {
+	var alias model.Alias
+	err := d.Client.Where("id = ?", ID).First(&alias).Error
+	return alias, err
+}
+
+func (d *Database) GetAliases(ctx context.Context, recipientID string) ([]model.Alias, error) {
+	var aliases []model.Alias
+	err := d.Client.Where("recipient_id = ?", recipientID).Find(&aliases).Error
+	return aliases, err
+}
+
+func (d *Database) PostAlias(ctx context.Context, alias model.Alias) error {
+	alias.ID = uuid.NewV4().String()
+	return d.Client.Create(&alias).Error
+}
+
+func (d *Database) UpdateAlias(ctx context.Context, ID string, alias model.Alias) error {
+	return d.Client.Where("id = ?", ID).Save(&alias).Error
+}
+
+func (d *Database) DeleteAlias(ctx context.Context, ID string) error {
+	return d.Client.Where("id = ?", ID).Delete(&model.Alias{}).Error
+}

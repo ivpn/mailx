@@ -9,7 +9,7 @@ import (
 
 type Alias struct {
 	gorm.Model
-	ID          string `json:"id"`
+	ID          string `gorm:"primaryKey" json:"id"`
 	RecipientID string `json:"recipient_id"`
 	Slug        string `json:"slug"`
 }

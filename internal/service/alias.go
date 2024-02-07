@@ -34,8 +34,8 @@ func (s *Service) GetAlias(ctx context.Context, ID string) (model.Alias, error) 
 	return alias, nil
 }
 
-func (s *Service) GetAliass(ctx context.Context, aliasID string) ([]model.Alias, error) {
-	aliases, err := s.Store.GetAliases(ctx, aliasID)
+func (s *Service) GetAliases(ctx context.Context, recipientID string) ([]model.Alias, error) {
+	aliases, err := s.Store.GetAliases(ctx, recipientID)
 	if err != nil {
 		log.Printf("an error occured fetching the aliass: %s", err.Error())
 		return []model.Alias{}, ErrGetAliases

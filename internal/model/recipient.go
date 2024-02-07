@@ -4,7 +4,7 @@ import "github.com/jinzhu/gorm"
 
 type Recipient struct {
 	gorm.Model
-	ID           string `json:"id"`
+	ID           string `gorm:"primaryKey" json:"id"`
 	UserID       string `json:"user_id"`
 	Email        string `json:"email"`
 	Verification string `json:"verification"`

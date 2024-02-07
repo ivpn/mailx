@@ -25,6 +25,14 @@ type Alias struct {
 	Slug        string `json:"slug"`
 }
 
+type AliasStore interface {
+	GetAlias(context.Context, string) (Alias, error)
+	GetAliases(context.Context, string) ([]Alias, error)
+	PostAlias(context.Context, Alias) (Alias, error)
+	UpdateAlias(context.Context, string, Alias) (Alias, error)
+	DeleteAlias(context.Context, string) error
+}
+
 func (s *Service) GetAlias(ctx context.Context, ID string) (Alias, error) {
 	rcp, err := s.Store.GetAlias(ctx, ID)
 	if err != nil {

@@ -26,6 +26,15 @@ type Recipient struct {
 	Verified     bool   `json:"verified"`
 }
 
+type RecipienteStore interface {
+	GetRecipient(context.Context, string) (Recipient, error)
+	GetRecipients(context.Context, string) ([]Recipient, error)
+	PostRecipient(context.Context, Recipient) (Recipient, error)
+	UpdateRecipient(context.Context, string, Recipient) (Recipient, error)
+	DeleteRecipient(context.Context, string) error
+	VerifyRecipient(context.Context, string, string) (Recipient, error)
+}
+
 func (s *Service) GetRecipient(ctx context.Context, ID string) (Recipient, error) {
 	rcp, err := s.Store.GetRecipient(ctx, ID)
 	if err != nil {

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"log"
 
-	"github.com/jinzhu/gorm"
+	"ivpn.net/email-service/internal/model"
 )
 
 var (
@@ -17,45 +17,36 @@ var (
 	ErrVerifyRecipient = errors.New("could not verify recipient")
 )
 
-type Recipient struct {
-	gorm.Model
-	ID           string `json:"id"`
-	UserID       string `json:"user_id"`
-	Email        string `json:"email"`
-	Verification string `json:"verification"`
-	Verified     bool   `json:"verified"`
-}
-
 type RecipienteStore interface {
-	GetRecipient(context.Context, string) (Recipient, error)
-	GetRecipients(context.Context, string) ([]Recipient, error)
-	PostRecipient(context.Context, Recipient) error
-	UpdateRecipient(context.Context, Recipient) error
+	GetRecipient(context.Context, string) (model.Recipient, error)
+	GetRecipients(context.Context, string) ([]model.Recipient, error)
+	PostRecipient(context.Context, model.Recipient) error
+	UpdateRecipient(context.Context, model.Recipient) error
 	DeleteRecipient(context.Context, string) error
-	VerifyRecipient(context.Context, string, string) (Recipient, error)
+	VerifyRecipient(context.Context, string, string) (model.Recipient, error)
 }
 
-func (s *Service) GetRecipient(ctx context.Context, ID string) (Recipient, error) {
+func (s *Service) GetRecipient(ctx context.Context, ID string) (model.Recipient, error) {
 	rcp, err := s.Store.GetRecipient(ctx, ID)
 	if err != nil {
 		log.Printf("an error occured fetching the recipient: %s", err.Error())
-		return Recipient{}, ErrGetRecipient
+		return model.Recipient{}, ErrGetRecipient
 	}
 
 	return rcp, nil
 }
 
-func (s *Service) GetRecipients(ctx context.Context, userID string) ([]Recipient, error) {
+func (s *Service) GetRecipients(ctx context.Context, userID string) ([]model.Recipient, error) {
 	rcps, err := s.Store.GetRecipients(ctx, userID)
 	if err != nil {
 		log.Printf("an error occured fetching the recipients: %s", err.Error())
-		return []Recipient{}, ErrGetRecipients
+		return []model.Recipient{}, ErrGetRecipients
 	}
 
 	return rcps, nil
 }
 
-func (s *Service) PostRecipient(ctx context.Context, recipient Recipient) error {
+func (s *Service) PostRecipient(ctx context.Context, recipient model.Recipient) error {
 	err := s.Store.PostRecipient(ctx, recipient)
 	if err != nil {
 		log.Printf("an error occurred creating the recipient: %s", err.Error())
@@ -65,7 +56,7 @@ func (s *Service) PostRecipient(ctx context.Context, recipient Recipient) error 
 	return nil
 }
 
-func (s *Service) UpdateRecipient(ctx context.Context, recipient Recipient) error {
+func (s *Service) UpdateRecipient(ctx context.Context, recipient model.Recipient) error {
 	err := s.Store.UpdateRecipient(ctx, recipient)
 	if err != nil {
 		log.Printf("an error occurred updating the recipient: %s", err.Error())
@@ -85,11 +76,11 @@ func (s *Service) DeleteRecipient(ctx context.Context, ID string) error {
 	return nil
 }
 
-func (s *Service) VerifyRecipient(ctx context.Context, ID string, verification string) (Recipient, error) {
+func (s *Service) VerifyRecipient(ctx context.Context, ID string, verification string) (model.Recipient, error) {
 	rcp, err := s.Store.VerifyRecipient(ctx, ID, verification)
 	if err != nil {
 		log.Printf("an error occurred verifying the recipient: %s", err.Error())
-		return Recipient{}, ErrVerifyRecipient
+		return model.Recipient{}, ErrVerifyRecipient
 	}
 
 	return rcp, nil

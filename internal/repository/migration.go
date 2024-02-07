@@ -4,16 +4,16 @@ import (
 	"log"
 
 	"github.com/jinzhu/gorm"
-	"ivpn.net/email-service/internal/service"
+	"ivpn.net/email-service/internal/model"
 )
 
 func Migrate(db *gorm.DB) error {
-	err := db.AutoMigrate(&service.Recipient{}).Error
+	err := db.AutoMigrate(&model.Recipient{}).Error
 	if err != nil {
 		return err
 	}
 
-	err = db.AutoMigrate(&service.Alias{}).Error
+	err = db.AutoMigrate(&model.Alias{}).Error
 	if err != nil {
 		return err
 	}

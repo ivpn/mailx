@@ -1,4 +1,4 @@
-package service
+package model
 
 import (
 	"math/rand"
@@ -10,7 +10,7 @@ func TestGenerateSlug(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 
 	const charset = "abcdefghijklmnopqrstuvwxyz0123456789"
-	result := generateSlug()
+	result := GenerateSlug()
 
 	if len(result) != 8 {
 		t.Errorf("Expected slug length of 8, but got %d", len(result))

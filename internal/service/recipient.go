@@ -29,8 +29,8 @@ type Recipient struct {
 type RecipienteStore interface {
 	GetRecipient(context.Context, string) (Recipient, error)
 	GetRecipients(context.Context, string) ([]Recipient, error)
-	PostRecipient(context.Context, Recipient) (Recipient, error)
-	UpdateRecipient(context.Context, string, Recipient) (Recipient, error)
+	PostRecipient(context.Context, Recipient) error
+	UpdateRecipient(context.Context, Recipient) error
 	DeleteRecipient(context.Context, string) error
 	VerifyRecipient(context.Context, string, string) (Recipient, error)
 }
@@ -55,24 +55,24 @@ func (s *Service) GetRecipients(ctx context.Context, userID string) ([]Recipient
 	return rcps, nil
 }
 
-func (s *Service) PostRecipient(ctx context.Context, rcp Recipient) (Recipient, error) {
-	rcp, err := s.Store.PostRecipient(ctx, rcp)
+func (s *Service) PostRecipient(ctx context.Context, recipient Recipient) error {
+	err := s.Store.PostRecipient(ctx, recipient)
 	if err != nil {
 		log.Printf("an error occurred creating the recipient: %s", err.Error())
-		return Recipient{}, ErrPostRecipient
+		return ErrPostRecipient
 	}
 
-	return rcp, nil
+	return nil
 }
 
-func (s *Service) UpdateRecipient(ctx context.Context, ID string, newRecipient Recipient) (Recipient, error) {
-	rcp, err := s.Store.UpdateRecipient(ctx, ID, newRecipient)
+func (s *Service) UpdateRecipient(ctx context.Context, recipient Recipient) error {
+	err := s.Store.UpdateRecipient(ctx, recipient)
 	if err != nil {
 		log.Printf("an error occurred updating the recipient: %s", err.Error())
-		return Recipient{}, ErrUpdateRecipient
+		return ErrUpdateRecipient
 	}
 
-	return rcp, nil
+	return nil
 }
 
 func (s *Service) DeleteRecipient(ctx context.Context, ID string) error {

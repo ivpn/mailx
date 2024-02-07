@@ -6,6 +6,8 @@ import (
 	"log"
 	"math/rand"
 	"time"
+
+	"github.com/jinzhu/gorm"
 )
 
 var (
@@ -17,6 +19,7 @@ var (
 )
 
 type Alias struct {
+	gorm.Model
 	ID          string `json:"id"`
 	RecipientID string `json:"recipient_id"`
 	Slug        string `json:"slug"`

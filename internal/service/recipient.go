@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"log"
+
+	"github.com/jinzhu/gorm"
 )
 
 var (
@@ -16,6 +18,7 @@ var (
 )
 
 type Recipient struct {
+	gorm.Model
 	ID           string `json:"id"`
 	UserID       string `json:"user_id"`
 	Email        string `json:"email"`

@@ -13,7 +13,7 @@ func Run() error {
 		return err
 	}
 
-	err = smpt.Start(cfg)
+	err = smpt.Start(cfg.SMTP)
 	return err
 }
 

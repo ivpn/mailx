@@ -6,15 +6,23 @@ import (
 	"github.com/joho/godotenv"
 )
 
+type SMTPConfig struct {
+	Host     string
+	Port     string
+	Hostname string
+}
+
+type DBConfig struct {
+	Host     string
+	Port     string
+	Name     string
+	User     string
+	Password string
+}
+
 type Config struct {
-	SMTPHost     string
-	SMTPPort     string
-	SMTPHostname string
-	DBHost       string
-	DBPort       string
-	DBName       string
-	DBUser       string
-	DBPassword   string
+	SMTP SMTPConfig
+	DB   DBConfig
 }
 
 func New() (Config, error) {
@@ -24,13 +32,17 @@ func New() (Config, error) {
 	}
 
 	return Config{
-		SMTPHost:     os.Getenv("SMTP_HOST"),
-		SMTPPort:     os.Getenv("SMTP_PORT"),
-		SMTPHostname: os.Getenv("SMTP_HOSTNAME"),
-		DBHost:       os.Getenv("DB_HOST"),
-		DBPort:       os.Getenv("DB_PORT"),
-		DBName:       os.Getenv("DB_NAME"),
-		DBUser:       os.Getenv("DB_USER"),
-		DBPassword:   os.Getenv("DB_PASSWORD"),
+		SMTP: SMTPConfig{
+			Host:     os.Getenv("SMTP_HOST"),
+			Port:     os.Getenv("SMTP_PORT"),
+			Hostname: os.Getenv("SMTP_HOSTNAME"),
+		},
+		DB: DBConfig{
+			Host:     os.Getenv("DB_HOST"),
+			Port:     os.Getenv("DB_PORT"),
+			Name:     os.Getenv("DB_NAME"),
+			User:     os.Getenv("DB_USER"),
+			Password: os.Getenv("DB_PASSWORD"),
+		},
 	}, nil
 }

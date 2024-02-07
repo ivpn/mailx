@@ -12,7 +12,7 @@ type Database struct {
 	Client *gorm.DB
 }
 
-func New(cfg config.Config) (*Database, error) {
+func New(cfg config.DBConfig) (*Database, error) {
 	db, err := connect(cfg)
 	if err != nil {
 		log.Printf("an error occured connecting DB: %s", err.Error())
@@ -30,8 +30,8 @@ func New(cfg config.Config) (*Database, error) {
 	}, nil
 }
 
-func connect(cfg config.Config) (*gorm.DB, error) {
-	dsn := cfg.DBUser + ":" + cfg.DBPassword + "@tcp(" + cfg.DBHost + ":" + cfg.DBPort + ")/" + cfg.DBName + "?charset=utf8&parseTime=True&loc=Europe%2FBerlin"
+func connect(cfg config.DBConfig) (*gorm.DB, error) {
+	dsn := cfg.User + ":" + cfg.Password + "@tcp(" + cfg.Host + ":" + cfg.Port + ")/" + cfg.Name + "?charset=utf8&parseTime=True&loc=Europe%2FBerlin"
 
 	db, err := gorm.Open("mysql", dsn)
 	if err != nil {

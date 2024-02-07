@@ -7,12 +7,12 @@ import (
 	"ivpn.net/email-service/config"
 )
 
-func Start(cfg config.Config) error {
-	log.Printf("SMTP server starting on port %s", cfg.SMTPPort)
+func Start(cfg config.SMTPConfig) error {
+	log.Printf("SMTP server starting on port %s", cfg.Port)
 	srv := &smtpd.Server{
-		Addr:         cfg.SMTPHost + ":" + cfg.SMTPPort,
+		Addr:         cfg.Host + ":" + cfg.Port,
 		Handler:      InboundHandler,
-		Hostname:     cfg.SMTPHostname,
+		Hostname:     cfg.Hostname,
 		AuthRequired: true,
 	}
 

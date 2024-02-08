@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    env_file:
+      - ./config/.env
+    ports:
+      - 8025:8025
+    depends_on:
+      - db
+    networks:
+      - net
+
+  db:
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: email
+      MYSQL_USER: email
+      MYSQL_PASSWORD: email
+    ports: 
+      - 3306:3306
+    volumes:
+      - emaildb:/var/lib/mysql
+    networks:
+      - net
+
+volumes:
+  emaildb:
+
+networks:
+  net:
+    driver: bridge

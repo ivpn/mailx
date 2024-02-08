@@ -8,7 +8,7 @@ import (
 )
 
 func Start(cfg config.SMTPConfig) error {
-	log.Printf("SMTP server starting on port %s", cfg.Port)
+	log.Printf("SMTP server starting on :%s", cfg.Port)
 	srv := &smtpd.Server{
 		Addr:         cfg.Host + ":" + cfg.Port,
 		Handler:      InboundHandler,

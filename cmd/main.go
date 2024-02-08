@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"ivpn.net/email-service/config"
+	"ivpn.net/email-service/internal/repository"
 	"ivpn.net/email-service/internal/transport/smpt"
 )
 
@@ -13,8 +14,17 @@ func Run() error {
 		return err
 	}
 
+	_, err = repository.New(cfg.DB)
+	if err != nil {
+		return err
+	}
+
 	err = smpt.Start(cfg.SMTP)
-	return err
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func main() {

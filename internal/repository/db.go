@@ -1,9 +1,11 @@
-package database
+package repository
 
 import (
 	"log"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"ivpn.net/email-service/config"
 	"ivpn.net/email-service/internal/model"
 )
@@ -31,9 +33,11 @@ func New(cfg config.DBConfig) (*Database, error) {
 }
 
 func connect(cfg config.DBConfig) (*gorm.DB, error) {
-	dsn := cfg.User + ":" + cfg.Password + "@tcp(" + cfg.Host + ":" + cfg.Port + ")/" + cfg.Name + "?charset=utf8&parseTime=True&loc=Europe%2FBerlin"
+	dsn := cfg.User + ":" + cfg.Password + "@tcp(" + cfg.Host + ":" + cfg.Port + ")/" + cfg.Name + "?charset=utf8mb4&parseTime=True&loc=Local"
 
-	db, err := gorm.Open("mysql", dsn)
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Silent),
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -44,10 +48,7 @@ func connect(cfg config.DBConfig) (*gorm.DB, error) {
 }
 
 func migrate(db *gorm.DB) error {
-	err := db.AutoMigrate(
-		&model.Recipient{},
-		&model.Alias{},
-	).Error
+	err := db.AutoMigrate(&model.Recipient{}, &model.Alias{})
 	if err != nil {
 		return err
 	}

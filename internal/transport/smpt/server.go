@@ -9,13 +9,13 @@ import (
 
 func Start(cfg config.SMTPConfig) error {
 	log.Printf("SMTP server starting on :%s", cfg.Port)
-	srv := &smtpd.Server{
+
+	server := &smtpd.Server{
 		Addr:         cfg.Host + ":" + cfg.Port,
 		Handler:      InboundHandler,
 		Hostname:     cfg.Hostname,
 		AuthRequired: true,
 	}
 
-	err := srv.ListenAndServe()
-	return err
+	return server.ListenAndServe()
 }

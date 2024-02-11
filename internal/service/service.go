@@ -1,15 +1,15 @@
 package service
 
-type Service struct {
-	Store ServiceStore
-}
-
-type ServiceStore interface {
+type Store interface {
 	RecipienteStore
 	AliasStore
 }
 
-func New(store ServiceStore) *Service {
+type Service struct {
+	Store Store
+}
+
+func New(store Store) *Service {
 	return &Service{
 		Store: store,
 	}

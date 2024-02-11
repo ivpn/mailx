@@ -14,7 +14,7 @@ var (
 )
 
 type RecipientService interface {
-	GetRecipient(context.Context, string) (error, model.Recipient)
+	GetRecipient(context.Context, string) (model.Recipient, error)
 	GetRecipients(context.Context, string) ([]model.Recipient, error)
 	PostRecipient(context.Context, model.Recipient) error
 	UpdateRecipient(context.Context, model.Recipient) error
@@ -24,7 +24,7 @@ type RecipientService interface {
 
 func (h *Handler) GetRecipient(c *fiber.Ctx) {
 	id := c.Params("id")
-	err, model := h.Service.GetRecipient(c.Context(), id)
+	recipient, err := h.Service.GetRecipient(c.Context(), id)
 	if err != nil {
 		c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
@@ -32,7 +32,7 @@ func (h *Handler) GetRecipient(c *fiber.Ctx) {
 		return
 	}
 
-	c.JSON(model)
+	c.JSON(recipient)
 }
 
 func (h *Handler) GetRecipients(c *fiber.Ctx) {
@@ -112,7 +112,7 @@ func (h *Handler) DeleteRecipient(c *fiber.Ctx) {
 func (h *Handler) VerifyRecipient(c *fiber.Ctx) {
 	id := c.Params("id")
 	verification := c.Params("verification")
-	model, err := h.Service.VerifyRecipient(c.Context(), id, verification)
+	recipient, err := h.Service.VerifyRecipient(c.Context(), id, verification)
 	if err != nil {
 		c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
@@ -120,5 +120,5 @@ func (h *Handler) VerifyRecipient(c *fiber.Ctx) {
 		return
 	}
 
-	c.JSON(model)
+	c.JSON(recipient)
 }

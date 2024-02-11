@@ -1,7 +1,11 @@
 package api
 
+import "github.com/gofiber/fiber"
+
 func (h *Handler) SetupRoutes() {
 	v1 := h.Server.Group("/v1")
+
+	v1.Get("/health", HealthCheck)
 
 	v1.Get("/recipient/:id", h.GetRecipient)
 	v1.Get("/recipients/:user_id", h.GetRecipients)
@@ -15,4 +19,8 @@ func (h *Handler) SetupRoutes() {
 	v1.Post("/alias", h.PostAlias)
 	v1.Put("/alias", h.UpdateAlias)
 	v1.Delete("/alias/:id", h.DeleteAlias)
+}
+
+func HealthCheck(c *fiber.Ctx) {
+	c.Send("OK")
 }

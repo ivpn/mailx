@@ -7,6 +7,7 @@ require github.com/mhale/smtpd v0.8.2
 require github.com/joho/godotenv v1.5.1
 
 require (
+	github.com/gofiber/fiber v1.14.6
 	github.com/satori/go.uuid v1.2.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gorm.io/driver/mysql v1.5.4
@@ -16,7 +17,6 @@ require (
 require (
 	github.com/andybalholm/brotli v1.0.0 // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
-	github.com/gofiber/fiber v1.14.6 // indirect
 	github.com/gofiber/utils v0.0.10 // indirect
 	github.com/gorilla/schema v1.1.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect

@@ -3,33 +3,33 @@ version: '3.8'
 services:
   app:
     build: .
+    container_name: email-app
     env_file:
       - ./config/.env
     ports:
       - 8025:8025
     depends_on:
-      - db
-    networks:
-      - net
+      db:
+        condition: service_healthy
 
   db:
     image: mariadb
+    container_name: email-db
     restart: always
+    healthcheck:
+      test: "/usr/bin/mariadb --user=email --password=email --execute \"SHOW DATABASES;\""
+      interval: 2s
+      timeout: 10s
+      retries: 5
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: email
       MYSQL_USER: email
       MYSQL_PASSWORD: email
-    ports: 
+    ports:
       - 3306:3306
     volumes:
       - emaildb:/var/lib/mysql
-    networks:
-      - net
 
 volumes:
   emaildb:
-
-networks:
-  net:
-    driver: bridge

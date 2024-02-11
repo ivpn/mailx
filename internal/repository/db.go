@@ -42,7 +42,7 @@ func connect(cfg config.DBConfig) (*gorm.DB, error) {
 		return nil, err
 	}
 
-	log.Println("DB connection successful")
+	log.Println("DB connection OK")
 
 	return db, nil
 }
@@ -53,7 +53,7 @@ func migrate(db *gorm.DB) error {
 		return err
 	}
 
-	log.Println("DB migration successful")
+	log.Println("DB migration OK")
 
 	return nil
 }

@@ -1,6 +1,8 @@
 package api
 
 import (
+	"log"
+
 	"github.com/gofiber/fiber"
 	"ivpn.net/email-service/config"
 )
@@ -16,6 +18,8 @@ type Handler struct {
 }
 
 func Start(cfg config.APIConfig, service Service) error {
+	log.Printf("API server starting on :%s", cfg.Port)
+
 	app := fiber.New()
 
 	h := &Handler{

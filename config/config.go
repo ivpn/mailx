@@ -6,6 +6,10 @@ import (
 	"github.com/joho/godotenv"
 )
 
+type APIConfig struct {
+	Port string
+}
+
 type SMTPConfig struct {
 	Host     string
 	Port     string
@@ -21,6 +25,7 @@ type DBConfig struct {
 }
 
 type Config struct {
+	API  APIConfig
 	SMTP SMTPConfig
 	DB   DBConfig
 }
@@ -32,6 +37,9 @@ func New() (Config, error) {
 	}
 
 	return Config{
+		API: APIConfig{
+			Port: os.Getenv("API_PORT"),
+		},
 		SMTP: SMTPConfig{
 			Host:     os.Getenv("SMTP_HOST"),
 			Port:     os.Getenv("SMTP_PORT"),

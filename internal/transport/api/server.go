@@ -7,6 +7,7 @@ import (
 
 type Service interface {
 	RecipientService
+	AliasService
 }
 
 type Handler struct {

@@ -7,6 +7,12 @@ import (
 	"ivpn.net/email-service/internal/model"
 )
 
+var (
+	PostRecipientSuccess   = "Recipient created"
+	UpdateRecipientSuccess = "Recipient updated"
+	DeleteRecipientSuccess = "Recipient deleted"
+)
+
 type RecipientService interface {
 	GetRecipient(context.Context, string) (error, model.Recipient)
 	GetRecipients(context.Context, string) ([]model.Recipient, error)
@@ -30,7 +36,7 @@ func (h *Handler) GetRecipient(c *fiber.Ctx) {
 }
 
 func (h *Handler) GetRecipients(c *fiber.Ctx) {
-	userID := c.Params("userID")
+	userID := c.Params("user_id")
 	recipients, err := h.Service.GetRecipients(c.Context(), userID)
 	if err != nil {
 		c.Status(500).JSON(fiber.Map{
@@ -61,7 +67,7 @@ func (h *Handler) PostRecipient(c *fiber.Ctx) {
 	}
 
 	c.Status(201).JSON(fiber.Map{
-		"message": "Recipient created",
+		"message": PostRecipientSuccess,
 	})
 }
 
@@ -84,7 +90,7 @@ func (h *Handler) UpdateRecipient(c *fiber.Ctx) {
 	}
 
 	c.Status(200).JSON(fiber.Map{
-		"message": "Recipient updated",
+		"message": UpdateRecipientSuccess,
 	})
 }
 
@@ -99,7 +105,7 @@ func (h *Handler) DeleteRecipient(c *fiber.Ctx) {
 	}
 
 	c.Status(200).JSON(fiber.Map{
-		"message": "Recipient deleted",
+		"message": DeleteRecipientSuccess,
 	})
 }
 

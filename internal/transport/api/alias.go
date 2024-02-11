@@ -8,14 +8,16 @@ import (
 )
 
 var (
+	PostAliasSuccess   = "Alias created"
+	UpdateAliasSuccess = "Alias updated"
 	DeleteAliasSuccess = "Alias deleted"
 )
 
 type AliasService interface {
 	GetAlias(context.Context, string) (model.Alias, error)
 	GetAliases(context.Context, string) ([]model.Alias, error)
-	PostAlias(context.Context, model.Alias) (model.Alias, error)
-	UpdateAlias(context.Context, string, model.Alias) (model.Alias, error)
+	PostAlias(context.Context, model.Alias) error
+	UpdateAlias(context.Context, string, model.Alias) error
 	DeleteAlias(context.Context, string) error
 }
 
@@ -55,7 +57,7 @@ func (h *Handler) PostAlias(c *fiber.Ctx) {
 		return
 	}
 
-	alias, err = h.Service.PostAlias(c.Context(), alias)
+	err = h.Service.PostAlias(c.Context(), alias)
 	if err != nil {
 		c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
@@ -63,7 +65,9 @@ func (h *Handler) PostAlias(c *fiber.Ctx) {
 		return
 	}
 
-	c.JSON(alias)
+	c.Status(201).JSON(fiber.Map{
+		"message": PostAliasSuccess,
+	})
 }
 
 func (h *Handler) UpdateAlias(c *fiber.Ctx) {
@@ -77,7 +81,7 @@ func (h *Handler) UpdateAlias(c *fiber.Ctx) {
 		return
 	}
 
-	alias, err = h.Service.UpdateAlias(c.Context(), id, alias)
+	err = h.Service.UpdateAlias(c.Context(), id, alias)
 	if err != nil {
 		c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
@@ -85,7 +89,9 @@ func (h *Handler) UpdateAlias(c *fiber.Ctx) {
 		return
 	}
 
-	c.JSON(alias)
+	c.Status(200).JSON(fiber.Map{
+		"message": UpdateAliasSuccess,
+	})
 }
 
 func (h *Handler) DeleteAlias(c *fiber.Ctx) {

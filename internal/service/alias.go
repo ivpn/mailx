@@ -19,8 +19,8 @@ var (
 type AliasStore interface {
 	GetAlias(context.Context, string) (model.Alias, error)
 	GetAliases(context.Context, string) ([]model.Alias, error)
-	PostAlias(context.Context, model.Alias) (model.Alias, error)
-	UpdateAlias(context.Context, string, model.Alias) (model.Alias, error)
+	PostAlias(context.Context, model.Alias) error
+	UpdateAlias(context.Context, string, model.Alias) error
 	DeleteAlias(context.Context, string) error
 }
 
@@ -44,24 +44,24 @@ func (s *Service) GetAliases(ctx context.Context, recipientID string) ([]model.A
 	return aliases, nil
 }
 
-func (s *Service) PostAlias(ctx context.Context, alias model.Alias) (model.Alias, error) {
-	alias, err := s.Store.PostAlias(ctx, alias)
+func (s *Service) PostAlias(ctx context.Context, alias model.Alias) error {
+	err := s.Store.PostAlias(ctx, alias)
 	if err != nil {
 		log.Printf("an error occurred creating the alias: %s", err.Error())
-		return model.Alias{}, ErrPostAlias
+		return ErrPostAlias
 	}
 
-	return alias, nil
+	return nil
 }
 
-func (s *Service) UpdateAlias(ctx context.Context, ID string, newAlias model.Alias) (model.Alias, error) {
-	alias, err := s.Store.UpdateAlias(ctx, ID, newAlias)
+func (s *Service) UpdateAlias(ctx context.Context, ID string, newAlias model.Alias) error {
+	err := s.Store.UpdateAlias(ctx, ID, newAlias)
 	if err != nil {
 		log.Printf("an error occurred updating the alias: %s", err.Error())
-		return model.Alias{}, ErrUpdateAlias
+		return ErrUpdateAlias
 	}
 
-	return alias, nil
+	return nil
 }
 
 func (s *Service) DeleteAlias(ctx context.Context, ID string) error {

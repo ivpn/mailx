@@ -3,7 +3,7 @@ package api
 import (
 	"context"
 
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"ivpn.net/email-service/internal/model"
 )
 
@@ -21,90 +21,85 @@ type AliasService interface {
 	DeleteAlias(context.Context, string) error
 }
 
-func (h *Handler) GetAlias(c *fiber.Ctx) {
+func (h *Handler) GetAlias(c *fiber.Ctx) error {
 	id := c.Params("id")
 	alias, err := h.Service.GetAlias(c.Context(), id)
 	if err != nil {
 		c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
 		})
-		return
+		return err
 	}
 
-	c.JSON(alias)
+	return c.JSON(alias)
 }
 
-func (h *Handler) GetAliases(c *fiber.Ctx) {
+func (h *Handler) GetAliases(c *fiber.Ctx) error {
 	recipientID := c.Params("recipient_id")
 	aliases, err := h.Service.GetAliases(c.Context(), recipientID)
 	if err != nil {
 		c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
 		})
-		return
+		return err
 	}
 
-	c.JSON(aliases)
+	return c.JSON(aliases)
 }
 
-func (h *Handler) PostAlias(c *fiber.Ctx) {
+func (h *Handler) PostAlias(c *fiber.Ctx) error {
 	var alias model.Alias
 	err := c.BodyParser(&alias)
 	if err != nil {
-		c.Status(400).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
 		})
-		return
 	}
 
 	err = h.Service.PostAlias(c.Context(), alias)
 	if err != nil {
-		c.Status(500).JSON(fiber.Map{
+		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
 		})
-		return
 	}
 
-	c.Status(201).JSON(fiber.Map{
+	return c.Status(201).JSON(fiber.Map{
 		"message": PostAliasSuccess,
 	})
 }
 
-func (h *Handler) UpdateAlias(c *fiber.Ctx) {
+func (h *Handler) UpdateAlias(c *fiber.Ctx) error {
 	id := c.Params("id")
 	var alias model.Alias
 	err := c.BodyParser(&alias)
 	if err != nil {
-		c.Status(400).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
 		})
-		return
 	}
 
 	err = h.Service.UpdateAlias(c.Context(), id, alias)
 	if err != nil {
-		c.Status(500).JSON(fiber.Map{
+		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
 		})
-		return
 	}
 
-	c.Status(200).JSON(fiber.Map{
+	return c.Status(200).JSON(fiber.Map{
 		"message": UpdateAliasSuccess,
 	})
 }
 
-func (h *Handler) DeleteAlias(c *fiber.Ctx) {
+func (h *Handler) DeleteAlias(c *fiber.Ctx) error {
 	id := c.Params("id")
 	err := h.Service.DeleteAlias(c.Context(), id)
 	if err != nil {
-		c.Status(500).JSON(fiber.Map{
+		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
 		})
-		return
 	}
 
-	c.Status(200).JSON(fiber.Map{
+	return c.Status(200).JSON(fiber.Map{
 		"message": DeleteAliasSuccess,
 	})
 }

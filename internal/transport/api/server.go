@@ -3,7 +3,7 @@ package api
 import (
 	"log"
 
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"ivpn.net/email-service/config"
 )
 
@@ -29,5 +29,5 @@ func Start(cfg config.APIConfig, service Service) error {
 
 	h.SetupRoutes()
 
-	return h.Server.Listen(cfg.Port)
+	return h.Server.Listen(":" + cfg.Port)
 }

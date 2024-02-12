@@ -3,7 +3,7 @@ package api
 import (
 	"context"
 
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"ivpn.net/email-service/internal/model"
 )
 
@@ -22,103 +22,95 @@ type RecipientService interface {
 	VerifyRecipient(context.Context, string, string) (model.Recipient, error)
 }
 
-func (h *Handler) GetRecipient(c *fiber.Ctx) {
+func (h *Handler) GetRecipient(c *fiber.Ctx) error {
 	id := c.Params("id")
 	recipient, err := h.Service.GetRecipient(c.Context(), id)
 	if err != nil {
-		c.Status(500).JSON(fiber.Map{
+		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
 		})
-		return
 	}
 
-	c.JSON(recipient)
+	return c.JSON(recipient)
 }
 
-func (h *Handler) GetRecipients(c *fiber.Ctx) {
+func (h *Handler) GetRecipients(c *fiber.Ctx) error {
 	userID := c.Params("user_id")
 	recipients, err := h.Service.GetRecipients(c.Context(), userID)
 	if err != nil {
-		c.Status(500).JSON(fiber.Map{
+		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
 		})
-		return
 	}
 
-	c.JSON(recipients)
+	return c.JSON(recipients)
 }
 
-func (h *Handler) PostRecipient(c *fiber.Ctx) {
+func (h *Handler) PostRecipient(c *fiber.Ctx) error {
 	var recipient model.Recipient
 	err := c.BodyParser(&recipient)
 	if err != nil {
-		c.Status(400).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
 		})
-		return
 	}
 
 	err = h.Service.PostRecipient(c.Context(), recipient)
 	if err != nil {
-		c.Status(500).JSON(fiber.Map{
+		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
 		})
-		return
 	}
 
-	c.Status(201).JSON(fiber.Map{
+	return c.Status(201).JSON(fiber.Map{
 		"message": PostRecipientSuccess,
 	})
 }
 
-func (h *Handler) UpdateRecipient(c *fiber.Ctx) {
+func (h *Handler) UpdateRecipient(c *fiber.Ctx) error {
 	var recipient model.Recipient
 	err := c.BodyParser(&recipient)
 	if err != nil {
-		c.Status(400).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
 		})
-		return
 	}
 
 	err = h.Service.UpdateRecipient(c.Context(), recipient)
 	if err != nil {
-		c.Status(500).JSON(fiber.Map{
+		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
 		})
-		return
 	}
 
-	c.Status(200).JSON(fiber.Map{
+	return c.Status(200).JSON(fiber.Map{
 		"message": UpdateRecipientSuccess,
 	})
 }
 
-func (h *Handler) DeleteRecipient(c *fiber.Ctx) {
+func (h *Handler) DeleteRecipient(c *fiber.Ctx) error {
 	id := c.Params("id")
 	err := h.Service.DeleteRecipient(c.Context(), id)
 	if err != nil {
-		c.Status(500).JSON(fiber.Map{
+		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
 		})
-		return
 	}
 
-	c.Status(200).JSON(fiber.Map{
+	return c.Status(200).JSON(fiber.Map{
 		"message": DeleteRecipientSuccess,
 	})
 }
 
-func (h *Handler) VerifyRecipient(c *fiber.Ctx) {
+func (h *Handler) VerifyRecipient(c *fiber.Ctx) error {
 	id := c.Params("id")
 	verification := c.Params("verification")
 	recipient, err := h.Service.VerifyRecipient(c.Context(), id, verification)
 	if err != nil {
-		c.Status(500).JSON(fiber.Map{
+		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
 		})
-		return
 	}
 
-	c.JSON(recipient)
+	return c.JSON(recipient)
 }

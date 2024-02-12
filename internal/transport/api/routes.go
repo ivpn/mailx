@@ -1,6 +1,6 @@
 package api
 
-import "github.com/gofiber/fiber"
+import "github.com/gofiber/fiber/v2"
 
 func (h *Handler) SetupRoutes() {
 	v1 := h.Server.Group("/v1")
@@ -21,6 +21,6 @@ func (h *Handler) SetupRoutes() {
 	v1.Delete("/alias/:id", h.DeleteAlias)
 }
 
-func HealthCheck(c *fiber.Ctx) {
-	c.Send("OK")
+func HealthCheck(c *fiber.Ctx) error {
+	return c.SendString("OK")
 }

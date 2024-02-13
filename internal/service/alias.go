@@ -9,16 +9,18 @@ import (
 )
 
 var (
-	ErrGetAlias    = errors.New("could not get alias by ID")
-	ErrGetAliases  = errors.New("could not get aliass by recipient ID")
-	ErrPostAlias   = errors.New("could not post alias")
-	ErrUpdateAlias = errors.New("could not update alias")
-	ErrDeleteAlias = errors.New("could not delete alias")
+	ErrGetAlias       = errors.New("could not get alias by ID")
+	ErrGetAliases     = errors.New("could not get aliass by recipient ID")
+	ErrGetAliasByName = errors.New("could not get alias by name")
+	ErrPostAlias      = errors.New("could not post alias")
+	ErrUpdateAlias    = errors.New("could not update alias")
+	ErrDeleteAlias    = errors.New("could not delete alias")
 )
 
 type AliasStore interface {
 	GetAlias(context.Context, string) (model.Alias, error)
 	GetAliases(context.Context, string) ([]model.Alias, error)
+	GetAliasByName(string) (model.Alias, error)
 	PostAlias(context.Context, model.Alias) error
 	UpdateAlias(context.Context, string, model.Alias) error
 	DeleteAlias(context.Context, string) error
@@ -42,6 +44,16 @@ func (s *Service) GetAliases(ctx context.Context, recipientID string) ([]model.A
 	}
 
 	return aliases, nil
+}
+
+func (s *Service) GetAliasByName(name string) (model.Alias, error) {
+	alias, err := s.Store.GetAliasByName(name)
+	if err != nil {
+		log.Printf("an error occured fetching the alias: %s", err.Error())
+		return model.Alias{}, ErrGetAliasByName
+	}
+
+	return alias, nil
 }
 
 func (s *Service) PostAlias(ctx context.Context, alias model.Alias) error {

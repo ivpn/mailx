@@ -19,6 +19,12 @@ func (d *Database) GetAliases(ctx context.Context, recipientID string) ([]model.
 	return aliases, err
 }
 
+func (d *Database) GetAliasByName(name string) (model.Alias, error) {
+	var alias model.Alias
+	err := d.Client.Where("name = ?", name).First(&alias).Error
+	return alias, err
+}
+
 func (d *Database) PostAlias(ctx context.Context, alias model.Alias) error {
 	alias.ID = uuid.NewV4().String()
 	return d.Client.Create(&alias).Error

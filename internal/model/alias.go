@@ -11,10 +11,10 @@ type Alias struct {
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	RecipientID string `json:"recipient_id"`
-	Slug        string `json:"slug"`
+	Name        string `json:"name"`
 }
 
-func GenerateSlug() string {
+func GenerateName() string {
 	rand.Seed(time.Now().UnixNano())
 
 	const charset = "abcdefghijklmnopqrstuvwxyz0123456789"

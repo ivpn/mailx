@@ -9,12 +9,12 @@ cp ./config/.env.sample ./config/.env
 
 ### Build
 ```bash
-docker build -t email-service .
+docker build -t email-app .
 ```
 
 ### Run
 ```bash
-docker run -it --publish 8025:8025 email-service
+docker compose up
 ```
 
 ### Test

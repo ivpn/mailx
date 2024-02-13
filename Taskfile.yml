@@ -6,10 +6,10 @@ tasks:
       - cp ./config/.env.sample ./config/.env
   build:
     cmds:
-      - docker build -t email-service .
+      - docker build -t email-app .
   run:
     cmds:
-      - docker run -it --publish 8025:8025 email-service
+      - docker compose up
   test:
     cmds:
       - go test ./... --timeout 5s

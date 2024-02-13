@@ -16,16 +16,16 @@ func Run() error {
 		return err
 	}
 
-	go func() {
-		smpt.Start(cfg.SMTP)
-	}()
-
 	db, err := repository.New(cfg.DB)
 	if err != nil {
 		return err
 	}
 
 	service := service.New(db)
+
+	go func() {
+		smpt.Start(cfg.SMTP, service)
+	}()
 
 	err = api.Start(cfg.API, service)
 	if err != nil {

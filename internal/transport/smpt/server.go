@@ -2,17 +2,22 @@ package smpt
 
 import (
 	"log"
+	"net"
 
 	"github.com/mhale/smtpd"
 	"ivpn.net/email-service/config"
 )
 
-func Start(cfg config.SMTPConfig) error {
+type Service interface {
+	ProcessMessage(net.Addr, string, []string, []byte) error
+}
+
+func Start(cfg config.SMTPConfig, service Service) error {
 	log.Printf("SMTP server starting on :%s", cfg.Port)
 
 	server := &smtpd.Server{
 		Addr:         cfg.Host + ":" + cfg.Port,
-		Handler:      InboundHandler,
+		Handler:      service.ProcessMessage,
 		Hostname:     cfg.Hostname,
 		AuthRequired: true,
 	}

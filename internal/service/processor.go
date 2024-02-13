@@ -30,7 +30,7 @@ func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data
 		log.Println("[Service] Drop message: " + err.Error())
 	}
 
-	log.Println("[Service] Recipient:" + recipient.Email)
+	log.Println("[Service] Recipient: " + recipient.Email)
 
 	return err
 }

@@ -6,6 +6,7 @@ import (
 )
 
 type Recipient struct {
+	PK           uint   `gorm:"primaryKey"`
 	ID           string `json:"id"`
 	CreatedAt    time.Time
 	UpdatedAt    time.Time

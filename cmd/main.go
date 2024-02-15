@@ -16,7 +16,7 @@ func Run() error {
 		return err
 	}
 
-	db, err := repository.New(cfg.DB)
+	db, err := repository.New()
 	if err != nil {
 		return err
 	}

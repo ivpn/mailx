@@ -14,16 +14,19 @@ type Database struct {
 	Client *gorm.DB
 }
 
-func New(cfg config.DBConfig) (*Database, error) {
-	db, err := connect(cfg)
+func New() (*Database, error) {
+	cfg, err := config.New()
 	if err != nil {
-		log.Printf("an error occured connecting DB: %s", err.Error())
+		return nil, err
+	}
+
+	db, err := connect(cfg.DB)
+	if err != nil {
 		return nil, err
 	}
 
 	err = migrate(db)
 	if err != nil {
-		log.Printf("an error occured migrating DB: %s", err.Error())
 		return nil, err
 	}
 

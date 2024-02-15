@@ -12,13 +12,18 @@ type Service interface {
 	ProcessMessage(net.Addr, string, []string, []byte) error
 }
 
-func Start(cfg config.SMTPConfig, service Service) error {
-	log.Printf("SMTP server starting on :%s", cfg.Port)
+func Start(service Service) error {
+	cfg, err := config.New()
+	if err != nil {
+		return err
+	}
+
+	log.Printf("SMTP server starting on :%s", cfg.SMTP.Port)
 
 	server := &smtpd.Server{
-		Addr:         cfg.Host + ":" + cfg.Port,
+		Addr:         cfg.SMTP.Host + ":" + cfg.SMTP.Port,
 		Handler:      service.ProcessMessage,
-		Hostname:     cfg.Hostname,
+		Hostname:     cfg.SMTP.Hostname,
 		AuthRequired: true,
 	}
 

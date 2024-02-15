@@ -24,7 +24,7 @@ func Run() error {
 	service := service.New(db)
 
 	go func() {
-		smpt.Start(cfg.SMTP, service)
+		smpt.Start(service)
 	}()
 
 	err = api.Start(cfg.API, service)

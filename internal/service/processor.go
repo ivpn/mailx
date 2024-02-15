@@ -3,7 +3,6 @@ package service
 import (
 	"bytes"
 	"context"
-	"log"
 	"net"
 	"net/mail"
 	"strings"
@@ -21,20 +20,18 @@ type Message struct {
 func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data []byte) error {
 	msg, err := parse(origin, from, to, data)
 	if err != nil {
-		log.Println("[Service] Drop message: " + err.Error())
 		return err
 	}
 
 	for _, to := range msg.To {
 		recipient, err := s.findRecipient(to)
 		if err != nil {
-			log.Println("[Service] Drop message: " + err.Error())
 			continue
 		}
 
 		err = email.Send(msg.From, recipient, msg.Subject, msg.Body)
 		if err != nil {
-			log.Println("[Service] Error sending message: " + err.Error())
+			continue
 		}
 	}
 

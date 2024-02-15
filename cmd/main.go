@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 
-	"ivpn.net/email-service/config"
 	"ivpn.net/email-service/internal/repository"
 	"ivpn.net/email-service/internal/service"
 	"ivpn.net/email-service/internal/transport/api"
@@ -11,11 +10,6 @@ import (
 )
 
 func Run() error {
-	cfg, err := config.New()
-	if err != nil {
-		return err
-	}
-
 	db, err := repository.New()
 	if err != nil {
 		return err
@@ -27,7 +21,7 @@ func Run() error {
 		smpt.Start(service)
 	}()
 
-	err = api.Start(cfg.API, service)
+	err = api.Start(service)
 	if err != nil {
 		return err
 	}

@@ -17,8 +17,13 @@ type Handler struct {
 	Server  *fiber.App
 }
 
-func Start(cfg config.APIConfig, service Service) error {
-	log.Printf("API server starting on :%s", cfg.Port)
+func Start(service Service) error {
+	cfg, err := config.New()
+	if err != nil {
+		return err
+	}
+
+	log.Printf("API server starting on :%s", cfg.API.Port)
 
 	app := fiber.New()
 
@@ -29,5 +34,5 @@ func Start(cfg config.APIConfig, service Service) error {
 
 	h.SetupRoutes()
 
-	return h.Server.Listen(":" + cfg.Port)
+	return h.Server.Listen(":" + cfg.API.Port)
 }

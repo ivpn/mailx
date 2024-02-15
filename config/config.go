@@ -24,10 +24,18 @@ type DBConfig struct {
 	Password string
 }
 
+type SMTPClientConfig struct {
+	Host     string
+	Port     string
+	User     string
+	Password string
+}
+
 type Config struct {
-	API  APIConfig
-	SMTP SMTPConfig
-	DB   DBConfig
+	API        APIConfig
+	SMTP       SMTPConfig
+	DB         DBConfig
+	SMTPClient SMTPClientConfig
 }
 
 func New() (Config, error) {
@@ -51,6 +59,12 @@ func New() (Config, error) {
 			Name:     os.Getenv("DB_NAME"),
 			User:     os.Getenv("DB_USER"),
 			Password: os.Getenv("DB_PASSWORD"),
+		},
+		SMTPClient: SMTPClientConfig{
+			Host:     os.Getenv("SMTP_CLIENT_HOST"),
+			Port:     os.Getenv("SMTP_CLIENT_PORT"),
+			User:     os.Getenv("SMTP_CLIENT_USER"),
+			Password: os.Getenv("SMTP_CLIENT_PASSWORD"),
 		},
 	}, nil
 }

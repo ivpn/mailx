@@ -9,28 +9,22 @@ import (
 	"ivpn.net/email-service/internal/transport/smpt"
 )
 
-func Run() error {
+func main() {
 	db, err := repository.New()
 	if err != nil {
-		return err
+		log.Println(err)
 	}
 
-	service := service.New(db)
+	svc := service.New(db)
 
 	go func() {
-		smpt.Start(service)
+		err := smpt.Start(svc)
+		if err != nil {
+			log.Println(err)
+		}
 	}()
 
-	err = api.Start(service)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func main() {
-	err := Run()
+	err = api.Start(svc)
 	if err != nil {
 		log.Println(err)
 	}

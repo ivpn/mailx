@@ -6,10 +6,7 @@ import (
 )
 
 type Recipient struct {
-	PK           uint   `gorm:"primaryKey"`
-	ID           string `json:"id"`
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
+	UUIDBaseModel
 	UserID       string `json:"user_id"`
 	Email        string `json:"email"`
 	Verification string `json:"verification"`

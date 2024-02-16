@@ -2,9 +2,6 @@ package model
 
 import (
 	"errors"
-	"time"
-
-	"github.com/google/uuid"
 )
 
 var (
@@ -12,12 +9,9 @@ var (
 )
 
 type User struct {
-	PK        uint      `gorm:"primaryKey"`
-	ID        uuid.UUID `json:"id"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	Email     string   `json:"email"`
-	Password  password `json:"-"`
+	UUIDBaseModel
+	Email    string   `json:"email"`
+	Password password `json:"-"`
 }
 
 type password struct {

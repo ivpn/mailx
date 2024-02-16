@@ -6,10 +6,7 @@ import (
 )
 
 type Alias struct {
-	PK          uint   `gorm:"primaryKey"`
-	ID          string `json:"id"`
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	UUIDBaseModel
 	RecipientID string `json:"recipient_id"`
 	Name        string `json:"name"`
 }

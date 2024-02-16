@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 
-	"github.com/google/uuid"
 	"ivpn.net/email-service/internal/model"
 )
 
@@ -20,7 +19,6 @@ func (d *Database) GetRecipients(ctx context.Context, userID string) ([]model.Re
 }
 
 func (d *Database) PostRecipient(ctx context.Context, recipient model.Recipient) error {
-	recipient.ID = uuid.New().String()
 	return d.Client.Create(&recipient).Error
 }
 

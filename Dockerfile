@@ -1,5 +1,5 @@
 # stage 1: building application binary file
-FROM golang:1.19 AS builder
+FROM golang:1.22 AS builder
 
 RUN mkdir /app
 ADD . /app

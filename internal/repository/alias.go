@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	uuid "github.com/satori/go.uuid"
+	"github.com/google/uuid"
 	"ivpn.net/email-service/internal/model"
 )
 
@@ -26,7 +26,7 @@ func (d *Database) GetAliasByName(name string) (model.Alias, error) {
 }
 
 func (d *Database) PostAlias(ctx context.Context, alias model.Alias) error {
-	alias.ID = uuid.NewV4().String()
+	alias.ID = uuid.New().String()
 	return d.Client.Create(&alias).Error
 }
 

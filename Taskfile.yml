@@ -12,4 +12,4 @@ tasks:
       - docker compose up
   test:
     cmds:
-      - go test ./...
+      - go test ./... -v

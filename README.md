@@ -20,7 +20,7 @@ docker compose up
 ### Test
 Run unit tests:  
 ```bash
-go test ./... --timeout 5s
+go test ./... -v
 ```
 
 Send test email:  

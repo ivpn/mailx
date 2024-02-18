@@ -6,7 +6,7 @@ import (
 )
 
 type Alias struct {
-	UUIDBaseModel
+	BaseModel
 	RecipientID string `json:"recipient_id"`
 	Name        string `json:"name"`
 }

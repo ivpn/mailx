@@ -12,7 +12,7 @@ var (
 )
 
 type User struct {
-	UUIDBaseModel
+	BaseModel
 	Email    string   `json:"email"`
 	Password password `json:"-"`
 }

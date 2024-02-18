@@ -7,13 +7,13 @@ import (
 	"gorm.io/gorm"
 )
 
-type UUIDBaseModel struct {
+type BaseModel struct {
 	ID        string    `json:"id"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-func (base *UUIDBaseModel) BeforeCreate(tx *gorm.DB) error {
+func (base *BaseModel) BeforeCreate(tx *gorm.DB) error {
 	uuid := uuid.New().String()
 	tx.Statement.SetColumn("ID", uuid)
 	return nil

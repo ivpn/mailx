@@ -18,9 +18,11 @@ docker compose up
 ```
 
 ### Test
-Run unit tests:  
+Run tests:  
 ```bash
 go test ./... -v
+go vet ./...
+gosec ./...
 ```
 
 Send test email:  

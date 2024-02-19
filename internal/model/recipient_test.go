@@ -22,3 +22,13 @@ func TestGenerateVerification(t *testing.T) {
 		}
 	}
 }
+
+func contains(s string, char byte) bool {
+	for i := 0; i < len(s); i++ {
+		if s[i] == char {
+			return true
+		}
+	}
+
+	return false
+}

@@ -51,7 +51,7 @@ func connect(cfg config.DBConfig) (*gorm.DB, error) {
 }
 
 func migrate(db *gorm.DB) error {
-	err := db.AutoMigrate(&model.Recipient{}, &model.Alias{})
+	err := db.AutoMigrate(&model.Recipient{}, &model.Alias{}, &model.User{})
 	if err != nil {
 		return err
 	}

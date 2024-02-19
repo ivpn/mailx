@@ -15,16 +15,16 @@ func main() {
 		log.Println(err)
 	}
 
-	svc := service.New(db)
+	service := service.New(db)
 
 	go func() {
-		err := smpt.Start(svc)
+		err := smpt.Start(service)
 		if err != nil {
 			log.Println(err)
 		}
 	}()
 
-	err = api.Start(svc)
+	err = api.Start(service)
 	if err != nil {
 		log.Println(err)
 	}

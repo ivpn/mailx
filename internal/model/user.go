@@ -13,13 +13,9 @@ var (
 
 type User struct {
 	BaseModel
-	Email    string   `json:"email"`
-	Password password `json:"-"`
-}
-
-type password struct {
-	plaintext *string
-	hash      string
+	Email         string  `json:"email"`
+	PasswordHash  string  `json:"-"`
+	PasswordPlain *string `gorm:"-"`
 }
 
 func (u *User) IsValid() error {
@@ -27,7 +23,7 @@ func (u *User) IsValid() error {
 		return ErrEmailInvalid
 	}
 
-	if u.Password.plaintext == nil || len(*u.Password.plaintext) < 8 || len(*u.Password.plaintext) > 64 {
+	if u.PasswordPlain == nil || len(*u.PasswordPlain) < 8 || len(*u.PasswordPlain) > 64 {
 		return ErrPasswordInvalid
 	}
 

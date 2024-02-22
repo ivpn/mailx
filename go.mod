@@ -8,7 +8,7 @@ require github.com/joho/godotenv v1.5.1
 
 require (
 	github.com/alexedwards/argon2id v1.0.0
-	github.com/gofiber/fiber/v2 v2.52.0
+	github.com/gofiber/fiber/v2 v2.52.1
 	github.com/google/uuid v1.6.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gorm.io/driver/mysql v1.5.4

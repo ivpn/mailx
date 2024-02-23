@@ -7,7 +7,7 @@ import (
 	"net/mail"
 	"strings"
 
-	"ivpn.net/email-service/internal/client/email"
+	"ivpn.net/email-service/internal/client/mailer"
 )
 
 type Message struct {
@@ -29,7 +29,7 @@ func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data
 			continue
 		}
 
-		err = email.Send(msg.From, recipient, msg.Subject, msg.Body)
+		err = mailer.Send(msg.From, recipient, msg.Subject, msg.Body)
 		if err != nil {
 			continue
 		}

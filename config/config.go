@@ -24,6 +24,10 @@ type DBConfig struct {
 	Password string
 }
 
+type RedisConfig struct {
+	Addr string
+}
+
 type SMTPClientConfig struct {
 	Host     string
 	Port     string
@@ -35,6 +39,7 @@ type Config struct {
 	API        APIConfig
 	SMTP       SMTPConfig
 	DB         DBConfig
+	Redis      RedisConfig
 	SMTPClient SMTPClientConfig
 }
 
@@ -59,6 +64,9 @@ func New() (Config, error) {
 			Name:     os.Getenv("DB_NAME"),
 			User:     os.Getenv("DB_USER"),
 			Password: os.Getenv("DB_PASSWORD"),
+		},
+		Redis: RedisConfig{
+			Addr: os.Getenv("REDIS_ADDR"),
 		},
 		SMTPClient: SMTPClientConfig{
 			Host:     os.Getenv("SMTP_CLIENT_HOST"),

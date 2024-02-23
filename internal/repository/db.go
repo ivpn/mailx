@@ -14,7 +14,7 @@ type Database struct {
 	Client *gorm.DB
 }
 
-func New() (*Database, error) {
+func NewDB() (*Database, error) {
 	cfg, err := config.New()
 	if err != nil {
 		return nil, err
@@ -33,6 +33,15 @@ func New() (*Database, error) {
 	return &Database{
 		Client: db,
 	}, nil
+}
+
+func (d *Database) Close() error {
+	db, err := d.Client.DB()
+	if err != nil {
+		return err
+	}
+
+	return db.Close()
 }
 
 func connect(cfg config.DBConfig) (*gorm.DB, error) {

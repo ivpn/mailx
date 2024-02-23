@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	db, err := repository.New()
+	db, err := repository.NewDB()
 	if err != nil {
 		log.Println(err)
 	}

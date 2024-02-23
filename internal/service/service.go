@@ -3,6 +3,7 @@ package service
 type Store interface {
 	RecipienteStore
 	AliasStore
+	UserStore
 }
 
 type Service struct {

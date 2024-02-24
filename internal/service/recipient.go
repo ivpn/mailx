@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 
+	"gorm.io/gorm"
 	"ivpn.net/email-service/internal/model"
 )
 
@@ -50,7 +51,12 @@ func (s *Service) PostRecipient(ctx context.Context, recipient model.Recipient) 
 	err := s.Store.PostRecipient(ctx, recipient)
 	if err != nil {
 		log.Printf("an error occurred creating the recipient: %s", err.Error())
-		return ErrPostRecipient
+		switch {
+		case errors.Is(err, gorm.ErrDuplicatedKey):
+			return model.ErrDuplicateRecipient
+		default:
+			return ErrPostRecipient
+		}
 	}
 
 	return nil

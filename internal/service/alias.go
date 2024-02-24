@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 
+	"gorm.io/gorm"
 	"ivpn.net/email-service/internal/model"
 )
 
@@ -60,7 +61,12 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias) error {
 	err := s.Store.PostAlias(ctx, alias)
 	if err != nil {
 		log.Printf("an error occurred creating the alias: %s", err.Error())
-		return ErrPostAlias
+		switch {
+		case errors.Is(err, gorm.ErrDuplicatedKey):
+			return model.ErrDuplicateAlias
+		default:
+			return ErrPostAlias
+		}
 	}
 
 	return nil

@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"gorm.io/gorm"
 	"ivpn.net/email-service/internal/client/mailer"
 	"ivpn.net/email-service/internal/model"
 	"ivpn.net/email-service/internal/utils"
@@ -38,7 +39,12 @@ func (s *Service) PostUser(ctx context.Context, user model.User) error {
 	err = s.Store.PostUser(ctx, user)
 	if err != nil {
 		log.Printf("error creating user: %s", err.Error())
-		return ErrPostUser
+		switch {
+		case errors.Is(err, gorm.ErrDuplicatedKey):
+			return model.ErrDuplicateEmail
+		default:
+			return ErrPostUser
+		}
 	}
 
 	otp, err := utils.GenerateOTP()
@@ -53,11 +59,12 @@ func (s *Service) PostUser(ctx context.Context, user model.User) error {
 		return ErrSaveOTP
 	}
 
-	err = mailer.Send("form@example.net", user.Email, "Activate your account", utils.FormatOTP(otp.Secret))
-	if err != nil {
-		log.Printf("error creating user: %s", err.Error())
-		return ErrSendOTP
-	}
+	utils.Background(func() {
+		err = mailer.Send("form@example.net", user.Email, "Activate your account", utils.FormatOTP(otp.Secret))
+		if err != nil {
+			log.Printf("error creating user: %s", err.Error())
+		}
+	})
 
 	return nil
 }

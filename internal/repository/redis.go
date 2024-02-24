@@ -15,7 +15,7 @@ type Redis struct {
 func NewRedis() (*Redis, error) {
 	cfg, err := config.New()
 	if err != nil {
-		return nil, err
+		return &Redis{}, err
 	}
 
 	client := redis.NewClient(&redis.Options{
@@ -24,7 +24,7 @@ func NewRedis() (*Redis, error) {
 
 	_, err = client.Ping(context.Background()).Result()
 	if err != nil {
-		return nil, err
+		return &Redis{}, err
 	}
 
 	return &Redis{
@@ -36,10 +36,10 @@ func (r *Redis) Close() error {
 	return r.Client.Close()
 }
 
-func (r *Redis) Set(key string, value interface{}, expiration time.Duration) error {
-	return r.Client.Set(context.Background(), key, value, expiration).Err()
+func (r *Redis) Set(ctx context.Context, key string, value interface{}, expiration time.Duration) error {
+	return r.Client.Set(ctx, key, value, expiration).Err()
 }
 
-func (r *Redis) Get(key string) (string, error) {
-	return r.Client.Get(context.Background(), key).Result()
+func (r *Redis) Get(ctx context.Context, key string) (string, error) {
+	return r.Client.Get(ctx, key).Result()
 }

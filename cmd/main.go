@@ -15,7 +15,12 @@ func main() {
 		log.Println(err)
 	}
 
-	service := service.New(db)
+	redis, err := repository.NewRedis()
+	if err != nil {
+		log.Println(err)
+	}
+
+	service := service.New(db, redis)
 
 	go func() {
 		err := smpt.Start(service)

@@ -8,14 +8,16 @@ import (
 var (
 	ErrEmailInvalid    = errors.New("invalid email")
 	ErrPasswordInvalid = errors.New("invalid password")
+	ErrDuplicateEmail  = errors.New("duplicate email")
 	EmailRX            = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 )
 
 type User struct {
 	BaseModel
-	Email         string  `json:"email"`
+	Email         string  `gorm:"unique" json:"email"`
 	PasswordHash  string  `json:"-"`
-	PasswordPlain *string `gorm:"-"`
+	PasswordPlain *string `gorm:"-" json:"-"`
+	IsActive      bool    `json:"is_active"`
 }
 
 func (u *User) Validate() error {

@@ -32,7 +32,9 @@ var (
 )
 
 func GenerateAlias() string {
-	rand.Seed(time.Now().UnixNano())
+	source := rand.NewSource(time.Now().UnixNano())
+	rand.New(source)
+
 	return randomAdjective() + "." + randomNoun() + randomNumber()
 }
 

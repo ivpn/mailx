@@ -1,27 +1,32 @@
 package model
 
 import (
-	"log"
+	"errors"
 
 	"github.com/alexedwards/argon2id"
 )
 
-func (u *User) Set(plaintextPassword string) error {
-	hash, err := argon2id.CreateHash(plaintextPassword, argon2id.DefaultParams)
+var (
+	ErrHashFailed  = errors.New("password hash failed")
+	ErrMatchFailed = errors.New("password match failed")
+)
+
+func (u *User) SetPassword(passwordPlain string) error {
+	hash, err := argon2id.CreateHash(passwordPlain, argon2id.DefaultParams)
 	if err != nil {
-		return err
+		return ErrHashFailed
 	}
 
-	u.PasswordPlain = &plaintextPassword
 	u.PasswordHash = hash
+	u.PasswordPlain = nil
 
 	return nil
 }
 
-func (u *User) Matches(plaintextPassword string) (bool, error) {
-	match, err := argon2id.ComparePasswordAndHash(plaintextPassword, u.PasswordHash)
+func (u *User) Matches(passwordPlain string) (bool, error) {
+	match, err := argon2id.ComparePasswordAndHash(passwordPlain, u.PasswordHash)
 	if err != nil {
-		log.Fatal(err)
+		return false, ErrMatchFailed
 	}
 
 	return match, nil

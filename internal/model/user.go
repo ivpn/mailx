@@ -18,7 +18,7 @@ type User struct {
 	PasswordPlain *string `gorm:"-"`
 }
 
-func (u *User) IsValid() error {
+func (u *User) Validate() error {
 	if u.Email == "" || !EmailRX.MatchString(u.Email) {
 		return ErrEmailInvalid
 	}

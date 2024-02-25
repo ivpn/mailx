@@ -38,3 +38,7 @@ func (r *Redis) Set(ctx context.Context, key string, value interface{}, expirati
 func (r *Redis) Get(ctx context.Context, key string) (string, error) {
 	return r.Client.Get(ctx, key).Result()
 }
+
+func (r *Redis) Del(ctx context.Context, key string) error {
+	return r.Client.Del(ctx, key).Err()
+}

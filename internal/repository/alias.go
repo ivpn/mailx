@@ -12,9 +12,9 @@ func (d *Database) GetAlias(ctx context.Context, ID string) (model.Alias, error)
 	return alias, err
 }
 
-func (d *Database) GetAliases(ctx context.Context, recipientID string) ([]model.Alias, error) {
+func (d *Database) GetAliases(ctx context.Context, userID string) ([]model.Alias, error) {
 	var aliases []model.Alias
-	err := d.Client.Where("recipient_id = ?", recipientID).Find(&aliases).Error
+	err := d.Client.Where("user_id = ?", userID).Find(&aliases).Error
 	return aliases, err
 }
 

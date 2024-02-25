@@ -10,20 +10,20 @@ import (
 	"ivpn.net/email-service/internal/transport/smpt"
 )
 
-func main() {
+func Run() error {
 	cfg, err := config.New()
 	if err != nil {
-		log.Println(err)
+		return err
 	}
 
 	db, err := repository.NewDB(cfg.DB)
 	if err != nil {
-		log.Println(err)
+		return err
 	}
 
 	redis, err := repository.NewRedis(cfg.Redis)
 	if err != nil {
-		log.Println(err)
+		return err
 	}
 
 	service := service.New(cfg, db, redis)
@@ -36,6 +36,15 @@ func main() {
 	}()
 
 	err = api.Start(cfg.API, service)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func main() {
+	err := Run()
 	if err != nil {
 		log.Println(err)
 	}

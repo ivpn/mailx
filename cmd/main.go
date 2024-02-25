@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"ivpn.net/email-service/config"
 	"ivpn.net/email-service/internal/repository"
 	"ivpn.net/email-service/internal/service"
 	"ivpn.net/email-service/internal/transport/api"
@@ -10,6 +11,11 @@ import (
 )
 
 func main() {
+	cfg, err := config.New()
+	if err != nil {
+		log.Println(err)
+	}
+
 	db, err := repository.NewDB()
 	if err != nil {
 		log.Println(err)
@@ -20,7 +26,7 @@ func main() {
 		log.Println(err)
 	}
 
-	service := service.New(db, redis)
+	service := service.New(cfg, db, redis)
 
 	go func() {
 		err := smpt.Start(service)

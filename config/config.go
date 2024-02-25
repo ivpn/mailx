@@ -33,6 +33,12 @@ type SMTPClientConfig struct {
 	Port     string
 	User     string
 	Password string
+	Sender   string
+}
+
+type ServiceConfig struct {
+	TokenExpiration   string
+	SessionExpiration string
 }
 
 type Config struct {
@@ -41,6 +47,7 @@ type Config struct {
 	DB         DBConfig
 	Redis      RedisConfig
 	SMTPClient SMTPClientConfig
+	Service    ServiceConfig
 }
 
 func New() (Config, error) {
@@ -73,6 +80,11 @@ func New() (Config, error) {
 			Port:     os.Getenv("SMTP_CLIENT_PORT"),
 			User:     os.Getenv("SMTP_CLIENT_USER"),
 			Password: os.Getenv("SMTP_CLIENT_PASSWORD"),
+			Sender:   os.Getenv("SMTP_CLIENT_SENDER"),
+		},
+		Service: ServiceConfig{
+			TokenExpiration:   os.Getenv("TOKEN_EXPIRATION"),
+			SessionExpiration: os.Getenv("SESSION_EXPIRATION"),
 		},
 	}, nil
 }

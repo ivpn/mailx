@@ -29,7 +29,9 @@ func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data
 			continue
 		}
 
-		err = mailer.Send(msg.From, recipient, msg.Subject, msg.Body)
+		mailer := mailer.New(s.Cfg.SMTPClient)
+		mailer.Sender = msg.From
+		err = mailer.Send(recipient, msg.Subject, msg.Body)
 		if err != nil {
 			continue
 		}

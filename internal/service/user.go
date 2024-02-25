@@ -60,7 +60,8 @@ func (s *Service) PostUser(ctx context.Context, user model.User) error {
 	}
 
 	utils.Background(func() {
-		err = mailer.Send("form@example.net", user.Email, "Activate your account", utils.FormatOTP(otp.Secret))
+		mailer := mailer.New(s.Cfg.SMTPClient)
+		err = mailer.Send(user.Email, "Activate your account", utils.FormatOTP(otp.Secret))
 		if err != nil {
 			log.Printf("error creating user: %s", err.Error())
 		}

@@ -3,6 +3,8 @@ package service
 import (
 	"context"
 	"time"
+
+	"ivpn.net/email-service/config"
 )
 
 type Store interface {
@@ -17,12 +19,14 @@ type Cache interface {
 }
 
 type Service struct {
+	Cfg   config.Config
 	Store Store
 	Cache Cache
 }
 
-func New(store Store, cache Cache) *Service {
+func New(cfg config.Config, store Store, cache Cache) *Service {
 	return &Service{
+		Cfg:   cfg,
 		Store: store,
 		Cache: cache,
 	}

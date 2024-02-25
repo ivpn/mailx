@@ -14,13 +14,8 @@ type Database struct {
 	Client *gorm.DB
 }
 
-func NewDB() (*Database, error) {
-	cfg, err := config.New()
-	if err != nil {
-		return nil, err
-	}
-
-	db, err := connect(cfg.DB)
+func NewDB(cfg config.DBConfig) (*Database, error) {
+	db, err := connect(cfg)
 	if err != nil {
 		return nil, err
 	}

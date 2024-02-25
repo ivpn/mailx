@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"time"
 
 	"github.com/joho/godotenv"
 )
@@ -37,8 +38,8 @@ type SMTPClientConfig struct {
 }
 
 type ServiceConfig struct {
-	TokenExpiration   string
-	SessionExpiration string
+	TokenExpiration   time.Duration
+	SessionExpiration time.Duration
 }
 
 type Config struct {
@@ -52,6 +53,18 @@ type Config struct {
 
 func New() (Config, error) {
 	err := godotenv.Load("./config/.env")
+	if err != nil {
+		return Config{}, err
+	}
+
+	tokenExpStr := os.Getenv("TOKEN_EXPIRATION")
+	tokenExp, err := time.ParseDuration(tokenExpStr)
+	if err != nil {
+		return Config{}, err
+	}
+
+	sessionExpStr := os.Getenv("SESSION_EXPIRATION")
+	sessionExp, err := time.ParseDuration(sessionExpStr)
 	if err != nil {
 		return Config{}, err
 	}
@@ -83,8 +96,8 @@ func New() (Config, error) {
 			Sender:   os.Getenv("SMTP_CLIENT_SENDER"),
 		},
 		Service: ServiceConfig{
-			TokenExpiration:   os.Getenv("TOKEN_EXPIRATION"),
-			SessionExpiration: os.Getenv("SESSION_EXPIRATION"),
+			TokenExpiration:   tokenExp,
+			SessionExpiration: sessionExp,
 		},
 	}, nil
 }

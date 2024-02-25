@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"log"
-	"time"
 
 	"gorm.io/gorm"
 	"ivpn.net/email-service/internal/client/mailer"
@@ -53,7 +52,7 @@ func (s *Service) PostUser(ctx context.Context, user model.User) error {
 		return ErrGenerateOTP
 	}
 
-	err = s.Cache.Set(ctx, "activation_"+user.ID, otp.Hash, 10*time.Minute)
+	err = s.Cache.Set(ctx, "activation_"+user.ID, otp.Hash, s.Cfg.Service.TokenExpiration)
 	if err != nil {
 		log.Printf("error creating user: %s", err.Error())
 		return ErrSaveOTP

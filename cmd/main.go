@@ -16,12 +16,12 @@ func main() {
 		log.Println(err)
 	}
 
-	db, err := repository.NewDB()
+	db, err := repository.NewDB(cfg.DB)
 	if err != nil {
 		log.Println(err)
 	}
 
-	redis, err := repository.NewRedis()
+	redis, err := repository.NewRedis(cfg.Redis)
 	if err != nil {
 		log.Println(err)
 	}
@@ -29,13 +29,13 @@ func main() {
 	service := service.New(cfg, db, redis)
 
 	go func() {
-		err := smpt.Start(service)
+		err := smpt.Start(cfg.SMTP, service)
 		if err != nil {
 			log.Println(err)
 		}
 	}()
 
-	err = api.Start(service)
+	err = api.Start(cfg.API, service)
 	if err != nil {
 		log.Println(err)
 	}

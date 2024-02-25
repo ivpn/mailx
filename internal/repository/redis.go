@@ -12,17 +12,12 @@ type Redis struct {
 	Client *redis.Client
 }
 
-func NewRedis() (*Redis, error) {
-	cfg, err := config.New()
-	if err != nil {
-		return &Redis{}, err
-	}
-
+func NewRedis(cfg config.RedisConfig) (*Redis, error) {
 	client := redis.NewClient(&redis.Options{
-		Addr: cfg.Redis.Addr,
+		Addr: cfg.Addr,
 	})
 
-	_, err = client.Ping(context.Background()).Result()
+	_, err := client.Ping(context.Background()).Result()
 	if err != nil {
 		return &Redis{}, err
 	}

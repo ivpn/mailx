@@ -9,3 +9,9 @@ import (
 func (d *Database) PostUser(ctx context.Context, user model.User) error {
 	return d.Client.Create(&user).Error
 }
+
+func (d *Database) GetUserByEmail(ctx context.Context, email string) (model.User, error) {
+	var user model.User
+	err := d.Client.Where("email = ?", email).First(&user).Error
+	return user, err
+}

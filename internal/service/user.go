@@ -20,6 +20,7 @@ var (
 
 type UserStore interface {
 	PostUser(context.Context, model.User) error
+	GetUserByEmail(context.Context, string) (model.User, error)
 }
 
 func (s *Service) PostUser(ctx context.Context, user model.User) error {
@@ -67,4 +68,8 @@ func (s *Service) PostUser(ctx context.Context, user model.User) error {
 	})
 
 	return nil
+}
+
+func (s *Service) GetUserByEmail(ctx context.Context, email string) (model.User, error) {
+	return s.Store.GetUserByEmail(ctx, email)
 }

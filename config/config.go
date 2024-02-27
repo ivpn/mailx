@@ -8,7 +8,10 @@ import (
 )
 
 type APIConfig struct {
-	Port string
+	Port            string
+	CookieSecret    string
+	TokenSecret     string
+	TokenExpiration time.Duration
 }
 
 type SMTPConfig struct {
@@ -38,9 +41,7 @@ type SMTPClientConfig struct {
 }
 
 type ServiceConfig struct {
-	TokenSecret       string
-	TokenExpiration   time.Duration
-	SessionExpiration time.Duration
+	OTPExpiration time.Duration
 }
 
 type Config struct {
@@ -64,15 +65,18 @@ func New() (Config, error) {
 		return Config{}, err
 	}
 
-	sessionExpStr := os.Getenv("SESSION_EXPIRATION")
-	sessionExp, err := time.ParseDuration(sessionExpStr)
+	otpExpStr := os.Getenv("OTP_EXPIRATION")
+	otpExp, err := time.ParseDuration(otpExpStr)
 	if err != nil {
 		return Config{}, err
 	}
 
 	return Config{
 		API: APIConfig{
-			Port: os.Getenv("API_PORT"),
+			Port:            os.Getenv("API_PORT"),
+			CookieSecret:    os.Getenv("COOKIE_SECRET"),
+			TokenSecret:     os.Getenv("TOKEN_SECRET"),
+			TokenExpiration: tokenExp,
 		},
 		SMTP: SMTPConfig{
 			Host:     os.Getenv("SMTP_HOST"),
@@ -97,9 +101,7 @@ func New() (Config, error) {
 			Sender:   os.Getenv("SMTP_CLIENT_SENDER"),
 		},
 		Service: ServiceConfig{
-			TokenSecret:       os.Getenv("TOKEN_SECRET"),
-			TokenExpiration:   tokenExp,
-			SessionExpiration: sessionExp,
+			OTPExpiration: otpExp,
 		},
 	}, nil
 }

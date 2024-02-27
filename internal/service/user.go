@@ -52,7 +52,7 @@ func (s *Service) PostUser(ctx context.Context, user model.User) error {
 		return ErrGenerateOTP
 	}
 
-	err = s.Cache.Set(ctx, "activation_"+user.ID, otp.Hash, s.Cfg.Service.TokenExpiration)
+	err = s.Cache.Set(ctx, "activation_"+user.ID, otp.Hash, s.Cfg.Service.OTPExpiration)
 	if err != nil {
 		log.Printf("error creating user: %s", err.Error())
 		return ErrSaveOTP

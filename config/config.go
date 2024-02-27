@@ -38,6 +38,7 @@ type SMTPClientConfig struct {
 }
 
 type ServiceConfig struct {
+	TokenSecret       string
 	TokenExpiration   time.Duration
 	SessionExpiration time.Duration
 }
@@ -96,6 +97,7 @@ func New() (Config, error) {
 			Sender:   os.Getenv("SMTP_CLIENT_SENDER"),
 		},
 		Service: ServiceConfig{
+			TokenSecret:       os.Getenv("TOKEN_SECRET"),
 			TokenExpiration:   tokenExp,
 			SessionExpiration: sessionExp,
 		},

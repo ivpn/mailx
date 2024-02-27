@@ -1,7 +1,18 @@
 package api
 
-func (h *Handler) SetupRoutes() {
+import (
+	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
+	"ivpn.net/email-service/config"
+	"ivpn.net/email-service/internal/middleware"
+)
+
+func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1 := h.Server.Group("/v1")
+
+	v1.Use(encryptcookie.New(encryptcookie.Config{
+		Key: cfg.CookieSecret,
+	}))
+	v1.Use(middleware.NewAuth(cfg))
 
 	v1.Get("/recipient/:id", h.GetRecipient)
 	v1.Get("/recipients/:user_id", h.GetRecipients)

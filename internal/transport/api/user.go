@@ -14,7 +14,7 @@ var (
 
 type UserService interface {
 	PostUser(context.Context, model.User) error
-	Login(context.Context, string, string) (model.User, error)
+	GetUserByCredentials(context.Context, string, string) (model.User, error)
 }
 
 type LoginRequest struct {
@@ -32,7 +32,7 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 		})
 	}
 
-	user, err := h.Service.Login(c.Context(), req.Email, req.Password)
+	user, err := h.Service.GetUserByCredentials(c.Context(), req.Email, req.Password)
 	if err != nil {
 		return c.Status(401).JSON(fiber.Map{
 			"error": err.Error(),

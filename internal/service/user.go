@@ -72,7 +72,7 @@ func (s *Service) PostUser(ctx context.Context, user model.User) error {
 	return nil
 }
 
-func (s *Service) Login(ctx context.Context, email string, password string) (model.User, error) {
+func (s *Service) GetUserByCredentials(ctx context.Context, email string, password string) (model.User, error) {
 	user, err := s.Store.GetUserByEmail(ctx, email)
 	if err != nil {
 		return model.User{}, ErrIncorrectEmail

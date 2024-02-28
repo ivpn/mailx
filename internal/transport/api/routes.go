@@ -14,6 +14,8 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	}))
 	v1.Use(middleware.NewAuth(cfg))
 
+	v1.Post("/login", h.Login)
+
 	v1.Get("/recipient/:id", h.GetRecipient)
 	v1.Get("/recipients/:user_id", h.GetRecipients)
 	v1.Post("/recipient", h.PostRecipient)

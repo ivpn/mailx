@@ -3,7 +3,6 @@ package middleware
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
@@ -13,7 +12,7 @@ import (
 func NewAuth(cfg config.APIConfig) fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
-		tokenString := ExtractToken(c)
+		tokenString := extractToken(c)
 
 		token, err := jwt.Parse(tokenString, func(jwtToken *jwt.Token) (interface{}, error) {
 			if _, ok := jwtToken.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -40,16 +39,7 @@ func NewAuth(cfg config.APIConfig) fiber.Handler {
 	}
 }
 
-func CreateToken(cfg config.APIConfig, userID string) (string, error) {
-	claims := jwt.MapClaims{}
-	claims["user_id"] = userID
-	claims["exp"] = time.Now().Add(cfg.TokenExpiration).Unix()
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	return token.SignedString([]byte(cfg.TokenSecret))
-}
-
-func ExtractToken(c *fiber.Ctx) string {
+func extractToken(c *fiber.Ctx) string {
 	var tokenString string
 	authorization := c.Get("Authorization")
 

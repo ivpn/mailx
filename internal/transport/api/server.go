@@ -11,9 +11,11 @@ import (
 type Service interface {
 	RecipientService
 	AliasService
+	UserService
 }
 
 type Handler struct {
+	Cfg     config.APIConfig
 	Service Service
 	Server  *fiber.App
 }
@@ -25,6 +27,7 @@ func Start(cfg config.APIConfig, service Service) error {
 	app.Use(healthcheck.New())
 
 	h := &Handler{
+		Cfg:     cfg,
 		Service: service,
 		Server:  app,
 	}

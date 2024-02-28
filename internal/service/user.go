@@ -12,10 +12,12 @@ import (
 )
 
 var (
-	ErrPostUser    = errors.New("could not save user")
-	ErrGenerateOTP = errors.New("could not generate OTP")
-	ErrSaveOTP     = errors.New("could not save OTP")
-	ErrSendOTP     = errors.New("could not send OTP")
+	ErrPostUser       = errors.New("could not save user")
+	ErrCreateOTP      = errors.New("could not create OTP")
+	ErrSaveOTP        = errors.New("could not save OTP")
+	ErrSendOTP        = errors.New("could not send OTP")
+	ErrIncorrectEmail = errors.New("incorrect email")
+	ErrIncorrectPass  = errors.New("incorrect password")
 )
 
 type UserStore interface {
@@ -47,10 +49,10 @@ func (s *Service) PostUser(ctx context.Context, user model.User) error {
 		}
 	}
 
-	otp, err := utils.GenerateOTP()
+	otp, err := utils.CreateOTP()
 	if err != nil {
 		log.Printf("error creating user: %s", err.Error())
-		return ErrGenerateOTP
+		return ErrCreateOTP
 	}
 
 	err = s.Cache.Set(ctx, "activation_"+user.ID, otp.Hash, s.Cfg.Service.OTPExpiration)
@@ -70,6 +72,16 @@ func (s *Service) PostUser(ctx context.Context, user model.User) error {
 	return nil
 }
 
-func (s *Service) GetUserByEmail(ctx context.Context, email string) (model.User, error) {
-	return s.Store.GetUserByEmail(ctx, email)
+func (s *Service) Login(ctx context.Context, email string, password string) (model.User, error) {
+	user, err := s.Store.GetUserByEmail(ctx, email)
+	if err != nil {
+		return model.User{}, ErrIncorrectEmail
+	}
+
+	matches := user.Matches(password)
+	if !matches {
+		return model.User{}, ErrIncorrectPass
+	}
+
+	return user, nil
 }

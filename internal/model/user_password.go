@@ -23,11 +23,11 @@ func (u *User) SetPassword(passwordPlain string) error {
 	return nil
 }
 
-func (u *User) Matches(passwordPlain string) (bool, error) {
+func (u *User) Matches(passwordPlain string) bool {
 	match, err := argon2id.ComparePasswordAndHash(passwordPlain, u.PasswordHash)
 	if err != nil {
-		return false, ErrMatchFailed
+		return false
 	}
 
-	return match, nil
+	return match
 }

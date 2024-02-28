@@ -6,6 +6,10 @@ import (
 	"fmt"
 	"math/big"
 	"strings"
+	"time"
+
+	"github.com/golang-jwt/jwt"
+	"ivpn.net/email-service/config"
 )
 
 type Token struct {
@@ -13,7 +17,7 @@ type Token struct {
 	Hash   string
 }
 
-func GenerateOTP() (*Token, error) {
+func CreateOTP() (*Token, error) {
 	bigInt, err := rand.Int(rand.Reader, big.NewInt(900000))
 	if err != nil {
 		return nil, err
@@ -44,7 +48,7 @@ func FormatOTP(s string) string {
 	return strings.Join(words, " ")
 }
 
-func ValidateToken(secret string) error {
+func ValidateOTP(secret string) error {
 	if secret == "" {
 		return fmt.Errorf("token must be provided")
 	}
@@ -54,4 +58,13 @@ func ValidateToken(secret string) error {
 	}
 
 	return nil
+}
+
+func CreateToken(cfg config.APIConfig, userID string) (string, error) {
+	claims := jwt.MapClaims{}
+	claims["user_id"] = userID
+	claims["exp"] = time.Now().Add(cfg.TokenExpiration).Unix()
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	return token.SignedString([]byte(cfg.TokenSecret))
 }

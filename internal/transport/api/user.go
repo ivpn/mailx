@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/gofiber/fiber/v2"
+	"ivpn.net/email-service/internal/middleware/auth"
 	"ivpn.net/email-service/internal/model"
 	"ivpn.net/email-service/internal/utils"
 )
@@ -28,8 +29,7 @@ type UserRequest struct {
 }
 
 type ActivateRequest struct {
-	UserID string `json:"id"`
-	OTP    string `json:"otp"`
+	OTP string `json:"otp"`
 }
 
 func (h *Handler) Register(c *fiber.Ctx) error {
@@ -107,6 +107,8 @@ func (h *Handler) Logout(c *fiber.Ctx) error {
 }
 
 func (h *Handler) Activate(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
+
 	req := ActivateRequest{}
 	err := c.BodyParser(&req)
 	if err != nil {
@@ -115,7 +117,7 @@ func (h *Handler) Activate(c *fiber.Ctx) error {
 		})
 	}
 
-	err = h.Service.ActivateUser(c.Context(), req.UserID, req.OTP)
+	err = h.Service.ActivateUser(c.Context(), userID, req.OTP)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),

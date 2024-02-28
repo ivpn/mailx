@@ -3,7 +3,7 @@ package api
 import (
 	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
 	"ivpn.net/email-service/config"
-	"ivpn.net/email-service/internal/middleware"
+	"ivpn.net/email-service/internal/middleware/auth"
 )
 
 func (h *Handler) SetupRoutes(cfg config.APIConfig) {
@@ -12,7 +12,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Use(encryptcookie.New(encryptcookie.Config{
 		Key: cfg.CookieSecret,
 	}))
-	v1.Use(middleware.NewAuth(cfg))
+	v1.Use(auth.New(cfg))
 
 	v1.Post("/login", h.Login)
 	v1.Post("/logout", h.Logout)

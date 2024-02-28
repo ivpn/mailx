@@ -1,4 +1,4 @@
-package middleware
+package auth
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	"ivpn.net/email-service/config"
 )
 
-func NewAuth(cfg config.APIConfig) fiber.Handler {
+func New(cfg config.APIConfig) fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
 		tokenString := extractToken(c)
@@ -37,6 +37,13 @@ func NewAuth(cfg config.APIConfig) fiber.Handler {
 
 		return c.Next()
 	}
+}
+
+func GetUserID(c *fiber.Ctx) string {
+	user := c.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userID := claims["user_id"].(string)
+	return userID
 }
 
 func extractToken(c *fiber.Ctx) string {

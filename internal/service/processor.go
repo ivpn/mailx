@@ -18,7 +18,7 @@ type Message struct {
 }
 
 func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data []byte) error {
-	msg, err := parse(origin, from, to, data)
+	msg, err := parse(from, to, data)
 	if err != nil {
 		return err
 	}
@@ -55,7 +55,7 @@ func (s *Service) findRecipient(email string) (string, error) {
 	return recipient.Email, nil
 }
 
-func parse(origin net.Addr, from string, to []string, data []byte) (Message, error) {
+func parse(from string, to []string, data []byte) (Message, error) {
 	msg, err := mail.ReadMessage(bytes.NewReader(data))
 	if err != nil {
 		return Message{}, err

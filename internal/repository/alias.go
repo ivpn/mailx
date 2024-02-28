@@ -28,8 +28,8 @@ func (d *Database) PostAlias(ctx context.Context, alias model.Alias) error {
 	return d.Client.Create(&alias).Error
 }
 
-func (d *Database) UpdateAlias(ctx context.Context, ID string, alias model.Alias) error {
-	return d.Client.Where("id = ?", ID).Save(&alias).Error
+func (d *Database) UpdateAlias(ctx context.Context, alias model.Alias) error {
+	return d.Client.Save(alias).Error
 }
 
 func (d *Database) DeleteAlias(ctx context.Context, ID string) error {

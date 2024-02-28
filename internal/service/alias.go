@@ -23,7 +23,7 @@ type AliasStore interface {
 	GetAliases(context.Context, string) ([]model.Alias, error)
 	GetAliasByName(string) (model.Alias, error)
 	PostAlias(context.Context, model.Alias) error
-	UpdateAlias(context.Context, string, model.Alias) error
+	UpdateAlias(context.Context, model.Alias) error
 	DeleteAlias(context.Context, string) error
 }
 
@@ -72,8 +72,8 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias) error {
 	return nil
 }
 
-func (s *Service) UpdateAlias(ctx context.Context, ID string, newAlias model.Alias) error {
-	err := s.Store.UpdateAlias(ctx, ID, newAlias)
+func (s *Service) UpdateAlias(ctx context.Context, alias model.Alias) error {
+	err := s.Store.UpdateAlias(ctx, alias)
 	if err != nil {
 		log.Printf("an error occurred updating the alias: %s", err.Error())
 		return ErrUpdateAlias

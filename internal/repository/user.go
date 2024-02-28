@@ -15,3 +15,7 @@ func (d *Database) GetUserByEmail(ctx context.Context, email string) (model.User
 	err := d.Client.Where("email = ?", email).First(&user).Error
 	return user, err
 }
+
+func (d *Database) UpdateUser(ctx context.Context, user model.User) error {
+	return d.Client.Save(&user).Error
+}

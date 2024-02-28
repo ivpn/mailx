@@ -22,6 +22,7 @@ var (
 
 type UserStore interface {
 	PostUser(context.Context, model.User) error
+	UpdateUser(context.Context, model.User) error
 	GetUserByEmail(context.Context, string) (model.User, error)
 }
 

@@ -39,22 +39,6 @@ func (h *Handler) Register(c *fiber.Ctx) error {
 		PasswordPlain: &req.Password,
 	}
 
-	// Validate the user
-	err = user.Validate()
-	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"error": err.Error(),
-		})
-	}
-
-	// Hash the password
-	err = user.SetPassword(req.Password)
-	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": err.Error(),
-		})
-	}
-
 	// Save the user
 	err = h.Service.PostUser(c.Context(), user)
 	if err != nil {

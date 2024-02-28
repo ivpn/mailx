@@ -13,17 +13,34 @@ import (
 
 var (
 	ErrPostUser       = errors.New("could not save user")
+	ErrActivateUser   = errors.New("could not activate user")
 	ErrCreateOTP      = errors.New("could not create OTP")
 	ErrSaveOTP        = errors.New("could not save OTP")
 	ErrSendOTP        = errors.New("could not send OTP")
+	ErrIncorrectOTP   = errors.New("incorrect OTP")
 	ErrIncorrectEmail = errors.New("incorrect email")
 	ErrIncorrectPass  = errors.New("incorrect password")
 )
 
 type UserStore interface {
+	GetUserByEmail(context.Context, string) (model.User, error)
 	PostUser(context.Context, model.User) error
 	UpdateUser(context.Context, model.User) error
-	GetUserByEmail(context.Context, string) (model.User, error)
+	ActivateUser(context.Context, string) error
+}
+
+func (s *Service) GetUserByCredentials(ctx context.Context, email string, password string) (model.User, error) {
+	user, err := s.Store.GetUserByEmail(ctx, email)
+	if err != nil {
+		return model.User{}, ErrIncorrectEmail
+	}
+
+	matches := user.Matches(password)
+	if !matches {
+		return model.User{}, ErrIncorrectPass
+	}
+
+	return user, nil
 }
 
 func (s *Service) PostUser(ctx context.Context, user model.User) error {
@@ -73,16 +90,27 @@ func (s *Service) PostUser(ctx context.Context, user model.User) error {
 	return nil
 }
 
-func (s *Service) GetUserByCredentials(ctx context.Context, email string, password string) (model.User, error) {
-	user, err := s.Store.GetUserByEmail(ctx, email)
+func (s *Service) ActivateUser(ctx context.Context, userID string, otp string) error {
+	hash, err := s.Cache.Get(ctx, "activation_"+userID)
 	if err != nil {
-		return model.User{}, ErrIncorrectEmail
+		log.Printf("error activating user: %s", err.Error())
+		return ErrActivateUser
 	}
 
-	matches := user.Matches(password)
-	if !matches {
-		return model.User{}, ErrIncorrectPass
+	if hash != utils.OTPHash(otp) {
+		return ErrIncorrectOTP
 	}
 
-	return user, nil
+	err = s.Store.ActivateUser(ctx, userID)
+	if err != nil {
+		log.Printf("error activating user: %s", err.Error())
+		return ErrActivateUser
+	}
+
+	err = s.Cache.Del(ctx, "activation_"+userID)
+	if err != nil {
+		log.Printf("error activating user: %s", err.Error())
+	}
+
+	return nil
 }

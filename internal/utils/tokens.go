@@ -39,6 +39,11 @@ func CreateOTP() (*Token, error) {
 	return &token, nil
 }
 
+func OTPHash(secret string) string {
+	hash := sha256.Sum256([]byte(secret))
+	return fmt.Sprintf("%x\n", hash)
+}
+
 func FormatOTP(s string) string {
 	length := len(s)
 	half := length / 2

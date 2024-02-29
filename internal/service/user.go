@@ -90,6 +90,12 @@ func (s *Service) PostUser(ctx context.Context, user model.User) error {
 }
 
 func (s *Service) ActivateUser(ctx context.Context, userID string, otp string) error {
+	err := utils.ValidateOTP(otp)
+	if err != nil {
+		log.Printf("error activating user: %s", err.Error())
+		return err
+	}
+
 	hash, err := s.Cache.Get(ctx, "activation_"+userID)
 	if err != nil {
 		log.Printf("error activating user: %s", err.Error())

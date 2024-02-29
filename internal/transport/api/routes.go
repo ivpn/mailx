@@ -31,7 +31,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	alias.Use(auth)
 	alias.Get("/:id", h.GetAlias)
 	alias.Get("/:user_id", h.GetAliases)
-	alias.Post("", h.PostAlias)
-	alias.Put("", h.UpdateAlias)
+	alias.Post("/", h.PostAlias)
+	alias.Put("/", h.UpdateAlias)
 	alias.Delete("/:id", h.DeleteAlias)
 }

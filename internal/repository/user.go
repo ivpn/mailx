@@ -16,10 +16,6 @@ func (d *Database) PostUser(ctx context.Context, user model.User) error {
 	return d.Client.Create(&user).Error
 }
 
-func (d *Database) UpdateUser(ctx context.Context, user model.User) error {
-	return d.Client.Save(&user).Error
-}
-
 func (d *Database) ActivateUser(ctx context.Context, ID string) error {
 	return d.Client.Model(&model.User{}).Where("id = ?", ID).Update("active", true).Error
 }

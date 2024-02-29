@@ -19,8 +19,8 @@ var (
 
 type UserService interface {
 	PostUser(context.Context, model.User) error
-	GetUserByCredentials(context.Context, string, string) (model.User, error)
 	ActivateUser(context.Context, string, string) error
+	GetUserByCredentials(context.Context, string, string) (model.User, error)
 }
 
 type UserRequest struct {
@@ -58,6 +58,29 @@ func (h *Handler) Register(c *fiber.Ctx) error {
 
 	return c.Status(200).JSON(fiber.Map{
 		"message": RegisterSuccess,
+	})
+}
+
+func (h *Handler) Activate(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
+
+	req := ActivateRequest{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	err = h.Service.ActivateUser(c.Context(), userID, req.OTP)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": ActivateSuccess,
 	})
 }
 
@@ -103,28 +126,5 @@ func (h *Handler) Logout(c *fiber.Ctx) error {
 
 	return c.Status(200).JSON(fiber.Map{
 		"message": LogoutSuccess,
-	})
-}
-
-func (h *Handler) Activate(c *fiber.Ctx) error {
-	userID := auth.GetUserID(c)
-
-	req := ActivateRequest{}
-	err := c.BodyParser(&req)
-	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": err.Error(),
-		})
-	}
-
-	err = h.Service.ActivateUser(c.Context(), userID, req.OTP)
-	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": err.Error(),
-		})
-	}
-
-	return c.Status(200).JSON(fiber.Map{
-		"message": ActivateSuccess,
 	})
 }

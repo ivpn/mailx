@@ -25,7 +25,6 @@ var (
 type UserStore interface {
 	GetUserByEmail(context.Context, string) (model.User, error)
 	PostUser(context.Context, model.User) error
-	UpdateUser(context.Context, model.User) error
 	ActivateUser(context.Context, string) error
 }
 

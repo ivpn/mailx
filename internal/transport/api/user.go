@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"log"
 
 	"github.com/gofiber/fiber/v2"
 	"ivpn.net/email-service/internal/middleware/auth"
@@ -10,11 +11,13 @@ import (
 )
 
 var (
-	RegisterSuccess = "User created"
-	LoginSuccess    = "Login successful"
-	LogoutSuccess   = "Logout successful"
-	ActivateSuccess = "User activated"
-	CookieAuth      = "Auth"
+	RegisterSuccess       = "User created"
+	LoginSuccess          = "Login successful"
+	LogoutSuccess         = "Logout successful"
+	ActivateSuccess       = "User activated"
+	CookieAuth            = "Auth"
+	ErrInvalidCredentials = "Invalid credentials"
+	ErrInvalidRequest     = "Invalid request"
 )
 
 type UserService interface {
@@ -89,24 +92,40 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 	req := UserRequest{}
 	err := c.BodyParser(&req)
 	if err != nil {
+		log.Printf("error login: %s", err.Error())
 		return c.Status(500).JSON(fiber.Map{
-			"error": err.Error(),
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	// Validate the request
+	userModel := model.User{
+		Email:         req.Email,
+		PasswordPlain: &req.Password,
+	}
+	err = userModel.Validate()
+	if err != nil {
+		log.Printf("error login: %s", err.Error())
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidCredentials,
 		})
 	}
 
 	// Get the user
 	user, err := h.Service.GetUserByCredentials(c.Context(), req.Email, req.Password)
 	if err != nil {
+		log.Printf("error login: %s", err.Error())
 		return c.Status(401).JSON(fiber.Map{
-			"error": err.Error(),
+			"error": ErrInvalidCredentials,
 		})
 	}
 
 	// Create auth token
 	token, err := utils.CreateToken(h.Cfg, user.ID)
 	if err != nil {
+		log.Printf("error login: %s", err.Error())
 		return c.Status(500).JSON(fiber.Map{
-			"error": err.Error(),
+			"error": ErrInvalidCredentials,
 		})
 	}
 

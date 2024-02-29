@@ -8,23 +8,30 @@ import (
 func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1 := h.Server.Group("/v1")
 
-	v1.Use(auth.New(cfg))
-
 	v1.Post("/register", h.Register)
-	v1.Post("/activate", h.Activate)
 	v1.Post("/login", h.Login)
-	v1.Post("/logout", h.Logout)
 
-	v1.Get("/recipient/:id", h.GetRecipient)
-	v1.Get("/recipients/:user_id", h.GetRecipients)
-	v1.Post("/recipient", h.PostRecipient)
-	v1.Put("/recipient", h.UpdateRecipient)
-	v1.Delete("/recipient/:id", h.DeleteRecipient)
-	v1.Get("/recipient/verify/:id/:verification", h.VerifyRecipient)
+	auth := auth.New(cfg)
 
-	v1.Get("/alias/:id", h.GetAlias)
-	v1.Get("/aliases/:user_id", h.GetAliases)
-	v1.Post("/alias", h.PostAlias)
-	v1.Put("/alias", h.UpdateAlias)
-	v1.Delete("/alias/:id", h.DeleteAlias)
+	user := v1.Group("/user")
+	user.Use(auth)
+	user.Post("/activate", h.Activate)
+	user.Post("/logout", h.Logout)
+
+	recipient := v1.Group("/recipient")
+	recipient.Use(auth)
+	recipient.Get("/:id", h.GetRecipient)
+	recipient.Get("/:user_id", h.GetRecipients)
+	recipient.Post("/", h.PostRecipient)
+	recipient.Put("/", h.UpdateRecipient)
+	recipient.Delete("/:id", h.DeleteRecipient)
+	recipient.Get("/verify/:id/:verification", h.VerifyRecipient)
+
+	alias := v1.Group("/alias")
+	alias.Use(auth)
+	alias.Get("/:id", h.GetAlias)
+	alias.Get("/:user_id", h.GetAliases)
+	alias.Post("", h.PostAlias)
+	alias.Put("", h.UpdateAlias)
+	alias.Delete("/:id", h.DeleteAlias)
 }

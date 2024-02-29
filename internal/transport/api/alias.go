@@ -35,8 +35,8 @@ func (h *Handler) GetAlias(c *fiber.Ctx) error {
 }
 
 func (h *Handler) GetAliases(c *fiber.Ctx) error {
-	recipientID := c.Params("recipient_id")
-	aliases, err := h.Service.GetAliases(c.Context(), recipientID)
+	userID := c.Params("user_id")
+	aliases, err := h.Service.GetAliases(c.Context(), userID)
 	if err != nil {
 		c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),

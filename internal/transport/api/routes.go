@@ -27,7 +27,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Get("/recipient/verify/:id/:verification", h.VerifyRecipient)
 
 	v1.Get("/alias/:id", h.GetAlias)
-	v1.Get("/aliases/:recipient_id", h.GetAliases)
+	v1.Get("/aliases/:user_id", h.GetAliases)
 	v1.Post("/alias", h.PostAlias)
 	v1.Put("/alias", h.UpdateAlias)
 	v1.Delete("/alias/:id", h.DeleteAlias)

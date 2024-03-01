@@ -9,6 +9,8 @@ import (
 	"ivpn.net/email-service/config"
 )
 
+const AuthCookie = "auth"
+
 func New(cfg config.APIConfig) fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
@@ -52,8 +54,8 @@ func extractToken(c *fiber.Ctx) string {
 
 	if strings.HasPrefix(authorization, "Bearer ") {
 		tokenString = strings.TrimPrefix(authorization, "Bearer ")
-	} else if c.Cookies("token") != "" {
-		tokenString = c.Cookies("token")
+	} else if c.Cookies(AuthCookie) != "" {
+		tokenString = c.Cookies(AuthCookie)
 	}
 
 	return tokenString

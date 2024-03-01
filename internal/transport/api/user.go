@@ -15,7 +15,6 @@ var (
 	LoginSuccess          = "Login successful"
 	LogoutSuccess         = "Logout successful"
 	ActivateSuccess       = "User activated"
-	CookieAuth            = "Auth"
 	ErrInvalidCredentials = "Invalid credentials"
 	ErrInvalidRequest     = "Invalid request"
 )
@@ -121,7 +120,7 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 	}
 
 	// Create auth token
-	token, err := utils.CreateToken(h.Cfg, user.ID)
+	token, err := utils.CreateAuthToken(h.Cfg, user.ID)
 	if err != nil {
 		log.Printf("error login: %s", err.Error())
 		return c.Status(500).JSON(fiber.Map{
@@ -131,7 +130,7 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 
 	// Set the token in ecrypted cookie
 	c.Cookie(&fiber.Cookie{
-		Name:  CookieAuth,
+		Name:  auth.AuthCookie,
 		Value: token,
 	})
 
@@ -141,7 +140,7 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 }
 
 func (h *Handler) Logout(c *fiber.Ctx) error {
-	c.ClearCookie(CookieAuth)
+	c.ClearCookie(auth.AuthCookie)
 
 	return c.Status(200).JSON(fiber.Map{
 		"message": LogoutSuccess,

@@ -12,12 +12,12 @@ import (
 	"ivpn.net/email-service/config"
 )
 
-type Token struct {
+type OTP struct {
 	Secret string
 	Hash   string
 }
 
-func CreateOTP() (*Token, error) {
+func CreateOTP() (*OTP, error) {
 	bigInt, err := rand.Int(rand.Reader, big.NewInt(900000))
 	if err != nil {
 		return nil, err
@@ -28,7 +28,7 @@ func CreateOTP() (*Token, error) {
 	// Convert the integer to a string and get the first 6 characters
 	sixDigitStr := fmt.Sprintf("%06d", sixDigitNum)
 
-	token := Token{
+	token := OTP{
 		Secret: sixDigitStr,
 	}
 
@@ -65,7 +65,7 @@ func ValidateOTP(secret string) error {
 	return nil
 }
 
-func CreateToken(cfg config.APIConfig, userID string) (string, error) {
+func CreateAuthToken(cfg config.APIConfig, userID string) (string, error) {
 	claims := jwt.MapClaims{}
 	claims["user_id"] = userID
 	claims["exp"] = time.Now().Add(cfg.TokenExpiration).Unix()

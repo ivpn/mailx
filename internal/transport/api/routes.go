@@ -1,37 +1,35 @@
 package api
 
 import (
+	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
 	"ivpn.net/email-service/config"
 	"ivpn.net/email-service/internal/middleware/auth"
 )
 
 func (h *Handler) SetupRoutes(cfg config.APIConfig) {
+	h.Server.Post("/v1/register", h.Register)
+	h.Server.Post("/v1/login", h.Login)
+
 	v1 := h.Server.Group("/v1")
 
-	v1.Post("/register", h.Register)
-	v1.Post("/login", h.Login)
+	v1.Use(encryptcookie.New(encryptcookie.Config{
+		Key: cfg.CookieSecret,
+	}))
+	v1.Use(auth.New(cfg))
 
-	auth := auth.New(cfg)
+	v1.Post("/user/activate", h.Activate)
+	v1.Post("/user/logout", h.Logout)
 
-	user := v1.Group("/user")
-	user.Use(auth)
-	user.Post("/activate", h.Activate)
-	user.Post("/logout", h.Logout)
+	v1.Get("/recipient/:id", h.GetRecipient)
+	v1.Get("/recipient/:user_id", h.GetRecipients)
+	v1.Post("/recipient", h.PostRecipient)
+	v1.Put("/recipient", h.UpdateRecipient)
+	v1.Delete("/recipient/:id", h.DeleteRecipient)
+	v1.Post("/recipient/verify/:id/:verification", h.VerifyRecipient)
 
-	recipient := v1.Group("/recipient")
-	recipient.Use(auth)
-	recipient.Get("/:id", h.GetRecipient)
-	recipient.Get("/:user_id", h.GetRecipients)
-	recipient.Post("/", h.PostRecipient)
-	recipient.Put("/", h.UpdateRecipient)
-	recipient.Delete("/:id", h.DeleteRecipient)
-	recipient.Get("/verify/:id/:verification", h.VerifyRecipient)
-
-	alias := v1.Group("/alias")
-	alias.Use(auth)
-	alias.Get("/:id", h.GetAlias)
-	alias.Get("/:user_id", h.GetAliases)
-	alias.Post("/", h.PostAlias)
-	alias.Put("/", h.UpdateAlias)
-	alias.Delete("/:id", h.DeleteAlias)
+	v1.Get("/alias/:id", h.GetAlias)
+	v1.Get("/alias/:user_id", h.GetAliases)
+	v1.Post("/alias/", h.PostAlias)
+	v1.Put("/alias/", h.UpdateAlias)
+	v1.Delete("/alias/:id", h.DeleteAlias)
 }

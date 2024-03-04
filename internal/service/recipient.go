@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"gorm.io/gorm"
+	"ivpn.net/email-service/internal/client/mailer"
 	"ivpn.net/email-service/internal/model"
 	"ivpn.net/email-service/internal/utils"
 )
@@ -51,13 +52,13 @@ func (s *Service) GetRecipients(ctx context.Context, userID string) ([]model.Rec
 func (s *Service) PostRecipient(ctx context.Context, recipient model.Recipient) error {
 	err := recipient.Validate()
 	if err != nil {
-		log.Printf("an error occurred creating the recipient: %s", err.Error())
+		log.Printf("error creating recipient: %s", err.Error())
 		return err
 	}
 
 	err = s.Store.PostRecipient(ctx, recipient)
 	if err != nil {
-		log.Printf("an error occurred creating the recipient: %s", err.Error())
+		log.Printf("error creating recipient: %s", err.Error())
 		switch {
 		case errors.Is(err, gorm.ErrDuplicatedKey):
 			return model.ErrDuplicateRecipient
@@ -65,6 +66,26 @@ func (s *Service) PostRecipient(ctx context.Context, recipient model.Recipient) 
 			return ErrPostRecipient
 		}
 	}
+
+	otp, err := utils.CreateOTP()
+	if err != nil {
+		log.Printf("error creating recipient: %s", err.Error())
+		return ErrCreateOTP
+	}
+
+	err = s.Cache.Set(ctx, "activation_recipient_"+recipient.ID, otp.Hash, s.Cfg.Service.OTPExpiration)
+	if err != nil {
+		log.Printf("error creating recipient: %s", err.Error())
+		return ErrSaveOTP
+	}
+
+	utils.Background(func() {
+		mailer := mailer.New(s.Cfg.SMTPClient)
+		err = mailer.Send(recipient.Email, "Activate your account", utils.FormatOTP(otp.Secret))
+		if err != nil {
+			log.Printf("error creating recipient: %s", err.Error())
+		}
+	})
 
 	return nil
 }

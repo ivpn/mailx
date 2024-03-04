@@ -48,6 +48,7 @@ func (h *Handler) Register(c *fiber.Ctx) error {
 	user := model.User{
 		Email:         req.Email,
 		PasswordPlain: &req.Password,
+		IsActive:      false,
 	}
 
 	// Save the user

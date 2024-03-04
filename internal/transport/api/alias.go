@@ -81,13 +81,20 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 }
 
 func (h *Handler) UpdateAlias(c *fiber.Ctx) error {
-	var alias model.Alias
-	err := c.BodyParser(&alias)
+	req := AliasRequest{}
+	err := c.BodyParser(&req)
 	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
+		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
+
+	alias := model.Alias{
+		UserID:      auth.GetUserID(c),
+		RecipientID: req.RecipientID,
+		Descripion:  req.Description,
+	}
+	alias.ID = c.Params("id")
 
 	err = h.Service.UpdateAlias(c.Context(), alias)
 	if err != nil {

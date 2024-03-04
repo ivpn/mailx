@@ -2,7 +2,7 @@ package model
 
 import "time"
 
-type Plan struct {
+type Subscription struct {
 	BaseModel
 	Name         string     `json:"name"`
 	UserID       string     `json:"user_id"`

@@ -53,18 +53,6 @@ func FormatOTP(s string) string {
 	return strings.Join(words, " ")
 }
 
-func ValidateOTP(secret string) error {
-	if secret == "" {
-		return fmt.Errorf("token must be provided")
-	}
-
-	if len(secret) != 6 {
-		return fmt.Errorf("token must be 6 bytes long")
-	}
-
-	return nil
-}
-
 func CreateAuthToken(cfg config.APIConfig, userID string) (string, error) {
 	claims := jwt.MapClaims{}
 	claims["user_id"] = userID

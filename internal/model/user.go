@@ -5,15 +5,14 @@ import (
 	"regexp"
 
 	"github.com/alexedwards/argon2id"
+	"ivpn.net/email-service/internal/utils"
 )
 
 var (
-	ErrEmailInvalid    = errors.New("invalid email")
-	ErrPasswordInvalid = errors.New("invalid password")
-	ErrDuplicateEmail  = errors.New("duplicate email")
-	ErrHashFailed      = errors.New("password hash failed")
-	ErrMatchFailed     = errors.New("password match failed")
-	EmailRX            = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+	ErrDuplicateEmail = errors.New("duplicate email")
+	ErrHashFailed     = errors.New("password hash failed")
+	ErrMatchFailed    = errors.New("password match failed")
+	EmailRX           = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 )
 
 type User struct {
@@ -25,12 +24,14 @@ type User struct {
 }
 
 func (u *User) Validate() error {
-	if u.Email == "" || !EmailRX.MatchString(u.Email) {
-		return ErrEmailInvalid
+	err := utils.ValidateEmail(u.Email)
+	if err != nil {
+		return err
 	}
 
-	if u.PasswordPlain == nil || len(*u.PasswordPlain) < 8 || len(*u.PasswordPlain) > 64 {
-		return ErrPasswordInvalid
+	err = utils.ValidatePassword(*u.PasswordPlain)
+	if err != nil {
+		return err
 	}
 
 	return nil

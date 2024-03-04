@@ -33,7 +33,7 @@ func New(cfg config.APIConfig) fiber.Handler {
 
 		}
 
-		if claims["auth_id"] == nil {
+		if claims["user_id"] == nil {
 			return c.SendStatus(fiber.StatusUnauthorized)
 		}
 

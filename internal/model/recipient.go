@@ -12,10 +12,9 @@ var (
 
 type Recipient struct {
 	BaseModel
-	UserID       string `json:"user_id"`
-	Email        string `gorm:"unique" json:"email"`
-	Verification string `json:"verification"`
-	Verified     bool   `json:"verified"`
+	UserID   string `json:"user_id"`
+	Email    string `gorm:"unique" json:"email"`
+	IsActive bool   `json:"is_active"`
 }
 
 func (r *Recipient) Validate() error {

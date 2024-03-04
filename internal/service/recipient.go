@@ -7,15 +7,16 @@ import (
 
 	"gorm.io/gorm"
 	"ivpn.net/email-service/internal/model"
+	"ivpn.net/email-service/internal/utils"
 )
 
 var (
-	ErrGetRecipient    = errors.New("could not get recipient by ID")
-	ErrGetRecipients   = errors.New("could not get recipients by user ID")
-	ErrPostRecipient   = errors.New("could not post recipient")
-	ErrUpdateRecipient = errors.New("could not update recipient")
-	ErrDeleteRecipient = errors.New("could not delete recipient")
-	ErrVerifyRecipient = errors.New("could not verify recipient")
+	ErrGetRecipient      = errors.New("could not get recipient by ID")
+	ErrGetRecipients     = errors.New("could not get recipients by user ID")
+	ErrPostRecipient     = errors.New("could not post recipient")
+	ErrUpdateRecipient   = errors.New("could not update recipient")
+	ErrDeleteRecipient   = errors.New("could not delete recipient")
+	ErrActivateRecipient = errors.New("could not activate recipient")
 )
 
 type RecipienteStore interface {
@@ -24,7 +25,7 @@ type RecipienteStore interface {
 	PostRecipient(context.Context, model.Recipient) error
 	UpdateRecipient(context.Context, model.Recipient) error
 	DeleteRecipient(context.Context, string) error
-	VerifyRecipient(context.Context, string, string) (model.Recipient, error)
+	ActivateRecipient(context.Context, string) error
 }
 
 func (s *Service) GetRecipient(ctx context.Context, ID string) (model.Recipient, error) {
@@ -88,12 +89,33 @@ func (s *Service) DeleteRecipient(ctx context.Context, ID string) error {
 	return nil
 }
 
-func (s *Service) VerifyRecipient(ctx context.Context, ID string, verification string) (model.Recipient, error) {
-	rcp, err := s.Store.VerifyRecipient(ctx, ID, verification)
+func (s *Service) ActivateRecipient(ctx context.Context, ID string, otp string) error {
+	err := utils.ValidateOTP(otp)
 	if err != nil {
-		log.Printf("an error occurred verifying the recipient: %s", err.Error())
-		return model.Recipient{}, ErrVerifyRecipient
+		log.Printf("error activating recipient: %s", err.Error())
+		return err
 	}
 
-	return rcp, nil
+	hash, err := s.Cache.Get(ctx, "activation_recipient_"+ID)
+	if err != nil {
+		log.Printf("error activating recipient: %s", err.Error())
+		return ErrActivateRecipient
+	}
+
+	if hash != utils.OTPHash(otp) {
+		return ErrIncorrectOTP
+	}
+
+	err = s.Store.ActivateRecipient(ctx, ID)
+	if err != nil {
+		log.Printf("error activating recipient: %s", err.Error())
+		return ErrActivateRecipient
+	}
+
+	err = s.Cache.Del(ctx, "activation_recipient_"+ID)
+	if err != nil {
+		log.Printf("error activating recipient: %s", err.Error())
+	}
+
+	return nil
 }

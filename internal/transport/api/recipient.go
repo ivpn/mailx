@@ -8,9 +8,10 @@ import (
 )
 
 var (
-	PostRecipientSuccess   = "Recipient created"
-	UpdateRecipientSuccess = "Recipient updated"
-	DeleteRecipientSuccess = "Recipient deleted"
+	PostRecipientSuccess     = "Recipient created"
+	ActivateRecipientSuccess = "Recipient activated"
+	UpdateRecipientSuccess   = "Recipient updated"
+	DeleteRecipientSuccess   = "Recipient deleted"
 )
 
 type RecipientService interface {
@@ -19,7 +20,7 @@ type RecipientService interface {
 	PostRecipient(context.Context, model.Recipient) error
 	UpdateRecipient(context.Context, model.Recipient) error
 	DeleteRecipient(context.Context, string) error
-	VerifyRecipient(context.Context, string, string) (model.Recipient, error)
+	ActivateRecipient(context.Context, string, string) error
 }
 
 func (h *Handler) GetRecipient(c *fiber.Ctx) error {
@@ -89,8 +90,8 @@ func (h *Handler) UpdateRecipient(c *fiber.Ctx) error {
 }
 
 func (h *Handler) DeleteRecipient(c *fiber.Ctx) error {
-	id := c.Params("id")
-	err := h.Service.DeleteRecipient(c.Context(), id)
+	ID := c.Params("id")
+	err := h.Service.DeleteRecipient(c.Context(), ID)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
@@ -102,15 +103,25 @@ func (h *Handler) DeleteRecipient(c *fiber.Ctx) error {
 	})
 }
 
-func (h *Handler) VerifyRecipient(c *fiber.Ctx) error {
-	id := c.Params("id")
-	verification := c.Params("verification")
-	recipient, err := h.Service.VerifyRecipient(c.Context(), id, verification)
+func (h *Handler) ActivateRecipient(c *fiber.Ctx) error {
+	ID := c.Params("id")
+
+	req := ActivateRequest{}
+	err := c.BodyParser(&req)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
 
-	return c.JSON(recipient)
+	err = h.Service.ActivateRecipient(c.Context(), ID, req.OTP)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": ActivateRecipientSuccess,
+	})
 }

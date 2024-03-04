@@ -14,7 +14,7 @@ var (
 	RegisterSuccess       = "User created"
 	LoginSuccess          = "Login successful"
 	LogoutSuccess         = "Logout successful"
-	ActivateSuccess       = "User activated"
+	ActivateUserSuccess   = "User activated"
 	ErrInvalidCredentials = "Invalid credentials"
 	ErrInvalidRequest     = "Invalid request"
 )
@@ -64,7 +64,7 @@ func (h *Handler) Register(c *fiber.Ctx) error {
 }
 
 func (h *Handler) Activate(c *fiber.Ctx) error {
-	userID := auth.GetUserID(c)
+	ID := auth.GetUserID(c)
 
 	req := ActivateRequest{}
 	err := c.BodyParser(&req)
@@ -74,7 +74,7 @@ func (h *Handler) Activate(c *fiber.Ctx) error {
 		})
 	}
 
-	err = h.Service.ActivateUser(c.Context(), userID, req.OTP)
+	err = h.Service.ActivateUser(c.Context(), ID, req.OTP)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
@@ -82,7 +82,7 @@ func (h *Handler) Activate(c *fiber.Ctx) error {
 	}
 
 	return c.Status(200).JSON(fiber.Map{
-		"message": ActivateSuccess,
+		"message": ActivateUserSuccess,
 	})
 }
 

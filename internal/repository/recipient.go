@@ -30,15 +30,6 @@ func (d *Database) DeleteRecipient(ctx context.Context, ID string) error {
 	return d.Client.Where("id = ?", ID).Delete(&model.Recipient{}).Error
 }
 
-func (d *Database) VerifyRecipient(ctx context.Context, ID string, verification string) (model.Recipient, error) {
-	var recipient model.Recipient
-	err := d.Client.Where("id = ? AND verification = ?", ID, verification).First(&recipient).Error
-	if err != nil {
-		return recipient, err
-	}
-
-	recipient.Verified = true
-	recipient.Verification = ""
-
-	return recipient, d.Client.Save(&recipient).Error
+func (d *Database) ActivateRecipient(ctx context.Context, ID string) error {
+	return d.Client.Model(&model.Recipient{}).Where("id = ?", ID).Update("active", true).Error
 }

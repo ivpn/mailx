@@ -89,14 +89,14 @@ func (s *Service) PostUser(ctx context.Context, user model.User) error {
 	return nil
 }
 
-func (s *Service) ActivateUser(ctx context.Context, userID string, otp string) error {
+func (s *Service) ActivateUser(ctx context.Context, ID string, otp string) error {
 	err := utils.ValidateOTP(otp)
 	if err != nil {
 		log.Printf("error activating user: %s", err.Error())
 		return err
 	}
 
-	hash, err := s.Cache.Get(ctx, "activation_"+userID)
+	hash, err := s.Cache.Get(ctx, "activation_"+ID)
 	if err != nil {
 		log.Printf("error activating user: %s", err.Error())
 		return ErrActivateUser
@@ -106,13 +106,13 @@ func (s *Service) ActivateUser(ctx context.Context, userID string, otp string) e
 		return ErrIncorrectOTP
 	}
 
-	err = s.Store.ActivateUser(ctx, userID)
+	err = s.Store.ActivateUser(ctx, ID)
 	if err != nil {
 		log.Printf("error activating user: %s", err.Error())
 		return ErrActivateUser
 	}
 
-	err = s.Cache.Del(ctx, "activation_"+userID)
+	err = s.Cache.Del(ctx, "activation_"+ID)
 	if err != nil {
 		log.Printf("error activating user: %s", err.Error())
 	}

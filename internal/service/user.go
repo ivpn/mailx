@@ -17,6 +17,7 @@ var (
 	ErrCreateOTP      = errors.New("could not create OTP")
 	ErrSaveOTP        = errors.New("could not save OTP")
 	ErrSendOTP        = errors.New("could not send OTP")
+	ErrExpiredOTP     = errors.New("expired OTP")
 	ErrIncorrectOTP   = errors.New("incorrect OTP")
 	ErrIncorrectEmail = errors.New("incorrect email")
 	ErrIncorrectPass  = errors.New("incorrect password")
@@ -99,7 +100,7 @@ func (s *Service) ActivateUser(ctx context.Context, ID string, otp string) error
 	hash, err := s.Cache.Get(ctx, "activation_"+ID)
 	if err != nil {
 		log.Printf("error activating user: %s", err.Error())
-		return ErrActivateUser
+		return ErrExpiredOTP
 	}
 
 	if hash != utils.HashOTP(otp) {

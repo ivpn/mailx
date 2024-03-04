@@ -120,7 +120,7 @@ func (s *Service) ActivateRecipient(ctx context.Context, ID string, otp string) 
 	hash, err := s.Cache.Get(ctx, "activation_recipient_"+ID)
 	if err != nil {
 		log.Printf("error activating recipient: %s", err.Error())
-		return ErrActivateRecipient
+		return ErrExpiredOTP
 	}
 
 	if hash != utils.HashOTP(otp) {

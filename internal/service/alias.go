@@ -30,7 +30,7 @@ type AliasStore interface {
 func (s *Service) GetAlias(ctx context.Context, ID string) (model.Alias, error) {
 	alias, err := s.Store.GetAlias(ctx, ID)
 	if err != nil {
-		log.Printf("an error occured fetching the alias: %s", err.Error())
+		log.Printf("error fetching alias: %s", err.Error())
 		return model.Alias{}, ErrGetAlias
 	}
 
@@ -40,7 +40,7 @@ func (s *Service) GetAlias(ctx context.Context, ID string) (model.Alias, error) 
 func (s *Service) GetAliases(ctx context.Context, userID string) ([]model.Alias, error) {
 	aliases, err := s.Store.GetAliases(ctx, userID)
 	if err != nil {
-		log.Printf("an error occured fetching the aliass: %s", err.Error())
+		log.Printf("error fetching aliass: %s", err.Error())
 		return []model.Alias{}, ErrGetAliases
 	}
 
@@ -50,7 +50,7 @@ func (s *Service) GetAliases(ctx context.Context, userID string) ([]model.Alias,
 func (s *Service) GetAliasByName(name string) (model.Alias, error) {
 	alias, err := s.Store.GetAliasByName(name)
 	if err != nil {
-		log.Printf("an error occured fetching the alias: %s", err.Error())
+		log.Printf("error fetching alias: %s", err.Error())
 		return model.Alias{}, ErrGetAliasByName
 	}
 
@@ -62,7 +62,7 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias) error {
 		alias.Name = model.GenerateAlias()
 		err := s.Store.PostAlias(ctx, alias)
 		if err != nil {
-			log.Printf("an error occurred creating the alias: %s", err.Error())
+			log.Printf("error creating alias: %s", err.Error())
 			switch {
 			case errors.Is(err, gorm.ErrDuplicatedKey):
 				continue
@@ -79,7 +79,7 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias) error {
 func (s *Service) UpdateAlias(ctx context.Context, alias model.Alias) error {
 	err := s.Store.UpdateAlias(ctx, alias)
 	if err != nil {
-		log.Printf("an error occurred updating the alias: %s", err.Error())
+		log.Printf("error updating alias: %s", err.Error())
 		return ErrUpdateAlias
 	}
 
@@ -89,7 +89,7 @@ func (s *Service) UpdateAlias(ctx context.Context, alias model.Alias) error {
 func (s *Service) DeleteAlias(ctx context.Context, ID string) error {
 	err := s.Store.DeleteAlias(ctx, ID)
 	if err != nil {
-		log.Printf("an error occurred deleting the alias: %s", err.Error())
+		log.Printf("error deleting alias: %s", err.Error())
 		return ErrDeleteAlias
 	}
 

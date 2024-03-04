@@ -11,6 +11,7 @@ type Store interface {
 	RecipienteStore
 	AliasStore
 	UserStore
+	SubscriptionStore
 }
 
 type Cache interface {

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/gofiber/fiber/v2"
+	"ivpn.net/email-service/internal/middleware/auth"
 	"ivpn.net/email-service/internal/model"
 )
 
@@ -35,7 +36,7 @@ func (h *Handler) GetAlias(c *fiber.Ctx) error {
 }
 
 func (h *Handler) GetAliases(c *fiber.Ctx) error {
-	userID := c.Params("user_id")
+	userID := auth.GetUserID(c)
 	aliases, err := h.Service.GetAliases(c.Context(), userID)
 	if err != nil {
 		c.Status(500).JSON(fiber.Map{

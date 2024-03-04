@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/gofiber/fiber/v2"
+	"ivpn.net/email-service/internal/middleware/auth"
 	"ivpn.net/email-service/internal/model"
 )
 
@@ -23,6 +24,10 @@ type RecipientService interface {
 	ActivateRecipient(context.Context, string, string) error
 }
 
+type RecipientRequest struct {
+	Email string `json:"email"`
+}
+
 func (h *Handler) GetRecipient(c *fiber.Ctx) error {
 	id := c.Params("id")
 	recipient, err := h.Service.GetRecipient(c.Context(), id)
@@ -36,7 +41,7 @@ func (h *Handler) GetRecipient(c *fiber.Ctx) error {
 }
 
 func (h *Handler) GetRecipients(c *fiber.Ctx) error {
-	userID := c.Params("user_id")
+	userID := auth.GetUserID(c)
 	recipients, err := h.Service.GetRecipients(c.Context(), userID)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
@@ -48,14 +53,22 @@ func (h *Handler) GetRecipients(c *fiber.Ctx) error {
 }
 
 func (h *Handler) PostRecipient(c *fiber.Ctx) error {
-	var recipient model.Recipient
-	err := c.BodyParser(&recipient)
+	// Parse the request
+	req := RecipientRequest{}
+	err := c.BodyParser(&req)
 	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
+		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
 
+	// Create new recipient
+	recipient := model.Recipient{
+		Email:    req.Email,
+		IsActive: false,
+	}
+
+	// Save the recipient
 	err = h.Service.PostRecipient(c.Context(), recipient)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
@@ -65,27 +78,6 @@ func (h *Handler) PostRecipient(c *fiber.Ctx) error {
 
 	return c.Status(201).JSON(fiber.Map{
 		"message": PostRecipientSuccess,
-	})
-}
-
-func (h *Handler) UpdateRecipient(c *fiber.Ctx) error {
-	var recipient model.Recipient
-	err := c.BodyParser(&recipient)
-	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"error": err.Error(),
-		})
-	}
-
-	err = h.Service.UpdateRecipient(c.Context(), recipient)
-	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": err.Error(),
-		})
-	}
-
-	return c.Status(200).JSON(fiber.Map{
-		"message": UpdateRecipientSuccess,
 	})
 }
 

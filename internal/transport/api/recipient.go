@@ -53,7 +53,6 @@ func (h *Handler) GetRecipients(c *fiber.Ctx) error {
 }
 
 func (h *Handler) PostRecipient(c *fiber.Ctx) error {
-	// Parse the request
 	req := RecipientRequest{}
 	err := c.BodyParser(&req)
 	if err != nil {
@@ -62,13 +61,11 @@ func (h *Handler) PostRecipient(c *fiber.Ctx) error {
 		})
 	}
 
-	// Create new recipient
 	recipient := model.Recipient{
 		Email:    req.Email,
 		IsActive: false,
 	}
 
-	// Save the recipient
 	err = h.Service.PostRecipient(c.Context(), recipient)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{

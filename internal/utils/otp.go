@@ -6,10 +6,6 @@ import (
 	"fmt"
 	"math/big"
 	"strings"
-	"time"
-
-	"github.com/golang-jwt/jwt"
-	"ivpn.net/email-service/config"
 )
 
 type OTP struct {
@@ -24,22 +20,15 @@ func CreateOTP() (*OTP, error) {
 	}
 
 	sixDigitNum := bigInt.Int64() + 100000
-
-	// Convert the integer to a string and get the first 6 characters
 	sixDigitStr := fmt.Sprintf("%06d", sixDigitNum)
-
-	token := OTP{
-		Secret: sixDigitStr,
-	}
-
+	token := OTP{Secret: sixDigitStr}
 	hash := sha256.Sum256([]byte(token.Secret))
-
 	token.Hash = fmt.Sprintf("%x\n", hash)
 
 	return &token, nil
 }
 
-func OTPHash(secret string) string {
+func HashOTP(secret string) string {
 	hash := sha256.Sum256([]byte(secret))
 	return fmt.Sprintf("%x\n", hash)
 }
@@ -51,13 +40,4 @@ func FormatOTP(s string) string {
 	secondHalf := s[half:]
 	words := []string{firstHalf, secondHalf}
 	return strings.Join(words, " ")
-}
-
-func CreateAuthToken(cfg config.APIConfig, userID string) (string, error) {
-	claims := jwt.MapClaims{}
-	claims["user_id"] = userID
-	claims["exp"] = time.Now().Add(cfg.TokenExpiration).Unix()
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	return token.SignedString([]byte(cfg.TokenSecret))
 }

@@ -102,7 +102,7 @@ func (s *Service) ActivateUser(ctx context.Context, ID string, otp string) error
 		return ErrActivateUser
 	}
 
-	if hash != utils.OTPHash(otp) {
+	if hash != utils.HashOTP(otp) {
 		return ErrIncorrectOTP
 	}
 

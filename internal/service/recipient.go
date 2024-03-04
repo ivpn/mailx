@@ -123,7 +123,7 @@ func (s *Service) ActivateRecipient(ctx context.Context, ID string, otp string) 
 		return ErrActivateRecipient
 	}
 
-	if hash != utils.OTPHash(otp) {
+	if hash != utils.HashOTP(otp) {
 		return ErrIncorrectOTP
 	}
 

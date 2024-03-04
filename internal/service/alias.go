@@ -58,15 +58,19 @@ func (s *Service) GetAliasByName(name string) (model.Alias, error) {
 }
 
 func (s *Service) PostAlias(ctx context.Context, alias model.Alias) error {
-	err := s.Store.PostAlias(ctx, alias)
-	if err != nil {
-		log.Printf("an error occurred creating the alias: %s", err.Error())
-		switch {
-		case errors.Is(err, gorm.ErrDuplicatedKey):
-			return model.ErrDuplicateAlias
-		default:
-			return ErrPostAlias
+	for i := 0; i < 5; i++ {
+		alias.Name = model.GenerateAlias()
+		err := s.Store.PostAlias(ctx, alias)
+		if err != nil {
+			log.Printf("an error occurred creating the alias: %s", err.Error())
+			switch {
+			case errors.Is(err, gorm.ErrDuplicatedKey):
+				continue
+			default:
+				return ErrPostAlias
+			}
 		}
+		break
 	}
 
 	return nil

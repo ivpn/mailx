@@ -22,6 +22,11 @@ type AliasService interface {
 	DeleteAlias(context.Context, string) error
 }
 
+type AliasRequest struct {
+	RecipientID string `json:"recipient_id"`
+	Description string `json:"description"`
+}
+
 func (h *Handler) GetAlias(c *fiber.Ctx) error {
 	id := c.Params("id")
 	alias, err := h.Service.GetAlias(c.Context(), id)
@@ -49,12 +54,18 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 }
 
 func (h *Handler) PostAlias(c *fiber.Ctx) error {
-	var alias model.Alias
-	err := c.BodyParser(&alias)
+	req := AliasRequest{}
+	err := c.BodyParser(&req)
 	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
+		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
 		})
+	}
+
+	alias := model.Alias{
+		UserID:      auth.GetUserID(c),
+		RecipientID: req.RecipientID,
+		Descripion:  req.Description,
 	}
 
 	err = h.Service.PostAlias(c.Context(), alias)

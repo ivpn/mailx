@@ -3,11 +3,16 @@ package service
 import (
 	"bytes"
 	"context"
+	"errors"
 	"net"
 	"net/mail"
 	"strings"
 
 	"ivpn.net/email-service/internal/client/mailer"
+)
+
+var (
+	ErrInactiveSubscription = errors.New("inactive subscription")
 )
 
 type Message struct {
@@ -50,6 +55,15 @@ func (s *Service) findRecipient(email string) (string, error) {
 	recipient, err := s.GetRecipient(context.Background(), alias.RecipientID)
 	if err != nil {
 		return "", err
+	}
+
+	sub, err := s.GetSubscription(context.Background(), recipient.UserID)
+	if err != nil {
+		return "", err
+	}
+
+	if !sub.Active {
+		return "", ErrInactiveSubscription
 	}
 
 	return recipient.Email, nil

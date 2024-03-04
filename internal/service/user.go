@@ -67,6 +67,12 @@ func (s *Service) PostUser(ctx context.Context, user model.User) error {
 		}
 	}
 
+	err = s.PostSubscription(ctx, user.ID)
+	if err != nil {
+		log.Printf("error creating user: %s", err.Error())
+		return ErrPostUser
+	}
+
 	otp, err := utils.CreateOTP()
 	if err != nil {
 		log.Printf("error creating user: %s", err.Error())

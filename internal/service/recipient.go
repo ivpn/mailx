@@ -48,7 +48,13 @@ func (s *Service) GetRecipients(ctx context.Context, userID string) ([]model.Rec
 }
 
 func (s *Service) PostRecipient(ctx context.Context, recipient model.Recipient) error {
-	err := s.Store.PostRecipient(ctx, recipient)
+	err := recipient.Validate()
+	if err != nil {
+		log.Printf("an error occurred creating the recipient: %s", err.Error())
+		return err
+	}
+
+	err = s.Store.PostRecipient(ctx, recipient)
 	if err != nil {
 		log.Printf("an error occurred creating the recipient: %s", err.Error())
 		switch {

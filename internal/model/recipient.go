@@ -2,8 +2,8 @@ package model
 
 import (
 	"errors"
-	"math/rand"
-	"time"
+
+	"ivpn.net/email-service/internal/utils"
 )
 
 var (
@@ -18,15 +18,11 @@ type Recipient struct {
 	Verified     bool   `json:"verified"`
 }
 
-func GenerateVerification() string {
-	source := rand.NewSource(time.Now().UnixNano())
-	r := rand.New(source)
-
-	const charset = "0123456789"
-	result := make([]byte, 6)
-	for i := range result {
-		result[i] = charset[r.Intn(len(charset))]
+func (r *Recipient) Validate() error {
+	err := utils.ValidateEmail(r.Email)
+	if err != nil {
+		return err
 	}
 
-	return string(result)
+	return nil
 }

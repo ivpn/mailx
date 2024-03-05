@@ -23,7 +23,7 @@ var (
 type RecipienteStore interface {
 	GetRecipient(context.Context, string) (model.Recipient, error)
 	GetRecipients(context.Context, string) ([]model.Recipient, error)
-	PostRecipient(context.Context, model.Recipient) error
+	PostRecipient(context.Context, model.Recipient) (model.Recipient, error)
 	UpdateRecipient(context.Context, model.Recipient) error
 	DeleteRecipient(context.Context, string) error
 	ActivateRecipient(context.Context, string) error
@@ -56,7 +56,7 @@ func (s *Service) PostRecipient(ctx context.Context, recipient model.Recipient) 
 		return err
 	}
 
-	err = s.Store.PostRecipient(ctx, recipient)
+	recipient, err = s.Store.PostRecipient(ctx, recipient)
 	if err != nil {
 		log.Printf("error creating recipient: %s", err.Error())
 		switch {

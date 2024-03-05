@@ -18,8 +18,9 @@ func (d *Database) GetRecipients(ctx context.Context, userID string) ([]model.Re
 	return recipients, err
 }
 
-func (d *Database) PostRecipient(ctx context.Context, recipient model.Recipient) error {
-	return d.Client.Create(&recipient).Error
+func (d *Database) PostRecipient(ctx context.Context, recipient model.Recipient) (model.Recipient, error) {
+	err := d.Client.Create(&recipient).Error
+	return recipient, err
 }
 
 func (d *Database) UpdateRecipient(ctx context.Context, recipient model.Recipient) error {
@@ -31,5 +32,5 @@ func (d *Database) DeleteRecipient(ctx context.Context, ID string) error {
 }
 
 func (d *Database) ActivateRecipient(ctx context.Context, ID string) error {
-	return d.Client.Model(&model.Recipient{}).Where("id = ?", ID).Update("active", true).Error
+	return d.Client.Model(&model.Recipient{}).Where("id = ?", ID).Update("is_active", true).Error
 }

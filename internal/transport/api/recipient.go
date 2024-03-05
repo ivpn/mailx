@@ -62,6 +62,7 @@ func (h *Handler) PostRecipient(c *fiber.Ctx) error {
 	}
 
 	recipient := model.Recipient{
+		UserID:   auth.GetUserID(c),
 		Email:    req.Email,
 		IsActive: false,
 	}

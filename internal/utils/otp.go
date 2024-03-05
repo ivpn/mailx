@@ -5,7 +5,6 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"math/big"
-	"strings"
 )
 
 type OTP struct {
@@ -31,13 +30,4 @@ func CreateOTP() (*OTP, error) {
 func HashOTP(secret string) string {
 	hash := sha256.Sum256([]byte(secret))
 	return fmt.Sprintf("%x\n", hash)
-}
-
-func FormatOTP(s string) string {
-	length := len(s)
-	half := length / 2
-	firstHalf := s[:half]
-	secondHalf := s[half:]
-	words := []string{firstHalf, secondHalf}
-	return strings.Join(words, " ")
 }

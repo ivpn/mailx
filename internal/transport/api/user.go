@@ -129,7 +129,7 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 		})
 	}
 
-	// Set the token in ecrypted cookie
+	// Set the token in encrypted cookie
 	c.Cookie(&fiber.Cookie{
 		Name:  auth.AuthCookie,
 		Value: token,

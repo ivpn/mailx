@@ -15,10 +15,13 @@ func New(cfg config.APIConfig) fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
 		tokenString := extractToken(c)
+		if tokenString == "" {
+			return c.SendStatus(fiber.StatusUnauthorized)
+		}
 
-		token, err := jwt.Parse(tokenString, func(jwtToken *jwt.Token) (interface{}, error) {
-			if _, ok := jwtToken.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("unexpected signing method: %s", jwtToken.Header["alg"])
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
 
 			return []byte(cfg.TokenSecret), nil
@@ -37,15 +40,14 @@ func New(cfg config.APIConfig) fiber.Handler {
 			return c.SendStatus(fiber.StatusUnauthorized)
 		}
 
+		c.Locals("user_id", claims["user_id"])
+
 		return c.Next()
 	}
 }
 
 func GetUserID(c *fiber.Ctx) string {
-	user := c.Locals("user").(*jwt.Token)
-	claims := user.Claims.(jwt.MapClaims)
-	userID := claims["user_id"].(string)
-	return userID
+	return c.Locals("user_id").(string)
 }
 
 func extractToken(c *fiber.Ctx) string {

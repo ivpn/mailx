@@ -62,7 +62,7 @@ func (s *Service) findRecipient(email string) (string, error) {
 		return "", err
 	}
 
-	if !sub.Active {
+	if !sub.IsActive {
 		return "", ErrInactiveSubscription
 	}
 

@@ -37,7 +37,7 @@ func (s *Service) PostSubscription(ctx context.Context, userID string) error {
 		Name:         "IVPN",
 		UserID:       userID,
 		ActivationID: uuid.New().String(),
-		Active:       true,
+		IsActive:     false,
 	}
 
 	err := s.Store.PostSubscription(ctx, sub)

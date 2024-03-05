@@ -7,6 +7,6 @@ type Subscription struct {
 	Name         string     `json:"name"`
 	UserID       string     `json:"user_id"`
 	ActivationID string     `json:"activation_id"`
-	Active       bool       `json:"active"`
+	IsActive     bool       `json:"is_active"`
 	ActiveUntil  *time.Time `json:"active_until"`
 }

@@ -12,7 +12,7 @@ var (
 
 type Recipient struct {
 	BaseModel
-	UserID   string `json:"user_id"`
+	UserID   string `json:"-"`
 	Email    string `gorm:"unique" json:"email"`
 	IsActive bool   `json:"is_active"`
 }

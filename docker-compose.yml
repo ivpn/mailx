@@ -39,7 +39,7 @@ services:
     ports:
       - 6379:6379
     volumes:
-      - email-redis:/var/lib/redis
+      - email-redis:/data
 
 volumes:
   email-db:

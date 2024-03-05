@@ -18,5 +18,5 @@ func (d *Database) PostUser(ctx context.Context, user model.User) (model.User, e
 }
 
 func (d *Database) ActivateUser(ctx context.Context, ID string) error {
-	return d.Client.Model(&model.User{}).Where("id = ?", ID).Update("active", true).Error
+	return d.Client.Model(&model.User{}).Where("id = ?", ID).Update("is_active", true).Error
 }

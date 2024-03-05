@@ -4,6 +4,7 @@ services:
   app:
     build: .
     container_name: email-app
+    restart: always
     env_file:
       - ./config/.env
     ports:

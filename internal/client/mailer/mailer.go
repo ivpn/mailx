@@ -31,6 +31,7 @@ func (m Mailer) Send(to string, subject string, body string) error {
 	msg.SetHeader("To", to)
 	msg.SetHeader("Subject", subject)
 	msg.SetBody("text/plain", body)
+	msg.AddAlternative("text/html", body)
 
 	err := m.dialer.DialAndSend(msg)
 	if err != nil {

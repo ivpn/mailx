@@ -12,8 +12,9 @@ func (d *Database) GetUserByEmail(ctx context.Context, email string) (model.User
 	return user, err
 }
 
-func (d *Database) PostUser(ctx context.Context, user model.User) error {
-	return d.Client.Create(&user).Error
+func (d *Database) PostUser(ctx context.Context, user model.User) (model.User, error) {
+	err := d.Client.Create(&user).Error
+	return user, err
 }
 
 func (d *Database) ActivateUser(ctx context.Context, ID string) error {

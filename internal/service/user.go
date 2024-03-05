@@ -25,7 +25,7 @@ var (
 
 type UserStore interface {
 	GetUserByEmail(context.Context, string) (model.User, error)
-	PostUser(context.Context, model.User) error
+	PostUser(context.Context, model.User) (model.User, error)
 	ActivateUser(context.Context, string) error
 }
 
@@ -56,7 +56,7 @@ func (s *Service) PostUser(ctx context.Context, user model.User) error {
 		return err
 	}
 
-	err = s.Store.PostUser(ctx, user)
+	user, err = s.Store.PostUser(ctx, user)
 	if err != nil {
 		log.Printf("error creating user: %s", err.Error())
 		switch {

@@ -19,6 +19,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Get("/recipient/:id", h.GetRecipient)
 	v1.Get("/recipients", h.GetRecipients)
 	v1.Post("/recipient", h.PostRecipient)
+	v1.Post("/recipient/sendotp/:id", h.SendRecipientOTP)
 	v1.Post("/recipient/activate/:id", h.ActivateRecipient)
 	v1.Delete("/recipient/:id", h.DeleteRecipient)
 

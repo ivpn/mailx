@@ -90,6 +90,36 @@ func (s *Service) PostRecipient(ctx context.Context, recipient model.Recipient) 
 	return nil
 }
 
+func (s *Service) SendRecipientOTP(ctx context.Context, ID string) error {
+	recipient, err := s.GetRecipient(ctx, ID)
+	if err != nil {
+		log.Printf("error sending OTP: %s", err.Error())
+		return ErrGetRecipient
+	}
+
+	otp, err := utils.CreateOTP()
+	if err != nil {
+		log.Printf("error sending OTP: %s", err.Error())
+		return ErrCreateOTP
+	}
+
+	err = s.Cache.Set(ctx, "activation_recipient_"+ID, otp.Hash, s.Cfg.Service.OTPExpiration)
+	if err != nil {
+		log.Printf("error sending OTP: %s", err.Error())
+		return ErrSaveOTP
+	}
+
+	utils.Background(func() {
+		mailer := mailer.New(s.Cfg.SMTPClient)
+		err = mailer.Send(recipient.Email, "Activate recipient", otp.Secret)
+		if err != nil {
+			log.Printf("error sending OTP: %s", err.Error())
+		}
+	})
+
+	return nil
+}
+
 func (s *Service) UpdateRecipient(ctx context.Context, recipient model.Recipient) error {
 	err := s.Store.UpdateRecipient(ctx, recipient)
 	if err != nil {

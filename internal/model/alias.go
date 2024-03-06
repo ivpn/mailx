@@ -3,7 +3,7 @@ package model
 import "errors"
 
 var (
-	ErrDuplicateAlias = errors.New("duplicate alias")
+	ErrDuplicateAlias = errors.New("alias already exists")
 )
 
 type Alias struct {

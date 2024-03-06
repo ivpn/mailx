@@ -14,7 +14,7 @@ import (
 var (
 	ErrGetRecipient      = errors.New("could not get recipient by ID")
 	ErrGetRecipients     = errors.New("could not get recipients by user ID")
-	ErrPostRecipient     = errors.New("could not post recipient")
+	ErrPostRecipient     = errors.New("could not create recipient")
 	ErrUpdateRecipient   = errors.New("could not update recipient")
 	ErrDeleteRecipient   = errors.New("could not delete recipient")
 	ErrActivateRecipient = errors.New("could not activate recipient")

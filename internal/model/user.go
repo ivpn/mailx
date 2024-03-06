@@ -9,9 +9,9 @@ import (
 )
 
 var (
-	ErrDuplicateEmail = errors.New("duplicate email")
+	ErrDuplicateEmail = errors.New("email already exists")
 	ErrHashFailed     = errors.New("password hash failed")
-	ErrMatchFailed    = errors.New("password match failed")
+	ErrMatchFailed    = errors.New("incorrect password")
 	EmailRX           = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 )
 

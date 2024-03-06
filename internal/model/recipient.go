@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	ErrDuplicateRecipient = errors.New("duplicate recipient")
+	ErrDuplicateRecipient = errors.New("email already exists")
 )
 
 type Recipient struct {

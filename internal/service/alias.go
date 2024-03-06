@@ -13,7 +13,7 @@ var (
 	ErrGetAlias       = errors.New("could not get alias by ID")
 	ErrGetAliases     = errors.New("could not get aliass by recipient ID")
 	ErrGetAliasByName = errors.New("could not get alias by name")
-	ErrPostAlias      = errors.New("could not post alias")
+	ErrPostAlias      = errors.New("could not create alias, try again")
 	ErrUpdateAlias    = errors.New("could not update alias")
 	ErrDeleteAlias    = errors.New("could not delete alias")
 )

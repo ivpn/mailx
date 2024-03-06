@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	ErrPostUser       = errors.New("could not save user")
+	ErrPostUser       = errors.New("could not create user")
 	ErrActivateUser   = errors.New("could not activate user")
 	ErrCreateOTP      = errors.New("could not create OTP")
 	ErrSaveOTP        = errors.New("could not save OTP")

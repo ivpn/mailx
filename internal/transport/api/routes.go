@@ -18,8 +18,8 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Get("/recipient/:id", h.GetRecipient)
 	v1.Get("/recipients", h.GetRecipients)
 	v1.Post("/recipient", h.PostRecipient)
-	v1.Delete("/recipient/:id", h.DeleteRecipient)
 	v1.Post("/recipient/activate/:id", h.ActivateRecipient)
+	v1.Delete("/recipient/:id", h.DeleteRecipient)
 
 	v1.Get("/alias/:id", h.GetAlias)
 	v1.Get("/aliases", h.GetAliases)

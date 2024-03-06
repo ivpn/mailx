@@ -92,7 +92,6 @@ func (h *Handler) UpdateAlias(c *fiber.Ctx) error {
 	}
 
 	alias := model.Alias{
-		UserID:      auth.GetUserID(c),
 		RecipientID: req.RecipientID,
 		Descripion:  req.Description,
 		Enabled:     req.Enabled,

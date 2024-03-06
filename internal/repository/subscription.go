@@ -17,7 +17,7 @@ func (d *Database) PostSubscription(ctx context.Context, subscription model.Subs
 }
 
 func (d *Database) UpdateSubscription(ctx context.Context, subscription model.Subscription) error {
-	return d.Client.Save(subscription).Error
+	return d.Client.Updates(subscription).Error
 }
 
 func (d *Database) DeleteSubscription(ctx context.Context, userID string) error {

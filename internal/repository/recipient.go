@@ -24,7 +24,7 @@ func (d *Database) PostRecipient(ctx context.Context, recipient model.Recipient)
 }
 
 func (d *Database) UpdateRecipient(ctx context.Context, recipient model.Recipient) error {
-	return d.Client.Save(recipient).Error
+	return d.Client.Updates(recipient).Error
 }
 
 func (d *Database) DeleteRecipient(ctx context.Context, ID string) error {

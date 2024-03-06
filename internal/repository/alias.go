@@ -29,7 +29,11 @@ func (d *Database) PostAlias(ctx context.Context, alias model.Alias) error {
 }
 
 func (d *Database) UpdateAlias(ctx context.Context, alias model.Alias) error {
-	return d.Client.Save(alias).Error
+	return d.Client.Model(&alias).Updates(map[string]interface{}{
+		"recipient_id": alias.RecipientID,
+		"descripion":   alias.Descripion,
+		"enabled":      alias.Enabled,
+	}).Error
 }
 
 func (d *Database) DeleteAlias(ctx context.Context, ID string) error {

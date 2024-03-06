@@ -12,6 +12,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1 := h.Server.Group("/v1")
 	v1.Use(auth.New(cfg))
 
+	v1.Post("/user/sendotp", h.SendUserOTP)
 	v1.Post("/user/activate", h.Activate)
 	v1.Post("/user/logout", h.Logout)
 

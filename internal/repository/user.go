@@ -6,6 +6,12 @@ import (
 	"ivpn.net/email-service/internal/model"
 )
 
+func (d *Database) GetUser(ctx context.Context, ID string) (model.User, error) {
+	var user model.User
+	err := d.Client.Where("id = ?", ID).First(&user).Error
+	return user, err
+}
+
 func (d *Database) GetUserByEmail(ctx context.Context, email string) (model.User, error) {
 	var user model.User
 	err := d.Client.Where("email = ?", email).First(&user).Error

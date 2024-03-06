@@ -12,6 +12,7 @@ import (
 )
 
 var (
+	ErrGetUser        = errors.New("could not get user by ID")
 	ErrPostUser       = errors.New("could not create user")
 	ErrActivateUser   = errors.New("could not activate user")
 	ErrCreateOTP      = errors.New("could not create OTP")
@@ -24,6 +25,7 @@ var (
 )
 
 type UserStore interface {
+	GetUser(context.Context, string) (model.User, error)
 	GetUserByEmail(context.Context, string) (model.User, error)
 	PostUser(context.Context, model.User) (model.User, error)
 	ActivateUser(context.Context, string) error
@@ -90,6 +92,36 @@ func (s *Service) PostUser(ctx context.Context, user model.User) error {
 		err = mailer.Send(user.Email, "Activate your account", otp.Secret)
 		if err != nil {
 			log.Printf("error creating user: %s", err.Error())
+		}
+	})
+
+	return nil
+}
+
+func (s *Service) SendUserOTP(ctx context.Context, userID string) error {
+	user, err := s.Store.GetUser(ctx, userID)
+	if err != nil {
+		log.Printf("error sending OTP: %s", err.Error())
+		return ErrGetUser
+	}
+
+	otp, err := utils.CreateOTP()
+	if err != nil {
+		log.Printf("error sending OTP: %s", err.Error())
+		return ErrCreateOTP
+	}
+
+	err = s.Cache.Set(ctx, "activation_"+userID, otp.Hash, s.Cfg.Service.OTPExpiration)
+	if err != nil {
+		log.Printf("error sending OTP: %s", err.Error())
+		return ErrSaveOTP
+	}
+
+	utils.Background(func() {
+		mailer := mailer.New(s.Cfg.SMTPClient)
+		err = mailer.Send(user.Email, "Activate your account", otp.Secret)
+		if err != nil {
+			log.Printf("error sending OTP: %s", err.Error())
 		}
 	})
 

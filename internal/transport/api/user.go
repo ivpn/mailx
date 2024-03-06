@@ -14,6 +14,7 @@ var (
 	RegisterSuccess       = "User created"
 	LoginSuccess          = "Login successful"
 	LogoutSuccess         = "Logout successful"
+	OTPSent               = "OTP sent"
 	ActivateUserSuccess   = "User activated"
 	ErrInvalidCredentials = "Invalid credentials"
 	ErrInvalidRequest     = "Invalid request"
@@ -21,6 +22,7 @@ var (
 
 type UserService interface {
 	PostUser(context.Context, model.User) error
+	SendUserOTP(context.Context, string) error
 	ActivateUser(context.Context, string, string) error
 	GetUserByCredentials(context.Context, string, string) (model.User, error)
 }
@@ -61,6 +63,21 @@ func (h *Handler) Register(c *fiber.Ctx) error {
 
 	return c.Status(200).JSON(fiber.Map{
 		"message": RegisterSuccess,
+	})
+}
+
+func (h *Handler) SendUserOTP(c *fiber.Ctx) error {
+	ID := auth.GetUserID(c)
+
+	err := h.Service.SendUserOTP(c.Context(), ID)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": OTPSent,
 	})
 }
 

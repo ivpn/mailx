@@ -25,6 +25,7 @@ type AliasService interface {
 type AliasRequest struct {
 	RecipientID string `json:"recipient_id"`
 	Description string `json:"description"`
+	Enabled     bool   `json:"enabled"`
 }
 
 func (h *Handler) GetAlias(c *fiber.Ctx) error {
@@ -66,6 +67,7 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 		UserID:      auth.GetUserID(c),
 		RecipientID: req.RecipientID,
 		Descripion:  req.Description,
+		Enabled:     req.Enabled,
 	}
 
 	err = h.Service.PostAlias(c.Context(), alias)
@@ -93,6 +95,7 @@ func (h *Handler) UpdateAlias(c *fiber.Ctx) error {
 		UserID:      auth.GetUserID(c),
 		RecipientID: req.RecipientID,
 		Descripion:  req.Description,
+		Enabled:     req.Enabled,
 	}
 	alias.ID = c.Params("id")
 

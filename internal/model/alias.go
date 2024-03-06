@@ -12,4 +12,5 @@ type Alias struct {
 	RecipientID string `json:"recipient_id"`
 	Name        string `gorm:"unique" json:"name"`
 	Descripion  string `json:"description"`
+	Enabled     bool   `json:"enabled"`
 }

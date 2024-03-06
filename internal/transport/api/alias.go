@@ -32,10 +32,9 @@ func (h *Handler) GetAlias(c *fiber.Ctx) error {
 	id := c.Params("id")
 	alias, err := h.Service.GetAlias(c.Context(), id)
 	if err != nil {
-		c.Status(500).JSON(fiber.Map{
+		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
 		})
-		return err
 	}
 
 	return c.JSON(alias)
@@ -45,10 +44,9 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 	userID := auth.GetUserID(c)
 	aliases, err := h.Service.GetAliases(c.Context(), userID)
 	if err != nil {
-		c.Status(500).JSON(fiber.Map{
+		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
 		})
-		return err
 	}
 
 	return c.JSON(aliases)

@@ -2,9 +2,8 @@ package main
 
 import (
 	"log"
-	"strconv"
+	"net/smtp"
 
-	"gopkg.in/gomail.v2"
 	"ivpn.net/email-service/config"
 )
 
@@ -18,22 +17,23 @@ func main() {
 }
 
 func send(cfg config.SMTPConfig) {
-	host := cfg.Host
-	port, err := strconv.Atoi(cfg.Port)
+	err := smtp.SendMail(
+		cfg.Host+":"+cfg.Port,
+		nil,
+		"sender@example.com",
+		[]string{"recipient@example.com"},
+		[]byte(
+			"From: Foo Bar <foo@bar.com>\r\n"+
+				"Content-Type: text/plain; charset=us-ascii\r\n"+
+				"Content-Transfer-Encoding: 7bit\r\n"+
+				"Subject: Test mail\r\n"+
+				"Date: Fri, 8 Mar 2024 11:14:26 +0800\r\n"+
+				"To: Baz Quux <baz@quux.com>\r\n\r\n"+
+				"This is the email body."),
+	)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	m := gomail.NewMessage()
-	m.SetHeader("From", "from@example.com")
-	m.SetHeader("To", "to@example.com")
-	m.SetHeader("Subject", "Hello!")
-	m.SetBody("text/plain", "Hello!")
-
-	d := gomail.Dialer{Host: host, Port: port}
-	if err := d.DialAndSend(m); err != nil {
-		log.Panic(err)
-	}
-
-	log.Println("Sent email")
+	log.Println("Email sent successfully")
 }

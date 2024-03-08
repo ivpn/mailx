@@ -8,7 +8,7 @@ services:
     env_file:
       - ./config/.env
     ports:
-      - 2525:2525
+      - 587:587
       - 80:3000
     depends_on:
       db:

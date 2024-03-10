@@ -5,11 +5,9 @@ services:
     build: .
     container_name: email-app
     restart: always
-    env_file:
-      - ./config/.env
     ports:
-      - 587:587
-      - 80:3000
+      - ${SMTP_PORT}
+      - ${API_PORT}
     depends_on:
       db:
         condition: service_healthy

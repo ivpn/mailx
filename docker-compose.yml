@@ -28,8 +28,6 @@ services:
       MYSQL_DATABASE: email
       MYSQL_USER: email
       MYSQL_PASSWORD: email
-    ports:
-      - 3306:3306
     volumes:
       - email-db:/var/lib/mysql
   
@@ -37,8 +35,6 @@ services:
     image: redis
     container_name: email-redis
     restart: always
-    ports:
-      - 6379:6379
     volumes:
       - email-redis:/data
 

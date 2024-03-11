@@ -17,6 +17,9 @@
 # Go workspace file
 go.work
 
+# Certs
+*.pem
+
 # Other
 .env
 .env.test

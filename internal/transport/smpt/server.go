@@ -19,7 +19,7 @@ func Start(cfg config.SMTPConfig, service Service) error {
 		Addr:         cfg.Host + ":" + cfg.Port,
 		Handler:      service.ProcessMessage,
 		Hostname:     cfg.Hostname,
-		AuthRequired: true,
+		AuthRequired: false,
 	}
 
 	return server.ListenAndServe()

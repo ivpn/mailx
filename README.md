@@ -4,7 +4,7 @@
 
 ### Config
 ```bash
-cp ./config/.env.sample ./config/.env
+cp .env.sample .env
 ```
 
 ### Build

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"log"
 	"net"
 	"net/mail"
 	"strings"
@@ -39,15 +40,19 @@ func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data
 		mailer.Sender = msg.From
 		err = mailer.Send(recipient, msg.Subject, msg.Body)
 		if err != nil {
+			log.Println("error forwarding message", err)
 			continue
 		}
 
-		s.PostMessage(context.Background(), model.Message{
+		err = s.PostMessage(context.Background(), model.Message{
 			AliasID: alias.ID,
 			UserID:  alias.UserID,
 			Type:    model.Forward,
 			Size:    len(data),
 		})
+		if err != nil {
+			log.Println("error saving message", err)
+		}
 	}
 
 	return err

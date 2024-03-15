@@ -56,10 +56,11 @@ func connect(cfg config.DBConfig) (*gorm.DB, error) {
 
 func migrate(db *gorm.DB) error {
 	err := db.AutoMigrate(
-		&model.Recipient{},
-		&model.Alias{},
 		&model.User{},
 		&model.Subscription{},
+		&model.Recipient{},
+		&model.Alias{},
+		&model.Message{},
 	)
 	if err != nil {
 		return err

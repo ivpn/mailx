@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"ivpn.net/email-service/internal/client/mailer"
+	"ivpn.net/email-service/internal/model"
 )
 
 var (
@@ -29,7 +30,7 @@ func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data
 	}
 
 	for _, to := range msg.To {
-		recipient, err := s.findRecipient(to)
+		recipient, alias, err := s.findRecipient(to)
 		if err != nil {
 			continue
 		}
@@ -40,33 +41,40 @@ func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data
 		if err != nil {
 			continue
 		}
+
+		s.PostMessage(context.Background(), model.Message{
+			AliasID: alias.ID,
+			UserID:  alias.UserID,
+			Type:    model.Forward,
+			Size:    len(data),
+		})
 	}
 
 	return err
 }
 
-func (s *Service) findRecipient(email string) (string, error) {
+func (s *Service) findRecipient(email string) (string, *model.Alias, error) {
 	name := email[:strings.Index(email, "@")]
 	alias, err := s.GetAliasByName(name)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
 	recipient, err := s.GetRecipient(context.Background(), alias.RecipientID)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
 	sub, err := s.GetSubscription(context.Background(), recipient.UserID)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
 	if !sub.IsActive {
-		return "", ErrInactiveSubscription
+		return "", nil, ErrInactiveSubscription
 	}
 
-	return recipient.Email, nil
+	return recipient.Email, &alias, nil
 }
 
 func parse(from string, to []string, data []byte) (Message, error) {

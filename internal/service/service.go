@@ -12,6 +12,7 @@ type Store interface {
 	AliasStore
 	UserStore
 	SubscriptionStore
+	MessageStore
 }
 
 type Cache interface {

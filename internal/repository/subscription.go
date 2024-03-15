@@ -8,7 +8,7 @@ import (
 
 func (d *Database) GetSubscription(ctx context.Context, userID string) (model.Subscription, error) {
 	var subscription model.Subscription
-	err := d.Client.First("user_id = ?", userID).Find(&subscription).Error
+	err := d.Client.Where("user_id = ?", userID).Find(&subscription).Error
 	return subscription, err
 }
 

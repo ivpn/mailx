@@ -21,7 +21,7 @@ func send(cfg config.SMTPConfig) {
 		cfg.Host+":"+cfg.Port,
 		nil,
 		"sender@example.com",
-		[]string{"recipient@example.com"},
+		[]string{"white.fog68@example.com"},
 		[]byte(
 			"From: Foo Bar <foo@bar.com>\r\n"+
 				"Content-Type: text/plain; charset=us-ascii\r\n"+

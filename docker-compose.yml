@@ -1,9 +1,9 @@
 version: '3.8'
 
 services:
-  app:
+  api:
     build: .
-    container_name: email-app
+    container_name: email-api
     restart: always
     ports:
       - ${SMTP_PORT}:${SMTP_PORT}

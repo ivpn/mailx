@@ -12,6 +12,7 @@ type Service interface {
 	RecipientService
 	AliasService
 	UserService
+	SubsctiptionService
 }
 
 type Handler struct {

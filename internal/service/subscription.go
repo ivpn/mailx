@@ -6,7 +6,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/google/uuid"
 	"ivpn.net/email-service/internal/model"
 )
 
@@ -34,12 +33,10 @@ func (s *Service) GetSubscription(ctx context.Context, userID string) (model.Sub
 }
 
 func (s *Service) PostSubscription(ctx context.Context, userID string) error {
-	now := time.Now()
 	sub := model.Subscription{
-		Type:         model.Free,
-		UserID:       userID,
-		ActivationID: uuid.New().String(),
-		ActiveUntil:  &now,
+		Type:        model.Free,
+		UserID:      userID,
+		ActiveUntil: time.Now().AddDate(0, -1, 0),
 	}
 
 	err := s.Store.PostSubscription(ctx, sub)

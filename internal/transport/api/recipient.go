@@ -58,7 +58,7 @@ func (h *Handler) PostRecipient(c *fiber.Ctx) error {
 	err := c.BodyParser(&req)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
-			"error": err.Error(),
+			"error": ErrInvalidRequest,
 		})
 	}
 
@@ -101,7 +101,7 @@ func (h *Handler) ActivateRecipient(c *fiber.Ctx) error {
 	err := c.BodyParser(&req)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
-			"error": err.Error(),
+			"error": ErrInvalidRequest,
 		})
 	}
 

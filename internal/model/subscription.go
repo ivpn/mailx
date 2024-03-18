@@ -11,8 +11,7 @@ const (
 
 type Subscription struct {
 	BaseModel
-	UserID       string           `json:"-"`
-	ActivationID string           `json:"activation_id"`
-	Type         SubscriptionType `json:"type"`
-	ActiveUntil  *time.Time       `json:"active_until"`
+	UserID      string           `json:"-"`
+	Type        SubscriptionType `json:"type"`
+	ActiveUntil time.Time        `json:"active_until"`
 }

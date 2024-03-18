@@ -44,7 +44,7 @@ func (h *Handler) Register(c *fiber.Ctx) error {
 	err := c.BodyParser(&req)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
-			"error": err.Error(),
+			"error": ErrInvalidRequest,
 		})
 	}
 
@@ -90,7 +90,7 @@ func (h *Handler) Activate(c *fiber.Ctx) error {
 	err := c.BodyParser(&req)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
-			"error": err.Error(),
+			"error": ErrInvalidRequest,
 		})
 	}
 

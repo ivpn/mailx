@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/mail"
 	"strings"
+	"time"
 
 	"ivpn.net/email-service/internal/client/mailer"
 	"ivpn.net/email-service/internal/model"
@@ -75,7 +76,7 @@ func (s *Service) findRecipient(email string) (string, *model.Alias, error) {
 		return "", nil, err
 	}
 
-	if !sub.IsActive {
+	if sub.ActiveUntil.Before(time.Now()) {
 		return "", nil, ErrInactiveSubscription
 	}
 

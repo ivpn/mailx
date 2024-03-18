@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"time"
 
 	"github.com/google/uuid"
 	"ivpn.net/email-service/internal/model"
@@ -33,11 +34,12 @@ func (s *Service) GetSubscription(ctx context.Context, userID string) (model.Sub
 }
 
 func (s *Service) PostSubscription(ctx context.Context, userID string) error {
+	now := time.Now()
 	sub := model.Subscription{
-		Name:         "IVPN",
+		Type:         model.Free,
 		UserID:       userID,
 		ActivationID: uuid.New().String(),
-		IsActive:     false,
+		ActiveUntil:  &now,
 	}
 
 	err := s.Store.PostSubscription(ctx, sub)
@@ -50,6 +52,7 @@ func (s *Service) PostSubscription(ctx context.Context, userID string) error {
 }
 
 func (s *Service) UpdateSubscription(ctx context.Context, subscription model.Subscription) error {
+	subscription.Type = model.Managed
 	err := s.Store.UpdateSubscription(ctx, subscription)
 	if err != nil {
 		log.Printf("error updating subscription: %s", err.Error())

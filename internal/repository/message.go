@@ -21,3 +21,7 @@ func (d *Database) GetMessagesByAlias(ctx context.Context, aliasID string) ([]mo
 func (d *Database) PostMessage(ctx context.Context, message model.Message) error {
 	return d.Client.Create(&message).Error
 }
+
+func (d *Database) DeleteMessageByUserID(ctx context.Context, userID string) error {
+	return d.Client.Where("user_id = ?", userID).Delete(&model.Message{}).Error
+}

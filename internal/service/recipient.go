@@ -12,12 +12,13 @@ import (
 )
 
 var (
-	ErrGetRecipient      = errors.New("could not get recipient by ID")
-	ErrGetRecipients     = errors.New("could not get recipients by user ID")
-	ErrPostRecipient     = errors.New("could not create recipient")
-	ErrUpdateRecipient   = errors.New("could not update recipient")
-	ErrDeleteRecipient   = errors.New("could not delete recipient")
-	ErrActivateRecipient = errors.New("could not activate recipient")
+	ErrGetRecipient            = errors.New("could not get recipient by ID")
+	ErrGetRecipients           = errors.New("could not get recipients by user ID")
+	ErrPostRecipient           = errors.New("could not create recipient")
+	ErrUpdateRecipient         = errors.New("could not update recipient")
+	ErrDeleteRecipient         = errors.New("could not delete recipient")
+	ErrDeleteRecipientByUserID = errors.New("could not delete recipient by user ID")
+	ErrActivateRecipient       = errors.New("could not activate recipient")
 )
 
 type RecipienteStore interface {
@@ -27,6 +28,7 @@ type RecipienteStore interface {
 	UpdateRecipient(context.Context, model.Recipient) error
 	DeleteRecipient(context.Context, string) error
 	ActivateRecipient(context.Context, string) error
+	DeleteRecipientByUserID(context.Context, string) error
 }
 
 func (s *Service) GetRecipient(ctx context.Context, ID string) (model.Recipient, error) {
@@ -166,6 +168,16 @@ func (s *Service) ActivateRecipient(ctx context.Context, ID string, otp string) 
 	err = s.Cache.Del(ctx, "activation_recipient_"+ID)
 	if err != nil {
 		log.Printf("error activating recipient: %s", err.Error())
+	}
+
+	return nil
+}
+
+func (s *Service) DeleteRecipientByUserID(ctx context.Context, userID string) error {
+	err := s.Store.DeleteRecipientByUserID(ctx, userID)
+	if err != nil {
+		log.Printf("an error occurred deleting the recipient: %s", err.Error())
+		return ErrDeleteRecipientByUserID
 	}
 
 	return nil

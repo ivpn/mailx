@@ -94,3 +94,7 @@ func (d *Database) UpdateAlias(ctx context.Context, alias model.Alias) error {
 func (d *Database) DeleteAlias(ctx context.Context, ID string) error {
 	return d.Client.Where("id = ?", ID).Delete(&model.Alias{}).Error
 }
+
+func (d *Database) DeleteAliasByUserID(ctx context.Context, userID string) error {
+	return d.Client.Where("user_id = ?", userID).Delete(&model.Alias{}).Error
+}

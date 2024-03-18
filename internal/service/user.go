@@ -161,8 +161,32 @@ func (s *Service) ActivateUser(ctx context.Context, ID string, otp string) error
 	return nil
 }
 
-func (s *Service) DeleteUser(ctx context.Context, ID string) error {
-	err := s.Store.DeleteUser(ctx, ID)
+func (s *Service) DeleteUser(ctx context.Context, userID string) error {
+	err := s.Store.DeleteAliasByUserID(ctx, userID)
+	if err != nil {
+		log.Printf("error deleting user: %s", err.Error())
+		return ErrDeleteUser
+	}
+
+	err = s.Store.DeleteRecipientByUserID(ctx, userID)
+	if err != nil {
+		log.Printf("error deleting user: %s", err.Error())
+		return ErrDeleteUser
+	}
+
+	err = s.Store.DeleteMessageByUserID(ctx, userID)
+	if err != nil {
+		log.Printf("error deleting user: %s", err.Error())
+		return ErrDeleteUser
+	}
+
+	err = s.Store.DeleteSubscription(ctx, userID)
+	if err != nil {
+		log.Printf("error deleting user: %s", err.Error())
+		return ErrDeleteUser
+	}
+
+	err = s.Store.DeleteUser(ctx, userID)
 	if err != nil {
 		log.Printf("error deleting user: %s", err.Error())
 		return ErrDeleteUser

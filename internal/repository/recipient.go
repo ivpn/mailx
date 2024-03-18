@@ -34,3 +34,7 @@ func (d *Database) DeleteRecipient(ctx context.Context, ID string) error {
 func (d *Database) ActivateRecipient(ctx context.Context, ID string) error {
 	return d.Client.Model(&model.Recipient{}).Where("id = ?", ID).Update("is_active", true).Error
 }
+
+func (d *Database) DeleteRecipientByUserID(ctx context.Context, userID string) error {
+	return d.Client.Where("user_id = ?", userID).Delete(&model.Recipient{}).Error
+}

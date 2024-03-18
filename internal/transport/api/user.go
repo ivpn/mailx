@@ -14,6 +14,7 @@ var (
 	RegisterSuccess       = "User created"
 	LoginSuccess          = "Login successful"
 	LogoutSuccess         = "Logout successful"
+	DeleteUserSuccess     = "User deleted"
 	OTPSent               = "OTP sent"
 	ActivateUserSuccess   = "User activated"
 	ErrInvalidCredentials = "Invalid credentials"
@@ -25,6 +26,7 @@ type UserService interface {
 	SendUserOTP(context.Context, string) error
 	ActivateUser(context.Context, string, string) error
 	GetUserByCredentials(context.Context, string, string) (model.User, error)
+	DeleteUser(context.Context, string) error
 }
 
 type UserRequest struct {
@@ -162,5 +164,53 @@ func (h *Handler) Logout(c *fiber.Ctx) error {
 
 	return c.Status(200).JSON(fiber.Map{
 		"message": LogoutSuccess,
+	})
+}
+
+func (h *Handler) DeleteUser(c *fiber.Ctx) error {
+	ID := auth.GetUserID(c)
+
+	// Parse the request
+	req := UserRequest{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		log.Printf("error login: %s", err.Error())
+		return c.Status(500).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	// Validate the request
+	userModel := model.User{
+		Email:         req.Email,
+		PasswordPlain: &req.Password,
+	}
+	err = userModel.Validate()
+	if err != nil {
+		log.Printf("error login: %s", err.Error())
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidCredentials,
+		})
+	}
+
+	// Get the user
+	user, err := h.Service.GetUserByCredentials(c.Context(), req.Email, req.Password)
+	if err != nil || user.ID != ID {
+		log.Printf("error login: %s", err.Error())
+		return c.Status(401).JSON(fiber.Map{
+			"error": ErrInvalidCredentials,
+		})
+	}
+
+	// Delete the user
+	err = h.Service.DeleteUser(c.Context(), ID)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": DeleteUserSuccess,
 	})
 }

@@ -15,6 +15,7 @@ var (
 	ErrGetUser        = errors.New("could not get user by ID")
 	ErrPostUser       = errors.New("could not create user")
 	ErrActivateUser   = errors.New("could not activate user")
+	ErrDeleteUser     = errors.New("could not delete user")
 	ErrCreateOTP      = errors.New("could not create OTP")
 	ErrSaveOTP        = errors.New("could not save OTP")
 	ErrSendOTP        = errors.New("could not send OTP")
@@ -29,6 +30,7 @@ type UserStore interface {
 	GetUserByEmail(context.Context, string) (model.User, error)
 	PostUser(context.Context, model.User) (model.User, error)
 	ActivateUser(context.Context, string) error
+	DeleteUser(context.Context, string) error
 }
 
 func (s *Service) GetUserByCredentials(ctx context.Context, email string, password string) (model.User, error) {
@@ -154,6 +156,16 @@ func (s *Service) ActivateUser(ctx context.Context, ID string, otp string) error
 	err = s.Cache.Del(ctx, "activation_"+ID)
 	if err != nil {
 		log.Printf("error activating user: %s", err.Error())
+	}
+
+	return nil
+}
+
+func (s *Service) DeleteUser(ctx context.Context, ID string) error {
+	err := s.Store.DeleteUser(ctx, ID)
+	if err != nil {
+		log.Printf("error deleting user: %s", err.Error())
+		return ErrDeleteUser
 	}
 
 	return nil

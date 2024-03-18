@@ -15,6 +15,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Post("/user/sendotp", h.SendUserOTP)
 	v1.Post("/user/activate", h.Activate)
 	v1.Post("/user/logout", h.Logout)
+	v1.Post("/user/delete", h.DeleteUser)
 
 	v1.Get("/recipient/:id", h.GetRecipient)
 	v1.Get("/recipients", h.GetRecipients)

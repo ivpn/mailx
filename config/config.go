@@ -12,6 +12,8 @@ type APIConfig struct {
 	CookieSecret    string
 	TokenSecret     string
 	TokenExpiration time.Duration
+	PSK             string
+	PSKAllowOrigin  string
 }
 
 type SMTPConfig struct {
@@ -77,6 +79,8 @@ func New() (Config, error) {
 			CookieSecret:    os.Getenv("COOKIE_SECRET"),
 			TokenSecret:     os.Getenv("TOKEN_SECRET"),
 			TokenExpiration: tokenExp,
+			PSK:             os.Getenv("PSK"),
+			PSKAllowOrigin:  os.Getenv("PSK_ALLOW_ORIGIN"),
 		},
 		SMTP: SMTPConfig{
 			Host:     os.Getenv("SMTP_HOST"),

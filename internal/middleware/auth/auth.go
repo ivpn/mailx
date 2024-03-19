@@ -14,7 +14,7 @@ const AuthCookie = "auth"
 func New(cfg config.APIConfig) fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
-		tokenString := extractToken(c)
+		tokenString := getToken(c)
 		if tokenString == "" {
 			return c.SendStatus(fiber.StatusUnauthorized)
 		}
@@ -46,11 +46,22 @@ func New(cfg config.APIConfig) fiber.Handler {
 	}
 }
 
+func NewPSK(cfg config.APIConfig) fiber.Handler {
+
+	return func(c *fiber.Ctx) error {
+		if getToken(c) != cfg.PSK {
+			return c.SendStatus(fiber.StatusUnauthorized)
+		}
+
+		return c.Next()
+	}
+}
+
 func GetUserID(c *fiber.Ctx) string {
 	return c.Locals("user_id").(string)
 }
 
-func extractToken(c *fiber.Ctx) string {
+func getToken(c *fiber.Ctx) string {
 	var tokenString string
 	authorization := c.Get("Authorization")
 

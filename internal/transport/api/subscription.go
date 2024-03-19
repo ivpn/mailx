@@ -18,11 +18,6 @@ type SubsctiptionService interface {
 	UpdateSubscription(context.Context, model.Subscription) error
 }
 
-type SubscriptionRequest struct {
-	ID          string `json:"id"`
-	ActiveUntil string `json:"active_until"`
-}
-
 func (h *Handler) GetSubscription(c *fiber.Ctx) error {
 	userID := auth.GetUserID(c)
 
@@ -37,7 +32,7 @@ func (h *Handler) GetSubscription(c *fiber.Ctx) error {
 }
 
 func (h *Handler) UpdateSubscription(c *fiber.Ctx) error {
-	req := SubscriptionRequest{}
+	req := SubscriptionReq{}
 	err := c.BodyParser(&req)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{

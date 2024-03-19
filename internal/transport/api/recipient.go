@@ -25,10 +25,6 @@ type RecipientService interface {
 	DeleteRecipient(context.Context, string) error
 }
 
-type RecipientRequest struct {
-	Email string `json:"email"`
-}
-
 func (h *Handler) GetRecipient(c *fiber.Ctx) error {
 	id := c.Params("id")
 	recipient, err := h.Service.GetRecipient(c.Context(), id)
@@ -54,7 +50,7 @@ func (h *Handler) GetRecipients(c *fiber.Ctx) error {
 }
 
 func (h *Handler) PostRecipient(c *fiber.Ctx) error {
-	req := RecipientRequest{}
+	req := RecipientReq{}
 	err := c.BodyParser(&req)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
@@ -97,7 +93,7 @@ func (h *Handler) SendRecipientOTP(c *fiber.Ctx) error {
 func (h *Handler) ActivateRecipient(c *fiber.Ctx) error {
 	ID := c.Params("id")
 
-	req := ActivateRequest{}
+	req := ActivateReq{}
 	err := c.BodyParser(&req)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{

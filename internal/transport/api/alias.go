@@ -22,12 +22,6 @@ type AliasService interface {
 	DeleteAlias(context.Context, string) error
 }
 
-type AliasRequest struct {
-	RecipientID string `json:"recipient_id"`
-	Description string `json:"description"`
-	Enabled     bool   `json:"enabled"`
-}
-
 func (h *Handler) GetAlias(c *fiber.Ctx) error {
 	id := c.Params("id")
 	alias, err := h.Service.GetAlias(c.Context(), id)
@@ -53,7 +47,7 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 }
 
 func (h *Handler) PostAlias(c *fiber.Ctx) error {
-	req := AliasRequest{}
+	req := AliasReq{}
 	err := c.BodyParser(&req)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
@@ -81,7 +75,7 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 }
 
 func (h *Handler) UpdateAlias(c *fiber.Ctx) error {
-	req := AliasRequest{}
+	req := AliasReq{}
 	err := c.BodyParser(&req)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{

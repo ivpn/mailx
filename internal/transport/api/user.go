@@ -29,18 +29,9 @@ type UserService interface {
 	DeleteUser(context.Context, string) error
 }
 
-type UserRequest struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
-type ActivateRequest struct {
-	OTP string `json:"otp"`
-}
-
 func (h *Handler) Register(c *fiber.Ctx) error {
 	// Parse the request
-	req := UserRequest{}
+	req := UserReq{}
 	err := c.BodyParser(&req)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
@@ -86,7 +77,7 @@ func (h *Handler) SendUserOTP(c *fiber.Ctx) error {
 func (h *Handler) Activate(c *fiber.Ctx) error {
 	ID := auth.GetUserID(c)
 
-	req := ActivateRequest{}
+	req := ActivateReq{}
 	err := c.BodyParser(&req)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
@@ -108,7 +99,7 @@ func (h *Handler) Activate(c *fiber.Ctx) error {
 
 func (h *Handler) Login(c *fiber.Ctx) error {
 	// Parse the request
-	req := UserRequest{}
+	req := UserReq{}
 	err := c.BodyParser(&req)
 	if err != nil {
 		log.Printf("error login: %s", err.Error())
@@ -171,7 +162,7 @@ func (h *Handler) DeleteUser(c *fiber.Ctx) error {
 	ID := auth.GetUserID(c)
 
 	// Parse the request
-	req := UserRequest{}
+	req := UserReq{}
 	err := c.BodyParser(&req)
 	if err != nil {
 		log.Printf("error deleting user: %s", err.Error())

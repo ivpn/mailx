@@ -9,7 +9,10 @@ import (
 	"ivpn.net/email-service/config"
 )
 
-const AuthCookie = "auth"
+const (
+	AUTH_COOKIE = "auth"
+	USER_ID     = "user_id"
+)
 
 func New(cfg config.APIConfig) fiber.Handler {
 
@@ -36,11 +39,11 @@ func New(cfg config.APIConfig) fiber.Handler {
 
 		}
 
-		if claims["user_id"] == nil {
+		if claims[USER_ID] == nil {
 			return c.SendStatus(fiber.StatusUnauthorized)
 		}
 
-		c.Locals("user_id", claims["user_id"])
+		c.Locals(USER_ID, claims[USER_ID])
 
 		return c.Next()
 	}
@@ -57,8 +60,19 @@ func NewPSK(cfg config.APIConfig) fiber.Handler {
 	}
 }
 
+func NewPSKCORS(cfg config.APIConfig) fiber.Handler {
+
+	return func(c *fiber.Ctx) error {
+		c.Set("Access-Control-Allow-Origin", cfg.PSKAllowOrigin)
+		c.Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept")
+		c.Set("Access-Control-Allow-Methods", "PUT")
+
+		return c.Next()
+	}
+}
+
 func GetUserID(c *fiber.Ctx) string {
-	return c.Locals("user_id").(string)
+	return c.Locals(USER_ID).(string)
 }
 
 func getToken(c *fiber.Ctx) string {
@@ -67,8 +81,8 @@ func getToken(c *fiber.Ctx) string {
 
 	if strings.HasPrefix(authorization, "Bearer ") {
 		tokenString = strings.TrimPrefix(authorization, "Bearer ")
-	} else if c.Cookies(AuthCookie) != "" {
-		tokenString = c.Cookies(AuthCookie)
+	} else if c.Cookies(AUTH_COOKIE) != "" {
+		tokenString = c.Cookies(AUTH_COOKIE)
 	}
 
 	return tokenString

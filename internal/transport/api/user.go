@@ -150,7 +150,7 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 
 	// Set the token in encrypted cookie
 	c.Cookie(&fiber.Cookie{
-		Name:  auth.AuthCookie,
+		Name:  auth.AUTH_COOKIE,
 		Value: token,
 	})
 
@@ -160,7 +160,7 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 }
 
 func (h *Handler) Logout(c *fiber.Ctx) error {
-	c.ClearCookie(auth.AuthCookie)
+	c.ClearCookie(auth.AUTH_COOKIE)
 
 	return c.Status(200).JSON(fiber.Map{
 		"message": LogoutSuccess,

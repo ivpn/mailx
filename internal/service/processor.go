@@ -16,6 +16,7 @@ import (
 
 var (
 	ErrInactiveSubscription = errors.New("inactive subscription")
+	ErrDisabledAlias        = errors.New("disabled alias")
 )
 
 type Message struct {
@@ -64,6 +65,10 @@ func (s *Service) findRecipient(email string) (string, *model.Alias, error) {
 	alias, err := s.GetAliasByName(name)
 	if err != nil {
 		return "", nil, err
+	}
+
+	if !alias.Enabled {
+		return "", nil, ErrDisabledAlias
 	}
 
 	recipient, err := s.GetRecipient(context.Background(), alias.RecipientID)

@@ -8,8 +8,8 @@ var (
 
 type Alias struct {
 	BaseModel
-	UserID      string     `json:"-"`
 	Name        string     `gorm:"unique" json:"name"`
+	UserID      string     `json:"-"`
 	Enabled     bool       `json:"enabled"`
 	Description string     `json:"description"`
 	Recipients  string     `json:"recipients"`

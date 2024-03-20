@@ -1,18 +1,21 @@
 package model
 
-type MessageType string
+import "time"
+
+type MessageType int
 
 const (
-	Forward MessageType = "Forward"
-	Block   MessageType = "Block"
-	Reply   MessageType = "Reply"
-	Send    MessageType = "Send"
+	Forward MessageType = 0
+	Block   MessageType = 1
+	Reply   MessageType = 2
+	Send    MessageType = 3
 )
 
 type Message struct {
-	BaseModel
-	UserID  string      `json:"user_id"`
-	AliasID string      `json:"alias_id"`
-	Type    MessageType `json:"type"`
-	Size    int         `json:"size"`
+	ID        uint `gorm:"primaryKey"`
+	CreatedAt time.Time
+	UserID    string
+	AliasID   string
+	Type      MessageType
+	Size      int
 }

@@ -9,10 +9,10 @@ var (
 type Alias struct {
 	BaseModel
 	UserID      string     `json:"-"`
-	RecipientID string     `json:"recipient_id"`
 	Name        string     `gorm:"unique" json:"name"`
 	Enabled     bool       `json:"enabled"`
 	Description string     `json:"description"`
+	Recipients  string     `json:"recipients"`
 	Stats       AliasStats `gorm:"-" json:"stats"`
 }
 

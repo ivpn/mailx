@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"strings"
 
 	"ivpn.net/email-service/internal/model"
 )
@@ -21,6 +22,12 @@ func (d *Database) GetRecipientByEmail(ctx context.Context, email string) (model
 func (d *Database) GetRecipients(ctx context.Context, userID string) ([]model.Recipient, error) {
 	var recipients []model.Recipient
 	err := d.Client.Where("user_id = ?", userID).Find(&recipients).Error
+	return recipients, err
+}
+
+func (d *Database) GetRecipientsByIDs(ctx context.Context, IDs string) ([]model.Recipient, error) {
+	var recipients []model.Recipient
+	err := d.Client.Where("id IN ?", strings.Split(IDs, ",")).Find(&recipients).Error
 	return recipients, err
 }
 

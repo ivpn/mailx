@@ -17,6 +17,7 @@ import (
 var (
 	ErrInactiveSubscription = errors.New("inactive subscription")
 	ErrDisabledAlias        = errors.New("disabled alias")
+	ErrNoRecipients         = errors.New("no recipients")
 )
 
 type Message struct {
@@ -71,12 +72,7 @@ func (s *Service) findRecipient(email string) (string, *model.Alias, error) {
 		return "", nil, ErrDisabledAlias
 	}
 
-	recipient, err := s.GetRecipient(context.Background(), alias.RecipientID)
-	if err != nil {
-		return "", nil, err
-	}
-
-	sub, err := s.GetSubscription(context.Background(), recipient.UserID)
+	sub, err := s.GetSubscription(context.Background(), alias.UserID)
 	if err != nil {
 		return "", nil, err
 	}
@@ -84,6 +80,13 @@ func (s *Service) findRecipient(email string) (string, *model.Alias, error) {
 	if sub.ActiveUntil.Before(time.Now()) {
 		return "", nil, ErrInactiveSubscription
 	}
+
+	rcps, err := s.GetRecipientsByIDs(context.Background(), alias.Recipients)
+	if err != nil || len(rcps) == 0 {
+		return "", nil, ErrNoRecipients
+	}
+
+	recipient := rcps[0]
 
 	return recipient.Email, &alias, nil
 }

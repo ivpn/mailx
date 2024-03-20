@@ -25,6 +25,7 @@ type RecipienteStore interface {
 	GetRecipient(context.Context, string) (model.Recipient, error)
 	GetRecipientByEmail(context.Context, string) (model.Recipient, error)
 	GetRecipients(context.Context, string) ([]model.Recipient, error)
+	GetRecipientsByIDs(context.Context, string) ([]model.Recipient, error)
 	PostRecipient(context.Context, model.Recipient) (model.Recipient, error)
 	UpdateRecipient(context.Context, model.Recipient) error
 	DeleteRecipient(context.Context, string) error
@@ -54,6 +55,16 @@ func (s *Service) GetRecipientByEmail(ctx context.Context, email string) (model.
 
 func (s *Service) GetRecipients(ctx context.Context, userID string) ([]model.Recipient, error) {
 	rcps, err := s.Store.GetRecipients(ctx, userID)
+	if err != nil {
+		log.Printf("an error occured fetching the recipients: %s", err.Error())
+		return []model.Recipient{}, ErrGetRecipients
+	}
+
+	return rcps, nil
+}
+
+func (s *Service) GetRecipientsByIDs(ctx context.Context, IDs string) ([]model.Recipient, error) {
+	rcps, err := s.Store.GetRecipientsByIDs(ctx, IDs)
 	if err != nil {
 		log.Printf("an error occured fetching the recipients: %s", err.Error())
 		return []model.Recipient{}, ErrGetRecipients

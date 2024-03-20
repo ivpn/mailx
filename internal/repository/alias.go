@@ -36,7 +36,7 @@ func (d *Database) GetAlias(ctx context.Context, ID string) (model.Alias, error)
 func (d *Database) GetAliases(ctx context.Context, userID string) ([]model.Alias, error) {
 	var aliases []model.Alias
 	query := `
-        SELECT a.*, 
+        SELECT a.*,
             COALESCE(SUM(CASE WHEN m.type = ? THEN 1 ELSE 0 END), 0) AS forwards,
             COALESCE(SUM(CASE WHEN m.type = ? THEN 1 ELSE 0 END), 0) AS blocks,
             COALESCE(SUM(CASE WHEN m.type = ? THEN 1 ELSE 0 END), 0) AS replies,
@@ -57,7 +57,7 @@ func (d *Database) GetAliases(ctx context.Context, userID string) ([]model.Alias
 	for rows.Next() {
 		var alias model.Alias
 		var forwards, blocks, replies, sends, bandwidth int
-		if err := rows.Scan(&alias.ID, &alias.CreatedAt, &alias.UpdatedAt, &alias.UserID, &alias.RecipientID, &alias.Name, &alias.Enabled, &alias.Description, &forwards, &blocks, &replies, &sends, &bandwidth); err != nil {
+		if err := rows.Scan(&alias.ID, &alias.CreatedAt, &alias.UpdatedAt, &alias.UserID, &alias.Name, &alias.Enabled, &alias.Description, &alias.Recipients, &forwards, &blocks, &replies, &sends, &bandwidth); err != nil {
 			return nil, err
 		}
 		alias.Stats = model.AliasStats{
@@ -85,9 +85,9 @@ func (d *Database) PostAlias(ctx context.Context, alias model.Alias) error {
 
 func (d *Database) UpdateAlias(ctx context.Context, alias model.Alias) error {
 	return d.Client.Model(&alias).Updates(map[string]interface{}{
-		"recipient_id": alias.RecipientID,
-		"description":  alias.Description,
-		"enabled":      alias.Enabled,
+		"description": alias.Description,
+		"enabled":     alias.Enabled,
+		"recipients":  alias.Recipients,
 	}).Error
 }
 

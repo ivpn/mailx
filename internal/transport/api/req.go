@@ -1,9 +1,9 @@
 package api
 
 type AliasReq struct {
-	RecipientID string `json:"recipient_id"`
 	Description string `json:"description"`
 	Enabled     bool   `json:"enabled"`
+	Recipients  string `json:"recipients"`
 }
 
 type RecipientReq struct {

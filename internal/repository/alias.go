@@ -57,7 +57,7 @@ func (d *Database) GetAliases(ctx context.Context, userID string) ([]model.Alias
 	for rows.Next() {
 		var alias model.Alias
 		var forwards, blocks, replies, sends, bandwidth int
-		if err := rows.Scan(&alias.ID, &alias.CreatedAt, &alias.UpdatedAt, &alias.Name, &alias.UserID, &alias.Enabled, &alias.Description, &alias.Recipients, &forwards, &blocks, &replies, &sends, &bandwidth); err != nil {
+		if err := rows.Scan(&alias.ID, &alias.CreatedAt, &alias.UpdatedAt, &alias.Name, &alias.UserID, &alias.Enabled, &alias.Description, &alias.Recipients, &alias.FromName, &forwards, &blocks, &replies, &sends, &bandwidth); err != nil {
 			return nil, err
 		}
 		alias.Stats = model.AliasStats{
@@ -88,6 +88,7 @@ func (d *Database) UpdateAlias(ctx context.Context, alias model.Alias) error {
 		"description": alias.Description,
 		"enabled":     alias.Enabled,
 		"recipients":  alias.Recipients,
+		"from_name":   alias.FromName,
 	}).Error
 }
 

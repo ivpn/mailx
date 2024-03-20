@@ -11,8 +11,9 @@ type Alias struct {
 	Name        string     `gorm:"unique" json:"name"`
 	UserID      string     `json:"-"`
 	Enabled     bool       `json:"enabled"`
-	Description string     `json:"description"`
-	Recipients  string     `json:"recipients"`
+	Description string     `gorm:"default:''" json:"description"`
+	Recipients  string     `gorm:"default:''" json:"recipients"`
+	FromName    string     `gorm:"default:''" json:"from_name"`
 	Stats       AliasStats `gorm:"-" json:"stats"`
 }
 

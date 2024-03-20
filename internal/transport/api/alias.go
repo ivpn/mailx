@@ -60,6 +60,7 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 		Description: req.Description,
 		Enabled:     req.Enabled,
 		Recipients:  req.Recipients,
+		FromName:    req.FromName,
 	}
 
 	err = h.Service.PostAlias(c.Context(), alias)
@@ -87,6 +88,7 @@ func (h *Handler) UpdateAlias(c *fiber.Ctx) error {
 		Description: req.Description,
 		Enabled:     req.Enabled,
 		Recipients:  req.Recipients,
+		FromName:    req.FromName,
 	}
 	alias.ID = c.Params("id")
 

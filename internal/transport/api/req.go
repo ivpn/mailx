@@ -4,6 +4,7 @@ type AliasReq struct {
 	Description string `json:"description"`
 	Enabled     bool   `json:"enabled"`
 	Recipients  string `json:"recipients"`
+	FromName    string `json:"from_name"`
 }
 
 type RecipientReq struct {

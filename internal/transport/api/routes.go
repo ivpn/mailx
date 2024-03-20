@@ -9,7 +9,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	h.Server.Post("/v1/register", h.Register)
 	h.Server.Post("/v1/login", h.Login)
 
-	sub := h.Server.Group("/v1/subscription")
+	sub := h.Server.Group("/v1/subscription/update")
 	sub.Use(auth.NewPSK(cfg))
 	sub.Use(auth.NewPSKCORS(cfg))
 	sub.Put("", h.UpdateSubscription)

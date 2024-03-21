@@ -18,6 +18,7 @@ var (
 	ErrInactiveSubscription = errors.New("inactive subscription")
 	ErrDisabledAlias        = errors.New("disabled alias")
 	ErrNoRecipients         = errors.New("no recipients")
+	ErrInactiveRecipient    = errors.New("inactive recipient")
 )
 
 type Message struct {
@@ -87,6 +88,9 @@ func (s *Service) findRecipient(email string) (string, *model.Alias, error) {
 	}
 
 	recipient := rcps[0]
+	if !recipient.IsActive {
+		return "", nil, ErrInactiveRecipient
+	}
 
 	return recipient.Email, &alias, nil
 }

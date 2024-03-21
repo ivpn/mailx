@@ -15,6 +15,7 @@ var (
 	ErrGetRecipient            = errors.New("could not get recipient by ID")
 	ErrGetRecipients           = errors.New("could not get recipients by user ID")
 	ErrPostRecipient           = errors.New("could not create recipient")
+	ErrMaxExceededRecipient    = errors.New("max recipients exceeded")
 	ErrUpdateRecipient         = errors.New("could not update recipient")
 	ErrDeleteRecipient         = errors.New("could not delete recipient")
 	ErrDeleteRecipientByUserID = errors.New("could not delete recipient by user ID")
@@ -78,6 +79,16 @@ func (s *Service) PostRecipient(ctx context.Context, recipient model.Recipient) 
 	if err != nil {
 		log.Printf("error creating recipient: %s", err.Error())
 		return err
+	}
+
+	rcps, err := s.Store.GetRecipients(ctx, recipient.UserID)
+	if err != nil || len(rcps) >= 10 {
+		log.Printf("error creating recipient: %s", err.Error())
+		return ErrPostRecipient
+	}
+
+	if len(rcps) >= 10 {
+		return ErrMaxExceededRecipient
 	}
 
 	recipient, err = s.Store.PostRecipient(ctx, recipient)

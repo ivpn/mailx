@@ -17,7 +17,7 @@ var (
 type AliasService interface {
 	GetAlias(context.Context, string) (model.Alias, error)
 	GetAliases(context.Context, string) ([]model.Alias, error)
-	PostAlias(context.Context, model.Alias) error
+	PostAlias(context.Context, model.Alias, string) error
 	UpdateAlias(context.Context, model.Alias) error
 	DeleteAlias(context.Context, string) error
 }
@@ -63,7 +63,7 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 		FromName:    req.FromName,
 	}
 
-	err = h.Service.PostAlias(c.Context(), alias)
+	err = h.Service.PostAlias(c.Context(), alias, req.Format)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),

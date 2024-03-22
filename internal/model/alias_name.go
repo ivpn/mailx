@@ -4,6 +4,14 @@ import (
 	"fmt"
 	"math/rand"
 	"time"
+
+	"github.com/google/uuid"
+)
+
+const (
+	AliasFormatRandomWords = "words"
+	AliasFormatRandomChars = "chars"
+	AliasFormatUUID        = "uuid"
 )
 
 var (
@@ -31,7 +39,32 @@ var (
 	}
 )
 
-func GenerateAlias() string {
+func GenerateAlias(format string) string {
+	switch format {
+	case AliasFormatRandomChars:
+		return generateRandomChars()
+	case AliasFormatUUID:
+		return uuid.New().String()
+	default:
+		return generateRandomWords()
+	}
+}
+
+func generateRandomChars() string {
+	source := rand.NewSource(time.Now().UnixNano())
+	rand.New(source)
+
+	var letterRunes = []rune("abcdefghijklmnopqrstuvwxyz0123456789")
+
+	b := make([]rune, 8)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+
+	return string(b)
+}
+
+func generateRandomWords() string {
 	source := rand.NewSource(time.Now().UnixNano())
 	rand.New(source)
 

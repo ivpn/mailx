@@ -59,9 +59,9 @@ func (s *Service) GetAliasByName(name string) (model.Alias, error) {
 	return alias, nil
 }
 
-func (s *Service) PostAlias(ctx context.Context, alias model.Alias) error {
+func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format string) error {
 	for i := 0; i < 5; i++ {
-		alias.Name = model.GenerateAlias()
+		alias.Name = model.GenerateAlias(format)
 		err := s.Store.PostAlias(ctx, alias)
 		if err != nil {
 			log.Printf("error creating alias: %s", err.Error())

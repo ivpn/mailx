@@ -6,7 +6,7 @@ tasks:
       - cp .env.sample .env
   build:
     cmds:
-      - docker build -t email-app .
+      - docker build -t email-api .
   run:
     cmds:
       - docker compose up

@@ -82,7 +82,7 @@ func (s *Service) PostRecipient(ctx context.Context, recipient model.Recipient) 
 	}
 
 	rcps, err := s.Store.GetRecipients(ctx, recipient.UserID)
-	if err != nil || len(rcps) >= 10 {
+	if err != nil {
 		log.Printf("error creating recipient: %s", err.Error())
 		return ErrPostRecipient
 	}

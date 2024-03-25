@@ -31,12 +31,6 @@ func (d *Database) GetVerifiedRecipients(ctx context.Context, recipientEmails st
 	return recipients, err
 }
 
-func (d *Database) GetRecipientsByIDs(ctx context.Context, IDs string) ([]model.Recipient, error) {
-	var recipients []model.Recipient
-	err := d.Client.Where("id IN ?", strings.Split(IDs, ",")).Find(&recipients).Error
-	return recipients, err
-}
-
 func (d *Database) PostRecipient(ctx context.Context, recipient model.Recipient) (model.Recipient, error) {
 	err := d.Client.Create(&recipient).Error
 	return recipient, err

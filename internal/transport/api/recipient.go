@@ -18,6 +18,7 @@ var (
 type RecipientService interface {
 	GetRecipient(context.Context, string) (model.Recipient, error)
 	GetRecipients(context.Context, string) ([]model.Recipient, error)
+	GetVerifiedRecipients(context.Context, string) ([]model.Recipient, error)
 	PostRecipient(context.Context, model.Recipient) error
 	SendRecipientOTP(context.Context, string) error
 	UpdateRecipient(context.Context, model.Recipient) error

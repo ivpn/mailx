@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"strings"
 
 	"ivpn.net/email-service/internal/utils"
 )
@@ -24,4 +25,13 @@ func (r *Recipient) Validate() error {
 	}
 
 	return nil
+}
+
+func GetEmails(rcps []Recipient) string {
+	emails := []string{}
+	for _, r := range rcps {
+		emails = append(emails, r.Email)
+	}
+
+	return strings.Join(emails, ",")
 }

@@ -55,11 +55,18 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 		})
 	}
 
+	rcps, err := h.Service.GetVerifiedRecipients(c.Context(), req.Recipients)
+	if err != nil || len(rcps) == 0 {
+		return c.Status(500).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
 	alias := model.Alias{
 		UserID:      auth.GetUserID(c),
 		Description: req.Description,
 		Enabled:     req.Enabled,
-		Recipients:  req.Recipients,
+		Recipients:  model.GetEmails(rcps),
 		FromName:    req.FromName,
 	}
 
@@ -84,10 +91,17 @@ func (h *Handler) UpdateAlias(c *fiber.Ctx) error {
 		})
 	}
 
+	rcps, err := h.Service.GetVerifiedRecipients(c.Context(), req.Recipients)
+	if err != nil || len(rcps) == 0 {
+		return c.Status(500).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
 	alias := model.Alias{
 		Description: req.Description,
 		Enabled:     req.Enabled,
-		Recipients:  req.Recipients,
+		Recipients:  model.GetEmails(rcps),
 		FromName:    req.FromName,
 	}
 	alias.ID = c.Params("id")

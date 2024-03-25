@@ -107,6 +107,8 @@ func getRespondTo(email string) (string, string) {
 
 		// Get alias name up to "+" and domain after "@"
 		alias = email[:strings.Index(email, "+")] + email[strings.Index(email, "@"):]
+	} else {
+		rcp = ""
 	}
 
 	return alias, rcp

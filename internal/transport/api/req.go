@@ -22,6 +22,10 @@ type UserReq struct {
 	Password string `json:"password"`
 }
 
+type DeleteUserReq struct {
+	Password string `json:"password"`
+}
+
 type ActivateReq struct {
 	OTP string `json:"otp"`
 }

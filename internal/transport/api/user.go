@@ -26,6 +26,7 @@ type UserService interface {
 	SendUserOTP(context.Context, string) error
 	ActivateUser(context.Context, string, string) error
 	GetUserByCredentials(context.Context, string, string) (model.User, error)
+	GetUserByPassword(context.Context, string, string) (model.User, error)
 	DeleteUser(context.Context, string) error
 }
 
@@ -162,7 +163,7 @@ func (h *Handler) DeleteUser(c *fiber.Ctx) error {
 	ID := auth.GetUserID(c)
 
 	// Parse the request
-	req := UserReq{}
+	req := DeleteUserReq{}
 	err := c.BodyParser(&req)
 	if err != nil {
 		log.Printf("error deleting user: %s", err.Error())
@@ -172,11 +173,7 @@ func (h *Handler) DeleteUser(c *fiber.Ctx) error {
 	}
 
 	// Validate the request
-	userModel := model.User{
-		Email:         req.Email,
-		PasswordPlain: &req.Password,
-	}
-	err = userModel.Validate()
+	err = utils.ValidatePassword(req.Password)
 	if err != nil {
 		log.Printf("error deleting user: %s", err.Error())
 		return c.Status(400).JSON(fiber.Map{
@@ -185,7 +182,7 @@ func (h *Handler) DeleteUser(c *fiber.Ctx) error {
 	}
 
 	// Get the user
-	user, err := h.Service.GetUserByCredentials(c.Context(), req.Email, req.Password)
+	user, err := h.Service.GetUserByPassword(c.Context(), ID, req.Password)
 	if err != nil || user.ID != ID {
 		log.Printf("error deleting user: %s", err.Error())
 		return c.Status(401).JSON(fiber.Map{

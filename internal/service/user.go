@@ -47,6 +47,20 @@ func (s *Service) GetUserByCredentials(ctx context.Context, email string, passwo
 	return user, nil
 }
 
+func (s *Service) GetUserByPassword(ctx context.Context, userID string, password string) (model.User, error) {
+	user, err := s.Store.GetUser(ctx, userID)
+	if err != nil {
+		return model.User{}, ErrGetUser
+	}
+
+	matches := user.Matches(password)
+	if !matches {
+		return model.User{}, ErrIncorrectPass
+	}
+
+	return user, nil
+}
+
 func (s *Service) PostUser(ctx context.Context, user model.User) error {
 	err := user.Validate()
 	if err != nil {

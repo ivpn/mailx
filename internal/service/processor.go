@@ -89,17 +89,9 @@ func (s *Service) findRecipient(email string) (string, *model.Alias, model.Messa
 		return respondTo, &alias, model.Reply, nil
 	}
 
-	rcps, err := s.GetRecipientsByIDs(context.Background(), alias.Recipients)
-	if err != nil || len(rcps) == 0 {
-		return "", nil, 0, ErrNoRecipients
-	}
+	r := strings.Split(alias.Recipients, ",")[0]
 
-	recipient := rcps[0]
-	if !recipient.IsActive {
-		return "", nil, 0, ErrInactiveRecipient
-	}
-
-	return recipient.Email, &alias, model.Forward, nil
+	return r, &alias, model.Forward, nil
 }
 
 func getRespondTo(email string) (string, string) {

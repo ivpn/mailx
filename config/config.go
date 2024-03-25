@@ -14,6 +14,7 @@ type APIConfig struct {
 	TokenExpiration time.Duration
 	PSK             string
 	PSKAllowOrigin  string
+	Domains         string
 }
 
 type SMTPConfig struct {
@@ -81,6 +82,7 @@ func New() (Config, error) {
 			TokenExpiration: tokenExp,
 			PSK:             os.Getenv("PSK"),
 			PSKAllowOrigin:  os.Getenv("PSK_ALLOW_ORIGIN"),
+			Domains:         os.Getenv("DOMAINS"),
 		},
 		SMTP: SMTPConfig{
 			Host:     os.Getenv("SMTP_HOST"),

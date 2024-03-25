@@ -95,8 +95,7 @@ func (s *Service) findRecipient(email string) (string, *model.Alias, model.Messa
 }
 
 func getRespondTo(email string) (string, string) {
-	// Get alias name up to "@"
-	alias := email[:strings.Index(email, "@")]
+	alias := email
 
 	// Get respond to email between "+" and "@"
 	rcp := email[strings.Index(email, "+")+1 : strings.Index(email, "@")]
@@ -106,8 +105,8 @@ func getRespondTo(email string) (string, string) {
 		// Replace "=" with "@" to get valid respond to email
 		rcp = strings.Replace(rcp, "=", "@", 1)
 
-		// Get alias name up to "+"
-		alias = email[:strings.Index(email, "+")]
+		// Get alias name up to "+" and domain after "@"
+		alias = email[:strings.Index(email, "+")] + email[strings.Index(email, "@"):]
 	}
 
 	return alias, rcp

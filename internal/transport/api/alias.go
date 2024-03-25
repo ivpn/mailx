@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"ivpn.net/email-service/internal/middleware/auth"
@@ -12,12 +13,13 @@ var (
 	PostAliasSuccess   = "Alias created"
 	UpdateAliasSuccess = "Alias updated"
 	DeleteAliasSuccess = "Alias deleted"
+	ErrInvalidDomain   = "Invalid domain"
 )
 
 type AliasService interface {
 	GetAlias(context.Context, string) (model.Alias, error)
 	GetAliases(context.Context, string) ([]model.Alias, error)
-	PostAlias(context.Context, model.Alias, string) error
+	PostAlias(context.Context, model.Alias, string, string) error
 	UpdateAlias(context.Context, model.Alias) error
 	DeleteAlias(context.Context, string) error
 }
@@ -55,6 +57,12 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 		})
 	}
 
+	if !strings.Contains(h.Cfg.Domains, req.Domain) {
+		return c.Status(500).JSON(fiber.Map{
+			"error": ErrInvalidDomain,
+		})
+	}
+
 	rcps, err := h.Service.GetVerifiedRecipients(c.Context(), req.Recipients)
 	if err != nil || len(rcps) == 0 {
 		return c.Status(500).JSON(fiber.Map{
@@ -70,7 +78,7 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 		FromName:    req.FromName,
 	}
 
-	err = h.Service.PostAlias(c.Context(), alias, req.Format)
+	err = h.Service.PostAlias(c.Context(), alias, req.Format, req.Domain)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),

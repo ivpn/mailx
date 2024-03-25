@@ -6,6 +6,7 @@ type AliasReq struct {
 	Recipients  string `json:"recipients"`
 	FromName    string `json:"from_name"`
 	Format      string `json:"format"`
+	Domain      string `json:"domain"`
 }
 
 type RecipientReq struct {

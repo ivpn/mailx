@@ -12,6 +12,7 @@ import (
 
 	"ivpn.net/email-service/internal/client/mailer"
 	"ivpn.net/email-service/internal/model"
+	"ivpn.net/email-service/internal/utils"
 )
 
 var (
@@ -35,7 +36,7 @@ func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data
 	}
 
 	for _, to := range msg.To {
-		recipient, alias, err := s.findRecipient(to)
+		recipient, alias, msgType, err := s.findRecipient(to)
 		if err != nil {
 			continue
 		}
@@ -51,7 +52,7 @@ func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data
 		err = s.PostMessage(context.Background(), model.Message{
 			AliasID: alias.ID,
 			UserID:  alias.UserID,
-			Type:    model.Forward,
+			Type:    msgType,
 			Size:    len(data),
 		})
 		if err != nil {
@@ -62,37 +63,62 @@ func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data
 	return err
 }
 
-func (s *Service) findRecipient(email string) (string, *model.Alias, error) {
-	name := email[:strings.Index(email, "@")]
+func (s *Service) findRecipient(email string) (string, *model.Alias, model.MessageType, error) {
+	name, respondTo := getRespondTo(email)
+
 	alias, err := s.GetAliasByName(name)
 	if err != nil {
-		return "", nil, err
+		return "", nil, 0, err
 	}
 
 	if !alias.Enabled {
-		return "", nil, ErrDisabledAlias
+		return "", nil, 0, ErrDisabledAlias
 	}
 
 	sub, err := s.GetSubscription(context.Background(), alias.UserID)
 	if err != nil {
-		return "", nil, err
+		return "", nil, 0, err
 	}
 
 	if sub.ActiveUntil.Before(time.Now()) {
-		return "", nil, ErrInactiveSubscription
+		return "", nil, 0, ErrInactiveSubscription
+	}
+
+	err = utils.ValidateEmail(respondTo)
+	if err == nil {
+		return respondTo, &alias, model.Reply, nil
 	}
 
 	rcps, err := s.GetRecipientsByIDs(context.Background(), alias.Recipients)
 	if err != nil || len(rcps) == 0 {
-		return "", nil, ErrNoRecipients
+		return "", nil, 0, ErrNoRecipients
 	}
 
 	recipient := rcps[0]
 	if !recipient.IsActive {
-		return "", nil, ErrInactiveRecipient
+		return "", nil, 0, ErrInactiveRecipient
 	}
 
-	return recipient.Email, &alias, nil
+	return recipient.Email, &alias, model.Forward, nil
+}
+
+func getRespondTo(email string) (string, string) {
+	// Get alias name up to "@"
+	alias := email[:strings.Index(email, "@")]
+
+	// Get respond to email between "+" and "@"
+	rcp := email[strings.Index(email, "+")+1 : strings.Index(email, "@")]
+
+	// Check if respond to email is not empty and contains "="
+	if rcp != "" && strings.Contains(rcp, "=") {
+		// Replace "=" with "@" to get valid respond to email
+		rcp = strings.Replace(rcp, "=", "@", 1)
+
+		// Get alias name up to "+"
+		alias = email[:strings.Index(email, "+")]
+	}
+
+	return alias, rcp
 }
 
 func parse(from string, to []string, data []byte) (Message, error) {

@@ -15,6 +15,7 @@ type APIConfig struct {
 	PSK             string
 	PSKAllowOrigin  string
 	Domains         string
+	LogFile         string
 }
 
 type SMTPConfig struct {
@@ -83,6 +84,7 @@ func New() (Config, error) {
 			PSK:             os.Getenv("PSK"),
 			PSKAllowOrigin:  os.Getenv("PSK_ALLOW_ORIGIN"),
 			Domains:         os.Getenv("DOMAINS"),
+			LogFile:         os.Getenv("LOG_FILE"),
 		},
 		SMTP: SMTPConfig{
 			Host:     os.Getenv("SMTP_HOST"),

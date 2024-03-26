@@ -18,6 +18,13 @@ type SubscriptionReq struct {
 	ActiveUntil string `json:"active_until"`
 }
 
+type SettingsReq struct {
+	ID        string `json:"id"`
+	Domain    string `json:"domain"`
+	Recipient string `json:"recipient"`
+	FromName  string `json:"from_name"`
+}
+
 type UserReq struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`

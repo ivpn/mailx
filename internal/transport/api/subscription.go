@@ -13,7 +13,7 @@ var (
 	UpdateSubscriptionSuccess = "Subscription updated"
 )
 
-type SubsctiptionService interface {
+type SubscriptionService interface {
 	GetSubscription(context.Context, string) (model.Subscription, error)
 	UpdateSubscription(context.Context, model.Subscription) error
 }

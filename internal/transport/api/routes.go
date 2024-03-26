@@ -24,6 +24,9 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 
 	v1.Get("/subscription", h.GetSubscription)
 
+	v1.Get("/settings", h.GetSettings)
+	v1.Put("/settings", h.UpdateSettings)
+
 	v1.Get("/recipient/:id", h.GetRecipient)
 	v1.Get("/recipients", h.GetRecipients)
 	v1.Post("/recipient", h.PostRecipient)

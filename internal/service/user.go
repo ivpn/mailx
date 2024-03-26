@@ -91,6 +91,12 @@ func (s *Service) PostUser(ctx context.Context, user model.User) error {
 		return ErrPostUser
 	}
 
+	err = s.PostSettings(ctx, user.ID)
+	if err != nil {
+		log.Printf("error creating user: %s", err.Error())
+		return ErrPostUser
+	}
+
 	otp, err := utils.CreateOTP()
 	if err != nil {
 		log.Printf("error creating user: %s", err.Error())
@@ -195,6 +201,12 @@ func (s *Service) DeleteUser(ctx context.Context, userID string) error {
 	}
 
 	err = s.Store.DeleteSubscription(ctx, userID)
+	if err != nil {
+		log.Printf("error deleting user: %s", err.Error())
+		return ErrDeleteUser
+	}
+
+	err = s.Store.DeleteSettings(ctx, userID)
 	if err != nil {
 		log.Printf("error deleting user: %s", err.Error())
 		return ErrDeleteUser

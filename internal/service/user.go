@@ -13,6 +13,7 @@ import (
 
 var (
 	ErrGetUser        = errors.New("could not get user by ID")
+	ErrGetUserStats   = errors.New("could not get user stats")
 	ErrPostUser       = errors.New("could not create user")
 	ErrActivateUser   = errors.New("could not activate user")
 	ErrDeleteUser     = errors.New("could not delete user")
@@ -31,6 +32,7 @@ type UserStore interface {
 	PostUser(context.Context, model.User) (model.User, error)
 	ActivateUser(context.Context, string) error
 	DeleteUser(context.Context, string) error
+	GetUserStats(context.Context, string) (model.UserStats, error)
 }
 
 func (s *Service) GetUserByCredentials(ctx context.Context, email string, password string) (model.User, error) {
@@ -219,4 +221,14 @@ func (s *Service) DeleteUser(ctx context.Context, userID string) error {
 	}
 
 	return nil
+}
+
+func (s *Service) GetUserStats(ctx context.Context, userID string) (model.UserStats, error) {
+	stats, err := s.Store.GetUserStats(ctx, userID)
+	if err != nil {
+		log.Printf("error getting user stats: %s", err.Error())
+		return model.UserStats{}, ErrGetUserStats
+	}
+
+	return stats, nil
 }

@@ -23,6 +23,15 @@ type User struct {
 	IsActive      bool    `json:"is_active"`
 }
 
+type UserStats struct {
+	Forwards  int   `json:"forwards"`
+	Blocks    int   `json:"blocks"`
+	Replies   int   `json:"replies"`
+	Sends     int   `json:"sends"`
+	Bandwidth int   `json:"bandwidth"`
+	Aliases   int64 `json:"aliases"`
+}
+
 func (u *User) Validate() error {
 	err := utils.ValidateEmail(u.Email)
 	if err != nil {

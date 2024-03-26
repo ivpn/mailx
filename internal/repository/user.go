@@ -30,3 +30,29 @@ func (d *Database) ActivateUser(ctx context.Context, ID string) error {
 func (d *Database) DeleteUser(ctx context.Context, ID string) error {
 	return d.Client.Where("id = ?", ID).Delete(&model.User{}).Error
 }
+
+func (d *Database) GetUserStats(ctx context.Context, ID string) (model.UserStats, error) {
+	var userStats model.UserStats
+
+	err := d.Client.Model(&model.Alias{}).
+		Where("user_id = ?", ID).
+		Count(&userStats.Aliases).Error
+	if err != nil {
+		return model.UserStats{}, err
+	}
+
+	err = d.Client.Model(&model.Message{}).
+		Select("SUM(CASE WHEN type = ? THEN 1 ELSE 0 END) as forwards, "+
+			"SUM(CASE WHEN type = ? THEN 1 ELSE 0 END) as blocks, "+
+			"SUM(CASE WHEN type = ? THEN 1 ELSE 0 END) as replies, "+
+			"SUM(CASE WHEN type = ? THEN 1 ELSE 0 END) as sends, "+
+			"SUM(size) as bandwidth",
+			model.Forward, model.Block, model.Reply, model.Send).
+		Where("user_id = ?", ID).
+		Scan(&userStats).Error
+	if err != nil {
+		return model.UserStats{}, err
+	}
+
+	return userStats, nil
+}

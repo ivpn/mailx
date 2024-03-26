@@ -11,6 +11,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    volumes:
+      - email-api:/var/log
 
   db:
     image: mariadb
@@ -37,5 +39,6 @@ services:
       - email-redis:/data
 
 volumes:
+  email-api:
   email-db:
   email-redis:

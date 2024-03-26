@@ -25,6 +25,11 @@ func NewDB(cfg config.DBConfig) (*Database, error) {
 		return nil, err
 	}
 
+	err = cleanUp(db)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Database{
 		Client: db,
 	}, nil
@@ -68,6 +73,17 @@ func migrate(db *gorm.DB) error {
 	}
 
 	log.Println("DB migration OK")
+
+	return nil
+}
+
+func cleanUp(db *gorm.DB) error {
+	err := db.Where("created_at < NOW() - INTERVAL 90 DAY").Delete(&model.Message{}).Error
+	if err != nil {
+		return err
+	}
+
+	log.Println("DB clean up OK")
 
 	return nil
 }

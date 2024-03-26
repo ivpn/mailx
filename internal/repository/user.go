@@ -49,6 +49,7 @@ func (d *Database) GetUserStats(ctx context.Context, ID string) (model.UserStats
 			"SUM(size) as bandwidth",
 			model.Forward, model.Block, model.Reply, model.Send).
 		Where("user_id = ?", ID).
+		Where("created_at > NOW() - INTERVAL 90 DAY").
 		Scan(&userStats).Error
 	if err != nil {
 		return model.UserStats{}, err

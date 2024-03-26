@@ -13,6 +13,7 @@ type Store interface {
 	UserStore
 	SubscriptionStore
 	MessageStore
+	SettingsStore
 }
 
 type Cache interface {

@@ -1,4 +1,19 @@
 definitions:
+  api.AliasReq:
+    properties:
+      description:
+        type: string
+      domain:
+        type: string
+      enabled:
+        type: boolean
+      format:
+        type: string
+      from_name:
+        type: string
+      recipients:
+        type: string
+    type: object
   api.ErrorRes:
     properties:
       error:
@@ -15,6 +30,36 @@ definitions:
     properties:
       message:
         type: string
+    type: object
+  model.Alias:
+    properties:
+      description:
+        type: string
+      enabled:
+        type: boolean
+      from_name:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      recipients:
+        type: string
+      stats:
+        $ref: '#/definitions/model.AliasStats'
+    type: object
+  model.AliasStats:
+    properties:
+      bandwidth:
+        type: integer
+      blocks:
+        type: integer
+      forwards:
+        type: integer
+      replies:
+        type: integer
+      sends:
+        type: integer
     type: object
   model.Subscription:
     properties:
@@ -36,6 +81,132 @@ definitions:
 info:
   contact: {}
 paths:
+  /alias:
+    post:
+      consumes:
+      - application/json
+      description: Create alias
+      parameters:
+      - description: Alias request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.AliasReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Create alias
+      tags:
+      - alias
+  /alias/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete alias
+      parameters:
+      - description: Alias ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Delete alias
+      tags:
+      - alias
+    get:
+      consumes:
+      - application/json
+      description: Get alias by ID
+      parameters:
+      - description: Alias ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Alias'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Get alias
+      tags:
+      - alias
+    put:
+      consumes:
+      - application/json
+      description: Update alias
+      parameters:
+      - description: Alias ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Alias request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.AliasReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Update alias
+      tags:
+      - alias
+  /aliases:
+    get:
+      consumes:
+      - application/json
+      description: Get all aliases
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Alias'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Get aliases
+      tags:
+      - alias
   /v1/subscription:
     get:
       consumes:

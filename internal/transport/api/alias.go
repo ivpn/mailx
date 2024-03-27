@@ -24,6 +24,15 @@ type AliasService interface {
 	DeleteAlias(context.Context, string) error
 }
 
+// @Summary Get alias
+// @Description Get alias by ID
+// @Tags alias
+// @Accept json
+// @Produce json
+// @Param id path string true "Alias ID"
+// @Success 200 {object} model.Alias
+// @Failure 500 {object} ErrorRes
+// @Router /alias/{id} [get]
 func (h *Handler) GetAlias(c *fiber.Ctx) error {
 	id := c.Params("id")
 	alias, err := h.Service.GetAlias(c.Context(), id)
@@ -36,6 +45,14 @@ func (h *Handler) GetAlias(c *fiber.Ctx) error {
 	return c.JSON(alias)
 }
 
+// @Summary Get aliases
+// @Description Get all aliases
+// @Tags alias
+// @Accept json
+// @Produce json
+// @Success 200 {array} model.Alias
+// @Failure 500 {object} ErrorRes
+// @Router /aliases [get]
 func (h *Handler) GetAliases(c *fiber.Ctx) error {
 	userID := auth.GetUserID(c)
 	aliases, err := h.Service.GetAliases(c.Context(), userID)
@@ -48,6 +65,15 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 	return c.JSON(aliases)
 }
 
+// @Summary Create alias
+// @Description Create alias
+// @Tags alias
+// @Accept json
+// @Produce json
+// @Param body body AliasReq true "Alias request"
+// @Success 201 {object} SuccessRes
+// @Failure 500 {object} ErrorRes
+// @Router /alias [post]
 func (h *Handler) PostAlias(c *fiber.Ctx) error {
 	req := AliasReq{}
 	err := c.BodyParser(&req)
@@ -90,6 +116,16 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 	})
 }
 
+// @Summary Update alias
+// @Description Update alias
+// @Tags alias
+// @Accept json
+// @Produce json
+// @Param id path string true "Alias ID"
+// @Param body body AliasReq true "Alias request"
+// @Success 200 {object} SuccessRes
+// @Failure 500 {object} ErrorRes
+// @Router /alias/{id} [put]
 func (h *Handler) UpdateAlias(c *fiber.Ctx) error {
 	req := AliasReq{}
 	err := c.BodyParser(&req)
@@ -126,6 +162,15 @@ func (h *Handler) UpdateAlias(c *fiber.Ctx) error {
 	})
 }
 
+// @Summary Delete alias
+// @Description Delete alias
+// @Tags alias
+// @Accept json
+// @Produce json
+// @Param id path string true "Alias ID"
+// @Success 200 {object} SuccessRes
+// @Failure 500 {object} ErrorRes
+// @Router /alias/{id} [delete]
 func (h *Handler) DeleteAlias(c *fiber.Ctx) error {
 	id := c.Params("id")
 	err := h.Service.DeleteAlias(c.Context(), id)

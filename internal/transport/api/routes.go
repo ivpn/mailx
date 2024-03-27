@@ -1,11 +1,15 @@
 package api
 
 import (
+	"github.com/gofiber/swagger"
 	"ivpn.net/email-service/config"
+	_ "ivpn.net/email-service/docs"
 	"ivpn.net/email-service/internal/middleware/auth"
 )
 
 func (h *Handler) SetupRoutes(cfg config.APIConfig) {
+	h.Server.Get("/swagger/*", swagger.HandlerDefault)
+
 	h.Server.Post("/v1/register", h.Register)
 	h.Server.Post("/v1/login", h.Login)
 

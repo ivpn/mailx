@@ -1,0 +1,74 @@
+definitions:
+  api.ErrorRes:
+    properties:
+      error:
+        type: string
+    type: object
+  api.SuccessRes:
+    properties:
+      message:
+        type: string
+    type: object
+  model.Subscription:
+    properties:
+      active_until:
+        type: string
+      id:
+        type: string
+      type:
+        $ref: '#/definitions/model.SubscriptionType'
+    type: object
+  model.SubscriptionType:
+    enum:
+    - Free
+    - Managed
+    type: string
+    x-enum-varnames:
+    - Free
+    - Managed
+info:
+  contact: {}
+paths:
+  /v1/subscription:
+    get:
+      consumes:
+      - application/json
+      description: Get subscription
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Subscription'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get subscription
+      tags:
+      - subscription
+  /v1/subscription/update:
+    put:
+      consumes:
+      - application/json
+      description: Update subscription
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update subscription
+      tags:
+      - subscription
+swagger: "2.0"

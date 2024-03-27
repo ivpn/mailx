@@ -29,6 +29,17 @@ definitions:
       email:
         type: string
     type: object
+  api.SettingsReq:
+    properties:
+      domain:
+        type: string
+      from_name:
+        type: string
+      id:
+        type: string
+      recipient:
+        type: string
+    type: object
   api.SubscriptionReq:
     properties:
       active_until:
@@ -79,6 +90,19 @@ definitions:
         type: string
       is_active:
         type: boolean
+    type: object
+  model.Settings:
+    properties:
+      domain:
+        type: string
+      from_name:
+        type: string
+      id:
+        type: string
+      recipient:
+        type: string
+      user_id:
+        type: string
     type: object
   model.Subscription:
     properties:
@@ -378,6 +402,50 @@ paths:
       summary: Get recipients
       tags:
       - recipient
+  /settings:
+    get:
+      consumes:
+      - application/json
+      description: Get settings
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Settings'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Get settings
+      tags:
+      - settings
+    put:
+      consumes:
+      - application/json
+      description: Update settings
+      parameters:
+      - description: Settings
+        in: body
+        name: settings
+        required: true
+        schema:
+          $ref: '#/definitions/api.SettingsReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Update settings
+      tags:
+      - settings
   /v1/subscription:
     get:
       consumes:

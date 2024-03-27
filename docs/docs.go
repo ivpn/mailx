@@ -437,6 +437,73 @@ const docTemplate = `{
                 }
             }
         },
+        "/settings": {
+            "get": {
+                "description": "Get settings",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Get settings",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Settings"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update settings",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Update settings",
+                "parameters": [
+                    {
+                        "description": "Settings",
+                        "name": "settings",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.SettingsReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/subscription": {
             "get": {
                 "security": [
@@ -565,6 +632,23 @@ const docTemplate = `{
                 }
             }
         },
+        "api.SettingsReq": {
+            "type": "object",
+            "properties": {
+                "domain": {
+                    "type": "string"
+                },
+                "from_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "recipient": {
+                    "type": "string"
+                }
+            }
+        },
         "api.SubscriptionReq": {
             "type": "object",
             "properties": {
@@ -641,6 +725,26 @@ const docTemplate = `{
                 },
                 "is_active": {
                     "type": "boolean"
+                }
+            }
+        },
+        "model.Settings": {
+            "type": "object",
+            "properties": {
+                "domain": {
+                    "type": "string"
+                },
+                "from_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "recipient": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
                 }
             }
         },

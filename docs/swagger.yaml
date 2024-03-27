@@ -1,4 +1,9 @@
 definitions:
+  api.ActivateReq:
+    properties:
+      otp:
+        type: string
+    type: object
   api.AliasReq:
     properties:
       description:
@@ -17,6 +22,11 @@ definitions:
   api.ErrorRes:
     properties:
       error:
+        type: string
+    type: object
+  api.RecipientReq:
+    properties:
+      email:
         type: string
     type: object
   api.SubscriptionReq:
@@ -60,6 +70,15 @@ definitions:
         type: integer
       sends:
         type: integer
+    type: object
+  model.Recipient:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
     type: object
   model.Subscription:
     properties:
@@ -207,6 +226,158 @@ paths:
       summary: Get aliases
       tags:
       - alias
+  /recipient:
+    post:
+      consumes:
+      - application/json
+      description: Create recipient
+      parameters:
+      - description: Recipient request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.RecipientReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Create recipient
+      tags:
+      - recipient
+  /recipient/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete recipient
+      parameters:
+      - description: Recipient ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Delete recipient
+      tags:
+      - recipient
+    get:
+      consumes:
+      - application/json
+      description: Get recipient by ID
+      parameters:
+      - description: Recipient ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Recipient'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Get recipient
+      tags:
+      - recipient
+  /recipient/activate/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Activate recipient
+      parameters:
+      - description: Recipient ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Activate request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.ActivateReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Activate recipient
+      tags:
+      - recipient
+  /recipient/sendotp/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Send recipient OTP
+      parameters:
+      - description: Recipient ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Send recipient OTP
+      tags:
+      - recipient
+  /recipients:
+    get:
+      consumes:
+      - application/json
+      description: Get all recipients
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Recipient'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Get recipients
+      tags:
+      - recipient
   /v1/subscription:
     get:
       consumes:

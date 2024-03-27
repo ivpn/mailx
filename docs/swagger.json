@@ -195,6 +195,237 @@
                 }
             }
         },
+        "/recipient": {
+            "post": {
+                "description": "Create recipient",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "recipient"
+                ],
+                "summary": "Create recipient",
+                "parameters": [
+                    {
+                        "description": "Recipient request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.RecipientReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/recipient/activate/{id}": {
+            "post": {
+                "description": "Activate recipient",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "recipient"
+                ],
+                "summary": "Activate recipient",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Recipient ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Activate request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.ActivateReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/recipient/sendotp/{id}": {
+            "post": {
+                "description": "Send recipient OTP",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "recipient"
+                ],
+                "summary": "Send recipient OTP",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Recipient ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/recipient/{id}": {
+            "get": {
+                "description": "Get recipient by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "recipient"
+                ],
+                "summary": "Get recipient",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Recipient ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Recipient"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete recipient",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "recipient"
+                ],
+                "summary": "Delete recipient",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Recipient ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/recipients": {
+            "get": {
+                "description": "Get all recipients",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "recipient"
+                ],
+                "summary": "Get recipients",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Recipient"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/subscription": {
             "get": {
                 "security": [
@@ -276,6 +507,14 @@
         }
     },
     "definitions": {
+        "api.ActivateReq": {
+            "type": "object",
+            "properties": {
+                "otp": {
+                    "type": "string"
+                }
+            }
+        },
         "api.AliasReq": {
             "type": "object",
             "properties": {
@@ -303,6 +542,14 @@
             "type": "object",
             "properties": {
                 "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.RecipientReq": {
+            "type": "object",
+            "properties": {
+                "email": {
                     "type": "string"
                 }
             }
@@ -369,6 +616,20 @@
                 },
                 "sends": {
                     "type": "integer"
+                }
+            }
+        },
+        "model.Recipient": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
                 }
             }
         },

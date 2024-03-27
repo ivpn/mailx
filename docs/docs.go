@@ -67,6 +67,17 @@ const docTemplate = `{
                     "subscription"
                 ],
                 "summary": "Update subscription",
+                "parameters": [
+                    {
+                        "description": "Subscription request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.SubscriptionReq"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -89,6 +100,17 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.SubscriptionReq": {
+            "type": "object",
+            "properties": {
+                "active_until": {
+                    "type": "string"
+                },
+                "id": {
                     "type": "string"
                 }
             }

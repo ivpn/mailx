@@ -4,6 +4,13 @@ definitions:
       error:
         type: string
     type: object
+  api.SubscriptionReq:
+    properties:
+      active_until:
+        type: string
+      id:
+        type: string
+    type: object
   api.SuccessRes:
     properties:
       message:
@@ -55,6 +62,13 @@ paths:
       consumes:
       - application/json
       description: Update subscription
+      parameters:
+      - description: Subscription request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.SubscriptionReq'
       produces:
       - application/json
       responses:

@@ -46,6 +46,7 @@ func (h *Handler) GetSubscription(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
+// @Param body body SubscriptionReq true "Subscription request"
 // @Success 200 {object} SuccessRes
 // @Failure 500 {object} ErrorRes
 // @Router /v1/subscription/update [put]

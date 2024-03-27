@@ -52,6 +52,13 @@ definitions:
       message:
         type: string
     type: object
+  api.UserReq:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
   model.Alias:
     properties:
       description:
@@ -121,6 +128,21 @@ definitions:
     x-enum-varnames:
     - Free
     - Managed
+  model.UserStats:
+    properties:
+      aliases:
+        type: integer
+      bandwidth:
+        type: integer
+      blocks:
+        type: integer
+      forwards:
+        type: integer
+      replies:
+        type: integer
+      sends:
+        type: integer
+    type: object
 info:
   contact: {}
 paths:
@@ -250,6 +272,32 @@ paths:
       summary: Get aliases
       tags:
       - alias
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Login user
+      parameters:
+      - description: User request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.UserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Login user
+      tags:
+      - user
   /recipient:
     post:
       consumes:
@@ -402,6 +450,32 @@ paths:
       summary: Get recipients
       tags:
       - recipient
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Register user
+      parameters:
+      - description: User request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.UserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Register user
+      tags:
+      - user
   /settings:
     get:
       consumes:
@@ -446,7 +520,7 @@ paths:
       summary: Update settings
       tags:
       - settings
-  /v1/subscription:
+  /subscription:
     get:
       consumes:
       - application/json
@@ -467,7 +541,7 @@ paths:
       summary: Get subscription
       tags:
       - subscription
-  /v1/subscription/update:
+  /subscription/update:
     put:
       consumes:
       - application/json
@@ -495,4 +569,95 @@ paths:
       summary: Update subscription
       tags:
       - subscription
+  /user/activate:
+    post:
+      consumes:
+      - application/json
+      description: Activate user
+      parameters:
+      - description: Activate request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.ActivateReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Activate user
+      tags:
+      - user
+  /user/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Logout user
+      tags:
+      - user
+  /user/sendotp:
+    post:
+      consumes:
+      - application/json
+      description: Send user OTP
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Send user OTP
+      tags:
+      - user
+  /user/stats:
+    get:
+      consumes:
+      - application/json
+      description: Get user stats
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.UserStats'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get user stats
+      tags:
+      - user
 swagger: "2.0"

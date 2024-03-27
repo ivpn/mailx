@@ -26,7 +26,7 @@ type SubscriptionService interface {
 // @Security ApiKeyAuth
 // @Success 200 {object} model.Subscription
 // @Failure 500 {object} ErrorRes
-// @Router /v1/subscription [get]
+// @Router /subscription [get]
 func (h *Handler) GetSubscription(c *fiber.Ctx) error {
 	userID := auth.GetUserID(c)
 
@@ -49,7 +49,7 @@ func (h *Handler) GetSubscription(c *fiber.Ctx) error {
 // @Param body body SubscriptionReq true "Subscription request"
 // @Success 200 {object} SuccessRes
 // @Failure 500 {object} ErrorRes
-// @Router /v1/subscription/update [put]
+// @Router /subscription/update [put]
 func (h *Handler) UpdateSubscription(c *fiber.Ctx) error {
 	req := SubscriptionReq{}
 	err := c.BodyParser(&req)

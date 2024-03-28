@@ -8,8 +8,6 @@ import (
 )
 
 func (h *Handler) SetupRoutes(cfg config.APIConfig) {
-	h.Server.Get("/swagger/*", swagger.HandlerDefault)
-
 	h.Server.Post("/v1/register", h.Register)
 	h.Server.Post("/v1/login", h.Login)
 
@@ -44,4 +42,8 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Post("/alias", h.PostAlias)
 	v1.Put("/alias/:id", h.UpdateAlias)
 	v1.Delete("/alias/:id", h.DeleteAlias)
+
+	docs := h.Server.Group("/docs")
+	docs.Use(auth.NewBasicAuth(cfg))
+	docs.Get("/*", swagger.HandlerDefault)
 }

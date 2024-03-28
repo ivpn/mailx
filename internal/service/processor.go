@@ -30,7 +30,7 @@ type Message struct {
 }
 
 func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data []byte) error {
-	msg, err := parse(from, to, data)
+	msg, err := parseMessage(from, to, data)
 	if err != nil {
 		log.Println("error parsing message", err)
 		return err
@@ -144,7 +144,7 @@ func getRespondTo(email string) (string, string) {
 	return alias, rcp
 }
 
-func parse(from string, to []string, data []byte) (Message, error) {
+func parseMessage(from string, to []string, data []byte) (Message, error) {
 	msg, err := mail.ReadMessage(bytes.NewReader(data))
 	if err != nil {
 		return Message{}, err

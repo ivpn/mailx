@@ -101,6 +101,7 @@ func (s *Service) findRecipient(email string) (string, model.Alias, model.Messag
 	}
 
 	if !alias.Enabled {
+		s.saveMessage(alias, model.Block, []byte{})
 		return "", model.Alias{}, 0, ErrDisabledAlias
 	}
 

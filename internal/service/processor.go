@@ -32,66 +32,95 @@ type Message struct {
 func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data []byte) error {
 	msg, err := parse(from, to, data)
 	if err != nil {
+		log.Println("error parsing message", err)
 		return err
 	}
 
 	for _, to := range msg.To {
 		recipient, alias, msgType, err := s.findRecipient(to)
 		if err != nil {
+			log.Println("error processing message", err)
 			continue
 		}
 
-		mailer := mailer.New(s.Cfg.SMTPClient)
-		mailer.Sender = msg.From
-		err = mailer.Send(recipient, msg.Subject, msg.Body)
+		err = s.queueMessage(recipient, alias, msgType, msg)
 		if err != nil {
-			log.Println("error forwarding message", err)
+			log.Println("error queueing message", err)
 			continue
 		}
 
-		err = s.PostMessage(context.Background(), model.Message{
-			AliasID: alias.ID,
-			UserID:  alias.UserID,
-			Type:    msgType,
-			Size:    len(data),
-		})
-		if err != nil {
-			log.Println("error saving message", err)
-		}
+		s.saveMessage(alias, msgType, data)
 	}
 
 	return err
 }
 
-func (s *Service) findRecipient(email string) (string, *model.Alias, model.MessageType, error) {
+func (s *Service) queueMessage(recipient string, alias model.Alias, msgType model.MessageType, msg Message) error {
+	mailer := mailer.New(s.Cfg.SMTPClient)
+	mailer.Sender = msg.From
+
+	if msgType == model.Forward {
+		data := map[string]interface{}{
+			"alias": alias.Name,
+			"from":  recipient,
+		}
+		err := mailer.Forward(recipient, msg.Subject, msg.Body, "header.html", data)
+		if err != nil {
+			log.Println("error forwarding message", err)
+			return err
+		}
+	} else {
+		err := mailer.Send(recipient, msg.Subject, msg.Body)
+		if err != nil {
+			log.Println("error sending message", err)
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (s *Service) saveMessage(alias model.Alias, msgType model.MessageType, data []byte) {
+	err := s.PostMessage(context.Background(), model.Message{
+		AliasID: alias.ID,
+		UserID:  alias.UserID,
+		Type:    msgType,
+		Size:    len(data),
+	})
+	if err != nil {
+		log.Println("error saving message", err)
+	}
+}
+
+func (s *Service) findRecipient(email string) (string, model.Alias, model.MessageType, error) {
 	name, respondTo := getRespondTo(email)
 
 	alias, err := s.GetAliasByName(name)
 	if err != nil {
-		return "", nil, 0, err
+		return "", model.Alias{}, 0, err
 	}
 
 	if !alias.Enabled {
-		return "", nil, 0, ErrDisabledAlias
+		return "", model.Alias{}, 0, ErrDisabledAlias
 	}
 
 	sub, err := s.GetSubscription(context.Background(), alias.UserID)
 	if err != nil {
-		return "", nil, 0, err
+		return "", model.Alias{}, 0, err
 	}
 
 	if sub.ActiveUntil.Before(time.Now()) {
-		return "", nil, 0, ErrInactiveSubscription
+		return "", model.Alias{}, 0, ErrInactiveSubscription
 	}
 
 	err = utils.ValidateEmail(respondTo)
 	if err == nil {
-		return respondTo, &alias, model.Reply, nil
+		return respondTo, alias, model.Reply, nil
 	}
 
 	r := strings.Split(alias.Recipients, ",")[0]
 
-	return r, &alias, model.Forward, nil
+	return r, alias, model.Forward, nil
 }
 
 func getRespondTo(email string) (string, string) {

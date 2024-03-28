@@ -1,7 +1,9 @@
 package api
 
 import (
+	"github.com/gofiber/swagger"
 	"ivpn.net/email-service/config"
+	_ "ivpn.net/email-service/docs"
 	"ivpn.net/email-service/internal/middleware/auth"
 )
 
@@ -40,4 +42,8 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Post("/alias", h.PostAlias)
 	v1.Put("/alias/:id", h.UpdateAlias)
 	v1.Delete("/alias/:id", h.DeleteAlias)
+
+	docs := h.Server.Group("/docs")
+	docs.Use(auth.NewBasicAuth(cfg))
+	docs.Get("/*", swagger.HandlerDefault)
 }

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/basicauth"
 	"github.com/golang-jwt/jwt"
 	"ivpn.net/email-service/config"
 )
@@ -58,6 +59,15 @@ func NewPSK(cfg config.APIConfig) fiber.Handler {
 
 		return c.Next()
 	}
+}
+
+func NewBasicAuth(cfg config.APIConfig) fiber.Handler {
+
+	return basicauth.New(basicauth.Config{
+		Users: map[string]string{
+			cfg.BasicAuthUser: cfg.BasicAuthPassword,
+		},
+	})
 }
 
 func NewPSKCORS(cfg config.APIConfig) fiber.Handler {

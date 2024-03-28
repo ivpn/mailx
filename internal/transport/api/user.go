@@ -31,6 +31,15 @@ type UserService interface {
 	GetUserStats(context.Context, string) (model.UserStats, error)
 }
 
+// @Summary Register user
+// @Description Register user
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param body body UserReq true "User request"
+// @Success 200 {object} SuccessRes
+// @Failure 500 {object} ErrorRes
+// @Router /register [post]
 func (h *Handler) Register(c *fiber.Ctx) error {
 	// Parse the request
 	req := UserReq{}
@@ -61,6 +70,15 @@ func (h *Handler) Register(c *fiber.Ctx) error {
 	})
 }
 
+// @Summary Send user OTP
+// @Description Send user OTP
+// @Tags user
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} SuccessRes
+// @Failure 500 {object} ErrorRes
+// @Router /user/sendotp [post]
 func (h *Handler) SendUserOTP(c *fiber.Ctx) error {
 	ID := auth.GetUserID(c)
 
@@ -76,6 +94,16 @@ func (h *Handler) SendUserOTP(c *fiber.Ctx) error {
 	})
 }
 
+// @Summary Activate user
+// @Description Activate user
+// @Tags user
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param body body ActivateReq true "Activate request"
+// @Success 200 {object} SuccessRes
+// @Failure 500 {object} ErrorRes
+// @Router /user/activate [post]
 func (h *Handler) Activate(c *fiber.Ctx) error {
 	ID := auth.GetUserID(c)
 
@@ -99,6 +127,15 @@ func (h *Handler) Activate(c *fiber.Ctx) error {
 	})
 }
 
+// @Summary Login user
+// @Description Login user
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param body body UserReq true "User request"
+// @Success 200 {object} SuccessRes
+// @Failure 500 {object} ErrorRes
+// @Router /login [post]
 func (h *Handler) Login(c *fiber.Ctx) error {
 	// Parse the request
 	req := UserReq{}
@@ -152,6 +189,15 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 	})
 }
 
+// @Summary Logout user
+// @Description Logout user
+// @Tags user
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} SuccessRes
+// @Failure 500 {object} ErrorRes
+// @Router /user/logout [post]
 func (h *Handler) Logout(c *fiber.Ctx) error {
 	c.ClearCookie(auth.AUTH_COOKIE)
 
@@ -204,6 +250,15 @@ func (h *Handler) DeleteUser(c *fiber.Ctx) error {
 	})
 }
 
+// @Summary Get user stats
+// @Description Get user stats
+// @Tags user
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} model.UserStats
+// @Failure 500 {object} ErrorRes
+// @Router /user/stats [get]
 func (h *Handler) GetUserStats(c *fiber.Ctx) error {
 	ID := auth.GetUserID(c)
 

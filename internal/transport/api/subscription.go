@@ -18,6 +18,15 @@ type SubscriptionService interface {
 	UpdateSubscription(context.Context, model.Subscription) error
 }
 
+// @Summary Get subscription
+// @Description Get subscription
+// @Tags subscription
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} model.Subscription
+// @Failure 500 {object} ErrorRes
+// @Router /subscription [get]
 func (h *Handler) GetSubscription(c *fiber.Ctx) error {
 	userID := auth.GetUserID(c)
 
@@ -31,6 +40,16 @@ func (h *Handler) GetSubscription(c *fiber.Ctx) error {
 	return c.JSON(sub)
 }
 
+// @Summary Update subscription
+// @Description Update subscription
+// @Tags subscription
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param body body SubscriptionReq true "Subscription request"
+// @Success 200 {object} SuccessRes
+// @Failure 500 {object} ErrorRes
+// @Router /subscription/update [put]
 func (h *Handler) UpdateSubscription(c *fiber.Ctx) error {
 	req := SubscriptionReq{}
 	err := c.BodyParser(&req)

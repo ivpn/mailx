@@ -15,3 +15,6 @@ tasks:
       - go test ./... -v
       - go vet ./...
       - gosec ./...
+  docs:
+    cmds:
+      - swag init -g cmd/main.go

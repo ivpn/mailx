@@ -1,0 +1,663 @@
+definitions:
+  api.ActivateReq:
+    properties:
+      otp:
+        type: string
+    type: object
+  api.AliasReq:
+    properties:
+      description:
+        type: string
+      domain:
+        type: string
+      enabled:
+        type: boolean
+      format:
+        type: string
+      from_name:
+        type: string
+      recipients:
+        type: string
+    type: object
+  api.ErrorRes:
+    properties:
+      error:
+        type: string
+    type: object
+  api.RecipientReq:
+    properties:
+      email:
+        type: string
+    type: object
+  api.SettingsReq:
+    properties:
+      domain:
+        type: string
+      from_name:
+        type: string
+      id:
+        type: string
+      recipient:
+        type: string
+    type: object
+  api.SubscriptionReq:
+    properties:
+      active_until:
+        type: string
+      id:
+        type: string
+    type: object
+  api.SuccessRes:
+    properties:
+      message:
+        type: string
+    type: object
+  api.UserReq:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  model.Alias:
+    properties:
+      description:
+        type: string
+      enabled:
+        type: boolean
+      from_name:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      recipients:
+        type: string
+      stats:
+        $ref: '#/definitions/model.AliasStats'
+    type: object
+  model.AliasStats:
+    properties:
+      bandwidth:
+        type: integer
+      blocks:
+        type: integer
+      forwards:
+        type: integer
+      replies:
+        type: integer
+      sends:
+        type: integer
+    type: object
+  model.Recipient:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+    type: object
+  model.Settings:
+    properties:
+      domain:
+        type: string
+      from_name:
+        type: string
+      id:
+        type: string
+      recipient:
+        type: string
+      user_id:
+        type: string
+    type: object
+  model.Subscription:
+    properties:
+      active_until:
+        type: string
+      id:
+        type: string
+      type:
+        $ref: '#/definitions/model.SubscriptionType'
+    type: object
+  model.SubscriptionType:
+    enum:
+    - Free
+    - Managed
+    type: string
+    x-enum-varnames:
+    - Free
+    - Managed
+  model.UserStats:
+    properties:
+      aliases:
+        type: integer
+      bandwidth:
+        type: integer
+      blocks:
+        type: integer
+      forwards:
+        type: integer
+      replies:
+        type: integer
+      sends:
+        type: integer
+    type: object
+info:
+  contact: {}
+paths:
+  /alias:
+    post:
+      consumes:
+      - application/json
+      description: Create alias
+      parameters:
+      - description: Alias request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.AliasReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Create alias
+      tags:
+      - alias
+  /alias/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete alias
+      parameters:
+      - description: Alias ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Delete alias
+      tags:
+      - alias
+    get:
+      consumes:
+      - application/json
+      description: Get alias by ID
+      parameters:
+      - description: Alias ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Alias'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Get alias
+      tags:
+      - alias
+    put:
+      consumes:
+      - application/json
+      description: Update alias
+      parameters:
+      - description: Alias ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Alias request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.AliasReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Update alias
+      tags:
+      - alias
+  /aliases:
+    get:
+      consumes:
+      - application/json
+      description: Get all aliases
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Alias'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Get aliases
+      tags:
+      - alias
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Login user
+      parameters:
+      - description: User request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.UserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Login user
+      tags:
+      - user
+  /recipient:
+    post:
+      consumes:
+      - application/json
+      description: Create recipient
+      parameters:
+      - description: Recipient request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.RecipientReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Create recipient
+      tags:
+      - recipient
+  /recipient/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete recipient
+      parameters:
+      - description: Recipient ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Delete recipient
+      tags:
+      - recipient
+    get:
+      consumes:
+      - application/json
+      description: Get recipient by ID
+      parameters:
+      - description: Recipient ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Recipient'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Get recipient
+      tags:
+      - recipient
+  /recipient/activate/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Activate recipient
+      parameters:
+      - description: Recipient ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Activate request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.ActivateReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Activate recipient
+      tags:
+      - recipient
+  /recipient/sendotp/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Send recipient OTP
+      parameters:
+      - description: Recipient ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Send recipient OTP
+      tags:
+      - recipient
+  /recipients:
+    get:
+      consumes:
+      - application/json
+      description: Get all recipients
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Recipient'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Get recipients
+      tags:
+      - recipient
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Register user
+      parameters:
+      - description: User request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.UserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Register user
+      tags:
+      - user
+  /settings:
+    get:
+      consumes:
+      - application/json
+      description: Get settings
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Settings'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Get settings
+      tags:
+      - settings
+    put:
+      consumes:
+      - application/json
+      description: Update settings
+      parameters:
+      - description: Settings
+        in: body
+        name: settings
+        required: true
+        schema:
+          $ref: '#/definitions/api.SettingsReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Update settings
+      tags:
+      - settings
+  /subscription:
+    get:
+      consumes:
+      - application/json
+      description: Get subscription
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Subscription'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get subscription
+      tags:
+      - subscription
+  /subscription/update:
+    put:
+      consumes:
+      - application/json
+      description: Update subscription
+      parameters:
+      - description: Subscription request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.SubscriptionReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update subscription
+      tags:
+      - subscription
+  /user/activate:
+    post:
+      consumes:
+      - application/json
+      description: Activate user
+      parameters:
+      - description: Activate request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.ActivateReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Activate user
+      tags:
+      - user
+  /user/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Logout user
+      tags:
+      - user
+  /user/sendotp:
+    post:
+      consumes:
+      - application/json
+      description: Send user OTP
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Send user OTP
+      tags:
+      - user
+  /user/stats:
+    get:
+      consumes:
+      - application/json
+      description: Get user stats
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.UserStats'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get user stats
+      tags:
+      - user
+swagger: "2.0"

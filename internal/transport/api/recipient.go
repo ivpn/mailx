@@ -26,6 +26,15 @@ type RecipientService interface {
 	DeleteRecipient(context.Context, string) error
 }
 
+// @Summary Get recipient
+// @Description Get recipient by ID
+// @Tags recipient
+// @Accept json
+// @Produce json
+// @Param id path string true "Recipient ID"
+// @Success 200 {object} model.Recipient
+// @Failure 500 {object} ErrorRes
+// @Router /recipient/{id} [get]
 func (h *Handler) GetRecipient(c *fiber.Ctx) error {
 	id := c.Params("id")
 	recipient, err := h.Service.GetRecipient(c.Context(), id)
@@ -38,6 +47,14 @@ func (h *Handler) GetRecipient(c *fiber.Ctx) error {
 	return c.JSON(recipient)
 }
 
+// @Summary Get recipients
+// @Description Get all recipients
+// @Tags recipient
+// @Accept json
+// @Produce json
+// @Success 200 {array} model.Recipient
+// @Failure 500 {object} ErrorRes
+// @Router /recipients [get]
 func (h *Handler) GetRecipients(c *fiber.Ctx) error {
 	userID := auth.GetUserID(c)
 	recipients, err := h.Service.GetRecipients(c.Context(), userID)
@@ -50,6 +67,15 @@ func (h *Handler) GetRecipients(c *fiber.Ctx) error {
 	return c.JSON(recipients)
 }
 
+// @Summary Create recipient
+// @Description Create recipient
+// @Tags recipient
+// @Accept json
+// @Produce json
+// @Param body body RecipientReq true "Recipient request"
+// @Success 201 {object} SuccessRes
+// @Failure 500 {object} ErrorRes
+// @Router /recipient [post]
 func (h *Handler) PostRecipient(c *fiber.Ctx) error {
 	req := RecipientReq{}
 	err := c.BodyParser(&req)
@@ -77,6 +103,15 @@ func (h *Handler) PostRecipient(c *fiber.Ctx) error {
 	})
 }
 
+// @Summary Send recipient OTP
+// @Description Send recipient OTP
+// @Tags recipient
+// @Accept json
+// @Produce json
+// @Param id path string true "Recipient ID"
+// @Success 200 {object} SuccessRes
+// @Failure 500 {object} ErrorRes
+// @Router /recipient/sendotp/{id} [post]
 func (h *Handler) SendRecipientOTP(c *fiber.Ctx) error {
 	ID := c.Params("id")
 	err := h.Service.SendRecipientOTP(c.Context(), ID)
@@ -91,6 +126,16 @@ func (h *Handler) SendRecipientOTP(c *fiber.Ctx) error {
 	})
 }
 
+// @Summary Activate recipient
+// @Description Activate recipient
+// @Tags recipient
+// @Accept json
+// @Produce json
+// @Param id path string true "Recipient ID"
+// @Param body body ActivateReq true "Activate request"
+// @Success 200 {object} SuccessRes
+// @Failure 500 {object} ErrorRes
+// @Router /recipient/activate/{id} [post]
 func (h *Handler) ActivateRecipient(c *fiber.Ctx) error {
 	ID := c.Params("id")
 
@@ -114,6 +159,15 @@ func (h *Handler) ActivateRecipient(c *fiber.Ctx) error {
 	})
 }
 
+// @Summary Delete recipient
+// @Description Delete recipient
+// @Tags recipient
+// @Accept json
+// @Produce json
+// @Param id path string true "Recipient ID"
+// @Success 200 {object} SuccessRes
+// @Failure 500 {object} ErrorRes
+// @Router /recipient/{id} [delete]
 func (h *Handler) DeleteRecipient(c *fiber.Ctx) error {
 	ID := c.Params("id")
 	err := h.Service.DeleteRecipient(c.Context(), ID)

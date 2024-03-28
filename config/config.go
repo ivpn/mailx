@@ -8,14 +8,16 @@ import (
 )
 
 type APIConfig struct {
-	Port            string
-	CookieSecret    string
-	TokenSecret     string
-	TokenExpiration time.Duration
-	PSK             string
-	PSKAllowOrigin  string
-	Domains         string
-	LogFile         string
+	Port              string
+	CookieSecret      string
+	TokenSecret       string
+	TokenExpiration   time.Duration
+	PSK               string
+	PSKAllowOrigin    string
+	Domains           string
+	LogFile           string
+	BasicAuthUser     string
+	BasicAuthPassword string
 }
 
 type SMTPConfig struct {
@@ -77,14 +79,16 @@ func New() (Config, error) {
 
 	return Config{
 		API: APIConfig{
-			Port:            os.Getenv("API_PORT"),
-			CookieSecret:    os.Getenv("COOKIE_SECRET"),
-			TokenSecret:     os.Getenv("TOKEN_SECRET"),
-			TokenExpiration: tokenExp,
-			PSK:             os.Getenv("PSK"),
-			PSKAllowOrigin:  os.Getenv("PSK_ALLOW_ORIGIN"),
-			Domains:         os.Getenv("DOMAINS"),
-			LogFile:         os.Getenv("LOG_FILE"),
+			Port:              os.Getenv("API_PORT"),
+			CookieSecret:      os.Getenv("COOKIE_SECRET"),
+			TokenSecret:       os.Getenv("TOKEN_SECRET"),
+			TokenExpiration:   tokenExp,
+			PSK:               os.Getenv("PSK"),
+			PSKAllowOrigin:    os.Getenv("PSK_ALLOW_ORIGIN"),
+			Domains:           os.Getenv("DOMAINS"),
+			LogFile:           os.Getenv("LOG_FILE"),
+			BasicAuthUser:     os.Getenv("BASIC_AUTH_USER"),
+			BasicAuthPassword: os.Getenv("BASIC_AUTH_PASSWORD"),
 		},
 		SMTP: SMTPConfig{
 			Host:     os.Getenv("SMTP_HOST"),

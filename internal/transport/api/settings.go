@@ -17,6 +17,14 @@ type SettingsService interface {
 	UpdateSettings(context.Context, model.Settings) error
 }
 
+// @Summary Get settings
+// @Description Get settings
+// @Tags settings
+// @Accept json
+// @Produce json
+// @Success 200 {object} model.Settings
+// @Failure 500 {object} ErrorRes
+// @Router /settings [get]
 func (h *Handler) GetSettings(c *fiber.Ctx) error {
 	userID := auth.GetUserID(c)
 
@@ -30,6 +38,15 @@ func (h *Handler) GetSettings(c *fiber.Ctx) error {
 	return c.JSON(settings)
 }
 
+// @Summary Update settings
+// @Description Update settings
+// @Tags settings
+// @Accept json
+// @Produce json
+// @Param settings body SettingsReq true "Settings"
+// @Success 200 {object} SuccessRes
+// @Failure 500 {object} ErrorRes
+// @Router /settings [put]
 func (h *Handler) UpdateSettings(c *fiber.Ctx) error {
 	req := SettingsReq{}
 	err := c.BodyParser(&req)

@@ -83,7 +83,7 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 		})
 	}
 
-	if req.Domain == "" || !strings.Contains(h.Cfg.Domains, req.Domain) {
+	if !strings.Contains(h.Cfg.Domains, req.Domain) {
 		return c.Status(500).JSON(fiber.Map{
 			"error": ErrInvalidDomain,
 		})

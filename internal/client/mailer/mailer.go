@@ -47,20 +47,20 @@ func (m Mailer) Send(to string, subject string, body string) error {
 	return nil
 }
 
-func (m Mailer) Forward(to string, subject string, body string, templateFile string, data interface{}) error {
+func (m Mailer) Forward(to string, subject string, body string, templateFile string, templateData interface{}) error {
 	tmpl, err := template.New("email").ParseFS(templateFS, "templates/"+templateFile)
 	if err != nil {
 		return err
 	}
 
 	header := new(bytes.Buffer)
-	err = tmpl.ExecuteTemplate(header, "header", data)
+	err = tmpl.ExecuteTemplate(header, "header", templateData)
 	if err != nil {
 		return err
 	}
 
 	headerHtml := new(bytes.Buffer)
-	err = tmpl.ExecuteTemplate(headerHtml, "headerHtml", data)
+	err = tmpl.ExecuteTemplate(headerHtml, "headerHtml", templateData)
 	if err != nil {
 		return err
 	}

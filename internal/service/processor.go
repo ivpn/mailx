@@ -43,7 +43,7 @@ func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data
 			continue
 		}
 
-		err = s.queueMessage(recipient, alias, msgType, msg)
+		err = s.queueMessage(from, recipient, data, alias, msgType)
 		if err != nil {
 			log.Println("error queueing message", err)
 			continue
@@ -55,22 +55,21 @@ func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data
 	return err
 }
 
-func (s *Service) queueMessage(recipient string, alias model.Alias, msgType model.MessageType, msg Message) error {
+func (s *Service) queueMessage(from string, to string, data []byte, alias model.Alias, msgType model.MessageType) error {
 	mailer := mailer.New(s.Cfg.SMTPClient)
-	mailer.Sender = msg.From
 
 	if msgType == model.Forward {
-		data := map[string]interface{}{
+		templateData := map[string]interface{}{
 			"alias": alias.Name,
-			"from":  recipient,
+			"from":  from,
 		}
-		err := mailer.Forward(recipient, msg.Subject, msg.Body, "header.html", data)
+		err := mailer.Forward(from, to, data, "header.html", templateData)
 		if err != nil {
 			log.Println("error forwarding message", err)
 			return err
 		}
 	} else {
-		err := mailer.Send(recipient, msg.Subject, msg.Body)
+		err := mailer.Reply(from, to, data)
 		if err != nil {
 			log.Println("error sending message", err)
 			return err

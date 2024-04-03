@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"embed"
 	"html/template"
+	"io"
 	"log"
 	"strconv"
 
@@ -62,6 +63,28 @@ func (mailer Mailer) Reply(from string, to string, data []byte) error {
 	m.SetBody("text/plain", email.TextBody)
 	m.AddAlternative("text/html", email.HTMLBody)
 
+	for _, a := range email.Attachments {
+		m.Attach(a.Filename, gomail.SetCopyFunc(func(w io.Writer) error {
+			data, err := io.ReadAll(a.Data)
+			if err != nil {
+				return err
+			}
+			_, err = w.Write(data)
+			return err
+		}))
+	}
+
+	for _, f := range email.EmbeddedFiles {
+		m.Embed(f.CID, gomail.SetCopyFunc(func(w io.Writer) error {
+			data, err := io.ReadAll(f.Data)
+			if err != nil {
+				return err
+			}
+			_, err = w.Write(data)
+			return err
+		}))
+	}
+
 	err = mailer.dialer.DialAndSend(m)
 	if err != nil {
 		return err
@@ -101,6 +124,28 @@ func (mailer Mailer) Forward(from string, to string, data []byte, templateFile s
 	m.SetHeader("Subject", email.Subject)
 	m.SetBody("text/plain", header.String()+email.TextBody)
 	m.AddAlternative("text/html", headerHtml.String()+email.HTMLBody)
+
+	for _, a := range email.Attachments {
+		m.Attach(a.Filename, gomail.SetCopyFunc(func(w io.Writer) error {
+			data, err := io.ReadAll(a.Data)
+			if err != nil {
+				return err
+			}
+			_, err = w.Write(data)
+			return err
+		}))
+	}
+
+	for _, f := range email.EmbeddedFiles {
+		m.Embed(f.CID, gomail.SetCopyFunc(func(w io.Writer) error {
+			data, err := io.ReadAll(f.Data)
+			if err != nil {
+				return err
+			}
+			_, err = w.Write(data)
+			return err
+		}))
+	}
 
 	err = mailer.dialer.DialAndSend(m)
 	if err != nil {

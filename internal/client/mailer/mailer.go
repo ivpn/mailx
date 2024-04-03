@@ -5,9 +5,9 @@ import (
 	"embed"
 	"html/template"
 	"log"
-	"net/mail"
 	"strconv"
 
+	"github.com/DusanKasan/parsemail"
 	"gopkg.in/gomail.v2"
 	"ivpn.net/email-service/config"
 )
@@ -17,11 +17,6 @@ var templateFS embed.FS
 type Mailer struct {
 	dialer *gomail.Dialer
 	Sender string
-}
-
-type Msg struct {
-	Subject string
-	Body    string
 }
 
 func New(cfg config.SMTPClientConfig) Mailer {
@@ -54,7 +49,8 @@ func (mailer Mailer) Send(to string, subject string, body string) error {
 }
 
 func (mailer Mailer) Reply(from string, to string, data []byte) error {
-	msg, err := parseMsg(data)
+	var reader = bytes.NewReader(data)
+	email, err := parsemail.Parse(reader)
 	if err != nil {
 		return err
 	}
@@ -62,9 +58,9 @@ func (mailer Mailer) Reply(from string, to string, data []byte) error {
 	m := gomail.NewMessage()
 	m.SetHeader("From", from)
 	m.SetHeader("To", to)
-	m.SetHeader("Subject", msg.Subject)
-	m.SetBody("text/plain", msg.Body)
-	m.AddAlternative("text/html", msg.Body)
+	m.SetHeader("Subject", email.Subject)
+	m.SetBody("text/plain", email.TextBody)
+	m.AddAlternative("text/html", email.HTMLBody)
 
 	err = mailer.dialer.DialAndSend(m)
 	if err != nil {
@@ -76,7 +72,8 @@ func (mailer Mailer) Reply(from string, to string, data []byte) error {
 }
 
 func (mailer Mailer) Forward(from string, to string, data []byte, templateFile string, templateData interface{}) error {
-	msg, err := parseMsg(data)
+	var reader = bytes.NewReader(data)
+	email, err := parsemail.Parse(reader)
 	if err != nil {
 		return err
 	}
@@ -101,9 +98,9 @@ func (mailer Mailer) Forward(from string, to string, data []byte, templateFile s
 	m := gomail.NewMessage()
 	m.SetHeader("From", from)
 	m.SetHeader("To", to)
-	m.SetHeader("Subject", msg.Subject)
-	m.SetBody("text/plain", header.String()+msg.Body)
-	m.AddAlternative("text/html", headerHtml.String()+msg.Body)
+	m.SetHeader("Subject", email.Subject)
+	m.SetBody("text/plain", header.String()+email.TextBody)
+	m.AddAlternative("text/html", headerHtml.String()+email.HTMLBody)
 
 	err = mailer.dialer.DialAndSend(m)
 	if err != nil {
@@ -112,21 +109,4 @@ func (mailer Mailer) Forward(from string, to string, data []byte, templateFile s
 
 	log.Println("Email forward sent successfully")
 	return nil
-}
-
-func parseMsg(data []byte) (Msg, error) {
-	msg, err := mail.ReadMessage(bytes.NewReader(data))
-	if err != nil {
-		return Msg{}, err
-	}
-
-	subject := msg.Header.Get("Subject")
-	buf := new(bytes.Buffer)
-	buf.ReadFrom(msg.Body)
-	body := buf.String()
-
-	return Msg{
-		Subject: subject,
-		Body:    body,
-	}, nil
 }

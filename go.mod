@@ -7,6 +7,7 @@ require github.com/mhale/smtpd v0.8.2
 require github.com/joho/godotenv v1.5.1
 
 require (
+	github.com/DusanKasan/parsemail v1.2.0
 	github.com/alexedwards/argon2id v1.0.0
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
 	github.com/gofiber/fiber/v2 v2.52.1

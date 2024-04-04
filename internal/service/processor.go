@@ -43,13 +43,15 @@ func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data
 			continue
 		}
 
-		err = s.queueMessage(from, recipient, data, alias, msgType)
-		if err != nil {
-			log.Println("error queueing message", err)
-			continue
-		}
+		utils.Background(func() {
+			err = s.queueMessage(from, recipient, data, alias, msgType)
+			if err != nil {
+				log.Println("error queueing message", err)
+				return
+			}
 
-		s.saveMessage(alias, msgType, data)
+			s.saveMessage(alias, msgType, data)
+		})
 	}
 
 	return err

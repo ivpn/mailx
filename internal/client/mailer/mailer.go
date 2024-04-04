@@ -13,6 +13,7 @@ import (
 	"ivpn.net/email-service/config"
 )
 
+//go:embed templates/*
 var templateFS embed.FS
 
 type Mailer struct {

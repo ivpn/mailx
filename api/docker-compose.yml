@@ -1,9 +1,10 @@
-version: '3.8'
+name: email
 
 services:
   api:
     build: .
     container_name: email-api
+    image: email-api
     restart: always
     ports:
       - ${SMTP_PORT}:${SMTP_PORT}
@@ -13,6 +14,16 @@ services:
         condition: service_healthy
     volumes:
       - email-api:/var/log
+  
+  app:
+    build: ../app
+    container_name: email-app
+    image: email-app
+    restart: always
+    ports:
+      - ${APP_PORT}:${APP_PORT}
+    expose:
+      - ${APP_PORT}
 
   db:
     image: mariadb

@@ -1,6 +1,28 @@
 # Email Service
 
+## API Stack
+
+- Go
+- Fiber (API, middleware)
+- Gorm (ORM)
+- MariaDB (Database)
+- Redis (Cache)
+- Docker (Containerization)
+
+## App Stack
+
+- TypeScript
+- Vue.js
+- Vite (Bundler)
+- Tailwind (Styling)
+- Docker (Containerization)
+
 ## Run locally
+
+### Move to api directory
+```bash
+cd api
+```
 
 ### Config
 ```bash
@@ -9,7 +31,7 @@ cp .env.sample .env
 
 ### Build
 ```bash
-docker build -t email-app .
+docker compose build
 ```
 
 ### Run

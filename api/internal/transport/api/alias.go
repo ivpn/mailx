@@ -29,6 +29,7 @@ type AliasService interface {
 // @Tags alias
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param id path string true "Alias ID"
 // @Success 200 {object} model.Alias
 // @Failure 500 {object} ErrorRes
@@ -50,6 +51,7 @@ func (h *Handler) GetAlias(c *fiber.Ctx) error {
 // @Tags alias
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Success 200 {array} model.Alias
 // @Failure 500 {object} ErrorRes
 // @Router /aliases [get]
@@ -70,6 +72,7 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 // @Tags alias
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param body body AliasReq true "Alias request"
 // @Success 201 {object} SuccessRes
 // @Failure 500 {object} ErrorRes
@@ -121,6 +124,7 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 // @Tags alias
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param id path string true "Alias ID"
 // @Param body body AliasReq true "Alias request"
 // @Success 200 {object} SuccessRes
@@ -167,6 +171,7 @@ func (h *Handler) UpdateAlias(c *fiber.Ctx) error {
 // @Tags alias
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param id path string true "Alias ID"
 // @Success 200 {object} SuccessRes
 // @Failure 500 {object} ErrorRes

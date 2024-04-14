@@ -6,6 +6,11 @@
     "paths": {
         "/alias": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Create alias",
                 "consumes": [
                     "application/json"
@@ -46,6 +51,11 @@
         },
         "/alias/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Get alias by ID",
                 "consumes": [
                     "application/json"
@@ -82,6 +92,11 @@
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Update alias",
                 "consumes": [
                     "application/json"
@@ -127,6 +142,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Delete alias",
                 "consumes": [
                     "application/json"
@@ -165,6 +185,11 @@
         },
         "/aliases": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Get all aliases",
                 "consumes": [
                     "application/json"
@@ -237,6 +262,11 @@
         },
         "/recipient": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Create recipient",
                 "consumes": [
                     "application/json"
@@ -277,6 +307,11 @@
         },
         "/recipient/activate/{id}": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Activate recipient",
                 "consumes": [
                     "application/json"
@@ -324,6 +359,11 @@
         },
         "/recipient/sendotp/{id}": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Send recipient OTP",
                 "consumes": [
                     "application/json"
@@ -362,6 +402,11 @@
         },
         "/recipient/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Get recipient by ID",
                 "consumes": [
                     "application/json"
@@ -398,6 +443,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Delete recipient",
                 "consumes": [
                     "application/json"
@@ -436,6 +486,11 @@
         },
         "/recipients": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Get all recipients",
                 "consumes": [
                     "application/json"
@@ -508,6 +563,11 @@
         },
         "/settings": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Get settings",
                 "consumes": [
                     "application/json"
@@ -535,6 +595,11 @@
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Update settings",
                 "consumes": [
                     "application/json"

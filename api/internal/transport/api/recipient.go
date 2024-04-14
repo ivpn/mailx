@@ -31,6 +31,7 @@ type RecipientService interface {
 // @Tags recipient
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param id path string true "Recipient ID"
 // @Success 200 {object} model.Recipient
 // @Failure 500 {object} ErrorRes
@@ -52,6 +53,7 @@ func (h *Handler) GetRecipient(c *fiber.Ctx) error {
 // @Tags recipient
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Success 200 {array} model.Recipient
 // @Failure 500 {object} ErrorRes
 // @Router /recipients [get]
@@ -72,6 +74,7 @@ func (h *Handler) GetRecipients(c *fiber.Ctx) error {
 // @Tags recipient
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param body body RecipientReq true "Recipient request"
 // @Success 201 {object} SuccessRes
 // @Failure 500 {object} ErrorRes
@@ -108,6 +111,7 @@ func (h *Handler) PostRecipient(c *fiber.Ctx) error {
 // @Tags recipient
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param id path string true "Recipient ID"
 // @Success 200 {object} SuccessRes
 // @Failure 500 {object} ErrorRes
@@ -131,6 +135,7 @@ func (h *Handler) SendRecipientOTP(c *fiber.Ctx) error {
 // @Tags recipient
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param id path string true "Recipient ID"
 // @Param body body ActivateReq true "Activate request"
 // @Success 200 {object} SuccessRes
@@ -164,6 +169,7 @@ func (h *Handler) ActivateRecipient(c *fiber.Ctx) error {
 // @Tags recipient
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param id path string true "Recipient ID"
 // @Success 200 {object} SuccessRes
 // @Failure 500 {object} ErrorRes

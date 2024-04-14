@@ -22,6 +22,7 @@ type SettingsService interface {
 // @Tags settings
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Success 200 {object} model.Settings
 // @Failure 500 {object} ErrorRes
 // @Router /settings [get]
@@ -43,6 +44,7 @@ func (h *Handler) GetSettings(c *fiber.Ctx) error {
 // @Tags settings
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param settings body SettingsReq true "Settings"
 // @Success 200 {object} SuccessRes
 // @Failure 500 {object} ErrorRes

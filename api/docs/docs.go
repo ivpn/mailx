@@ -17,6 +17,11 @@ const docTemplate = `{
     "paths": {
         "/alias": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Create alias",
                 "consumes": [
                     "application/json"
@@ -57,6 +62,11 @@ const docTemplate = `{
         },
         "/alias/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Get alias by ID",
                 "consumes": [
                     "application/json"
@@ -93,6 +103,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Update alias",
                 "consumes": [
                     "application/json"
@@ -138,6 +153,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Delete alias",
                 "consumes": [
                     "application/json"
@@ -176,6 +196,11 @@ const docTemplate = `{
         },
         "/aliases": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Get all aliases",
                 "consumes": [
                     "application/json"
@@ -248,6 +273,11 @@ const docTemplate = `{
         },
         "/recipient": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Create recipient",
                 "consumes": [
                     "application/json"
@@ -288,6 +318,11 @@ const docTemplate = `{
         },
         "/recipient/activate/{id}": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Activate recipient",
                 "consumes": [
                     "application/json"
@@ -335,6 +370,11 @@ const docTemplate = `{
         },
         "/recipient/sendotp/{id}": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Send recipient OTP",
                 "consumes": [
                     "application/json"
@@ -373,6 +413,11 @@ const docTemplate = `{
         },
         "/recipient/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Get recipient by ID",
                 "consumes": [
                     "application/json"
@@ -409,6 +454,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Delete recipient",
                 "consumes": [
                     "application/json"
@@ -447,6 +497,11 @@ const docTemplate = `{
         },
         "/recipients": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Get all recipients",
                 "consumes": [
                     "application/json"
@@ -519,6 +574,11 @@ const docTemplate = `{
         },
         "/settings": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Get settings",
                 "consumes": [
                     "application/json"
@@ -546,6 +606,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Update settings",
                 "consumes": [
                     "application/json"

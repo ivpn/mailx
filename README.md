@@ -8,6 +8,7 @@
 - MariaDB (Database)
 - Redis (Cache)
 - Docker (Containerization)
+- Swagger (API Documentation)
 
 ## App Stack
 

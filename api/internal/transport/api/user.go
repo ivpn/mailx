@@ -206,6 +206,16 @@ func (h *Handler) Logout(c *fiber.Ctx) error {
 	})
 }
 
+// @Summary Delete user
+// @Description Delete user
+// @Tags user
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param body body DeleteUserReq true "Delete user request"
+// @Success 200 {object} SuccessRes
+// @Failure 500 {object} ErrorRes
+// @Router /user/delete [delete]
 func (h *Handler) DeleteUser(c *fiber.Ctx) error {
 	ID := auth.GetUserID(c)
 

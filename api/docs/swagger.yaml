@@ -19,6 +19,11 @@ definitions:
       recipients:
         type: string
     type: object
+  api.DeleteUserReq:
+    properties:
+      password:
+        type: string
+    type: object
   api.ErrorRes:
     properties:
       error:
@@ -595,6 +600,34 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Activate user
+      tags:
+      - user
+  /user/delete:
+    delete:
+      consumes:
+      - application/json
+      description: Delete user
+      parameters:
+      - description: Delete user request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.DeleteUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete user
       tags:
       - user
   /user/logout:

@@ -708,6 +708,51 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/delete": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Delete user",
+                "parameters": [
+                    {
+                        "description": "Delete user request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.DeleteUserReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
         "/user/logout": {
             "post": {
                 "security": [
@@ -839,6 +884,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "recipients": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.DeleteUserReq": {
+            "type": "object",
+            "properties": {
+                "password": {
                     "type": "string"
                 }
             }

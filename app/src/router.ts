@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
-import Register from './components/Register.vue'
+import Signup from './components/Signup.vue'
+import Login from './components/Login.vue'
 
 const routes = [
     {
@@ -10,15 +11,24 @@ const routes = [
         props: { msg: 'Hello' }
     },
     {
-        path: '/register',
-        name: 'Register',
-        component: Register
+        path: '/signup',
+        name: 'Sign Up',
+        component: Signup
     },
+    {
+        path: '/login',
+        name: 'Log In',
+        component: Login
+    }
 ]
 
 const router = createRouter({
     history: createWebHistory(),
     routes
+})
+
+router.beforeEach((to) => {
+    document.title = to.name as string
 })
 
 export default router

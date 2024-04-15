@@ -1,13 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
+import Register from './components/Register.vue'
 
 const routes = [
     {
         path: '/',
         name: 'Home',
-        component: HelloWorld
+        component: HelloWorld,
+        props: { msg: 'Hello' }
     },
-    // add more routes here
+    {
+        path: '/register',
+        name: 'Register',
+        component: Register
+    },
 ]
 
 const router = createRouter({

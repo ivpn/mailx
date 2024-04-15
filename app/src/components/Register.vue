@@ -1,0 +1,51 @@
+<template>
+    <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+        <form class="w-full max-w-sm bg-white rounded shadow-md px-8 pt-6 pb-8 mb-4" @submit.prevent="register">
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="email">
+                    Email
+                </label>
+                <input v-model="email"
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    id="email" type="email" placeholder="Email" autocomplete="email">
+            </div>
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
+                    Password
+                </label>
+                <input v-model="password"
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+                    id="password" type="password" placeholder="******************" autocomplete="current-password">
+            </div>
+            <div class="flex items-center justify-between">
+                <button
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    type="submit">
+                    Sign Up
+                </button>
+            </div>
+        </form>
+    </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import { userApi } from '../api/user.ts'
+
+const email = ref('')
+const password = ref('')
+
+const register = async () => {
+    const data = {
+        email: email.value,
+        password: password.value
+    }
+
+    try {
+        const response = await userApi.register(data)
+        console.log(response)
+    } catch (error) {
+        console.error(error)
+    }
+}
+</script>

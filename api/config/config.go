@@ -9,6 +9,7 @@ import (
 
 type APIConfig struct {
 	Port              string
+	ApiAllowOrigin    string
 	CookieSecret      string
 	TokenSecret       string
 	TokenExpiration   time.Duration
@@ -80,6 +81,7 @@ func New() (Config, error) {
 	return Config{
 		API: APIConfig{
 			Port:              os.Getenv("API_PORT"),
+			ApiAllowOrigin:    os.Getenv("API_ALLOW_ORIGIN"),
 			CookieSecret:      os.Getenv("COOKIE_SECRET"),
 			TokenSecret:       os.Getenv("TOKEN_SECRET"),
 			TokenExpiration:   tokenExp,

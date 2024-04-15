@@ -70,6 +70,17 @@ func NewBasicAuth(cfg config.APIConfig) fiber.Handler {
 	})
 }
 
+func NewAPICORS(cfg config.APIConfig) fiber.Handler {
+
+	return func(c *fiber.Ctx) error {
+		c.Set("Access-Control-Allow-Origin", cfg.ApiAllowOrigin)
+		c.Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept")
+		c.Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
+
+		return c.Next()
+	}
+}
+
 func NewPSKCORS(cfg config.APIConfig) fiber.Handler {
 
 	return func(c *fiber.Ctx) error {

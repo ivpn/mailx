@@ -1,8 +1,8 @@
 import axios from 'axios'
 
-let baseURL = 'http://localhost:3000'
+const apiUrl = import.meta.env.VUE_APP_API_URL;
 
 export const healthcheckApi = {
-    livez: () => axios.get(baseURL + '/livez'),
-    readyz: () => axios.get(baseURL + '/readyz'),
+    livez: () => axios.get(apiUrl + '/livez'),
+    readyz: () => axios.get(apiUrl + '/readyz'),
 }

@@ -8,17 +8,19 @@
                     Email Address
                 </label>
                 <input v-model="email"
-                    class="appearance-none outline-none border-2 rounded w-full py-3 px-4 text-gray-700 leading-tight focus:border-blue-500"
+                    class="appearance-none outline-none border-2 rounded w-full py-3 px-4 text-gray-700 leading-tight focus:border-blue-500 mb-2"
                     id="email" type="email" autocomplete="email">
+                    <p class="text-red-500 text-sm">This field is a required</p>
             </div>
             <div class="mb-6">
                 <label class="block text-gray-500 text-sm font-bold mb-2" for="password">
                     Password
                 </label>
                 <input v-model="password"
-                    class="appearance-none outline-none border-2 rounded w-full py-3 px-4 text-gray-700 leading-tight focus:border-blue-500 mb-2"
+                    class="appearance-none outline-none border-2 border-red-500 rounded w-full py-3 px-4 text-gray-700 leading-tight focus:border-blue-500 mb-2"
                     id="password" type="password" autocomplete="current-password">
-                <p class="text-gray-500 text-sm mb-8">Must be at least 8 characters</p>
+                <p class="text-red-500 text-sm mb-2">This field is a required</p>
+                <p class="text-gray-500 text-sm mb-2">Must be at least 8 characters</p>
             </div>
             <div class="flex items-center justify-between">
                 <button
@@ -27,6 +29,7 @@
                     Sign Up
                 </button>
             </div>
+            <p class="text-red-500 text-sm mt-6">Error message from the API.</p>
         </form>
     </div>
 </template>

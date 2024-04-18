@@ -29,6 +29,7 @@
                 </div>
                 <div class="flex items-center justify-between">
                     <button
+                        :disabled="isLoading"
                         class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline"
                         type="submit">
                         Sign Up
@@ -59,6 +60,7 @@ const emailError = ref(false)
 const passwordError = ref(false)
 const apiSuccess = ref('')
 const apiError = ref('')
+const isLoading = ref(false)
 
 const validateEmail = () => {
     emailError.value = !email.value
@@ -81,6 +83,7 @@ const register = async () => {
         return
     }
     
+    isLoading.value = true // Start loading
     const data = {
         email: email.value,
         password: password.value
@@ -95,6 +98,8 @@ const register = async () => {
         if (axios.isAxiosError(error)) {
             apiError.value = error.message
         }
+    } finally {
+        isLoading.value = false // End loading
     }
 }
 </script>

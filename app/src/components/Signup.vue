@@ -13,7 +13,7 @@
                         v-bind:class="{ 'border-red-500': emailError }"
                         class="appearance-none outline-none border-2 rounded w-full py-3 px-4 text-gray-700 leading-tight focus:border-blue-500 mb-2"
                         id="email" type="email" autocomplete="email">
-                        <p v-if="emailError" class="text-red-500 text-sm">Required field</p>
+                    <p v-if="emailError" class="text-red-500 text-sm">Required field</p>
                 </div>
                 <div class="mb-6">
                     <label class="block text-gray-500 text-sm font-semibold mb-2" for="password">

@@ -5,7 +5,7 @@
         <form class="w-full max-w-sm bg-white rounded px-8 pt-6 pb-8 mb-4" @submit.prevent="register">
             <div v-if="!apiSuccess">
                 <div class="mb-4">
-                    <label class="block text-gray-500 text-sm font-bold mb-2" for="email">
+                    <label class="block text-gray-500 text-sm font-semibold mb-2" for="email">
                         Email Address
                     </label>
                     <input
@@ -13,10 +13,10 @@
                         v-bind:class="{ 'border-red-500': emailError }"
                         class="appearance-none outline-none border-2 rounded w-full py-3 px-4 text-gray-700 leading-tight focus:border-blue-500 mb-2"
                         id="email" type="email" autocomplete="email">
-                        <p v-if="emailError" class="text-red-500 text-sm">This field is required</p>
+                        <p v-if="emailError" class="text-red-500 text-sm">Required field</p>
                 </div>
                 <div class="mb-6">
-                    <label class="block text-gray-500 text-sm font-bold mb-2" for="password">
+                    <label class="block text-gray-500 text-sm font-semibold mb-2" for="password">
                         Password
                     </label>
                     <input
@@ -24,7 +24,7 @@
                         v-bind:class="{ 'border-red-500': passwordError }"
                         class="appearance-none outline-none border-2 rounded w-full py-3 px-4 text-gray-700 leading-tight focus:border-blue-500 mb-2"
                         id="password" type="password" autocomplete="current-password">
-                    <p v-if="passwordError" class="text-red-500 text-sm mb-2">This field is required</p>
+                    <p v-if="passwordError" class="text-red-500 text-sm mb-2">Required field</p>
                     <p class="text-gray-500 text-sm mb-2">Must be at least 8 characters</p>
                 </div>
                 <div class="flex items-center justify-between">

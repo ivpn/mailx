@@ -1,23 +1,23 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import { getCookie } from 'typescript-cookie'
+import Dashboard from './components/Dashboard.vue'
 import Signup from './components/Signup.vue'
 import Login from './components/Login.vue'
 
 const routes = [
     {
         path: '/',
-        name: 'Home',
-        component: HelloWorld,
-        props: { msg: 'Hello' }
+        name: 'App',
+        component: Dashboard,
     },
     {
         path: '/signup',
-        name: 'Sign Up',
+        name: 'App - Sign Up',
         component: Signup
     },
     {
         path: '/login',
-        name: 'Log In',
+        name: 'App - Log In',
         component: Login
     }
 ]
@@ -27,8 +27,16 @@ const router = createRouter({
     routes
 })
 
-router.beforeEach((to) => {
+router.beforeEach((to, _, next) => {
     document.title = to.name as string
+
+    const authCookie = getCookie('auth')
+
+    if (to.path === '/' && !authCookie) {
+        next('/login')
+    } else {
+        next()
+    }
 })
 
 export default router

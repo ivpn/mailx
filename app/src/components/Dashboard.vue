@@ -1,6 +1,6 @@
 <template>
-    <div class="container mx-auto max-w-screen-lg">
-        <header class="flex flex-col justify-between w-full text-sm border-b border-gray-200">
+    <div class="container mx-auto max-w-screen-lg px-5">
+        <header class="flex flex-col justify-between w-full text-sm border-b-2 border-gray-100">
             <div class="flex flex-row justify-between pt-6 pb-2">
                 <a class="inline-flex items-center gap-x-2 text-xl font-semibold text-black" href="#">
                     <span class="bg-black w-10 h-10 text-white flex items-center justify-center rounded-md">B</span>
@@ -18,8 +18,7 @@
             </div>
             <nav>
                 <div class="flex flex-row items-center gap-6">
-                    <a class="py-4 font-medium text-blue-500 border-blue-500 border-b-2" href="#"
-                        aria-current="page">Dashboard</a>
+                    <a class="py-4 font-medium text-blue-500 hover:text-blue-500 border-blue-500 border-b-2" href="#">Dashboard</a>
                     <a class="py-4 font-medium text-gray-500 hover:text-blue-500" href="#">Aliases</a>
                     <a class="py-4 font-medium text-gray-500 hover:text-blue-500" href="#">Recipients</a>
                     <a class="py-4 font-medium text-gray-500 hover:text-blue-500" href="#">Settings</a>

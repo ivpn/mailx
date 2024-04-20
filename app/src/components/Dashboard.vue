@@ -18,14 +18,16 @@
             </div>
             <nav>
                 <div class="flex flex-row items-center gap-6">
-                    <a class="py-4 font-medium text-blue-500 hover:text-blue-500 border-blue-500 border-b-2" href="#">Dashboard</a>
-                    <a class="py-4 font-medium text-gray-500 hover:text-blue-500" href="#">Aliases</a>
-                    <a class="py-4 font-medium text-gray-500 hover:text-blue-500" href="#">Recipients</a>
-                    <a class="py-4 font-medium text-gray-500 hover:text-blue-500" href="#">Settings</a>
-                    <a class="py-4 font-medium text-gray-500 hover:text-blue-500" href="#">Subscription</a>
+                    <a class="py-4 font-medium text-blue-600 hover:text-blue-600 border-blue-600 border-b-2"
+                        href="/">Dashboard</a>
+                    <a class="py-4 font-medium text-gray-500 hover:text-blue-600" href="/aliases">Aliases</a>
+                    <a class="py-4 font-medium text-gray-500 hover:text-blue-600" href="/recipients">Recipients</a>
+                    <a class="py-4 font-medium text-gray-500 hover:text-blue-600" href="/settings">Settings</a>
+                    <a class="py-4 font-medium text-gray-500 hover:text-blue-600" href="/subscription">Subscription</a>
                 </div>
             </nav>
         </header>
+        <router-view></router-view>
     </div>
 </template>
 

@@ -4,6 +4,8 @@ import Dashboard from './components/Dashboard.vue'
 import QuickActions from './components/QuickActions.vue'
 import Aliases from './components/Aliases.vue'
 import Recipients from './components/Recipients.vue'
+import Settings from './components/Settings.vue'
+import Subscription from './components/Subscription.vue'
 import Signup from './components/Signup.vue'
 import Login from './components/Login.vue'
 
@@ -27,6 +29,16 @@ const routes = [
                 path: 'recipients',
                 name: 'App - Recipients',
                 component: Recipients,
+            },
+            {
+                path: 'settings',
+                name: 'App - Settings',
+                component: Settings,
+            },
+            {
+                path: 'subscription',
+                name: 'App - Subscription',
+                component: Subscription,
             }
         ]
     },

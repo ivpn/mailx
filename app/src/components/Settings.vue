@@ -1,5 +1,5 @@
 <template>
     <div>
-        <h1>Recipients</h1>
+        <h1>Settings</h1>
     </div>
 </template>

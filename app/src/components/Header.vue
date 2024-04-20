@@ -27,6 +27,9 @@
                 v-bind:class="{ 'text-blue-600 border-blue-600 border-b-2': route == '/recipients', 'text-gray-500': route != '/recipients'}"
                 class="py-4 font-medium hover:text-blue-600" href="/recipients">Recipients</a>
                 <a
+                v-bind:class="{ 'text-blue-600 border-blue-600 border-b-2': route == '/stats', 'text-gray-500': route != '/stats'}"
+                class="py-4 font-medium hover:text-blue-600" href="/stats">Stats</a>
+                <a
                 v-bind:class="{ 'text-blue-600 border-blue-600 border-b-2': route == '/settings', 'text-gray-500': route != '/settings'}"
                 class="py-4 font-medium hover:text-blue-600"  href="/settings">Settings</a>
                 <a

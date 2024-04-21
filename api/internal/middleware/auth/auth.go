@@ -6,6 +6,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/golang-jwt/jwt"
 	"ivpn.net/email/api/config"
 )
@@ -72,24 +73,19 @@ func NewBasicAuth(cfg config.APIConfig) fiber.Handler {
 
 func NewAPICORS(cfg config.APIConfig) fiber.Handler {
 
-	return func(c *fiber.Ctx) error {
-		c.Set("Access-Control-Allow-Origin", cfg.ApiAllowOrigin)
-		c.Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept")
-		c.Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
-
-		return c.Next()
-	}
+	return cors.New(cors.Config{
+		AllowOrigins:     cfg.ApiAllowOrigin,
+		AllowCredentials: true,
+	})
 }
 
 func NewPSKCORS(cfg config.APIConfig) fiber.Handler {
 
-	return func(c *fiber.Ctx) error {
-		c.Set("Access-Control-Allow-Origin", cfg.PSKAllowOrigin)
-		c.Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept")
-		c.Set("Access-Control-Allow-Methods", "PUT")
-
-		return c.Next()
-	}
+	return cors.New(cors.Config{
+		AllowOrigins:     cfg.PSKAllowOrigin,
+		AllowMethods:     fiber.MethodPut,
+		AllowCredentials: true,
+	})
 }
 
 func GetUserID(c *fiber.Ctx) string {

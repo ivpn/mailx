@@ -1,5 +1,5 @@
 <template>
-    <header class="flex flex-col justify-between w-full text-sm border-b-2 border-gray-100">
+    <header class="flex flex-col justify-between w-full text-sm border-b border-gray-200">
         <div class="flex flex-row justify-between pt-6 pb-2">
             <a class="inline-flex items-center gap-x-2 text-xl font-semibold text-black" href="#">
                 <span class="bg-black w-10 h-10 text-white flex items-center justify-center rounded-md">B</span>

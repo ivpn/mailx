@@ -4,5 +4,5 @@ import env from "../env.json"
 const apiUrl = env.API_URL
 
 export const subscriptionApi = {
-    get: () => axios.get(apiUrl + '/subscription'),
+    get: () => axios.get(apiUrl + '/v1/subscription', { withCredentials: true }),
 }

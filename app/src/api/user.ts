@@ -1,14 +1,14 @@
 import axios from 'axios'
 import env from "../env.json"
 
-const apiUrl = env.API_URL
+const apiUrl = env.API_URL + '/v1'
 
 export const userApi = {
-    register: (data: any) => axios.post(apiUrl + '/v1/register', data),
-    login: (data: any) => axios.post(apiUrl + '/v1/login', data),
-    logout: () => axios.post(apiUrl + '/v1/user/logout'),
-    delete: (data: any) => axios.delete(apiUrl + '/v1/user/delete', data),
-    sendOtp: () => axios.post(apiUrl + '/v1/user/sendotp'),
-    activate: (data: any) => axios.post(apiUrl + '/v1/user/activate', data),
-    stats: () => axios.get(apiUrl + '/v1/user/stats'),
+    register: (data: any) => axios.post(apiUrl + '/register', data),
+    login: (data: any) => axios.post(apiUrl + '/login', data),
+    logout: () => axios.post(apiUrl + '/user/logout', { withCredentials: true }),
+    delete: (data: any) => axios.delete(apiUrl + '/user/delete', { ...data, withCredentials: true }),
+    sendOtp: () => axios.post(apiUrl + '/user/sendotp', { withCredentials: true }),
+    activate: (data: any) => axios.post(apiUrl + '/user/activate', { ...data, withCredentials: true }),
+    stats: () => axios.get(apiUrl + '/user/stats', { withCredentials: true }),
 }

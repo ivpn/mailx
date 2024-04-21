@@ -80,13 +80,13 @@ const login = async () => {
     try {
         const response = await userApi.login(data)
         apiError.value = ''
-        if (response.data.success) {
+        if (response.status === 200) {
             // Redirect to the dashboard
             window.location.href = '/'
         }
     } catch (error) {
         if (axios.isAxiosError(error)) {
-            apiError.value = error.message
+            apiError.value = error.response?.data.error
         }
     } finally {
         isLoading.value = false // End loading

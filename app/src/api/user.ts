@@ -1,6 +1,7 @@
 import axios from 'axios'
+import env from "../env.json"
 
-const apiUrl = import.meta.env.VUE_APP_API_URL
+const apiUrl = env.API_URL
 
 export const userApi = {
     register: (data: any) => axios.post(apiUrl + '/v1/register', data),

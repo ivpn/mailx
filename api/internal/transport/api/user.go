@@ -170,7 +170,7 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 	}
 
 	// Create auth token
-	token, err := utils.CreateAuthToken(h.Cfg, user.ID)
+	token, err := utils.CreateAuthToken(h.Cfg, user.ID, user.Email)
 	if err != nil {
 		log.Printf("error login: %s", err.Error())
 		return c.Status(500).JSON(fiber.Map{

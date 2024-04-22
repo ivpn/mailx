@@ -9,6 +9,13 @@ import Settings from './components/Settings.vue'
 import Subscription from './components/Subscription.vue'
 import Signup from './components/Signup.vue'
 import Login from './components/Login.vue'
+import { type IStaticMethods } from 'preline/preline'
+
+declare global {
+    interface Window {
+        HSStaticMethods: IStaticMethods;
+    }
+}
 
 const routes = [
     {
@@ -74,6 +81,14 @@ router.beforeEach((to, _, next) => {
         next('/login')
     } else {
         next()
+    }
+})
+
+router.afterEach((failure) => {
+    if (!failure) {
+        setTimeout(() => {
+            window.HSStaticMethods.autoInit();
+        }, 100)
     }
 })
 

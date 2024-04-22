@@ -11,8 +11,6 @@
                 class="py-4 font-medium hover:text-blue-600" href="/stats">Stats</a>
             <a v-bind:class="{ 'text-blue-600 border-blue-600 border-b-2': route == '/settings', 'text-gray-500': route != '/settings' }"
                 class="py-4 font-medium hover:text-blue-600" href="/settings">Settings</a>
-            <a v-bind:class="{ 'text-blue-600 border-blue-600 border-b-2': route == '/subscription', 'text-gray-500': route != '/subscription' }"
-                class="py-4 font-medium hover:text-blue-600" href="/subscription">Subscription</a>
         </div>
     </nav>
 </template>

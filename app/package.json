@@ -9,8 +9,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@preline/dropdown": "^2.1.0",
     "axios": "^1.6.8",
     "jwt-decode": "^4.0.0",
+    "preline": "^2.1.0",
     "typescript-cookie": "^1.0.6",
     "vue": "^3.4.21",
     "vue-router": "4"

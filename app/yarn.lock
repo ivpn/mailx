@@ -197,6 +197,16 @@
   resolved "https://registry.yarnpkg.com/@pkgjs/parseargs/-/parseargs-0.11.0.tgz#a77ea742fab25775145434eb1d2328cf5013ac33"
   integrity sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==
 
+"@popperjs/core@^2.11.2":
+  version "2.11.8"
+  resolved "https://registry.yarnpkg.com/@popperjs/core/-/core-2.11.8.tgz#6b79032e760a0899cd4204710beede972a3a185f"
+  integrity sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==
+
+"@preline/dropdown@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@preline/dropdown/-/dropdown-2.1.0.tgz#70cacfdbeaf6aa48a4a851856a80a8e0cccbff13"
+  integrity sha512-Lp4W0PnF3dM4ysWGsF8WYIK7JU6F4NzyQHMqVYHcgbxXlaKhIzyYtERDBWVQqoDE3j3p6NahHVDoepArd1Y88w==
+
 "@rollup/rollup-android-arm-eabi@4.14.1":
   version "4.14.1"
   resolved "https://registry.yarnpkg.com/@rollup/rollup-android-arm-eabi/-/rollup-android-arm-eabi-4.14.1.tgz#ca0501dd836894216cb9572848c5dde4bfca3bec"
@@ -1027,6 +1037,13 @@ postcss@^8.4.23, postcss@^8.4.35, postcss@^8.4.38:
     nanoid "^3.3.7"
     picocolors "^1.0.0"
     source-map-js "^1.2.0"
+
+preline@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/preline/-/preline-2.1.0.tgz#6ab006c11379a03b380d341b7b5b6f827baebc40"
+  integrity sha512-7pwrGNPVfGYUv1XHW9i49ejowIVHCDTx8JvbM43hapLi1GCjj9NnAZmTKupxaROboB4Nvp2x0ADBVKAhpmZppA==
+  dependencies:
+    "@popperjs/core" "^2.11.2"
 
 proxy-from-env@^1.1.0:
   version "1.1.0"

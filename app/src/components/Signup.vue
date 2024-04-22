@@ -96,7 +96,7 @@ const register = async () => {
     } catch (error) {
         apiSuccess.value = ''
         if (axios.isAxiosError(error)) {
-            apiError.value = error.message
+            apiError.value = error.response?.data.error
         }
     } finally {
         isLoading.value = false // End loading

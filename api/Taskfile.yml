@@ -4,6 +4,7 @@ tasks:
   config:
     cmds:
       - cp .env.sample .env
+      - cp ../app/src/env.sample.json ../app/src/env.json
   build:
     cmds:
       - docker compose build

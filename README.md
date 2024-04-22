@@ -28,6 +28,7 @@ cd api
 ### Config
 ```bash
 cp .env.sample .env
+cp ../app/src/env.sample.json ../app/src/env.json
 ```
 
 ### Build

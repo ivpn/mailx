@@ -7,7 +7,7 @@
             </a>
             <button type="button"
                 class="flex items-center text-gray-500 bg-gray-100 px-3 rounded-md hover:text-blue-5000 font-medium">
-                user.name@example.net
+                {{ jwt().email }}
                 <svg class="ms-1 flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                     stroke-linejoin="round">
@@ -21,4 +21,5 @@
 
 <script setup lang="ts">
 import Menu from './Menu.vue'
+import { jwt } from '../utils/jwt'
 </script>

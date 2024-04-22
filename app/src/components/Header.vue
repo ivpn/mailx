@@ -25,7 +25,7 @@
                         href="/subscription">
                         Subscription
                     </a>
-                    <a class="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-gray-200 focus:outline-none"
+                    <a @click.prevent="logout" class="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-gray-200 focus:outline-none"
                         href="#">
                         Log Out
                     </a>
@@ -40,6 +40,14 @@
 import Menu from './Menu.vue'
 import { jwt } from '../utils/jwt'
 import dropdown from '@preline/dropdown'
+import { userApi } from '../api/user.ts'
 
 dropdown.autoInit
+
+const logout = async () => {
+    try {
+        await userApi.logout()
+        window.location.href = '/login'
+    } catch {}
+}
 </script>

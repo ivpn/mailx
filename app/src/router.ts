@@ -6,6 +6,7 @@ import Aliases from './components/Aliases.vue'
 import Recipients from './components/Recipients.vue'
 import Stats from './components/Stats.vue'
 import Settings from './components/Settings.vue'
+import Account from './components/Account.vue'
 import Subscription from './components/Subscription.vue'
 import Signup from './components/Signup.vue'
 import Login from './components/Login.vue'
@@ -47,6 +48,11 @@ const routes = [
                 path: 'settings',
                 name: 'App - Settings',
                 component: Settings,
+            },
+            {
+                path: 'account',
+                name: 'App - Account',
+                component: Account,
             },
             {
                 path: 'subscription',

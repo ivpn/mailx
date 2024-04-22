@@ -4,7 +4,7 @@
         <p class="text-gray-500 text-sm mb-8">Need an account? <a class="text-blue-600 hover:text-blue-700" href="/signup">Sign Up</a></p>
         <form class="w-full max-w-sm bg-white rounded-md px-8 pt-6 pb-8 mb-4" @submit.prevent="login">
             <div class="mb-4">
-                <label class="block text-gray-500 text-sm font-bold mb-2" for="email">
+                <label class="block text-gray-500 text-sm font-semibold mb-2" for="email">
                     Email Address
                 </label>
                 <input
@@ -15,7 +15,7 @@
                 <p v-if="emailError" class="text-red-500 text-sm">Required field</p>
             </div>
             <div class="mb-6">
-                <label class="block text-gray-500 text-sm font-bold mb-2" for="password">
+                <label class="block text-gray-500 text-sm font-semibold mb-2" for="password">
                     Password
                 </label>
                 <input

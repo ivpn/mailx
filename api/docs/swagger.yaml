@@ -133,6 +133,15 @@ definitions:
     x-enum-varnames:
     - Free
     - Managed
+  model.User:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+    type: object
   model.UserStats:
     properties:
       aliases:
@@ -600,6 +609,27 @@ paths:
       summary: Update subscription
       tags:
       - subscription
+  /user:
+    get:
+      consumes:
+      - application/json
+      description: Get user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get user
+      tags:
+      - user
   /user/activate:
     post:
       consumes:

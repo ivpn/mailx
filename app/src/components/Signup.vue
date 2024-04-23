@@ -30,7 +30,7 @@
                 <div class="flex items-center justify-between">
                     <button
                         :disabled="isLoading"
-                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:shadow-outline"
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md focus:outline-none focus:shadow-outline"
                         type="submit">
                         Sign Up
                     </button>
@@ -41,7 +41,7 @@
                 <p class="text-gray-500 text-sm mb-6">{{ apiSuccess }}</p>
                 <a
                     href="/login"
-                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:shadow-outline">
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md focus:outline-none focus:shadow-outline">
                     Proceed to Log In
                 </a>
             </div>

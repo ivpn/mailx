@@ -28,6 +28,7 @@ type UserService interface {
 	GetUserByCredentials(context.Context, string, string) (model.User, error)
 	GetUserByPassword(context.Context, string, string) (model.User, error)
 	DeleteUser(context.Context, string) error
+	GetUser(context.Context, string) (model.User, error)
 	GetUserStats(context.Context, string) (model.UserStats, error)
 }
 
@@ -258,6 +259,28 @@ func (h *Handler) DeleteUser(c *fiber.Ctx) error {
 	return c.Status(200).JSON(fiber.Map{
 		"message": DeleteUserSuccess,
 	})
+}
+
+// @Summary Get user
+// @Description Get user
+// @Tags user
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} model.User
+// @Failure 500 {object} ErrorRes
+// @Router /user [get]
+func (h *Handler) GetUser(c *fiber.Ctx) error {
+	ID := auth.GetUserID(c)
+
+	user, err := h.Service.GetUser(c.Context(), ID)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(user)
 }
 
 // @Summary Get user stats

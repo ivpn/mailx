@@ -6,14 +6,14 @@
         </p>
         <div v-if="!confirmSuccess" class="mb-4 max-w-xs">
             <div class="mb-4">
-                <label class="block text-gray-500 text-sm font-semibold mb-3" for="account-otp">
+                <label class="block text-gray-500 text-sm font-semibold mb-3" for="otp">
                     6-digit OTP code:
                 </label>
                 <input
                     v-model="otp"
                     v-bind:class="{ 'border-red-500': otpError }"
                     class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-blue-600 mb-2"
-                    id="account-otp" type="text">
+                    id="otp" type="text">
                 <p v-if="otpError" class="text-red-500 text-sm mb-2">Required field</p>
             </div>
             <div class="flex flex-row gap-4">
@@ -66,9 +66,7 @@ const getUser = async () => {
 }
 
 const confirmEmail = async () => {
-    if (!validateOtp()) {
-        return
-    }
+    if (!validateOtp()) return
 
     const req = {
         otp: otp.value

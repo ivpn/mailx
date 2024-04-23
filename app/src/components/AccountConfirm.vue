@@ -4,7 +4,7 @@
         <p class="text-sm text-gray-500 mb-3">
             We have sent a 6-digit OTP code to your email address. Please enter the code below to confirm your email. Accounts with unconfirmed email address may be deleted after 7 days.
         </p>
-        <div class="mb-4 max-w-xs">
+        <div v-if="!confirmSuccess" class="mb-4 max-w-xs">
             <div class="mb-4">
                 <label class="block text-gray-500 text-sm font-semibold mb-3" for="account-otp">
                     6-digit OTP code:
@@ -32,7 +32,10 @@
             </div>
         </div>
         <p v-if="error" class="text-red-500 text-sm mb-3">{{ error }}</p>
-        <p v-if="success" class="text-gray-500 text-sm mb-3">{{ success }}</p>
+        <p v-if="resendSuccess && !error && !confirmSuccess" class="text-gray-500 text-sm mb-3">{{ resendSuccess }}</p>
+        <p v-if="confirmSuccess" class="text-gray-500 text-sm my-3">
+            <span class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-teal-100 text-teal-800">{{ confirmSuccess }}</span>
+        </p>
     </div>
 </template>
 
@@ -47,7 +50,8 @@ const res = ref({
 })
 const otp = ref('')
 const otpError = ref(false)
-const success = ref('')
+const confirmSuccess = ref('')
+const resendSuccess = ref('')
 const error = ref('')
 
 const getUser = async () => {
@@ -72,12 +76,11 @@ const confirmEmail = async () => {
 
     try {
         const response = await userApi.activate(req)
-        success.value = response.data.message
+        confirmSuccess.value = response.data.message
         error.value = ''
-        getUser()
     } catch (err) {
         if (axios.isAxiosError(err)) {
-            success.value = ''
+            confirmSuccess.value = ''
             error.value = err.response?.data.error
         }
     }
@@ -86,11 +89,11 @@ const confirmEmail = async () => {
 const sendOtp = async () => {
     try {
         const response = await userApi.sendOtp()
-        success.value = response.data.message
+        resendSuccess.value = response.data.message
         error.value = ''
     } catch (err) {
         if (axios.isAxiosError(err)) {
-            success.value = ''
+            resendSuccess.value = ''
             error.value = err.response?.data.error
         }
     }

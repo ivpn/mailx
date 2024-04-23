@@ -1,12 +1,9 @@
-import axios from 'axios'
-import env from "../env.json"
-
-const apiUrl = env.API_URL + '/v1'
+import { api } from './api'
 
 export const aliasApi = {
-    get: (id: string) => axios.get(apiUrl + '/alias/' + id, { withCredentials: true }),
-    getList: () => axios.get(apiUrl + '/aliases', { withCredentials: true }),
-    create: (data: any) => axios.post(apiUrl + '/alias', { ...data, withCredentials: true }),
-    update: (id: string, data: any) => axios.put(apiUrl + '/alias/' + id, { ...data, withCredentials: true }),
-    delete: (id: string) => axios.delete(apiUrl + '/alias/' + id, { withCredentials: true }),
+    get: (id: string) => api.get('/alias/' + id),
+    getList: () => api.get('/aliases'),
+    create: (data: any) => api.post('/alias', data),
+    update: (id: string, data: any) => api.put('/alias/' + id, data),
+    delete: (id: string) => api.delete('/alias/' + id),
 }

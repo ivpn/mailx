@@ -15,8 +15,8 @@ var (
 	LoginSuccess          = "Login successful"
 	LogoutSuccess         = "Logout successful"
 	DeleteUserSuccess     = "User deleted"
-	OTPSent               = "OTP sent"
-	ActivateUserSuccess   = "User activated"
+	OTPSent               = "New OTP is sent"
+	ActivateUserSuccess   = "Email confirmed"
 	ErrInvalidCredentials = "Invalid credentials"
 	ErrInvalidRequest     = "Invalid request"
 )

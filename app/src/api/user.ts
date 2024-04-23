@@ -10,5 +10,6 @@ export const userApi = {
     delete: (data: any) => axios.delete(apiUrl + '/user/delete', { ...data, withCredentials: true }),
     sendOtp: () => axios.post(apiUrl + '/user/sendotp', { withCredentials: true }),
     activate: (data: any) => axios.post(apiUrl + '/user/activate', { ...data, withCredentials: true }),
+    get: () => axios.get(apiUrl + '/user', { withCredentials: true }),
     stats: () => axios.get(apiUrl + '/user/stats', { withCredentials: true }),
 }

@@ -8,7 +8,7 @@
         <p v-if="res.id" class="text-sm text-gray-500 mb-3">Subscription ID:
             <span class="text-black font-semibold">{{ res.id }}</span>
         </p>
-        <p v-if="apiError" class="text-red-500 text-sm mb-3">{{ apiError }}</p>
+        <p v-if="error" class="text-red-500 text-sm mb-3">{{ error }}</p>
     </div>
 </template>
 
@@ -21,15 +21,15 @@ const res = ref({
     id: '',
     active_until: ''
 })
-const apiError = ref('')
+const error = ref('')
 
 const getSubscription = async () => {
     try {
         const response = await subscriptionApi.get()
         res.value = response.data
-    } catch (error) {
-        if (axios.isAxiosError(error)) {
-            apiError.value = error.message
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.message
         }
     }
 }

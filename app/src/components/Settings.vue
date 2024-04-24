@@ -27,7 +27,7 @@
             Default Recipient
         </h2>
         <p class="text-sm text-gray-500 mb-3">
-            The default recipient to be selected by default in the drop down options when creating a new recipient. You can create recipients <a class="text-violet-600 hover:text-violet-700 font-semibold" href="/recipients">here</a>.
+            The default recipient to be selected by default in the drop down options when creating a new recipient. You can add recipients <a class="text-violet-600 hover:text-violet-700 font-semibold" href="/recipients">here</a>.
         </p>
         <div class="max-w-xs mb-6">
             <label class="block text-gray-500 text-sm font-semibold mb-3" for="recipient">

@@ -1,14 +1,17 @@
 <template>
     <div class="flex flex-col bg-white border border-gray-200 rounded-xl p-5 pb-4 my-8">
         <h1 class="text-lg font-bold text-gray-800 mb-4">Subscription</h1>
-        <p v-if="res.id" class="text-sm text-gray-500 mb-3">
+        <p v-if="res.id" class="text-sm text-gray-500 mb-4">
             <span v-if="isActive()" class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-teal-100 text-teal-800">Active</span>
             <span v-if="!isActive()" class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-gray-100 text-gray-500">Inactive</span>
         </p>
-        <p v-if="res.id" class="text-sm text-gray-500 mb-3">Subscription ID:
-            <span class="text-black font-semibold">{{ res.id }}</span>
+        <p v-if="isActive()" class="text-sm text-gray-500 mb-4">Active until
+            <span class="text-black font-semibold block pt-2">{{ activeUntilDate() }}</span>
         </p>
-        <p v-if="apiError" class="text-red-500 text-sm mb-3">{{ apiError }}</p>
+        <p v-if="res.id" class="text-sm text-gray-500 mb-3">Subscription ID
+            <span class="text-black font-semibold block pt-2">{{ res.id }}</span>
+        </p>
+        <p v-if="error" class="text-red-500 text-sm mb-3">{{ error }}</p>
     </div>
 </template>
 
@@ -21,21 +24,25 @@ const res = ref({
     id: '',
     active_until: ''
 })
-const apiError = ref('')
+const error = ref('')
 
 const getSubscription = async () => {
     try {
         const response = await subscriptionApi.get()
         res.value = response.data
-    } catch (error) {
-        if (axios.isAxiosError(error)) {
-            apiError.value = error.message
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.message
         }
     }
 }
 
 const isActive = () => {
     return res.value.active_until > new Date().toISOString()
+}
+
+const activeUntilDate = () => {
+    return new Date(res.value.active_until).toDateString()
 }
 
 onMounted(() => {

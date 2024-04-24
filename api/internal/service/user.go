@@ -35,6 +35,15 @@ type UserStore interface {
 	GetUserStats(context.Context, string) (model.UserStats, error)
 }
 
+func (s *Service) GetUser(ctx context.Context, userID string) (model.User, error) {
+	user, err := s.Store.GetUser(ctx, userID)
+	if err != nil {
+		return model.User{}, ErrGetUser
+	}
+
+	return user, nil
+}
+
 func (s *Service) GetUserByCredentials(ctx context.Context, email string, password string) (model.User, error) {
 	user, err := s.Store.GetUserByEmail(ctx, email)
 	if err != nil {

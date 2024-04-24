@@ -1,9 +1,6 @@
-import axios from 'axios'
-import env from "../env.json"
-
-const apiUrl = env.API_URL
+import { api } from './api'
 
 export const healthcheckApi = {
-    livez: () => axios.get(apiUrl + '/livez'),
-    readyz: () => axios.get(apiUrl + '/readyz'),
+    livez: () => api.get('/livez'),
+    readyz: () => api.get('/readyz'),
 }

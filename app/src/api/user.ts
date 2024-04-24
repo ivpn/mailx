@@ -1,14 +1,12 @@
-import axios from 'axios'
-import env from "../env.json"
-
-const apiUrl = env.API_URL + '/v1'
+import { api } from './api'
 
 export const userApi = {
-    register: (data: any) => axios.post(apiUrl + '/register', data),
-    login: (data: any) => axios.post(apiUrl + '/login', data),
-    logout: () => axios.post(apiUrl + '/user/logout', { withCredentials: true }),
-    delete: (data: any) => axios.delete(apiUrl + '/user/delete', { ...data, withCredentials: true }),
-    sendOtp: () => axios.post(apiUrl + '/user/sendotp', { withCredentials: true }),
-    activate: (data: any) => axios.post(apiUrl + '/user/activate', { ...data, withCredentials: true }),
-    stats: () => axios.get(apiUrl + '/user/stats', { withCredentials: true }),
+    register: (data: any) => api.post('/register', data),
+    login: (data: any) => api.post('/login', data),
+    logout: () => api.post('/user/logout'),
+    delete: (data: any) => api.delete('/user/delete', data),
+    sendOtp: () => api.post('/user/sendotp'),
+    activate: (data: any) => api.post('/user/activate', data),
+    get: () => api.get('/user'),
+    stats: () => api.get('/user/stats'),
 }

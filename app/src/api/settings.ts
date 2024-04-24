@@ -1,9 +1,6 @@
-import axios from 'axios'
-import env from "../env.json"
-
-const apiUrl = env.API_URL + '/v1'
+import { api } from './api'
 
 export const settingsApi = {
-    get: () => axios.get(apiUrl + '/settings', { withCredentials: true }),
-    update: (data: any) => axios.put(apiUrl + '/settings', { ...data, withCredentials: true }),
+    get: () => api.get('/settings'),
+    update: (data: any) => api.put('/settings', data),
 }

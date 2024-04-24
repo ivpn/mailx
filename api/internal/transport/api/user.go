@@ -15,8 +15,8 @@ var (
 	LoginSuccess          = "Login successful"
 	LogoutSuccess         = "Logout successful"
 	DeleteUserSuccess     = "User deleted"
-	OTPSent               = "OTP sent"
-	ActivateUserSuccess   = "User activated"
+	OTPSent               = "New OTP is sent"
+	ActivateUserSuccess   = "Email confirmed"
 	ErrInvalidCredentials = "Invalid credentials"
 	ErrInvalidRequest     = "Invalid request"
 )
@@ -28,6 +28,7 @@ type UserService interface {
 	GetUserByCredentials(context.Context, string, string) (model.User, error)
 	GetUserByPassword(context.Context, string, string) (model.User, error)
 	DeleteUser(context.Context, string) error
+	GetUser(context.Context, string) (model.User, error)
 	GetUserStats(context.Context, string) (model.UserStats, error)
 }
 
@@ -170,7 +171,7 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 	}
 
 	// Create auth token
-	token, err := utils.CreateAuthToken(h.Cfg, user.ID)
+	token, err := utils.CreateAuthToken(h.Cfg, user.ID, user.Email)
 	if err != nil {
 		log.Printf("error login: %s", err.Error())
 		return c.Status(500).JSON(fiber.Map{
@@ -258,6 +259,28 @@ func (h *Handler) DeleteUser(c *fiber.Ctx) error {
 	return c.Status(200).JSON(fiber.Map{
 		"message": DeleteUserSuccess,
 	})
+}
+
+// @Summary Get user
+// @Description Get user
+// @Tags user
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} model.User
+// @Failure 500 {object} ErrorRes
+// @Router /user [get]
+func (h *Handler) GetUser(c *fiber.Ctx) error {
+	ID := auth.GetUserID(c)
+
+	user, err := h.Service.GetUser(c.Context(), ID)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(user)
 }
 
 // @Summary Get user stats

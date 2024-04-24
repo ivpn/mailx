@@ -13,7 +13,7 @@
                             <path d="m6 9 6 6 6-6" />
                         </svg>
                     </button>
-                    <div class="hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-60 bg-white border border-gray-200 shadow- rounded-lg p-2 mt-2 after:h-4 after:absolute after:-bottom-4 after:start-0 after:w-full before:h-4 before:absolute before:-top-4 before:start-0 before:w-full"
+                    <div class="hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-60 bg-white border border-gray-200 shadow-sm rounded-lg p-2 mt-2 after:h-4 after:absolute after:-bottom-4 after:start-0 after:w-full before:h-4 before:absolute before:-top-4 before:start-0 before:w-full"
                         aria-labelledby="hs-dropdown-default">
                         <a class="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-gray-100 focus:outline-none"
                             href="/account">

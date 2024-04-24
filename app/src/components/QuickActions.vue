@@ -1,4 +1,5 @@
 <template>
+    <AccountConfirm />
     <div class="flex flex-col items-center p-4 text-center pt-20">
         <h3 class="text-lg font-bold text-gray-800">
             Quick actions
@@ -18,3 +19,7 @@
         </div>
     </div>
 </template>
+
+<script setup lang="ts">
+import AccountConfirm from './AccountConfirm.vue'
+</script>

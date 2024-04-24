@@ -1,5 +1,5 @@
 <template>
-    <div v-if="!res.is_active" class="flex flex-col bg-white border border-gray-200 rounded-xl p-5 pb-4 my-8">
+    <div v-if="!res.is_active" class="flex flex-col bg-white shadow-sm rounded-xl p-5 pb-4 my-8">
         <h1 class="text-lg font-bold text-gray-800 mb-4">Confirm Your Email</h1>
         <p class="text-sm text-gray-500 mb-3">
             We have sent a 6-digit OTP code to your email address. Please enter the code below to confirm your email. Accounts with unconfirmed email address may be deleted after 7 days.

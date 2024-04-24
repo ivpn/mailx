@@ -12,14 +12,14 @@
                 <input
                     v-model="otp"
                     v-bind:class="{ 'border-red-500': otpError }"
-                    class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-blue-600 mb-2"
+                    class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-violet-600 mb-2"
                     id="otp" type="text">
                 <p v-if="otpError" class="text-red-500 text-sm mb-2">Required field</p>
             </div>
             <div class="flex flex-row gap-4">
                 <button
                     @click="confirmEmail"
-                    class="bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm py-2 px-3 rounded-md focus:outline-none focus:shadow-outline"
+                    class="bg-violet-600 hover:bg-violet-700 text-white font-medium text-sm py-2 px-3 rounded-md focus:outline-none focus:shadow-outline"
                     type="submit">
                     Confirm
                 </button>

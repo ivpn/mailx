@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100">
         <h1 class="text-gray-700 text-2xl font-semibold mb-2">Sign Up</h1>
-        <p class="text-gray-500 text-sm mb-8">Have an account? <a class="text-blue-600 hover:text-blue-700" href="/login">Log In</a></p>
+        <p class="text-gray-500 text-sm mb-8">Have an account? <a class="text-violet-600 hover:text-violet-700" href="/login">Log In</a></p>
         <form class="w-full max-w-sm bg-white rounded-md px-8 pt-6 pb-8 mb-4" @submit.prevent="register">
             <div v-if="!apiSuccess">
                 <div class="mb-4">
@@ -11,7 +11,7 @@
                     <input
                         v-model="email"
                         v-bind:class="{ 'border-red-500': emailError }"
-                        class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-blue-600 mb-2"
+                        class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-violet-600 mb-2"
                         id="email" type="email" autocomplete="email">
                     <p v-if="emailError" class="text-red-500 text-sm">Required field</p>
                 </div>
@@ -22,7 +22,7 @@
                     <input
                         v-model="password"
                         v-bind:class="{ 'border-red-500': passwordError }"
-                        class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-blue-600 mb-2"
+                        class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-violet-600 mb-2"
                         id="password" type="password" autocomplete="current-password">
                     <p v-if="passwordError" class="text-red-500 text-sm mb-2">Required field</p>
                     <p class="text-gray-500 text-sm mb-2">Must be at least 8 characters</p>
@@ -30,7 +30,7 @@
                 <div class="flex items-center justify-between">
                     <button
                         :disabled="isLoading"
-                        class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md focus:outline-none focus:shadow-outline"
+                        class="bg-violet-600 hover:bg-violet-700 text-white font-medium py-3 px-4 rounded-md focus:outline-none focus:shadow-outline"
                         type="submit">
                         Sign Up
                     </button>
@@ -41,7 +41,7 @@
                 <p class="text-gray-500 text-sm mb-6">{{ apiSuccess }}</p>
                 <a
                     href="/login"
-                    class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md focus:outline-none focus:shadow-outline">
+                    class="bg-violet-600 hover:bg-violet-700 text-white font-medium py-3 px-4 rounded-md focus:outline-none focus:shadow-outline">
                     Proceed to Log In
                 </a>
             </div>

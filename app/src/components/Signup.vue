@@ -38,7 +38,7 @@
                 <p v-if="apiError" class="text-red-500 text-sm mt-6">{{ apiError }}</p>
             </div>
             <div v-if="apiSuccess">
-                <p class="text-gray-500 text-sm mb-6">{{ apiSuccess }}</p>
+                <p class="text-green-500 text-sm mb-6">{{ apiSuccess }}</p>
                 <a
                     href="/login"
                     class="bg-violet-600 hover:bg-violet-700 text-white font-medium py-3 px-4 rounded-md focus:outline-none focus:shadow-outline">

@@ -70,6 +70,7 @@
             </button>
         </div>
         <p v-if="error" class="text-red-500 text-sm mb-3">{{ error }}</p>
+        <p v-if="success" class="text-green-500 text-sm mb-3">{{ success }}</p>
     </div>
 </template>
 
@@ -88,6 +89,7 @@ const res = ref({
 })
 const domains = ref(env.DOMAINS)
 const recipients = ref([])
+const success = ref('')
 const error = ref('')
 
 const getSettings = async () => {
@@ -109,15 +111,16 @@ const saveSettings = async () => {
     const recipientInput = document.getElementById('recipient') as HTMLInputElement
     res.value.recipient = recipientInput.value
 
-    console.log(res.value)
-    // try {
-    //     await settingsApi.update(res.value)
-    //     error.value = ''
-    // } catch (err) {
-    //     if (axios.isAxiosError(err)) {
-    //         error.value = err.message
-    //     }
-    // }
+    try {
+        const response = await settingsApi.update(res.value)
+        success.value = response.data.message
+        error.value = ''
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            success.value = ''
+            error.value = err.message
+        }
+    }
 }
 
 const getRecipients = async () => {

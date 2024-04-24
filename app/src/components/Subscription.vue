@@ -1,16 +1,26 @@
 <template>
     <div class="flex flex-col bg-white shadow-sm rounded-xl p-5 pb-4 my-8">
         <h1 class="text-xl font-bold text-gray-800 mb-4">Subscription</h1>
-        <p v-if="res.id" class="text-sm text-gray-500 mb-4">
+        <p v-if="res.id" class="text-sm text-gray-500 mb-5">
             <span v-if="isActive()" class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-teal-100 text-teal-800">Active</span>
             <span v-if="!isActive()" class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-gray-100 text-gray-500">Inactive</span>
         </p>
-        <p v-if="isActive()" class="text-sm text-gray-500 mb-4">Active until
-            <span class="text-black font-semibold block pt-2">{{ activeUntilDate() }}</span>
-        </p>
-        <p v-if="res.id" class="text-sm text-gray-500 mb-3">Subscription ID
-            <span class="text-black font-semibold block pt-2">{{ res.id }}</span>
-        </p>
+        <div v-if="isActive()" class="mb-3">
+            <h2 class="font-semibold text-gray-800 mb-3">
+                Active until
+            </h2>
+            <p class="text-sm text-gray-500 mb-3">
+                {{ activeUntilDate() }}
+            </p>
+        </div>
+        <div v-if="res.id" class="mb-3">
+            <h2 class="font-semibold text-gray-800 mb-3">
+                Subscription ID
+            </h2>
+            <p class="text-sm text-gray-500 mb-3">
+                {{ res.id }}
+            </p>
+        </div>
         <p v-if="error" class="text-red-500 text-sm mb-3">{{ error }}</p>
     </div>
 </template>

@@ -11,8 +11,8 @@ export default {
   plugins: [
     require('preline/plugin'),
     require("@tailwindcss/forms")({
-      strategy: 'base',
-      strategy: 'class',
+      // strategy: 'base',
+      // strategy: 'class',
     }),
   ],
 }

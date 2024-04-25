@@ -21,7 +21,7 @@ func (d *Database) GetRecipientByEmail(ctx context.Context, email string) (model
 
 func (d *Database) GetRecipients(ctx context.Context, userID string) ([]model.Recipient, error) {
 	var recipients []model.Recipient
-	err := d.Client.Where("user_id = ?", userID).Find(&recipients).Error
+	err := d.Client.Where("user_id = ?", userID).Order("created_at").Find(&recipients).Error
 	return recipients, err
 }
 

@@ -1,7 +1,9 @@
 <template>
-    <div class="container mx-auto max-w-screen-lg px-5">
+    <div class="min-h-screen bg-gray-100">
         <Header />
-        <router-view></router-view>
+        <div class="container mx-auto max-w-screen-lg px-5">
+            <router-view></router-view>
+        </div>
     </div>
 </template>
 

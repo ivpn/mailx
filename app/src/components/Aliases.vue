@@ -1,22 +1,41 @@
 <template>
     <div class="flex flex-col bg-white shadow-sm rounded-xl p-5 pb-4 my-8">
         <h1 class="text-xl font-bold text-gray-800 mb-5">Aliases</h1>
-        <div class="flex items-center justify-between mb-5">
+        <div class="flex items-center justify-between mb-6">
             <button
                 class="bg-violet-600 hover:bg-violet-700 text-white font-medium text-sm py-2 px-3 rounded-md focus:outline-none focus:shadow-outline"
                 type="submit">
                 Create Alias
             </button>
         </div>
-        <div class="grid grid-cols-6 gap-2 mb-5">
-            <div class="font-medium text-sm text-gray-500">Created</div>
-            <div class="font-medium text-sm text-gray-500">Alias</div>
-            <div class="font-medium text-sm text-gray-500">Recipients</div>
-            <div class="font-medium text-sm text-gray-500" title="Forwards/Blocks/Replies/Sends">F/B/R/S</div>
-            <div class="font-medium text-sm text-gray-500">Active</div>
-        </div>
-        <div v-if="list.length" class="mb-4">
-            <AliasCard v-for="alias in list" :alias="alias" />
+        <div class="flex flex-col">
+            <div class="-m-1.5 overflow-x-auto">
+                <div class="p-1.5 min-w-full inline-block align-middle">
+                    <div class="overflow-hidden">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="pr-5 py-3 text-start text-xs font-medium text-gray-500 uppercase">
+                                        Created</th>
+                                    <th scope="col" class="px-5 py-3 text-start text-xs font-medium text-gray-500 uppercase">
+                                        Alias</th>
+                                    <th scope="col" class="px-5 py-3 text-start text-xs font-medium text-gray-500 uppercase">
+                                        Recipients</th>
+                                    <th scope="col" class="px-5 py-3 text-start text-xs font-medium text-gray-500 uppercase">
+                                        F/B/R/S</th>
+                                    <th scope="col" class="px-5 py-3 text-start text-xs font-medium text-gray-500 uppercase">
+                                        Active</th>
+                                    <th scope="col" class="pl-5 py-3 text-end text-xs font-medium text-gray-500 uppercase">
+                                        Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <AliasCard v-for="alias in list" :alias="alias" />  
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
         <p v-if="error" class="text-red-600 text-sm mb-4">{{ error }}</p>
     </div>

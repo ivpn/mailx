@@ -9,7 +9,7 @@ import (
 
 type BaseModel struct {
 	ID        string    `json:"id"`
-	CreatedAt time.Time `json:"-"`
+	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"-"`
 }
 

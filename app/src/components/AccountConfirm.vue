@@ -32,7 +32,7 @@
             </div>
         </div>
         <p v-if="error" class="text-red-600 text-sm mb-3">{{ error }}</p>
-        <p v-if="resendSuccess && !error && !confirmSuccess" class="text-green-500 text-sm mb-3">{{ resendSuccess }}</p>
+        <p v-if="resendSuccess && !error && !confirmSuccess" class="text-green-600 text-sm mb-3">{{ resendSuccess }}</p>
         <p v-if="confirmSuccess" class="text-gray-500 text-sm my-3">
             <span class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-teal-100 text-teal-800">{{ confirmSuccess }}</span>
         </p>

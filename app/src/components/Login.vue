@@ -9,10 +9,10 @@
                 </label>
                 <input
                     v-model="email"
-                    v-bind:class="{ 'border-red-500': emailError }"
+                    v-bind:class="{ 'border-red-600': emailError }"
                     class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-violet-600 mb-2"
                     id="email" type="email" autocomplete="email">
-                <p v-if="emailError" class="text-red-500 text-sm">Required field</p>
+                <p v-if="emailError" class="text-red-600 text-sm">Required field</p>
             </div>
             <div class="mb-6">
                 <label class="block text-gray-500 text-sm font-semibold mb-2" for="password">
@@ -20,10 +20,10 @@
                 </label>
                 <input
                     v-model="password"
-                    v-bind:class="{ 'border-red-500': passwordError }"
+                    v-bind:class="{ 'border-red-600': passwordError }"
                     class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-violet-600 mb-2"
                     id="password" type="password" autocomplete="current-password">
-                <p v-if="passwordError" class="text-red-500 text-sm mb-2">Required field</p>
+                <p v-if="passwordError" class="text-red-600 text-sm mb-2">Required field</p>
             </div>
             <div class="flex items-center justify-between">
                 <button
@@ -33,7 +33,7 @@
                     Log In
                 </button>
             </div>
-            <p v-if="apiError" class="text-red-500 text-sm mt-6">{{ apiError }}</p>
+            <p v-if="apiError" class="text-red-600 text-sm mt-6">{{ apiError }}</p>
         </form>
     </div>
 </template>

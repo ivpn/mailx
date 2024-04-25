@@ -18,7 +18,7 @@
         <div v-if="list.length" class="mb-4">
             <AliasCard v-for="alias in list" :alias="alias" />
         </div>
-        <p v-if="error" class="text-red-500 text-sm mb-4">{{ error }}</p>
+        <p v-if="error" class="text-red-600 text-sm mb-4">{{ error }}</p>
     </div>
 </template>
 

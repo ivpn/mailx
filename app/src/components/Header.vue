@@ -24,7 +24,7 @@
                             Subscription
                         </a>
                         <a @click.prevent="logout"
-                            class="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-red-500 hover:bg-gray-100 focus:outline-none"
+                            class="flex items-center gap-x-3.5 py-2 px-3 rounded-md text-sm text-red-600 hover:bg-gray-100 focus:outline-none"
                             href="#">
                             Log out
                         </a>

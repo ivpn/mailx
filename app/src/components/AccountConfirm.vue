@@ -11,10 +11,10 @@
                 </label>
                 <input
                     v-model="otp"
-                    v-bind:class="{ 'border-red-500': otpError }"
+                    v-bind:class="{ 'border-red-600': otpError }"
                     class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-violet-600 mb-2"
                     id="otp" type="text">
-                <p v-if="otpError" class="text-red-500 text-sm mb-2">Required field</p>
+                <p v-if="otpError" class="text-red-600 text-sm mb-2">Required field</p>
             </div>
             <div class="flex flex-row gap-4">
                 <button
@@ -31,7 +31,7 @@
                 </button>
             </div>
         </div>
-        <p v-if="error" class="text-red-500 text-sm mb-3">{{ error }}</p>
+        <p v-if="error" class="text-red-600 text-sm mb-3">{{ error }}</p>
         <p v-if="resendSuccess && !error && !confirmSuccess" class="text-green-500 text-sm mb-3">{{ resendSuccess }}</p>
         <p v-if="confirmSuccess" class="text-gray-500 text-sm my-3">
             <span class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-teal-100 text-teal-800">{{ confirmSuccess }}</span>

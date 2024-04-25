@@ -9,12 +9,12 @@
         <div>{{ alias.enabled }}</div>
         <div class="flex gap-2 justify-items-end place-content-end">
             <button
-                class="bg-violet-600 hover:bg-violet-700 text-white font-medium text-sm py-2 px-3 rounded-md focus:outline-none focus:shadow-outline"
+                class="text-violet-600 hover:text-violet-700 font-medium text-sm py-2 px-3 rounded-md focus:outline-none focus:shadow-outline"
                 type="submit">
                 Edit
             </button>
             <button
-                class="bg-red-600 hover:bg-red-700 text-white font-medium text-sm py-2 px-3 rounded-md focus:outline-none focus:shadow-outline"
+                class="text-red-600 hover:text-red-700 font-medium text-sm py-2 px-3 rounded-md focus:outline-none focus:shadow-outline"
                 type="submit">
                 Delete
             </button>

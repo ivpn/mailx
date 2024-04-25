@@ -24,7 +24,7 @@
             <div class="flex items-center">
                 <input type="checkbox"
                     v-bind:checked="alias.enabled"
-                    class="relative w-11 h-6 p-px bg-gray-100 border-transparent text-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:ring-white disabled:opacity-50 disabled:pointer-events-none checked:bg-none checked:text-violet-600 checked:border-violet-600 
+                    class="form-checkbox relative w-11 h-6 p-px bg-gray-100 border-transparent text-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:ring-white disabled:opacity-50 disabled:pointer-events-none checked:bg-none checked:text-violet-600 checked:border-violet-600 
 
                     before:inline-block before:size-5 before:bg-white checked:before:bg-violet-200 before:translate-x-0 checked:before:translate-x-full before:rounded-full before:shadow before:transform before:ring-0 before:transition before:ease-in-out before:duration-200">
             </div>

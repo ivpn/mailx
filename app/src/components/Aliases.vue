@@ -21,7 +21,7 @@
                 </button>
             </div>
         </div>
-        <div v-if="list.length">
+        <div v-bind:class="{ 'hidden': !list.length }">
             <div class="flex items-center justify-between mb-6">
                 <button
                     class="mt-3 py-2 pl-2 pr-3 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-md border border-transparent bg-violet-600 text-white hover:bg-violet-700">
@@ -42,24 +42,33 @@
                                 <thead>
                                     <tr>
                                         <th scope="col"
-                                            class="pr-5 py-3 text-start text-xs font-medium text-gray-500 uppercase">
-                                            Created</th>
+                                            class="pr-5 py-3 text-start text-xs font-medium text-gray-500">
+                                            CREATED</th>
                                         <th scope="col"
-                                            class="px-5 py-3 text-start text-xs font-medium text-gray-500 uppercase">
-                                            Alias</th>
+                                            class="px-5 py-3 text-start text-xs font-medium text-gray-500">
+                                            ALIAS</th>
                                         <th scope="col"
-                                            class="px-5 py-3 text-start text-xs font-medium text-gray-500 uppercase">
-                                            Recipients</th>
+                                            class="px-5 py-3 text-start text-xs font-medium text-gray-500">
+                                            RECIPIENTS</th>
                                         <th scope="col"
-                                            class="px-5 py-3 text-start text-xs font-medium text-gray-500 uppercase"
-                                            title="Forwards/Blocks/Replies/Sends">
-                                            Count</th>
+                                            class="px-5 py-3 text-start text-xs font-medium text-gray-500">
+                                            <div class="hs-tooltip inline-block">
+                                                <span class="hs-tooltip-toggle">
+                                                    COUNT
+                                                    <span
+                                                        class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded shadow-sm"
+                                                        role="tooltip">
+                                                        Forwards/Blocks/Replies/Sends
+                                                    </span>
+                                                </span>
+                                            </div>
+                                        </th>
                                         <th scope="col"
-                                            class="px-5 py-3 text-start text-xs font-medium text-gray-500 uppercase">
-                                            Active</th>
+                                            class="px-5 py-3 text-start text-xs font-medium text-gray-500">
+                                            ACTIVE</th>
                                         <th scope="col"
-                                            class="pl-5 py-3 text-end text-xs font-medium text-gray-500 uppercase">
-                                            Actions</th>
+                                            class="pl-5 py-3 text-end text-xs font-medium text-gray-500">
+                                            ACTIONS</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200">
@@ -80,6 +89,7 @@ import { onMounted, ref } from 'vue'
 import axios from 'axios'
 import { aliasApi } from '../api/alias'
 import AliasCard from './AliasCard.vue'
+import tooltip from '@preline/tooltip'
 
 const alias = ref({
     id: '',
@@ -105,6 +115,7 @@ const getList = async () => {
         const response = await aliasApi.getList()
         list.value = response.data
         error.value = ''
+        
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.message
@@ -113,6 +124,7 @@ const getList = async () => {
 }
 
 onMounted(() => {
+    tooltip.autoInit()
     getList()
 })
 

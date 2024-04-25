@@ -207,6 +207,11 @@
   resolved "https://registry.yarnpkg.com/@preline/dropdown/-/dropdown-2.1.0.tgz#70cacfdbeaf6aa48a4a851856a80a8e0cccbff13"
   integrity sha512-Lp4W0PnF3dM4ysWGsF8WYIK7JU6F4NzyQHMqVYHcgbxXlaKhIzyYtERDBWVQqoDE3j3p6NahHVDoepArd1Y88w==
 
+"@preline/tooltip@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@preline/tooltip/-/tooltip-2.1.0.tgz#04d5264dabfc5f02b247a25d6cf85ee2483457f2"
+  integrity sha512-ateBPiXniSXgHGQog7dsl0wOTKLZrkpo3w8ioAM9t60w3ajZSMMZCsfTbfeWMdHWs/VOOQyMWmRCBPfI369wTQ==
+
 "@rollup/rollup-android-arm-eabi@4.14.1":
   version "4.14.1"
   resolved "https://registry.yarnpkg.com/@rollup/rollup-android-arm-eabi/-/rollup-android-arm-eabi-4.14.1.tgz#ca0501dd836894216cb9572848c5dde4bfca3bec"

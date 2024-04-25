@@ -13,7 +13,7 @@
                 Select default domain:
             </label>
             <select id="domain"
-                class="form-select py-3 px-4 pe-9 block w-full border-2 border-gray-200 rounded-lg text-gray-700 focus:border-violet-600 disabled:opacity-50 disabled:pointer-events-none outline-none">
+                class="form-select py-2.5 px-4 pe-9 block w-full border-2 border-gray-200 rounded-lg text-gray-700 focus:border-violet-600 disabled:opacity-50 disabled:pointer-events-none outline-none">
                 <option
                     v-for="(domain, index) in domains"
                     v-bind:domain
@@ -35,7 +35,7 @@
             </label>
             <select id="recipient"
                 :disabled="!recipients.length"
-                class="form-select py-3 px-4 pe-9 block w-full border-2 border-gray-200 rounded-lg text-gray-700 focus:border-violet-600 disabled:opacity-50 disabled:pointer-events-none outline-none">
+                class="form-select py-2.5 px-4 pe-9 block w-full border-2 border-gray-200 rounded-lg text-gray-700 focus:border-violet-600 disabled:opacity-50 disabled:pointer-events-none outline-none">
                 <option
                     v-for="recipient in recipients"
                     v-bind:value=recipient

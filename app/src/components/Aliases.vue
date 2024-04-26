@@ -63,7 +63,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200">
-                                    <AliasCard v-for="alias in list" :alias="alias" />
+                                    <AliasCard v-for="alias in list" :alias="alias" :recipients.sync="recipients" />
                                 </tbody>
                             </table>
                         </div>
@@ -79,6 +79,7 @@
 import { onMounted, ref } from 'vue'
 import axios from 'axios'
 import { aliasApi } from '../api/alias'
+import { recipientApi } from '../api/recipient.ts'
 import AliasCard from './AliasCard.vue'
 
 const alias = ref({
@@ -98,6 +99,7 @@ const alias = ref({
 })
 
 const list = ref([] as typeof alias[])
+const recipients = ref([])
 const error = ref('')
 
 const getList = async () => {
@@ -113,8 +115,21 @@ const getList = async () => {
     }
 }
 
+const getRecipients = async () => {
+    try {
+        const response = await recipientApi.getList()
+        recipients.value = response.data.map((recipient: { email: string }) => recipient.email)
+        error.value = ''
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.message
+        }
+    }
+}
+
 onMounted(() => {
     getList()
+    getRecipients()
 })
 
 </script>

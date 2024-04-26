@@ -42,7 +42,7 @@
         </td>
         <td class="pl-5 py-4 whitespace-nowrap text-end text-sm">
             <div class="flex gap-5 justify-end">
-                <AliasEdit :alias="alias" />
+                <AliasEdit :alias="alias" :recipients="recipients" />
                 <button
                     class="text-red-600 hover:text-red-700 font-semibold text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
                     type="submit">
@@ -54,11 +54,12 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import tooltip from '@preline/tooltip'
 import AliasEdit from './AliasEdit.vue'
 
-defineProps(['alias'])
+const props = defineProps(['alias', 'recipients'])
+const recipients = ref(props.recipients)
 
 onMounted(() => {
     tooltip.autoInit()

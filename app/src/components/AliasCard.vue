@@ -42,11 +42,7 @@
         </td>
         <td class="pl-5 py-4 whitespace-nowrap text-end text-sm">
             <div class="flex gap-5 justify-end">
-                <button
-                    class="text-violet-600 hover:text-violet-700 font-semibold text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
-                    type="submit">
-                    Edit
-                </button>
+                <AliasEdit :alias="alias" />
                 <button
                     class="text-red-600 hover:text-red-700 font-semibold text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
                     type="submit">
@@ -60,6 +56,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import tooltip from '@preline/tooltip'
+import AliasEdit from './AliasEdit.vue'
 
 defineProps(['alias'])
 

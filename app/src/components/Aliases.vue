@@ -52,16 +52,7 @@
                                             RECIPIENTS</th>
                                         <th scope="col"
                                             class="px-5 py-3 text-start text-xs font-medium text-gray-500">
-                                            <div class="hs-tooltip inline-block">
-                                                <span class="hs-tooltip-toggle">
-                                                    COUNT
-                                                    <span
-                                                        class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded shadow-sm"
-                                                        role="tooltip">
-                                                        Forwards/Blocks/Replies/Sends
-                                                    </span>
-                                                </span>
-                                            </div>
+                                            COUNT
                                         </th>
                                         <th scope="col"
                                             class="px-5 py-3 text-start text-xs font-medium text-gray-500">
@@ -89,7 +80,6 @@ import { onMounted, ref } from 'vue'
 import axios from 'axios'
 import { aliasApi } from '../api/alias'
 import AliasCard from './AliasCard.vue'
-import tooltip from '@preline/tooltip'
 
 const alias = ref({
     id: '',
@@ -124,7 +114,6 @@ const getList = async () => {
 }
 
 onMounted(() => {
-    tooltip.autoInit()
     getList()
 })
 

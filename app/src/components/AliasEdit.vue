@@ -14,8 +14,7 @@
                         <h3 class="font-bold text-gray-800">
                             Edit alias
                         </h3>
-                        <button @click="closeOverlay"
-                            type="button"
+                        <button @click="close" type="button"
                             class="flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent text-gray-800 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none">
                             <span class="sr-only">Close</span>
                             <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -49,7 +48,7 @@
                         <div class="max-w-xs mb-6">
                             <label v-bind:for="'recipient_' + alias.id"
                                 class="block text-gray-500 text-sm font-semibold mb-3">
-                                Select default recipient:
+                                Default recipient:
                             </label>
                             <select v-model="alias.recipients" v-bind:id="'recipient_' + alias.id"
                                 :disabled="!recipients.length"
@@ -62,14 +61,17 @@
                         </div>
                     </div>
                     <div class="flex justify-start items-center gap-x-2 py-3 px-4 border-t">
-                        <button @click="updateAlias"
+                        <button v-if="!success" @click="updateAlias"
                             class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-semibold rounded-md border border-transparent bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50 disabled:pointer-events-none">
                             Save
                         </button>
-                        <button @click="closeOverlay"
+                        <button @click="close"
                             class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-md border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
                             Close
                         </button>
+                    </div>
+                    <div class="flex items-start">
+                        <p v-if="error" class="px-5 text-red-600 text-sm mb-3">{{ error }}</p>
                     </div>
                 </div>
             </div>
@@ -94,10 +96,7 @@ const updateAlias = async () => {
         const response = await aliasApi.update(alias.value.id, alias.value)
         success.value = response.data.message
         error.value = ''
-        const modal = document.querySelector('#hs-basic-modal' + alias.value.id)
-        if (modal instanceof HTMLElement) {
-            overlay.close(modal)
-        }
+        close()
     } catch (err) {
         if (axios.isAxiosError(err)) {
             success.value = ''
@@ -106,10 +105,12 @@ const updateAlias = async () => {
     }
 }
 
-const closeOverlay = () => {
+const close = () => {
     alias.value.description = props.alias.description
     alias.value.from_name = props.alias.from_name
     alias.value.recipients = props.alias.recipients
+    success.value = ''
+    error.value = ''
     const modal = document.querySelector('#hs-basic-modal' + alias.value.id)
     if (modal instanceof HTMLElement) {
         overlay.close(modal)

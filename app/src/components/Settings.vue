@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col bg-white shadow-sm rounded-xl p-5 pb-4 my-8">
-        <h1 class="text-xl font-bold text-gray-800 mb-5">Settings</h1>
+        <h1 class="text-2xl font-bold text-gray-800 mb-5">Settings</h1>
         <h2 class="font-semibold text-gray-800 mb-3">
             Default Domain
         </h2>

@@ -11,7 +11,7 @@
             <input
                 v-model="password"
                 v-bind:class="{ 'border-red-600': passwordError }"
-                class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-blue-600 mb-2"
+                class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-violet-600 mb-2"
                 id="account-password" type="text" autocomplete="current-password">
             <p v-if="passwordError" class="text-red-600 text-sm mb-2">Required field</p>
         </div>

@@ -1,7 +1,6 @@
 <template>
-    <div class="flex flex-col bg-white shadow-sm rounded-xl p-5 pb-4 my-8">
-        <h1 class="text-xl font-bold text-gray-800 mb-5">Aliases</h1>
-        <div v-if="!list.length && !error" class="flex flex-col items-center p-4 text-center py-20">
+    <div v-if="!list.length && loaded" class="flex flex-col p-5 pb-4 my-8">
+        <div class="flex flex-col items-center p-4 text-center py-20">
             <h3 class="text-lg font-bold text-gray-800">
                 No aliases yet
             </h3>
@@ -21,7 +20,10 @@
                 </button>
             </div>
         </div>
-        <div v-bind:class="{ 'hidden': !list.length }">
+    </div>
+    <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="flex flex-col bg-white shadow-sm rounded-xl p-5 pb-4 my-8">
+        <h1 class="text-xl font-bold text-gray-800 mb-5">Aliases</h1>
+        <div>
             <div class="flex items-center justify-between mb-6">
                 <button
                     class="mt-3 py-2 pl-2 pr-3 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-md border border-transparent bg-violet-600 text-white hover:bg-violet-700">
@@ -101,13 +103,14 @@ const alias = ref({
 const list = ref([] as typeof alias[])
 const recipients = ref([])
 const error = ref('')
+const loaded = ref(false)
 
 const getList = async () => {
     try {
         const response = await aliasApi.getList()
         list.value = response.data
+        loaded.value = true
         error.value = ''
-        
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.message

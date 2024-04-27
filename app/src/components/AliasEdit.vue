@@ -1,11 +1,12 @@
 <template>
     <div>
-        <button data-hs-overlay="#hs-basic-modal"
+        <button v-bind:data-hs-overlay="'#hs-basic-modal' + alias.id"
             class="text-violet-600 hover:text-violet-700 font-semibold text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
             type="submit">
             Edit
         </button>
-        <div id="hs-basic-modal"
+        <div
+            v-bind:id="'hs-basic-modal' + alias.id"
             class="hs-overlay hidden size-full fixed top-0 start-0 z-[60] overflow-x-hidden overflow-y-auto pointer-events-none">
             <div
                 class="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 opacity-0 transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
@@ -16,7 +17,7 @@
                         </h3>
                         <button type="button"
                             class="flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent text-gray-800 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none"
-                            data-hs-overlay="#hs-basic-modal">
+                            v-bind:data-hs-overlay="'#hs-basic-modal' + alias.id">
                             <span class="sr-only">Close</span>
                             <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -57,6 +58,7 @@
                                 Select default recipient:
                             </label>
                             <select
+                                v-model="alias.recipients"
                                 v-bind:id="'recipient_' + alias.id"
                                 :disabled="!recipients.length"
                                 class="form-select py-2.5 px-4 pe-9 block w-full border-2 border-gray-200 rounded-lg text-gray-700 focus:border-violet-600 disabled:opacity-50 disabled:pointer-events-none outline-none">
@@ -73,9 +75,9 @@
                             class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-semibold rounded-md border border-transparent bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50 disabled:pointer-events-none">
                             Save
                         </button>
-                        <button type="button"
-                            class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-md border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none"
-                            data-hs-overlay="#hs-basic-modal">
+                        <button
+                            @click="closeOverlay"
+                            class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-md border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
                             Close
                         </button>
                     </div>
@@ -92,18 +94,35 @@ import axios from 'axios'
 import { aliasApi } from '../api/alias.ts'
 
 const props = defineProps(['alias', 'recipients'])
-const alias = ref(props.alias)
+let alias = ref(Object.assign({}, props.alias))
 const recipients = ref(props.recipients)
+const success = ref('')
 const error = ref('')
 
 const updateAlias = async () => {
     try {
-        await aliasApi.update(alias.value.id, alias.value)
+        const response = await aliasApi.update(alias.value.id, alias.value)
+        success.value = response.data.message
         error.value = ''
+        const modal = document.querySelector('#hs-basic-modal' + alias.value.id)
+        if (modal instanceof HTMLElement) {
+            overlay.close(modal)
+        }
     } catch (err) {
         if (axios.isAxiosError(err)) {
+            success.value = ''
             error.value = err.message
         }
+    }
+}
+
+const closeOverlay = () => {
+    alias.value.description = props.alias.description
+    alias.value.from_name = props.alias.from_name
+    alias.value.recipients = props.alias.recipients
+    const modal = document.querySelector('#hs-basic-modal' + alias.value.id)
+    if (modal instanceof HTMLElement) {
+        overlay.close(modal)
     }
 }
 

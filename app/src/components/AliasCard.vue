@@ -44,6 +44,7 @@
             <div class="flex gap-5 justify-end">
                 <AliasEdit :alias="alias" :recipients="recipients" />
                 <button
+                    @click="deleteAlias"
                     class="text-red-600 hover:text-red-700 font-semibold text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
                     type="submit">
                     Delete
@@ -54,12 +55,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, defineEmits } from 'vue'
 import tooltip from '@preline/tooltip'
 import AliasEdit from './AliasEdit.vue'
 
 const props = defineProps(['alias', 'recipients'])
+let alias = props.alias
 const recipients = ref(props.recipients)
+const emit = defineEmits(['onDeleteAlias'])
+
+const deleteAlias = () => {
+    emit('onDeleteAlias', alias.id)
+}
 
 onMounted(() => {
     tooltip.autoInit()

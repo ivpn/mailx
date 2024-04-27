@@ -63,7 +63,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200">
-                                    <AliasCard v-for="alias in list" :alias="alias" :recipients.sync="recipients" />
+                                    <AliasCard @onDeleteAlias="deleteAlias" v-for="alias in list" :alias="alias" :recipients.sync="recipients" />
                                 </tbody>
                             </table>
                         </div>
@@ -108,6 +108,19 @@ const getList = async () => {
         list.value = response.data
         error.value = ''
         
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.message
+        }
+    }
+}
+
+const deleteAlias = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this alias?')) return
+    try {
+        await aliasApi.delete(id)
+        error.value = ''
+        getList()
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.message

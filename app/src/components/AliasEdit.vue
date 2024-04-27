@@ -1,7 +1,7 @@
 <template>
     <div>
         <button v-bind:data-hs-overlay="'#hs-basic-modal' + alias.id"
-            class="text-violet-600 hover:text-violet-700 font-semibold text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
+            class="text-violet-600 hover:text-violet-700 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
             type="submit">
             Edit
         </button>

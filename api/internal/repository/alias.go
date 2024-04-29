@@ -47,6 +47,7 @@ func (d *Database) GetAliases(ctx context.Context, userID string) ([]model.Alias
 		ON a.id = m.alias_id
 		AND a.user_id = ?
         GROUP BY a.id
+		ORDER BY a.created_at DESC
     `
 	rows, err := d.Client.Raw(query, model.Forward, model.Block, model.Reply, model.Send, userID).Rows()
 	if err != nil {

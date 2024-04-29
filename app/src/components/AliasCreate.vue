@@ -1,7 +1,6 @@
 <template>
     <div>
-        <button
-            v-bind:data-hs-overlay="'#hs-modal-create-alias'"
+        <button v-bind:data-hs-overlay="'#hs-modal-create-alias'"
             class="mt-3 py-2 pl-2 pr-3 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-md border border-transparent bg-violet-600 text-white hover:bg-violet-700">
             <svg class="flex-shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
@@ -34,8 +33,7 @@
                     <div class="p-4 whitespace-normal text-left text-base">
                         <!-- TODO: Add alias name type select -->
                         <div class="max-w-xs mb-5">
-                            <label for="alias_description"
-                                class="block text-gray-500 text-sm font-semibold mb-3">
+                            <label for="alias_description" class="block text-gray-500 text-sm font-semibold mb-3">
                                 Description:
                             </label>
                             <input id="alias_description" v-model="alias.description"
@@ -43,8 +41,7 @@
                                 type="text">
                         </div>
                         <div class="max-w-xs mb-5">
-                            <label for="alias_from_name"
-                                class="block text-gray-500 text-sm font-semibold mb-3">
+                            <label for="alias_from_name" class="block text-gray-500 text-sm font-semibold mb-3">
                                 From name:
                             </label>
                             <input id="alias_from_name" v-model="alias.from_name"
@@ -52,16 +49,26 @@
                                 type="text">
                         </div>
                         <div class="max-w-xs mb-6">
-                            <label for="alias_recipient"
-                                class="block text-gray-500 text-sm font-semibold mb-3">
+                            <label for="alias_recipient" class="block text-gray-500 text-sm font-semibold mb-3">
                                 Recipient:
                             </label>
-                            <select v-model="alias.recipients" id="alias_recipient"
-                                :disabled="!recipients.length"
+                            <select id="alias_recipient" :disabled="!recipients.length"
                                 class="form-select py-2.5 px-4 pe-9 block w-full border-2 border-gray-200 rounded-lg text-gray-700 focus:border-violet-600 disabled:opacity-50 disabled:pointer-events-none outline-none">
-                                <option v-for="recipient in recipients" v-bind:value=recipient
-                                    :selected="recipient == alias.recipients" :key="recipient">
+                                <option v-for="(recipient, index) in recipients" v-bind:recipient
+                                    :selected="recipient == alias.recipients || index === 0" :key="recipient">
                                     {{ recipient }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="max-w-xs mb-6">
+                            <label class="block text-gray-500 text-sm font-semibold mb-3" for="alias_domain">
+                                Domain:
+                            </label>
+                            <select id="alias_domain" :disabled="!domains.length"
+                                class="form-select py-2.5 px-4 pe-9 block w-full border-2 border-gray-200 rounded-lg text-gray-700 focus:border-violet-600 disabled:opacity-50 disabled:pointer-events-none outline-none">
+                                <option v-for="(domain, index) in domains" v-bind:domain
+                                    :selected="domain == alias.domain || index === 0" :key="domain">
+                                    {{ domain }}
                                 </option>
                             </select>
                         </div>
@@ -90,17 +97,28 @@ import { ref, onMounted } from 'vue'
 import overlay from '@preline/overlay'
 import axios from 'axios'
 import { aliasApi } from '../api/alias.ts'
+import env from "../env.json"
 
 const props = defineProps(['recipients'])
 const alias = ref({
     description: '',
+    enabled: true,
+    format: 'words',
     from_name: '',
-    recipients: ''
+    recipients: '',
+    domain: '',
 })
 const recipients = ref(props.recipients)
+const domains = ref(env.DOMAINS)
 const error = ref('')
 
 const postAlias = async () => {
+    const domainInput = document.getElementById('alias_domain') as HTMLInputElement
+    alias.value.domain = domainInput.value
+
+    const recipientInput = document.getElementById('alias_recipient') as HTMLInputElement
+    alias.value.recipients = recipientInput.value
+
     try {
         await aliasApi.create(alias.value)
         error.value = ''

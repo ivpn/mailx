@@ -25,7 +25,7 @@
         <h1 class="text-2xl font-bold text-gray-800 mb-5">Aliases</h1>
         <div>
             <div class="flex items-center justify-between mb-6">
-                <AliasCreate :recipients.sync="recipients" />
+                <AliasCreate v-if="recipients.length" :recipients.sync="recipients" />
             </div>
             <div class="flex flex-col">
                 <div class="-m-1.5 overflow-x-auto">

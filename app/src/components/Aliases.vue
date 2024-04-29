@@ -16,7 +16,7 @@
                         <path d="M5 12h14"></path>
                         <path d="M12 5v14"></path>
                     </svg>
-                    Create Alias
+                    Add Alias
                 </button>
             </div>
         </div>
@@ -25,16 +25,7 @@
         <h1 class="text-2xl font-bold text-gray-800 mb-5">Aliases</h1>
         <div>
             <div class="flex items-center justify-between mb-6">
-                <button
-                    class="mt-3 py-2 pl-2 pr-3 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-md border border-transparent bg-violet-600 text-white hover:bg-violet-700">
-                    <svg class="flex-shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <path d="M5 12h14"></path>
-                        <path d="M12 5v14"></path>
-                    </svg>
-                    Create Alias
-                </button>
+                <AliasCreate :recipients.sync="recipients" />
             </div>
             <div class="flex flex-col">
                 <div class="-m-1.5 overflow-x-auto">
@@ -83,6 +74,7 @@ import axios from 'axios'
 import { aliasApi } from '../api/alias'
 import { recipientApi } from '../api/recipient.ts'
 import AliasCard from './AliasCard.vue'
+import AliasCreate from './AliasCreate.vue'
 
 const alias = ref({
     id: '',

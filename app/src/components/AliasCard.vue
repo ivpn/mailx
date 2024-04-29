@@ -12,7 +12,8 @@
             </div>
         </td>
         <td class="px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800">
-            {{ alias.name }}
+            <p>{{ alias.name }}</p>
+            <p class="text-gray-500">{{ alias.description }}</p>
         </td>
         <td class="px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800">
             {{ alias.recipients.split(',').length }}

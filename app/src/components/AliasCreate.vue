@@ -8,7 +8,7 @@
                 <path d="M5 12h14"></path>
                 <path d="M12 5v14"></path>
             </svg>
-            Add Alias
+            Create Alias
         </button>
         <div v-bind:id="'hs-modal-create-alias'"
             class="hs-overlay hidden size-full fixed top-0 start-0 z-[60] overflow-x-hidden overflow-y-auto pointer-events-none">
@@ -17,7 +17,7 @@
                 <div class="flex flex-col bg-white border shadow-sm rounded-xl pointer-events-auto">
                     <div class="flex justify-between items-center py-3 px-4 border-b">
                         <h3 class="font-bold text-gray-800">
-                            Add alias
+                            Create Alias
                         </h3>
                         <button @click="close" type="button"
                             class="flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent text-gray-800 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none">
@@ -76,7 +76,7 @@
                     <div class="flex justify-start items-center gap-x-2 py-3 px-4 border-t">
                         <button @click="postAlias"
                             class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-semibold rounded-md border border-transparent bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50 disabled:pointer-events-none">
-                            Save
+                            Create Alias
                         </button>
                         <button @click="close"
                             class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-md border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">

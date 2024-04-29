@@ -16,7 +16,7 @@
                     <path d="M5 12h14"></path>
                     <path d="M12 5v14"></path>
                 </svg>
-                Add Alias
+                Add Recipient
             </button>
             <button
                 class="mt-3 py-2 pl-2 pr-3 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-md border border-transparent bg-violet-600 text-white hover:bg-violet-700">
@@ -26,7 +26,7 @@
                     <path d="M5 12h14"></path>
                     <path d="M12 5v14"></path>
                 </svg>
-                Add Recipient
+                Create Alias
             </button>
         </div>
     </div>

@@ -16,7 +16,7 @@
                         <path d="M5 12h14"></path>
                         <path d="M12 5v14"></path>
                     </svg>
-                    Add Alias
+                    Create Alias
                 </button>
             </div>
         </div>

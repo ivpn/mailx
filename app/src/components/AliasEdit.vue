@@ -80,12 +80,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, defineEmits } from 'vue'
 import overlay from '@preline/overlay'
 import axios from 'axios'
 import { aliasApi } from '../api/alias.ts'
 
 const props = defineProps(['alias', 'recipients'])
+const emit = defineEmits(['onEditAlias'])
 let alias = ref(Object.assign({}, props.alias))
 const recipients = ref(props.recipients)
 const success = ref('')
@@ -96,6 +97,7 @@ const updateAlias = async () => {
         const response = await aliasApi.update(alias.value.id, alias.value)
         success.value = response.data.message
         error.value = ''
+        emit('onEditAlias')
         close()
     } catch (err) {
         if (axios.isAxiosError(err)) {

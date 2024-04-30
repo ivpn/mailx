@@ -47,7 +47,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200">
-                                    <AliasCard @onDeleteAlias="deleteAlias" v-for="alias in list" :alias="alias" :key="alias.id" :recipients.sync="recipients" />
+                                    <AliasCard @onDeleteAlias="deleteAlias" @onEditAlias="getList" v-for="alias in list" :alias="alias" :key="cardKey" :recipients.sync="recipients" />
                                 </tbody>
                             </table>
                         </div>
@@ -94,6 +94,7 @@ const settings = ref({
 })
 const error = ref('')
 const loaded = ref(false)
+const cardKey = ref(0)
 
 const getList = async () => {
     try {
@@ -101,6 +102,7 @@ const getList = async () => {
         list.value = response.data
         loaded.value = true
         error.value = ''
+        renderCard()
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.message
@@ -143,6 +145,10 @@ const deleteAlias = async (id: string) => {
             error.value = err.message
         }
     }
+}
+
+const renderCard = () => {
+    cardKey.value++
 }
 
 onMounted(() => {

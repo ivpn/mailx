@@ -43,7 +43,7 @@
         </td>
         <td class="pl-5 py-4 whitespace-nowrap text-end text-sm">
             <div class="flex gap-5 justify-end">
-                <AliasEdit :alias="alias" :recipients="recipients" />
+                <AliasEdit :alias="alias" :recipients="recipients" @onEditAlias="onEditAlias" />
                 <button
                     @click="deleteAlias"
                     class="text-red-600 hover:text-red-700 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
@@ -62,9 +62,9 @@ import AliasEdit from './AliasEdit.vue'
 import { aliasApi } from '../api/alias.ts'
 
 const props = defineProps(['alias', 'recipients'])
-let alias = ref(props.alias)
+const alias = ref(props.alias)
 const recipients = ref(props.recipients)
-const emit = defineEmits(['onDeleteAlias'])
+const emit = defineEmits(['onDeleteAlias', 'onEditAlias'])
 
 const updateAlias = async () => {
     alias.value.enabled = !alias.value.enabled
@@ -75,6 +75,10 @@ const updateAlias = async () => {
 
 const deleteAlias = () => {
     emit('onDeleteAlias', alias.value.id)
+}
+
+const onEditAlias = () => {
+    emit('onEditAlias')
 }
 
 onMounted(() => {

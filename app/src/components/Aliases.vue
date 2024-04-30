@@ -56,7 +56,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200">
-                                    <AliasCard @onDeleteAlias="deleteAlias" v-for="alias in list" :alias="alias" :recipients.sync="recipients" />
+                                    <AliasCard @onDeleteAlias="deleteAlias" v-for="alias in list" :alias="alias" :key="alias.id" :recipients.sync="recipients" />
                                 </tbody>
                             </table>
                         </div>
@@ -76,7 +76,7 @@ import { recipientApi } from '../api/recipient.ts'
 import AliasCard from './AliasCard.vue'
 import AliasCreate from './AliasCreate.vue'
 
-const alias = ref({
+const alias = {
     id: '',
     created_at: '',
     name: '',
@@ -90,7 +90,7 @@ const alias = ref({
         replies: 0,
         sends: 0
     }
-})
+}
 
 const list = ref([] as typeof alias[])
 const recipients = ref([])

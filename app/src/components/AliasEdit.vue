@@ -27,7 +27,7 @@
                     </div>
                     <div class="p-4 whitespace-normal text-left text-base">
                         <h1 class="text-xl font-bold text-gray-800 mb-5">{{ alias.name }}</h1>
-                        <div class="max-w-xs mb-5">
+                        <div class="mb-5">
                             <label v-bind:for="'description_' + alias.id"
                                 class="block text-gray-500 text-sm font-semibold mb-3">
                                 Description:
@@ -36,7 +36,7 @@
                                 class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-violet-600 mb-2"
                                 type="text">
                         </div>
-                        <div class="max-w-xs mb-5">
+                        <div class="mb-5">
                             <label v-bind:for="'from_' + alias.id"
                                 class="block text-gray-500 text-sm font-semibold mb-3">
                                 From name:
@@ -45,7 +45,7 @@
                                 class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-violet-600 mb-2"
                                 type="text">
                         </div>
-                        <div class="max-w-xs mb-6">
+                        <div class="mb-6">
                             <label v-bind:for="'recipient_' + alias.id"
                                 class="block text-gray-500 text-sm font-semibold mb-3">
                                 Default recipient:

@@ -31,8 +31,48 @@
                         </button>
                     </div>
                     <div class="p-4 whitespace-normal text-left text-base">
-                        <!-- TODO: Add alias name type select -->
-                        <div class="max-w-xs mb-5">
+                        <div class="grid space-y-3 mb-5">
+                            <p class="text-gray-500 text-sm font-semibold mb-1">
+                                Alias format:
+                            </p>
+                            <div class="relative flex items-start">
+                                <div class="flex items-center h-5 mt-1">
+                                    <input v-model="alias.format" value="word" id="hs-radio-word" name="hs-radio-with-description" type="radio"
+                                        class="form-radio border-gray-200 rounded-full text-blue-600 focus:ring-white"
+                                        aria-describedby="hs-radio-word-description" checked>
+                                </div>
+                                <label for="hs-radio-word" class="ms-3">
+                                    <span class="block text-sm font-semibold text-gray-800">Word</span>
+                                    <span id="hs-radio-word-description" class="block text-sm text-gray-600">e.g.
+                                        quiet.haze16@{{ alias.domain }}</span>
+                                </label>
+                            </div>
+                            <div class="relative flex items-start">
+                                <div class="flex items-center h-5 mt-1">
+                                    <input v-model="alias.format" value="chars" id="hs-radio-chars" name="hs-radio-with-description" type="radio"
+                                        class="form-radio border-gray-200 rounded-full text-blue-600 focus:ring-white"
+                                        aria-describedby="hs-radio-chars-description">
+                                </div>
+                                <label for="hs-radio-chars" class="ms-3">
+                                    <span class="block text-sm font-semibold text-gray-800">Random</span>
+                                    <span id="hs-radio-chars-description" class="block text-sm text-gray-600">e.g.
+                                        uf1h0hxi@{{ alias.domain }}</span>
+                                </label>
+                            </div>
+                            <div class="relative flex items-start">
+                                <div class="flex items-center h-5 mt-1">
+                                    <input v-model="alias.format" value="uuid" id="hs-radio-uuid" name="hs-radio-with-description" type="radio"
+                                        class="form-radio border-gray-200 rounded-full text-blue-600 focus:ring-white"
+                                        aria-describedby="hs-radio-uuid-description">
+                                </div>
+                                <label for="hs-radio-uuid" class="ms-3">
+                                    <span class="block text-sm font-semibold text-gray-800">UUID</span>
+                                    <span id="hs-radio-uuid-description" class="block text-sm text-gray-600">e.g.
+                                        550e8400-e29b-41d4-a716-446655440000@{{ alias.domain }}</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-5">
                             <label for="alias_description" class="block text-gray-500 text-sm font-semibold mb-3">
                                 Description:
                             </label>
@@ -40,7 +80,7 @@
                                 class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-violet-600 mb-2"
                                 type="text">
                         </div>
-                        <div class="max-w-xs mb-5">
+                        <div class="mb-5">
                             <label for="alias_from_name" class="block text-gray-500 text-sm font-semibold mb-3">
                                 From name:
                             </label>
@@ -48,7 +88,7 @@
                                 class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-violet-600 mb-2"
                                 type="text">
                         </div>
-                        <div class="max-w-xs mb-6">
+                        <div class="mb-6">
                             <label for="alias_recipient" class="block text-gray-500 text-sm font-semibold mb-3">
                                 Recipient:
                             </label>
@@ -60,7 +100,7 @@
                                 </option>
                             </select>
                         </div>
-                        <div class="max-w-xs mb-6">
+                        <div class="mb-6">
                             <label class="block text-gray-500 text-sm font-semibold mb-3" for="alias_domain">
                                 Domain:
                             </label>
@@ -103,10 +143,10 @@ const props = defineProps(['recipients'])
 const alias = ref({
     description: '',
     enabled: true,
-    format: 'words',
+    format: '',
     from_name: '',
     recipients: '',
-    domain: '',
+    domain: env.DOMAINS[0],
 })
 const recipients = ref(props.recipients)
 const domains = ref(env.DOMAINS)

@@ -133,13 +133,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, defineEmits } from 'vue'
 import overlay from '@preline/overlay'
 import axios from 'axios'
 import { aliasApi } from '../api/alias.ts'
 import env from "../env.json"
 
 const props = defineProps(['recipients'])
+const emit = defineEmits(['onCreateAlias'])
 const alias = ref({
     description: '',
     enabled: true,
@@ -153,6 +154,8 @@ const domains = ref(env.DOMAINS)
 const error = ref('')
 
 const postAlias = async () => {
+    alias.value.enabled = true
+
     const domainInput = document.getElementById('alias_domain') as HTMLInputElement
     alias.value.domain = domainInput.value
 
@@ -162,6 +165,7 @@ const postAlias = async () => {
     try {
         await aliasApi.create(alias.value)
         error.value = ''
+        emit('onCreateAlias')
         close()
     } catch (err) {
         if (axios.isAxiosError(err)) {

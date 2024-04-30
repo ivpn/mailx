@@ -34,7 +34,7 @@ func (d *Database) GetAlias(ctx context.Context, ID string) (model.Alias, error)
 }
 
 func (d *Database) GetAliases(ctx context.Context, userID string) ([]model.Alias, error) {
-	var aliases []model.Alias
+	aliases := []model.Alias{}
 	query := `
         SELECT a.*,
             COALESCE(SUM(CASE WHEN m.type = ? THEN 1 ELSE 0 END), 0) AS forwards,
@@ -47,6 +47,7 @@ func (d *Database) GetAliases(ctx context.Context, userID string) ([]model.Alias
 		ON a.id = m.alias_id
 		AND a.user_id = ?
         GROUP BY a.id
+		ORDER BY a.created_at DESC
     `
 	rows, err := d.Client.Raw(query, model.Forward, model.Block, model.Reply, model.Send, userID).Rows()
 	if err != nil {

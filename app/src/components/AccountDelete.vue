@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col bg-white border border-red-500 shadow-sm rounded-xl p-5 pb-4 my-8">
+    <div class="flex flex-col bg-white border border-red-600 shadow-sm rounded-xl p-5 pb-4 my-8">
         <h1 class="text-xl font-bold text-gray-800 mb-4">Delete Account</h1>
         <p class="text-sm text-gray-500 mb-3">
             Are you sure you want to delete your account? This action cannot be undone.
@@ -10,15 +10,15 @@
             </label>
             <input
                 v-model="password"
-                v-bind:class="{ 'border-red-500': passwordError }"
-                class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-blue-600 mb-2"
+                v-bind:class="{ 'border-red-600': passwordError }"
+                class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-violet-600 mb-2"
                 id="account-password" type="text" autocomplete="current-password">
-            <p v-if="passwordError" class="text-red-500 text-sm mb-2">Required field</p>
+            <p v-if="passwordError" class="text-red-600 text-sm mb-2">Required field</p>
         </div>
         <div class="mb-3 max-w-xs">
             <button
                 @click="promptDeleteAccount"
-                class="bg-red-500 hover:bg-red-600 text-white font-medium text-sm py-2 px-3 rounded-md focus:outline-none focus:shadow-outline"
+                class="bg-red-600 hover:bg-red-700 text-white font-medium text-sm py-2 px-3 rounded-md focus:outline-none focus:shadow-outline"
                 type="submit">
                 Delete Account
             </button>

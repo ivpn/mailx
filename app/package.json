@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@preline/dropdown": "^2.1.0",
+    "@preline/overlay": "^2.1.0",
+    "@preline/tooltip": "^2.1.0",
     "@tailwindcss/forms": "^0.5.7",
     "axios": "^1.6.8",
     "jwt-decode": "^4.0.0",

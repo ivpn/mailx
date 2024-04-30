@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col bg-white shadow-sm rounded-xl p-5 pb-4 my-8">
-        <h1 class="text-xl font-bold text-gray-800 mb-5">Settings</h1>
+        <h1 class="text-2xl font-bold text-gray-800 mb-5">Settings</h1>
         <h2 class="font-semibold text-gray-800 mb-3">
             Default Domain
         </h2>
@@ -13,7 +13,7 @@
                 Select default domain:
             </label>
             <select id="domain"
-                class="form-select py-3 px-4 pe-9 block w-full border-2 border-gray-200 rounded-lg text-gray-700 focus:border-violet-600 disabled:opacity-50 disabled:pointer-events-none outline-none">
+                class="form-select py-2.5 px-4 pe-9 block w-full border-2 border-gray-200 rounded-lg text-gray-700 focus:border-violet-600 disabled:opacity-50 disabled:pointer-events-none outline-none">
                 <option
                     v-for="(domain, index) in domains"
                     v-bind:domain
@@ -35,7 +35,7 @@
             </label>
             <select id="recipient"
                 :disabled="!recipients.length"
-                class="form-select py-3 px-4 pe-9 block w-full border-2 border-gray-200 rounded-lg text-gray-700 focus:border-violet-600 disabled:opacity-50 disabled:pointer-events-none outline-none">
+                class="form-select py-2.5 px-4 pe-9 block w-full border-2 border-gray-200 rounded-lg text-gray-700 focus:border-violet-600 disabled:opacity-50 disabled:pointer-events-none outline-none">
                 <option
                     v-for="recipient in recipients"
                     v-bind:value=recipient
@@ -69,8 +69,8 @@
                 Save Settings
             </button>
         </div>
-        <p v-if="error" class="text-red-500 text-sm mb-3">{{ error }}</p>
-        <p v-if="success" class="text-green-500 text-sm mb-3">{{ success }}</p>
+        <p v-if="error" class="text-red-600 text-sm mb-3">{{ error }}</p>
+        <p v-if="success" class="text-green-600 text-sm mb-3">{{ success }}</p>
     </div>
 </template>
 

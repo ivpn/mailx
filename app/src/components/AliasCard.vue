@@ -2,11 +2,21 @@
     <tr>
         <td class="pr-5 py-4 whitespace-nowrap text-start text-sm text-gray-800">
             <div class="mt-1 flex items-center gap-2">
-                <div v-if="alias.enabled" class="flex-none rounded-full bg-emerald-500/20 p-1">
+                <div v-if="alias.enabled" class="hs-tooltip flex-none rounded-full bg-emerald-500/20 p-1">
                     <div class="h-1.5 w-1.5 rounded-full bg-emerald-400"></div>
+                    <span
+                        class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded shadow-sm"
+                        role="tooltip">
+                        Active
+                    </span>
                 </div>
-                <div v-if="!alias.enabled" class="flex-none rounded-full bg-gray-500/20 p-1">
+                <div v-if="!alias.enabled" class="hs-tooltip flex-none rounded-full bg-gray-500/20 p-1">
                     <div class="h-1.5 w-1.5 rounded-full bg-gray-400"></div>
+                    <span
+                        class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded shadow-sm"
+                        role="tooltip">
+                        Inactive
+                    </span>
                 </div>
                 <p>{{ new Date(alias.created_at).toDateString() }}</p>
             </div>

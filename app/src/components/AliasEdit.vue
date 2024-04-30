@@ -48,7 +48,7 @@
                         <div class="mb-6">
                             <label v-bind:for="'recipient_' + alias.id"
                                 class="block text-gray-500 text-sm font-semibold mb-3">
-                                Default recipient:
+                                Recipient:
                             </label>
                             <select v-model="alias.recipients" v-bind:id="'recipient_' + alias.id"
                                 :disabled="!recipients.length"

@@ -95,7 +95,7 @@
                             <select id="alias_recipient" :disabled="!recipients.length"
                                 class="form-select py-2.5 px-4 pe-9 block w-full border-2 border-gray-200 rounded-lg text-gray-700 focus:border-violet-600 disabled:opacity-50 disabled:pointer-events-none outline-none">
                                 <option v-for="(recipient, index) in recipients" v-bind:recipient
-                                    :selected="recipient == alias.recipients || index === 0" :key="recipient">
+                                    :selected="recipient == settings.recipient || index === 0" :key="recipient">
                                     {{ recipient }}
                                 </option>
                             </select>
@@ -139,7 +139,7 @@ import axios from 'axios'
 import { aliasApi } from '../api/alias.ts'
 import env from "../env.json"
 
-const props = defineProps(['recipients'])
+const props = defineProps(['recipients', 'settings'])
 const emit = defineEmits(['onCreateAlias'])
 const alias = ref({
     description: '',
@@ -150,6 +150,7 @@ const alias = ref({
     domain: env.DOMAINS[0],
 })
 const recipients = ref(props.recipients)
+const settings = ref(props.settings)
 const domains = ref(env.DOMAINS)
 const error = ref('')
 

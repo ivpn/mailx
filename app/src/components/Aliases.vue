@@ -16,7 +16,7 @@
         <h1 class="text-2xl font-bold text-gray-800 mb-5">Aliases</h1>
         <div>
             <div class="flex items-center justify-between mb-6">
-                <AliasCreate v-if="recipients.length" @onCreateAlias="getList" :recipients.sync="recipients" />
+                <AliasCreate v-if="recipients.length && settings.recipient" @onCreateAlias="getList" :recipients.sync="recipients" :settings.sync="settings" />
             </div>
             <div class="flex flex-col">
                 <div class="-m-1.5 overflow-x-auto">
@@ -64,6 +64,7 @@ import { onMounted, ref } from 'vue'
 import axios from 'axios'
 import { aliasApi } from '../api/alias'
 import { recipientApi } from '../api/recipient.ts'
+import { settingsApi } from '../api/settings.ts'
 import AliasCard from './AliasCard.vue'
 import AliasCreate from './AliasCreate.vue'
 
@@ -85,6 +86,12 @@ const alias = {
 
 const list = ref([] as typeof alias[])
 const recipients = ref([])
+const settings = ref({
+    id: '',
+    domain: '',
+    recipient: '',
+    from_name: ''
+})
 const error = ref('')
 const loaded = ref(false)
 
@@ -93,6 +100,30 @@ const getList = async () => {
         const response = await aliasApi.getList()
         list.value = response.data
         loaded.value = true
+        error.value = ''
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.message
+        }
+    }
+}
+
+const getRecipients = async () => {
+    try {
+        const response = await recipientApi.getList()
+        recipients.value = response.data.map((recipient: { email: string }) => recipient.email)
+        error.value = ''
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.message
+        }
+    }
+}
+
+const getSettings = async () => {
+    try {
+        const response = await settingsApi.get()
+        settings.value = response.data
         error.value = ''
     } catch (err) {
         if (axios.isAxiosError(err)) {
@@ -114,21 +145,10 @@ const deleteAlias = async (id: string) => {
     }
 }
 
-const getRecipients = async () => {
-    try {
-        const response = await recipientApi.getList()
-        recipients.value = response.data.map((recipient: { email: string }) => recipient.email)
-        error.value = ''
-    } catch (err) {
-        if (axios.isAxiosError(err)) {
-            error.value = err.message
-        }
-    }
-}
-
 onMounted(() => {
     getList()
     getRecipients()
+    getSettings()
 })
 
 </script>

@@ -38,7 +38,7 @@
                             <div class="relative flex items-start">
                                 <div class="flex items-center h-5 mt-1">
                                     <input v-model="alias.format" value="word" id="hs-radio-word" name="hs-radio-with-description" type="radio"
-                                        class="form-radio border-gray-200 rounded-full text-blue-600 focus:ring-white"
+                                        class="form-radio border-gray-200 rounded-full text-violet-600 focus:ring-white"
                                         aria-describedby="hs-radio-word-description" checked>
                                 </div>
                                 <label for="hs-radio-word" class="ms-3">
@@ -50,7 +50,7 @@
                             <div class="relative flex items-start">
                                 <div class="flex items-center h-5 mt-1">
                                     <input v-model="alias.format" value="chars" id="hs-radio-chars" name="hs-radio-with-description" type="radio"
-                                        class="form-radio border-gray-200 rounded-full text-blue-600 focus:ring-white"
+                                        class="form-radio border-gray-200 rounded-full text-violet-600 focus:ring-white"
                                         aria-describedby="hs-radio-chars-description">
                                 </div>
                                 <label for="hs-radio-chars" class="ms-3">
@@ -62,7 +62,7 @@
                             <div class="relative flex items-start">
                                 <div class="flex items-center h-5 mt-1">
                                     <input v-model="alias.format" value="uuid" id="hs-radio-uuid" name="hs-radio-with-description" type="radio"
-                                        class="form-radio border-gray-200 rounded-full text-blue-600 focus:ring-white"
+                                        class="form-radio border-gray-200 rounded-full text-violet-600 focus:ring-white"
                                         aria-describedby="hs-radio-uuid-description">
                                 </div>
                                 <label for="hs-radio-uuid" class="ms-3">

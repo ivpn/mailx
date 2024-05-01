@@ -133,7 +133,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, defineEmits } from 'vue'
+import { ref, onMounted } from 'vue'
 import overlay from '@preline/overlay'
 import axios from 'axios'
 import { aliasApi } from '../api/alias.ts'

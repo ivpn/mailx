@@ -58,7 +58,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200">
-                                    <!-- TODO: Recipient card -->
+                                    <RecipientRow  @onDeleteRecipient="deleteRecipient" @onEditRecipient="getList" v-for="recipient in list" :recipient="recipient" :key="rowKey" />
                                 </tbody>
                             </table>
                         </div>
@@ -71,7 +71,56 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
+import axios from 'axios'
+import { recipientApi } from '../api/recipient.ts'
+import RecipientRow from './RecipientRow.vue'
 
+const recipient = {
+    id: '',
+    created_at: '',
+    email: '',
+    is_active: false,
+}
+
+const list = ref([] as typeof recipient[])
 const error = ref('')
+const loaded = ref(false)
+const rowKey = ref(0)
+
+const getList = async () => {
+    try {
+        const response = await recipientApi.getList()
+        list.value = response.data
+        loaded.value = true
+        error.value = ''
+        renderRow()
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.message
+        }
+    }
+}
+
+
+const deleteRecipient = async (id: string) => {
+    if (!confirm('Are you sure you want to delete recipient?')) return
+    try {
+        await recipientApi.delete(id)
+        error.value = ''
+        getList()
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.message
+        }
+    }
+}
+
+const renderRow = () => {
+    rowKey.value++
+}
+
+onMounted(() => {
+    getList()
+})
 </script>

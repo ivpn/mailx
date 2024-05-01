@@ -47,7 +47,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200">
-                                    <AliasRow @onDeleteAlias="deleteAlias" @onEditAlias="getList" v-for="alias in list" :alias="alias" :key="cardKey" :recipients.sync="recipients" />
+                                    <AliasRow @onDeleteAlias="deleteAlias" @onEditAlias="getList" v-for="alias in list" :alias="alias" :key="rowKey" :recipients.sync="recipients" />
                                 </tbody>
                             </table>
                         </div>
@@ -94,7 +94,7 @@ const settings = ref({
 })
 const error = ref('')
 const loaded = ref(false)
-const cardKey = ref(0)
+const rowKey = ref(0)
 
 const getList = async () => {
     try {
@@ -102,7 +102,7 @@ const getList = async () => {
         list.value = response.data
         loaded.value = true
         error.value = ''
-        renderCard()
+        renderRow()
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.message
@@ -135,7 +135,7 @@ const getSettings = async () => {
 }
 
 const deleteAlias = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this alias?')) return
+    if (!confirm('Are you sure you want to delete alias?')) return
     try {
         await aliasApi.delete(id)
         error.value = ''
@@ -147,8 +147,8 @@ const deleteAlias = async (id: string) => {
     }
 }
 
-const renderCard = () => {
-    cardKey.value++
+const renderRow = () => {
+    rowKey.value++
 }
 
 onMounted(() => {

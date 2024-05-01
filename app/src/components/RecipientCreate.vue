@@ -35,9 +35,13 @@
                             <label for="recipient_email" class="block text-gray-500 text-sm font-semibold mb-3">
                                 Email:
                             </label>
-                            <input id="recipient_email" v-model="recipient.email"
+                            <input
+                                v-model="recipient.email"
+                                v-bind:class="{ 'border-red-600': emailError }"
+                                id="recipient_email"
                                 class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-violet-600 mb-2"
                                 type="text">
+                            <p v-if="emailError" class="text-red-600 text-sm">Required field</p>
                         </div>
                     </div>
                     <div class="flex justify-start items-center gap-x-2 py-3 px-4 border-t">
@@ -70,8 +74,18 @@ const recipient = ref({
     email: '',
 })
 const error = ref('')
+const emailError = ref(false)
+
+const validateEmail = () => {
+    emailError.value = !recipient.value.email
+    return !emailError.value
+}
 
 const postRecipient = async () => {
+    if (!validateEmail()) {
+        return
+    }
+
     try {
         await recipientApi.create(recipient.value)
         error.value = ''

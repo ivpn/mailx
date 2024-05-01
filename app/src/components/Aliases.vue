@@ -8,7 +8,7 @@
                 To get started, create an alias.
             </p>
             <div class="flex gap-4">
-                <AliasCreate v-if="recipients.length" @onCreateAlias="getList" :recipients.sync="recipients" />
+                <AliasCreate v-if="recipients.length && settings.recipient" @onCreateAlias="getList" :recipients.sync="recipients" :settings.sync="settings" />
             </div>
         </div>
     </div>

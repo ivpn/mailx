@@ -47,7 +47,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200">
-                                    <AliasCard @onDeleteAlias="deleteAlias" @onEditAlias="getList" v-for="alias in list" :alias="alias" :key="cardKey" :recipients.sync="recipients" />
+                                    <AliasRow @onDeleteAlias="deleteAlias" @onEditAlias="getList" v-for="alias in list" :alias="alias" :key="cardKey" :recipients.sync="recipients" />
                                 </tbody>
                             </table>
                         </div>
@@ -65,7 +65,7 @@ import axios from 'axios'
 import { aliasApi } from '../api/alias'
 import { recipientApi } from '../api/recipient.ts'
 import { settingsApi } from '../api/settings.ts'
-import AliasCard from './AliasCard.vue'
+import AliasRow from './AliasRow.vue'
 import AliasCreate from './AliasCreate.vue'
 
 const alias = {

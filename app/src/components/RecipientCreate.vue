@@ -32,6 +32,11 @@
                     </div>
                     <div class="p-4 whitespace-normal text-left text-base">
                         <div class="mb-5">
+                            <p class="text-sm text-gray-500 mb-3">
+                                Add a email address to receive forwarded emails. A 6 digit verification code will be sent to this email address. If expired, you can resend the verification code.
+                            </p>
+                        </div>
+                        <div class="mb-5">
                             <label for="recipient_email" class="block text-gray-500 text-sm font-semibold mb-3">
                                 Email:
                             </label>
@@ -39,6 +44,7 @@
                                 v-model="recipient.email"
                                 v-bind:class="{ 'border-red-600': emailError }"
                                 id="recipient_email"
+                                placeholder="name@example.net"
                                 class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-violet-600 mb-2"
                                 type="text">
                             <p v-if="emailError" class="text-red-600 text-sm">Required field</p>

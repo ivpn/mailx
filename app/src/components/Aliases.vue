@@ -55,7 +55,7 @@
                 </div>
             </div>
         </div>
-        <p v-if="error" class="text-red-600 text-sm mb-4">{{ error }}</p>
+        <p v-if="error" class="text-red-600 text-sm mb-4">Error: {{ error }}</p>
     </div>
 </template>
 

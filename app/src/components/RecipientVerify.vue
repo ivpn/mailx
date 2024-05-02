@@ -31,7 +31,7 @@
                                 We have sent a 6-digit OTP code to this recipient email address. Please enter the code below to verify the recipient email. Recipients with unconfirmed email address may be deleted after 7 days.
                             </p>
                         </div>
-                        <div class="mb-5">
+                        <div class="mb-3">
                             <label class="block text-gray-500 text-sm font-semibold mb-3" for="otp">
                                 6-digit OTP code:
                             </label>
@@ -94,7 +94,7 @@ const verifyRecipient = async () => {
     if (!validateOtp()) return
 
     try {
-        await recipientApi.activate(recipient.value.id, req.value.otp)
+        await recipientApi.activate(recipient.value.id, req.value)
         error.value = ''
         emit('onVerifyRecipient')
         close()

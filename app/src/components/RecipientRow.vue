@@ -14,7 +14,7 @@
         </td>
         <td class="pl-5 py-4 whitespace-nowrap text-end text-sm">
             <div class="flex gap-5 justify-end">
-                <RecipientVerify :recipient="recipient" />
+                <RecipientVerify :recipient="recipient" @onVerifyRecipient="onVerifyRecipient" />
                 <button
                     @click="deleteRecipient"
                     class="text-red-600 hover:text-red-700 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
@@ -33,13 +33,13 @@ import RecipientVerify from './RecipientVerify.vue'
 
 const props = defineProps(['recipient'])
 const recipient = ref(props.recipient)
-const emit = defineEmits(['onDeleteRecipient', 'onEditRecipient'])
+const emit = defineEmits(['onDeleteRecipient', 'onVerifyRecipient'])
 
 const deleteRecipient = () => {
     emit('onDeleteRecipient', recipient.value.id)
 }
 
-// const onEditRecipient = () => {
-//     emit('onEditRecipient')
-// }
+const onVerifyRecipient = () => {
+    emit('onVerifyRecipient')
+}
 </script>

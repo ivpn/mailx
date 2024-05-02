@@ -36,7 +36,7 @@
                                 Add a email address to receive forwarded emails. A 6 digit verification code will be sent to this email address. If expired, you can resend the verification code.
                             </p>
                         </div>
-                        <div class="mb-5">
+                        <div class="mb-3">
                             <label for="recipient_email" class="block text-gray-500 text-sm font-semibold mb-3">
                                 Email:
                             </label>
@@ -61,7 +61,7 @@
                         </button>
                     </div>
                     <div class="flex items-start">
-                        <p v-if="error" class="px-5 text-red-600 text-sm mb-3">{{ error }}</p>
+                        <p v-if="error" class="px-5 text-red-600 text-sm mb-3">Error: {{ error }}</p>
                     </div>
                 </div>
             </div>

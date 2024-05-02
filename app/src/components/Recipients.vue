@@ -40,7 +40,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200">
-                                    <RecipientRow  @onDeleteRecipient="deleteRecipient" @onEditRecipient="getList" v-for="recipient in list" :recipient="recipient" :key="rowKey" />
+                                    <RecipientRow  @onDeleteRecipient="deleteRecipient" @onVerifyRecipient="getList" v-for="recipient in list" :recipient="recipient" :key="rowKey" />
                                 </tbody>
                             </table>
                         </div>
@@ -48,7 +48,7 @@
                 </div>
             </div>
         </div>
-        <p v-if="error" class="text-red-600 text-sm mb-4">{{ error }}</p>
+        <p v-if="error" class="text-red-600 text-sm mb-4">Error: {{ error }}</p>
     </div>
 </template>
 

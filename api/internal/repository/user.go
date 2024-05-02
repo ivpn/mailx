@@ -41,6 +41,16 @@ func (d *Database) GetUserStats(ctx context.Context, ID string) (model.UserStats
 		return model.UserStats{}, err
 	}
 
+	var messages = []model.Message{}
+	err = d.Client.Where("user_id = ? AND created_at > NOW() - INTERVAL ? DAY", ID, 7).Find(&messages).Error
+	if err != nil {
+		return model.UserStats{}, err
+	}
+	userStats.Messages = make([]interface{}, len(messages))
+	for i, msg := range messages {
+		userStats.Messages[i] = msg
+	}
+
 	err = d.Client.Model(&model.Message{}).
 		Select("SUM(CASE WHEN type = ? THEN 1 ELSE 0 END) as forwards, "+
 			"SUM(CASE WHEN type = ? THEN 1 ELSE 0 END) as blocks, "+

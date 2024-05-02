@@ -12,10 +12,10 @@ const (
 )
 
 type Message struct {
-	ID        uint `gorm:"primaryKey"`
+	ID        uint `json:"-" gorm:"primaryKey"`
 	CreatedAt time.Time
-	UserID    string
-	AliasID   string
+	UserID    string `json:"-"`
+	AliasID   string `json:"-"`
 	Type      MessageType
-	Size      int
+	Size      int `json:"-"`
 }

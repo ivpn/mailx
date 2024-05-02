@@ -14,7 +14,7 @@
         </td>
         <td class="pl-5 py-4 whitespace-nowrap text-end text-sm">
             <div class="flex gap-5 justify-end">
-                <!-- TODO: Edit recipient component -->
+                <RecipientVerify :recipient="recipient" />
                 <button
                     @click="deleteRecipient"
                     class="text-red-600 hover:text-red-700 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
@@ -28,6 +28,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import RecipientVerify from './RecipientVerify.vue'
 // import { recipientApi } from '../api/recipient.ts'
 
 const props = defineProps(['recipient'])

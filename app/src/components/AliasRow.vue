@@ -66,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, defineEmits } from 'vue'
+import { ref, onMounted } from 'vue'
 import tooltip from '@preline/tooltip'
 import AliasEdit from './AliasEdit.vue'
 import { aliasApi } from '../api/alias.ts'

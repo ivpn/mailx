@@ -11,8 +11,9 @@
                     <input
                         v-model="email"
                         v-bind:class="{ 'border-red-600': emailError }"
+                        placeholder="name@example.net"
                         class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-violet-600 mb-2"
-                        id="email" type="email" autocomplete="email">
+                        id="email" type="email">
                     <p v-if="emailError" class="text-red-600 text-sm">Required field</p>
                 </div>
                 <div class="mb-6">
@@ -23,7 +24,7 @@
                         v-model="password"
                         v-bind:class="{ 'border-red-600': passwordError }"
                         class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-violet-600 mb-2"
-                        id="password" type="password" autocomplete="current-password">
+                        id="password" type="password">
                     <p v-if="passwordError" class="text-red-600 text-sm mb-2">Required field</p>
                     <p class="text-gray-500 text-sm mb-2">Must be at least 8 characters</p>
                 </div>

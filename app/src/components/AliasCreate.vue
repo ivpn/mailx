@@ -119,12 +119,12 @@
                             Create Alias
                         </button>
                         <button @click="close"
-                            class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-md border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
-                            Close
+                            class="text-gray-500 bg-gray-100 hover:bg-gray-200 font-medium text-sm py-2 px-3 rounded-md focus:outline-none focus:shadow-outline">
+                            Cancel
                         </button>
                     </div>
                     <div class="flex items-start">
-                        <p v-if="error" class="px-5 text-red-600 text-sm mb-3">{{ error }}</p>
+                        <p v-if="error" class="px-5 text-red-600 text-sm mb-3">Error: {{ error }}</p>
                     </div>
                 </div>
             </div>
@@ -133,7 +133,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, defineEmits } from 'vue'
+import { ref, onMounted } from 'vue'
 import overlay from '@preline/overlay'
 import axios from 'axios'
 import { aliasApi } from '../api/alias.ts'

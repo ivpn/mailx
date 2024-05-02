@@ -1,18 +1,18 @@
 <template>
     <div>
-        <button v-bind:data-hs-overlay="'#hs-basic-modal' + alias.id"
+        <button v-bind:data-hs-overlay="'#hs-basic-modal' + recipient.id"
             class="text-violet-600 hover:text-violet-700 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
             type="submit">
-            Edit
+            Verify
         </button>
-        <div v-bind:id="'hs-basic-modal' + alias.id"
+        <div v-bind:id="'hs-basic-modal' + recipient.id"
             class="hs-overlay hidden size-full fixed top-0 start-0 z-[60] overflow-x-hidden overflow-y-auto pointer-events-none">
             <div
                 class="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 opacity-0 transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
                 <div class="flex flex-col bg-white border shadow-sm rounded-xl pointer-events-auto">
                     <div class="flex justify-between items-center py-3 px-4 border-b">
                         <h3 class="font-bold text-gray-800">
-                            Edit alias
+                            Verify recipient
                         </h3>
                         <button @click="close" type="button"
                             class="flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent text-gray-800 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none">
@@ -26,52 +26,42 @@
                         </button>
                     </div>
                     <div class="p-4 whitespace-normal text-left text-base">
-                        <h1 class="text-xl font-bold text-gray-800 mb-5">{{ alias.name }}</h1>
                         <div class="mb-5">
-                            <label v-bind:for="'description_' + alias.id"
-                                class="block text-gray-500 text-sm font-semibold mb-3">
-                                Description:
-                            </label>
-                            <input v-bind:id="'description_' + alias.id" v-model="alias.description"
-                                class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-violet-600 mb-2"
-                                type="text">
+                            <p class="text-sm text-gray-500 mb-3">
+                                We have sent a 6-digit OTP code to this recipient email address. Please enter the code below to verify the recipient email. Recipients with unconfirmed email address may be deleted after 7 days.
+                            </p>
                         </div>
-                        <div class="mb-5">
-                            <label v-bind:for="'from_' + alias.id"
-                                class="block text-gray-500 text-sm font-semibold mb-3">
-                                From name:
+                        <div class="mb-3">
+                            <label class="block text-gray-500 text-sm font-semibold mb-3" for="otp">
+                                6-digit OTP code:
                             </label>
-                            <input v-bind:id="'from_' + alias.id" v-model="alias.from_name"
+                            <input
+                                v-model="req.otp"
+                                v-bind:class="{ 'border-red-600': otpError }"
                                 class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-violet-600 mb-2"
-                                type="text">
-                        </div>
-                        <div class="mb-6">
-                            <label v-bind:for="'recipient_' + alias.id"
-                                class="block text-gray-500 text-sm font-semibold mb-3">
-                                Recipient:
-                            </label>
-                            <select v-model="alias.recipients" v-bind:id="'recipient_' + alias.id"
-                                :disabled="!recipients.length"
-                                class="form-select py-2.5 px-4 pe-9 block w-full border-2 border-gray-200 rounded-lg text-gray-700 focus:border-violet-600 disabled:opacity-50 disabled:pointer-events-none outline-none">
-                                <option v-for="recipient in recipients" v-bind:value=recipient
-                                    :selected="recipient == alias.recipients" :key="recipient">
-                                    {{ recipient }}
-                                </option>
-                            </select>
+                                id="otp" type="text">
+                            <p v-if="otpError" class="text-red-600 text-sm mb-2">Required field</p>
                         </div>
                     </div>
                     <div class="flex justify-start items-center gap-x-2 py-3 px-4 border-t">
-                        <button v-if="!success" @click="updateAlias"
+                        <button @click="verifyRecipient"
                             class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-semibold rounded-md border border-transparent bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50 disabled:pointer-events-none">
-                            Save
+                            Verify
+                        </button>
+                        <button
+                            @click="sendOtp"
+                            class="text-gray-500 bg-gray-100 hover:bg-gray-200 font-medium text-sm py-2 px-3 rounded-md focus:outline-none focus:shadow-outline"
+                            type="submit">
+                            Resend OTP
                         </button>
                         <button @click="close"
-                        class="text-gray-500 bg-gray-100 hover:bg-gray-200 font-medium text-sm py-2 px-3 rounded-md focus:outline-none focus:shadow-outline">
+                            class="text-gray-500 bg-gray-100 hover:bg-gray-200 font-medium text-sm py-2 px-3 rounded-md focus:outline-none focus:shadow-outline">
                             Cancel
                         </button>
                     </div>
                     <div class="flex items-start">
                         <p v-if="error" class="px-5 text-red-600 text-sm mb-3">Error: {{ error }}</p>
+                        <p v-if="resendSuccess && !error" class="px-5 text-green-600 text-sm mb-3">{{ resendSuccess }}</p>
                     </div>
                 </div>
             </div>
@@ -83,37 +73,57 @@
 import { ref, onMounted } from 'vue'
 import overlay from '@preline/overlay'
 import axios from 'axios'
-import { aliasApi } from '../api/alias.ts'
+import { recipientApi } from '../api/recipient.ts'
 
-const props = defineProps(['alias', 'recipients'])
-const emit = defineEmits(['onEditAlias'])
-let alias = ref(Object.assign({}, props.alias))
-const recipients = ref(props.recipients)
-const success = ref('')
+const req = ref({
+    otp: '',
+})
+const emit = defineEmits(['onVerifyRecipient'])
+const props = defineProps(['recipient'])
+const recipient = ref(props.recipient)
+const resendSuccess = ref('')
 const error = ref('')
+const otpError = ref(false)
 
-const updateAlias = async () => {
+const validateOtp = () => {
+    otpError.value = !req.value.otp
+    return !otpError.value
+}
+
+const verifyRecipient = async () => {
+    if (!validateOtp()) return
+
     try {
-        const response = await aliasApi.update(alias.value.id, alias.value)
-        success.value = response.data.message
+        await recipientApi.activate(recipient.value.id, req.value)
         error.value = ''
-        emit('onEditAlias')
+        emit('onVerifyRecipient')
         close()
     } catch (err) {
         if (axios.isAxiosError(err)) {
-            success.value = ''
-            error.value = err.message
+            console.log(err.response?.data.error)
+            error.value = err.response?.data.error
+        }
+    }
+}
+
+const sendOtp = async () => {
+    try {
+        const response = await recipientApi.sendOtp(recipient.value.id)
+        resendSuccess.value = response.data.message
+        error.value = ''
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            resendSuccess.value = ''
+            error.value = err.response?.data.error
         }
     }
 }
 
 const close = () => {
-    alias.value.description = props.alias.description
-    alias.value.from_name = props.alias.from_name
-    alias.value.recipients = props.alias.recipients
-    success.value = ''
+    req.value.otp = ''
+    resendSuccess.value = ''
     error.value = ''
-    const modal = document.querySelector('#hs-basic-modal' + alias.value.id)
+    const modal = document.querySelector('#hs-basic-modal' + recipient.value.id)
     if (modal instanceof HTMLElement) {
         overlay.close(modal)
     }

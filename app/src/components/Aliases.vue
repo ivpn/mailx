@@ -8,7 +8,7 @@
                 To get started, create an alias.
             </p>
             <div class="flex gap-4">
-                <AliasCreate v-if="recipients.length" @onCreateAlias="getList" :recipients.sync="recipients" />
+                <AliasCreate v-if="recipients.length && settings.recipient" @onCreateAlias="getList" :recipients.sync="recipients" :settings.sync="settings" />
             </div>
         </div>
     </div>
@@ -47,7 +47,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200">
-                                    <AliasCard @onDeleteAlias="deleteAlias" @onEditAlias="getList" v-for="alias in list" :alias="alias" :key="cardKey" :recipients.sync="recipients" />
+                                    <AliasRow @onDeleteAlias="deleteAlias" @onEditAlias="getList" v-for="alias in list" :alias="alias" :key="rowKey" :recipients.sync="recipients" />
                                 </tbody>
                             </table>
                         </div>
@@ -55,7 +55,7 @@
                 </div>
             </div>
         </div>
-        <p v-if="error" class="text-red-600 text-sm mb-4">{{ error }}</p>
+        <p v-if="error" class="text-red-600 text-sm mb-4">Error: {{ error }}</p>
     </div>
 </template>
 
@@ -65,7 +65,7 @@ import axios from 'axios'
 import { aliasApi } from '../api/alias'
 import { recipientApi } from '../api/recipient.ts'
 import { settingsApi } from '../api/settings.ts'
-import AliasCard from './AliasCard.vue'
+import AliasRow from './AliasRow.vue'
 import AliasCreate from './AliasCreate.vue'
 
 const alias = {
@@ -94,7 +94,7 @@ const settings = ref({
 })
 const error = ref('')
 const loaded = ref(false)
-const cardKey = ref(0)
+const rowKey = ref(0)
 
 const getList = async () => {
     try {
@@ -102,7 +102,7 @@ const getList = async () => {
         list.value = response.data
         loaded.value = true
         error.value = ''
-        renderCard()
+        renderRow()
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.message
@@ -135,7 +135,7 @@ const getSettings = async () => {
 }
 
 const deleteAlias = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this alias?')) return
+    if (!confirm('Are you sure you want to delete alias?')) return
     try {
         await aliasApi.delete(id)
         error.value = ''
@@ -147,8 +147,8 @@ const deleteAlias = async (id: string) => {
     }
 }
 
-const renderCard = () => {
-    cardKey.value++
+const renderRow = () => {
+    rowKey.value++
 }
 
 onMounted(() => {

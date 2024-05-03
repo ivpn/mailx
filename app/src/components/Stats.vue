@@ -76,11 +76,14 @@ const initChart = () => {
             },
         },
         dataLabels: {
-            enabled: false
+            enabled: false,
         },
         series: getLast7DaysCounts(stats.value.messages),
         xaxis: {
             categories: getLast7Days(),
+        },
+        yaxis: {
+            forceNiceScale: true,
         },
     }
 

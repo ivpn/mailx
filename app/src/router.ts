@@ -54,11 +54,6 @@ const routes = [
                 name: 'App - Account',
                 component: Account,
             },
-            {
-                path: 'subscription',
-                name: 'App - Subscription',
-                component: Subscription,
-            }
         ]
     },
     {

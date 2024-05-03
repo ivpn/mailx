@@ -14,7 +14,7 @@
         </td>
         <td class="pl-5 py-4 whitespace-nowrap text-end text-sm">
             <div class="flex gap-5 justify-end">
-                <RecipientVerify :recipient="recipient" @onVerifyRecipient="onVerifyRecipient" />
+                <RecipientVerify v-if="!recipient.is_active" :recipient="recipient" @onVerifyRecipient="onVerifyRecipient" />
                 <button
                     @click="deleteRecipient"
                     class="text-red-600 hover:text-red-700 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"

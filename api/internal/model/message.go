@@ -12,10 +12,10 @@ const (
 )
 
 type Message struct {
-	ID        uint `json:"-" gorm:"primaryKey"`
-	CreatedAt time.Time
-	UserID    string `json:"-"`
-	AliasID   string `json:"-"`
-	Type      MessageType
-	Size      int `json:"-"`
+	ID        uint        `json:"-" gorm:"primaryKey"`
+	CreatedAt time.Time   `json:"created_at"`
+	UserID    string      `json:"-"`
+	AliasID   string      `json:"-"`
+	Type      MessageType `json:"type"`
+	Size      int         `json:"-"`
 }

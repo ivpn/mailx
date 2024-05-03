@@ -32,6 +32,16 @@ import { userApi } from '../api/user.ts'
 import axios from 'axios'
 import ApexCharts from 'apexcharts'
 
+interface Message {
+    created_at: string
+    type: number
+}
+
+interface CountData {
+    name: string
+    data: number[]
+}
+
 const stats = ref({
     forwards: 0,
     blocks: 0,
@@ -39,10 +49,7 @@ const stats = ref({
     sends: 0,
     bandwidth: 0,
     aliases: 0,
-    messages: {
-        created_at: '',
-        type: 0,
-    }
+    messages: [],
 })
 const error = ref('')
 
@@ -51,6 +58,7 @@ const getStats = async () => {
         const response = await userApi.stats()
         stats.value = response.data
         error.value = ''
+        initChart()
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.response?.data.error || err.message
@@ -70,26 +78,9 @@ const initChart = () => {
         dataLabels: {
             enabled: false
         },
-        series: [
-            {
-                name: 'Forwards',
-                data: [30, 40, 35, 50, 49, 60, 70],
-            },
-            {
-                name: 'Blocks',
-                data: [23, 12, 54, 61, 32, 56, 81],
-            },
-            {
-                name: 'Replies',
-                data: [45, 23, 56, 32, 34, 52, 41],
-            },
-            {
-                name: 'Sends',
-                data: [23, 12, 54, 61, 32, 56, 81],
-            },
-        ],
+        series: getLast7DaysCounts(stats.value.messages),
         xaxis: {
-            categories: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            categories: getLast7Days(),
         },
     }
 
@@ -97,8 +88,56 @@ const initChart = () => {
     chart.render()
 }
 
+function getLast7Days(): string[] {
+    const result: string[] = []
+
+    for (let i = 6; i >= 0; i--) {
+        const today = new Date()
+        today.setDate(today.getDate() - i)
+        result.push((today).toLocaleDateString('en-US', { weekday: 'short' }))
+    }
+
+    return result
+}
+
+function getLast7DaysCounts(messages: Message[]): CountData[] {
+    const typeNames = ['Forwards', 'Blocks', 'Replies', 'Sends']
+
+    const days: { [key: string]: number[] } = {
+        Forwards: Array(7).fill(0),
+        Blocks: Array(7).fill(0),
+        Replies: Array(7).fill(0),
+        Sends: Array(7).fill(0),
+    }
+
+    const now = new Date()
+    const sevenDaysAgo = new Date(now)
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+
+    messages.forEach((msg) => {
+        const messageDate = new Date(msg.created_at)
+        if (messageDate >= sevenDaysAgo) {
+            const dayIndex = Math.floor((now.getTime() - messageDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
+            const typeIndex = msg.type
+
+            if (typeIndex >= 0 && typeIndex < 4 && dayIndex >= 0 && dayIndex < 7) {
+                days[typeNames[typeIndex]][6 - dayIndex]++
+            }
+        }
+    })
+
+    const result: CountData[] = []
+    for (let i = 0; i < 4; i++) {
+        result.push({
+            name: typeNames[i],
+            data: days[typeNames[i]],
+        })
+    }
+
+    return result
+}
+
 onMounted(() => {
     getStats()
-    initChart()
 })
 </script>

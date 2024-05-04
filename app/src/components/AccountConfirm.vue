@@ -6,14 +6,14 @@
         </p>
         <div v-if="!confirmSuccess" class="mb-4 max-w-xs">
             <div class="mb-4">
-                <label class="block text-gray-500 text-sm font-semibold mb-3" for="otp">
+                <label class="block text-gray-500 text-sm font-semibold mb-3" for="account-otp">
                     6-digit OTP code:
                 </label>
                 <input
                     v-model="otp"
                     v-bind:class="{ 'border-red-600': otpError }"
                     class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-violet-600 mb-2"
-                    id="otp" type="text">
+                    id="account-otp" type="text">
                 <p v-if="otpError" class="text-red-600 text-sm mb-2">Required field</p>
             </div>
             <div class="flex flex-row gap-4">

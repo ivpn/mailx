@@ -16,7 +16,8 @@
         </div>
     </div>
     <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="flex flex-col bg-white shadow-sm rounded-xl p-5 pb-4 my-8">
-        <h1 class="text-2xl font-bold text-gray-800 mb-5">Aliases</h1>
+        <h1 v-if="!isDashboard" class="text-2xl font-bold text-gray-800 mb-5">Aliases</h1>
+        <h1 v-if="isDashboard" class="text-2xl font-bold text-gray-800 mb-5">Recent Aliases</h1>
         <div>
             <div class="flex items-center justify-between mb-6">
                 <AliasCreate v-if="recipients.length && settings.recipient" @onCreateAlias="getList" :recipients.sync="recipients" :settings.sync="settings" />
@@ -87,6 +88,8 @@ const alias = {
     }
 }
 
+const props = defineProps(['dashboard'])
+const isDashboard = props.dashboard
 const list = ref([] as typeof alias[])
 const recipients = ref([])
 const settings = ref({
@@ -103,6 +106,7 @@ const getList = async () => {
     try {
         const response = await aliasApi.getList()
         list.value = response.data
+        if (isDashboard) list.value = list.value.slice(0, 5)
         loaded.value = true
         error.value = ''
         renderRow()

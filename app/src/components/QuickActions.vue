@@ -1,5 +1,8 @@
 <template>
     <AccountConfirm />
+    <Aliases :dashboard="true" />
+    <Recipients :dashboard="true" />
+    <!-- 
     <div class="flex flex-col items-center p-4 text-center pt-20">
         <h3 class="text-lg font-bold text-gray-800">
             Quick actions
@@ -30,8 +33,11 @@
             </button>
         </div>
     </div>
+    -->
 </template>
 
 <script setup lang="ts">
 import AccountConfirm from './AccountConfirm.vue'
+import Aliases from './Aliases.vue'
+import Recipients from './Recipients.vue'
 </script>

@@ -120,7 +120,7 @@ function getLast7DaysCounts(messages: Message[]): CountData[] {
     messages.forEach((msg) => {
         const messageDate = new Date(msg.created_at)
         if (messageDate >= sevenDaysAgo) {
-            const dayIndex = Math.floor((now.getTime() - messageDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
+            const dayIndex = Math.floor((now.getTime() - messageDate.getTime()) / (1000 * 60 * 60 * 24))
             const typeIndex = msg.type
 
             if (typeIndex >= 0 && typeIndex < 4 && dayIndex >= 0 && dayIndex < 7) {

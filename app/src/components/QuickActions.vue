@@ -1,7 +1,7 @@
 <template>
     <AccountConfirm :dashboard="true" />
-    <Recipients :dashboard="true" />
     <Aliases :dashboard="true" />
+    <Recipients :dashboard="true" />
 </template>
 
 <script setup lang="ts">

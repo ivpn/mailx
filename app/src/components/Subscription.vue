@@ -13,13 +13,22 @@
                 {{ activeUntilDate() }}
             </p>
         </div>
-        <div v-if="res.id" class="mb-3">
+        <div class="mb-3">
             <h2 class="font-semibold text-gray-800 mb-3">
                 Subscription ID
             </h2>
-            <p class="text-sm text-gray-500 mb-3">
-                {{ res.id }}
-            </p>
+            <div class="hs-tooltip text-sm text-gray-500 mb-3">
+                <span class="hs-tooltip-toggle">
+                    <button @click="copyAlias(res.id)">
+                        {{ res.id }}
+                    </button>
+                    <span
+                        class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded shadow-sm"
+                        role="tooltip">
+                        {{ copyText }}
+                    </span>
+                </span>
+            </div>
         </div>
         <p v-if="error" class="text-red-600 text-sm mb-3">Error: {{ error }}</p>
     </div>
@@ -27,6 +36,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import tooltip from '@preline/tooltip'
 import axios from 'axios'
 import { subscriptionApi } from '../api/subscription.ts'
 
@@ -35,6 +45,7 @@ const res = ref({
     active_until: ''
 })
 const error = ref('')
+const copyText = ref('Click to copy')
 
 const getSubscription = async () => {
     try {
@@ -55,7 +66,16 @@ const activeUntilDate = () => {
     return new Date(res.value.active_until).toDateString()
 }
 
+const copyAlias = (alias: string) => {
+    navigator.clipboard.writeText(alias)
+    copyText.value = 'Copied!'
+    setTimeout(() => {
+        copyText.value = 'Click to copy'
+    }, 2000)
+}
+
 onMounted(() => {
     getSubscription()
+    tooltip.autoInit()
 })
 </script>

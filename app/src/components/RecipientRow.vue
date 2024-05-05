@@ -4,7 +4,18 @@
             <p>{{ new Date(recipient.created_at).toDateString() }}</p>
         </td>
         <td class="px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800">
-            <p>{{ recipient.email }}</p>
+            <div class="hs-tooltip inline-block">
+                <span class="hs-tooltip-toggle">
+                    <button @click="copyAlias(recipient.email)">
+                        {{ recipient.email }}
+                    </button>
+                    <span
+                        class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded shadow-sm"
+                        role="tooltip">
+                        {{ copyText }}
+                    </span>
+                </span>
+            </div>
         </td>
         <td class="px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800">
             <p>
@@ -27,13 +38,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import tooltip from '@preline/tooltip'
 import RecipientVerify from './RecipientVerify.vue'
 // import { recipientApi } from '../api/recipient.ts'
 
 const props = defineProps(['recipient'])
 const recipient = ref(props.recipient)
 const emit = defineEmits(['onDeleteRecipient', 'onVerifyRecipient'])
+const copyText = ref('Click to copy')
 
 const deleteRecipient = () => {
     emit('onDeleteRecipient', recipient.value.id)
@@ -42,4 +55,16 @@ const deleteRecipient = () => {
 const onVerifyRecipient = () => {
     emit('onVerifyRecipient')
 }
+
+const copyAlias = (alias: string) => {
+    navigator.clipboard.writeText(alias)
+    copyText.value = 'Copied!'
+    setTimeout(() => {
+        copyText.value = 'Click to copy'
+    }, 2000)
+}
+
+onMounted(() => {
+    tooltip.autoInit()
+})
 </script>

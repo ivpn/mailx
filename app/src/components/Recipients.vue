@@ -49,6 +49,10 @@
                 </div>
             </div>
         </div>
+        <p v-if="isDashboard" class="text-sm text-gray-500 my-4">
+            <a href="/recipients" class="text-violet-600 hover:text-violet-700 font-medium text-sm py-2"
+                type="submit">All Recipients</a>
+        </p>
         <p v-if="error" class="text-red-600 text-sm mb-4">Error: {{ error }}</p>
     </div>
 </template>

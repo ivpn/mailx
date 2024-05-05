@@ -36,9 +36,6 @@
             </div>
             <p class="text-gray-500">{{ alias.description }}</p>
         </td>
-        <td class="px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800">
-            {{ alias.recipients.split(',').length }}
-        </td>
         <td class="px-5 py-4 whitespace-nowrap text-start text-sm">
             <div class="hs-tooltip inline-block">
                 <span class="hs-tooltip-toggle">

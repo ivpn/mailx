@@ -26,15 +26,32 @@
                         </button>
                     </div>
                     <div class="p-4 whitespace-normal text-left text-base">
-                        <h1 class="text-xl font-bold text-gray-800 mb-5">{{ alias.name }}</h1>
+                        <div class="mb-5">
+                            <p class="text-gray-500 mb-3">
+                                Generate the proper email address to send a message from this alias. Note that to send emails using an alias, you need to do so from an account-verified recipient.
+                            </p>
+                        </div>
+                        <div class="mb-5">
+                            <label v-bind:for="'from_alias_' + alias.id"
+                                class="block text-gray-500 text-sm font-semibold mb-3">
+                                From alias:
+                            </label>
+                            <input v-bind:id="'from_alias_' + alias.id" v-bind:value="alias.name" disabled
+                                class="disabled appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-violet-600 mb-2"
+                                type="text">
+                        </div>
                         <div class="mb-5">
                             <label v-bind:for="'to_email_' + alias.id"
                                 class="block text-gray-500 text-sm font-semibold mb-3">
                                 To email:
                             </label>
-                            <input v-bind:id="'to_email_' + alias.id" v-model="toEmail"
+                            <input
+                                v-bind:id="'to_email_' + alias.id"
+                                v-bind:class="{ 'border-red-600': emailError }"
+                                v-model="toEmail"
                                 class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-violet-600 mb-2"
                                 type="text">
+                            <p v-if="emailError" class="text-red-600 text-sm">Required field</p>
                         </div>
                     </div>
                     <div class="flex justify-start items-center gap-x-2 py-3 px-4 border-t">
@@ -60,13 +77,20 @@ import overlay from '@preline/overlay'
 const props = defineProps(['alias'])
 const alias = ref(props.alias)
 const toEmail = ref('')
+const emailError = ref(false)
+
+const validateEmail = () => {
+    emailError.value = !toEmail.value
+    return !emailError.value
+}
 
 const showAddress = () => {
-
+    if (!validateEmail()) return
 }
 
 const close = () => {
     toEmail.value = ''
+    emailError.value = false
     const modal = document.querySelector('#hs-modal-send-alias' + alias.value.id)
     if (modal instanceof HTMLElement) {
         overlay.close(modal)

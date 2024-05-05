@@ -1,11 +1,14 @@
 <template>
-    <div v-if="!list.length && loaded" class="flex flex-col p-5 pb-4 my-8">
-        <div class="flex flex-col items-center p-4 text-center py-20">
+    <div v-if="!list.length && loaded" class="flex flex-col my-14">
+        <div class="flex flex-col items-center text-center">
             <h3 class="text-lg font-bold text-gray-800">
-                No aliases yet
+                Create Aliases
             </h3>
-            <p class="my-2 text-gray-500">
+            <p v-if="recipients.length && settings.recipient" class="my-2 text-gray-500">
                 To get started, create an alias.
+            </p>
+            <p v-if="!recipients.length && loaded" class="my-2 text-gray-500">
+                To get started, first add a recipient.
             </p>
             <div class="flex gap-4">
                 <AliasCreate v-if="recipients.length && settings.recipient" @onCreateAlias="getList" :recipients.sync="recipients" :settings.sync="settings" />
@@ -13,7 +16,8 @@
         </div>
     </div>
     <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="flex flex-col bg-white shadow-sm rounded-xl p-5 pb-4 my-8">
-        <h1 class="text-2xl font-bold text-gray-800 mb-5">Aliases</h1>
+        <h1 v-if="!isDashboard" class="text-2xl font-bold text-gray-800 mb-5">Aliases</h1>
+        <h1 v-if="isDashboard" class="text-2xl font-bold text-gray-800 mb-5">Latest Aliases</h1>
         <div>
             <div class="flex items-center justify-between mb-6">
                 <AliasCreate v-if="recipients.length && settings.recipient" @onCreateAlias="getList" :recipients.sync="recipients" :settings.sync="settings" />
@@ -55,6 +59,10 @@
                 </div>
             </div>
         </div>
+        <p v-if="isDashboard" class="text-sm text-gray-500 my-4">
+            <a href="/aliases" class="text-violet-600 hover:text-violet-700 font-medium text-sm py-2"
+                type="submit">All Aliases</a>
+        </p>
         <p v-if="error" class="text-red-600 text-sm mb-4">Error: {{ error }}</p>
     </div>
 </template>
@@ -84,6 +92,8 @@ const alias = {
     }
 }
 
+const props = defineProps(['dashboard'])
+const isDashboard = props.dashboard
 const list = ref([] as typeof alias[])
 const recipients = ref([])
 const settings = ref({
@@ -100,6 +110,7 @@ const getList = async () => {
     try {
         const response = await aliasApi.getList()
         list.value = response.data
+        if (isDashboard) list.value = list.value.slice(0, 5)
         loaded.value = true
         error.value = ''
         renderRow()

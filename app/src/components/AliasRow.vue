@@ -22,7 +22,18 @@
             </div>
         </td>
         <td class="px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800">
-            <p>{{ alias.name }}</p>
+            <div class="hs-tooltip inline-block">
+                <span class="hs-tooltip-toggle">
+                    <button @click="copyAlias(alias.name)">
+                        {{ alias.name }}
+                    </button>
+                    <span
+                        class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded shadow-sm"
+                        role="tooltip">
+                        {{ copyText }}
+                    </span>
+                </span>
+            </div>
             <p class="text-gray-500">{{ alias.description }}</p>
         </td>
         <td class="px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800">
@@ -75,6 +86,7 @@ const props = defineProps(['alias', 'recipients'])
 const alias = ref(props.alias)
 const recipients = ref(props.recipients)
 const emit = defineEmits(['onDeleteAlias', 'onEditAlias'])
+const copyText = ref('Click to copy')
 
 const updateAlias = async () => {
     alias.value.enabled = !alias.value.enabled
@@ -89,6 +101,14 @@ const deleteAlias = () => {
 
 const onEditAlias = () => {
     emit('onEditAlias')
+}
+
+const copyAlias = (alias: string) => {
+    navigator.clipboard.writeText(alias)
+    copyText.value = 'Copied!'
+    setTimeout(() => {
+        copyText.value = 'Click to copy'
+    }, 2000)
 }
 
 onMounted(() => {

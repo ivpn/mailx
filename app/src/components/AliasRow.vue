@@ -61,6 +61,7 @@
         </td>
         <td class="pl-5 py-4 whitespace-nowrap text-end text-sm">
             <div class="flex gap-5 justify-end">
+                <AliasSend :alias="alias" />
                 <AliasEdit :alias="alias" :recipients="recipients" @onEditAlias="onEditAlias" />
                 <button
                     @click="deleteAlias"
@@ -77,6 +78,7 @@
 import { ref, onMounted } from 'vue'
 import tooltip from '@preline/tooltip'
 import AliasEdit from './AliasEdit.vue'
+import AliasSend from './AliasSend.vue'
 import { aliasApi } from '../api/alias.ts'
 
 const props = defineProps(['alias', 'recipients'])

@@ -1,5 +1,13 @@
 <template>
-    <div v-if="!res.is_active" class="flex flex-col bg-white shadow-sm rounded-xl p-5 pb-4 my-8">
+    <div v-if="!res.is_active && isDashboard" class="flex flex-col items-center text-center my-14 pt-6">
+        <h3 class="text-lg font-bold text-gray-800">
+            Verify Your Email
+        </h3>
+        <p class="my-2 text-gray-500">
+            Please <a class="text-violet-600 hover:text-violet-700 font-medium" href="/account">verify</a> your account email address.
+        </p>
+    </div>
+    <div v-if="!res.is_active && !isDashboard" class="flex flex-col bg-white shadow-sm rounded-xl p-5 pb-4 my-8">
         <h1 class="text-xl font-bold text-gray-800 mb-4">Verify Your Account Email</h1>
         <p class="text-sm text-gray-500 mb-3">
             We have sent a 6-digit OTP code to your email address. Please enter the code below to verify your account email. Accounts with unconfirmed email address may be deleted after 7 days.
@@ -53,6 +61,8 @@ const otpError = ref(false)
 const confirmSuccess = ref('')
 const resendSuccess = ref('')
 const error = ref('')
+const props = defineProps(['dashboard'])
+const isDashboard = props.dashboard
 
 const getUser = async () => {
     try {

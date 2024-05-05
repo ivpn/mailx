@@ -1,7 +1,7 @@
 <template>
-    <AccountConfirm />
-    <Aliases :dashboard="true" />
+    <AccountConfirm :dashboard="true" />
     <Recipients :dashboard="true" />
+    <Aliases :dashboard="true" />
     <!-- 
     <div class="flex flex-col items-center p-4 text-center pt-20">
         <h3 class="text-lg font-bold text-gray-800">

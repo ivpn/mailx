@@ -36,13 +36,19 @@ import Menu from './Menu.vue'
 import { jwt } from '../utils/jwt'
 import dropdown from '@preline/dropdown'
 import { userApi } from '../api/user.ts'
+import { setCookie } from 'typescript-cookie';
 
 dropdown.autoInit
 
 const logout = async () => {
     try {
         await userApi.logout()
+        clearCookies()
         window.location.href = '/login'
     } catch { }
+}
+
+const clearCookies = () => {
+    setCookie('auth', '')
 }
 </script>

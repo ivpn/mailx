@@ -105,6 +105,7 @@ function getLast7Days(): string[] {
 
 function getLast7DaysCounts(messages: Message[]): CountData[] {
     const typeNames = ['Forwards', 'Blocks', 'Replies', 'Sends']
+    const last7Days = getLast7Days()
 
     const days: { [key: string]: number[] } = {
         Forwards: Array(7).fill(0),
@@ -119,13 +120,14 @@ function getLast7DaysCounts(messages: Message[]): CountData[] {
 
     messages.forEach((msg) => {
         const messageDate = new Date(msg.created_at)
+        const messageDay = (messageDate).toLocaleDateString('en-US', { weekday: 'short' })
+        const dayIndex = last7Days.indexOf(messageDay)
+
         if (messageDate >= sevenDaysAgo) {
-            const diffTime = Math.abs(now.getTime() - messageDate.getTime())
-            const dayIndex = Math.floor(diffTime / (1000 * 60 * 60 * 24))
             const typeIndex = msg.type
 
             if (typeIndex >= 0 && typeIndex < 4 && dayIndex >= 0 && dayIndex < 7) {
-                days[typeNames[typeIndex]][5 - dayIndex]++
+                days[typeNames[typeIndex]][dayIndex]++
             }
         }
     })

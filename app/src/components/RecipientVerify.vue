@@ -1,7 +1,7 @@
 <template>
     <div>
         <button v-bind:data-hs-overlay="'#hs-basic-modal' + recipient.id"
-            class="text-violet-600 hover:text-violet-700 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
+            class="text-blue-600 hover:text-blue-700 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
             type="submit">
             Verify
         </button>
@@ -38,14 +38,14 @@
                             <input
                                 v-model="req.otp"
                                 v-bind:class="{ 'border-red-600': otpError }"
-                                class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-violet-600 mb-2"
+                                class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-blue-600 mb-2"
                                 id="otp" type="text">
                             <p v-if="otpError" class="text-red-600 text-sm mb-2">Required field</p>
                         </div>
                     </div>
                     <div class="flex justify-start items-center gap-x-2 py-3 px-4 border-t">
                         <button @click="verifyRecipient"
-                            class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-md bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50 disabled:pointer-events-none">
+                            class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
                             Verify
                         </button>
                         <button

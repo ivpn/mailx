@@ -37,9 +37,6 @@
                                             ALIAS</th>
                                         <th scope="col"
                                             class="px-5 py-3 text-start text-xs font-medium text-gray-500">
-                                            RECIPIENTS</th>
-                                        <th scope="col"
-                                            class="px-5 py-3 text-start text-xs font-medium text-gray-500">
                                             COUNT
                                         </th>
                                         <th scope="col"

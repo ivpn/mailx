@@ -1,7 +1,7 @@
 <template>
     <div>
         <button v-bind:data-hs-overlay="'#hs-modal-create-recipient'"
-            class="mt-3 py-2 pl-2 pr-3 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-md border border-transparent bg-violet-600 text-white hover:bg-violet-700">
+            class="mt-3 py-2 pl-2 pr-3 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-md bg-violet-600 text-white hover:bg-violet-700">
             <svg class="flex-shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
                 stroke-linejoin="round">
@@ -32,7 +32,7 @@
                     </div>
                     <div class="p-4 whitespace-normal text-left text-base">
                         <div class="mb-5">
-                            <p class="text-sm text-gray-500 mb-3">
+                            <p class="text-gray-800 mb-3">
                                 Add a email address to receive forwarded emails. A 6 digit verification code will be sent to this email address. If expired, you can resend the verification code. Unverified recipients will not receive any forwarded emails.
                             </p>
                         </div>
@@ -52,7 +52,7 @@
                     </div>
                     <div class="flex justify-start items-center gap-x-2 py-3 px-4 border-t">
                         <button @click="postRecipient"
-                            class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-md border border-transparent bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50 disabled:pointer-events-none">
+                            class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-md bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50 disabled:pointer-events-none">
                             Add Recipient
                         </button>
                         <button @click="close"

@@ -67,9 +67,7 @@ const validate = () => {
 }
 
 const login = async () => {
-    if (!validate()) {
-        return
-    }
+    if (!validate()) return
     
     isLoading.value = true // Start loading
     const data = {

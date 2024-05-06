@@ -36,9 +36,6 @@
             </div>
             <p class="text-gray-500">{{ alias.description }}</p>
         </td>
-        <td class="px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800">
-            {{ alias.recipients.split(',').length }}
-        </td>
         <td class="px-5 py-4 whitespace-nowrap text-start text-sm">
             <div class="hs-tooltip inline-block">
                 <span class="hs-tooltip-toggle">
@@ -64,6 +61,7 @@
         </td>
         <td class="pl-5 py-4 whitespace-nowrap text-end text-sm">
             <div class="flex gap-5 justify-end">
+                <AliasSend :alias="alias" />
                 <AliasEdit :alias="alias" :recipients="recipients" @onEditAlias="onEditAlias" />
                 <button
                     @click="deleteAlias"
@@ -80,6 +78,7 @@
 import { ref, onMounted } from 'vue'
 import tooltip from '@preline/tooltip'
 import AliasEdit from './AliasEdit.vue'
+import AliasSend from './AliasSend.vue'
 import { aliasApi } from '../api/alias.ts'
 
 const props = defineProps(['alias', 'recipients'])

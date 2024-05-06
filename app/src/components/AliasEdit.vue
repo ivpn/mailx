@@ -1,7 +1,7 @@
 <template>
     <div>
         <button v-bind:data-hs-overlay="'#hs-basic-modal' + alias.id"
-            class="text-violet-600 hover:text-violet-700 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
+            class="text-blue-600 hover:text-blue-700 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
             type="submit">
             Edit
         </button>
@@ -33,7 +33,7 @@
                                 Description:
                             </label>
                             <input v-bind:id="'description_' + alias.id" v-model="alias.description"
-                                class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-violet-600 mb-2"
+                                class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-blue-600 mb-2"
                                 type="text">
                         </div>
                         <div class="mb-5">
@@ -42,7 +42,7 @@
                                 From name:
                             </label>
                             <input v-bind:id="'from_' + alias.id" v-model="alias.from_name"
-                                class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-violet-600 mb-2"
+                                class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-blue-600 mb-2"
                                 type="text">
                         </div>
                         <div class="mb-6">
@@ -52,7 +52,7 @@
                             </label>
                             <select v-model="alias.recipients" v-bind:id="'recipient_' + alias.id"
                                 :disabled="!recipients.length"
-                                class="form-select py-2.5 px-4 pe-9 block w-full border-2 border-gray-200 rounded-lg text-gray-700 focus:border-violet-600 disabled:opacity-50 disabled:pointer-events-none outline-none">
+                                class="form-select py-2.5 px-4 pe-9 block w-full border-2 border-gray-200 rounded-lg text-gray-700 focus:border-blue-600 disabled:opacity-50 disabled:pointer-events-none outline-none">
                                 <option v-for="recipient in recipients" v-bind:value=recipient
                                     :selected="recipient == alias.recipients" :key="recipient">
                                     {{ recipient }}
@@ -62,7 +62,7 @@
                     </div>
                     <div class="flex justify-start items-center gap-x-2 py-3 px-4 border-t">
                         <button v-if="!success" @click="updateAlias"
-                            class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-md bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50 disabled:pointer-events-none">
+                            class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
                             Save
                         </button>
                         <button @click="close"

@@ -13,7 +13,7 @@
                 Select default domain:
             </label>
             <select id="domain"
-                class="form-select py-2.5 px-4 pe-9 block w-full border-2 border-gray-200 rounded-lg text-gray-700 focus:border-violet-600 disabled:opacity-50 disabled:pointer-events-none outline-none">
+                class="form-select py-2.5 px-4 pe-9 block w-full border-2 border-gray-200 rounded-lg text-gray-700 focus:border-blue-600 disabled:opacity-50 disabled:pointer-events-none outline-none">
                 <option
                     v-for="(domain, index) in domains"
                     v-bind:domain
@@ -27,7 +27,7 @@
             Default Recipient
         </h2>
         <p class="text-sm text-gray-500 mb-3">
-            The default recipient to be selected by default in the drop down options when creating a new recipient. You can add recipients <a class="text-violet-600 hover:text-violet-700 font-semibold" href="/recipients">here</a>.
+            The default recipient to be selected by default in the drop down options when creating a new recipient. You can add recipients <a class="text-blue-600 hover:text-blue-700 font-semibold" href="/recipients">here</a>.
         </p>
         <div class="max-w-xs mb-6">
             <label class="block text-gray-500 text-sm font-semibold mb-3" for="recipient">
@@ -35,7 +35,7 @@
             </label>
             <select id="recipient"
                 :disabled="!recipients.length"
-                class="form-select py-2.5 px-4 pe-9 block w-full border-2 border-gray-200 rounded-lg text-gray-700 focus:border-violet-600 disabled:opacity-50 disabled:pointer-events-none outline-none">
+                class="form-select py-2.5 px-4 pe-9 block w-full border-2 border-gray-200 rounded-lg text-gray-700 focus:border-blue-600 disabled:opacity-50 disabled:pointer-events-none outline-none">
                 <option
                     v-for="recipient in recipients"
                     v-bind:value=recipient
@@ -58,13 +58,13 @@
             </label>
             <input
                 v-model="res.from_name"
-                class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-violet-600 mb-2"
+                class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-blue-600 mb-2"
                 id="from-name" type="text">
         </div>
         <div class="mb-3">
             <button
                 @click="saveSettings"
-                class="bg-violet-600 hover:bg-violet-700 text-white font-medium text-sm py-2 px-3 rounded-md focus:outline-none focus:shadow-outline"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm py-2 px-3 rounded-md focus:outline-none focus:shadow-outline"
                 type="submit">
                 Save Settings
             </button>

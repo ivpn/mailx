@@ -53,6 +53,24 @@
                                 type="text">
                             <p v-if="emailError" class="text-red-600 text-sm">Required field</p>
                         </div>
+                        <div v-bind:class="{ 'hidden': generatedEmail == '' }" class="mb-5">
+                            <p class="text-gray-500 text-sm font-semibold mb-3">
+                                Send message to this email:
+                            </p>
+                            <div class="hs-tooltip text-gray-800 mb-3">
+                                <span class="hs-tooltip-toggle">
+                                    <button @click="copy(generatedEmail)">
+                                        {{ generatedEmail }}
+                                    </button>
+                                    <span
+                                        class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded shadow-sm"
+                                        role="tooltip">
+                                        {{ copyText }}
+                                    </span>
+                                </span>
+                            </div>
+
+                        </div>
                     </div>
                     <div class="flex justify-start items-center gap-x-2 py-3 px-4 border-t">
                         <button @click="showAddress"
@@ -73,11 +91,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import overlay from '@preline/overlay'
+import tooltip from '@preline/tooltip'
 
 const props = defineProps(['alias'])
 const alias = ref(props.alias)
 const toEmail = ref('')
+const generatedEmail = ref('')
 const emailError = ref(false)
+const copyText = ref('Click to copy')
 
 const validateEmail = () => {
     emailError.value = !toEmail.value
@@ -86,6 +107,7 @@ const validateEmail = () => {
 
 const showAddress = () => {
     if (!validateEmail()) return
+    generatedEmail.value = alias.value.name.replace('@', `+${toEmail.value.replace('@', '=')}@`)
 }
 
 const close = () => {
@@ -97,7 +119,16 @@ const close = () => {
     }
 }
 
+const copy = (text: string) => {
+    navigator.clipboard.writeText(text)
+    copyText.value = 'Copied!'
+    setTimeout(() => {
+        copyText.value = 'Click to copy'
+    }, 2000)
+}
+
 onMounted(() => {
     overlay.autoInit()
+    tooltip.autoInit()
 })
 </script>

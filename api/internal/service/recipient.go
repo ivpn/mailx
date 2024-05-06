@@ -178,12 +178,6 @@ func (s *Service) DeleteRecipient(ctx context.Context, ID string) error {
 }
 
 func (s *Service) ActivateRecipient(ctx context.Context, ID string, otp string) error {
-	err := utils.ValidateOTP(otp)
-	if err != nil {
-		log.Printf("error activating recipient: %s", err.Error())
-		return err
-	}
-
 	hash, err := s.Cache.Get(ctx, "activation_recipient_"+ID)
 	if err != nil {
 		log.Printf("error activating recipient: %s", err.Error())

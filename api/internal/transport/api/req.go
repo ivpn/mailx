@@ -35,5 +35,5 @@ type DeleteUserReq struct {
 }
 
 type ActivateReq struct {
-	OTP string `json:"otp"`
+	OTP string `json:"otp" validate:"required,len=6"`
 }

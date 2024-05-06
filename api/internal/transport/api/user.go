@@ -116,6 +116,13 @@ func (h *Handler) Activate(c *fiber.Ctx) error {
 		})
 	}
 
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
 	err = h.Service.ActivateUser(c.Context(), ID, req.OTP)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{

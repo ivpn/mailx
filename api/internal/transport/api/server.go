@@ -5,6 +5,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"ivpn.net/email/api/config"
+	"ivpn.net/email/api/internal/utils"
 )
 
 type Service interface {
@@ -16,9 +17,10 @@ type Service interface {
 }
 
 type Handler struct {
-	Cfg     config.APIConfig
-	Service Service
-	Server  *fiber.App
+	Cfg       config.APIConfig
+	Service   Service
+	Server    *fiber.App
+	Validator utils.Validator
 }
 
 func Start(cfg config.APIConfig, service Service) error {
@@ -27,9 +29,10 @@ func Start(cfg config.APIConfig, service Service) error {
 	app := fiber.New()
 
 	h := &Handler{
-		Cfg:     cfg,
-		Service: service,
-		Server:  app,
+		Cfg:       cfg,
+		Service:   service,
+		Server:    app,
+		Validator: utils.NewValidator(),
 	}
 
 	h.SetupRoutes(cfg)

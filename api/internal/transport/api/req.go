@@ -3,10 +3,10 @@ package api
 type AliasReq struct {
 	Description string `json:"description"`
 	Enabled     bool   `json:"enabled"`
-	Recipients  string `json:"recipients"`
+	Recipients  string `json:"recipients" validate:"required"`
 	FromName    string `json:"from_name"`
 	Format      string `json:"format"`
-	Domain      string `json:"domain"`
+	Domain      string `json:"domain" validate:"required"`
 }
 
 type RecipientReq struct {

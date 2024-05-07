@@ -10,7 +10,7 @@ type AliasReq struct {
 }
 
 type RecipientReq struct {
-	Email string `json:"email"`
+	Email string `json:"email" validate:"required,email"`
 }
 
 type SubscriptionReq struct {

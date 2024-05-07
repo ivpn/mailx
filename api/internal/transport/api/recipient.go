@@ -88,6 +88,13 @@ func (h *Handler) PostRecipient(c *fiber.Ctx) error {
 		})
 	}
 
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
 	recipient := model.Recipient{
 		UserID:   auth.GetUserID(c),
 		Email:    req.Email,

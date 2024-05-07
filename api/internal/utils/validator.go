@@ -23,11 +23,8 @@ func NewValidator() Validator {
 }
 
 func ValidateEmail(email string) error {
-	if email == "" || !EmailRX.MatchString(email) {
-		return ErrInvalidEmail
-	}
-
-	return nil
+	validator := NewValidator()
+	return validator.Var(email, "required,email")
 }
 
 func ValidatePassword(password string) error {

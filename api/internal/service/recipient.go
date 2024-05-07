@@ -75,12 +75,6 @@ func (s *Service) GetVerifiedRecipients(ctx context.Context, recipientEmails str
 }
 
 func (s *Service) PostRecipient(ctx context.Context, recipient model.Recipient) error {
-	err := recipient.Validate()
-	if err != nil {
-		log.Printf("error creating recipient: %s", err.Error())
-		return err
-	}
-
 	rcps, err := s.Store.GetRecipients(ctx, recipient.UserID)
 	if err != nil {
 		log.Printf("error creating recipient: %s", err.Error())

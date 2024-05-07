@@ -14,8 +14,8 @@ type RecipientReq struct {
 }
 
 type SubscriptionReq struct {
-	ID          string `json:"id"`
-	ActiveUntil string `json:"active_until"`
+	ID          string `json:"id" validate:"required,uuid"`
+	ActiveUntil string `json:"active_until" validate:"required"`
 }
 
 type SettingsReq struct {

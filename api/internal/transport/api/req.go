@@ -19,7 +19,7 @@ type SubscriptionReq struct {
 }
 
 type SettingsReq struct {
-	ID        string `json:"id"`
+	ID        string `json:"id" validate:"required,uuid"`
 	Domain    string `json:"domain"`
 	Recipient string `json:"recipient"`
 	FromName  string `json:"from_name"`

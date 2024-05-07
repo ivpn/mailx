@@ -51,6 +51,14 @@ func (h *Handler) Register(c *fiber.Ctx) error {
 		})
 	}
 
+	// Validate the request
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
 	// Create new user
 	user := model.User{
 		Email:         req.Email,

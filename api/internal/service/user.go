@@ -73,13 +73,7 @@ func (s *Service) GetUserByPassword(ctx context.Context, userID string, password
 }
 
 func (s *Service) PostUser(ctx context.Context, user model.User) error {
-	err := user.Validate()
-	if err != nil {
-		log.Printf("error creating user: %s", err.Error())
-		return err
-	}
-
-	err = user.SetPassword(*user.PasswordPlain)
+	err := user.SetPassword(*user.PasswordPlain)
 	if err != nil {
 		log.Printf("error creating user: %s", err.Error())
 		return err

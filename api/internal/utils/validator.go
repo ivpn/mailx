@@ -26,11 +26,3 @@ func ValidateEmail(email string) error {
 	validator := NewValidator()
 	return validator.Var(email, "required,email")
 }
-
-func ValidatePassword(password string) error {
-	if password == "" || len(password) < 8 || len(password) > 64 {
-		return ErrInvalidPassword
-	}
-
-	return nil
-}

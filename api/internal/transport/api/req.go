@@ -26,12 +26,12 @@ type SettingsReq struct {
 }
 
 type UserReq struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required,min=8,max=64"`
 }
 
 type DeleteUserReq struct {
-	Password string `json:"password"`
+	Password string `json:"password" validate:"required,min=8,max=64"`
 }
 
 type ActivateReq struct {

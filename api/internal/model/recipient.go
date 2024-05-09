@@ -3,8 +3,6 @@ package model
 import (
 	"errors"
 	"strings"
-
-	"ivpn.net/email/api/internal/utils"
 )
 
 var (
@@ -16,15 +14,6 @@ type Recipient struct {
 	UserID   string `json:"-"`
 	Email    string `gorm:"unique" json:"email"`
 	IsActive bool   `json:"is_active"`
-}
-
-func (r *Recipient) Validate() error {
-	err := utils.ValidateEmail(r.Email)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func GetEmails(rcps []Recipient) string {

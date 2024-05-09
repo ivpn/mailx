@@ -87,6 +87,13 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 		})
 	}
 
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
 	if !strings.Contains(h.Cfg.Domains, req.Domain) {
 		return c.Status(500).JSON(fiber.Map{
 			"error": ErrInvalidDomain,

@@ -59,6 +59,13 @@ func (h *Handler) UpdateSubscription(c *fiber.Ctx) error {
 		})
 	}
 
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
 	activeUntil, err := dateparse.ParseAny(req.ActiveUntil)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{

@@ -5,7 +5,6 @@ import (
 	"regexp"
 
 	"github.com/alexedwards/argon2id"
-	"ivpn.net/email/api/internal/utils"
 )
 
 var (
@@ -31,20 +30,6 @@ type UserStats struct {
 	Bandwidth int           `json:"bandwidth"`
 	Aliases   int64         `json:"aliases"`
 	Messages  []interface{} `json:"messages" gorm:"type:text"`
-}
-
-func (u *User) Validate() error {
-	err := utils.ValidateEmail(u.Email)
-	if err != nil {
-		return err
-	}
-
-	err = utils.ValidatePassword(*u.PasswordPlain)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func (u *User) SetPassword(passwordPlain string) error {

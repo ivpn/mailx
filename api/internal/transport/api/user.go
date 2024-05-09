@@ -51,6 +51,14 @@ func (h *Handler) Register(c *fiber.Ctx) error {
 		})
 	}
 
+	// Validate the request
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
 	// Create new user
 	user := model.User{
 		Email:         req.Email,
@@ -116,6 +124,14 @@ func (h *Handler) Activate(c *fiber.Ctx) error {
 		})
 	}
 
+	// Validate the request
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
 	err = h.Service.ActivateUser(c.Context(), ID, req.OTP)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
@@ -149,15 +165,10 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 	}
 
 	// Validate the request
-	userModel := model.User{
-		Email:         req.Email,
-		PasswordPlain: &req.Password,
-	}
-	err = userModel.Validate()
+	err = h.Validator.Struct(req)
 	if err != nil {
-		log.Printf("error login: %s", err.Error())
-		return c.Status(400).JSON(fiber.Map{
-			"error": ErrInvalidCredentials,
+		return c.Status(500).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
 		})
 	}
 
@@ -231,11 +242,10 @@ func (h *Handler) DeleteUser(c *fiber.Ctx) error {
 	}
 
 	// Validate the request
-	err = utils.ValidatePassword(req.Password)
+	err = h.Validator.Struct(req)
 	if err != nil {
-		log.Printf("error deleting user: %s", err.Error())
-		return c.Status(400).JSON(fiber.Map{
-			"error": ErrInvalidCredentials,
+		return c.Status(500).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
 		})
 	}
 

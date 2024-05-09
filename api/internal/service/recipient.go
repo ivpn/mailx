@@ -75,12 +75,6 @@ func (s *Service) GetVerifiedRecipients(ctx context.Context, recipientEmails str
 }
 
 func (s *Service) PostRecipient(ctx context.Context, recipient model.Recipient) error {
-	err := recipient.Validate()
-	if err != nil {
-		log.Printf("error creating recipient: %s", err.Error())
-		return err
-	}
-
 	rcps, err := s.Store.GetRecipients(ctx, recipient.UserID)
 	if err != nil {
 		log.Printf("error creating recipient: %s", err.Error())
@@ -178,12 +172,6 @@ func (s *Service) DeleteRecipient(ctx context.Context, ID string) error {
 }
 
 func (s *Service) ActivateRecipient(ctx context.Context, ID string, otp string) error {
-	err := utils.ValidateOTP(otp)
-	if err != nil {
-		log.Printf("error activating recipient: %s", err.Error())
-		return err
-	}
-
 	hash, err := s.Cache.Get(ctx, "activation_recipient_"+ID)
 	if err != nil {
 		log.Printf("error activating recipient: %s", err.Error())

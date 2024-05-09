@@ -58,6 +58,13 @@ func (h *Handler) UpdateSettings(c *fiber.Ctx) error {
 		})
 	}
 
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
 	settings := model.Settings{
 		Domain:    req.Domain,
 		Recipient: req.Recipient,

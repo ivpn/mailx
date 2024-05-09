@@ -73,13 +73,7 @@ func (s *Service) GetUserByPassword(ctx context.Context, userID string, password
 }
 
 func (s *Service) PostUser(ctx context.Context, user model.User) error {
-	err := user.Validate()
-	if err != nil {
-		log.Printf("error creating user: %s", err.Error())
-		return err
-	}
-
-	err = user.SetPassword(*user.PasswordPlain)
+	err := user.SetPassword(*user.PasswordPlain)
 	if err != nil {
 		log.Printf("error creating user: %s", err.Error())
 		return err
@@ -164,12 +158,6 @@ func (s *Service) SendUserOTP(ctx context.Context, userID string) error {
 }
 
 func (s *Service) ActivateUser(ctx context.Context, ID string, otp string) error {
-	err := utils.ValidateOTP(otp)
-	if err != nil {
-		log.Printf("error activating user: %s", err.Error())
-		return err
-	}
-
 	hash, err := s.Cache.Get(ctx, "activation_"+ID)
 	if err != nil {
 		log.Printf("error activating user: %s", err.Error())

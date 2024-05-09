@@ -947,6 +947,9 @@
     "definitions": {
         "api.ActivateReq": {
             "type": "object",
+            "required": [
+                "otp"
+            ],
             "properties": {
                 "otp": {
                     "type": "string"
@@ -955,6 +958,10 @@
         },
         "api.AliasReq": {
             "type": "object",
+            "required": [
+                "domain",
+                "recipients"
+            ],
             "properties": {
                 "description": {
                     "type": "string"
@@ -978,9 +985,14 @@
         },
         "api.DeleteUserReq": {
             "type": "object",
+            "required": [
+                "password"
+            ],
             "properties": {
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 8
                 }
             }
         },
@@ -994,6 +1006,9 @@
         },
         "api.RecipientReq": {
             "type": "object",
+            "required": [
+                "email"
+            ],
             "properties": {
                 "email": {
                     "type": "string"
@@ -1002,6 +1017,9 @@
         },
         "api.SettingsReq": {
             "type": "object",
+            "required": [
+                "id"
+            ],
             "properties": {
                 "domain": {
                     "type": "string"
@@ -1019,6 +1037,10 @@
         },
         "api.SubscriptionReq": {
             "type": "object",
+            "required": [
+                "active_until",
+                "id"
+            ],
             "properties": {
                 "active_until": {
                     "type": "string"
@@ -1038,18 +1060,27 @@
         },
         "api.UserReq": {
             "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
             "properties": {
                 "email": {
                     "type": "string"
                 },
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 8
                 }
             }
         },
         "model.Alias": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -1096,6 +1127,9 @@
         "model.Recipient": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "type": "string"
+                },
                 "email": {
                     "type": "string"
                 },
@@ -1110,6 +1144,9 @@
         "model.Settings": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "type": "string"
+                },
                 "domain": {
                     "type": "string"
                 },
@@ -1121,9 +1158,6 @@
                 },
                 "recipient": {
                     "type": "string"
-                },
-                "user_id": {
-                    "type": "string"
                 }
             }
         },
@@ -1131,6 +1165,9 @@
             "type": "object",
             "properties": {
                 "active_until": {
+                    "type": "string"
+                },
+                "created_at": {
                     "type": "string"
                 },
                 "id": {
@@ -1155,6 +1192,9 @@
         "model.User": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "type": "string"
+                },
                 "email": {
                     "type": "string"
                 },
@@ -1180,6 +1220,10 @@
                 },
                 "forwards": {
                     "type": "integer"
+                },
+                "messages": {
+                    "type": "array",
+                    "items": {}
                 },
                 "replies": {
                     "type": "integer"

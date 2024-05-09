@@ -958,6 +958,9 @@ const docTemplate = `{
     "definitions": {
         "api.ActivateReq": {
             "type": "object",
+            "required": [
+                "otp"
+            ],
             "properties": {
                 "otp": {
                     "type": "string"
@@ -966,6 +969,10 @@ const docTemplate = `{
         },
         "api.AliasReq": {
             "type": "object",
+            "required": [
+                "domain",
+                "recipients"
+            ],
             "properties": {
                 "description": {
                     "type": "string"
@@ -989,9 +996,14 @@ const docTemplate = `{
         },
         "api.DeleteUserReq": {
             "type": "object",
+            "required": [
+                "password"
+            ],
             "properties": {
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 8
                 }
             }
         },
@@ -1005,6 +1017,9 @@ const docTemplate = `{
         },
         "api.RecipientReq": {
             "type": "object",
+            "required": [
+                "email"
+            ],
             "properties": {
                 "email": {
                     "type": "string"
@@ -1013,6 +1028,9 @@ const docTemplate = `{
         },
         "api.SettingsReq": {
             "type": "object",
+            "required": [
+                "id"
+            ],
             "properties": {
                 "domain": {
                     "type": "string"
@@ -1030,6 +1048,10 @@ const docTemplate = `{
         },
         "api.SubscriptionReq": {
             "type": "object",
+            "required": [
+                "active_until",
+                "id"
+            ],
             "properties": {
                 "active_until": {
                     "type": "string"
@@ -1049,18 +1071,27 @@ const docTemplate = `{
         },
         "api.UserReq": {
             "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
             "properties": {
                 "email": {
                     "type": "string"
                 },
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 8
                 }
             }
         },
         "model.Alias": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -1107,6 +1138,9 @@ const docTemplate = `{
         "model.Recipient": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "type": "string"
+                },
                 "email": {
                     "type": "string"
                 },
@@ -1121,6 +1155,9 @@ const docTemplate = `{
         "model.Settings": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "type": "string"
+                },
                 "domain": {
                     "type": "string"
                 },
@@ -1132,9 +1169,6 @@ const docTemplate = `{
                 },
                 "recipient": {
                     "type": "string"
-                },
-                "user_id": {
-                    "type": "string"
                 }
             }
         },
@@ -1142,6 +1176,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "active_until": {
+                    "type": "string"
+                },
+                "created_at": {
                     "type": "string"
                 },
                 "id": {
@@ -1166,6 +1203,9 @@ const docTemplate = `{
         "model.User": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "type": "string"
+                },
                 "email": {
                     "type": "string"
                 },
@@ -1191,6 +1231,10 @@ const docTemplate = `{
                 },
                 "forwards": {
                     "type": "integer"
+                },
+                "messages": {
+                    "type": "array",
+                    "items": {}
                 },
                 "replies": {
                     "type": "integer"

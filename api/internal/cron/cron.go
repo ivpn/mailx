@@ -7,6 +7,6 @@ import (
 )
 
 func New(db *gorm.DB) {
-	gocron.Every(1).Day().Do(jobs.DeleteOldMessages, db)
+	gocron.Every(1).Hour().Do(jobs.DeleteOldMessages, db)
 	gocron.Start()
 }

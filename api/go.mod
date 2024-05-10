@@ -15,6 +15,7 @@ require (
 	github.com/gofiber/swagger v1.0.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.6.0
+	github.com/jasonlvhit/gocron v0.0.1
 	github.com/redis/go-redis/v9 v9.5.1
 	github.com/swaggo/swag v1.16.3
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df

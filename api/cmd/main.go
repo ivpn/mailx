@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"ivpn.net/email/api/config"
+	"ivpn.net/email/api/internal/cron"
 	"ivpn.net/email/api/internal/repository"
 	"ivpn.net/email/api/internal/service"
 	"ivpn.net/email/api/internal/transport/api"
@@ -28,6 +29,8 @@ func Run() error {
 	if err != nil {
 		return err
 	}
+
+	cron.New(db.Client)
 
 	service := service.New(cfg, db, redis)
 

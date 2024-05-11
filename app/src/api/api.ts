@@ -1,5 +1,6 @@
 import axios from 'axios'
 import env from "../env.json"
+import { setCookie } from 'typescript-cookie'
 
 export const api = axios.create({
     withCredentials: true,
@@ -11,6 +12,7 @@ api.interceptors.response.use(
     error => {
         if (error.response && error.response.status === 401) {
             // Handle the 401 error
+            setCookie('auth', '')
             window.location.href = '/login'
         }
         return Promise.reject(error)

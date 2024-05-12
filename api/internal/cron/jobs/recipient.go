@@ -16,6 +16,4 @@ func DeleteUnverifiedRecipients(db *gorm.DB) {
 		log.Println("Error deleting unverified recipients:", err)
 		return
 	}
-
-	log.Println("Unverified recipients deleted successfully")
 }

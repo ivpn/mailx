@@ -62,6 +62,4 @@ func DeleteUnverifiedUsers(db *gorm.DB) {
 			return
 		}
 	}
-
-	log.Println("Unverified users deleted successfully")
 }

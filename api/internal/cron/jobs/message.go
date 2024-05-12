@@ -16,6 +16,4 @@ func DeleteOldMessages(db *gorm.DB) {
 		log.Println("Error deleting old messages:", err)
 		return
 	}
-
-	log.Println("Old messages deleted successfully")
 }

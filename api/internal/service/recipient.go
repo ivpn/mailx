@@ -23,19 +23,19 @@ var (
 )
 
 type RecipienteStore interface {
-	GetRecipient(context.Context, string) (model.Recipient, error)
-	GetRecipientByEmail(context.Context, string) (model.Recipient, error)
+	GetRecipient(context.Context, string, string) (model.Recipient, error)
+	GetRecipientByEmail(context.Context, string, string) (model.Recipient, error)
 	GetRecipients(context.Context, string) ([]model.Recipient, error)
-	GetVerifiedRecipients(context.Context, string) ([]model.Recipient, error)
+	GetVerifiedRecipients(context.Context, string, string) ([]model.Recipient, error)
 	PostRecipient(context.Context, model.Recipient) (model.Recipient, error)
 	UpdateRecipient(context.Context, model.Recipient) error
-	DeleteRecipient(context.Context, string) error
-	ActivateRecipient(context.Context, string) error
+	DeleteRecipient(context.Context, string, string) error
+	ActivateRecipient(context.Context, string, string) error
 	DeleteRecipientByUserID(context.Context, string) error
 }
 
-func (s *Service) GetRecipient(ctx context.Context, ID string) (model.Recipient, error) {
-	rcp, err := s.Store.GetRecipient(ctx, ID)
+func (s *Service) GetRecipient(ctx context.Context, ID string, userID string) (model.Recipient, error) {
+	rcp, err := s.Store.GetRecipient(ctx, ID, userID)
 	if err != nil {
 		log.Printf("an error occured fetching the recipient: %s", err.Error())
 		return model.Recipient{}, ErrGetRecipient
@@ -44,8 +44,8 @@ func (s *Service) GetRecipient(ctx context.Context, ID string) (model.Recipient,
 	return rcp, nil
 }
 
-func (s *Service) GetRecipientByEmail(ctx context.Context, email string) (model.Recipient, error) {
-	rcp, err := s.Store.GetRecipientByEmail(ctx, email)
+func (s *Service) GetRecipientByEmail(ctx context.Context, email string, userID string) (model.Recipient, error) {
+	rcp, err := s.Store.GetRecipientByEmail(ctx, email, userID)
 	if err != nil {
 		log.Printf("an error occured fetching the recipient: %s", err.Error())
 		return model.Recipient{}, ErrGetRecipient
@@ -64,8 +64,8 @@ func (s *Service) GetRecipients(ctx context.Context, userID string) ([]model.Rec
 	return rcps, nil
 }
 
-func (s *Service) GetVerifiedRecipients(ctx context.Context, recipientEmails string) ([]model.Recipient, error) {
-	rcps, err := s.Store.GetVerifiedRecipients(ctx, recipientEmails)
+func (s *Service) GetVerifiedRecipients(ctx context.Context, recipientEmails string, userID string) ([]model.Recipient, error) {
+	rcps, err := s.Store.GetVerifiedRecipients(ctx, recipientEmails, userID)
 	if err != nil {
 		log.Printf("an error occured fetching the recipients: %s", err.Error())
 		return []model.Recipient{}, ErrGetRecipients
@@ -120,8 +120,8 @@ func (s *Service) PostRecipient(ctx context.Context, recipient model.Recipient) 
 	return nil
 }
 
-func (s *Service) SendRecipientOTP(ctx context.Context, ID string) error {
-	recipient, err := s.GetRecipient(ctx, ID)
+func (s *Service) SendRecipientOTP(ctx context.Context, ID string, userID string) error {
+	recipient, err := s.GetRecipient(ctx, ID, userID)
 	if err != nil {
 		log.Printf("error sending OTP: %s", err.Error())
 		return ErrGetRecipient
@@ -161,8 +161,8 @@ func (s *Service) UpdateRecipient(ctx context.Context, recipient model.Recipient
 	return nil
 }
 
-func (s *Service) DeleteRecipient(ctx context.Context, ID string) error {
-	err := s.Store.DeleteRecipient(ctx, ID)
+func (s *Service) DeleteRecipient(ctx context.Context, ID string, userID string) error {
+	err := s.Store.DeleteRecipient(ctx, ID, userID)
 	if err != nil {
 		log.Printf("an error occurred deleting the recipient: %s", err.Error())
 		return ErrDeleteRecipient
@@ -171,7 +171,7 @@ func (s *Service) DeleteRecipient(ctx context.Context, ID string) error {
 	return nil
 }
 
-func (s *Service) ActivateRecipient(ctx context.Context, ID string, otp string) error {
+func (s *Service) ActivateRecipient(ctx context.Context, ID string, userID string, otp string) error {
 	hash, err := s.Cache.Get(ctx, "activation_recipient_"+ID)
 	if err != nil {
 		log.Printf("error activating recipient: %s", err.Error())
@@ -182,7 +182,7 @@ func (s *Service) ActivateRecipient(ctx context.Context, ID string, otp string) 
 		return ErrIncorrectOTP
 	}
 
-	err = s.Store.ActivateRecipient(ctx, ID)
+	err = s.Store.ActivateRecipient(ctx, ID, userID)
 	if err != nil {
 		log.Printf("error activating recipient: %s", err.Error())
 		return ErrActivateRecipient

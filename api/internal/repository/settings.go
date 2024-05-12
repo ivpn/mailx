@@ -17,7 +17,7 @@ func (d *Database) PostSettings(ctx context.Context, settings model.Settings) er
 }
 
 func (d *Database) UpdateSettings(ctx context.Context, settings model.Settings) error {
-	return d.Client.Updates(settings).Error
+	return d.Client.Where("user_id = ?", settings.UserID).Updates(settings).Error
 }
 
 func (d *Database) DeleteSettings(ctx context.Context, userID string) error {

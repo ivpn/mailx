@@ -20,17 +20,17 @@ var (
 )
 
 type AliasStore interface {
-	GetAlias(context.Context, string) (model.Alias, error)
+	GetAlias(context.Context, string, string) (model.Alias, error)
 	GetAliases(context.Context, string) ([]model.Alias, error)
 	GetAliasByName(string) (model.Alias, error)
 	PostAlias(context.Context, model.Alias) error
 	UpdateAlias(context.Context, model.Alias) error
-	DeleteAlias(context.Context, string) error
+	DeleteAlias(context.Context, string, string) error
 	DeleteAliasByUserID(context.Context, string) error
 }
 
-func (s *Service) GetAlias(ctx context.Context, ID string) (model.Alias, error) {
-	alias, err := s.Store.GetAlias(ctx, ID)
+func (s *Service) GetAlias(ctx context.Context, ID string, userID string) (model.Alias, error) {
+	alias, err := s.Store.GetAlias(ctx, ID, userID)
 	if err != nil {
 		log.Printf("error fetching alias: %s", err.Error())
 		return model.Alias{}, ErrGetAlias
@@ -88,8 +88,8 @@ func (s *Service) UpdateAlias(ctx context.Context, alias model.Alias) error {
 	return nil
 }
 
-func (s *Service) DeleteAlias(ctx context.Context, ID string) error {
-	err := s.Store.DeleteAlias(ctx, ID)
+func (s *Service) DeleteAlias(ctx context.Context, ID string, userID string) error {
+	err := s.Store.DeleteAlias(ctx, ID, userID)
 	if err != nil {
 		log.Printf("error deleting alias: %s", err.Error())
 		return ErrDeleteAlias

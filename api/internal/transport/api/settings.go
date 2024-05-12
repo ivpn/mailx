@@ -50,6 +50,8 @@ func (h *Handler) GetSettings(c *fiber.Ctx) error {
 // @Failure 500 {object} ErrorRes
 // @Router /settings [put]
 func (h *Handler) UpdateSettings(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
+
 	req := SettingsReq{}
 	err := c.BodyParser(&req)
 	if err != nil {
@@ -66,6 +68,7 @@ func (h *Handler) UpdateSettings(c *fiber.Ctx) error {
 	}
 
 	settings := model.Settings{
+		UserID:    userID,
 		Domain:    req.Domain,
 		Recipient: req.Recipient,
 		FromName:  req.FromName,

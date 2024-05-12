@@ -18,11 +18,11 @@ var (
 )
 
 type AliasService interface {
-	GetAlias(context.Context, string) (model.Alias, error)
+	GetAlias(context.Context, string, string) (model.Alias, error)
 	GetAliases(context.Context, string) ([]model.Alias, error)
 	PostAlias(context.Context, model.Alias, string, string) error
 	UpdateAlias(context.Context, model.Alias) error
-	DeleteAlias(context.Context, string) error
+	DeleteAlias(context.Context, string, string) error
 }
 
 // @Summary Get alias
@@ -36,8 +36,9 @@ type AliasService interface {
 // @Failure 500 {object} ErrorRes
 // @Router /alias/{id} [get]
 func (h *Handler) GetAlias(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
 	id := c.Params("id")
-	alias, err := h.Service.GetAlias(c.Context(), id)
+	alias, err := h.Service.GetAlias(c.Context(), id, userID)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
@@ -157,6 +158,7 @@ func (h *Handler) UpdateAlias(c *fiber.Ctx) error {
 	}
 
 	alias := model.Alias{
+		UserID:      userID,
 		Description: req.Description,
 		Enabled:     req.Enabled,
 		Recipients:  model.GetEmails(rcps),
@@ -187,8 +189,9 @@ func (h *Handler) UpdateAlias(c *fiber.Ctx) error {
 // @Failure 500 {object} ErrorRes
 // @Router /alias/{id} [delete]
 func (h *Handler) DeleteAlias(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
 	id := c.Params("id")
-	err := h.Service.DeleteAlias(c.Context(), id)
+	err := h.Service.DeleteAlias(c.Context(), id, userID)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),

@@ -6,10 +6,10 @@ import (
 	"ivpn.net/email/api/internal/model"
 )
 
-func (d *Database) GetAlias(ctx context.Context, ID string) (model.Alias, error) {
+func (d *Database) GetAlias(ctx context.Context, ID string, userID string) (model.Alias, error) {
 	var alias model.Alias
 	var aliasStats model.AliasStats
-	err := d.Client.Where("id = ?", ID).
+	err := d.Client.Where("id = ? AND user_id = ?", ID, userID).
 		First(&alias).Error
 	if err != nil {
 		return alias, err
@@ -85,7 +85,7 @@ func (d *Database) PostAlias(ctx context.Context, alias model.Alias) error {
 }
 
 func (d *Database) UpdateAlias(ctx context.Context, alias model.Alias) error {
-	return d.Client.Model(&alias).Updates(map[string]interface{}{
+	return d.Client.Model(&alias).Where("user_id = ?", alias.UserID).Updates(map[string]interface{}{
 		"description": alias.Description,
 		"enabled":     alias.Enabled,
 		"recipients":  alias.Recipients,
@@ -93,8 +93,8 @@ func (d *Database) UpdateAlias(ctx context.Context, alias model.Alias) error {
 	}).Error
 }
 
-func (d *Database) DeleteAlias(ctx context.Context, ID string) error {
-	return d.Client.Where("id = ?", ID).Delete(&model.Alias{}).Error
+func (d *Database) DeleteAlias(ctx context.Context, ID string, userID string) error {
+	return d.Client.Where("id = ? AND user_id", ID, userID).Delete(&model.Alias{}).Error
 }
 
 func (d *Database) DeleteAliasByUserID(ctx context.Context, userID string) error {

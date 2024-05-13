@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
@@ -21,9 +22,14 @@ type Handler struct {
 	Service   Service
 	Server    *fiber.App
 	Validator utils.Validator
+	Cache     Cache
 }
 
-func Start(cfg config.APIConfig, service Service) error {
+type Cache interface {
+	Get(context.Context, string) (string, error)
+}
+
+func Start(cfg config.APIConfig, service Service, cache Cache) error {
 	log.Printf("API server starting on :%s", cfg.Port)
 
 	app := fiber.New()
@@ -33,6 +39,7 @@ func Start(cfg config.APIConfig, service Service) error {
 		Service:   service,
 		Server:    app,
 		Validator: utils.NewValidator(),
+		Cache:     cache,
 	}
 
 	h.SetupRoutes(cfg)

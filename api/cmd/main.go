@@ -41,7 +41,7 @@ func Run() error {
 		}
 	}()
 
-	err = api.Start(cfg.API, service)
+	err = api.Start(cfg.API, service, redis)
 	if err != nil {
 		return err
 	}

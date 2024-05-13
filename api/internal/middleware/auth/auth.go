@@ -1,10 +1,12 @@
 package auth
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"time"
 
+	"github.com/alexedwards/argon2id"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -23,11 +25,25 @@ const (
 	USER_ID     = "user_id"
 )
 
-func New(cfg config.APIConfig) fiber.Handler {
+type Cache interface {
+	Get(context.Context, string) (string, error)
+}
+
+func New(cfg config.APIConfig, cache Cache) fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
 		tokenString := GetToken(c)
 		if tokenString == "" {
+			return c.SendStatus(fiber.StatusUnauthorized)
+		}
+
+		tokenHash, err := argon2id.CreateHash(tokenString, argon2id.DefaultParams)
+		if err != nil {
+			return c.SendStatus(fiber.StatusUnauthorized)
+		}
+
+		loggedOut, _ := cache.Get(c.Context(), "logout_"+tokenHash)
+		if loggedOut != "" {
 			return c.SendStatus(fiber.StatusUnauthorized)
 		}
 
@@ -45,7 +61,6 @@ func New(cfg config.APIConfig) fiber.Handler {
 		claims, ok := token.Claims.(jwt.MapClaims)
 		if !ok || !token.Valid {
 			return c.SendStatus(fiber.StatusUnauthorized)
-
 		}
 
 		if claims[USER_ID] == nil {

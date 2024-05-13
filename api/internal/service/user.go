@@ -250,7 +250,7 @@ func (s *Service) LogoutUser(c *fiber.Ctx) error {
 		return ErrLogoutUser
 	}
 
-	err = s.Cache.Set(c.Context(), "logout_"+jwtHash, true, exp)
+	err = s.Cache.Set(c.Context(), "logout_"+jwtHash, "true", exp)
 	if err != nil {
 		log.Printf("error saving jwt: %s", err.Error())
 		return ErrLogoutUser

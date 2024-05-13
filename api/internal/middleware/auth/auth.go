@@ -32,22 +32,22 @@ type Cache interface {
 func New(cfg config.APIConfig, cache Cache) fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
-		tokenString := GetToken(c)
-		if tokenString == "" {
+		jwtString := GetToken(c)
+		if jwtString == "" {
 			return c.SendStatus(fiber.StatusUnauthorized)
 		}
 
-		tokenHash, err := utils.Hash(tokenString)
+		jwtHash, err := utils.Hash(jwtString)
 		if err != nil {
 			return c.SendStatus(fiber.StatusUnauthorized)
 		}
 
-		loggedOut, _ := cache.Get(c.Context(), "logout_"+tokenHash)
-		if loggedOut != "" {
+		jwtInvalid, _ := cache.Get(c.Context(), "logout_"+jwtHash)
+		if jwtInvalid != "" {
 			return c.SendStatus(fiber.StatusUnauthorized)
 		}
 
-		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		token, err := jwt.Parse(jwtString, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}

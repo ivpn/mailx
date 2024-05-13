@@ -3,7 +3,7 @@ package model
 import (
 	"errors"
 
-	"github.com/alexedwards/argon2id"
+	"ivpn.net/email/api/internal/utils"
 )
 
 var (
@@ -30,7 +30,7 @@ type UserStats struct {
 }
 
 func (u *User) SetPassword(passwordPlain string) error {
-	hash, err := argon2id.CreateHash(passwordPlain, argon2id.DefaultParams)
+	hash, err := utils.Hash(passwordPlain)
 	if err != nil {
 		return ErrHashFailed
 	}
@@ -42,10 +42,5 @@ func (u *User) SetPassword(passwordPlain string) error {
 }
 
 func (u *User) Matches(passwordPlain string) bool {
-	match, err := argon2id.ComparePasswordAndHash(passwordPlain, u.PasswordHash)
-	if err != nil {
-		return false
-	}
-
-	return match
+	return utils.HashMatches(passwordPlain, u.PasswordHash)
 }

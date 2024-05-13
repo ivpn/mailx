@@ -5,7 +5,6 @@ import (
 	"errors"
 	"log"
 
-	"github.com/alexedwards/argon2id"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 	"ivpn.net/email/api/internal/client/mailer"
@@ -239,9 +238,9 @@ func (s *Service) GetUserStats(ctx context.Context, userID string) (model.UserSt
 func (s *Service) LogoutUser(c *fiber.Ctx) error {
 	jwt := auth.GetToken(c)
 
-	jwtHash, err := argon2id.CreateHash(jwt, argon2id.DefaultParams)
+	jwtHash, err := utils.Hash(jwt)
 	if err != nil {
-		log.Printf("error saving jwt: %s", err.Error())
+		log.Printf("error hashing jwt: %s", err.Error())
 		return ErrLogoutUser
 	}
 

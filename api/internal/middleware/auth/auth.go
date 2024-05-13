@@ -6,12 +6,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/alexedwards/argon2id"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/golang-jwt/jwt"
 	"ivpn.net/email/api/config"
+	"ivpn.net/email/api/internal/utils"
 )
 
 var (
@@ -37,7 +37,7 @@ func New(cfg config.APIConfig, cache Cache) fiber.Handler {
 			return c.SendStatus(fiber.StatusUnauthorized)
 		}
 
-		tokenHash, err := argon2id.CreateHash(tokenString, argon2id.DefaultParams)
+		tokenHash, err := utils.Hash(tokenString)
 		if err != nil {
 			return c.SendStatus(fiber.StatusUnauthorized)
 		}

@@ -5,8 +5,11 @@ import (
 	"errors"
 	"log"
 
+	"github.com/alexedwards/argon2id"
+	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 	"ivpn.net/email/api/internal/client/mailer"
+	"ivpn.net/email/api/internal/middleware/auth"
 	"ivpn.net/email/api/internal/model"
 	"ivpn.net/email/api/internal/utils"
 )
@@ -24,6 +27,7 @@ var (
 	ErrIncorrectOTP   = errors.New("incorrect OTP")
 	ErrIncorrectEmail = errors.New("incorrect email")
 	ErrIncorrectPass  = errors.New("incorrect password")
+	ErrLogoutUser     = errors.New("could not logout user")
 )
 
 type UserStore interface {
@@ -230,4 +234,28 @@ func (s *Service) GetUserStats(ctx context.Context, userID string) (model.UserSt
 	}
 
 	return stats, nil
+}
+
+func (s *Service) LogoutUser(c *fiber.Ctx) error {
+	jwt := auth.GetToken(c)
+
+	jwtHash, err := argon2id.CreateHash(jwt, argon2id.DefaultParams)
+	if err != nil {
+		log.Printf("error saving jwt: %s", err.Error())
+		return ErrLogoutUser
+	}
+
+	exp, err := auth.GetTokenExp(c)
+	if err != nil {
+		log.Printf("error saving jwt: %s", err.Error())
+		return ErrLogoutUser
+	}
+
+	err = s.Cache.Set(c.Context(), "logout_"+jwtHash, true, exp)
+	if err != nil {
+		log.Printf("error saving jwt: %s", err.Error())
+		return ErrLogoutUser
+	}
+
+	return nil
 }

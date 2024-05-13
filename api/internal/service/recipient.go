@@ -178,7 +178,7 @@ func (s *Service) ActivateRecipient(ctx context.Context, ID string, userID strin
 		return ErrExpiredOTP
 	}
 
-	if hash != utils.HashOTP(otp) {
+	if !utils.MatchOTP(otp, hash) {
 		return ErrIncorrectOTP
 	}
 

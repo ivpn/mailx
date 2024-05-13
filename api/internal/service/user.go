@@ -164,7 +164,7 @@ func (s *Service) ActivateUser(ctx context.Context, ID string, otp string) error
 		return ErrExpiredOTP
 	}
 
-	if hash != utils.HashOTP(otp) {
+	if !utils.MatchOTP(otp, hash) {
 		return ErrIncorrectOTP
 	}
 

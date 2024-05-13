@@ -2,9 +2,15 @@ package utils
 
 import (
 	"crypto/rand"
-	"crypto/sha256"
+	"errors"
 	"fmt"
 	"math/big"
+
+	"github.com/alexedwards/argon2id"
+)
+
+var (
+	ErrHashFailed = errors.New("hash failed")
 )
 
 type OTP struct {
@@ -21,13 +27,22 @@ func CreateOTP() (*OTP, error) {
 	sixDigitNum := bigInt.Int64() + 100000
 	sixDigitStr := fmt.Sprintf("%06d", sixDigitNum)
 	token := OTP{Secret: sixDigitStr}
-	hash := sha256.Sum256([]byte(token.Secret))
-	token.Hash = fmt.Sprintf("%x\n", hash)
+
+	hash, err := argon2id.CreateHash(token.Secret, argon2id.DefaultParams)
+	if err != nil {
+		return nil, ErrHashFailed
+	}
+
+	token.Hash = hash
 
 	return &token, nil
 }
 
-func HashOTP(secret string) string {
-	hash := sha256.Sum256([]byte(secret))
-	return fmt.Sprintf("%x\n", hash)
+func MatchOTP(secret string, hash string) bool {
+	match, err := argon2id.ComparePasswordAndHash(secret, hash)
+	if err != nil {
+		return false
+	}
+
+	return match
 }

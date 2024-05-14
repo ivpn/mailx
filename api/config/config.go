@@ -48,7 +48,8 @@ type SMTPClientConfig struct {
 }
 
 type ServiceConfig struct {
-	OTPExpiration time.Duration
+	OTPExpiration    time.Duration
+	SubscriptionType string
 }
 
 type Config struct {
@@ -115,7 +116,8 @@ func New() (Config, error) {
 			Sender:   os.Getenv("SMTP_CLIENT_SENDER"),
 		},
 		Service: ServiceConfig{
-			OTPExpiration: otpExp,
+			OTPExpiration:    otpExp,
+			SubscriptionType: os.Getenv("SUBSCRIPTION_TYPE"),
 		},
 	}, nil
 }

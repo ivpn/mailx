@@ -32,6 +32,10 @@ func New(cfg config.APIConfig, cache Cache) fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
 		jwtString := GetToken(c)
+		if jwtString == "" {
+			return c.SendStatus(fiber.StatusUnauthorized)
+		}
+
 		jwtSignature := GetTokenSignature(jwtString)
 		jwtInvalid, _ := cache.Get(c.Context(), "logout_"+jwtSignature)
 		if jwtInvalid != "" {

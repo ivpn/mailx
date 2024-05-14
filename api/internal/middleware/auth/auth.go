@@ -1,8 +1,10 @@
 package auth
 
 import (
+	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
@@ -11,20 +13,36 @@ import (
 	"ivpn.net/email/api/config"
 )
 
+var (
+	ErrNoToken  = fmt.Errorf("no token")
+	ErrNoClaims = fmt.Errorf("no claims")
+	ErrNoExp    = fmt.Errorf("no exp")
+)
+
 const (
 	AUTH_COOKIE = "auth"
 	USER_ID     = "user_id"
 )
 
-func New(cfg config.APIConfig) fiber.Handler {
+type Cache interface {
+	Get(context.Context, string) (string, error)
+}
+
+func New(cfg config.APIConfig, cache Cache) fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
-		tokenString := getToken(c)
-		if tokenString == "" {
+		jwtString := GetToken(c)
+		if jwtString == "" {
 			return c.SendStatus(fiber.StatusUnauthorized)
 		}
 
-		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		jwtSignature := GetTokenSignature(jwtString)
+		jwtInvalid, _ := cache.Get(c.Context(), "logout_"+jwtSignature)
+		if jwtInvalid != "" {
+			return c.SendStatus(fiber.StatusUnauthorized)
+		}
+
+		token, err := jwt.Parse(jwtString, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
@@ -38,7 +56,6 @@ func New(cfg config.APIConfig) fiber.Handler {
 		claims, ok := token.Claims.(jwt.MapClaims)
 		if !ok || !token.Valid {
 			return c.SendStatus(fiber.StatusUnauthorized)
-
 		}
 
 		if claims[USER_ID] == nil {
@@ -54,7 +71,7 @@ func New(cfg config.APIConfig) fiber.Handler {
 func NewPSK(cfg config.APIConfig) fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
-		if getToken(c) != cfg.PSK {
+		if GetToken(c) != cfg.PSK {
 			return c.SendStatus(fiber.StatusUnauthorized)
 		}
 
@@ -92,7 +109,7 @@ func GetUserID(c *fiber.Ctx) string {
 	return c.Locals(USER_ID).(string)
 }
 
-func getToken(c *fiber.Ctx) string {
+func GetToken(c *fiber.Ctx) string {
 	var tokenString string
 	authorization := c.Get("Authorization")
 
@@ -103,4 +120,39 @@ func getToken(c *fiber.Ctx) string {
 	}
 
 	return tokenString
+}
+
+func GetTokenExp(cfg config.APIConfig, c *fiber.Ctx) (time.Duration, error) {
+	jwtString := GetToken(c)
+	token, err := jwt.Parse(jwtString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+
+		return []byte(cfg.TokenSecret), nil
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return 0, ErrNoClaims
+	}
+
+	exp, ok := claims["exp"].(float64)
+	if !ok {
+		return 0, ErrNoExp
+	}
+
+	return time.Until(time.Unix(int64(exp), 0)), nil
+}
+
+func GetTokenSignature(jwt string) string {
+	parts := strings.Split(jwt, ".")
+	if len(parts) != 3 {
+		return ""
+	}
+
+	return parts[2]
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"time"
 
 	"gorm.io/gorm"
 	"ivpn.net/email/api/internal/client/mailer"
@@ -24,6 +25,7 @@ var (
 	ErrIncorrectOTP   = errors.New("incorrect OTP")
 	ErrIncorrectEmail = errors.New("incorrect email")
 	ErrIncorrectPass  = errors.New("incorrect password")
+	ErrLogoutUser     = errors.New("could not logout user")
 )
 
 type UserStore interface {
@@ -164,7 +166,7 @@ func (s *Service) ActivateUser(ctx context.Context, ID string, otp string) error
 		return ErrExpiredOTP
 	}
 
-	if hash != utils.HashOTP(otp) {
+	if !utils.MatchOTP(otp, hash) {
 		return ErrIncorrectOTP
 	}
 
@@ -230,4 +232,14 @@ func (s *Service) GetUserStats(ctx context.Context, userID string) (model.UserSt
 	}
 
 	return stats, nil
+}
+
+func (s *Service) LogoutUser(ctx context.Context, jwtSignature string, jwtExp time.Duration) error {
+	err := s.Cache.Set(ctx, "logout_"+jwtSignature, "true", jwtExp)
+	if err != nil {
+		log.Printf("error saving jwt: %s", err.Error())
+		return ErrLogoutUser
+	}
+
+	return nil
 }

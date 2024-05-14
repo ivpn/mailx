@@ -17,6 +17,13 @@ func (d *Database) PostSubscription(ctx context.Context, subscription model.Subs
 }
 
 func (d *Database) UpdateSubscription(ctx context.Context, subscription model.Subscription) error {
+	sub := model.Subscription{}
+	sub.ID = subscription.ID
+	err := d.Client.First(&sub).Error
+	if err != nil {
+		return err
+	}
+
 	return d.Client.Updates(subscription).Error
 }
 

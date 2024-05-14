@@ -2,16 +2,13 @@ package model
 
 import (
 	"errors"
-	"regexp"
 
-	"github.com/alexedwards/argon2id"
+	"ivpn.net/email/api/internal/utils"
 )
 
 var (
 	ErrDuplicateEmail = errors.New("email already exists")
 	ErrHashFailed     = errors.New("password hash failed")
-	ErrMatchFailed    = errors.New("incorrect password")
-	EmailRX           = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 )
 
 type User struct {
@@ -33,7 +30,7 @@ type UserStats struct {
 }
 
 func (u *User) SetPassword(passwordPlain string) error {
-	hash, err := argon2id.CreateHash(passwordPlain, argon2id.DefaultParams)
+	hash, err := utils.Hash(passwordPlain)
 	if err != nil {
 		return ErrHashFailed
 	}
@@ -45,10 +42,5 @@ func (u *User) SetPassword(passwordPlain string) error {
 }
 
 func (u *User) Matches(passwordPlain string) bool {
-	match, err := argon2id.ComparePasswordAndHash(passwordPlain, u.PasswordHash)
-	if err != nil {
-		return false
-	}
-
-	return match
+	return utils.HashMatches(passwordPlain, u.PasswordHash)
 }

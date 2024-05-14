@@ -170,6 +170,7 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 	// Validate the request
 	err = h.Validator.Struct(req)
 	if err != nil {
+		log.Printf("error login: %s", err.Error())
 		return c.Status(500).JSON(fiber.Map{
 			"error": ErrInvalidRequest,
 		})

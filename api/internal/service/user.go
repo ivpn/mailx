@@ -237,12 +237,7 @@ func (s *Service) GetUserStats(ctx context.Context, userID string) (model.UserSt
 
 func (s *Service) LogoutUser(c *fiber.Ctx) error {
 	jwt := auth.GetToken(c)
-
-	jwtHash, err := utils.Hash(jwt)
-	if err != nil {
-		log.Printf("error hashing jwt: %s", err.Error())
-		return ErrLogoutUser
-	}
+	jwtSignature := auth.GetTokenSignature(jwt)
 
 	exp, err := auth.GetTokenExp(c)
 	if err != nil {
@@ -250,7 +245,7 @@ func (s *Service) LogoutUser(c *fiber.Ctx) error {
 		return ErrLogoutUser
 	}
 
-	err = s.Cache.Set(c.Context(), "logout_"+jwtHash, "true", exp)
+	err = s.Cache.Set(c.Context(), "logout_"+jwtSignature, "true", exp)
 	if err != nil {
 		log.Printf("error saving jwt: %s", err.Error())
 		return ErrLogoutUser

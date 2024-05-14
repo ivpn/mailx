@@ -8,7 +8,6 @@ require github.com/joho/godotenv v1.5.1
 
 require (
 	github.com/DusanKasan/parsemail v1.2.0
-	github.com/alexedwards/argon2id v1.0.0
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
 	github.com/go-playground/validator/v10 v10.20.0
 	github.com/gofiber/fiber/v2 v2.52.1
@@ -18,6 +17,7 @@ require (
 	github.com/jasonlvhit/gocron v0.0.1
 	github.com/redis/go-redis/v9 v9.5.1
 	github.com/swaggo/swag v1.16.3
+	golang.org/x/crypto v0.21.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gorm.io/driver/mysql v1.5.4
@@ -53,7 +53,6 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.51.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
-	golang.org/x/crypto v0.21.0 // indirect
 	golang.org/x/net v0.23.0 // indirect
 	golang.org/x/sys v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect

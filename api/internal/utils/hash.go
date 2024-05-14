@@ -1,12 +1,19 @@
 package utils
 
-import "github.com/alexedwards/argon2id"
+import (
+	"golang.org/x/crypto/bcrypt"
+)
 
 func Hash(secret string) (string, error) {
-	return argon2id.CreateHash(secret, argon2id.DefaultParams)
+	hash, err := bcrypt.GenerateFromPassword([]byte(secret), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+
+	return string(hash), nil
 }
 
 func HashMatches(secret string, hash string) bool {
-	matches, err := argon2id.ComparePasswordAndHash(secret, hash)
-	return matches && err == nil
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(secret))
+	return err == nil
 }

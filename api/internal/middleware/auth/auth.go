@@ -11,7 +11,6 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/golang-jwt/jwt"
 	"ivpn.net/email/api/config"
-	"ivpn.net/email/api/internal/utils"
 )
 
 var (
@@ -33,16 +32,8 @@ func New(cfg config.APIConfig, cache Cache) fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
 		jwtString := GetToken(c)
-		if jwtString == "" {
-			return c.SendStatus(fiber.StatusUnauthorized)
-		}
-
-		jwtHash, err := utils.Hash(jwtString)
-		if err != nil {
-			return c.SendStatus(fiber.StatusUnauthorized)
-		}
-
-		jwtInvalid, _ := cache.Get(c.Context(), "logout_"+jwtHash)
+		jwtSignature := GetTokenSignature(jwtString)
+		jwtInvalid, _ := cache.Get(c.Context(), "logout_"+jwtSignature)
 		if jwtInvalid != "" {
 			return c.SendStatus(fiber.StatusUnauthorized)
 		}
@@ -151,4 +142,13 @@ func GetTokenExp(c *fiber.Ctx) (time.Duration, error) {
 	}
 
 	return time.Until(time.Unix(int64(exp), 0)), nil
+}
+
+func GetTokenSignature(jwt string) string {
+	parts := strings.Split(jwt, ".")
+	if len(parts) != 3 {
+		return ""
+	}
+
+	return parts[2]
 }

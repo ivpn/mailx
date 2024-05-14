@@ -43,7 +43,7 @@ type UserService interface {
 // @Param body body UserReq true "User request"
 // @Success 200 {object} SuccessRes
 // @Failure 500 {object} ErrorRes
-// @Router /register [post]
+// @Router /p/register [post]
 func (h *Handler) Register(c *fiber.Ctx) error {
 	// Parse the request
 	req := UserReq{}
@@ -155,7 +155,7 @@ func (h *Handler) Activate(c *fiber.Ctx) error {
 // @Param body body UserReq true "User request"
 // @Success 200 {object} SuccessRes
 // @Failure 500 {object} ErrorRes
-// @Router /login [post]
+// @Router /p/login [post]
 func (h *Handler) Login(c *fiber.Ctx) error {
 	// Parse the request
 	req := UserReq{}

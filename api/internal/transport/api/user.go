@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"ivpn.net/email/api/internal/middleware/auth"
@@ -19,6 +20,7 @@ var (
 	ActivateUserSuccess   = "Email confirmed"
 	ErrInvalidCredentials = "Invalid credentials"
 	ErrInvalidRequest     = "Invalid request"
+	ErrLogoutUser         = "Could not logout user"
 )
 
 type UserService interface {
@@ -30,7 +32,7 @@ type UserService interface {
 	DeleteUser(context.Context, string) error
 	GetUser(context.Context, string) (model.User, error)
 	GetUserStats(context.Context, string) (model.UserStats, error)
-	LogoutUser(*fiber.Ctx) error
+	LogoutUser(context.Context, string, time.Duration) error
 }
 
 // @Summary Register user
@@ -212,7 +214,16 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 // @Failure 500 {object} ErrorRes
 // @Router /user/logout [post]
 func (h *Handler) Logout(c *fiber.Ctx) error {
-	err := h.Service.LogoutUser(c)
+	jwt := auth.GetToken(c)
+	jwtSignature := auth.GetTokenSignature(jwt)
+	jwtExp, err := auth.GetTokenExp(h.Cfg, c)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": ErrLogoutUser,
+		})
+	}
+
+	err = h.Service.LogoutUser(c.Context(), jwtSignature, jwtExp)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),

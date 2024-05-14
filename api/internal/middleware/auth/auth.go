@@ -118,14 +118,14 @@ func GetToken(c *fiber.Ctx) string {
 	return tokenString
 }
 
-func GetTokenExp(c *fiber.Ctx) (time.Duration, error) {
-	tokenString := GetToken(c)
-	if tokenString == "" {
-		return 0, ErrNoToken
-	}
+func GetTokenExp(cfg config.APIConfig, c *fiber.Ctx) (time.Duration, error) {
+	jwtString := GetToken(c)
+	token, err := jwt.Parse(jwtString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
 
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return nil, nil
+		return []byte(cfg.TokenSecret), nil
 	})
 	if err != nil {
 		return 0, err

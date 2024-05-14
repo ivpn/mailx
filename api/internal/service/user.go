@@ -4,11 +4,10 @@ import (
 	"context"
 	"errors"
 	"log"
+	"time"
 
-	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 	"ivpn.net/email/api/internal/client/mailer"
-	"ivpn.net/email/api/internal/middleware/auth"
 	"ivpn.net/email/api/internal/model"
 	"ivpn.net/email/api/internal/utils"
 )
@@ -235,17 +234,8 @@ func (s *Service) GetUserStats(ctx context.Context, userID string) (model.UserSt
 	return stats, nil
 }
 
-func (s *Service) LogoutUser(c *fiber.Ctx) error {
-	jwt := auth.GetToken(c)
-	jwtSignature := auth.GetTokenSignature(jwt)
-
-	exp, err := auth.GetTokenExp(c)
-	if err != nil {
-		log.Printf("error saving jwt: %s", err.Error())
-		return ErrLogoutUser
-	}
-
-	err = s.Cache.Set(c.Context(), "logout_"+jwtSignature, "true", exp)
+func (s *Service) LogoutUser(ctx context.Context, jwtSignature string, jwtExp time.Duration) error {
+	err := s.Cache.Set(ctx, "logout_"+jwtSignature, "true", jwtExp)
 	if err != nil {
 		log.Printf("error saving jwt: %s", err.Error())
 		return ErrLogoutUser

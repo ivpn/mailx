@@ -328,7 +328,7 @@ paths:
       summary: Get aliases
       tags:
       - alias
-  /login:
+  /p/login:
     post:
       consumes:
       - application/json
@@ -352,6 +352,32 @@ paths:
           schema:
             $ref: '#/definitions/api.ErrorRes'
       summary: Login user
+      tags:
+      - user
+  /p/register:
+    post:
+      consumes:
+      - application/json
+      description: Register user
+      parameters:
+      - description: User request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.UserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Register user
       tags:
       - user
   /recipient:
@@ -518,32 +544,6 @@ paths:
       summary: Get recipients
       tags:
       - recipient
-  /register:
-    post:
-      consumes:
-      - application/json
-      description: Register user
-      parameters:
-      - description: User request
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/api.UserReq'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api.SuccessRes'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/api.ErrorRes'
-      summary: Register user
-      tags:
-      - user
   /settings:
     get:
       consumes:

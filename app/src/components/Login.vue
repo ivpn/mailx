@@ -99,6 +99,6 @@ const login = async () => {
 
 const isLoggedIn = () => {
     const authCookie = getCookie('auth')
-    return authCookie !== ''
+    return authCookie && authCookie !== ''
 }
 </script>

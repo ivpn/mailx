@@ -199,7 +199,7 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 		Name:     auth.AUTH_COOKIE,
 		Value:    token,
 		HTTPOnly: true,
-		Expires:  time.Now().Add(time.Duration(h.Cfg.TokenExpiration) * time.Second),
+		Expires:  time.Now().Add(time.Duration(h.Cfg.TokenExpiration)),
 	})
 
 	return c.Status(200).JSON(fiber.Map{

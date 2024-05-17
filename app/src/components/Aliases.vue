@@ -4,14 +4,14 @@
             <h3 class="text-lg font-bold text-gray-800">
                 Create Aliases
             </h3>
-            <p v-if="recipients.length && settings.recipient" class="my-2 text-gray-500">
+            <p v-if="recipients.length && settings" class="my-2 text-gray-500">
                 To get started, create an alias.
             </p>
             <p v-if="!recipients.length && loaded" class="my-2 text-gray-500">
                 To get started, first add a recipient.
             </p>
             <div class="flex gap-4">
-                <AliasCreate v-if="recipients.length && settings.recipient" @onCreateAlias="getList" :recipients.sync="recipients" :settings.sync="settings" />
+                <AliasCreate v-if="recipients.length && settings" @onCreateAlias="getList" :recipients.sync="recipients" :settings.sync="settings" />
             </div>
         </div>
     </div>

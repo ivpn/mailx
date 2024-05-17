@@ -4,14 +4,14 @@
             <h3 class="text-lg font-bold text-gray-800">
                 Create Aliases
             </h3>
-            <p v-if="recipients.length && settings" class="my-2 text-gray-500">
+            <p v-if="recipients.length && settings.id" class="my-2 text-gray-500">
                 To get started, create an alias.
             </p>
             <p v-if="!recipients.length && loaded" class="my-2 text-gray-500">
                 To get started, first add a recipient.
             </p>
             <div class="flex gap-4">
-                <AliasCreate v-if="recipients.length && settings" @onCreateAlias="getList" :recipients.sync="recipients" :settings.sync="settings" />
+                <AliasCreate v-if="recipients.length && settings.id" @onCreateAlias="getList" :recipients.sync="recipients" :settings.sync="settings" />
             </div>
         </div>
     </div>
@@ -20,7 +20,7 @@
         <h1 v-if="isDashboard" class="text-2xl font-bold text-gray-800 mb-5">Latest Aliases</h1>
         <div>
             <div class="flex items-center justify-between mb-6">
-                <AliasCreate v-if="recipients.length && settings.recipient" @onCreateAlias="getList" :recipients.sync="recipients" :settings.sync="settings" />
+                <AliasCreate v-if="recipients.length && settings.id" @onCreateAlias="getList" :recipients.sync="recipients" :settings.sync="settings" />
             </div>
             <div class="flex flex-col">
                 <div class="-m-1.5 overflow-x-auto">

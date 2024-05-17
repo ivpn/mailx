@@ -117,7 +117,7 @@ func (s *Service) findRecipient(email string) (string, model.Alias, model.Messag
 
 	err = utils.ValidateEmail(respondTo)
 	if err == nil {
-		return respondTo, alias, model.Reply, nil
+		return respondTo, alias, model.Send, nil
 	}
 
 	r := strings.Split(alias.Recipients, ",")[0]

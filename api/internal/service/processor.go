@@ -71,7 +71,7 @@ func (s *Service) queueMessage(from string, to string, data []byte, alias model.
 			return err
 		}
 	} else {
-		err := mailer.Reply(from, to, data)
+		err := mailer.Reply(alias.Name, to, data)
 		if err != nil {
 			log.Println("error sending message", err)
 			return err

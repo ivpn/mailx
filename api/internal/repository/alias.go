@@ -36,19 +36,19 @@ func (d *Database) GetAlias(ctx context.Context, ID string, userID string) (mode
 func (d *Database) GetAliases(ctx context.Context, userID string) ([]model.Alias, error) {
 	aliases := []model.Alias{}
 	query := `
-        SELECT a.*,
-            COALESCE(SUM(CASE WHEN m.type = ? THEN 1 ELSE 0 END), 0) AS forwards,
-            COALESCE(SUM(CASE WHEN m.type = ? THEN 1 ELSE 0 END), 0) AS blocks,
-            COALESCE(SUM(CASE WHEN m.type = ? THEN 1 ELSE 0 END), 0) AS replies,
-            COALESCE(SUM(CASE WHEN m.type = ? THEN 1 ELSE 0 END), 0) AS sends,
-            COALESCE(SUM(m.size), 0) AS bandwidth
-        FROM aliases a
-        LEFT JOIN messages m
+		SELECT a.*,
+			COALESCE(SUM(CASE WHEN m.type = ? THEN 1 ELSE 0 END), 0) AS forwards,
+			COALESCE(SUM(CASE WHEN m.type = ? THEN 1 ELSE 0 END), 0) AS blocks,
+			COALESCE(SUM(CASE WHEN m.type = ? THEN 1 ELSE 0 END), 0) AS replies,
+			COALESCE(SUM(CASE WHEN m.type = ? THEN 1 ELSE 0 END), 0) AS sends,
+			COALESCE(SUM(m.size), 0) AS bandwidth
+		FROM aliases a
+		LEFT JOIN messages m
 		ON a.id = m.alias_id
-		AND a.user_id = ?
-        GROUP BY a.id
+		WHERE a.user_id = ?
+		GROUP BY a.id
 		ORDER BY a.created_at DESC
-    `
+	`
 	rows, err := d.Client.Raw(query, model.Forward, model.Block, model.Reply, model.Send, userID).Rows()
 	if err != nil {
 		return nil, err

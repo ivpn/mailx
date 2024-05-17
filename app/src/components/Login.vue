@@ -4,7 +4,7 @@
         <p class="text-gray-500 text-sm mb-8">Need an account? <a class="text-blue-600 hover:text-blue-700"
                 href="/signup">Sign Up</a></p>
         <form class="w-full max-w-sm bg-white rounded-md px-8 pt-6 pb-8 mb-4" @submit.prevent="login">
-            <div v-if="!isLoggedIn()">
+            <div v-if="!isLoggedIn">
                 <div class="mb-4">
                     <label class="block text-gray-500 text-sm font-semibold mb-2" for="email">
                         Email Address
@@ -32,7 +32,7 @@
                 </div>
                 <p v-if="apiError" class="text-red-600 text-sm mt-6">{{ apiError }}</p>
             </div>
-            <div v-if="isLoggedIn()" class="pb-2">
+            <div v-if="isLoggedIn" class="pb-2">
                 <p class="text-gray-500 mb-6">You are logged in</p>
                 <a href="/"
                     class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md focus:outline-none focus:shadow-outline">
@@ -47,7 +47,6 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import { userApi } from '../api/user.ts'
-import { getCookie } from 'typescript-cookie'
 
 const email = ref('')
 const password = ref('')
@@ -55,6 +54,7 @@ const emailError = ref(false)
 const passwordError = ref(false)
 const apiError = ref('')
 const isLoading = ref(false)
+const isLoggedIn = ref(false)
 
 const validateEmail = () => {
     emailError.value = !email.value
@@ -86,6 +86,8 @@ const login = async () => {
         apiError.value = ''
         if (response.status === 200) {
             // Redirect to the dashboard
+            localStorage.setItem('email', data.email)
+            isLoggedIn.value = true
             window.location.href = '/'
         }
     } catch (error) {
@@ -95,10 +97,5 @@ const login = async () => {
     } finally {
         isLoading.value = false // End loading
     }
-}
-
-const isLoggedIn = () => {
-    const authCookie = getCookie('auth')
-    return authCookie && authCookie !== ''
 }
 </script>

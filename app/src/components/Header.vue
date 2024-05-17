@@ -6,7 +6,7 @@
                 <div class="hs-dropdown relative inline-flex [--placement:bottom-right] my-3">
                     <button id="hs-dropdown-default" type="button"
                         class="flex items-center hs-dropdown-toggle text-gray-500 bg-gray-100 pl-4 pr-3 rounded-md hover:bg-gray-200">
-                        {{ jwt().email }}
+                        {{ getEmail() }}
                         <svg class="ms-1 flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round">
@@ -33,7 +33,6 @@
 
 <script setup lang="ts">
 import Menu from './Menu.vue'
-import { jwt } from '../utils/jwt'
 import dropdown from '@preline/dropdown'
 import { userApi } from '../api/user.ts'
 import { setCookie } from 'typescript-cookie';
@@ -44,11 +43,16 @@ const logout = async () => {
     try {
         await userApi.logout()
         clearCookies()
+        localStorage.removeItem('email')
         window.location.href = '/login'
     } catch { }
 }
 
 const clearCookies = () => {
     setCookie('auth', '')
+}
+
+const getEmail = () => {
+    return localStorage.getItem('email')
 }
 </script>

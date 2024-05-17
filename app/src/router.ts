@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { getCookie } from 'typescript-cookie'
 import Dashboard from './components/Dashboard.vue'
 import QuickActions from './components/QuickActions.vue'
 import Aliases from './components/Aliases.vue'
@@ -72,16 +71,8 @@ const router = createRouter({
     routes
 })
 
-router.beforeEach((to, _, next) => {
+router.beforeEach((to, _) => {
     document.title = to.name as string
-
-    const authCookie = getCookie('auth')
-
-    if (to.path === '/' && !authCookie) {
-        next('/login')
-    } else {
-        next()
-    }
 })
 
 router.afterEach((failure) => {

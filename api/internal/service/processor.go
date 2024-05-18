@@ -23,10 +23,11 @@ var (
 )
 
 type Message struct {
-	From    string
-	To      []string
-	Subject string
-	Body    string
+	From      string
+	To        []string
+	Subject   string
+	Body      string
+	RelayType model.MessageType
 }
 
 func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data []byte) error {
@@ -37,7 +38,7 @@ func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data
 	}
 
 	for _, to := range msg.To {
-		recipient, alias, msgType, err := s.findRecipient(to)
+		recipient, alias, msgType, err := s.findRecipient(to, msg.RelayType)
 		if err != nil {
 			log.Println("error processing message", err)
 			continue
@@ -93,7 +94,7 @@ func (s *Service) saveMessage(alias model.Alias, msgType model.MessageType, data
 	}
 }
 
-func (s *Service) findRecipient(email string) (string, model.Alias, model.MessageType, error) {
+func (s *Service) findRecipient(email string, relayType model.MessageType) (string, model.Alias, model.MessageType, error) {
 	name, respondTo := getRespondTo(email)
 
 	alias, err := s.GetAliasByName(name)
@@ -117,12 +118,17 @@ func (s *Service) findRecipient(email string) (string, model.Alias, model.Messag
 
 	err = utils.ValidateEmail(respondTo)
 	if err == nil {
-		return respondTo, alias, model.Send, nil
+		msgType := model.Send
+		if relayType == model.Reply {
+			msgType = model.Reply
+		}
+
+		return respondTo, alias, msgType, nil
 	}
 
 	r := strings.Split(alias.Recipients, ",")[0]
 
-	return r, alias, model.Forward, nil
+	return r, alias, relayType, nil
 }
 
 func getRespondTo(email string) (string, string) {
@@ -155,11 +161,25 @@ func parseMessage(from string, to []string, data []byte) (Message, error) {
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(msg.Body)
 	body := buf.String()
+	relayType := model.Forward
+
+	if isReply(msg) {
+		relayType = model.Reply
+	}
 
 	return Message{
-		From:    from,
-		To:      to,
-		Subject: subject,
-		Body:    body,
+		From:      from,
+		To:        to,
+		Subject:   subject,
+		Body:      body,
+		RelayType: relayType,
 	}, nil
+}
+
+func isReply(m *mail.Message) bool {
+	if m.Header.Get("In-Reply-To") != "" || m.Header.Get("References") != "" {
+		return true
+	}
+
+	return false
 }

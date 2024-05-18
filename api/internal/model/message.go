@@ -23,7 +23,7 @@ type Message struct {
 	Size      int         `json:"-"`
 }
 
-func ParseRespondTo(email string) (string, string) {
+func ParseReplyTo(email string) (string, string) {
 	alias := email
 
 	// Get respond to email between "+" and "@"
@@ -43,8 +43,8 @@ func ParseRespondTo(email string) (string, string) {
 	return alias, rcp
 }
 
-func GenerateRespondTo(alias, toEmail string) string {
-	replaced := strings.Replace(toEmail, "@", "=", 1)
+func GenerateReplyTo(alias string, to string) string {
+	replaced := strings.Replace(to, "@", "=", 1)
 	email := strings.Replace(alias, "@", "+"+replaced+"@", 1)
 	return email
 }

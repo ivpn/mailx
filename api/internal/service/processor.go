@@ -66,7 +66,7 @@ func (s *Service) queueMessage(from string, to string, data []byte, alias model.
 			"alias": alias.Name,
 			"from":  from,
 		}
-		generatedFrom := model.GenerateRespondTo(alias.Name, from)
+		generatedFrom := model.GenerateReplyTo(alias.Name, from)
 		err := mailer.Forward(generatedFrom, to, data, "header.tmpl", templateData)
 		if err != nil {
 			log.Println("error forwarding message", err)
@@ -96,7 +96,7 @@ func (s *Service) saveMessage(alias model.Alias, msgType model.MessageType, data
 }
 
 func (s *Service) findRecipient(email string, relayType model.MessageType) (string, model.Alias, model.MessageType, error) {
-	name, respondTo := model.ParseRespondTo(email)
+	name, replyTo := model.ParseReplyTo(email)
 
 	alias, err := s.GetAliasByName(name)
 	if err != nil {
@@ -117,14 +117,14 @@ func (s *Service) findRecipient(email string, relayType model.MessageType) (stri
 		return "", model.Alias{}, 0, ErrInactiveSubscription
 	}
 
-	err = utils.ValidateEmail(respondTo)
+	err = utils.ValidateEmail(replyTo)
 	if err == nil {
 		msgType := model.Send
 		if relayType == model.Reply {
 			msgType = model.Reply
 		}
 
-		return respondTo, alias, msgType, nil
+		return replyTo, alias, msgType, nil
 	}
 
 	r := strings.Split(alias.Recipients, ",")[0]

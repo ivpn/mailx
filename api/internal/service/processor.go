@@ -95,7 +95,7 @@ func (s *Service) saveMessage(alias model.Alias, msgType model.MessageType, data
 }
 
 func (s *Service) findRecipient(email string, relayType model.MessageType) (string, model.Alias, model.MessageType, error) {
-	name, respondTo := getRespondTo(email)
+	name, respondTo := model.ParseRespondTo(email)
 
 	alias, err := s.GetAliasByName(name)
 	if err != nil {
@@ -129,26 +129,6 @@ func (s *Service) findRecipient(email string, relayType model.MessageType) (stri
 	r := strings.Split(alias.Recipients, ",")[0]
 
 	return r, alias, relayType, nil
-}
-
-func getRespondTo(email string) (string, string) {
-	alias := email
-
-	// Get respond to email between "+" and "@"
-	rcp := email[strings.Index(email, "+")+1 : strings.Index(email, "@")]
-
-	// Check if respond to email is not empty and contains "="
-	if rcp != "" && strings.Contains(rcp, "=") {
-		// Replace "=" with "@" to get valid respond to email
-		rcp = strings.Replace(rcp, "=", "@", 1)
-
-		// Get alias name up to "+" and domain after "@"
-		alias = email[:strings.Index(email, "+")] + email[strings.Index(email, "@"):]
-	} else {
-		rcp = ""
-	}
-
-	return alias, rcp
 }
 
 func parseMessage(from string, to []string, data []byte) (Message, error) {

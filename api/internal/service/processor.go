@@ -23,10 +23,11 @@ var (
 )
 
 type Message struct {
-	From    string
-	To      []string
-	Subject string
-	Body    string
+	From      string
+	To        []string
+	Subject   string
+	Body      string
+	RelayType model.MessageType
 }
 
 func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data []byte) error {
@@ -37,7 +38,7 @@ func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data
 	}
 
 	for _, to := range msg.To {
-		recipient, alias, msgType, err := s.findRecipient(to)
+		recipient, alias, msgType, err := s.findRecipient(to, msg.RelayType)
 		if err != nil {
 			log.Println("error processing message", err)
 			continue
@@ -65,7 +66,8 @@ func (s *Service) queueMessage(from string, to string, data []byte, alias model.
 			"alias": alias.Name,
 			"from":  from,
 		}
-		err := mailer.Forward(from, to, data, "header.tmpl", templateData)
+		generatedFrom := model.GenerateReplyTo(alias.Name, from)
+		err := mailer.Forward(generatedFrom, to, data, "header.tmpl", templateData)
 		if err != nil {
 			log.Println("error forwarding message", err)
 			return err
@@ -93,8 +95,8 @@ func (s *Service) saveMessage(alias model.Alias, msgType model.MessageType, data
 	}
 }
 
-func (s *Service) findRecipient(email string) (string, model.Alias, model.MessageType, error) {
-	name, respondTo := getRespondTo(email)
+func (s *Service) findRecipient(email string, relayType model.MessageType) (string, model.Alias, model.MessageType, error) {
+	name, replyTo := model.ParseReplyTo(email)
 
 	alias, err := s.GetAliasByName(name)
 	if err != nil {
@@ -115,34 +117,19 @@ func (s *Service) findRecipient(email string) (string, model.Alias, model.Messag
 		return "", model.Alias{}, 0, ErrInactiveSubscription
 	}
 
-	err = utils.ValidateEmail(respondTo)
+	err = utils.ValidateEmail(replyTo)
 	if err == nil {
-		return respondTo, alias, model.Reply, nil
+		msgType := model.Send
+		if relayType == model.Reply {
+			msgType = model.Reply
+		}
+
+		return replyTo, alias, msgType, nil
 	}
 
 	r := strings.Split(alias.Recipients, ",")[0]
 
-	return r, alias, model.Forward, nil
-}
-
-func getRespondTo(email string) (string, string) {
-	alias := email
-
-	// Get respond to email between "+" and "@"
-	rcp := email[strings.Index(email, "+")+1 : strings.Index(email, "@")]
-
-	// Check if respond to email is not empty and contains "="
-	if rcp != "" && strings.Contains(rcp, "=") {
-		// Replace "=" with "@" to get valid respond to email
-		rcp = strings.Replace(rcp, "=", "@", 1)
-
-		// Get alias name up to "+" and domain after "@"
-		alias = email[:strings.Index(email, "+")] + email[strings.Index(email, "@"):]
-	} else {
-		rcp = ""
-	}
-
-	return alias, rcp
+	return r, alias, relayType, nil
 }
 
 func parseMessage(from string, to []string, data []byte) (Message, error) {
@@ -155,11 +142,25 @@ func parseMessage(from string, to []string, data []byte) (Message, error) {
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(msg.Body)
 	body := buf.String()
+	relayType := model.Forward
+
+	if isReply(msg) {
+		relayType = model.Reply
+	}
 
 	return Message{
-		From:    from,
-		To:      to,
-		Subject: subject,
-		Body:    body,
+		From:      from,
+		To:        to,
+		Subject:   subject,
+		Body:      body,
+		RelayType: relayType,
 	}, nil
+}
+
+func isReply(m *mail.Message) bool {
+	if m.Header.Get("In-Reply-To") != "" || m.Header.Get("References") != "" {
+		return true
+	}
+
+	return false
 }

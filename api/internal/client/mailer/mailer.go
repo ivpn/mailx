@@ -58,7 +58,7 @@ func (mailer Mailer) Reply(from string, name string, to string, data []byte) err
 	}
 
 	m := gomail.NewMessage()
-	m.SetHeader("From", from, name)
+	m.SetAddressHeader("From", from, name)
 	m.SetHeader("To", to)
 	m.SetHeader("Subject", email.Subject)
 	m.SetBody("text/plain", email.TextBody)
@@ -120,7 +120,7 @@ func (mailer Mailer) Forward(from string, name string, to string, data []byte, t
 	}
 
 	m := gomail.NewMessage()
-	m.SetHeader("From", from, name)
+	m.SetAddressHeader("From", from, name)
 	m.SetHeader("To", to)
 	m.SetHeader("Subject", email.Subject)
 	m.SetBody("text/plain", header.String()+email.TextBody)

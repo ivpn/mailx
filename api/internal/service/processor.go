@@ -67,13 +67,13 @@ func (s *Service) queueMessage(from string, to string, data []byte, alias model.
 			"from":  from,
 		}
 		generatedFrom := model.GenerateReplyTo(alias.Name, from)
-		err := mailer.Forward(generatedFrom, to, data, "header.tmpl", templateData)
+		err := mailer.Forward(generatedFrom, alias.FromName, to, data, "header.tmpl", templateData)
 		if err != nil {
 			log.Println("error forwarding message", err)
 			return err
 		}
 	} else {
-		err := mailer.Reply(alias.Name, to, data)
+		err := mailer.Reply(alias.Name, alias.FromName, to, data)
 		if err != nil {
 			log.Println("error sending message", err)
 			return err

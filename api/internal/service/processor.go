@@ -44,8 +44,14 @@ func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data
 			continue
 		}
 
+		settings, err := s.GetSettings(context.Background(), alias.UserID)
+		if err != nil {
+			log.Println("error getting settings", err)
+			continue
+		}
+
 		utils.Background(func() {
-			err = s.queueMessage(from, recipient, data, alias, msgType)
+			err = s.queueMessage(from, settings.FromName, recipient, data, alias, msgType)
 			if err != nil {
 				log.Println("error queueing message", err)
 				return
@@ -58,8 +64,13 @@ func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data
 	return err
 }
 
-func (s *Service) queueMessage(from string, to string, data []byte, alias model.Alias, msgType model.MessageType) error {
+func (s *Service) queueMessage(from string, settingsFromName string, to string, data []byte, alias model.Alias, msgType model.MessageType) error {
 	mailer := mailer.New(s.Cfg.SMTPClient)
+
+	name := alias.FromName
+	if name == "" {
+		name = settingsFromName
+	}
 
 	if msgType == model.Forward {
 		templateData := map[string]interface{}{
@@ -67,13 +78,13 @@ func (s *Service) queueMessage(from string, to string, data []byte, alias model.
 			"from":  from,
 		}
 		generatedFrom := model.GenerateReplyTo(alias.Name, from)
-		err := mailer.Forward(generatedFrom, to, data, "header.tmpl", templateData)
+		err := mailer.Forward(generatedFrom, name, to, data, "header.tmpl", templateData)
 		if err != nil {
 			log.Println("error forwarding message", err)
 			return err
 		}
 	} else {
-		err := mailer.Reply(alias.Name, to, data)
+		err := mailer.Reply(alias.Name, name, to, data)
 		if err != nil {
 			log.Println("error sending message", err)
 			return err

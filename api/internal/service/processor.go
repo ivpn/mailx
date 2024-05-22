@@ -24,6 +24,7 @@ var (
 
 type Message struct {
 	From      string
+	FromName  string
 	To        []string
 	Subject   string
 	Body      string
@@ -51,7 +52,7 @@ func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data
 		}
 
 		utils.Background(func() {
-			err = s.queueMessage(from, settings.FromName, recipient, data, alias, msgType)
+			err = s.queueMessage(from, msg.FromName, settings.FromName, recipient, data, alias, msgType)
 			if err != nil {
 				log.Println("error queueing message", err)
 				return
@@ -64,26 +65,28 @@ func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data
 	return err
 }
 
-func (s *Service) queueMessage(from string, settingsFromName string, to string, data []byte, alias model.Alias, msgType model.MessageType) error {
+func (s *Service) queueMessage(from string, fromName string, settingsFromName string, to string, data []byte, alias model.Alias, msgType model.MessageType) error {
 	mailer := mailer.New(s.Cfg.SMTPClient)
 
-	name := alias.FromName
-	if name == "" {
-		name = settingsFromName
-	}
-
+	// Forward message
 	if msgType == model.Forward {
 		templateData := map[string]interface{}{
 			"alias": alias.Name,
 			"from":  from,
 		}
 		generatedFrom := model.GenerateReplyTo(alias.Name, from)
-		err := mailer.Forward(generatedFrom, name, to, data, "header.tmpl", templateData)
+		err := mailer.Forward(generatedFrom, fromName, to, data, "header.tmpl", templateData)
 		if err != nil {
 			log.Println("error forwarding message", err)
 			return err
 		}
 	} else {
+		// Reply message
+		name := alias.FromName
+		if name == "" {
+			name = settingsFromName
+		}
+
 		err := mailer.Reply(alias.Name, name, to, data)
 		if err != nil {
 			log.Println("error sending message", err)
@@ -155,12 +158,20 @@ func parseMessage(from string, to []string, data []byte) (Message, error) {
 	body := buf.String()
 	relayType := model.Forward
 
+	fromHeader := msg.Header.Get("From")
+	fromAddress, err := mail.ParseAddress(fromHeader)
+	if err != nil {
+		return Message{}, err
+	}
+	fromName := fromAddress.Name
+
 	if isReply(msg) {
 		relayType = model.Reply
 	}
 
 	return Message{
 		From:      from,
+		FromName:  fromName,
 		To:        to,
 		Subject:   subject,
 		Body:      body,

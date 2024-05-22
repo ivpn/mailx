@@ -20,7 +20,7 @@ func send(cfg config.SMTPConfig) {
 	err := smtp.SendMail(
 		cfg.Host+":"+cfg.Port,
 		nil,
-		"sender@example.com",
+		"foo@bar.com",
 		[]string{"white.fog68@example.com"},
 		[]byte(
 			"From: Foo Bar <foo@bar.com>\r\n"+

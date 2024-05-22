@@ -22,13 +22,20 @@ var (
 	ErrInactiveRecipient    = errors.New("inactive recipient")
 )
 
-type Message struct {
-	From      string
-	FromName  string
-	To        []string
-	Subject   string
-	Body      string
-	RelayType model.MessageType
+type MsgType int
+
+const (
+	Reply MsgType = 2
+	Send  MsgType = 3
+)
+
+type Msg struct {
+	From     string
+	FromName string
+	To       []string
+	Subject  string
+	Body     string
+	Type     MsgType
 }
 
 func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data []byte) error {
@@ -39,7 +46,7 @@ func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data
 	}
 
 	for _, to := range msg.To {
-		recipient, alias, msgType, err := s.findRecipient(to, msg.RelayType)
+		recipient, alias, relayType, err := s.findRecipient(to, msg.Type)
 		if err != nil {
 			log.Println("error processing message", err)
 			continue
@@ -52,13 +59,13 @@ func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data
 		}
 
 		utils.Background(func() {
-			err = s.queueMessage(from, msg.FromName, settings.FromName, recipient, data, alias, msgType)
+			err = s.queueMessage(from, msg.FromName, settings.FromName, recipient, data, alias, relayType)
 			if err != nil {
 				log.Println("error queueing message", err)
 				return
 			}
 
-			s.saveMessage(alias, msgType, data)
+			s.saveMessage(alias, relayType, data)
 		})
 	}
 
@@ -68,7 +75,7 @@ func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data
 func (s *Service) queueMessage(from string, fromName string, settingsFromName string, to string, data []byte, alias model.Alias, msgType model.MessageType) error {
 	mailer := mailer.New(s.Cfg.SMTPClient)
 
-	// Forward message
+	// Forward
 	if msgType == model.Forward {
 		templateData := map[string]interface{}{
 			"alias": alias.Name,
@@ -81,7 +88,7 @@ func (s *Service) queueMessage(from string, fromName string, settingsFromName st
 			return err
 		}
 	} else {
-		// Reply message
+		// Reply | Send
 		name := alias.FromName
 		if name == "" {
 			name = settingsFromName
@@ -109,7 +116,7 @@ func (s *Service) saveMessage(alias model.Alias, msgType model.MessageType, data
 	}
 }
 
-func (s *Service) findRecipient(email string, relayType model.MessageType) (string, model.Alias, model.MessageType, error) {
+func (s *Service) findRecipient(email string, msgType MsgType) (string, model.Alias, model.MessageType, error) {
 	name, replyTo := model.ParseReplyTo(email)
 
 	alias, err := s.GetAliasByName(name)
@@ -118,6 +125,7 @@ func (s *Service) findRecipient(email string, relayType model.MessageType) (stri
 	}
 
 	if !alias.Enabled {
+		// Block
 		s.saveMessage(alias, model.Block, []byte{})
 		return "", model.Alias{}, 0, ErrDisabledAlias
 	}
@@ -133,49 +141,44 @@ func (s *Service) findRecipient(email string, relayType model.MessageType) (stri
 
 	err = utils.ValidateEmail(replyTo)
 	if err == nil {
-		msgType := model.Send
-		if relayType == model.Reply {
-			msgType = model.Reply
-		}
-
-		return replyTo, alias, msgType, nil
+		return replyTo, alias, model.MessageType(msgType), nil
 	}
 
 	r := strings.Split(alias.Recipients, ",")[0]
 
-	return r, alias, relayType, nil
+	return r, alias, model.Forward, nil
 }
 
-func parseMessage(from string, to []string, data []byte) (Message, error) {
+func parseMessage(from string, to []string, data []byte) (Msg, error) {
 	msg, err := mail.ReadMessage(bytes.NewReader(data))
 	if err != nil {
-		return Message{}, err
+		return Msg{}, err
 	}
 
 	subject := msg.Header.Get("Subject")
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(msg.Body)
 	body := buf.String()
-	relayType := model.Forward
+	msgType := Send
 
 	fromHeader := msg.Header.Get("From")
 	fromAddress, err := mail.ParseAddress(fromHeader)
 	if err != nil {
-		return Message{}, err
+		return Msg{}, err
 	}
 	fromName := fromAddress.Name
 
 	if isReply(msg) {
-		relayType = model.Reply
+		msgType = Reply
 	}
 
-	return Message{
-		From:      from,
-		FromName:  fromName,
-		To:        to,
-		Subject:   subject,
-		Body:      body,
-		RelayType: relayType,
+	return Msg{
+		From:     from,
+		FromName: fromName,
+		To:       to,
+		Subject:  subject,
+		Body:     body,
+		Type:     msgType,
 	}, nil
 }
 

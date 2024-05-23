@@ -17,8 +17,9 @@ import (
 var templateFS embed.FS
 
 type Mailer struct {
-	dialer *gomail.Dialer
-	Sender string
+	dialer     *gomail.Dialer
+	Sender     string
+	SenderName string
 }
 
 func New(cfg config.SMTPClientConfig) Mailer {
@@ -35,7 +36,7 @@ func New(cfg config.SMTPClientConfig) Mailer {
 
 func (mailer Mailer) Send(to string, subject string, body string) error {
 	m := gomail.NewMessage()
-	m.SetHeader("From", mailer.Sender)
+	m.SetAddressHeader("From", mailer.Sender, mailer.SenderName)
 	m.SetHeader("To", to)
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/plain", body)

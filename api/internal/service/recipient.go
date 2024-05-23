@@ -111,6 +111,7 @@ func (s *Service) PostRecipient(ctx context.Context, recipient model.Recipient) 
 	utils.Background(func() {
 		mailer := mailer.New(s.Cfg.SMTPClient)
 		mailer.Sender = s.Cfg.SMTPClient.Sender
+		mailer.SenderName = s.Cfg.SMTPClient.SenderName
 		err = mailer.Send(recipient.Email, "Activate recipient", otp.Secret)
 		if err != nil {
 			log.Printf("error creating recipient: %s", err.Error())
@@ -142,6 +143,7 @@ func (s *Service) SendRecipientOTP(ctx context.Context, ID string, userID string
 	utils.Background(func() {
 		mailer := mailer.New(s.Cfg.SMTPClient)
 		mailer.Sender = s.Cfg.SMTPClient.Sender
+		mailer.SenderName = s.Cfg.SMTPClient.SenderName
 		err = mailer.Send(recipient.Email, "Activate recipient", otp.Secret)
 		if err != nil {
 			log.Printf("error sending OTP: %s", err.Error())

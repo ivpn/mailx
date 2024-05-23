@@ -40,11 +40,12 @@ type RedisConfig struct {
 }
 
 type SMTPClientConfig struct {
-	Host     string
-	Port     string
-	User     string
-	Password string
-	Sender   string
+	Host       string
+	Port       string
+	User       string
+	Password   string
+	Sender     string
+	SenderName string
 }
 
 type ServiceConfig struct {
@@ -109,11 +110,12 @@ func New() (Config, error) {
 			Addr: os.Getenv("REDIS_ADDR"),
 		},
 		SMTPClient: SMTPClientConfig{
-			Host:     os.Getenv("SMTP_CLIENT_HOST"),
-			Port:     os.Getenv("SMTP_CLIENT_PORT"),
-			User:     os.Getenv("SMTP_CLIENT_USER"),
-			Password: os.Getenv("SMTP_CLIENT_PASSWORD"),
-			Sender:   os.Getenv("SMTP_CLIENT_SENDER"),
+			Host:       os.Getenv("SMTP_CLIENT_HOST"),
+			Port:       os.Getenv("SMTP_CLIENT_PORT"),
+			User:       os.Getenv("SMTP_CLIENT_USER"),
+			Password:   os.Getenv("SMTP_CLIENT_PASSWORD"),
+			Sender:     os.Getenv("SMTP_CLIENT_SENDER"),
+			SenderName: os.Getenv("SMTP_CLIENT_SENDER_NAME"),
 		},
 		Service: ServiceConfig{
 			OTPExpiration:    otpExp,

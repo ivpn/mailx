@@ -117,9 +117,14 @@ func (s *Service) PostUser(ctx context.Context, user model.User) error {
 	}
 
 	utils.Background(func() {
+		data := map[string]interface{}{
+			"otp":  otp.Secret,
+			"from": s.Cfg.SMTPClient.SenderName,
+		}
 		mailer := mailer.New(s.Cfg.SMTPClient)
 		mailer.Sender = s.Cfg.SMTPClient.Sender
-		err = mailer.Send(user.Email, "Activate your account", otp.Secret)
+		mailer.SenderName = s.Cfg.SMTPClient.SenderName
+		err = mailer.SendTemplate(user.Email, "["+mailer.SenderName+"] OTP to activate account", "otp_account.tmpl", data)
 		if err != nil {
 			log.Printf("error creating user: %s", err.Error())
 		}
@@ -148,9 +153,14 @@ func (s *Service) SendUserOTP(ctx context.Context, userID string) error {
 	}
 
 	utils.Background(func() {
+		data := map[string]interface{}{
+			"otp":  otp.Secret,
+			"from": s.Cfg.SMTPClient.SenderName,
+		}
 		mailer := mailer.New(s.Cfg.SMTPClient)
 		mailer.Sender = s.Cfg.SMTPClient.Sender
-		err = mailer.Send(user.Email, "Activate your account", otp.Secret)
+		mailer.SenderName = s.Cfg.SMTPClient.SenderName
+		err = mailer.SendTemplate(user.Email, "["+mailer.SenderName+"] OTP to activate account", "otp_account.tmpl", data)
 		if err != nil {
 			log.Printf("error sending OTP: %s", err.Error())
 		}

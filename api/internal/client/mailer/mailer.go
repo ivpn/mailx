@@ -17,8 +17,9 @@ import (
 var templateFS embed.FS
 
 type Mailer struct {
-	dialer *gomail.Dialer
-	Sender string
+	dialer     *gomail.Dialer
+	Sender     string
+	SenderName string
 }
 
 func New(cfg config.SMTPClientConfig) Mailer {
@@ -35,7 +36,7 @@ func New(cfg config.SMTPClientConfig) Mailer {
 
 func (mailer Mailer) Send(to string, subject string, body string) error {
 	m := gomail.NewMessage()
-	m.SetHeader("From", mailer.Sender)
+	m.SetAddressHeader("From", mailer.Sender, mailer.SenderName)
 	m.SetHeader("To", to)
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/plain", body)
@@ -154,5 +155,39 @@ func (mailer Mailer) Forward(from string, name string, to string, data []byte, t
 	}
 
 	log.Println("Email forward sent successfully")
+	return nil
+}
+
+func (mailer Mailer) SendTemplate(to string, subject string, templateFile string, templateData interface{}) error {
+	tmpl, err := template.New("email").ParseFS(templateFS, "templates/"+templateFile)
+	if err != nil {
+		return err
+	}
+
+	body := new(bytes.Buffer)
+	err = tmpl.ExecuteTemplate(body, "body", templateData)
+	if err != nil {
+		return err
+	}
+
+	bodyHtml := new(bytes.Buffer)
+	err = tmpl.ExecuteTemplate(bodyHtml, "bodyHtml", templateData)
+	if err != nil {
+		return err
+	}
+
+	m := gomail.NewMessage()
+	m.SetAddressHeader("From", mailer.Sender, mailer.SenderName)
+	m.SetHeader("To", to)
+	m.SetHeader("Subject", subject)
+	m.SetBody("text/plain", body.String())
+	m.AddAlternative("text/html", bodyHtml.String())
+
+	err = mailer.dialer.DialAndSend(m)
+	if err != nil {
+		return err
+	}
+
+	log.Println("Email template sent successfully")
 	return nil
 }

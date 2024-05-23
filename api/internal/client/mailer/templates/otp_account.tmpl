@@ -1,0 +1,12 @@
+{{define "body"}}
+Here is the OTP token to verify your account email address: {{.otp}}
+
+Accounts with unconfirmed email address may be deleted after 7 days.
+{{end}}
+
+{{define "bodyHtml"}}
+Here is the OTP token to verify your account email address:<br><br>
+<h2><b>{{.otp}}</b></h2>
+<br>
+Accounts with unconfirmed email address may be deleted after 7 days.
+{{end}}

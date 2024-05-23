@@ -1,0 +1,12 @@
+{{define "body"}}
+Here is the OTP token to verify your recipient email address: {{.otp}}
+
+Note: Unverified recipients will not receive any forwarded emails and may be deleted after 7 days.
+{{end}}
+
+{{define "bodyHtml"}}
+Here is the OTP token to verify your recipient email address:<br><br>
+<h2><b>{{.otp}}</b></h2>
+<br>
+Note: Unverified recipients will not receive any forwarded emails and may be deleted after 7 days.
+{{end}}

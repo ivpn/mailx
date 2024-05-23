@@ -13,6 +13,7 @@ api.interceptors.response.use(
         if (error.response && error.response.status === 401) {
             // Handle the 401 error
             setCookie('auth', '')
+            localStorage.removeItem('email')
             window.location.href = '/login'
         }
         return Promise.reject(error)

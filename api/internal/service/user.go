@@ -117,7 +117,10 @@ func (s *Service) PostUser(ctx context.Context, user model.User) error {
 	}
 
 	utils.Background(func() {
-		data := map[string]interface{}{"otp": otp.Secret}
+		data := map[string]interface{}{
+			"otp":  otp.Secret,
+			"from": s.Cfg.SMTPClient.SenderName,
+		}
 		mailer := mailer.New(s.Cfg.SMTPClient)
 		mailer.Sender = s.Cfg.SMTPClient.Sender
 		mailer.SenderName = s.Cfg.SMTPClient.SenderName
@@ -150,7 +153,10 @@ func (s *Service) SendUserOTP(ctx context.Context, userID string) error {
 	}
 
 	utils.Background(func() {
-		data := map[string]interface{}{"otp": otp.Secret}
+		data := map[string]interface{}{
+			"otp":  otp.Secret,
+			"from": s.Cfg.SMTPClient.SenderName,
+		}
 		mailer := mailer.New(s.Cfg.SMTPClient)
 		mailer.Sender = s.Cfg.SMTPClient.Sender
 		mailer.SenderName = s.Cfg.SMTPClient.SenderName

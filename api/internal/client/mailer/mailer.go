@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"strconv"
+	"strings"
 
 	"github.com/DusanKasan/parsemail"
 	"gopkg.in/gomail.v2"
@@ -60,7 +61,7 @@ func (mailer Mailer) Reply(from string, name string, to string, data []byte) err
 
 	// check if email.HTMLBody is empty
 	if email.HTMLBody == "" {
-		email.HTMLBody = email.TextBody
+		email.HTMLBody = strings.Replace(email.TextBody, "\n", "<br>", -1)
 	}
 
 	m := gomail.NewMessage()
@@ -127,7 +128,7 @@ func (mailer Mailer) Forward(from string, name string, to string, data []byte, t
 
 	// check if email.HTMLBody is empty
 	if email.HTMLBody == "" {
-		email.HTMLBody = email.TextBody
+		email.HTMLBody = strings.Replace(email.TextBody, "\n", "<br>", -1)
 	}
 
 	m := gomail.NewMessage()

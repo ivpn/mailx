@@ -99,7 +99,7 @@ const postRecipient = async () => {
         close()
     } catch (err) {
         if (axios.isAxiosError(err)) {
-            error.value = err.message
+            error.value = err.response?.data.error
         }
     }
 }

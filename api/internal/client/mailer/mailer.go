@@ -58,6 +58,11 @@ func (mailer Mailer) Reply(from string, name string, to string, data []byte) err
 		return err
 	}
 
+	// check if email.HTMLBody is empty
+	if email.HTMLBody == "" {
+		email.HTMLBody = email.TextBody
+	}
+
 	m := gomail.NewMessage()
 	m.SetAddressHeader("From", from, name)
 	m.SetHeader("To", to)
@@ -118,6 +123,11 @@ func (mailer Mailer) Forward(from string, name string, to string, data []byte, t
 	err = tmpl.ExecuteTemplate(headerHtml, "headerHtml", templateData)
 	if err != nil {
 		return err
+	}
+
+	// check if email.HTMLBody is empty
+	if email.HTMLBody == "" {
+		email.HTMLBody = email.TextBody
 	}
 
 	m := gomail.NewMessage()

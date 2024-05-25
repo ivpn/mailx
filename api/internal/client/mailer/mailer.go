@@ -3,6 +3,7 @@ package mailer
 import (
 	"bytes"
 	"embed"
+	"html"
 	"html/template"
 	"io"
 	"log"
@@ -59,9 +60,8 @@ func (mailer Mailer) Reply(from string, name string, to string, data []byte) err
 		return err
 	}
 
-	// check if email.HTMLBody is empty
 	if email.HTMLBody == "" {
-		email.HTMLBody = strings.Replace(email.TextBody, "\n", "<br>", -1)
+		email.HTMLBody = plainTextToHTML(email.TextBody)
 	}
 
 	m := gomail.NewMessage()
@@ -126,9 +126,8 @@ func (mailer Mailer) Forward(from string, name string, to string, data []byte, t
 		return err
 	}
 
-	// check if email.HTMLBody is empty
 	if email.HTMLBody == "" {
-		email.HTMLBody = strings.Replace(email.TextBody, "\n", "<br>", -1)
+		email.HTMLBody = plainTextToHTML(email.TextBody)
 	}
 
 	m := gomail.NewMessage()
@@ -201,4 +200,10 @@ func (mailer Mailer) SendTemplate(to string, subject string, templateFile string
 
 	log.Println("Email template sent successfully")
 	return nil
+}
+
+func plainTextToHTML(text string) string {
+	escaped := html.EscapeString(text)
+	html := strings.ReplaceAll(escaped, "\n", "<br>")
+	return html
 }

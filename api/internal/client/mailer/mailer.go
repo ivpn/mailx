@@ -3,16 +3,15 @@ package mailer
 import (
 	"bytes"
 	"embed"
-	"html"
 	"html/template"
 	"io"
 	"log"
 	"strconv"
-	"strings"
 
 	"github.com/DusanKasan/parsemail"
 	"gopkg.in/gomail.v2"
 	"ivpn.net/email/api/config"
+	"ivpn.net/email/api/internal/model"
 )
 
 //go:embed templates/*
@@ -61,7 +60,7 @@ func (mailer Mailer) Reply(from string, name string, to string, data []byte) err
 	}
 
 	if email.HTMLBody == "" {
-		email.HTMLBody = plainTextToHTML(email.TextBody)
+		email.HTMLBody = model.PlainTextToHTML(email.TextBody)
 	}
 
 	m := gomail.NewMessage()
@@ -127,7 +126,7 @@ func (mailer Mailer) Forward(from string, name string, to string, data []byte, t
 	}
 
 	if email.HTMLBody == "" {
-		email.HTMLBody = plainTextToHTML(email.TextBody)
+		email.HTMLBody = model.PlainTextToHTML(email.TextBody)
 	}
 
 	m := gomail.NewMessage()
@@ -200,10 +199,4 @@ func (mailer Mailer) SendTemplate(to string, subject string, templateFile string
 
 	log.Println("Email template sent successfully")
 	return nil
-}
-
-func plainTextToHTML(text string) string {
-	escaped := html.EscapeString(text)
-	html := strings.ReplaceAll(escaped, "\n", "<br>")
-	return html
 }

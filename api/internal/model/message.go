@@ -1,6 +1,7 @@
 package model
 
 import (
+	"html"
 	"strings"
 	"time"
 )
@@ -47,4 +48,10 @@ func GenerateReplyTo(alias string, to string) string {
 	replaced := strings.Replace(to, "@", "=", 1)
 	email := strings.Replace(alias, "@", "+"+replaced+"@", 1)
 	return email
+}
+
+func PlainTextToHTML(text string) string {
+	escaped := html.EscapeString(text)
+	html := strings.ReplaceAll(escaped, "\n", "<br>")
+	return html
 }

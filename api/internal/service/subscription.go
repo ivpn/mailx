@@ -10,10 +10,10 @@ import (
 )
 
 var (
-	ErrGetSubscriptionByName = errors.New("could not get subscription by user ID")
-	ErrPostSubscription      = errors.New("could not post subscription")
-	ErrUpdateSubscription    = errors.New("could not update subscription")
-	ErrDeleteSubscription    = errors.New("could not delete subscription")
+	ErrGetSubscription    = errors.New("could not get subscription by user ID")
+	ErrPostSubscription   = errors.New("could not post subscription")
+	ErrUpdateSubscription = errors.New("could not update subscription")
+	ErrDeleteSubscription = errors.New("could not delete subscription")
 )
 
 type SubscriptionStore interface {
@@ -26,7 +26,7 @@ type SubscriptionStore interface {
 func (s *Service) GetSubscription(ctx context.Context, userID string) (model.Subscription, error) {
 	subscription, err := s.Store.GetSubscription(ctx, userID)
 	if err != nil {
-		return model.Subscription{}, err
+		return model.Subscription{}, ErrGetSubscription
 	}
 
 	return subscription, nil

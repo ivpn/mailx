@@ -249,7 +249,7 @@ func (h *Handler) Logout(c *fiber.Ctx) error {
 // @Param body body DeleteUserReq true "Delete user request"
 // @Success 200 {object} SuccessRes
 // @Failure 500 {object} ErrorRes
-// @Router /user/delete [delete]
+// @Router /user/delete [post]
 func (h *Handler) DeleteUser(c *fiber.Ctx) error {
 	ID := auth.GetUserID(c)
 

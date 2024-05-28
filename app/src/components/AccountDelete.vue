@@ -12,7 +12,7 @@
                 v-model="password"
                 v-bind:class="{ 'border-red-600': passwordError }"
                 class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-blue-600 mb-2"
-                id="account-password" type="text" autocomplete="current-password">
+                id="account-password" type="password">
             <p v-if="passwordError" class="text-red-600 text-sm mb-2">Required field</p>
         </div>
         <div class="mb-3 max-w-xs">
@@ -22,7 +22,8 @@
                 type="submit">
                 Delete Account
             </button>
-        </div>    
+        </div>
+        <p v-if="error" class="text-red-600 text-sm mb-3">Error: {{ error }}</p>
     </div>
 </template>
 
@@ -53,12 +54,12 @@ const deleteAccount = async () => {
 
     try {
         await userApi.delete(req)
-        window.location.href = '/login'
+        alert('Account is deleted successfully. You will be logged out.')
+        userApi.clearSession()
     } catch (err) {
         if (axios.isAxiosError(err)) {
-            error.value = err.response?.data.message
+            error.value = err.response?.data.error || err.message
         }
     }
 }
-
 </script>

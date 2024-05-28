@@ -35,21 +35,14 @@
 import Menu from './Menu.vue'
 import dropdown from '@preline/dropdown'
 import { userApi } from '../api/user.ts'
-import { setCookie } from 'typescript-cookie';
 
 dropdown.autoInit
 
 const logout = async () => {
     try {
         await userApi.logout()
-        clearCookies()
-        localStorage.removeItem('email')
-        window.location.href = '/login'
+        userApi.clearSession()
     } catch { }
-}
-
-const clearCookies = () => {
-    setCookie('auth', '')
 }
 
 const getEmail = () => {

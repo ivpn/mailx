@@ -691,7 +691,7 @@ paths:
       tags:
       - user
   /user/delete:
-    delete:
+    post:
       consumes:
       - application/json
       description: Delete user

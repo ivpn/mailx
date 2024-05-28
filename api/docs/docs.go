@@ -808,7 +808,7 @@ const docTemplate = `{
             }
         },
         "/user/delete": {
-            "delete": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []

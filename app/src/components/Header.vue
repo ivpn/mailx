@@ -35,8 +35,7 @@
 import Menu from './Menu.vue'
 import dropdown from '@preline/dropdown'
 import { userApi } from '../api/user.ts'
-
-dropdown.autoInit
+import { onMounted } from 'vue';
 
 const logout = async () => {
     try {
@@ -48,4 +47,8 @@ const logout = async () => {
 const getEmail = () => {
     return localStorage.getItem('email')
 }
+
+onMounted(() => {
+    dropdown.autoInit()
+})
 </script>

@@ -88,9 +88,9 @@ const login = async () => {
             localStorage.setItem('email', data.email)
             window.location.href = '/'
         }
-    } catch (error) {
-        if (axios.isAxiosError(error)) {
-            apiError.value = error.response?.data.error
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            apiError.value = err.response?.data.error || err.message
         }
     } finally {
         isLoading.value = false // End loading

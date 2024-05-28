@@ -94,10 +94,10 @@ const register = async () => {
         const response = await userApi.register(data)
         apiSuccess.value = response.data.message
         apiError.value = ''
-    } catch (error) {
+    } catch (err) {
         apiSuccess.value = ''
-        if (axios.isAxiosError(error)) {
-            apiError.value = error.response?.data.error
+        if (axios.isAxiosError(err)) {
+            apiError.value = err.response?.data.error || err.message
         }
     } finally {
         isLoading.value = false // End loading

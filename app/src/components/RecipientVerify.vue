@@ -100,8 +100,7 @@ const verifyRecipient = async () => {
         close()
     } catch (err) {
         if (axios.isAxiosError(err)) {
-            console.log(err.response?.data.error)
-            error.value = err.response?.data.error
+            error.value = err.response?.data.error || err.message
         }
     }
 }
@@ -114,7 +113,7 @@ const sendOtp = async () => {
     } catch (err) {
         if (axios.isAxiosError(err)) {
             resendSuccess.value = ''
-            error.value = err.response?.data.error
+            error.value = err.response?.data.error || err.message
         }
     }
 }

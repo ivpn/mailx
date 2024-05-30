@@ -18,6 +18,10 @@
 - Tailwind (Styling)
 - Docker (Containerization)
 
+## Requirements
+
+- Docker
+
 ## Run locally
 
 ### Move to api directory

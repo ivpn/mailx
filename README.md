@@ -42,7 +42,7 @@ docker compose build
 
 ### Run
 ```bash
-docker compose up
+docker compose up -d
 ```
 
 API: http://localhost:3000  

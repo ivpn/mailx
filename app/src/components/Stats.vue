@@ -115,16 +115,19 @@ function getLast7DaysCounts(messages: Message[]): CountData[] {
     }
 
     const now = new Date()
+    const nowDay = (now).toLocaleDateString('en-US', { weekday: 'short' })
     const sevenDaysAgo = new Date(now)
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
 
     messages.forEach((msg) => {
         const messageDate = new Date(msg.created_at)
         const messageDay = (messageDate).toLocaleDateString('en-US', { weekday: 'short' })
-        const dayIndex = last7Days.indexOf(messageDay)
 
+        if (nowDay === messageDay && now.getDate() !== messageDate.getDate()) return
+        
         if (messageDate >= sevenDaysAgo) {
             const typeIndex = msg.type
+            const dayIndex = last7Days.indexOf(messageDay)
 
             if (typeIndex >= 0 && typeIndex < 4 && dayIndex >= 0 && dayIndex < 7) {
                 days[typeNames[typeIndex]][dayIndex]++

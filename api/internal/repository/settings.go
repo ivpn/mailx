@@ -2,14 +2,19 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	"ivpn.net/email/api/internal/model"
 )
 
 func (d *Database) GetSettings(ctx context.Context, userID string) (model.Settings, error) {
 	var settings model.Settings
-	err := d.Client.Where("user_id = ?", userID).Find(&settings).Error
-	return settings, err
+	q := d.Client.Where("user_id = ?", userID).Find(&settings)
+	if q.RowsAffected == 0 {
+		return model.Settings{}, fmt.Errorf("could not get settings by user ID")
+	}
+
+	return settings, q.Error
 }
 
 func (d *Database) PostSettings(ctx context.Context, settings model.Settings) error {

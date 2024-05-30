@@ -8,10 +8,10 @@ import (
 )
 
 var (
-	ErrGetSettingsByName = errors.New("could not get settings by user ID")
-	ErrPostSettings      = errors.New("could not post settings")
-	ErrUpdateSettings    = errors.New("could not update settings")
-	ErrDeleteSettings    = errors.New("could not delete settings")
+	ErrGetSettings    = errors.New("could not get settings by user ID")
+	ErrPostSettings   = errors.New("could not post settings")
+	ErrUpdateSettings = errors.New("could not update settings")
+	ErrDeleteSettings = errors.New("could not delete settings")
 )
 
 type SettingsStore interface {
@@ -24,7 +24,7 @@ type SettingsStore interface {
 func (s *Service) GetSettings(ctx context.Context, userID string) (model.Settings, error) {
 	settings, err := s.Store.GetSettings(ctx, userID)
 	if err != nil {
-		return model.Settings{}, err
+		return model.Settings{}, ErrGetSettings
 	}
 
 	return settings, nil

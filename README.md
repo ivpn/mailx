@@ -45,8 +45,11 @@ docker compose build
 docker compose up -d
 ```
 
-API: http://localhost:3000  
-APP: http://localhost:3001  
+App:  
+http://localhost:3001  
+
+API:  
+http://localhost:3000  
 
 ### Test
 Run tests:  

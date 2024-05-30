@@ -53,3 +53,12 @@ Send test email:
 ```bash
 go run test/send_test_mail.go
 ```
+
+### API Documentation
+Access API docs:  
+http://localhost:3000/docs/index.html
+
+Generate API docs:  
+```bash
+swag init -g cmd/main.go
+```

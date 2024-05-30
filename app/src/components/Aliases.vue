@@ -120,8 +120,9 @@ const getList = async () => {
 
 const getRecipients = async () => {
     try {
-        const response = await recipientApi.getList()
-        recipients.value = response.data.map((recipient: { email: string }) => recipient.email)
+        const res = await recipientApi.getList()
+        const list = res.data.filter((item: { is_active: boolean }) => item.is_active)
+        recipients.value = list.map((recipient: { email: string }) => recipient.email)
         error.value = ''
     } catch (err) {
         if (axios.isAxiosError(err)) {
@@ -132,8 +133,8 @@ const getRecipients = async () => {
 
 const getSettings = async () => {
     try {
-        const response = await settingsApi.get()
-        settings.value = response.data
+        const res = await settingsApi.get()
+        settings.value = res.data
         error.value = ''
     } catch (err) {
         if (axios.isAxiosError(err)) {

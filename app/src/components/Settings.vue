@@ -17,7 +17,7 @@
                 <option
                     v-for="(domain, index) in domains"
                     v-bind:domain
-                    :selected="domain == res.domain || index === 0"
+                    :selected="domain == req.domain || index === 0"
                     :key="domain">
                     {{ domain }}
                 </option>
@@ -39,7 +39,7 @@
                 <option
                     v-for="recipient in recipients"
                     v-bind:value=recipient
-                    :selected="recipient == res.recipient"
+                    :selected="recipient == req.recipient"
                     :key="recipient">
                     {{ recipient }}
                 </option>
@@ -57,7 +57,7 @@
                 From name:
             </label>
             <input
-                v-model="res.from_name"
+                v-model="req.from_name"
                 class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-blue-600 mb-2"
                 id="from-name" type="text">
         </div>
@@ -81,7 +81,7 @@ import { settingsApi } from '../api/settings.ts'
 import { recipientApi } from '../api/recipient.ts'
 import env from "../env.json"
 
-const res = ref({
+const req = ref({
     id: '',
     domain: '',
     recipient: '',
@@ -95,7 +95,7 @@ const error = ref('')
 const getSettings = async () => {
     try {
         const response = await settingsApi.get()
-        res.value = response.data
+        req.value = response.data
         error.value = ''
     } catch (err) {
         if (axios.isAxiosError(err)) {
@@ -106,14 +106,14 @@ const getSettings = async () => {
 
 const saveSettings = async () => {
     const domainInput = document.getElementById('domain') as HTMLInputElement
-    res.value.domain = domainInput.value
+    req.value.domain = domainInput.value
 
     const recipientInput = document.getElementById('recipient') as HTMLInputElement
-    res.value.recipient = recipientInput.value
+    req.value.recipient = recipientInput.value
 
     try {
-        const response = await settingsApi.update(res.value)
-        success.value = response.data.message
+        const res = await settingsApi.update(req.value)
+        success.value = res.data.message
         error.value = ''
     } catch (err) {
         if (axios.isAxiosError(err)) {
@@ -125,8 +125,9 @@ const saveSettings = async () => {
 
 const getRecipients = async () => {
     try {
-        const response = await recipientApi.getList()
-        recipients.value = response.data.map((recipient: { email: string }) => recipient.email)
+        const res = await recipientApi.getList()
+        const list = res.data.filter((item: { is_active: boolean }) => item.is_active)
+        recipients.value = list.map((recipient: { email: string }) => recipient.email)
         error.value = ''
     } catch (err) {
         if (axios.isAxiosError(err)) {

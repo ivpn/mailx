@@ -45,6 +45,9 @@ docker compose build
 docker compose up
 ```
 
+API: http://localhost:3000  
+APP: http://localhost:3001  
+
 ### Test
 Run tests:  
 ```bash
@@ -59,8 +62,8 @@ go run test/send_test_mail.go
 ```
 
 ### API Documentation
-Access API docs:  
-http://localhost:3000/docs/index.html
+API docs:  
+http://localhost:3000/docs  
 
 Generate API docs:  
 ```bash

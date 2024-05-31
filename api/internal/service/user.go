@@ -191,6 +191,23 @@ func (s *Service) ActivateUser(ctx context.Context, ID string, otp string) error
 		log.Printf("error activating user: %s", err.Error())
 	}
 
+	user, err := s.Store.GetUser(ctx, ID)
+	if err != nil {
+		log.Printf("error activating user: %s", err.Error())
+		return ErrActivateUser
+	}
+
+	recipient := model.Recipient{
+		UserID:   ID,
+		Email:    user.Email,
+		IsActive: true,
+	}
+
+	_, err = s.Store.PostRecipient(ctx, recipient)
+	if err != nil {
+		return ErrActivateUser
+	}
+
 	return nil
 }
 

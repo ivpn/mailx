@@ -10,9 +10,9 @@ import (
 )
 
 var (
-	PostAliasSuccess   = "Alias created"
-	UpdateAliasSuccess = "Alias updated"
-	DeleteAliasSuccess = "Alias deleted"
+	PostAliasSuccess   = "New alias created"
+	UpdateAliasSuccess = "Alias is updated"
+	DeleteAliasSuccess = "Alias is deleted"
 	ErrInvalidDomain   = "Invalid domain"
 	ErrUnverifiedRcp   = "Recipient not verified"
 )

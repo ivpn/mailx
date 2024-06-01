@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	UpdateSettingsSuccess = "Settings updated"
+	UpdateSettingsSuccess = "Settings are updated"
 )
 
 type SettingsService interface {

@@ -15,7 +15,7 @@ var (
 	ErrGetRecipient            = errors.New("could not get recipient by ID")
 	ErrGetRecipients           = errors.New("could not get recipients by user ID")
 	ErrPostRecipient           = errors.New("could not create recipient")
-	ErrMaxExceededRecipient    = errors.New("max recipients exceeded")
+	ErrMaxExceededRecipient    = errors.New("maximum number of recipients reached")
 	ErrUpdateRecipient         = errors.New("could not update recipient")
 	ErrDeleteRecipient         = errors.New("could not delete recipient")
 	ErrDeleteRecipientByUserID = errors.New("could not delete recipient by user ID")

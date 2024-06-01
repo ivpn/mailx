@@ -12,12 +12,12 @@ import (
 )
 
 var (
-	RegisterSuccess       = "User created"
+	RegisterSuccess       = "User is created"
 	LoginSuccess          = "Login successful"
 	LogoutSuccess         = "Logout successful"
-	DeleteUserSuccess     = "User deleted"
+	DeleteUserSuccess     = "User is deleted"
 	OTPSent               = "New OTP is sent"
-	ActivateUserSuccess   = "Email confirmed"
+	ActivateUserSuccess   = "Email is confirmed"
 	ErrInvalidCredentials = "Invalid credentials"
 	ErrInvalidRequest     = "Invalid request"
 	ErrLogoutUser         = "Could not logout user"

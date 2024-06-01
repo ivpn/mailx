@@ -11,7 +11,7 @@ import (
 
 var (
 	ErrGetSubscription    = errors.New("could not get subscription by user ID")
-	ErrPostSubscription   = errors.New("could not post subscription")
+	ErrPostSubscription   = errors.New("could not create subscription")
 	ErrUpdateSubscription = errors.New("could not update subscription")
 	ErrDeleteSubscription = errors.New("could not delete subscription")
 )

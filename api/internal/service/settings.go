@@ -9,7 +9,7 @@ import (
 
 var (
 	ErrGetSettings    = errors.New("could not get settings by user ID")
-	ErrPostSettings   = errors.New("could not post settings")
+	ErrPostSettings   = errors.New("could not create settings")
 	ErrUpdateSettings = errors.New("could not update settings")
 	ErrDeleteSettings = errors.New("could not delete settings")
 )

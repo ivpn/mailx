@@ -11,7 +11,7 @@ import (
 var (
 	ErrGetMessagesByUser     = errors.New("could not get messages by user ID")
 	ErrGetMessagesByAlias    = errors.New("could not get messages by alias ID")
-	ErrPostMessage           = errors.New("could not post message")
+	ErrPostMessage           = errors.New("could not create message")
 	ErrDeleteMessageByUserID = errors.New("could not delete messages by user ID")
 )
 

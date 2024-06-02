@@ -156,3 +156,12 @@ func GetTokenSignature(jwt string) string {
 
 	return parts[2]
 }
+
+func NewCookie(token string, cfg config.APIConfig) *fiber.Cookie {
+	return &fiber.Cookie{
+		Name:     AUTH_COOKIE,
+		Value:    token,
+		HTTPOnly: true,
+		Expires:  time.Now().Add(time.Duration(cfg.TokenExpiration)),
+	}
+}

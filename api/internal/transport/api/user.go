@@ -195,12 +195,7 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 	}
 
 	// Set the token in encrypted cookie
-	c.Cookie(&fiber.Cookie{
-		Name:     auth.AUTH_COOKIE,
-		Value:    token,
-		HTTPOnly: true,
-		Expires:  time.Now().Add(time.Duration(h.Cfg.TokenExpiration)),
-	})
+	c.Cookie(auth.NewCookie(token, h.Cfg))
 
 	return c.Status(200).JSON(fiber.Map{
 		"message": LoginSuccess,

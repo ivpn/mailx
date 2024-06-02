@@ -162,6 +162,7 @@ func NewCookie(token string, cfg config.APIConfig) *fiber.Cookie {
 		Name:     AUTH_COOKIE,
 		Value:    token,
 		HTTPOnly: true,
+		Secure:   true,
 		Expires:  time.Now().Add(time.Duration(cfg.TokenExpiration)),
 	}
 }

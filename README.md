@@ -24,15 +24,15 @@
 
 ## Run locally
 
+### Config
+```bash
+cp api/.env.sample api/.env
+cp app/src/env.sample.json app/src/env.json
+```
+
 ### Move to api directory
 ```bash
 cd api
-```
-
-### Config
-```bash
-cp .env.sample .env
-cp ../app/src/env.sample.json ../app/src/env.json
 ```
 
 ### Build

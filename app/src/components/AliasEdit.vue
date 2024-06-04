@@ -113,14 +113,12 @@ const close = () => {
     alias.value.recipients = props.alias.recipients
     success.value = ''
     error.value = ''
-    const modal = document.querySelector('#modal' + alias.value.id)
-    if (modal instanceof HTMLElement) {
-        overlay.close(modal)
-    }
+    const modal = document.querySelector('#modal' + alias.value.id) as any
+    overlay.close(modal)
 }
 
 const addEvents = () => {
-    const modal = overlay.getInstance('#modal' + alias.value.id, true)
+    const modal = overlay.getInstance('#modal' + alias.value.id as any, true) as any
     modal.element.on('close', () => {
         close()
     })

@@ -122,14 +122,12 @@ const close = () => {
     req.value.otp = ''
     resendSuccess.value = ''
     error.value = ''
-    const modal = document.querySelector('#modal-verify-recipient' + recipient.value.id)
-    if (modal instanceof HTMLElement) {
-        overlay.close(modal)
-    }
+    const modal = document.querySelector('#modal-verify-recipient' + recipient.value.id) as any
+    overlay.close(modal)
 }
 
 const addEvents = () => {
-    const modal = overlay.getInstance('#modal-verify-recipient' + recipient.value.id, true)
+    const modal = overlay.getInstance('#modal-verify-recipient' + recipient.value.id as any, true) as any
     modal.element.on('close', () => {
         close()
     })

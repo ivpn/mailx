@@ -107,14 +107,12 @@ const postRecipient = async () => {
 const close = () => {
     recipient.value = {} as any
     error.value = ''
-    const modal = document.querySelector('#modal-create-recipient')
-    if (modal instanceof HTMLElement) {
-        overlay.close(modal)
-    }
+    const modal = document.querySelector('#modal-create-recipient') as any
+    overlay.close(modal)
 }
 
 const addEvents = () => {
-    const modal = overlay.getInstance('#modal-create-recipient', true)
+    const modal = overlay.getInstance('#modal-create-recipient' as any, true) as any
     modal.element.on('close', () => {
         close()
     })

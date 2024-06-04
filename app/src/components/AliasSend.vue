@@ -114,10 +114,8 @@ const close = () => {
     toEmail.value = ''
     generatedEmail.value = ''
     emailError.value = false
-    const modal = document.querySelector('#modal-send-alias' + alias.value.id)
-    if (modal instanceof HTMLElement) {
-        overlay.close(modal)
-    }
+    const modal = document.querySelector('#modal-send-alias' + alias.value.id) as any
+    overlay.close(modal)
 }
 
 const copy = (text: string) => {
@@ -129,7 +127,7 @@ const copy = (text: string) => {
 }
 
 const addEvents = () => {
-    const modal = overlay.getInstance('#modal-send-alias' + alias.value.id, true)
+    const modal = overlay.getInstance('#modal-send-alias' + alias.value.id as any, true) as any
     modal.element.on('close', () => {
         close()
     })

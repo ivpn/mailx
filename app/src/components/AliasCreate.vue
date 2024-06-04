@@ -178,14 +178,12 @@ const postAlias = async () => {
 const close = () => {
     alias.value = {} as any
     error.value = ''
-    const modal = document.querySelector('#modal-create-alias')
-    if (modal instanceof HTMLElement) {
-        overlay.close(modal)
-    }
+    const modal = document.querySelector('#modal-create-alias') as any
+    overlay.close(modal)
 }
 
 const addEvents = () => {
-    const modal = overlay.getInstance('#modal-create-alias', true)
+    const modal = overlay.getInstance('#modal-create-alias' as any, true) as any
     modal.element.on('close', () => {
         close()
     })

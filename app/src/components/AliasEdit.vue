@@ -1,11 +1,11 @@
 <template>
     <div>
-        <button v-bind:data-hs-overlay="'#hs-basic-modal' + alias.id"
+        <button v-bind:data-hs-overlay="'#modal' + alias.id"
             class="text-blue-600 hover:text-blue-700 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
             type="submit">
             Edit
         </button>
-        <div v-bind:id="'hs-basic-modal' + alias.id"
+        <div v-bind:id="'modal' + alias.id"
             class="hs-overlay hidden size-full fixed top-0 start-0 z-[60] overflow-x-hidden overflow-y-auto pointer-events-none">
             <div
                 class="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 opacity-0 transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
@@ -66,7 +66,7 @@
                             Save
                         </button>
                         <button @click="close"
-                        class="text-gray-500 bg-gray-100 hover:bg-gray-200 font-medium text-sm py-2 px-3 rounded-md focus:outline-none focus:shadow-outline">
+                            class="text-gray-500 bg-gray-100 hover:bg-gray-200 font-medium text-sm py-2 px-3 rounded-md focus:outline-none focus:shadow-outline">
                             Cancel
                         </button>
                     </div>
@@ -113,13 +113,21 @@ const close = () => {
     alias.value.recipients = props.alias.recipients
     success.value = ''
     error.value = ''
-    const modal = document.querySelector('#hs-basic-modal' + alias.value.id)
+    const modal = document.querySelector('#modal' + alias.value.id)
     if (modal instanceof HTMLElement) {
         overlay.close(modal)
     }
 }
 
+const addEvents = () => {
+    const modal = overlay.getInstance('#modal' + alias.value.id, true)
+    modal.element.on('close', () => {
+        close()
+    })
+}
+
 onMounted(() => {
     overlay.autoInit()
+    addEvents()
 })
 </script>

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <button v-bind:data-hs-overlay="'#hs-modal-create-recipient'"
+        <button v-bind:data-hs-overlay="'#modal-create-recipient'"
             class="mt-3 py-2 pl-2 pr-3 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700">
             <svg class="flex-shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
@@ -10,7 +10,7 @@
             </svg>
             Add Recipient
         </button>
-        <div v-bind:id="'hs-modal-create-recipient'"
+        <div v-bind:id="'modal-create-recipient'"
             class="hs-overlay hidden size-full fixed top-0 start-0 z-[60] overflow-x-hidden overflow-y-auto pointer-events-none">
             <div
                 class="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 opacity-0 transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
@@ -107,13 +107,21 @@ const postRecipient = async () => {
 const close = () => {
     recipient.value = {} as any
     error.value = ''
-    const modal = document.querySelector('#hs-modal-create-recipient')
+    const modal = document.querySelector('#modal-create-recipient')
     if (modal instanceof HTMLElement) {
         overlay.close(modal)
     }
 }
 
+const addEvents = () => {
+    const modal = overlay.getInstance('#modal-create-recipient', true)
+    modal.element.on('close', () => {
+        close()
+    })
+}
+
 onMounted(() => {
     overlay.autoInit()
+    addEvents()
 })
 </script>

@@ -1,11 +1,11 @@
 <template>
     <div>
-        <button v-bind:data-hs-overlay="'#hs-basic-modal' + recipient.id"
+        <button v-bind:data-hs-overlay="'#modal-verify-recipient' + recipient.id"
             class="text-blue-600 hover:text-blue-700 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
             type="submit">
             Verify
         </button>
-        <div v-bind:id="'hs-basic-modal' + recipient.id"
+        <div v-bind:id="'modal-verify-recipient' + recipient.id"
             class="hs-overlay hidden size-full fixed top-0 start-0 z-[60] overflow-x-hidden overflow-y-auto pointer-events-none">
             <div
                 class="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 opacity-0 transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
@@ -122,13 +122,21 @@ const close = () => {
     req.value.otp = ''
     resendSuccess.value = ''
     error.value = ''
-    const modal = document.querySelector('#hs-basic-modal' + recipient.value.id)
+    const modal = document.querySelector('#modal-verify-recipient' + recipient.value.id)
     if (modal instanceof HTMLElement) {
         overlay.close(modal)
     }
 }
 
+const addEvents = () => {
+    const modal = overlay.getInstance('#modal-verify-recipient' + recipient.value.id, true)
+    modal.element.on('close', () => {
+        close()
+    })
+}
+
 onMounted(() => {
     overlay.autoInit()
+    addEvents()
 })
 </script>

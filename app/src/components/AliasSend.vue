@@ -1,11 +1,11 @@
 <template>
     <div>
-        <button v-bind:data-hs-overlay="'#hs-modal-send-alias' + alias.id"
+        <button v-bind:data-hs-overlay="'#modal-send-alias' + alias.id"
             class="text-blue-600 hover:text-blue-700 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
             type="submit">
             Send
         </button>
-        <div v-bind:id="'hs-modal-send-alias' + alias.id"
+        <div v-bind:id="'modal-send-alias' + alias.id"
             class="hs-overlay hidden size-full fixed top-0 start-0 z-[60] overflow-x-hidden overflow-y-auto pointer-events-none">
             <div
                 class="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 opacity-0 transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
@@ -112,8 +112,9 @@ const showAddress = () => {
 
 const close = () => {
     toEmail.value = ''
+    generatedEmail.value = ''
     emailError.value = false
-    const modal = document.querySelector('#hs-modal-send-alias' + alias.value.id)
+    const modal = document.querySelector('#modal-send-alias' + alias.value.id)
     if (modal instanceof HTMLElement) {
         overlay.close(modal)
     }
@@ -127,8 +128,16 @@ const copy = (text: string) => {
     }, 2000)
 }
 
+const addEvents = () => {
+    const modal = overlay.getInstance('#modal-send-alias' + alias.value.id, true)
+    modal.element.on('close', () => {
+        close()
+    })
+}
+
 onMounted(() => {
     overlay.autoInit()
     tooltip.autoInit()
+    addEvents()
 })
 </script>

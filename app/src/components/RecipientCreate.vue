@@ -32,7 +32,7 @@
                     </div>
                     <div class="p-4 whitespace-normal text-left text-base">
                         <div class="mb-5">
-                            <p class="text-gray-500 mb-3">
+                            <p class="mb-3">
                                 Add a email address to receive forwarded emails. A 6 digit verification code will be sent to this email address. If expired, you can resend the verification code. Unverified recipients will not receive any forwarded emails and may be deleted after 7 days.
                             </p>
                         </div>

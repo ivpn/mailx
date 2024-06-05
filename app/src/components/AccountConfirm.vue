@@ -20,7 +20,7 @@
                 <input
                     v-model="otp"
                     v-bind:class="{ 'border-red-600': otpError }"
-                    class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-bluish-500 mb-2"
+                    class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 leading-tight focus:border-bluish-500 mb-2"
                     id="account-otp" type="text">
                 <p v-if="otpError" class="text-red-600 text-sm mb-2">Required</p>
             </div>
@@ -33,7 +33,7 @@
                 </button>
                 <button
                     @click="sendOtp"
-                    class="text-gray-500 bg-gray-100 hover:bg-gray-200 font-medium text-sm py-2 px-3 rounded-md focus:outline-none focus:shadow-outline"
+                    class="text-gray-500 bg-gray-100 hover:bg-gray-200 font-medium text-base py-2 px-3 focus:outline-none focus:shadow-outline"
                     type="submit">
                     Resend OTP
                 </button>

@@ -9,9 +9,9 @@
             class="hs-overlay hidden size-full fixed top-0 start-0 z-[60] overflow-x-hidden overflow-y-auto pointer-events-none">
             <div
                 class="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 opacity-0 transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
-                <div class="flex flex-col bg-white border shadow-sm rounded-xl pointer-events-auto">
+                <div class="flex flex-col bg-white border shadow-sm rounded pointer-events-auto">
                     <div class="flex justify-between items-center py-3 px-4 border-b">
-                        <h3 class="font-bold text-gray-800">
+                        <h3 class="text-xl text-gray-800 font-semibold">
                             Edit alias
                         </h3>
                         <button @click="close" type="button"
@@ -26,33 +26,33 @@
                         </button>
                     </div>
                     <div class="p-4 whitespace-normal text-left text-base">
-                        <h1 class="text-xl font-bold text-gray-800 mb-5">{{ alias.name }}</h1>
+                        <h1 class="text-xl text-gray-800 font-semibold mb-5">{{ alias.name }}</h1>
                         <div class="mb-5">
                             <label v-bind:for="'description_' + alias.id"
-                                class="block text-gray-500 text-sm font-semibold mb-3">
+                                class="block text-gray-500 mb-3">
                                 Description:
                             </label>
                             <input v-bind:id="'description_' + alias.id" v-model="alias.description"
-                                class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-bluish-500 mb-2"
+                                class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 leading-tight focus:border-bluish-500 mb-2"
                                 type="text">
                         </div>
                         <div class="mb-5">
                             <label v-bind:for="'from_' + alias.id"
-                                class="block text-gray-500 text-sm font-semibold mb-3">
+                                class="block text-gray-500 mb-3">
                                 From name:
                             </label>
                             <input v-bind:id="'from_' + alias.id" v-model="alias.from_name"
-                                class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-bluish-500 mb-2"
+                                class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 leading-tight focus:border-bluish-500 mb-2"
                                 type="text">
                         </div>
                         <div class="mb-6">
                             <label v-bind:for="'recipient_' + alias.id"
-                                class="block text-gray-500 text-sm font-semibold mb-3">
+                                class="block text-gray-500 mb-3">
                                 Recipient:
                             </label>
                             <select v-model="alias.recipients" v-bind:id="'recipient_' + alias.id"
                                 :disabled="!recipients.length"
-                                class="form-select py-2.5 px-4 pe-9 block w-full border-2 border-gray-200 rounded-lg text-gray-700 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none">
+                                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none">
                                 <option v-for="recipient in recipients" v-bind:value=recipient
                                     :selected="recipient == alias.recipients" :key="recipient">
                                     {{ recipient }}
@@ -60,13 +60,13 @@
                             </select>
                         </div>
                     </div>
-                    <div class="flex justify-start items-center gap-x-2 py-3 px-4 border-t">
+                    <div class="flex justify-start items-center gap-x-3 py-4 px-4 border-t">
                         <button v-if="!success" @click="updateAlias"
-                            class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-md bg-bluish-500 text-white hover:bg-bluish-600 disabled:opacity-50 disabled:pointer-events-none">
+                            class="py-2 px-3 inline-flex items-center gap-x-2 font-medium text-base bg-bluish-500 text-white hover:bg-bluish-600 disabled:opacity-50 disabled:pointer-events-none">
                             Save
                         </button>
                         <button @click="close"
-                            class="text-gray-500 bg-gray-100 hover:bg-gray-200 font-medium text-sm py-2 px-3 rounded-md focus:outline-none focus:shadow-outline">
+                            class="text-gray-500 bg-gray-100 hover:bg-gray-200 font-medium text-base py-2 px-3 focus:outline-none focus:shadow-outline">
                             Cancel
                         </button>
                     </div>

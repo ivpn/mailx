@@ -11,7 +11,7 @@
             <input
                 v-model="password"
                 v-bind:class="{ 'border-red-600': passwordError }"
-                class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-bluish-500 mb-2"
+                class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 leading-tight focus:border-bluish-500 mb-2"
                 id="account-password" type="password">
             <p v-if="passwordError" class="text-red-600 text-sm mb-2">Required</p>
         </div>

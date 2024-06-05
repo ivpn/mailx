@@ -9,9 +9,9 @@
             class="hs-overlay hidden size-full fixed top-0 start-0 z-[60] overflow-x-hidden overflow-y-auto pointer-events-none">
             <div
                 class="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 opacity-0 transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
-                <div class="flex flex-col bg-white border shadow-sm rounded-xl pointer-events-auto">
+                <div class="flex flex-col bg-white border shadow-sm rounded pointer-events-auto">
                     <div class="flex justify-between items-center py-3 px-4 border-b">
-                        <h3 class="font-bold text-gray-800">
+                        <h3 class="text-xl text-gray-800 font-semibold">
                             Send from alias
                         </h3>
                         <button @click="close" type="button"
@@ -33,28 +33,28 @@
                         </div>
                         <div class="mb-5">
                             <label v-bind:for="'from_alias_' + alias.id"
-                                class="block text-gray-500 text-sm font-semibold mb-3">
+                                class="block text-gray-500 mb-3">
                                 From alias:
                             </label>
                             <input v-bind:id="'from_alias_' + alias.id" v-bind:value="alias.name" disabled
-                                class="disabled appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-bluish-500 mb-2"
+                                class="disabled appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 leading-tight focus:border-bluish-500 mb-2"
                                 type="text">
                         </div>
                         <div class="mb-5">
                             <label v-bind:for="'to_email_' + alias.id"
-                                class="block text-gray-500 text-sm font-semibold mb-3">
+                                class="block text-gray-500 mb-3">
                                 To email:
                             </label>
                             <input
                                 v-bind:id="'to_email_' + alias.id"
                                 v-bind:class="{ 'border-red-600': emailError }"
                                 v-model="toEmail"
-                                class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-bluish-500 mb-2"
+                                class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 leading-tight focus:border-bluish-500 mb-2"
                                 type="text">
                             <p v-if="emailError" class="text-red-600 text-sm">Required</p>
                         </div>
                         <div v-bind:class="{ 'hidden': generatedEmail == '' }" class="mb-5">
-                            <p class="text-gray-500 text-sm font-semibold mb-3">
+                            <p class="text-gray-500 mb-3">
                                 Send message to this email:
                             </p>
                             <div class="hs-tooltip text-gray-800 mb-3">
@@ -72,13 +72,13 @@
 
                         </div>
                     </div>
-                    <div class="flex justify-start items-center gap-x-2 py-3 px-4 border-t">
+                    <div class="flex justify-start items-center gap-x-3 py-4 px-4 border-t">
                         <button @click="showAddress"
-                            class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-md bg-bluish-500 text-white hover:bg-bluish-600 disabled:opacity-50 disabled:pointer-events-none">
+                            class="py-2 px-3 inline-flex items-center gap-x-2 font-medium text-base bg-bluish-500 text-white hover:bg-bluish-600 disabled:opacity-50 disabled:pointer-events-none">
                             Show address
                         </button>
                         <button @click="close"
-                        class="text-gray-500 bg-gray-100 hover:bg-gray-200 font-medium text-sm py-2 px-3 rounded-md focus:outline-none focus:shadow-outline">
+                        class="text-gray-500 bg-gray-100 hover:bg-gray-200 font-medium text-base py-2 px-3 focus:outline-none focus:shadow-outline">
                             Close
                         </button>
                     </div>

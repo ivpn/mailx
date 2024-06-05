@@ -1,7 +1,7 @@
 <template>
     <div>
         <button v-bind:data-hs-overlay="'#modal-create-alias'"
-            class="mt-3 py-2 pl-2 pr-3 inline-flex justify-center items-center gap-x-2 font-medium bg-bluish-500 text-white hover:bg-bluish-600">
+            class="mt-3 py-2 pl-2 pr-3 inline-flex justify-center items-center gap-x-2 font-medium text-base bg-bluish-500 text-white hover:bg-bluish-600">
             <svg class="flex-shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
                 stroke-linejoin="round">
@@ -113,13 +113,13 @@
                             </select>
                         </div>
                     </div>
-                    <div class="flex justify-start items-center gap-x-2 py-3 px-4 border-t">
+                    <div class="flex justify-start items-center gap-x-3 py-4 px-4 border-t">
                         <button @click="postAlias"
-                            class="py-2 px-3 inline-flex items-center gap-x-2 font-medium bg-bluish-500 text-white hover:bg-bluish-600 disabled:opacity-50 disabled:pointer-events-none">
+                            class="py-2 px-3 inline-flex items-center gap-x-2 font-medium text-base bg-bluish-500 text-white hover:bg-bluish-600 disabled:opacity-50 disabled:pointer-events-none">
                             Create Alias
                         </button>
                         <button @click="close"
-                            class="text-gray-500 bg-gray-100 hover:bg-gray-200 font-medium py-2 px-3 focus:outline-none focus:shadow-outline">
+                            class="text-gray-500 bg-gray-100 hover:bg-gray-200 font-medium text-base py-2 px-3 focus:outline-none focus:shadow-outline">
                             Cancel
                         </button>
                     </div>

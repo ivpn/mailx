@@ -70,7 +70,7 @@
             </button>
         </div>
         <p v-if="error" class="text-red-600 text-sm mb-3">Error: {{ error }}</p>
-        <p v-if="success" class="text-green-600 text-sm mb-3">{{ success }}</p>
+        <p v-if="success" class="text-emerald-600 text-sm mb-3">{{ success }}</p>
     </div>
 </template>
 

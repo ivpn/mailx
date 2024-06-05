@@ -19,7 +19,7 @@
         </td>
         <td class="px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800">
             <p>
-                <span v-if="recipient.is_active" class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-teal-100 text-teal-800">Verified</span>
+                <span v-if="recipient.is_active" class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-emerald-100 text-emerald-800">Verified</span>
                 <span v-if="!recipient.is_active" class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-gray-100 text-gray-500">Unverified</span>
             </p>
         </td>

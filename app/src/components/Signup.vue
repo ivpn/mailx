@@ -39,7 +39,7 @@
                 <p v-if="apiError" class="text-red-600 text-sm mt-6">{{ apiError }}</p>
             </div>
             <div v-if="apiSuccess">
-                <p class="text-green-600 text-sm mb-6">{{ apiSuccess }}</p>
+                <p class="text-emerald-600 text-sm mb-6">{{ apiSuccess }}</p>
                 <a
                     href="/login"
                     class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 focus:outline-none focus:shadow-outline">

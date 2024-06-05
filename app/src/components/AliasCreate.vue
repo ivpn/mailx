@@ -1,7 +1,7 @@
 <template>
     <div>
         <button v-bind:data-hs-overlay="'#modal-create-alias'"
-            class="mt-3 py-2 pl-2 pr-3 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-md bg-bluish-500 text-white hover:bg-bluish-600">
+            class="mt-3 py-2 pl-2 pr-3 inline-flex justify-center items-center gap-x-2 font-medium bg-bluish-500 text-white hover:bg-bluish-600">
             <svg class="flex-shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
                 stroke-linejoin="round">
@@ -14,9 +14,9 @@
             class="hs-overlay hidden size-full fixed top-0 start-0 z-[60] overflow-x-hidden overflow-y-auto pointer-events-none">
             <div
                 class="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 opacity-0 transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
-                <div class="flex flex-col bg-white border shadow-sm rounded-xl pointer-events-auto">
+                <div class="flex flex-col bg-white border shadow-sm rounded pointer-events-auto">
                     <div class="flex justify-between items-center py-3 px-4 border-b">
-                        <h3 class="font-bold text-gray-800">
+                        <h3 class="text-xl text-gray-800 font-semibold">
                             Create Alias
                         </h3>
                         <button @click="close" type="button"
@@ -32,7 +32,7 @@
                     </div>
                     <div class="p-4 whitespace-normal text-left text-base">
                         <div class="grid space-y-3 mb-5">
-                            <p class="text-gray-500 text-sm font-semibold mb-1">
+                            <p class="text-gray-700 mb-1">
                                 Alias format:
                             </p>
                             <div class="relative flex items-start">
@@ -73,27 +73,27 @@
                             </div>
                         </div>
                         <div class="mb-5">
-                            <label for="alias_description" class="block text-gray-500 text-sm font-semibold mb-3">
+                            <label for="alias_description" class="block text-gray-700 mb-3">
                                 Description:
                             </label>
                             <input id="alias_description" v-model="alias.description"
-                                class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-bluish-500 mb-2"
+                                class="appearance-none outline-none border border-gray-700 w-full py-3 px-4 text-gray-700 leading-tight focus:border-bluish-500 mb-2"
                                 type="text">
                         </div>
                         <div class="mb-5">
-                            <label for="alias_from_name" class="block text-gray-500 text-sm font-semibold mb-3">
+                            <label for="alias_from_name" class="block text-gray-700 mb-3">
                                 From name:
                             </label>
                             <input id="alias_from_name" v-model="alias.from_name"
-                                class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-bluish-500 mb-2"
+                                class="appearance-none outline-none border border-gray-700 w-full py-3 px-4 text-gray-700 leading-tight focus:border-bluish-500 mb-2"
                                 type="text">
                         </div>
                         <div class="mb-6">
-                            <label for="alias_recipient" class="block text-gray-500 text-sm font-semibold mb-3">
+                            <label for="alias_recipient" class="block text-gray-700 mb-3">
                                 Recipient:
                             </label>
                             <select id="alias_recipient" :disabled="!recipients.length"
-                                class="form-select py-2.5 px-4 pe-9 block w-full border-2 border-gray-200 rounded-lg text-gray-700 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none">
+                                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-700 text-gray-700 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none">
                                 <option v-for="(recipient, index) in recipients" v-bind:recipient
                                     :selected="recipient == settings.recipient || index === 0" :key="recipient">
                                     {{ recipient }}
@@ -101,11 +101,11 @@
                             </select>
                         </div>
                         <div class="mb-6">
-                            <label class="block text-gray-500 text-sm font-semibold mb-3" for="alias_domain">
+                            <label class="block text-gray-700 mb-3" for="alias_domain">
                                 Domain:
                             </label>
                             <select id="alias_domain" :disabled="!domains.length"
-                                class="form-select py-2.5 px-4 pe-9 block w-full border-2 border-gray-200 rounded-lg text-gray-700 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none">
+                                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-700 text-gray-700 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none">
                                 <option v-for="(domain, index) in domains" v-bind:domain
                                     :selected="domain == alias.domain || index === 0" :key="domain">
                                     {{ domain }}
@@ -115,11 +115,11 @@
                     </div>
                     <div class="flex justify-start items-center gap-x-2 py-3 px-4 border-t">
                         <button @click="postAlias"
-                            class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-md bg-bluish-500 text-white hover:bg-bluish-600 disabled:opacity-50 disabled:pointer-events-none">
+                            class="py-2 px-3 inline-flex items-center gap-x-2 font-medium bg-bluish-500 text-white hover:bg-bluish-600 disabled:opacity-50 disabled:pointer-events-none">
                             Create Alias
                         </button>
                         <button @click="close"
-                            class="text-gray-500 bg-gray-100 hover:bg-gray-200 font-medium text-sm py-2 px-3 rounded-md focus:outline-none focus:shadow-outline">
+                            class="text-gray-500 bg-gray-100 hover:bg-gray-200 font-medium py-2 px-3 focus:outline-none focus:shadow-outline">
                             Cancel
                         </button>
                     </div>
@@ -144,7 +144,7 @@ const emit = defineEmits(['onCreateAlias'])
 const alias = ref({
     description: '',
     enabled: true,
-    format: '',
+    format: 'word',
     from_name: '',
     recipients: '',
     domain: env.DOMAINS[0],
@@ -176,7 +176,7 @@ const postAlias = async () => {
 }
 
 const close = () => {
-    alias.value = {} as any
+    alias.value = { format: 'word' } as any
     error.value = ''
     const modal = document.querySelector('#modal-create-alias') as any
     overlay.close(modal)

@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import AccountConfirm from './AccountConfirm.vue'
+import AccountConfirm from './AccountVerify.vue'
 import Aliases from './Aliases.vue'
 import Recipients from './Recipients.vue'
 </script>

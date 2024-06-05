@@ -9,12 +9,12 @@
     </div>
     <div v-if="!res.is_active && !isDashboard" class="flex flex-col py-4 my-8">
         <h1 class="text-3xl font-semibold text-gray-800 mb-4">Verify Your Account Email</h1>
-        <p class="text-sm text-gray-500 mb-3">
+        <p class="text-gray-500 mb-3">
             We have sent a 6-digit OTP code to your email address. Please enter the code below to verify your account email. Accounts with unconfirmed email address may be deleted after 7 days.
         </p>
         <div v-if="!confirmSuccess" class="mb-4 max-w-xs">
             <div class="mb-4">
-                <label class="block text-gray-500 text-sm font-semibold mb-3" for="account-otp">
+                <label class="block text-gray-500 mb-3" for="account-otp">
                     6-digit OTP code:
                 </label>
                 <input
@@ -27,7 +27,7 @@
             <div class="flex flex-row gap-4">
                 <button
                     @click="confirmEmail"
-                    class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium text-sm py-2 px-3 rounded-md focus:outline-none focus:shadow-outline"
+                    class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-2 px-3 focus:outline-none focus:shadow-outline"
                     type="submit">
                     Verify
                 </button>

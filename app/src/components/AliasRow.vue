@@ -65,7 +65,7 @@
                 <AliasEdit :alias="alias" :recipients="recipients" @onEditAlias="onEditAlias" />
                 <button
                     @click="deleteAlias"
-                    class="text-red-600 hover:text-red-700 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
+                    class="text-red-600 hover:text-red-700 font-medium text-sm py-2 focus:outline-none focus:shadow-outline"
                     type="submit">
                     Delete
                 </button>

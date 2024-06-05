@@ -4,7 +4,7 @@
         <h2 class="font-semibold text-gray-800 mb-3">
             Default Domain
         </h2>
-        <p class="mb-3">
+        <p class="text-gray-500 mb-3">
             The default alias domain is the domain to be selected by default in the drop down options when generating a
             new alias.
         </p>
@@ -26,7 +26,7 @@
         <h2 class="font-semibold text-gray-800 mb-3">
             Default Recipient
         </h2>
-        <p class="mb-3">
+        <p class="text-gray-500 mb-3">
             The default recipient to be selected by default in the drop down options when creating a new recipient. You can add recipients <a class="text-bluish-500 hover:text-bluish-600 font-semibold" href="/recipients">here</a>.
         </p>
         <div class="max-w-xs mb-6">
@@ -48,7 +48,7 @@
         <h2 class="font-semibold text-gray-800 mb-3">
             From Name
         </h2>
-        <p class="mb-3">
+        <p class="text-gray-500 mb-3">
             The 'From Name' is shown when you send an email from an alias or reply anonymously to a forwarded email. If
             left blank, then the email alias will be used as the 'From Name'.
         </p>

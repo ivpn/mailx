@@ -1,16 +1,16 @@
 <template>
     <nav>
         <div class="flex flex-row items-center gap-8">
-            <a v-bind:class="{ 'text-bluish-500 border-bluish-500 border-b-2': route == '/', 'text-gray-500 border-b-2 border-white': route != '/' }"
-                class="py-5 font-medium hover:text-bluish-500" href="/">Dashboard</a>
-            <a v-bind:class="{ 'text-bluish-500 border-bluish-500 border-b-2': route == '/aliases', 'text-gray-500 border-b-2 border-white': route != '/aliases' }"
-                class="py-5 font-medium hover:text-bluish-500" href="/aliases">Aliases</a>
-            <a v-bind:class="{ 'text-bluish-500 border-bluish-500 border-b-2': route == '/recipients', 'text-gray-500 border-b-2 border-white': route != '/recipients' }"
-                class="py-5 font-medium hover:text-bluish-500" href="/recipients">Recipients</a>
-            <a v-bind:class="{ 'text-bluish-500 border-bluish-500 border-b-2': route == '/stats', 'text-gray-500 border-b-2 border-white': route != '/stats' }"
-                class="py-5 font-medium hover:text-bluish-500" href="/stats">Stats</a>
-            <a v-bind:class="{ 'text-bluish-500 border-bluish-500 border-b-2': route == '/settings', 'text-gray-500 border-b-2 border-white': route != '/settings' }"
-                class="py-5 font-medium hover:text-bluish-500" href="/settings">Settings</a>
+            <a v-bind:class="{ 'text-gray-800 border-bluish-500 border-b-2': route == '/', 'text-gray-500 border-b-2 border-gray-100': route != '/' }"
+                class="py-6 font-medium hover:text-gray-800" href="/">Dashboard</a>
+            <a v-bind:class="{ 'text-gray-800 border-bluish-500 border-b-2': route == '/aliases', 'text-gray-500 border-b-2 border-gray-100': route != '/aliases' }"
+                class="py-6 font-medium hover:text-gray-800" href="/aliases">Aliases</a>
+            <a v-bind:class="{ 'text-gray-800 border-bluish-500 border-b-2': route == '/recipients', 'text-gray-500 border-b-2 border-gray-100': route != '/recipients' }"
+                class="py-6 font-medium hover:text-gray-800" href="/recipients">Recipients</a>
+            <a v-bind:class="{ 'text-gray-800 border-bluish-500 border-b-2': route == '/stats', 'text-gray-500 border-b-2 border-gray-100': route != '/stats' }"
+                class="py-6 font-medium hover:text-gray-800" href="/stats">Stats</a>
+            <a v-bind:class="{ 'text-gray-800 border-bluish-500 border-b-2': route == '/settings', 'text-gray-500 border-b-2 border-gray-100': route != '/settings' }"
+                class="py-6 font-medium hover:text-gray-800" href="/settings">Settings</a>
         </div>
     </nav>
 </template>

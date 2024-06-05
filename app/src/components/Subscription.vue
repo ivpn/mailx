@@ -2,14 +2,14 @@
     <div class="flex flex-col py-4 my-8">
         <h1 class="text-3xl font-semibold text-gray-800 mb-4">Subscription</h1>
         <p v-if="res.id" class="text-sm text-gray-500 mb-5">
-            <span v-if="isActive()" class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-teal-100 text-teal-800">Active</span>
+            <span v-if="isActive()" class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-emerald-100 text-emerald-800">Active</span>
             <span v-if="!isActive()" class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-gray-100 text-gray-500">Inactive</span>
         </p>
         <div v-if="isActive()" class="mb-3">
             <h2 class="font-semibold text-gray-800 mb-3">
                 Active until
             </h2>
-            <p class="text-sm text-gray-500 mb-3">
+            <p class="text-gray-500 mb-3">
                 {{ activeUntilDate() }}
             </p>
         </div>
@@ -17,7 +17,7 @@
             <h2 class="font-semibold text-gray-800 mb-3">
                 Subscription ID
             </h2>
-            <div class="hs-tooltip text-sm text-gray-500 mb-3">
+            <div class="hs-tooltip text-gray-500 mb-3">
                 <span class="hs-tooltip-toggle">
                     <button @click="copyAlias(res.id)">
                         {{ res.id }}

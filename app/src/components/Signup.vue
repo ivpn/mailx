@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-        <h1 class="text-3xl text-gray-700 font-semibold mb-2">Sign Up</h1>
+        <h1 class="text-3xl text-gray-800 font-semibold mb-2">Sign Up</h1>
         <p class="text-gray-500 mb-8">Have an account? <a class="text-bluish-500 hover:text-bluish-600" href="/login">Log In</a></p>
         <form class="w-full max-w-sm bg-white px-8 pt-6 pb-8 mb-4" @submit.prevent="register">
             <div v-if="!apiSuccess">
@@ -14,10 +14,10 @@
                         placeholder="name@example.net"
                         class="appearance-none outline-none border border-gray-700 w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2"
                         id="email" type="email">
-                    <p v-if="emailError" class="text-red-600 text-sm">Required field</p>
+                    <p v-if="emailError" class="text-red-600 text-sm">Required</p>
                 </div>
                 <div class="mb-6">
-                    <label class="block mb-2" for="password">
+                    <label class="block text-gray-700 mb-2" for="password">
                         Password
                     </label>
                     <input
@@ -25,7 +25,7 @@
                         v-bind:class="{ 'border-red-600': passwordError }"
                         class="appearance-none outline-none border border-gray-700 w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2"
                         id="password" type="password">
-                    <p v-if="passwordError" class="text-red-600 text-sm mb-2">Required field</p>
+                    <p v-if="passwordError" class="text-red-600 text-sm mb-2">Required</p>
                     <p class="text-gray-500 text-sm mb-2">Must be at least 8 characters</p>
                 </div>
                 <div class="flex items-center justify-between">

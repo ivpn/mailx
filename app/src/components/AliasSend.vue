@@ -51,7 +51,7 @@
                                 v-model="toEmail"
                                 class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-bluish-500 mb-2"
                                 type="text">
-                            <p v-if="emailError" class="text-red-600 text-sm">Required field</p>
+                            <p v-if="emailError" class="text-red-600 text-sm">Required</p>
                         </div>
                         <div v-bind:class="{ 'hidden': generatedEmail == '' }" class="mb-5">
                             <p class="text-gray-500 text-sm font-semibold mb-3">

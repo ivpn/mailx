@@ -12,7 +12,7 @@
                     <input v-model="email" v-bind:class="{ 'border-red-600': emailError }"
                         class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-bluish-500 mb-2"
                         id="email" type="email" autocomplete="email">
-                    <p v-if="emailError" class="text-red-600 text-sm">Required field</p>
+                    <p v-if="emailError" class="text-red-600 text-sm">Required</p>
                 </div>
                 <div class="mb-6">
                     <label class="block text-gray-500 text-sm font-semibold mb-2" for="password">
@@ -21,7 +21,7 @@
                     <input v-model="password" v-bind:class="{ 'border-red-600': passwordError }"
                         class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-bluish-500 mb-2"
                         id="password" type="password" autocomplete="current-password">
-                    <p v-if="passwordError" class="text-red-600 text-sm mb-2">Required field</p>
+                    <p v-if="passwordError" class="text-red-600 text-sm mb-2">Required</p>
                 </div>
                 <div class="flex items-center justify-between">
                     <button :disabled="isLoading"

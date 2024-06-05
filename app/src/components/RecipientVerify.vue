@@ -40,7 +40,7 @@
                                 v-bind:class="{ 'border-red-600': otpError }"
                                 class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-bluish-500 mb-2"
                                 id="otp" type="text">
-                            <p v-if="otpError" class="text-red-600 text-sm mb-2">Required field</p>
+                            <p v-if="otpError" class="text-red-600 text-sm mb-2">Required</p>
                         </div>
                     </div>
                     <div class="flex justify-start items-center gap-x-2 py-3 px-4 border-t">

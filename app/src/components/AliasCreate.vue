@@ -32,7 +32,7 @@
                     </div>
                     <div class="p-4 whitespace-normal text-left text-base">
                         <div class="grid space-y-3 mb-5">
-                            <p class="text-gray-700 mb-1">
+                            <p class="text-gray-500 mb-1">
                                 Alias format:
                             </p>
                             <div class="relative flex items-start">
@@ -43,7 +43,7 @@
                                 </div>
                                 <label for="hs-radio-word" class="ms-3">
                                     <span class="block text-sm font-semibold text-gray-800">Word</span>
-                                    <span id="hs-radio-word-description" class="block text-sm text-gray-600">e.g.
+                                    <span id="hs-radio-word-description" class="block text-sm text-gray-500">e.g.
                                         quiet.haze16@{{ alias.domain }}</span>
                                 </label>
                             </div>
@@ -55,7 +55,7 @@
                                 </div>
                                 <label for="hs-radio-chars" class="ms-3">
                                     <span class="block text-sm font-semibold text-gray-800">Random</span>
-                                    <span id="hs-radio-chars-description" class="block text-sm text-gray-600">e.g.
+                                    <span id="hs-radio-chars-description" class="block text-sm text-gray-500">e.g.
                                         uf1h0hxi@{{ alias.domain }}</span>
                                 </label>
                             </div>
@@ -67,33 +67,33 @@
                                 </div>
                                 <label for="hs-radio-uuid" class="ms-3">
                                     <span class="block text-sm font-semibold text-gray-800">UUID</span>
-                                    <span id="hs-radio-uuid-description" class="block text-sm text-gray-600">e.g.
+                                    <span id="hs-radio-uuid-description" class="block text-sm text-gray-500">e.g.
                                         550e8400-e29b-41d4-a716-446655440000@{{ alias.domain }}</span>
                                 </label>
                             </div>
                         </div>
                         <div class="mb-5">
-                            <label for="alias_description" class="block text-gray-700 mb-3">
+                            <label for="alias_description" class="block text-gray-500 mb-3">
                                 Description:
                             </label>
                             <input id="alias_description" v-model="alias.description"
-                                class="appearance-none outline-none border border-gray-700 w-full py-3 px-4 text-gray-700 leading-tight focus:border-bluish-500 mb-2"
+                                class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 leading-tight focus:border-bluish-500 mb-2"
                                 type="text">
                         </div>
                         <div class="mb-5">
-                            <label for="alias_from_name" class="block text-gray-700 mb-3">
+                            <label for="alias_from_name" class="block text-gray-500 mb-3">
                                 From name:
                             </label>
                             <input id="alias_from_name" v-model="alias.from_name"
-                                class="appearance-none outline-none border border-gray-700 w-full py-3 px-4 text-gray-700 leading-tight focus:border-bluish-500 mb-2"
+                                class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 leading-tight focus:border-bluish-500 mb-2"
                                 type="text">
                         </div>
                         <div class="mb-6">
-                            <label for="alias_recipient" class="block text-gray-700 mb-3">
+                            <label for="alias_recipient" class="block text-gray-500 mb-3">
                                 Recipient:
                             </label>
                             <select id="alias_recipient" :disabled="!recipients.length"
-                                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-700 text-gray-700 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none">
+                                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none">
                                 <option v-for="(recipient, index) in recipients" v-bind:recipient
                                     :selected="recipient == settings.recipient || index === 0" :key="recipient">
                                     {{ recipient }}
@@ -101,11 +101,11 @@
                             </select>
                         </div>
                         <div class="mb-6">
-                            <label class="block text-gray-700 mb-3" for="alias_domain">
+                            <label class="block text-gray-500 mb-3" for="alias_domain">
                                 Domain:
                             </label>
                             <select id="alias_domain" :disabled="!domains.length"
-                                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-700 text-gray-700 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none">
+                                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none">
                                 <option v-for="(domain, index) in domains" v-bind:domain
                                     :selected="domain == alias.domain || index === 0" :key="domain">
                                     {{ domain }}

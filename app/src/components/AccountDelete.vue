@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col pb-4 my-8">
+    <div class="flex flex-col p-5 pb-4 my-8 bg-white">
         <h1 class="text-3xl font-semibold text-gray-800 mb-4">Delete Account</h1>
         <p class="text-gray-500 mb-3">
             Are you sure you want to delete your account? This action cannot be undone.

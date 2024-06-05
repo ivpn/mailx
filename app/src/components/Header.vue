@@ -5,7 +5,7 @@
                 <Menu />
                 <div class="hs-dropdown relative inline-flex [--placement:bottom-right] my-3">
                     <button id="hs-dropdown-default" type="button"
-                        class="flex items-center hs-dropdown-toggle text-bluish-500 pl-4 pr-3 hover:text-bluish-600">
+                        class="flex items-center hs-dropdown-toggle text-gray-500 pl-4 pr-3 hover:text-gray-800">
                         {{ getEmail() }}
                         <svg class="ms-1 flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"

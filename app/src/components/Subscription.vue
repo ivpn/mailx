@@ -1,6 +1,6 @@
 <template>
-    <div class="flex flex-col bg-white shadow-sm rounded-xl p-5 pb-4 my-8">
-        <h1 class="text-xl font-bold text-gray-800 mb-4">Subscription</h1>
+    <div class="flex flex-col py-4 my-8">
+        <h1 class="text-3xl font-semibold text-gray-800 mb-4">Subscription</h1>
         <p v-if="res.id" class="text-sm text-gray-500 mb-5">
             <span v-if="isActive()" class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-teal-100 text-teal-800">Active</span>
             <span v-if="!isActive()" class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-gray-100 text-gray-500">Inactive</span>

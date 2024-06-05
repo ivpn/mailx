@@ -1,6 +1,6 @@
 <template>
-    <div class="flex flex-col bg-white shadow-sm rounded-xl p-5 pb-4 my-8">
-        <h1 class="text-2xl font-bold text-gray-800 mb-5">Messages</h1>
+    <div class="flex flex-col py-4 my-8">
+        <h1 class="text-3xl text-gray-800 font-semibold mb-5">Messages</h1>
         <h2 class="font-semibold text-gray-800 mb-5">Last 7 days</h2>
         <div id="chart" class="mb-5"></div>
         <h2 class="font-semibold text-gray-800 mb-5">Last 90 days</h2>

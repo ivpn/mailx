@@ -37,8 +37,8 @@
                             </label>
                             <input
                                 v-model="req.otp"
-                                v-bind:class="{ 'border-red-600': otpError }"
-                                class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 leading-tight focus:border-bluish-500 mb-2"
+                                v-bind:class="{ 'border-gray-500': !otpError, 'border-red-600': otpError }"
+                                class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 leading-tight focus:border-bluish-500 mb-2"
                                 id="otp" type="text">
                             <p v-if="otpError" class="text-red-600 text-sm mb-2">Required</p>
                         </div>

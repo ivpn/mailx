@@ -9,8 +9,10 @@
                     <label class="block text-gray-500 mb-2" for="email">
                         Email Address
                     </label>
-                    <input v-model="email" v-bind:class="{ 'border-red-600': emailError }"
-                        class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2"
+                    <input
+                        v-model="email"
+                        v-bind:class="{ 'border-gray-500': !emailError, 'border-red-600': emailError }"
+                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2"
                         id="email" type="email" autocomplete="email">
                     <p v-if="emailError" class="text-red-600 text-sm">Required</p>
                 </div>
@@ -18,8 +20,10 @@
                     <label class="block text-gray-500 mb-2" for="password">
                         Password
                     </label>
-                    <input v-model="password" v-bind:class="{ 'border-red-600': passwordError }"
-                        class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2"
+                    <input
+                        v-model="password"
+                        v-bind:class="{ 'border-gray-500': !passwordError, 'border-red-600': passwordError }"
+                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2"
                         id="password" type="password" autocomplete="current-password">
                     <p v-if="passwordError" class="text-red-600 text-sm mb-2">Required</p>
                 </div>

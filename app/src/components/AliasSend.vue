@@ -47,9 +47,9 @@
                             </label>
                             <input
                                 v-bind:id="'to_email_' + alias.id"
-                                v-bind:class="{ 'border-red-600': emailError }"
+                                v-bind:class="{ 'border-gray-500': !emailError, 'border-red-600': emailError }"
                                 v-model="toEmail"
-                                class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 leading-tight focus:border-bluish-500 mb-2"
+                                class="appearance-none outline-none border  w-full py-3 px-4 text-gray-500 leading-tight focus:border-bluish-500 mb-2"
                                 type="text">
                             <p v-if="emailError" class="text-red-600 text-sm">Required</p>
                         </div>

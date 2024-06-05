@@ -1,15 +1,15 @@
 <template>
     <nav>
         <div class="flex flex-row items-center gap-8">
-            <a v-bind:class="{ 'text-gray-800 border-bluish-500 border-b-2': route == '/', 'text-gray-500 border-b-2 border-gray-100': route != '/' }"
+            <a v-bind:class="{ 'text-gray-800 border-bluish-500 border-b-2': route == '/', 'text-gray-500 border-b-2 border-white': route != '/' }"
                 class="py-6 font-medium hover:text-gray-800" href="/">Dashboard</a>
-            <a v-bind:class="{ 'text-gray-800 border-bluish-500 border-b-2': route == '/aliases', 'text-gray-500 border-b-2 border-gray-100': route != '/aliases' }"
+            <a v-bind:class="{ 'text-gray-800 border-bluish-500 border-b-2': route == '/aliases', 'text-gray-500 border-b-2 border-white': route != '/aliases' }"
                 class="py-6 font-medium hover:text-gray-800" href="/aliases">Aliases</a>
-            <a v-bind:class="{ 'text-gray-800 border-bluish-500 border-b-2': route == '/recipients', 'text-gray-500 border-b-2 border-gray-100': route != '/recipients' }"
+            <a v-bind:class="{ 'text-gray-800 border-bluish-500 border-b-2': route == '/recipients', 'text-gray-500 border-b-2 border-white': route != '/recipients' }"
                 class="py-6 font-medium hover:text-gray-800" href="/recipients">Recipients</a>
-            <a v-bind:class="{ 'text-gray-800 border-bluish-500 border-b-2': route == '/stats', 'text-gray-500 border-b-2 border-gray-100': route != '/stats' }"
+            <a v-bind:class="{ 'text-gray-800 border-bluish-500 border-b-2': route == '/stats', 'text-gray-500 border-b-2 border-white': route != '/stats' }"
                 class="py-6 font-medium hover:text-gray-800" href="/stats">Stats</a>
-            <a v-bind:class="{ 'text-gray-800 border-bluish-500 border-b-2': route == '/settings', 'text-gray-500 border-b-2 border-gray-100': route != '/settings' }"
+            <a v-bind:class="{ 'text-gray-800 border-bluish-500 border-b-2': route == '/settings', 'text-gray-500 border-b-2 border-white': route != '/settings' }"
                 class="py-6 font-medium hover:text-gray-800" href="/settings">Settings</a>
         </div>
     </nav>

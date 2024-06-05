@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col py-4 my-8">
+    <div class="flex flex-col p-5 pb-4 my-8 bg-white">
         <h1 class="text-3xl font-semibold text-gray-800 mb-4">Subscription</h1>
         <p v-if="res.id" class="text-sm text-gray-500 mb-5">
             <span v-if="isActive()" class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-emerald-100 text-emerald-800">Active</span>

@@ -1,5 +1,5 @@
 <template>
-    <header class="flex flex-col justify-between w-full bg-gray-100">
+    <header class="flex flex-col justify-between w-full bg-white">
         <div class="container mx-auto max-w-screen-lg px-5">
             <div class="flex flex-row justify-between max-w-screen-lg">
                 <Menu />

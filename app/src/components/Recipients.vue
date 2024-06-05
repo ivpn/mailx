@@ -12,7 +12,7 @@
             </div>
         </div>
     </div>
-    <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="flex flex-col py-4 my-8">
+    <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="flex flex-col p-5 pb-4 my-8 bg-white">
         <h1 v-if="!isDashboard" class="text-3xl text-gray-800 font-semibold mb-5">Recipients</h1>
         <h1 v-if="isDashboard" class="text-3xl text-gray-800 font-semibold mb-5">Latest Recipients</h1>
         <div>

@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100">
         <h1 class="text-gray-700 text-2xl font-semibold mb-2">Log In</h1>
-        <p class="text-gray-500 text-sm mb-8">Need an account? <a class="text-blue-600 hover:text-blue-700"
+        <p class="text-gray-500 text-sm mb-8">Need an account? <a class="text-bluish-500 hover:text-bluish-600"
                 href="/signup">Sign Up</a></p>
         <form class="w-full max-w-sm bg-white rounded-md px-8 pt-6 pb-8 mb-4" @submit.prevent="login">
             <div v-if="!isLoggedIn()">
@@ -10,7 +10,7 @@
                         Email Address
                     </label>
                     <input v-model="email" v-bind:class="{ 'border-red-600': emailError }"
-                        class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-blue-600 mb-2"
+                        class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-bluish-500 mb-2"
                         id="email" type="email" autocomplete="email">
                     <p v-if="emailError" class="text-red-600 text-sm">Required field</p>
                 </div>
@@ -19,13 +19,13 @@
                         Password
                     </label>
                     <input v-model="password" v-bind:class="{ 'border-red-600': passwordError }"
-                        class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-blue-600 mb-2"
+                        class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-bluish-500 mb-2"
                         id="password" type="password" autocomplete="current-password">
                     <p v-if="passwordError" class="text-red-600 text-sm mb-2">Required field</p>
                 </div>
                 <div class="flex items-center justify-between">
                     <button :disabled="isLoading"
-                        class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md focus:outline-none focus:shadow-outline"
+                        class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 rounded-md focus:outline-none focus:shadow-outline"
                         type="submit">
                         Log In
                     </button>
@@ -35,7 +35,7 @@
             <div v-if="isLoggedIn()" class="pb-2">
                 <p class="text-gray-500 mb-6">You are logged in</p>
                 <a href="/"
-                    class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md focus:outline-none focus:shadow-outline">
+                    class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 rounded-md focus:outline-none focus:shadow-outline">
                     Go to Dashboard
                 </a>
             </div>

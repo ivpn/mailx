@@ -1,7 +1,7 @@
 <template>
     <div>
         <button v-bind:data-hs-overlay="'#modal-create-alias'"
-            class="mt-3 py-2 pl-2 pr-3 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700">
+            class="mt-3 py-2 pl-2 pr-3 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-md bg-bluish-500 text-white hover:bg-bluish-600">
             <svg class="flex-shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
                 stroke-linejoin="round">
@@ -38,7 +38,7 @@
                             <div class="relative flex items-start">
                                 <div class="flex items-center h-5 mt-1">
                                     <input v-model="alias.format" value="word" id="hs-radio-word" name="hs-radio-with-description" type="radio"
-                                        class="form-radio border-gray-200 rounded-full text-blue-600 focus:ring-white"
+                                        class="form-radio border-gray-200 rounded-full text-bluish-500 focus:ring-white"
                                         aria-describedby="hs-radio-word-description" checked>
                                 </div>
                                 <label for="hs-radio-word" class="ms-3">
@@ -50,7 +50,7 @@
                             <div class="relative flex items-start">
                                 <div class="flex items-center h-5 mt-1">
                                     <input v-model="alias.format" value="chars" id="hs-radio-chars" name="hs-radio-with-description" type="radio"
-                                        class="form-radio border-gray-200 rounded-full text-blue-600 focus:ring-white"
+                                        class="form-radio border-gray-200 rounded-full text-bluish-500 focus:ring-white"
                                         aria-describedby="hs-radio-chars-description">
                                 </div>
                                 <label for="hs-radio-chars" class="ms-3">
@@ -62,7 +62,7 @@
                             <div class="relative flex items-start">
                                 <div class="flex items-center h-5 mt-1">
                                     <input v-model="alias.format" value="uuid" id="hs-radio-uuid" name="hs-radio-with-description" type="radio"
-                                        class="form-radio border-gray-200 rounded-full text-blue-600 focus:ring-white"
+                                        class="form-radio border-gray-200 rounded-full text-bluish-500 focus:ring-white"
                                         aria-describedby="hs-radio-uuid-description">
                                 </div>
                                 <label for="hs-radio-uuid" class="ms-3">
@@ -77,7 +77,7 @@
                                 Description:
                             </label>
                             <input id="alias_description" v-model="alias.description"
-                                class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-blue-600 mb-2"
+                                class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-bluish-500 mb-2"
                                 type="text">
                         </div>
                         <div class="mb-5">
@@ -85,7 +85,7 @@
                                 From name:
                             </label>
                             <input id="alias_from_name" v-model="alias.from_name"
-                                class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-blue-600 mb-2"
+                                class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-bluish-500 mb-2"
                                 type="text">
                         </div>
                         <div class="mb-6">
@@ -93,7 +93,7 @@
                                 Recipient:
                             </label>
                             <select id="alias_recipient" :disabled="!recipients.length"
-                                class="form-select py-2.5 px-4 pe-9 block w-full border-2 border-gray-200 rounded-lg text-gray-700 focus:border-blue-600 disabled:opacity-50 disabled:pointer-events-none outline-none">
+                                class="form-select py-2.5 px-4 pe-9 block w-full border-2 border-gray-200 rounded-lg text-gray-700 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none">
                                 <option v-for="(recipient, index) in recipients" v-bind:recipient
                                     :selected="recipient == settings.recipient || index === 0" :key="recipient">
                                     {{ recipient }}
@@ -105,7 +105,7 @@
                                 Domain:
                             </label>
                             <select id="alias_domain" :disabled="!domains.length"
-                                class="form-select py-2.5 px-4 pe-9 block w-full border-2 border-gray-200 rounded-lg text-gray-700 focus:border-blue-600 disabled:opacity-50 disabled:pointer-events-none outline-none">
+                                class="form-select py-2.5 px-4 pe-9 block w-full border-2 border-gray-200 rounded-lg text-gray-700 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none">
                                 <option v-for="(domain, index) in domains" v-bind:domain
                                     :selected="domain == alias.domain || index === 0" :key="domain">
                                     {{ domain }}
@@ -115,7 +115,7 @@
                     </div>
                     <div class="flex justify-start items-center gap-x-2 py-3 px-4 border-t">
                         <button @click="postAlias"
-                            class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+                            class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-md bg-bluish-500 text-white hover:bg-bluish-600 disabled:opacity-50 disabled:pointer-events-none">
                             Create Alias
                         </button>
                         <button @click="close"

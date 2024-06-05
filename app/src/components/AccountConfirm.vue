@@ -4,7 +4,7 @@
             Verify Your Email
         </h3>
         <p class="my-2 text-gray-500">
-            Please <a class="text-blue-600 hover:text-blue-700 font-medium" href="/account">verify</a> your account email address.
+            Please <a class="text-bluish-500 hover:text-bluish-600 font-medium" href="/account">verify</a> your account email address.
         </p>
     </div>
     <div v-if="!res.is_active && !isDashboard" class="flex flex-col bg-white shadow-sm rounded-xl p-5 pb-4 my-8">
@@ -20,14 +20,14 @@
                 <input
                     v-model="otp"
                     v-bind:class="{ 'border-red-600': otpError }"
-                    class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-blue-600 mb-2"
+                    class="appearance-none outline-none border-2 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:border-bluish-500 mb-2"
                     id="account-otp" type="text">
                 <p v-if="otpError" class="text-red-600 text-sm mb-2">Required field</p>
             </div>
             <div class="flex flex-row gap-4">
                 <button
                     @click="confirmEmail"
-                    class="bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm py-2 px-3 rounded-md focus:outline-none focus:shadow-outline"
+                    class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium text-sm py-2 px-3 rounded-md focus:outline-none focus:shadow-outline"
                     type="submit">
                     Verify
                 </button>

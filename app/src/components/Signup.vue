@@ -98,6 +98,10 @@ const register = async () => {
         apiSuccess.value = ''
         if (axios.isAxiosError(err)) {
             apiError.value = err.response?.data.error || err.message
+
+            if (err.response?.status === 429) {
+                apiError.value = 'Too many requests, please try again later'
+            }
         }
     } finally {
         isLoading.value = false // End loading

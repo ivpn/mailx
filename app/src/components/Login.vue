@@ -34,7 +34,7 @@
                         Log In
                     </button>
                 </div>
-                <p v-if="apiError" class="text-red-600 text-sm mt-6">{{ apiError }}</p>
+                <p v-if="apiError" class="text-red-600 text-sm mt-6">Error: {{ apiError }}</p>
             </div>
             <div v-if="isLoggedIn()" class="pb-2">
                 <p class="text-gray-500 mb-6">You are logged in</p>
@@ -95,6 +95,10 @@ const login = async () => {
     } catch (err) {
         if (axios.isAxiosError(err)) {
             apiError.value = err.response?.data.error || err.message
+
+            if (err.response?.status === 429) {
+                apiError.value = 'Too many requests, please try again later'
+            }
         }
     } finally {
         isLoading.value = false // End loading

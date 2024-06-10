@@ -5,7 +5,7 @@ import (
 	"errors"
 	"log"
 
-	"gorm.io/gorm"
+	"github.com/go-sql-driver/mysql"
 	"ivpn.net/email/api/internal/model"
 )
 
@@ -65,10 +65,10 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 		err := s.Store.PostAlias(ctx, alias)
 		if err != nil {
 			log.Printf("error creating alias: %s", err.Error())
-			switch {
-			case errors.Is(err, gorm.ErrDuplicatedKey):
+			var mysqlErr *mysql.MySQLError
+			if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
 				continue
-			default:
+			} else {
 				return ErrPostAlias
 			}
 		}

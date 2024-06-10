@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/smtp"
 
@@ -17,11 +18,15 @@ func main() {
 }
 
 func send(cfg config.SMTPConfig) {
+	var alias string
+	flag.StringVar(&alias, "alias", "", "Alias to use for sending a test email")
+	flag.Parse()
+
 	err := smtp.SendMail(
 		cfg.Host+":"+cfg.Port,
 		nil,
 		"foo@bar.com",
-		[]string{"white.fog68@example.com"},
+		[]string{alias},
 		[]byte(
 			"From: Foo Bar <foo@bar.com>\r\n"+
 				"Content-Type: text/plain; charset=us-ascii\r\n"+

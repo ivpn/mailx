@@ -51,7 +51,7 @@
                                 v-model="toEmail"
                                 class="appearance-none outline-none border  w-full py-3 px-4 text-gray-500 leading-tight focus:border-bluish-500 mb-2"
                                 type="text">
-                            <p v-if="emailError" class="text-red-600 text-sm">Required</p>
+                            <p v-if="emailError" class="text-red-600 text-sm">Valid email required</p>
                         </div>
                         <div v-bind:class="{ 'hidden': generatedEmail == '' }" class="mb-5">
                             <p class="text-gray-500 mb-3">
@@ -100,13 +100,22 @@ const generatedEmail = ref('')
 const emailError = ref(false)
 const copyText = ref('Click to copy')
 
+const isValidEmail = (email: string) => {
+    const re = /\S+@\S+\.\S+/
+    return re.test(email)
+}
+
 const validateEmail = () => {
-    emailError.value = !toEmail.value
+    emailError.value = !toEmail.value || !isValidEmail(toEmail.value)
     return !emailError.value
 }
 
 const showAddress = () => {
-    if (!validateEmail()) return
+    if (!validateEmail()) {
+        generatedEmail.value = ''
+        return
+    }
+
     generatedEmail.value = alias.value.name.replace('@', `+${toEmail.value.replace('@', '=')}@`)
 }
 

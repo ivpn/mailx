@@ -36,7 +36,7 @@
                         Sign Up
                     </button>
                 </div>
-                <p v-if="apiError" class="text-red-600 text-sm mt-6">{{ apiError }}</p>
+                <p v-if="apiError" class="text-red-600 text-sm mt-6">Error: {{ apiError }}</p>
             </div>
             <div v-if="apiSuccess">
                 <p class="text-emerald-600 text-sm mb-6">{{ apiSuccess }}</p>
@@ -98,6 +98,10 @@ const register = async () => {
         apiSuccess.value = ''
         if (axios.isAxiosError(err)) {
             apiError.value = err.response?.data.error || err.message
+
+            if (err.response?.status === 429) {
+                apiError.value = 'Too many requests, please try again later'
+            }
         }
     } finally {
         isLoading.value = false // End loading

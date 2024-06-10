@@ -61,7 +61,7 @@ gosec ./...
 
 Send test email:  
 ```bash
-go run test/send_test_mail.go
+go run test/send_test_mail.go -alias=dark.sky86@example.net
 ```
 
 ### API Documentation

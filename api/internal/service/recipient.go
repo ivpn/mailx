@@ -5,7 +5,7 @@ import (
 	"errors"
 	"log"
 
-	"gorm.io/gorm"
+	"github.com/go-sql-driver/mysql"
 	"ivpn.net/email/api/internal/client/mailer"
 	"ivpn.net/email/api/internal/model"
 	"ivpn.net/email/api/internal/utils"
@@ -88,10 +88,10 @@ func (s *Service) PostRecipient(ctx context.Context, recipient model.Recipient) 
 	recipient, err = s.Store.PostRecipient(ctx, recipient)
 	if err != nil {
 		log.Printf("error creating recipient: %s", err.Error())
-		switch {
-		case errors.Is(err, gorm.ErrDuplicatedKey):
+		var mysqlErr *mysql.MySQLError
+		if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
 			return model.ErrDuplicateRecipient
-		default:
+		} else {
 			return ErrPostRecipient
 		}
 	}

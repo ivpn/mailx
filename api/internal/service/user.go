@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"gorm.io/gorm"
+	"github.com/go-sql-driver/mysql"
 	"ivpn.net/email/api/internal/client/mailer"
 	"ivpn.net/email/api/internal/model"
 	"ivpn.net/email/api/internal/utils"
@@ -84,10 +84,10 @@ func (s *Service) PostUser(ctx context.Context, user model.User) error {
 	user, err = s.Store.PostUser(ctx, user)
 	if err != nil {
 		log.Printf("error creating user: %s", err.Error())
-		switch {
-		case errors.Is(err, gorm.ErrDuplicatedKey):
+		var mysqlErr *mysql.MySQLError
+		if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
 			return model.ErrDuplicateEmail
-		default:
+		} else {
 			return ErrPostUser
 		}
 	}

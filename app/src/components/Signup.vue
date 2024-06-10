@@ -36,7 +36,7 @@
                         Sign Up
                     </button>
                 </div>
-                <p v-if="apiError" class="text-red-600 text-sm mt-6">{{ apiError }}</p>
+                <p v-if="apiError" class="text-red-600 text-sm mt-6">Error: {{ apiError }}</p>
             </div>
             <div v-if="apiSuccess">
                 <p class="text-green-600 text-sm mb-6">{{ apiSuccess }}</p>

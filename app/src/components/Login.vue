@@ -30,7 +30,7 @@
                         Log In
                     </button>
                 </div>
-                <p v-if="apiError" class="text-red-600 text-sm mt-6">{{ apiError }}</p>
+                <p v-if="apiError" class="text-red-600 text-sm mt-6">Error: {{ apiError }}</p>
             </div>
             <div v-if="isLoggedIn()" class="pb-2">
                 <p class="text-gray-500 mb-6">You are logged in</p>

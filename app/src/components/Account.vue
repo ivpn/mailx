@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import AccountConfirm from './AccountConfirm.vue'
+import AccountConfirm from './AccountVerify.vue'
 import Subscription from './Subscription.vue';
 import DeleteAccount from './AccountDelete.vue'
 </script>

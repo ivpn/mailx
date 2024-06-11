@@ -12,9 +12,9 @@
             </div>
         </div>
     </div>
-    <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="flex flex-col bg-white shadow-sm rounded-xl p-5 pb-4 my-8">
-        <h1 v-if="!isDashboard" class="text-2xl font-bold text-gray-800 mb-5">Recipients</h1>
-        <h1 v-if="isDashboard" class="text-2xl font-bold text-gray-800 mb-5">Latest Recipients</h1>
+    <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="flex flex-col p-5 pb-4 my-8 bg-white">
+        <h1 v-if="!isDashboard" class="text-3xl text-gray-800 font-semibold mb-5">Recipients</h1>
+        <h1 v-if="isDashboard" class="text-3xl text-gray-800 font-semibold mb-5">Latest Recipients</h1>
         <div>
             <div class="flex items-center justify-between mb-6">
                 <RecipientCreate @onCreateRecipient="getList" />
@@ -50,7 +50,7 @@
             </div>
         </div>
         <p v-if="isDashboard" class="text-sm text-gray-500 my-4">
-            <a href="/recipients" class="text-blue-600 hover:text-blue-700 font-medium text-sm py-2"
+            <a href="/recipients" class="text-bluish-500 hover:text-bluish-600 font-medium text-sm py-2"
                 type="submit">All Recipients</a>
         </p>
         <p v-if="error" class="text-red-600 text-sm mb-4">Error: {{ error }}</p>

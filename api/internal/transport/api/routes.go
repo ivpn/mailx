@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/gofiber/fiber/v2/middleware/healthcheck"
+	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/swagger"
 	"ivpn.net/email/api/config"
@@ -11,6 +12,7 @@ import (
 
 func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	h.Server.Use(auth.NewAPICORS(cfg))
+	h.Server.Use(helmet.New())
 	h.Server.Use(healthcheck.New())
 
 	p := h.Server.Group("/v1/p")

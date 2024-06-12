@@ -34,14 +34,14 @@ type RecipientService interface {
 // @Security ApiKeyAuth
 // @Param id path string true "Recipient ID"
 // @Success 200 {object} model.Recipient
-// @Failure 500 {object} ErrorRes
+// @Failure 400 {object} ErrorRes
 // @Router /recipient/{id} [get]
 func (h *Handler) GetRecipient(c *fiber.Ctx) error {
 	userID := auth.GetUserID(c)
 	id := c.Params("id")
 	recipient, err := h.Service.GetRecipient(c.Context(), id, userID)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
@@ -56,13 +56,13 @@ func (h *Handler) GetRecipient(c *fiber.Ctx) error {
 // @Produce json
 // @Security ApiKeyAuth
 // @Success 200 {array} model.Recipient
-// @Failure 500 {object} ErrorRes
+// @Failure 400 {object} ErrorRes
 // @Router /recipients [get]
 func (h *Handler) GetRecipients(c *fiber.Ctx) error {
 	userID := auth.GetUserID(c)
 	recipients, err := h.Service.GetRecipients(c.Context(), userID)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
@@ -78,20 +78,20 @@ func (h *Handler) GetRecipients(c *fiber.Ctx) error {
 // @Security ApiKeyAuth
 // @Param body body RecipientReq true "Recipient request"
 // @Success 201 {object} SuccessRes
-// @Failure 500 {object} ErrorRes
+// @Failure 400 {object} ErrorRes
 // @Router /recipient [post]
 func (h *Handler) PostRecipient(c *fiber.Ctx) error {
 	req := RecipientReq{}
 	err := c.BodyParser(&req)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidRequest,
 		})
 	}
 
 	err = h.Validator.Struct(req)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidRequest,
 		})
 	}
@@ -104,7 +104,7 @@ func (h *Handler) PostRecipient(c *fiber.Ctx) error {
 
 	err = h.Service.PostRecipient(c.Context(), recipient)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
@@ -122,14 +122,14 @@ func (h *Handler) PostRecipient(c *fiber.Ctx) error {
 // @Security ApiKeyAuth
 // @Param id path string true "Recipient ID"
 // @Success 200 {object} SuccessRes
-// @Failure 500 {object} ErrorRes
+// @Failure 400 {object} ErrorRes
 // @Router /recipient/sendotp/{id} [post]
 func (h *Handler) SendRecipientOTP(c *fiber.Ctx) error {
 	userID := auth.GetUserID(c)
 	ID := c.Params("id")
 	err := h.Service.SendRecipientOTP(c.Context(), ID, userID)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
@@ -148,7 +148,7 @@ func (h *Handler) SendRecipientOTP(c *fiber.Ctx) error {
 // @Param id path string true "Recipient ID"
 // @Param body body ActivateReq true "Activate request"
 // @Success 200 {object} SuccessRes
-// @Failure 500 {object} ErrorRes
+// @Failure 400 {object} ErrorRes
 // @Router /recipient/activate/{id} [post]
 func (h *Handler) ActivateRecipient(c *fiber.Ctx) error {
 	userID := auth.GetUserID(c)
@@ -157,21 +157,21 @@ func (h *Handler) ActivateRecipient(c *fiber.Ctx) error {
 	req := ActivateReq{}
 	err := c.BodyParser(&req)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidRequest,
 		})
 	}
 
 	err = h.Validator.Struct(req)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidRequest,
 		})
 	}
 
 	err = h.Service.ActivateRecipient(c.Context(), ID, userID, req.OTP)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
@@ -189,14 +189,14 @@ func (h *Handler) ActivateRecipient(c *fiber.Ctx) error {
 // @Security ApiKeyAuth
 // @Param id path string true "Recipient ID"
 // @Success 200 {object} SuccessRes
-// @Failure 500 {object} ErrorRes
+// @Failure 400 {object} ErrorRes
 // @Router /recipient/{id} [delete]
 func (h *Handler) DeleteRecipient(c *fiber.Ctx) error {
 	userID := auth.GetUserID(c)
 	ID := c.Params("id")
 	err := h.Service.DeleteRecipient(c.Context(), ID, userID)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}

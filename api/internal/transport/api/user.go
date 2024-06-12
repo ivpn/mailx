@@ -41,15 +41,15 @@ type UserService interface {
 // @Accept json
 // @Produce json
 // @Param body body UserReq true "User request"
-// @Success 200 {object} SuccessRes
-// @Failure 500 {object} ErrorRes
+// @Success 201 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
 // @Router /p/register [post]
 func (h *Handler) Register(c *fiber.Ctx) error {
 	// Parse the request
 	req := UserReq{}
 	err := c.BodyParser(&req)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidRequest,
 		})
 	}
@@ -57,7 +57,7 @@ func (h *Handler) Register(c *fiber.Ctx) error {
 	// Validate the request
 	err = h.Validator.Struct(req)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidRequest,
 		})
 	}
@@ -72,12 +72,12 @@ func (h *Handler) Register(c *fiber.Ctx) error {
 	// Save the user
 	err = h.Service.PostUser(c.Context(), user)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
 
-	return c.Status(200).JSON(fiber.Map{
+	return c.Status(201).JSON(fiber.Map{
 		"message": RegisterSuccess,
 	})
 }
@@ -89,14 +89,14 @@ func (h *Handler) Register(c *fiber.Ctx) error {
 // @Produce json
 // @Security ApiKeyAuth
 // @Success 200 {object} SuccessRes
-// @Failure 500 {object} ErrorRes
+// @Failure 400 {object} ErrorRes
 // @Router /user/sendotp [post]
 func (h *Handler) SendUserOTP(c *fiber.Ctx) error {
 	ID := auth.GetUserID(c)
 
 	err := h.Service.SendUserOTP(c.Context(), ID)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
@@ -114,7 +114,7 @@ func (h *Handler) SendUserOTP(c *fiber.Ctx) error {
 // @Security ApiKeyAuth
 // @Param body body ActivateReq true "Activate request"
 // @Success 200 {object} SuccessRes
-// @Failure 500 {object} ErrorRes
+// @Failure 400 {object} ErrorRes
 // @Router /user/activate [post]
 func (h *Handler) Activate(c *fiber.Ctx) error {
 	ID := auth.GetUserID(c)
@@ -122,7 +122,7 @@ func (h *Handler) Activate(c *fiber.Ctx) error {
 	req := ActivateReq{}
 	err := c.BodyParser(&req)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidRequest,
 		})
 	}
@@ -130,14 +130,14 @@ func (h *Handler) Activate(c *fiber.Ctx) error {
 	// Validate the request
 	err = h.Validator.Struct(req)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidRequest,
 		})
 	}
 
 	err = h.Service.ActivateUser(c.Context(), ID, req.OTP)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
@@ -154,7 +154,7 @@ func (h *Handler) Activate(c *fiber.Ctx) error {
 // @Produce json
 // @Param body body UserReq true "User request"
 // @Success 200 {object} SuccessRes
-// @Failure 500 {object} ErrorRes
+// @Failure 400 {object} ErrorRes
 // @Router /p/login [post]
 func (h *Handler) Login(c *fiber.Ctx) error {
 	// Parse the request
@@ -162,7 +162,7 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 	err := c.BodyParser(&req)
 	if err != nil {
 		log.Printf("error login: %s", err.Error())
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidRequest,
 		})
 	}
@@ -171,7 +171,7 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 	err = h.Validator.Struct(req)
 	if err != nil {
 		log.Printf("error login: %s", err.Error())
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidRequest,
 		})
 	}
@@ -189,7 +189,7 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 	token, err := utils.CreateAuthToken(h.Cfg, user.ID, user.Email)
 	if err != nil {
 		log.Printf("error login: %s", err.Error())
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidCredentials,
 		})
 	}
@@ -209,21 +209,21 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 // @Produce json
 // @Security ApiKeyAuth
 // @Success 200 {object} SuccessRes
-// @Failure 500 {object} ErrorRes
+// @Failure 400 {object} ErrorRes
 // @Router /user/logout [post]
 func (h *Handler) Logout(c *fiber.Ctx) error {
 	jwt := auth.GetToken(c)
 	jwtSignature := auth.GetTokenSignature(jwt)
 	jwtExp, err := auth.GetTokenExp(h.Cfg, c)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": ErrLogoutUser,
 		})
 	}
 
 	err = h.Service.LogoutUser(c.Context(), jwtSignature, jwtExp)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
@@ -243,7 +243,7 @@ func (h *Handler) Logout(c *fiber.Ctx) error {
 // @Security ApiKeyAuth
 // @Param body body DeleteUserReq true "Delete user request"
 // @Success 200 {object} SuccessRes
-// @Failure 500 {object} ErrorRes
+// @Failure 400 {object} ErrorRes
 // @Router /user/delete [post]
 func (h *Handler) DeleteUser(c *fiber.Ctx) error {
 	ID := auth.GetUserID(c)
@@ -253,7 +253,7 @@ func (h *Handler) DeleteUser(c *fiber.Ctx) error {
 	err := c.BodyParser(&req)
 	if err != nil {
 		log.Printf("error deleting user: %s", err.Error())
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidRequest,
 		})
 	}
@@ -261,7 +261,7 @@ func (h *Handler) DeleteUser(c *fiber.Ctx) error {
 	// Validate the request
 	err = h.Validator.Struct(req)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidRequest,
 		})
 	}
@@ -278,7 +278,7 @@ func (h *Handler) DeleteUser(c *fiber.Ctx) error {
 	// Delete the user
 	err = h.Service.DeleteUser(c.Context(), ID)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
@@ -295,14 +295,14 @@ func (h *Handler) DeleteUser(c *fiber.Ctx) error {
 // @Produce json
 // @Security ApiKeyAuth
 // @Success 200 {object} model.User
-// @Failure 500 {object} ErrorRes
+// @Failure 400 {object} ErrorRes
 // @Router /user [get]
 func (h *Handler) GetUser(c *fiber.Ctx) error {
 	ID := auth.GetUserID(c)
 
 	user, err := h.Service.GetUser(c.Context(), ID)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
@@ -317,14 +317,14 @@ func (h *Handler) GetUser(c *fiber.Ctx) error {
 // @Produce json
 // @Security ApiKeyAuth
 // @Success 200 {object} model.UserStats
-// @Failure 500 {object} ErrorRes
+// @Failure 400 {object} ErrorRes
 // @Router /user/stats [get]
 func (h *Handler) GetUserStats(c *fiber.Ctx) error {
 	ID := auth.GetUserID(c)
 
 	stats, err := h.Service.GetUserStats(c.Context(), ID)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}

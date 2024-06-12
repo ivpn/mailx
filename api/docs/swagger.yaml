@@ -211,8 +211,8 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/api.SuccessRes'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/api.ErrorRes'
       security:
@@ -238,8 +238,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/api.SuccessRes'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/api.ErrorRes'
       security:
@@ -264,8 +264,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.Alias'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/api.ErrorRes'
       security:
@@ -296,8 +296,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/api.SuccessRes'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/api.ErrorRes'
       security:
@@ -319,8 +319,8 @@ paths:
             items:
               $ref: '#/definitions/model.Alias'
             type: array
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/api.ErrorRes'
       security:
@@ -347,8 +347,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/api.SuccessRes'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/api.ErrorRes'
       summary: Login user
@@ -369,12 +369,12 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
             $ref: '#/definitions/api.SuccessRes'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/api.ErrorRes'
       summary: Register user
@@ -399,8 +399,8 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/api.SuccessRes'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/api.ErrorRes'
       security:
@@ -426,8 +426,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/api.SuccessRes'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/api.ErrorRes'
       security:
@@ -452,8 +452,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.Recipient'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/api.ErrorRes'
       security:
@@ -485,8 +485,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/api.SuccessRes'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/api.ErrorRes'
       security:
@@ -512,8 +512,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/api.SuccessRes'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/api.ErrorRes'
       security:
@@ -535,8 +535,8 @@ paths:
             items:
               $ref: '#/definitions/model.Recipient'
             type: array
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/api.ErrorRes'
       security:
@@ -556,8 +556,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.Settings'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/api.ErrorRes'
       security:
@@ -583,8 +583,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/api.SuccessRes'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/api.ErrorRes'
       security:
@@ -604,8 +604,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.Subscription'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/api.ErrorRes'
       security:
@@ -632,8 +632,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/api.SuccessRes'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/api.ErrorRes'
       security:
@@ -653,8 +653,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.User'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/api.ErrorRes'
       security:
@@ -681,8 +681,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/api.SuccessRes'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/api.ErrorRes'
       security:
@@ -709,8 +709,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/api.SuccessRes'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/api.ErrorRes'
       security:
@@ -730,8 +730,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/api.SuccessRes'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/api.ErrorRes'
       security:
@@ -751,8 +751,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/api.SuccessRes'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/api.ErrorRes'
       security:
@@ -772,8 +772,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.UserStats'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/api.ErrorRes'
       security:

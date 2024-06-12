@@ -51,8 +51,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -94,8 +94,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/model.Alias"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -144,8 +144,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -185,8 +185,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -222,8 +222,8 @@ const docTemplate = `{
                             }
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -262,8 +262,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -296,14 +296,14 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -347,8 +347,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -399,8 +399,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -442,8 +442,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -485,8 +485,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/model.Recipient"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -526,8 +526,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -563,8 +563,8 @@ const docTemplate = `{
                             }
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -597,8 +597,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/model.Settings"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -640,8 +640,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -674,8 +674,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/model.Subscription"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -719,8 +719,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -753,8 +753,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/model.User"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -798,8 +798,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -843,8 +843,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -877,8 +877,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -911,8 +911,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -945,8 +945,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/model.UserStats"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }

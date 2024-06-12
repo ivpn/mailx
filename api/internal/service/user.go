@@ -35,6 +35,7 @@ type UserStore interface {
 	ActivateUser(context.Context, string) error
 	DeleteUser(context.Context, string) error
 	GetUserStats(context.Context, string) (model.UserStats, error)
+	ChangePassword(context.Context, model.User) error
 }
 
 func (s *Service) GetUser(ctx context.Context, userID string) (model.User, error) {
@@ -266,6 +267,28 @@ func (s *Service) LogoutUser(ctx context.Context, jwtSignature string, jwtExp ti
 	if err != nil {
 		log.Printf("error saving jwt: %s", err.Error())
 		return ErrLogoutUser
+	}
+
+	return nil
+}
+
+func (s *Service) ChangePassword(ctx context.Context, userID string, password string) error {
+	user, err := s.Store.GetUser(ctx, userID)
+	if err != nil {
+		log.Printf("error changing password: %s", err.Error())
+		return ErrGetUser
+	}
+
+	err = user.SetPassword(password)
+	if err != nil {
+		log.Printf("error changing password: %s", err.Error())
+		return err
+	}
+
+	err = s.Store.ChangePassword(ctx, user)
+	if err != nil {
+		log.Printf("error changing password: %s", err.Error())
+		return ErrPostUser
 	}
 
 	return nil

@@ -34,6 +34,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Post("/user/delete", h.DeleteUser)
 	v1.Get("/user", h.GetUser)
 	v1.Get("/user/stats", h.GetUserStats)
+	v1.Put("/user/changepassword", h.ChangePassword)
 
 	v1.Get("/subscription", h.GetSubscription)
 

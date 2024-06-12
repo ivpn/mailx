@@ -24,6 +24,15 @@ definitions:
     - domain
     - recipients
     type: object
+  api.ChangePasswordReq:
+    properties:
+      password:
+        maxLength: 64
+        minLength: 8
+        type: string
+    required:
+    - password
+    type: object
   api.DeleteUserReq:
     properties:
       password:
@@ -37,6 +46,13 @@ definitions:
     properties:
       error:
         type: string
+    type: object
+  api.InitiatePasswordResetReq:
+    properties:
+      email:
+        type: string
+    required:
+    - email
     type: object
   api.RecipientReq:
     properties:
@@ -328,6 +344,32 @@ paths:
       summary: Get aliases
       tags:
       - alias
+  /p/initiatepasswordreset:
+    post:
+      consumes:
+      - application/json
+      description: Initiate password reset
+      parameters:
+      - description: Initiate password reset request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.InitiatePasswordResetReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Initiate password reset
+      tags:
+      - user
   /p/login:
     post:
       consumes:
@@ -688,6 +730,34 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Activate user
+      tags:
+      - user
+  /user/changepassword:
+    put:
+      consumes:
+      - application/json
+      description: Change password
+      parameters:
+      - description: Change password request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.ChangePasswordReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Change password
       tags:
       - user
   /user/delete:

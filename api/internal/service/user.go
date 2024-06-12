@@ -315,7 +315,10 @@ func (s *Service) InitiatePasswordReset(ctx context.Context, email string) error
 
 	utils.Background(func() {
 		data := map[string]interface{}{
-			"otp": otp.Secret,
+			"otp":        otp.Secret,
+			"from":       s.Cfg.SMTPClient.SenderName,
+			"origin":     s.Cfg.API.ApiAllowOrigin,
+			"expiration": s.Cfg.Service.OTPExpiration.Minutes(),
 		}
 		mailer := mailer.New(s.Cfg.SMTPClient)
 		mailer.Sender = s.Cfg.SMTPClient.Sender

@@ -3,7 +3,8 @@ Here is the OTP token to verify your recipient email address: {{.otp}}
 
 Note: Unverified recipients will not receive any forwarded emails and may be deleted after 7 days.
 
-- {{.from}}
+Regards,
+{{.from}}
 {{end}}
 
 {{define "bodyHtml"}}
@@ -13,6 +14,7 @@ Here is the OTP token to verify your recipient email address:<br><br>
 <br>
 Note: Unverified recipients will not receive any forwarded emails and may be deleted after 7 days.
 <br><br>
-- <i>{{.from}}</i>
+Regards,<br>
+{{.from}}
 </div>
 {{end}}

@@ -54,6 +54,18 @@ definitions:
     required:
     - email
     type: object
+  api.PasswordResetReq:
+    properties:
+      otp:
+        type: string
+      password:
+        maxLength: 64
+        minLength: 8
+        type: string
+    required:
+    - otp
+    - password
+    type: object
   api.RecipientReq:
     properties:
       email:
@@ -420,6 +432,32 @@ paths:
           schema:
             $ref: '#/definitions/api.ErrorRes'
       summary: Register user
+      tags:
+      - user
+  /p/resetpassword:
+    put:
+      consumes:
+      - application/json
+      description: Reset password
+      parameters:
+      - description: Password reset request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.PasswordResetReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Reset password
       tags:
       - user
   /recipient:

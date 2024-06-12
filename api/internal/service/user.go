@@ -205,7 +205,7 @@ func (s *Service) ActivateUser(ctx context.Context, ID string, otp string) error
 
 	_, err = s.Store.PostRecipient(ctx, recipient)
 	if err != nil {
-		return ErrActivateUser
+		log.Printf("error saving account email as recipient: %s", err.Error())
 	}
 
 	return nil

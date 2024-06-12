@@ -8,6 +8,7 @@ import Settings from './components/Settings.vue'
 import Account from './components/Account.vue'
 import Signup from './components/Signup.vue'
 import Login from './components/Login.vue'
+import NotFound from './components/NotFound.vue'
 import { type IStaticMethods } from 'preline/preline'
 
 declare global {
@@ -63,6 +64,12 @@ const routes = [
         path: '/login',
         name: 'App - Log In',
         component: Login
+    },
+    // 404
+    {
+        path: '/:pathMatch(.*)*',
+        name: '404 - Not Found',
+        component: NotFound
     }
 ]
 

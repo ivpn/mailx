@@ -427,13 +427,13 @@ func (h *Handler) InitiatePasswordReset(c *fiber.Ctx) error {
 // @Tags user
 // @Accept json
 // @Produce json
-// @Param body body PasswordResetReq true "Password reset request"
+// @Param body body ResetPasswordReq true "Password reset request"
 // @Success 200 {object} SuccessRes
 // @Failure 400 {object} ErrorRes
 // @Router /p/resetpassword [put]
 func (h *Handler) ResetPassword(c *fiber.Ctx) error {
 	// Parse the request
-	req := PasswordResetReq{}
+	req := ResetPasswordReq{}
 	err := c.BodyParser(&req)
 	if err != nil {
 		log.Printf("error resetting password: %s", err.Error())

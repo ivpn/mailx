@@ -42,7 +42,7 @@ type InitiatePasswordResetReq struct {
 	Email string `json:"email" validate:"required,email"`
 }
 
-type PasswordResetReq struct {
+type ResetPasswordReq struct {
 	OTP      string `json:"otp" validate:"required,len=32"`
 	Password string `json:"password" validate:"required,min=8,max=64"`
 }

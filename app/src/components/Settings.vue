@@ -64,7 +64,7 @@
         <div class="mb-3">
             <button
                 @click="saveSettings"
-                class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium text-sm py-2 px-3 rounded-md focus:outline-none focus:shadow-outline"
+                class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-2 px-3 focus:outline-none focus:shadow-outline"
                 type="submit">
                 Save Settings
             </button>

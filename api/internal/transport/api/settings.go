@@ -24,14 +24,14 @@ type SettingsService interface {
 // @Produce json
 // @Security ApiKeyAuth
 // @Success 200 {object} model.Settings
-// @Failure 500 {object} ErrorRes
+// @Failure 400 {object} ErrorRes
 // @Router /settings [get]
 func (h *Handler) GetSettings(c *fiber.Ctx) error {
 	userID := auth.GetUserID(c)
 
 	settings, err := h.Service.GetSettings(c.Context(), userID)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
@@ -47,7 +47,7 @@ func (h *Handler) GetSettings(c *fiber.Ctx) error {
 // @Security ApiKeyAuth
 // @Param settings body SettingsReq true "Settings"
 // @Success 200 {object} SuccessRes
-// @Failure 500 {object} ErrorRes
+// @Failure 400 {object} ErrorRes
 // @Router /settings [put]
 func (h *Handler) UpdateSettings(c *fiber.Ctx) error {
 	userID := auth.GetUserID(c)
@@ -55,14 +55,14 @@ func (h *Handler) UpdateSettings(c *fiber.Ctx) error {
 	req := SettingsReq{}
 	err := c.BodyParser(&req)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidRequest,
 		})
 	}
 
 	err = h.Validator.Struct(req)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidRequest,
 		})
 	}
@@ -77,7 +77,7 @@ func (h *Handler) UpdateSettings(c *fiber.Ctx) error {
 
 	err = h.Service.UpdateSettings(c.Context(), settings)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}

@@ -12,16 +12,17 @@ import (
 )
 
 var (
-	RegisterSuccess       = "User is created"
-	LoginSuccess          = "Login successful"
-	LogoutSuccess         = "Logout successful"
-	DeleteUserSuccess     = "User is deleted"
-	OTPSent               = "New OTP is sent"
-	ActivateUserSuccess   = "Email is confirmed"
-	ChangePasswordSuccess = "Password is changed"
-	ErrInvalidCredentials = "Invalid credentials"
-	ErrInvalidRequest     = "Invalid request"
-	ErrLogoutUser         = "Could not logout user"
+	RegisterSuccess              = "User is created"
+	LoginSuccess                 = "Login successful"
+	LogoutSuccess                = "Logout successful"
+	DeleteUserSuccess            = "User is deleted"
+	OTPSent                      = "New OTP is sent"
+	ActivateUserSuccess          = "Email is confirmed"
+	ChangePasswordSuccess        = "Password is changed"
+	InitiatePasswordResetSuccess = "Password reset initiated"
+	ErrInvalidCredentials        = "Invalid credentials"
+	ErrInvalidRequest            = "Invalid request"
+	ErrLogoutUser                = "Could not logout user"
 )
 
 type UserService interface {
@@ -35,6 +36,7 @@ type UserService interface {
 	GetUserStats(context.Context, string) (model.UserStats, error)
 	LogoutUser(context.Context, string, time.Duration) error
 	ChangePassword(context.Context, string, string) error
+	InitiatePasswordReset(context.Context, string) error
 }
 
 // @Summary Register user
@@ -375,5 +377,27 @@ func (h *Handler) ChangePassword(c *fiber.Ctx) error {
 
 	return c.Status(200).JSON(fiber.Map{
 		"message": ChangePasswordSuccess,
+	})
+}
+
+func (h *Handler) InitiatePasswordReset(c *fiber.Ctx) error {
+	req := InitiatePasswordResetReq{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		log.Printf("error initiating password reset: %s", err.Error())
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	err = h.Service.InitiatePasswordReset(c.Context(), req.Email)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": InitiatePasswordResetSuccess,
 	})
 }

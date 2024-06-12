@@ -293,3 +293,38 @@ func (s *Service) ChangePassword(ctx context.Context, userID string, password st
 
 	return nil
 }
+
+func (s *Service) InitiatePasswordReset(ctx context.Context, email string) error {
+	user, err := s.Store.GetUserByEmail(ctx, email)
+	if err != nil {
+		log.Printf("error initiating password reset: %s", err.Error())
+		return ErrIncorrectEmail
+	}
+
+	otp, err := utils.CreateLongOTP()
+	if err != nil {
+		log.Printf("error initiating password reset: %s", err.Error())
+		return ErrCreateOTP
+	}
+
+	err = s.Cache.Set(ctx, "reset_"+otp.Hash, email, s.Cfg.Service.OTPExpiration)
+	if err != nil {
+		log.Printf("error initiating password reset: %s", err.Error())
+		return ErrSaveOTP
+	}
+
+	utils.Background(func() {
+		data := map[string]interface{}{
+			"otp": otp.Secret,
+		}
+		mailer := mailer.New(s.Cfg.SMTPClient)
+		mailer.Sender = s.Cfg.SMTPClient.Sender
+		mailer.SenderName = s.Cfg.SMTPClient.SenderName
+		err = mailer.SendTemplate(user.Email, "["+mailer.SenderName+"] Reset Password Notification", "password_reset.tmpl", data)
+		if err != nil {
+			log.Printf("error initiating password reset: %s", err.Error())
+		}
+	})
+
+	return nil
+}

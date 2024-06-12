@@ -19,6 +19,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	p.Use(limiter.New())
 	p.Post("/register", h.Register)
 	p.Post("/login", h.Login)
+	p.Post("/initiatepasswordreset", h.InitiatePasswordReset)
 
 	sub := h.Server.Group("/v1/subscription/update")
 	sub.Use(auth.NewPSK(cfg))

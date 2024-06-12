@@ -79,7 +79,7 @@ const confirmEmail = async () => {
     if (!validateOtp()) return
 
     const req = {
-        otp: otp.value
+        otp: otp.value + ''
     }
 
     try {

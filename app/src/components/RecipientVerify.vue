@@ -93,6 +93,8 @@ const validateOtp = () => {
 const verifyRecipient = async () => {
     if (!validateOtp()) return
 
+    req.value.otp = req.value.otp + ''
+
     try {
         await recipientApi.activate(recipient.value.id, req.value)
         error.value = ''

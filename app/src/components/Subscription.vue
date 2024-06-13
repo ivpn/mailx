@@ -1,37 +1,37 @@
 <template>
-    <div class="flex flex-col p-5 pb-4 my-8 bg-white">
-        <h1 class="text-3xl font-semibold text-gray-800 mb-4">Subscription</h1>
-        <p v-if="res.id" class="text-sm text-gray-500 mb-5">
-            <span v-if="isActive()" class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-emerald-100 text-emerald-800">Active</span>
-            <span v-if="!isActive()" class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-gray-100 text-gray-500">Inactive</span>
+    <h2 class="text-2xl font-semibold text-gray-800 mb-5">Subscription</h2>
+    <p v-if="res.id" class="text-sm text-gray-500 mb-5">
+        <span v-if="isActive()"
+            class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-emerald-100 text-emerald-800">Active</span>
+        <span v-if="!isActive()"
+            class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-gray-100 text-gray-500">Inactive</span>
+    </p>
+    <div v-if="isActive()" class="mb-3">
+        <h2 class="font-semibold text-gray-800 mb-3">
+            Active until:
+        </h2>
+        <p class="text-gray-500 mb-3">
+            {{ activeUntilDate() }}
         </p>
-        <div v-if="isActive()" class="mb-3">
-            <h2 class="font-semibold text-gray-800 mb-3">
-                Active until
-            </h2>
-            <p class="text-gray-500 mb-3">
-                {{ activeUntilDate() }}
-            </p>
-        </div>
-        <div class="mb-3">
-            <h2 class="font-semibold text-gray-800 mb-3">
-                Subscription ID
-            </h2>
-            <div class="hs-tooltip text-gray-500 mb-3">
-                <span class="hs-tooltip-toggle">
-                    <button @click="copyAlias(res.id)">
-                        {{ res.id }}
-                    </button>
-                    <span
-                        class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded shadow-sm"
-                        role="tooltip">
-                        {{ copyText }}
-                    </span>
-                </span>
-            </div>
-        </div>
-        <p v-if="error" class="text-red-600 text-sm mb-3">Error: {{ error }}</p>
     </div>
+    <div class="mb-3">
+        <h2 class="font-semibold text-gray-800 mb-3">
+            Subscription ID:
+        </h2>
+        <div class="hs-tooltip text-gray-500 mb-3">
+            <span class="hs-tooltip-toggle">
+                <button @click="copyAlias(res.id)">
+                    {{ res.id }}
+                </button>
+                <span
+                    class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded shadow-sm"
+                    role="tooltip">
+                    {{ copyText }}
+                </span>
+            </span>
+        </div>
+    </div>
+    <p v-if="error" class="text-red-600 text-sm mb-3">Error: {{ error }}</p>
 </template>
 
 <script setup lang="ts">

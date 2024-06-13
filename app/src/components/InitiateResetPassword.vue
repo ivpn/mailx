@@ -54,11 +54,16 @@ const initiatePasswordReset = async () => {
 
     isLoading.value = true // Start loading
 
+    const req = {
+        email: email.value
+    }
+
     try {
-        const res = await userApi.initiatePasswordReset(email.value)
+        const res = await userApi.initiatePasswordReset(req)
         apiSuccess.value = res.data.message
         apiError.value = ''
     } catch (err) {
+        apiSuccess.value = ''
         if (axios.isAxiosError(err)) {
             apiError.value = err.response?.data.error || err.message
 

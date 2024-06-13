@@ -11,6 +11,8 @@ export const userApi = {
     get: () => api.get('/user'),
     stats: () => api.get('/user/stats'),
     changePassword: (data: any) => api.put('/user/changepassword', data),
+    initiatePasswordReset: (data: any) => api.post('/p/initiatepasswordreset', data),
+    resetPassword: (data: any) => api.post('/p/resetpassword', data),
     clearSession: () => {
         setCookie('auth', '')
         localStorage.removeItem('email')

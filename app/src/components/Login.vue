@@ -44,6 +44,8 @@
                 </a>
             </div>
         </form>
+        <p class="text-gray-500 my-5"><a class="text-bluish-500 hover:text-bluish-600"
+            href="/initiate-password-reset">Forgot Your Password?</a></p>
     </div>
 </template>
 

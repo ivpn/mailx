@@ -80,9 +80,7 @@ const validate = () => {
 }
 
 const register = async () => {
-    if (!validate()) {
-        return
-    }
+    if (!validate()) return
     
     isLoading.value = true // Start loading
     const data = {
@@ -91,8 +89,8 @@ const register = async () => {
     }
 
     try {
-        const response = await userApi.register(data)
-        apiSuccess.value = response.data.message
+        const res = await userApi.register(data)
+        apiSuccess.value = res.data.message
         apiError.value = ''
     } catch (err) {
         apiSuccess.value = ''

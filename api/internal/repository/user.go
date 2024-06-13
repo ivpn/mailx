@@ -69,5 +69,5 @@ func (d *Database) GetUserStats(ctx context.Context, ID string) (model.UserStats
 }
 
 func (d *Database) ChangePassword(ctx context.Context, user model.User) error {
-	return d.Client.Model(&model.User{}).Where("id = ?", user.ID).Update("password", user.PasswordHash).Error
+	return d.Client.Save(&user).Error
 }

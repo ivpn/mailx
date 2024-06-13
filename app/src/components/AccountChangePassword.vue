@@ -44,6 +44,7 @@ const error = ref('')
 const success = ref('')
 
 const validatePassword = () => {
+    success.value = ''
     passwordError.value = ''
 
     if (!password.value || !passwordConfirm.value) {
@@ -68,6 +69,8 @@ const changePassword = async () => {
         const res = await userApi.changePassword(req)
         success.value = res.data.message
         error.value = ''
+        password.value = ''
+        passwordConfirm.value = ''
     } catch (err) {
         if (axios.isAxiosError(err)) {
             success.value = ''

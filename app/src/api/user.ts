@@ -10,7 +10,7 @@ export const userApi = {
     activate: (data: any) => api.post('/user/activate', data),
     get: () => api.get('/user'),
     stats: () => api.get('/user/stats'),
-    changePassword: (data: any) => api.post('/user/changepassword', data),
+    changePassword: (data: any) => api.put('/user/changepassword', data),
     clearSession: () => {
         setCookie('auth', '')
         localStorage.removeItem('email')

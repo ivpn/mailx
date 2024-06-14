@@ -371,7 +371,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api.PasswordResetReq"
+                            "$ref": "#/definitions/api.ResetPasswordReq"
                         }
                     }
                 ],
@@ -1164,7 +1164,18 @@ const docTemplate = `{
                 }
             }
         },
-        "api.PasswordResetReq": {
+        "api.RecipientReq": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.ResetPasswordReq": {
             "type": "object",
             "required": [
                 "otp",
@@ -1178,17 +1189,6 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 64,
                     "minLength": 8
-                }
-            }
-        },
-        "api.RecipientReq": {
-            "type": "object",
-            "required": [
-                "email"
-            ],
-            "properties": {
-                "email": {
-                    "type": "string"
                 }
             }
         },

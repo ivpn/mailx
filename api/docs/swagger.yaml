@@ -54,7 +54,14 @@ definitions:
     required:
     - email
     type: object
-  api.PasswordResetReq:
+  api.RecipientReq:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
+  api.ResetPasswordReq:
     properties:
       otp:
         type: string
@@ -65,13 +72,6 @@ definitions:
     required:
     - otp
     - password
-    type: object
-  api.RecipientReq:
-    properties:
-      email:
-        type: string
-    required:
-    - email
     type: object
   api.SettingsReq:
     properties:
@@ -445,7 +445,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/api.PasswordResetReq'
+          $ref: '#/definitions/api.ResetPasswordReq'
       produces:
       - application/json
       responses:

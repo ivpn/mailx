@@ -51,8 +51,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -94,8 +94,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/model.Alias"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -144,8 +144,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -185,8 +185,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -222,8 +222,48 @@ const docTemplate = `{
                             }
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/p/initiatepasswordreset": {
+            "post": {
+                "description": "Initiate password reset",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Initiate password reset",
+                "parameters": [
+                    {
+                        "description": "Initiate password reset request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.InitiatePasswordResetReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -262,8 +302,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -296,14 +336,54 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/p/resetpassword": {
+            "put": {
+                "description": "Reset password",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Reset password",
+                "parameters": [
+                    {
+                        "description": "Password reset request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.ResetPasswordReq"
+                        }
+                    }
+                ],
+                "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -347,8 +427,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -399,8 +479,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -442,8 +522,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -485,8 +565,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/model.Recipient"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -526,8 +606,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -563,8 +643,8 @@ const docTemplate = `{
                             }
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -597,8 +677,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/model.Settings"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -640,8 +720,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -674,8 +754,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/model.Subscription"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -719,8 +799,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -753,8 +833,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/model.User"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -798,8 +878,53 @@ const docTemplate = `{
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/changepassword": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Change password",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Change password",
+                "parameters": [
+                    {
+                        "description": "Change password request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.ChangePasswordReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -843,8 +968,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -877,8 +1002,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -911,8 +1036,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -945,8 +1070,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/model.UserStats"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -994,6 +1119,19 @@ const docTemplate = `{
                 }
             }
         },
+        "api.ChangePasswordReq": {
+            "type": "object",
+            "required": [
+                "password"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 8
+                }
+            }
+        },
         "api.DeleteUserReq": {
             "type": "object",
             "required": [
@@ -1015,6 +1153,17 @@ const docTemplate = `{
                 }
             }
         },
+        "api.InitiatePasswordResetReq": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                }
+            }
+        },
         "api.RecipientReq": {
             "type": "object",
             "required": [
@@ -1023,6 +1172,23 @@ const docTemplate = `{
             "properties": {
                 "email": {
                     "type": "string"
+                }
+            }
+        },
+        "api.ResetPasswordReq": {
+            "type": "object",
+            "required": [
+                "otp",
+                "password"
+            ],
+            "properties": {
+                "otp": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 8
                 }
             }
         },

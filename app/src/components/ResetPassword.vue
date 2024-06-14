@@ -1,41 +1,36 @@
 <template>
     <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-        <h1 class="text-3xl text-gray-800 font-semibold mb-2">Sign Up</h1>
-        <p class="text-gray-500 mb-8">Have an account? <a class="text-bluish-500 hover:text-bluish-600" href="/login">Log In</a></p>
-        <form class="w-full max-w-sm bg-white px-8 pt-6 pb-8 mb-4" @submit.prevent="register">
+        <h1 class="text-3xl text-gray-800 font-semibold mb-8">Set New Password</h1>
+        <form class="w-full max-w-sm bg-white px-8 pt-6 pb-8 mb-4" @submit.prevent="resetPassword">
             <div v-if="!apiSuccess">
-                <div class="mb-4">
-                    <label class="block text-gray-500 mb-2" for="email">
-                        Email Address
-                    </label>
-                    <input
-                        v-model="email"
-                        v-bind:class="{ 'border-gray-500': !emailError, 'border-red-600': emailError }"
-                        placeholder="name@example.net"
-                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2"
-                        id="email" type="email">
-                    <p v-if="emailError" class="text-red-600 text-sm">Required</p>
-                </div>
                 <div class="mb-6">
-                    <label class="block text-gray-500 mb-2" for="password">
-                        Password
+                    <label class="block text-gray-500 mb-2" for="password-new">
+                        New Password
                     </label>
                     <input
                         v-model="password"
                         v-bind:class="{ 'border-gray-500': !passwordError, 'border-red-600': passwordError }"
                         class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2"
-                        id="password" type="password">
-                    <p v-if="passwordError" class="text-red-600 text-sm mb-2">Required</p>
-                    <p class="text-gray-500 text-sm mb-2">Must be at least 8 characters</p>
+                        id="password-new" type="password">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-500 mb-2" for="password-new-conmfirm">
+                        Confirm
+                    </label>
+                    <input
+                        v-model="passwordConfirm"
+                        v-bind:class="{ 'border-gray-500': !passwordError, 'border-red-600': passwordError }"
+                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2"
+                        id="password-new-conmfirm" type="password">
                 </div>
                 <div class="flex items-center justify-between">
-                    <button
-                        :disabled="isLoading"
+                    <button :disabled="isLoading"
                         class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 focus:outline-none focus:shadow-outline"
                         type="submit">
-                        Sign Up
+                        Change Password
                     </button>
                 </div>
+                <p v-if="passwordError" class="text-red-600 text-sm mt-6">Error: {{ passwordError }}</p>
                 <p v-if="apiError" class="text-red-600 text-sm mt-6">Error: {{ apiError }}</p>
             </div>
             <div v-if="apiSuccess">
@@ -47,49 +42,52 @@
                 </a>
             </div>
         </form>
+        <p class="text-gray-500 my-5"><a class="text-bluish-500 hover:text-bluish-600"
+            href="/login">Back to Log In</a></p>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import axios from 'axios'
 import { userApi } from '../api/user.ts'
 
-const email = ref('')
 const password = ref('')
-const emailError = ref(false)
-const passwordError = ref(false)
-const apiSuccess = ref('')
+const passwordConfirm = ref('')
+const passwordError = ref('')
 const apiError = ref('')
+const apiSuccess = ref('')
 const isLoading = ref(false)
-
-const validateEmail = () => {
-    emailError.value = !email.value
-    return !emailError.value
-}
+const otp = ref('')
 
 const validatePassword = () => {
-    passwordError.value = !password.value
+    apiSuccess.value = ''
+    passwordError.value = ''
+
+    if (!password.value || !passwordConfirm.value) {
+        passwordError.value = 'Please fill required fields'
+    }
+
+    if (password.value !== passwordConfirm.value) {
+        passwordError.value = 'Passwords do not match'
+    }
+
     return !passwordError.value
 }
 
-const validate = () => {
-    const validEmail = validateEmail()
-    const validPass = validatePassword()
-    return validEmail && validPass
-}
+const resetPassword = async () => {
+    if (!validatePassword()) return
 
-const register = async () => {
-    if (!validate()) return
-    
     isLoading.value = true // Start loading
-    const data = {
-        email: email.value,
-        password: password.value
+
+    const req = {
+        password: password.value,
+        otp: otp.value
     }
 
     try {
-        const res = await userApi.register(data)
+        const res = await userApi.resetPassword(req)
         apiSuccess.value = res.data.message
         apiError.value = ''
     } catch (err) {
@@ -105,4 +103,9 @@ const register = async () => {
         isLoading.value = false // End loading
     }
 }
+
+onMounted(() => {
+    const route = useRoute()
+    otp.value = route.params.otp as string
+})
 </script>

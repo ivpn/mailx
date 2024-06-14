@@ -1,13 +1,15 @@
 <template>
-    <div class="flex flex-col p-5 pb-4 my-8 bg-white">
-        <h1 class="text-3xl font-semibold text-gray-800 mb-4">Subscription</h1>
+    <div class="mb-5">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-5">Subscription</h2>
         <p v-if="res.id" class="text-sm text-gray-500 mb-5">
-            <span v-if="isActive()" class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-emerald-100 text-emerald-800">Active</span>
-            <span v-if="!isActive()" class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-gray-100 text-gray-500">Inactive</span>
+            <span v-if="isActive()"
+                class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-emerald-100 text-emerald-800">Active</span>
+            <span v-if="!isActive()"
+                class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-gray-100 text-gray-500">Inactive</span>
         </p>
         <div v-if="isActive()" class="mb-3">
             <h2 class="font-semibold text-gray-800 mb-3">
-                Active until
+                Active until:
             </h2>
             <p class="text-gray-500 mb-3">
                 {{ activeUntilDate() }}
@@ -15,7 +17,7 @@
         </div>
         <div class="mb-3">
             <h2 class="font-semibold text-gray-800 mb-3">
-                Subscription ID
+                Subscription ID:
             </h2>
             <div class="hs-tooltip text-gray-500 mb-3">
                 <span class="hs-tooltip-toggle">

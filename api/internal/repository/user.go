@@ -67,3 +67,7 @@ func (d *Database) GetUserStats(ctx context.Context, ID string) (model.UserStats
 
 	return userStats, nil
 }
+
+func (d *Database) ChangePassword(ctx context.Context, user model.User) error {
+	return d.Client.Save(&user).Error
+}

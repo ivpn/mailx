@@ -26,6 +26,7 @@ var (
 	ErrIncorrectEmail = errors.New("incorrect email")
 	ErrIncorrectPass  = errors.New("incorrect password")
 	ErrLogoutUser     = errors.New("could not logout user")
+	ErrChangePassword = errors.New("could not change password")
 )
 
 type UserStore interface {
@@ -35,6 +36,7 @@ type UserStore interface {
 	ActivateUser(context.Context, string) error
 	DeleteUser(context.Context, string) error
 	GetUserStats(context.Context, string) (model.UserStats, error)
+	ChangePassword(context.Context, model.User) error
 }
 
 func (s *Service) GetUser(ctx context.Context, userID string) (model.User, error) {
@@ -266,6 +268,99 @@ func (s *Service) LogoutUser(ctx context.Context, jwtSignature string, jwtExp ti
 	if err != nil {
 		log.Printf("error saving jwt: %s", err.Error())
 		return ErrLogoutUser
+	}
+
+	return nil
+}
+
+func (s *Service) ChangePassword(ctx context.Context, userID string, password string) error {
+	user, err := s.Store.GetUser(ctx, userID)
+	if err != nil {
+		log.Printf("error changing password: %s", err.Error())
+		return ErrGetUser
+	}
+
+	err = user.SetPassword(password)
+	if err != nil {
+		log.Printf("error changing password: %s", err.Error())
+		return ErrChangePassword
+	}
+
+	err = s.Store.ChangePassword(ctx, user)
+	if err != nil {
+		log.Printf("error changing password: %s", err.Error())
+		return ErrChangePassword
+	}
+
+	return nil
+}
+
+func (s *Service) InitiatePasswordReset(ctx context.Context, email string) error {
+	user, err := s.Store.GetUserByEmail(ctx, email)
+	if err != nil {
+		log.Printf("error initiating password reset: %s", err.Error())
+		return ErrIncorrectEmail
+	}
+
+	otp, err := utils.CreateLongOTP()
+	if err != nil {
+		log.Printf("error initiating password reset: %s", err.Error())
+		return ErrCreateOTP
+	}
+
+	err = s.Cache.Set(ctx, "reset_"+otp.Secret, email, s.Cfg.Service.OTPExpiration)
+	if err != nil {
+		log.Printf("error initiating password reset: %s", err.Error())
+		return ErrSaveOTP
+	}
+
+	utils.Background(func() {
+		data := map[string]interface{}{
+			"otp":        otp.Secret,
+			"from":       s.Cfg.SMTPClient.SenderName,
+			"origin":     s.Cfg.API.ApiAllowOrigin,
+			"expiration": s.Cfg.Service.OTPExpiration.Minutes(),
+		}
+		mailer := mailer.New(s.Cfg.SMTPClient)
+		mailer.Sender = s.Cfg.SMTPClient.Sender
+		mailer.SenderName = s.Cfg.SMTPClient.SenderName
+		err = mailer.SendTemplate(user.Email, "["+mailer.SenderName+"] Reset Password Notification", "password_reset.tmpl", data)
+		if err != nil {
+			log.Printf("error initiating password reset: %s", err.Error())
+		}
+	})
+
+	return nil
+}
+
+func (s *Service) ResetPassword(ctx context.Context, otp string, password string) error {
+	email, err := s.Cache.Get(ctx, "reset_"+otp)
+	if err != nil {
+		log.Printf("error resetting password: %s", err.Error())
+		return ErrExpiredOTP
+	}
+
+	err = s.Cache.Del(ctx, "reset_"+otp)
+	if err != nil {
+		log.Printf("error resetting password: %s", err.Error())
+	}
+
+	user, err := s.Store.GetUserByEmail(ctx, email)
+	if err != nil {
+		log.Printf("error resetting password: %s", err.Error())
+		return ErrIncorrectEmail
+	}
+
+	err = user.SetPassword(password)
+	if err != nil {
+		log.Printf("error resetting password: %s", err.Error())
+		return ErrChangePassword
+	}
+
+	err = s.Store.ChangePassword(ctx, user)
+	if err != nil {
+		log.Printf("error resetting password: %s", err.Error())
+		return ErrChangePassword
 	}
 
 	return nil

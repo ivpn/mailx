@@ -19,6 +19,8 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	p.Use(limiter.New())
 	p.Post("/register", h.Register)
 	p.Post("/login", h.Login)
+	p.Post("/initiatepasswordreset", h.InitiatePasswordReset)
+	p.Put("/resetpassword", h.ResetPassword)
 
 	sub := h.Server.Group("/v1/subscription/update")
 	sub.Use(auth.NewPSK(cfg))
@@ -34,6 +36,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Post("/user/delete", h.DeleteUser)
 	v1.Get("/user", h.GetUser)
 	v1.Get("/user/stats", h.GetUserStats)
+	v1.Put("/user/changepassword", h.ChangePassword)
 
 	v1.Get("/subscription", h.GetSubscription)
 

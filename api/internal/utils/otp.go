@@ -11,6 +11,11 @@ var (
 	ErrCreateOTP = errors.New("create OTP failed")
 )
 
+const (
+	charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	length  = 32
+)
+
 type OTP struct {
 	Secret string
 	Hash   string
@@ -36,6 +41,39 @@ func CreateOTP() (*OTP, error) {
 	return &token, nil
 }
 
+func CreateLongOTP() (*OTP, error) {
+	str, err := generateRandomString(length)
+	if err != nil {
+		return nil, ErrCreateOTP
+	}
+
+	token := OTP{Secret: str}
+
+	hash, err := Hash(token.Secret)
+	if err != nil {
+		return nil, ErrCreateOTP
+	}
+
+	token.Hash = hash
+
+	return &token, nil
+}
+
 func MatchOTP(secret string, hash string) bool {
 	return HashMatches(secret, hash)
+}
+
+func generateRandomString(length int) (string, error) {
+	result := make([]byte, length)
+	charsetLength := big.NewInt(int64(len(charset)))
+
+	for i := range result {
+		num, err := rand.Int(rand.Reader, charsetLength)
+		if err != nil {
+			return "", err
+		}
+		result[i] = charset[num.Int64()]
+	}
+
+	return string(result), nil
 }

@@ -8,6 +8,8 @@ import Settings from './components/Settings.vue'
 import Account from './components/Account.vue'
 import Signup from './components/Signup.vue'
 import Login from './components/Login.vue'
+import InitiateResetPassword from './components/InitiateResetPassword.vue'
+import ResetPassword from './components/ResetPassword.vue'
 import NotFound from './components/NotFound.vue'
 import { type IStaticMethods } from 'preline/preline'
 
@@ -65,7 +67,17 @@ const routes = [
         name: 'App - Log In',
         component: Login
     },
-    // 404
+    {
+        path: '/initiate-password-reset',
+        name: 'App - Reset Password',
+        component: InitiateResetPassword
+    },
+    {
+        path: '/reset/password/:otp',
+        name: 'App - Set New Password',
+        component: ResetPassword,
+        params: true
+    },
     {
         path: '/:pathMatch(.*)*',
         name: '404 - Not Found',

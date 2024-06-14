@@ -12,15 +12,18 @@ import (
 )
 
 var (
-	RegisterSuccess       = "User is created"
-	LoginSuccess          = "Login successful"
-	LogoutSuccess         = "Logout successful"
-	DeleteUserSuccess     = "User is deleted"
-	OTPSent               = "New OTP is sent"
-	ActivateUserSuccess   = "Email is confirmed"
-	ErrInvalidCredentials = "Invalid credentials"
-	ErrInvalidRequest     = "Invalid request"
-	ErrLogoutUser         = "Could not logout user"
+	RegisterSuccess              = "User is created"
+	LoginSuccess                 = "Login successful"
+	LogoutSuccess                = "Logout successful"
+	DeleteUserSuccess            = "User is deleted"
+	OTPSent                      = "New OTP is sent"
+	ActivateUserSuccess          = "Email is confirmed"
+	ChangePasswordSuccess        = "Password is changed"
+	InitiatePasswordResetSuccess = "Password reset initiated"
+	ResetPasswordSuccess         = "Password was updated successfully"
+	ErrInvalidCredentials        = "Invalid credentials"
+	ErrInvalidRequest            = "Invalid request"
+	ErrLogoutUser                = "Could not logout user"
 )
 
 type UserService interface {
@@ -33,6 +36,9 @@ type UserService interface {
 	GetUser(context.Context, string) (model.User, error)
 	GetUserStats(context.Context, string) (model.UserStats, error)
 	LogoutUser(context.Context, string, time.Duration) error
+	ChangePassword(context.Context, string, string) error
+	InitiatePasswordReset(context.Context, string) error
+	ResetPassword(context.Context, string, string) error
 }
 
 // @Summary Register user
@@ -330,4 +336,130 @@ func (h *Handler) GetUserStats(c *fiber.Ctx) error {
 	}
 
 	return c.Status(200).JSON(stats)
+}
+
+// @Summary Change password
+// @Description Change password
+// @Tags user
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param body body ChangePasswordReq true "Change password request"
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /user/changepassword [put]
+func (h *Handler) ChangePassword(c *fiber.Ctx) error {
+	ID := auth.GetUserID(c)
+
+	// Parse the request
+	req := ChangePasswordReq{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		log.Printf("error changing password: %s", err.Error())
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	// Validate the request
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	// Change the password
+	err = h.Service.ChangePassword(c.Context(), ID, req.Password)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": ChangePasswordSuccess,
+	})
+}
+
+// @Summary Initiate password reset
+// @Description Initiate password reset
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param body body InitiatePasswordResetReq true "Initiate password reset request"
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /p/initiatepasswordreset [post]
+func (h *Handler) InitiatePasswordReset(c *fiber.Ctx) error {
+	// Parse the request
+	req := InitiatePasswordResetReq{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		log.Printf("error initiating password reset: %s", err.Error())
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	// Validate the request
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	// Initiate password reset
+	err = h.Service.InitiatePasswordReset(c.Context(), req.Email)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": InitiatePasswordResetSuccess,
+	})
+}
+
+// @Summary Reset password
+// @Description Reset password
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param body body ResetPasswordReq true "Password reset request"
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /p/resetpassword [put]
+func (h *Handler) ResetPassword(c *fiber.Ctx) error {
+	// Parse the request
+	req := ResetPasswordReq{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		log.Printf("error resetting password: %s", err.Error())
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	// Validate the request
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	// Reset the password
+	err = h.Service.ResetPassword(c.Context(), req.OTP, req.Password)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": ResetPasswordSuccess,
+	})
 }

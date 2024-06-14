@@ -48,7 +48,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import axios from 'axios'
 import { userApi } from '../api/user.ts'
 
@@ -58,6 +59,7 @@ const passwordError = ref('')
 const apiError = ref('')
 const apiSuccess = ref('')
 const isLoading = ref(false)
+const otp = ref('')
 
 const validatePassword = () => {
     apiSuccess.value = ''
@@ -80,7 +82,8 @@ const resetPassword = async () => {
     isLoading.value = true // Start loading
 
     const req = {
-        password: password.value
+        password: password.value,
+        otp: otp.value
     }
 
     try {
@@ -100,4 +103,9 @@ const resetPassword = async () => {
         isLoading.value = false // End loading
     }
 }
+
+onMounted(() => {
+    const route = useRoute()
+    otp.value = route.params.otp as string
+})
 </script>

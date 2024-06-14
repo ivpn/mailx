@@ -25,7 +25,7 @@
                 <p v-if="apiError" class="text-red-600 text-sm mt-6">Error: {{ apiError }}</p>
             </div>
             <div v-if="apiSuccess">
-                <p>If an account with the specified email address exists we will send an email with further instructions on how to reset your password.</p>
+                <p class="text-gray-500">If an account with the specified email address exists we will send an email with further instructions on how to reset your password.</p>
             </div>
         </form>
         <p class="text-gray-500 my-5"><a class="text-bluish-500 hover:text-bluish-600"

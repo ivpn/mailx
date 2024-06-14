@@ -73,11 +73,11 @@ const routes = [
         component: InitiateResetPassword
     },
     {
-        path: '/reset-password',
+        path: '/reset/password/:otp',
         name: 'App - Set New Password',
-        component: ResetPassword
+        component: ResetPassword,
+        params: true
     },
-    // 404
     {
         path: '/:pathMatch(.*)*',
         name: '404 - Not Found',

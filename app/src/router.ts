@@ -68,7 +68,7 @@ const routes = [
         component: Login
     },
     {
-        path: '/initiate-password-reset',
+        path: '/reset/password/initiate',
         name: 'App - Reset Password',
         component: InitiateResetPassword
     },

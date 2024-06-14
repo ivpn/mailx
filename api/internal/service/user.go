@@ -308,7 +308,7 @@ func (s *Service) InitiatePasswordReset(ctx context.Context, email string) error
 		return ErrCreateOTP
 	}
 
-	err = s.Cache.Set(ctx, "reset_"+otp.Hash, email, s.Cfg.Service.OTPExpiration)
+	err = s.Cache.Set(ctx, "reset_"+otp.Secret, email, s.Cfg.Service.OTPExpiration)
 	if err != nil {
 		log.Printf("error initiating password reset: %s", err.Error())
 		return ErrSaveOTP
@@ -334,19 +334,13 @@ func (s *Service) InitiatePasswordReset(ctx context.Context, email string) error
 }
 
 func (s *Service) ResetPassword(ctx context.Context, otp string, password string) error {
-	hash, err := utils.Hash(otp)
+	email, err := s.Cache.Get(ctx, "reset_"+otp)
 	if err != nil {
 		log.Printf("error resetting password: %s", err.Error())
 		return ErrExpiredOTP
 	}
 
-	email, err := s.Cache.Get(ctx, "reset_"+hash)
-	if err != nil {
-		log.Printf("error resetting password: %s", err.Error())
-		return ErrExpiredOTP
-	}
-
-	err = s.Cache.Del(ctx, "reset_"+hash)
+	err = s.Cache.Del(ctx, "reset_"+otp)
 	if err != nil {
 		log.Printf("error resetting password: %s", err.Error())
 	}

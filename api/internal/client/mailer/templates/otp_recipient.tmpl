@@ -1,7 +1,9 @@
 {{define "body"}}
-Here is the OTP token to verify your recipient email address: {{.otp}}
+Here is the OTP token to verify your recipient email address:ž
+{{.otp}}
 
-Note: Unverified recipients will not receive any forwarded emails and may be deleted after 7 days.
+Note:
+Unverified recipients will not receive any forwarded emails and may be deleted after 7 days.
 
 Regards,
 {{.from}}
@@ -9,10 +11,10 @@ Regards,
 
 {{define "bodyHtml"}}
 <div style="font-family: Arial, Helvetica, sans-serif;font-size: 15px;">
-Here is the OTP token to verify your recipient email address:<br><br>
-<h2 style="font-size: 24px;text-align: center;"><b>{{.otp}}</b></h2>
-<br>
-Note: Unverified recipients will not receive any forwarded emails and may be deleted after 7 days.
+Here is the OTP token to verify your recipient email address:<br>
+{{.otp}}<br><br>
+Note:<br>
+Unverified recipients will not receive any forwarded emails and may be deleted after 7 days.
 <br><br>
 Regards,<br>
 {{.from}}

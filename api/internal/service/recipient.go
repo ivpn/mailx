@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"strings"
 
 	"github.com/go-sql-driver/mysql"
 	"ivpn.net/email/api/internal/client/mailer"
@@ -172,7 +173,38 @@ func (s *Service) UpdateRecipient(ctx context.Context, recipient model.Recipient
 }
 
 func (s *Service) DeleteRecipient(ctx context.Context, ID string, userID string) error {
-	err := s.Store.DeleteRecipient(ctx, ID, userID)
+	// Get recipient
+	recipient, err := s.Store.GetRecipient(ctx, ID, userID)
+	if err != nil {
+		return err
+	}
+
+	// Get aliases
+	aliases, err := s.Store.GetAliases(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	// Delete recipient from each alias
+	// Disable alias if no recipients left
+	for _, alias := range aliases {
+		if strings.Contains(alias.Recipients, recipient.Email) {
+			r := alias.Recipients
+			r = strings.Replace(r, recipient.Email+",", "", -1)
+			r = strings.Replace(r, ","+recipient.Email, "", -1)
+			r = strings.Replace(r, recipient.Email, "", -1)
+			alias.Recipients = r
+			alias.Enabled = r != ""
+
+			// Update alias
+			err = s.Store.UpdateAlias(ctx, alias)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	err = s.Store.DeleteRecipient(ctx, ID, userID)
 	if err != nil {
 		log.Printf("an error occurred deleting the recipient: %s", err.Error())
 		return ErrDeleteRecipient

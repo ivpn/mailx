@@ -99,7 +99,7 @@ const deleteRecipient = async (id: string) => {
     try {
         await recipientApi.delete(id)
         error.value = ''
-        getList()
+        location.reload()
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.message

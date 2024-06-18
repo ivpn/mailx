@@ -18,12 +18,10 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	h.Server.Use(helmet.New())
 	h.Server.Use(healthcheck.New())
 
-	p := h.Server.Group("/v1/p")
-	p.Use(limiter.New())
-	p.Post("/register", h.Register)
-	p.Post("/login", h.Login)
-	p.Post("/initiatepasswordreset", h.InitiatePasswordReset)
-	p.Put("/resetpassword", h.ResetPassword)
+	h.Server.Post("/v1/register", limiter.New(), h.Register)
+	h.Server.Post("/v1/login", limiter.New(), h.Login)
+	h.Server.Post("/v1/initiatepasswordreset", limiter.New(), h.InitiatePasswordReset)
+	h.Server.Put("/v1/resetpassword", limiter.New(), h.ResetPassword)
 
 	sub := h.Server.Group("/v1/subscription/update")
 	sub.Use(auth.NewPSK(cfg))

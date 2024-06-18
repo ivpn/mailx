@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -51,6 +52,7 @@ type SMTPClientConfig struct {
 type ServiceConfig struct {
 	OTPExpiration    time.Duration
 	SubscriptionType string
+	MaxRecipients    int
 }
 
 type Config struct {
@@ -76,6 +78,11 @@ func New() (Config, error) {
 
 	otpExpStr := os.Getenv("OTP_EXPIRATION")
 	otpExp, err := time.ParseDuration(otpExpStr)
+	if err != nil {
+		return Config{}, err
+	}
+
+	maxRecipients, err := strconv.Atoi(os.Getenv("MAX_RECIPIENTS"))
 	if err != nil {
 		return Config{}, err
 	}
@@ -117,9 +124,11 @@ func New() (Config, error) {
 			Sender:     os.Getenv("SMTP_CLIENT_SENDER"),
 			SenderName: os.Getenv("SMTP_CLIENT_SENDER_NAME"),
 		},
+
 		Service: ServiceConfig{
 			OTPExpiration:    otpExp,
 			SubscriptionType: os.Getenv("SUBSCRIPTION_TYPE"),
+			MaxRecipients:    maxRecipients,
 		},
 	}, nil
 }

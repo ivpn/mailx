@@ -82,7 +82,7 @@ func (s *Service) PostRecipient(ctx context.Context, recipient model.Recipient) 
 		return ErrPostRecipient
 	}
 
-	if len(rcps) >= 10 {
+	if len(rcps) >= s.Cfg.Service.MaxRecipients {
 		return ErrMaxExceededRecipient
 	}
 

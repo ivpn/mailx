@@ -50,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import axios from 'axios'
 import { userApi } from '../api/user.ts'
 
@@ -110,4 +110,10 @@ const login = async () => {
 const isLoggedIn = () => {
     return localStorage.getItem('email') != '' && localStorage.getItem('email') != null
 }
+
+onMounted(() => {
+    if (isLoggedIn()) {
+        window.location.href = '/'
+    }
+})
 </script>

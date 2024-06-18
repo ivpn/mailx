@@ -18,9 +18,8 @@ var (
 	DeleteUserSuccess            = "User is deleted"
 	OTPSent                      = "New OTP is sent"
 	ActivateUserSuccess          = "Email is confirmed"
-	ChangePasswordSuccess        = "Password is changed"
 	InitiatePasswordResetSuccess = "Password reset initiated"
-	ResetPasswordSuccess         = "Password was updated successfully"
+	ResetPasswordSuccess         = "Your password has been changed successfully"
 	ErrInvalidCredentials        = "Invalid credentials"
 	ErrInvalidRequest            = "Invalid request"
 	ErrLogoutUser                = "Could not logout user"
@@ -378,7 +377,7 @@ func (h *Handler) ChangePassword(c *fiber.Ctx) error {
 	}
 
 	return c.Status(200).JSON(fiber.Map{
-		"message": ChangePasswordSuccess,
+		"message": ResetPasswordSuccess,
 	})
 }
 

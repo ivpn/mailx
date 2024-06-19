@@ -1,7 +1,9 @@
 <template>
     <div>
-        <button v-bind:data-hs-overlay="'#modal-send-alias' + alias.id"
-            class="text-bluish-500 hover:text-bluish-600 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
+        <button
+            v-bind:disabled="!alias.recipients.length"
+            v-bind:data-hs-overlay="'#modal-send-alias' + alias.id"
+            class="text-bluish-500 hover:text-bluish-600 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline disabled:opacity-50 disabled:pointer-events-none"
             type="submit">
             Send
         </button>

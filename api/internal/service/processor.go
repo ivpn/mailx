@@ -18,7 +18,7 @@ import (
 var (
 	ErrInactiveSubscription = errors.New("inactive subscription")
 	ErrDisabledAlias        = errors.New("disabled alias")
-	ErrNoRecipients         = errors.New("no recipients")
+	ErrNoRecipients         = errors.New("no verified recipients")
 	ErrInactiveRecipient    = errors.New("inactive recipient")
 )
 
@@ -46,7 +46,7 @@ func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data
 	}
 
 	for _, to := range msg.To {
-		recipient, alias, relayType, err := s.findRecipient(to, msg.Type)
+		recipient, alias, relayType, err := s.findRecipient(from, to, msg.Type)
 		if err != nil {
 			log.Println("error processing message", err)
 			continue
@@ -116,7 +116,7 @@ func (s *Service) saveMessage(alias model.Alias, msgType model.MessageType, data
 	}
 }
 
-func (s *Service) findRecipient(email string, msgType MsgType) (string, model.Alias, model.MessageType, error) {
+func (s *Service) findRecipient(from string, email string, msgType MsgType) (string, model.Alias, model.MessageType, error) {
 	name, replyTo := model.ParseReplyTo(email)
 
 	alias, err := s.GetAliasByName(name)
@@ -141,6 +141,11 @@ func (s *Service) findRecipient(email string, msgType MsgType) (string, model.Al
 
 	err = utils.ValidateEmail(replyTo)
 	if err == nil {
+		rcps, err := s.GetVerifiedRecipients(context.Background(), from, alias.UserID)
+		if err != nil || len(rcps) == 0 {
+			return "", model.Alias{}, 0, ErrNoRecipients
+		}
+
 		return replyTo, alias, model.MessageType(msgType), nil
 	}
 

@@ -41,7 +41,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200">
-                                    <RecipientRow  @onDeleteRecipient="deleteRecipient" @onVerifyRecipient="getList" v-for="recipient in list" :recipient="recipient" :key="rowKey" />
+                                    <RecipientRow  @onDeleteRecipient="deleteRecipient" @onVerifyRecipient="reload" v-for="recipient in list" :recipient="recipient" :key="rowKey" />
                                 </tbody>
                             </table>
                         </div>
@@ -99,12 +99,17 @@ const deleteRecipient = async (id: string) => {
     try {
         await recipientApi.delete(id)
         error.value = ''
-        location.reload()
+        reload()
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.message
         }
     }
+}
+
+const reload = () => {
+    if (!isDashboard) getList()
+    if (isDashboard) location.reload()
 }
 
 const renderRow = () => {

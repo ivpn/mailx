@@ -356,7 +356,7 @@ paths:
       summary: Get aliases
       tags:
       - alias
-  /p/initiatepasswordreset:
+  /initiatepasswordreset:
     post:
       consumes:
       - application/json
@@ -382,7 +382,7 @@ paths:
       summary: Initiate password reset
       tags:
       - user
-  /p/login:
+  /login:
     post:
       consumes:
       - application/json
@@ -406,58 +406,6 @@ paths:
           schema:
             $ref: '#/definitions/api.ErrorRes'
       summary: Login user
-      tags:
-      - user
-  /p/register:
-    post:
-      consumes:
-      - application/json
-      description: Register user
-      parameters:
-      - description: User request
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/api.UserReq'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/api.SuccessRes'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.ErrorRes'
-      summary: Register user
-      tags:
-      - user
-  /p/resetpassword:
-    put:
-      consumes:
-      - application/json
-      description: Reset password
-      parameters:
-      - description: Password reset request
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/api.ResetPasswordReq'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api.SuccessRes'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.ErrorRes'
-      summary: Reset password
       tags:
       - user
   /recipient:
@@ -624,6 +572,58 @@ paths:
       summary: Get recipients
       tags:
       - recipient
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Register user
+      parameters:
+      - description: User request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.UserReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Register user
+      tags:
+      - user
+  /resetpassword:
+    put:
+      consumes:
+      - application/json
+      description: Reset password
+      parameters:
+      - description: Password reset request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.ResetPasswordReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Reset password
+      tags:
+      - user
   /settings:
     get:
       consumes:

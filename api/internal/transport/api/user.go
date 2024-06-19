@@ -48,7 +48,7 @@ type UserService interface {
 // @Param body body UserReq true "User request"
 // @Success 201 {object} SuccessRes
 // @Failure 400 {object} ErrorRes
-// @Router /p/register [post]
+// @Router /register [post]
 func (h *Handler) Register(c *fiber.Ctx) error {
 	// Parse the request
 	req := UserReq{}
@@ -160,7 +160,7 @@ func (h *Handler) Activate(c *fiber.Ctx) error {
 // @Param body body UserReq true "User request"
 // @Success 200 {object} SuccessRes
 // @Failure 400 {object} ErrorRes
-// @Router /p/login [post]
+// @Router /login [post]
 func (h *Handler) Login(c *fiber.Ctx) error {
 	// Parse the request
 	req := UserReq{}
@@ -389,7 +389,7 @@ func (h *Handler) ChangePassword(c *fiber.Ctx) error {
 // @Param body body InitiatePasswordResetReq true "Initiate password reset request"
 // @Success 200 {object} SuccessRes
 // @Failure 400 {object} ErrorRes
-// @Router /p/initiatepasswordreset [post]
+// @Router /initiatepasswordreset [post]
 func (h *Handler) InitiatePasswordReset(c *fiber.Ctx) error {
 	// Parse the request
 	req := InitiatePasswordResetReq{}
@@ -430,7 +430,7 @@ func (h *Handler) InitiatePasswordReset(c *fiber.Ctx) error {
 // @Param body body ResetPasswordReq true "Password reset request"
 // @Success 200 {object} SuccessRes
 // @Failure 400 {object} ErrorRes
-// @Router /p/resetpassword [put]
+// @Router /resetpassword [put]
 func (h *Handler) ResetPassword(c *fiber.Ctx) error {
 	// Parse the request
 	req := ResetPasswordReq{}

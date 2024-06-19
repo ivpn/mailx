@@ -3,7 +3,9 @@
     <div class="flex flex-col p-5 my-8 bg-white">
         <h1 class="text-3xl font-semibold text-gray-800 mb-6">Account Settings</h1>
         <AccountSubscription />
+        <hr class="mb-8">
         <AccountChangePassword />
+        <hr class="mb-8">
         <AccountDelete />
     </div>
 </template>

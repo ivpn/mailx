@@ -28,7 +28,7 @@
                     <div class="p-4 whitespace-normal text-left text-base">
                         <div class="mb-5">
                             <p class="text-gray-500 mb-3">
-                                Generate the proper email address to send a message from this alias. Note that to send emails using an alias, you need to do so from an account-verified recipient.
+                                Generate the proper email address to send a message from this alias. Note that to send emails using an alias, you need to do so from a verified recipient.
                             </p>
                         </div>
                         <div class="mb-5">

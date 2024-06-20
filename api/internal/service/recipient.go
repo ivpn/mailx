@@ -27,6 +27,7 @@ type RecipienteStore interface {
 	GetRecipient(context.Context, string, string) (model.Recipient, error)
 	GetRecipientByEmail(context.Context, string, string) (model.Recipient, error)
 	GetRecipients(context.Context, string) ([]model.Recipient, error)
+	GetRecipientsCount(context.Context, string) (int, error)
 	GetVerifiedRecipients(context.Context, string, string) ([]model.Recipient, error)
 	PostRecipient(context.Context, model.Recipient) (model.Recipient, error)
 	UpdateRecipient(context.Context, model.Recipient) error
@@ -76,13 +77,13 @@ func (s *Service) GetVerifiedRecipients(ctx context.Context, recipientEmails str
 }
 
 func (s *Service) PostRecipient(ctx context.Context, recipient model.Recipient) error {
-	rcps, err := s.Store.GetRecipients(ctx, recipient.UserID)
+	count, err := s.Store.GetRecipientsCount(ctx, recipient.UserID)
 	if err != nil {
 		log.Printf("error creating recipient: %s", err.Error())
 		return ErrPostRecipient
 	}
 
-	if len(rcps) >= s.Cfg.Service.MaxRecipients {
+	if count >= s.Cfg.Service.MaxRecipients {
 		return ErrMaxExceededRecipient
 	}
 

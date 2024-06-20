@@ -45,7 +45,7 @@ func (d *Database) GetAliases(ctx context.Context, userID string) ([]model.Alias
 		FROM aliases a
 		LEFT JOIN messages m
 		ON a.id = m.alias_id
-		WHERE a.user_id = ?
+		WHERE a.user_id = ? AND a.deleted_at IS NULL
 		GROUP BY a.id
 		ORDER BY a.created_at DESC
 	`
@@ -58,7 +58,7 @@ func (d *Database) GetAliases(ctx context.Context, userID string) ([]model.Alias
 	for rows.Next() {
 		var alias model.Alias
 		var forwards, blocks, replies, sends, bandwidth int
-		if err := rows.Scan(&alias.ID, &alias.CreatedAt, &alias.UpdatedAt, &alias.Name, &alias.UserID, &alias.Enabled, &alias.Description, &alias.Recipients, &alias.FromName, &forwards, &blocks, &replies, &sends, &bandwidth); err != nil {
+		if err := rows.Scan(&alias.ID, &alias.CreatedAt, &alias.UpdatedAt, &alias.DeletedAt, &alias.Name, &alias.UserID, &alias.Enabled, &alias.Description, &alias.Recipients, &alias.FromName, &forwards, &blocks, &replies, &sends, &bandwidth); err != nil {
 			return nil, err
 		}
 		alias.Stats = model.AliasStats{

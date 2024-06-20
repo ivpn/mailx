@@ -64,7 +64,7 @@
         <td class="pl-5 py-4 whitespace-nowrap text-end text-sm">
             <div class="flex gap-5 justify-end">
                 <AliasSend :alias="alias" />
-                <AliasEdit :alias="alias" :recipients="recipients" @onEditAlias="onEditAlias" />
+                <AliasEdit :alias="alias" :recipients="recipients" @onEditAlias="onEditAlias" :key="rowKey" />
                 <button
                     @click="deleteAlias"
                     class="text-red-600 hover:text-red-700 font-medium text-sm py-2 focus:outline-none focus:shadow-outline"
@@ -88,11 +88,13 @@ const alias = ref(props.alias)
 const recipients = ref(props.recipients)
 const emit = defineEmits(['onDeleteAlias', 'onEditAlias'])
 const copyText = ref('Click to copy')
+const rowKey = ref(0)
 
 const updateAlias = async () => {
     alias.value.enabled = !alias.value.enabled
     try {
         await aliasApi.update(alias.value.id, alias.value)
+        renderRow()
     } catch {}
 }
 
@@ -110,6 +112,10 @@ const copyAlias = (alias: string) => {
     setTimeout(() => {
         copyText.value = 'Click to copy'
     }, 2000)
+}
+
+const renderRow = () => {
+    rowKey.value++
 }
 
 onMounted(() => {

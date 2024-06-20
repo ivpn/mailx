@@ -12,6 +12,7 @@ func New(db *gorm.DB) {
 	gocron.Every(1).Hour().Do(jobs.DeleteOldMessages, db)
 	gocron.Every(1).Hour().Do(jobs.DeleteUnverifiedRecipients, db)
 	gocron.Every(1).Hour().Do(jobs.DeleteUnverifiedUsers, db)
+	gocron.Every(1).Hour().Do(jobs.CleanupDeletedAliases, db)
 	gocron.Start()
 	log.Println("Cron jobs started")
 }

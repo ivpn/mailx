@@ -216,10 +216,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/model.Alias"
-                            }
+                            "$ref": "#/definitions/model.AliasList"
                         }
                     },
                     "400": {
@@ -1278,6 +1275,20 @@ const docTemplate = `{
                 },
                 "stats": {
                     "$ref": "#/definitions/model.AliasStats"
+                }
+            }
+        },
+        "model.AliasList": {
+            "type": "object",
+            "properties": {
+                "aliases": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Alias"
+                    }
+                },
+                "total": {
+                    "type": "integer"
                 }
             }
         },

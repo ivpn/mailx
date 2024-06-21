@@ -55,7 +55,7 @@ func (h *Handler) GetAlias(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Success 200 {array} model.Alias
+// @Success 200 {object} model.AliasList
 // @Failure 400 {object} ErrorRes
 // @Router /aliases [get]
 func (h *Handler) GetAliases(c *fiber.Ctx) error {

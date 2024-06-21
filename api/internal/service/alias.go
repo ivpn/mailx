@@ -39,8 +39,13 @@ func (s *Service) GetAlias(ctx context.Context, ID string, userID string) (model
 	return alias, nil
 }
 
-func (s *Service) GetAliases(ctx context.Context, userID string) ([]model.Alias, error) {
-	aliases, err := s.Store.GetAliases(ctx, userID, 0, 0)
+func (s *Service) GetAliases(ctx context.Context, userID string, limit int, page int) ([]model.Alias, error) {
+	offset := (page - 1) * limit
+	if page < 1 {
+		offset = 0
+	}
+
+	aliases, err := s.Store.GetAliases(ctx, userID, limit, offset)
 	if err != nil {
 		log.Printf("error fetching aliass: %s", err.Error())
 		return []model.Alias{}, ErrGetAliases

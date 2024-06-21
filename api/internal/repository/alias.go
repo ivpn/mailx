@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"strconv"
 
 	"ivpn.net/email/api/internal/model"
 )
@@ -47,15 +48,14 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 		ON a.id = m.alias_id
 		WHERE a.user_id = ? AND a.deleted_at IS NULL
 		GROUP BY a.id
-		ORDER BY a.created_at DESC
-	`
+		ORDER BY a.created_at DESC`
 
 	if limit > 0 {
-		query += "\nLIMIT " + string(rune(limit))
+		query += "\nLIMIT " + strconv.Itoa(limit)
 	}
 
 	if offset > 0 {
-		query += "\nOFFSET " + string(rune(offset))
+		query += "\nOFFSET " + strconv.Itoa(offset)
 	}
 
 	rows, err := d.Client.Raw(query, model.Forward, model.Block, model.Reply, model.Send, userID).Rows()

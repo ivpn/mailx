@@ -106,7 +106,7 @@ const rowKey = ref(0)
 const getList = async () => {
     try {
         const response = await aliasApi.getList()
-        list.value = response.data
+        list.value = response.data.aliases
         if (isDashboard) list.value = list.value.slice(0, 5)
         loaded.value = true
         error.value = ''

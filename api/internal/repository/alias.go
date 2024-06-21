@@ -83,7 +83,7 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 	return aliases, nil
 }
 
-func (d *Database) GetAliasesCount(ctx context.Context, userID string) (int, error) {
+func (d *Database) GetAliasCount(ctx context.Context, userID string) (int, error) {
 	var count int64
 	err := d.Client.Model(&model.Alias{}).Where("user_id = ?", userID).Count(&count).Error
 	return int(count), err

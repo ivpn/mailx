@@ -20,7 +20,7 @@ var (
 
 type AliasService interface {
 	GetAlias(context.Context, string, string) (model.Alias, error)
-	GetAliases(context.Context, string, int, int) ([]model.Alias, error)
+	GetAliases(context.Context, string, int, int) (model.AliasList, error)
 	PostAlias(context.Context, model.Alias, string, string) error
 	UpdateAlias(context.Context, model.Alias) error
 	DeleteAlias(context.Context, string, string) error
@@ -71,14 +71,14 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 		page = 0
 	}
 
-	aliases, err := h.Service.GetAliases(c.Context(), userID, limit, page)
+	list, err := h.Service.GetAliases(c.Context(), userID, limit, page)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
 
-	return c.JSON(aliases)
+	return c.JSON(list)
 }
 
 // @Summary Create alias

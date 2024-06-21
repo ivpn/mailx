@@ -29,3 +29,8 @@ type AliasStats struct {
 	Sends     int `json:"sends"`
 	Bandwidth int `json:"bandwidth"`
 }
+
+type AliasList struct {
+	Aliases []Alias `json:"aliases"`
+	Total   int     `json:"total"`
+}

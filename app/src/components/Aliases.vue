@@ -110,9 +110,12 @@ const total = ref(0)
 
 const getList = async () => {
     try {
-        const response = await aliasApi.getList()
-        list.value = response.data.aliases
-        total.value = response.data.total
+        const res = await aliasApi.getList({
+            limit: limit.value,
+            page: page.value,
+        })
+        list.value = res.data.aliases
+        total.value = res.data.total
         if (isDashboard) list.value = list.value.slice(0, 5)
         loaded.value = true
         error.value = ''
@@ -169,6 +172,7 @@ const renderRow = () => {
 const onUpdatePage = (obj: any) => {
     limit.value = obj.limit
     page.value = obj.page
+    getList()
 }
 
 onMounted(() => {

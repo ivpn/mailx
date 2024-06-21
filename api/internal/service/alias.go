@@ -21,7 +21,7 @@ var (
 
 type AliasStore interface {
 	GetAlias(context.Context, string, string) (model.Alias, error)
-	GetAliases(context.Context, string) ([]model.Alias, error)
+	GetAliases(context.Context, string, int, int) ([]model.Alias, error)
 	GetAliasByName(string) (model.Alias, error)
 	PostAlias(context.Context, model.Alias) error
 	UpdateAlias(context.Context, model.Alias) error
@@ -40,7 +40,7 @@ func (s *Service) GetAlias(ctx context.Context, ID string, userID string) (model
 }
 
 func (s *Service) GetAliases(ctx context.Context, userID string) ([]model.Alias, error) {
-	aliases, err := s.Store.GetAliases(ctx, userID)
+	aliases, err := s.Store.GetAliases(ctx, userID, 0, 0)
 	if err != nil {
 		log.Printf("error fetching aliass: %s", err.Error())
 		return []model.Alias{}, ErrGetAliases

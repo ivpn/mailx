@@ -33,7 +33,7 @@ func (d *Database) GetAlias(ctx context.Context, ID string, userID string) (mode
 	return alias, nil
 }
 
-func (d *Database) GetAliases(ctx context.Context, userID string) ([]model.Alias, error) {
+func (d *Database) GetAliases(ctx context.Context, userID string, limit int, offset int) ([]model.Alias, error) {
 	aliases := []model.Alias{}
 	query := `
 		SELECT a.*,
@@ -49,6 +49,15 @@ func (d *Database) GetAliases(ctx context.Context, userID string) ([]model.Alias
 		GROUP BY a.id
 		ORDER BY a.created_at DESC
 	`
+
+	if limit > 0 {
+		query += "\nLIMIT " + string(rune(limit))
+	}
+
+	if offset > 0 {
+		query += "\nOFFSET " + string(rune(offset))
+	}
+
 	rows, err := d.Client.Raw(query, model.Forward, model.Block, model.Reply, model.Send, userID).Rows()
 	if err != nil {
 		return nil, err
@@ -72,6 +81,12 @@ func (d *Database) GetAliases(ctx context.Context, userID string) ([]model.Alias
 	}
 
 	return aliases, nil
+}
+
+func (d *Database) GetAliasesCount(ctx context.Context, userID string) (int, error) {
+	var count int64
+	err := d.Client.Model(&model.Alias{}).Where("user_id = ?", userID).Count(&count).Error
+	return int(count), err
 }
 
 func (d *Database) GetAliasByName(name string) (model.Alias, error) {

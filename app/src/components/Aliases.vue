@@ -61,6 +61,7 @@
                 type="submit">All Aliases</a>
         </p>
         <p v-if="error" class="text-red-600 text-sm mb-4">Error: {{ error }}</p>
+        <Pagination v-if="list.length" :list.sync="list" :limit="limit" :page="page" :total="total" @onUpdatePage="onUpdatePage" />
     </div>
 </template>
 
@@ -72,6 +73,7 @@ import { recipientApi } from '../api/recipient.ts'
 import { settingsApi } from '../api/settings.ts'
 import AliasRow from './AliasRow.vue'
 import AliasCreate from './AliasCreate.vue'
+import Pagination from './Pagination.vue'
 
 const alias = {
     id: '',
@@ -102,11 +104,15 @@ const settings = ref({
 const error = ref('')
 const loaded = ref(false)
 const rowKey = ref(0)
+const limit = ref(25)
+const page = ref(1)
+const total = ref(0)
 
 const getList = async () => {
     try {
         const response = await aliasApi.getList()
         list.value = response.data.aliases
+        total.value = response.data.total
         if (isDashboard) list.value = list.value.slice(0, 5)
         loaded.value = true
         error.value = ''
@@ -158,6 +164,11 @@ const deleteAlias = async (id: string) => {
 
 const renderRow = () => {
     rowKey.value++
+}
+
+const onUpdatePage = (obj: any) => {
+    limit.value = obj.limit
+    page.value = obj.page
 }
 
 onMounted(() => {

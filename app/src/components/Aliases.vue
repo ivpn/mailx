@@ -61,7 +61,7 @@
                 type="submit">All Aliases</a>
         </p>
         <p v-if="error" class="text-red-600 text-sm mb-4">Error: {{ error }}</p>
-        <Pagination v-if="list.length" :list.sync="list" :limit="limit" :page="page" :total="total" @onUpdatePage="onUpdatePage" />
+        <Pagination v-if="list.length && !isDashboard" :list.sync="list" :limit="limit" :page="page" :total="total" @onUpdatePage="onUpdatePage" />
     </div>
 </template>
 

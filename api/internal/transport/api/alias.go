@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"strconv"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -19,7 +20,7 @@ var (
 
 type AliasService interface {
 	GetAlias(context.Context, string, string) (model.Alias, error)
-	GetAliases(context.Context, string) ([]model.Alias, error)
+	GetAliases(context.Context, string, int, int) (model.AliasList, error)
 	PostAlias(context.Context, model.Alias, string, string) error
 	UpdateAlias(context.Context, model.Alias) error
 	DeleteAlias(context.Context, string, string) error
@@ -54,19 +55,30 @@ func (h *Handler) GetAlias(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Success 200 {array} model.Alias
+// @Success 200 {object} model.AliasList
 // @Failure 400 {object} ErrorRes
 // @Router /aliases [get]
 func (h *Handler) GetAliases(c *fiber.Ctx) error {
 	userID := auth.GetUserID(c)
-	aliases, err := h.Service.GetAliases(c.Context(), userID)
+
+	limit, err := strconv.Atoi(c.Query("limit"))
+	if err != nil {
+		limit = 0
+	}
+
+	page, err := strconv.Atoi(c.Query("page"))
+	if err != nil {
+		page = 0
+	}
+
+	list, err := h.Service.GetAliases(c.Context(), userID, limit, page)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
 
-	return c.JSON(aliases)
+	return c.JSON(list)
 }
 
 // @Summary Create alias

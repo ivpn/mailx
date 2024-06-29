@@ -132,6 +132,15 @@ definitions:
       stats:
         $ref: '#/definitions/model.AliasStats'
     type: object
+  model.AliasList:
+    properties:
+      aliases:
+        items:
+          $ref: '#/definitions/model.Alias'
+        type: array
+      total:
+        type: integer
+    type: object
   model.AliasStats:
     properties:
       bandwidth:
@@ -344,9 +353,7 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/model.Alias'
-            type: array
+            $ref: '#/definitions/model.AliasList'
         "400":
           description: Bad Request
           schema:

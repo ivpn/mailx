@@ -25,6 +25,12 @@ func (d *Database) GetRecipients(ctx context.Context, userID string) ([]model.Re
 	return recipients, err
 }
 
+func (d *Database) GetRecipientsCount(ctx context.Context, userID string) (int, error) {
+	var count int64
+	err := d.Client.Model(&model.Recipient{}).Where("user_id = ?", userID).Count(&count).Error
+	return int(count), err
+}
+
 func (d *Database) GetVerifiedRecipients(ctx context.Context, recipientEmails string, userID string) ([]model.Recipient, error) {
 	var recipients []model.Recipient
 	err := d.Client.Where("email IN (?) AND is_active = true AND user_id = ?", strings.Split(recipientEmails, ","), userID).Find(&recipients).Error

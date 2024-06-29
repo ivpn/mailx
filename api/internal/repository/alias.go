@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"strconv"
 
 	"ivpn.net/email/api/internal/model"
 )
@@ -33,7 +34,7 @@ func (d *Database) GetAlias(ctx context.Context, ID string, userID string) (mode
 	return alias, nil
 }
 
-func (d *Database) GetAliases(ctx context.Context, userID string) ([]model.Alias, error) {
+func (d *Database) GetAliases(ctx context.Context, userID string, limit int, offset int) ([]model.Alias, error) {
 	aliases := []model.Alias{}
 	query := `
 		SELECT a.*,
@@ -47,8 +48,16 @@ func (d *Database) GetAliases(ctx context.Context, userID string) ([]model.Alias
 		ON a.id = m.alias_id
 		WHERE a.user_id = ? AND a.deleted_at IS NULL
 		GROUP BY a.id
-		ORDER BY a.created_at DESC
-	`
+		ORDER BY a.created_at DESC`
+
+	if limit > 0 {
+		query += "\nLIMIT " + strconv.Itoa(limit)
+	}
+
+	if offset > 0 {
+		query += "\nOFFSET " + strconv.Itoa(offset)
+	}
+
 	rows, err := d.Client.Raw(query, model.Forward, model.Block, model.Reply, model.Send, userID).Rows()
 	if err != nil {
 		return nil, err
@@ -72,6 +81,12 @@ func (d *Database) GetAliases(ctx context.Context, userID string) ([]model.Alias
 	}
 
 	return aliases, nil
+}
+
+func (d *Database) GetAliasCount(ctx context.Context, userID string) (int, error) {
+	var count int64
+	err := d.Client.Model(&model.Alias{}).Where("user_id = ?", userID).Count(&count).Error
+	return int(count), err
 }
 
 func (d *Database) GetAliasByName(name string) (model.Alias, error) {

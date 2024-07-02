@@ -7,13 +7,14 @@ services:
     image: email-api
     restart: always
     ports:
-      - ${SMTP_PORT}:${SMTP_PORT}
       - ${API_PORT}:${API_PORT}
     depends_on:
       db:
         condition: service_healthy
     volumes:
       - email-api:/var/log
+    networks:
+      email:
   
   app:
     build: ../app
@@ -39,6 +40,8 @@ services:
       MYSQL_PASSWORD: email
     volumes:
       - email-db:/var/lib/mysql
+    networks:
+      email:
   
   redis:
     image: redis
@@ -46,8 +49,14 @@ services:
     restart: always
     volumes:
       - email-redis:/data
+    networks:
+      email:
 
 volumes:
   email-api:
   email-db:
   email-redis:
+
+networks:
+  email:
+    driver: bridge

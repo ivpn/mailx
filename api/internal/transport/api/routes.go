@@ -14,6 +14,9 @@ import (
 )
 
 func (h *Handler) SetupRoutes(cfg config.APIConfig) {
+	h.Server.Get("/v1/health", h.Health)
+	h.Server.Post("/v1/email", h.HandleEmail)
+
 	h.Server.Use(auth.NewAPICORS(cfg))
 	h.Server.Use(helmet.New())
 	h.Server.Use(healthcheck.New())

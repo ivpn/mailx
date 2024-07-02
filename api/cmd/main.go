@@ -8,7 +8,6 @@ import (
 	"ivpn.net/email/api/internal/repository"
 	"ivpn.net/email/api/internal/service"
 	"ivpn.net/email/api/internal/transport/api"
-	"ivpn.net/email/api/internal/transport/smpt"
 	"ivpn.net/email/api/internal/utils"
 )
 
@@ -33,13 +32,6 @@ func Run() error {
 	cron.New(db.Client)
 
 	service := service.New(cfg, db, redis)
-
-	go func() {
-		err := smpt.Start(cfg.SMTP, service)
-		if err != nil {
-			log.Println(err)
-		}
-	}()
 
 	err = api.Start(cfg.API, service, redis)
 	if err != nil {

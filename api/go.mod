@@ -2,8 +2,6 @@ module ivpn.net/email/api
 
 go 1.22
 
-require github.com/mhale/smtpd v0.8.2
-
 require github.com/joho/godotenv v1.5.1
 
 require (

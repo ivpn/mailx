@@ -22,12 +22,6 @@ type APIConfig struct {
 	BasicAuthPassword string
 }
 
-type SMTPConfig struct {
-	Host     string
-	Port     string
-	Hostname string
-}
-
 type DBConfig struct {
 	Host     string
 	Port     string
@@ -57,7 +51,6 @@ type ServiceConfig struct {
 
 type Config struct {
 	API        APIConfig
-	SMTP       SMTPConfig
 	DB         DBConfig
 	Redis      RedisConfig
 	SMTPClient SMTPClientConfig
@@ -100,11 +93,6 @@ func New() (Config, error) {
 			LogFile:           os.Getenv("LOG_FILE"),
 			BasicAuthUser:     os.Getenv("BASIC_AUTH_USER"),
 			BasicAuthPassword: os.Getenv("BASIC_AUTH_PASSWORD"),
-		},
-		SMTP: SMTPConfig{
-			Host:     os.Getenv("SMTP_HOST"),
-			Port:     os.Getenv("SMTP_PORT"),
-			Hostname: os.Getenv("SMTP_HOSTNAME"),
 		},
 		DB: DBConfig{
 			Host:     os.Getenv("DB_HOST"),

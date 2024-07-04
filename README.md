@@ -88,6 +88,13 @@ exit
 docker compose up -d
 ```
 
+#### Update Mailserver
+```bash
+docker compose pull
+docker compose down
+docker compose up -d
+```
+
 ### Test
 Run API tests:  
 ```bash

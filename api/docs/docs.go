@@ -228,6 +228,40 @@ const docTemplate = `{
                 }
             }
         },
+        "/email": {
+            "post": {
+                "description": "Handle incoming email",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "email"
+                ],
+                "summary": "Email handler",
+                "parameters": [
+                    {
+                        "description": "Email body",
+                        "name": "email",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/initiatepasswordreset": {
             "post": {
                 "description": "Initiate password reset",

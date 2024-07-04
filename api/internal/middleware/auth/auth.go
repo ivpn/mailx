@@ -105,6 +105,17 @@ func NewPSKCORS(cfg config.APIConfig) fiber.Handler {
 	})
 }
 
+func NewMailserverCORS(cfg config.APIConfig) fiber.Handler {
+
+	return func(c *fiber.Ctx) error {
+		if c.IP() != "172.26.0.6" {
+			return c.SendStatus(fiber.StatusUnauthorized)
+		}
+
+		return c.Next()
+	}
+}
+
 func GetUserID(c *fiber.Ctx) string {
 	return c.Locals(USER_ID).(string)
 }

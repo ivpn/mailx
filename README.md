@@ -99,7 +99,7 @@ gosec ./...
 Send test email:  
 ```bash
 docker exec -it mailserver sh
-echo "Test email body" | mail -s "Test subject" example.alias12@example.net
+echo "Test email body" | mail -s "Test subject" example.alias@example.net
 ```
 
 ### API Documentation

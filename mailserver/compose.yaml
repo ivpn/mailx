@@ -27,6 +27,7 @@ services:
       - ENABLE_CLAMAV=0
       - PERMIT_DOCKER=connected-networks
       - SMTP_ONLY=1
+      - LOG_LEVEL=${LOG_LEVEL}
     restart: always
     stop_grace_period: 1m
     # Uncomment if using `ENABLE_FAIL2BAN=1`:

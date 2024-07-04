@@ -1,6 +1,6 @@
 # Email Service
 
-## API Stack
+## API
 
 - Go
 - Fiber (API, middleware)
@@ -10,13 +10,17 @@
 - Docker (Containerization)
 - Swagger (API Documentation)
 
-## App Stack
+## App
 
 - TypeScript
 - Vue.js
 - Vite (Bundler)
 - Tailwind (Styling)
 - Docker (Containerization)
+
+## Mailserver
+
+- Postfix - Inbound SMTP
 
 ## Requirements
 
@@ -28,19 +32,24 @@
 ```bash
 cp api/.env.sample api/.env
 cp app/src/env.sample.json app/src/env.json
+cp mailserver/.env.sample mailserver/.env
+cp mailserver/postfix-virtual.cf.sample mailserver/docker-data/dms/config/postfix-virtual.cf
+cp mailserver/postfix-aliases.cf.sample mailserver/docker-data/dms/config/postfix-aliases.cf
 ```
 
-### Move to api directory
+### API + App
+
+#### Move to api directory
 ```bash
 cd api
 ```
 
-### Build
+#### Build
 ```bash
 docker compose build
 ```
 
-### Run
+#### Run
 ```bash
 docker compose up -d
 ```
@@ -51,8 +60,35 @@ http://localhost:3001
 API:  
 http://localhost:3000  
 
+### Mailserver
+
+#### Move to mailserver directory
+```bash
+cd mailserver
+```
+
+#### Run
+```bash
+docker compose up -d
+```
+
+#### Update alias table
+```bash
+docker exec -it mailserver sh
+
+# Build the db file
+postmap /etc/postfix/virtual
+
+# Update the alias table
+newaliases
+
+# Restart the postfix service
+exit
+docker compose up -d
+```
+
 ### Test
-Run tests:  
+Run API tests:  
 ```bash
 go test ./... -v
 go vet ./...
@@ -61,7 +97,8 @@ gosec ./...
 
 Send test email:  
 ```bash
-go run test/send_test_mail.go -alias=dark.sky86@example.net
+docker exec -it mailserver sh
+echo "Test email body" | mail -s "Test subject" example.alias12@example.net
 ```
 
 ### API Documentation

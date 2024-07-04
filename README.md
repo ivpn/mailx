@@ -33,9 +33,9 @@
 cp api/.env.sample api/.env
 cp app/src/env.sample.json app/src/env.json
 cp mailserver/.env.sample mailserver/.env
-cp mailserver/postfix-main.cf.sample mailserver/docker-data/dms/config/postfix-main.cf
-cp mailserver/postfix-virtual.cf.sample mailserver/docker-data/dms/config/postfix-virtual.cf
-cp mailserver/postfix-aliases.cf.sample mailserver/docker-data/dms/config/postfix-aliases.cf
+cp mailserver/config/postfix-main.cf.sample mailserver/docker-data/dms/config/postfix-main.cf
+cp mailserver/config/postfix-virtual.cf.sample mailserver/docker-data/dms/config/postfix-virtual.cf
+cp mailserver/config/postfix-aliases.cf.sample mailserver/docker-data/dms/config/postfix-aliases.cf
 ```
 
 ### API + App

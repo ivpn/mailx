@@ -83,9 +83,8 @@ postmap /etc/postfix/virtual
 # Update the alias table
 newaliases
 
-# Restart the postfix service
-exit
-docker compose up -d
+# Restart Postfix
+supervisorctl restart postfix
 ```
 
 #### Update Mailserver

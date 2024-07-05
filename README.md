@@ -20,7 +20,7 @@
 
 ## Mailserver
 
-- Postfix - Inbound SMTP
+- Postfix
 
 ## Requirements
 

@@ -20,13 +20,16 @@
 
 ## Mailserver
 
-- Postfix
+- [Docker Mailserver](https://github.com/docker-mailserver/docker-mailserver)
 
 ## Requirements
 
 - Docker
 
 ## Run locally
+
+> [!TIP]
+> Docker Mailserver officially supports Linux. If you want to run it on macOS, please read [this issue](https://github.com/docker-mailserver/docker-mailserver/issues/3648).
 
 ### Config
 ```bash

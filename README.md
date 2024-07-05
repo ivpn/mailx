@@ -59,11 +59,6 @@ cp mailserver/config/postfix-aliases.cf.sample mailserver/docker-data/dms/config
 cd api
 ```
 
-#### Build
-```bash
-docker compose build
-```
-
 #### Run
 ```bash
 docker compose up -d

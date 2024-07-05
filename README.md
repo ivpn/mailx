@@ -136,4 +136,4 @@ swag init -g cmd/main.go
 ```
 
 > [!TIP]
-> If you have [Task](https://github.com/go-task/task) installed, you can run `task docs` to generate API documentation.
+> With [Task](https://github.com/go-task/task), run `task docs` to generate API documentation.

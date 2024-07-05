@@ -73,7 +73,7 @@ cd mailserver
 docker compose up -d
 ```
 
-#### Update alias table
+#### Setup Postfix
 ```bash
 docker exec -it mailserver sh
 
@@ -85,6 +85,9 @@ newaliases
 
 # Restart Postfix
 supervisorctl restart postfix
+
+# Show logs
+setup debug show-mail-logs
 ```
 
 #### Update Mailserver

@@ -44,13 +44,13 @@ cp mailserver/config/postfix-aliases.cf.sample mailserver/docker-data/dms/config
 
 > [!IMPORTANT]
 > Make sure to set up the required config:
-> - api/.env: DOMAINS, SMTP_CLIENT_*
-> - app/src/env.json: DOMAINS
-> - mailserver/.env: HOSTNAME
-> - mailserver/docker-data/dms/config/postfix-virtual.cf: @your-domain.net curl_email
+> - api/.env: `DOMAINS`, `SMTP_CLIENT_*`
+> - app/src/env.json: `DOMAINS`
+> - mailserver/.env: `HOSTNAME`
+> - mailserver/docker-data/dms/config/postfix-virtual.cf: `@your-domain.net curl_email`
 
 > [!TIP]
-> For local testing, you can use [MailHog](https://github.com/mailhog/MailHog) or [MailTrap](https://mailtrap.io/email-sandbox/) as outbound SMTP client (SMTP_CLIENT_*).
+> For local testing, you can use [MailHog](https://github.com/mailhog/MailHog) or [MailTrap](https://mailtrap.io/email-sandbox/) as outbound SMTP client (`SMTP_CLIENT_*`).
 
 ### API + App
 

@@ -111,7 +111,7 @@ docker compose down
 docker compose up -d
 ```
 
-### Test
+## Test
 Run API tests:  
 ```bash
 go test ./... -v
@@ -125,7 +125,7 @@ docker exec -it mailserver sh
 echo "Test email body" | mail -s "Test subject" example.alias@example.net
 ```
 
-### API Documentation
+## API Documentation
 API docs:  
 http://localhost:3000/docs  
 

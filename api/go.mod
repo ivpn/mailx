@@ -9,7 +9,7 @@ require (
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
 	github.com/go-playground/validator/v10 v10.20.0
 	github.com/go-sql-driver/mysql v1.7.1
-	github.com/gofiber/fiber/v2 v2.52.4
+	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/gofiber/swagger v1.0.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.6.0

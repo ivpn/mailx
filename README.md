@@ -29,7 +29,7 @@
 ## Run locally
 
 > [!IMPORTANT]
-> Docker Mailserver officially supports Linux. If you want to run it on macOS, please read [this issue](https://github.com/docker-mailserver/docker-mailserver/issues/3648).
+> Docker Mailserver officially supports Linux. If you want to run it on macOS, please read [this](https://github.com/docker-mailserver/docker-mailserver/issues/3648).
 
 ### Config
 ```bash

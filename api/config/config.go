@@ -11,6 +11,7 @@ import (
 type APIConfig struct {
 	Port              string
 	ApiAllowOrigin    string
+	ApiAllowIp        string
 	CookieSecret      string
 	TokenSecret       string
 	TokenExpiration   time.Duration
@@ -20,12 +21,6 @@ type APIConfig struct {
 	LogFile           string
 	BasicAuthUser     string
 	BasicAuthPassword string
-}
-
-type SMTPConfig struct {
-	Host     string
-	Port     string
-	Hostname string
 }
 
 type DBConfig struct {
@@ -57,7 +52,6 @@ type ServiceConfig struct {
 
 type Config struct {
 	API        APIConfig
-	SMTP       SMTPConfig
 	DB         DBConfig
 	Redis      RedisConfig
 	SMTPClient SMTPClientConfig
@@ -91,6 +85,7 @@ func New() (Config, error) {
 		API: APIConfig{
 			Port:              os.Getenv("API_PORT"),
 			ApiAllowOrigin:    os.Getenv("API_ALLOW_ORIGIN"),
+			ApiAllowIp:        os.Getenv("API_ALLOW_IP"),
 			CookieSecret:      os.Getenv("COOKIE_SECRET"),
 			TokenSecret:       os.Getenv("TOKEN_SECRET"),
 			TokenExpiration:   tokenExp,
@@ -100,11 +95,6 @@ func New() (Config, error) {
 			LogFile:           os.Getenv("LOG_FILE"),
 			BasicAuthUser:     os.Getenv("BASIC_AUTH_USER"),
 			BasicAuthPassword: os.Getenv("BASIC_AUTH_PASSWORD"),
-		},
-		SMTP: SMTPConfig{
-			Host:     os.Getenv("SMTP_HOST"),
-			Port:     os.Getenv("SMTP_PORT"),
-			Hostname: os.Getenv("SMTP_HOSTNAME"),
 		},
 		DB: DBConfig{
 			Host:     os.Getenv("DB_HOST"),

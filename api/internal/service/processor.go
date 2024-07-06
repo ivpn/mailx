@@ -5,7 +5,6 @@ import (
 	"context"
 	"errors"
 	"log"
-	"net"
 	"net/mail"
 	"strings"
 	"time"
@@ -38,15 +37,15 @@ type Msg struct {
 	Type     MsgType
 }
 
-func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data []byte) error {
-	msg, err := parseMessage(from, to, data)
+func (s *Service) ProcessMessage(data []byte) error {
+	msg, err := parseMessage(data)
 	if err != nil {
 		log.Println("error parsing message", err)
 		return err
 	}
 
 	for _, to := range msg.To {
-		recipient, alias, relayType, err := s.findRecipient(from, to, msg.Type)
+		recipient, alias, relayType, err := s.findRecipient(msg.From, to, msg.Type)
 		if err != nil {
 			log.Println("error processing message", err)
 			continue
@@ -59,7 +58,7 @@ func (s *Service) ProcessMessage(origin net.Addr, from string, to []string, data
 		}
 
 		utils.Background(func() {
-			err = s.queueMessage(from, msg.FromName, settings.FromName, recipient, data, alias, relayType)
+			err = s.queueMessage(msg.From, msg.FromName, settings.FromName, recipient, data, alias, relayType)
 			if err != nil {
 				log.Println("error queueing message", err)
 				return
@@ -154,32 +153,32 @@ func (s *Service) findRecipient(from string, email string, msgType MsgType) (str
 	return r, alias, model.Forward, nil
 }
 
-func parseMessage(from string, to []string, data []byte) (Msg, error) {
+func parseMessage(data []byte) (Msg, error) {
 	msg, err := mail.ReadMessage(bytes.NewReader(data))
 	if err != nil {
 		return Msg{}, err
 	}
 
+	to := strings.Split(msg.Header.Get("To"), ",")
 	subject := msg.Header.Get("Subject")
+
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(msg.Body)
 	body := buf.String()
 	msgType := Send
 
-	fromHeader := msg.Header.Get("From")
-	fromAddress, err := mail.ParseAddress(fromHeader)
+	address, err := mail.ParseAddress(msg.Header.Get("From"))
 	if err != nil {
 		return Msg{}, err
 	}
-	fromName := fromAddress.Name
 
 	if isReply(msg) {
 		msgType = Reply
 	}
 
 	return Msg{
-		From:     from,
-		FromName: fromName,
+		From:     address.Address,
+		FromName: address.Name,
 		To:       to,
 		Subject:  subject,
 		Body:     body,

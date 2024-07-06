@@ -15,6 +15,7 @@ type Service interface {
 	UserService
 	SubscriptionService
 	SettingsService
+	ProcessorService
 }
 
 type Handler struct {

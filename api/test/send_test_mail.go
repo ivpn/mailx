@@ -4,26 +4,19 @@ import (
 	"flag"
 	"log"
 	"net/smtp"
-
-	"ivpn.net/email/api/config"
 )
 
 func main() {
-	cfg, err := config.New()
-	if err != nil {
-		log.Panic(err)
-	}
-
-	send(cfg.SMTP)
+	send()
 }
 
-func send(cfg config.SMTPConfig) {
+func send() {
 	var alias string
 	flag.StringVar(&alias, "alias", "", "Alias to use for sending a test email")
 	flag.Parse()
 
 	err := smtp.SendMail(
-		cfg.Host+":"+cfg.Port,
+		"0.0.0.0:587",
 		nil,
 		"foo@bar.com",
 		[]string{alias},

@@ -363,6 +363,28 @@ paths:
       summary: Get aliases
       tags:
       - alias
+  /email:
+    post:
+      consumes:
+      - application/json
+      description: Handle incoming email
+      parameters:
+      - description: Email body
+        in: body
+        name: email
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Email handler
+      tags:
+      - email
   /initiatepasswordreset:
     post:
       consumes:

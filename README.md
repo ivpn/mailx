@@ -22,11 +22,11 @@
 
 - [Docker Mailserver](https://github.com/docker-mailserver/docker-mailserver)
 
-## Requirements
+## Installation
+
+### Requirements
 
 - Docker
-
-## Run locally
 
 > [!IMPORTANT]
 > Docker Mailserver officially supports Linux. If you want to run it on macOS, please read [this](https://github.com/docker-mailserver/docker-mailserver/issues/3648).

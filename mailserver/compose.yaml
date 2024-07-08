@@ -25,8 +25,9 @@ services:
       - ENABLE_SPAMASSASSIN=0
       - ENABLE_FETCHMAIL=0
       - ENABLE_CLAMAV=0
-      - PERMIT_DOCKER=connected-networks
+      - PERMIT_DOCKER=container
       - SMTP_ONLY=1
+      - ENABLE_RSPAMD=1
       - LOG_LEVEL=${LOG_LEVEL}
     restart: always
     stop_grace_period: 1m

@@ -9,8 +9,6 @@ import (
 
 // Delete unverified users older than 7 days
 func DeleteUnverifiedUsers(db *gorm.DB) {
-	log.Println("Deleting unverified users older than 7 days")
-
 	users := []model.User{}
 	err := db.Where("is_active = ? AND created_at < NOW() - INTERVAL ? DAY", false, 7).Find(&users).Error
 	if err != nil {

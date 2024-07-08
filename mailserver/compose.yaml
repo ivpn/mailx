@@ -11,6 +11,7 @@ services:
       - "465:465"  # ESMTP (implicit TLS)
       - "587:587"  # ESMTP (explicit TLS => STARTTLS)
     volumes:
+      - ./docker-data/certbot/certs/:/etc/letsencrypt
       - ./docker-data/dms/mail-data/:/var/mail/
       - ./docker-data/dms/mail-logs/:/var/log/mail/
       - ./docker-data/dms/config/:/tmp/docker-mailserver/
@@ -28,6 +29,7 @@ services:
       - PERMIT_DOCKER=container
       - SMTP_ONLY=1
       - ENABLE_RSPAMD=1
+      - SSL_TYPE=${SSL_TYPE}
       - LOG_LEVEL=${LOG_LEVEL}
     restart: always
     stop_grace_period: 1m

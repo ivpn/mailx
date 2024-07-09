@@ -30,13 +30,14 @@ services:
       - PERMIT_DOCKER=container
       - SMTP_ONLY=1
       - ENABLE_RSPAMD=1
+      - ENABLE_FAIL2BAN=1
       - SSL_TYPE=${SSL_TYPE}
       - LOG_LEVEL=${LOG_LEVEL}
     restart: always
     stop_grace_period: 1m
     # Uncomment if using `ENABLE_FAIL2BAN=1`:
-    # cap_add:
-    #   - NET_ADMIN
+    cap_add:
+      - NET_ADMIN
     healthcheck:
       test: "ss --listening --tcp | grep -P 'LISTEN.+:smtp' || exit 1"
       timeout: 3s

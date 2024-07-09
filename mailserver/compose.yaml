@@ -26,11 +26,11 @@ services:
       - ENABLE_AMAVIS=0
       - ENABLE_SPAMASSASSIN=0
       - ENABLE_FETCHMAIL=0
-      - ENABLE_CLAMAV=0
       - PERMIT_DOCKER=container
       - SMTP_ONLY=1
-      - ENABLE_RSPAMD=1
-      - ENABLE_FAIL2BAN=1
+      - ENABLE_RSPAMD=${ENABLE_RSPAMD}
+      - ENABLE_FAIL2BAN=${ENABLE_FAIL2BAN}
+      - ENABLE_CLAMAV=${ENABLE_CLAMAV}
       - SSL_TYPE=${SSL_TYPE}
       - LOG_LEVEL=${LOG_LEVEL}
     restart: always

@@ -67,7 +67,7 @@ func (s *Service) GetAliases(ctx context.Context, userID string, limit int, page
 func (s *Service) GetAliasByName(name string) (model.Alias, error) {
 	alias, err := s.Store.GetAliasByName(name)
 	if err != nil {
-		log.Printf("error fetching alias: %s", err.Error())
+		log.Printf("error fetching alias %s: %s", name, err.Error())
 		return model.Alias{}, ErrGetAliasByName
 	}
 

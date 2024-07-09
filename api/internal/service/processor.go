@@ -159,26 +159,35 @@ func parseMessage(data []byte) (Msg, error) {
 		return Msg{}, err
 	}
 
-	to := strings.Split(msg.Header.Get("To"), ",")
 	subject := msg.Header.Get("Subject")
+
+	to := make([]string, 0)
+	for _, t := range strings.Split(msg.Header.Get("To"), ",") {
+		address, err := mail.ParseAddress(t)
+		if err != nil {
+			return Msg{}, err
+		}
+
+		to = append(to, address.Address)
+	}
+
+	from, err := mail.ParseAddress(msg.Header.Get("From"))
+	if err != nil {
+		return Msg{}, err
+	}
 
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(msg.Body)
 	body := buf.String()
 	msgType := Send
 
-	address, err := mail.ParseAddress(msg.Header.Get("From"))
-	if err != nil {
-		return Msg{}, err
-	}
-
 	if isReply(msg) {
 		msgType = Reply
 	}
 
 	return Msg{
-		From:     address.Address,
-		FromName: address.Name,
+		From:     from.Address,
+		FromName: from.Name,
 		To:       to,
 		Subject:  subject,
 		Body:     body,

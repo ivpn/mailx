@@ -9,8 +9,6 @@ import (
 
 // Delete messages older than 90 days
 func DeleteOldMessages(db *gorm.DB) {
-	log.Println("Deleting messages older than 90 days")
-
 	err := db.Where("created_at < NOW() - INTERVAL ? DAY", 90).Delete(&model.Message{}).Error
 	if err != nil {
 		log.Println("Error deleting old messages:", err)

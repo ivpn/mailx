@@ -4,22 +4,26 @@
         <h2 class="font-semibold text-gray-800 mb-5">Last 7 days</h2>
         <div id="chart" class="mb-5"></div>
         <h2 class="font-semibold text-gray-800 mb-5">Last 90 days</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center mb-8">
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-center mb-8">
             <div class="p-4 border-r border-gray-200">
-                <p class="text-4xl font-bold text-gray-800 mb-2">{{ stats.forwards }}</p>
+                <p class="text-3xl font-bold text-gray-800 mb-2">{{ stats.forwards }}</p>
                 <p class="text-gray-500">Forwards</p>
             </div>
             <div class="p-4 border-r border-white md:border-gray-200">
-                <p class="text-4xl font-bold text-gray-800 mb-2">{{ stats.blocks }}</p>
+                <p class="text-3xl font-bold text-gray-800 mb-2">{{ stats.blocks }}</p>
                 <p class="text-gray-500">Blocks</p>
             </div>
             <div class="p-4 border-r border-gray-200">
-                <p class="text-4xl font-bold text-gray-800 mb-2">{{ stats.replies }}</p>
+                <p class="text-3xl font-bold text-gray-800 mb-2">{{ stats.replies }}</p>
                 <p class="text-gray-500">Replies</p>
             </div>
-            <div class="p-4">
-                <p class="text-4xl font-bold text-gray-800 mb-2">{{ stats.sends }}</p>
+            <div class="p-4 border-r border-white md:border-gray-200">
+                <p class="text-3xl font-bold text-gray-800 mb-2">{{ stats.sends }}</p>
                 <p class="text-gray-500">Sends</p>
+            </div>
+            <div class="p-4">
+                <p class="text-3xl font-bold text-gray-800 mb-2">{{ getBandwidth(stats.bandwidth) }}</p>
+                <p class="text-gray-500">Bandwidth</p>
             </div>
         </div>
         <p v-if="error" class="text-red-600 text-sm mb-3">Error: {{ error }}</p>
@@ -64,6 +68,16 @@ const getStats = async () => {
             error.value = err.response?.data.error || err.message
         }
     }
+}
+
+const getBandwidth = (bytes: number): string => {
+    if (bytes === 0) return '0 B'
+
+    const k = 1024
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
 }
 
 const initChart = () => {

@@ -26,17 +26,18 @@ services:
       - ENABLE_AMAVIS=0
       - ENABLE_SPAMASSASSIN=0
       - ENABLE_FETCHMAIL=0
-      - ENABLE_CLAMAV=0
       - PERMIT_DOCKER=container
       - SMTP_ONLY=1
-      - ENABLE_RSPAMD=1
+      - ENABLE_RSPAMD=${ENABLE_RSPAMD}
+      - ENABLE_FAIL2BAN=${ENABLE_FAIL2BAN}
+      - ENABLE_CLAMAV=${ENABLE_CLAMAV}
       - SSL_TYPE=${SSL_TYPE}
       - LOG_LEVEL=${LOG_LEVEL}
     restart: always
     stop_grace_period: 1m
     # Uncomment if using `ENABLE_FAIL2BAN=1`:
-    # cap_add:
-    #   - NET_ADMIN
+    cap_add:
+      - NET_ADMIN
     healthcheck:
       test: "ss --listening --tcp | grep -P 'LISTEN.+:smtp' || exit 1"
       timeout: 3s

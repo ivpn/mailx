@@ -62,12 +62,15 @@ services:
       db:
         condition: service_healthy
     environment:
-      BACKUP_FILENAME: "${BACKUP_FILENAME}-%Y-%m-%dT%H-%M-%S.tar.gz"
+      BACKUP_FILENAME: "backup-%Y-%m-%dT%H-%M-%S.tar.gz"
       BACKUP_CRON_EXPRESSION: ${BACKUP_CRON_EXPRESSION}
       BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS}
+      GPG_PASSPHRASE: ${GPG_PASSPHRASE}
       BACKUP_STOP_DURING_BACKUP_LABEL: db
     volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
       - email-db:/backup/email-db:ro
+      - ${HOME}/backups:/archive
 
 volumes:
   email-api:

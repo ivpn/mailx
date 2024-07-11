@@ -34,12 +34,14 @@ services:
       timeout: 10s
       retries: 5
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: email
-      MYSQL_USER: email
-      MYSQL_PASSWORD: email
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     volumes:
       - email-db:/var/lib/mysql
+    labels:
+      - docker-volume-backup.stop-during-backup=db
     networks:
       email:
   
@@ -51,6 +53,21 @@ services:
       - email-redis:/data
     networks:
       email:
+  
+  backup:
+    image: offen/docker-volume-backup:v2
+    container_name: backup
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      BACKUP_FILENAME: "${BACKUP_FILENAME}-%Y-%m-%dT%H-%M-%S.tar.gz"
+      BACKUP_CRON_EXPRESSION: ${BACKUP_CRON_EXPRESSION}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS}
+      BACKUP_STOP_DURING_BACKUP_LABEL: db
+    volumes:
+      - email-db:/backup/email-db:ro
 
 volumes:
   email-api:

@@ -63,6 +63,7 @@ services:
         condition: service_healthy
     environment:
       BACKUP_FILENAME: "backup-%Y-%m-%dT%H-%M-%S.tar.gz"
+      BACKUP_LATEST_SYMLINK: backup-latest.tar.gz.gpg
       BACKUP_CRON_EXPRESSION: ${BACKUP_CRON_EXPRESSION}
       BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS}
       GPG_PASSPHRASE: ${GPG_PASSPHRASE}

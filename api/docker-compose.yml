@@ -12,7 +12,7 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - email-api:/var/log
+      - api:/var/log
     networks:
       email:
   
@@ -39,7 +39,7 @@ services:
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - email-db:/var/lib/mysql
+      - db:/var/lib/mysql
     labels:
       - docker-volume-backup.stop-during-backup=db
     networks:
@@ -50,7 +50,7 @@ services:
     container_name: email-redis
     restart: always
     volumes:
-      - email-redis:/data
+      - redis:/data
     networks:
       email:
   
@@ -70,13 +70,13 @@ services:
       BACKUP_STOP_DURING_BACKUP_LABEL: db
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - email-db:/backup/email-db:ro
+      - db:/backup/db:ro
       - ${HOME}/backups:/archive
 
 volumes:
-  email-api:
-  email-db:
-  email-redis:
+  api:
+  db:
+  redis:
 
 networks:
   email:

@@ -20,7 +20,9 @@
 
 ## Mailserver
 
-- [Docker Mailserver](https://github.com/docker-mailserver/docker-mailserver)
+- [Postfix](http://www.postfix.org)
+- [Rspamd](https://rspamd.com/)
+- [Fail2ban](https://www.fail2ban.org/wiki/index.php/Main_Page)
 
 ## Installation
 

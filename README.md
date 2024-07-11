@@ -106,6 +106,39 @@ docker compose down
 docker compose up -d
 ```
 
+## Restore DB from backup
+
+DB backup is stored locally on the host machine in the `${HOME}/backups` directory.
+
+### Unpack backup
+```bash
+cd ${HOME}/backups
+gpg -o backup.tar.gz -d backup-latest.tar.gz.gpg
+tar -xvf backup.tar.gz
+```
+
+### Restore DB
+
+```bash
+# Stop the containers
+docker compose down
+
+# Clone the volume
+docker volume create email_db_clone
+docker run --rm -v email_db:/from -v email_db_clone:/to alpine sh -c "cp -a /from/. /to/"
+
+# Remove the original volume
+docker volume rm email_db
+
+# Recreate the original volume from backup
+docker run -d --name restore -v email_db:/email_db alpine
+docker cp /unpacked_volume_dir/. restore:/email_db
+docker stop restore && docker rm restore
+
+# Start the containers
+docker compose up -d
+```
+
 ## Test
 Run API tests:  
 ```bash

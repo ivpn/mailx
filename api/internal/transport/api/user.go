@@ -462,3 +462,21 @@ func (h *Handler) ResetPassword(c *fiber.Ctx) error {
 		"message": ResetPasswordSuccess,
 	})
 }
+
+func (h *Handler) TotpEnable(c *fiber.Ctx) error {
+	return c.Status(200).JSON(fiber.Map{
+		"message": "OK",
+	})
+}
+
+func (h *Handler) TotpEnableConfirm(c *fiber.Ctx) error {
+	return c.Status(200).JSON(fiber.Map{
+		"message": "OK",
+	})
+}
+
+func (h *Handler) TotpDisable(c *fiber.Ctx) error {
+	return c.Status(200).JSON(fiber.Map{
+		"message": "OK",
+	})
+}

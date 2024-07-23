@@ -15,7 +15,7 @@ import (
 const windowSize = 2
 
 // issues constant will appear in the Google Authenticator software
-const issuer = "IVPN"
+const issuer = ""
 
 // Much of this code assumes int == int64, which probably is not the case.
 

@@ -372,6 +372,12 @@ func (s *Service) TotpEnable(ctx context.Context, userID string) (model.TOTPNew,
 		[]byte(utils.RandomString(10, utils.AlphaNumericUserFriendlyUppercase)),
 	)
 
+	err := s.Cache.Set(ctx, "totp_"+userID, totpSecret, s.Cfg.Service.OTPExpiration)
+	if err != nil {
+		log.Printf("error enabling TOTP: %s", err.Error())
+		return model.TOTPNew{}, ErrSaveOTP
+	}
+
 	return model.TOTPNew{
 		URI:    utils.GenerateURI(totpSecret, userID),
 		Secret: totpSecret,

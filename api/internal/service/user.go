@@ -5,6 +5,7 @@ import (
 	"encoding/base32"
 	"errors"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/go-sql-driver/mysql"
@@ -384,8 +385,28 @@ func (s *Service) TotpEnable(ctx context.Context, userID string) (model.TOTPNew,
 	}, nil
 }
 
-func (s *Service) TotpEnableConfirm(ctx context.Context, userID string, otp string) error {
-	return nil
+func (s *Service) TotpEnableConfirm(ctx context.Context, userID string, otp string) (model.TOTPBackup, error) {
+	secret, err := s.Cache.Get(ctx, "totp_"+userID)
+	if err != nil {
+		log.Printf("error enabling TOTP: %s", err.Error())
+		return model.TOTPBackup{}, ErrExpiredOTP
+	}
+
+	if !utils.MatchOTP(otp, secret) {
+		return model.TOTPBackup{}, ErrIncorrectOTP
+	}
+
+	backupCodes := []string{}
+	for i := 0; i < 8; i++ {
+		backupCodes = append(backupCodes, utils.RandomString(8, utils.AlphaNumericUserFriendly))
+	}
+	totpBackup := strings.Join(backupCodes, " ")
+
+	// TODO: Save userID, secret, and backup codes
+
+	return model.TOTPBackup{
+		Backup: totpBackup,
+	}, nil
 }
 
 func (s *Service) TotpDisable(ctx context.Context, userID string) error {

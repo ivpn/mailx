@@ -50,3 +50,7 @@ type ResetPasswordReq struct {
 type ActivateReq struct {
 	OTP string `json:"otp" validate:"required,len=6"`
 }
+
+type TotpConfirm struct {
+	OTP string `json:"otp" validate:"required,len=6"`
+}

@@ -23,6 +23,7 @@ var (
 	ErrInvalidCredentials        = "Invalid credentials"
 	ErrInvalidRequest            = "Invalid request"
 	ErrLogoutUser                = "Could not logout user"
+	DisableTOTPSuccess           = "2FA is disabled"
 )
 
 type UserService interface {
@@ -511,7 +512,34 @@ func (h *Handler) TotpEnableConfirm(c *fiber.Ctx) error {
 }
 
 func (h *Handler) TotpDisable(c *fiber.Ctx) error {
+	// Parse the request
+	req := TotpConfirm{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		log.Printf("error enabling totp: %s", err.Error())
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	// Validate the request
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	// Disable the TOTP
+	ID := auth.GetUserID(c)
+	err = h.Service.TotpDisable(c.Context(), ID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
 	return c.Status(200).JSON(fiber.Map{
-		"message": "OK",
+		"message": DisableTOTPSuccess,
 	})
 }

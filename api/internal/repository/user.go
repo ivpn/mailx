@@ -85,3 +85,13 @@ func (d *Database) TotpDisable(ctx context.Context, ID string) error {
 		"totp_backup": nil,
 	}).Error
 }
+
+func (d *Database) TotpGetBackup(ctx context.Context, ID string) (string, string, error) {
+	var user model.User
+	err := d.Client.Select("totp_backup").Where("id = ?", ID).First(&user).Error
+	return user.TotpBackup, user.TotpBackupUsed, err
+}
+
+func (d *Database) TotpSetUsedBackup(ctx context.Context, ID string, backupCodes string) error {
+	return d.Client.Model(&model.User{}).Where("id = ?", ID).Update("totp_backup_used", backupCodes).Error
+}

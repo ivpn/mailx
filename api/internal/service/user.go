@@ -15,20 +15,25 @@ import (
 )
 
 var (
-	ErrGetUser        = errors.New("could not get user by ID")
-	ErrGetUserStats   = errors.New("could not get user stats")
-	ErrPostUser       = errors.New("could not create user")
-	ErrActivateUser   = errors.New("could not activate user")
-	ErrDeleteUser     = errors.New("could not delete user")
-	ErrCreateOTP      = errors.New("could not create OTP")
-	ErrSaveOTP        = errors.New("could not save OTP")
-	ErrSendOTP        = errors.New("could not send OTP")
-	ErrExpiredOTP     = errors.New("expired OTP")
-	ErrIncorrectOTP   = errors.New("incorrect OTP")
-	ErrIncorrectEmail = errors.New("incorrect email")
-	ErrIncorrectPass  = errors.New("incorrect password")
-	ErrLogoutUser     = errors.New("could not logout user")
-	ErrChangePassword = errors.New("could not change password")
+	ErrGetUser            = errors.New("could not get user by ID")
+	ErrGetUserStats       = errors.New("could not get user stats")
+	ErrPostUser           = errors.New("could not create user")
+	ErrActivateUser       = errors.New("could not activate user")
+	ErrDeleteUser         = errors.New("could not delete user")
+	ErrCreateOTP          = errors.New("could not create OTP")
+	ErrSaveOTP            = errors.New("could not save OTP")
+	ErrSendOTP            = errors.New("could not send OTP")
+	ErrExpiredOTP         = errors.New("expired OTP")
+	ErrIncorrectOTP       = errors.New("incorrect OTP")
+	ErrIncorrectEmail     = errors.New("incorrect email")
+	ErrIncorrectPass      = errors.New("incorrect password")
+	ErrLogoutUser         = errors.New("could not logout user")
+	ErrChangePassword     = errors.New("could not change password")
+	ErrTotpDisabled       = errors.New("TOTP is disabled")
+	ErrGetTotp            = errors.New("could not get TOTP")
+	ErrTotpBackupUsed     = errors.New("TOTP backup is used")
+	ErrTotpBackupNotFound = errors.New("TOTP backup not found")
+	ErrTotpSetBackup      = errors.New("could not set TOTP backup")
 )
 
 type UserStore interface {
@@ -41,6 +46,8 @@ type UserStore interface {
 	ChangePassword(context.Context, model.User) error
 	TotpEnable(context.Context, string, string, string) error
 	TotpDisable(context.Context, string) error
+	TotpGetBackup(context.Context, string) (string, string, error)
+	TotpSetUsedBackup(context.Context, string, string) error
 }
 
 func (s *Service) GetUser(ctx context.Context, userID string) (model.User, error) {
@@ -417,4 +424,52 @@ func (s *Service) TotpEnableConfirm(ctx context.Context, userID string, otp stri
 
 func (s *Service) TotpDisable(ctx context.Context, userID string) error {
 	return nil
+}
+
+func (s *Service) TotpUseBackup(ctx context.Context, userID string, backup string) (bool, error) {
+	user, err := s.Store.GetUser(ctx, userID)
+	if err != nil {
+		log.Printf("error using TOTP backup: %s", err.Error())
+		return false, ErrGetUser
+	}
+
+	if user.TotpBackupUsed != "" {
+		return false, ErrTotpDisabled
+	}
+
+	backups, used, err := s.Store.TotpGetBackup(ctx, userID)
+	if err != nil {
+		return false, ErrGetTotp
+	}
+
+	usedSlice := strings.Fields(used)
+
+	for _, code := range usedSlice {
+		if backup == code {
+			return false, ErrTotpBackupUsed
+		}
+	}
+
+	found := false
+
+	for _, code := range strings.Fields(backups) {
+		if backup == code {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		return false, ErrTotpBackupNotFound
+	}
+
+	usedSlice = append(usedSlice, backup)
+	used = strings.Join(usedSlice, " ")
+
+	err = s.Store.TotpSetUsedBackup(ctx, userID, used)
+	if err != nil {
+		return false, ErrTotpSetBackup
+	}
+
+	return true, nil
 }

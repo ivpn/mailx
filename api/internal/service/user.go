@@ -34,6 +34,7 @@ var (
 	ErrTotpBackupUsed     = errors.New("TOTP backup is used")
 	ErrTotpBackupNotFound = errors.New("TOTP backup not found")
 	ErrTotpSetBackup      = errors.New("could not set TOTP backup")
+	ErrTotpDisable        = errors.New("could not disable TOTP")
 )
 
 type UserStore interface {
@@ -422,8 +423,23 @@ func (s *Service) TotpEnableConfirm(ctx context.Context, userID string, otp stri
 	}, nil
 }
 
-func (s *Service) TotpDisable(ctx context.Context, userID string) error {
-	return nil
+func (s *Service) TotpDisable(ctx context.Context, userID string, otp string) error {
+	isValid, err := s.TotpUseBackup(ctx, userID, otp)
+	if err != nil {
+		log.Printf("error disabling TOTP: %s", err.Error())
+		return err
+	}
+
+	if !isValid {
+		err = s.Store.TotpDisable(ctx, userID)
+		if err != nil {
+			return ErrTotpDisable
+		}
+
+		return nil
+	}
+
+	return ErrTotpDisable
 }
 
 func (s *Service) TotpUseBackup(ctx context.Context, userID string, backup string) (bool, error) {

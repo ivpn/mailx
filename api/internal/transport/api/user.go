@@ -41,7 +41,7 @@ type UserService interface {
 	ResetPassword(context.Context, string, string) error
 	TotpEnable(context.Context, string) (model.TOTPNew, error)
 	TotpEnableConfirm(context.Context, string, string) (model.TOTPBackup, error)
-	TotpDisable(context.Context, string) error
+	TotpDisable(context.Context, string, string) error
 }
 
 // @Summary Register user
@@ -532,7 +532,7 @@ func (h *Handler) TotpDisable(c *fiber.Ctx) error {
 
 	// Disable the TOTP
 	ID := auth.GetUserID(c)
-	err = h.Service.TotpDisable(c.Context(), ID)
+	err = h.Service.TotpDisable(c.Context(), ID, req.OTP)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),

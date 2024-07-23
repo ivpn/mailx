@@ -71,3 +71,17 @@ func (d *Database) GetUserStats(ctx context.Context, ID string) (model.UserStats
 func (d *Database) ChangePassword(ctx context.Context, user model.User) error {
 	return d.Client.Save(&user).Error
 }
+
+func (d *Database) TotpEnable(ctx context.Context, ID string, secret string, backupCodes string) error {
+	return d.Client.Model(&model.User{}).Where("id = ?", ID).Updates(map[string]interface{}{
+		"totp_secret": secret,
+		"totp_backup": backupCodes,
+	}).Error
+}
+
+func (d *Database) TotpDisable(ctx context.Context, ID string) error {
+	return d.Client.Model(&model.User{}).Where("id = ?", ID).Updates(map[string]interface{}{
+		"totp_secret": nil,
+		"totp_backup": nil,
+	}).Error
+}

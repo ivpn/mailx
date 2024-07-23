@@ -39,7 +39,7 @@ type UserService interface {
 	InitiatePasswordReset(context.Context, string) error
 	ResetPassword(context.Context, string, string) error
 	TotpEnable(context.Context, string) (model.TOTPNew, error)
-	TotpEnableConfirm(context.Context, string, string) error
+	TotpEnableConfirm(context.Context, string, string) (model.TOTPBackup, error)
 	TotpDisable(context.Context, string) error
 }
 
@@ -467,15 +467,47 @@ func (h *Handler) ResetPassword(c *fiber.Ctx) error {
 }
 
 func (h *Handler) TotpEnable(c *fiber.Ctx) error {
-	return c.Status(200).JSON(fiber.Map{
-		"message": "OK",
-	})
+	// Enable TOTP
+	ID := auth.GetUserID(c)
+	res, err := h.Service.TotpEnable(c.Context(), ID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(res)
 }
 
 func (h *Handler) TotpEnableConfirm(c *fiber.Ctx) error {
-	return c.Status(200).JSON(fiber.Map{
-		"message": "OK",
-	})
+	// Parse the request
+	req := TotpConfirm{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		log.Printf("error enabling totp: %s", err.Error())
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	// Validate the request
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	// Confirm the TOTP
+	ID := auth.GetUserID(c)
+	res, err := h.Service.TotpEnableConfirm(c.Context(), ID, req.OTP)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(res)
 }
 
 func (h *Handler) TotpDisable(c *fiber.Ctx) error {

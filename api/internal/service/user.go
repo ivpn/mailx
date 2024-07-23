@@ -39,6 +39,8 @@ type UserStore interface {
 	DeleteUser(context.Context, string) error
 	GetUserStats(context.Context, string) (model.UserStats, error)
 	ChangePassword(context.Context, model.User) error
+	TotpEnable(context.Context, string, string, string) error
+	TotpDisable(context.Context, string) error
 }
 
 func (s *Service) GetUser(ctx context.Context, userID string) (model.User, error) {
@@ -402,7 +404,11 @@ func (s *Service) TotpEnableConfirm(ctx context.Context, userID string, otp stri
 	}
 	totpBackup := strings.Join(backupCodes, " ")
 
-	// TODO: Save userID, secret, and backup codes
+	err = s.Store.TotpEnable(ctx, userID, secret, totpBackup)
+	if err != nil {
+		log.Printf("error enabling TOTP: %s", err.Error())
+		return model.TOTPBackup{}, ErrSaveOTP
+	}
 
 	return model.TOTPBackup{
 		Backup: totpBackup,

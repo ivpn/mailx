@@ -38,6 +38,9 @@ type UserService interface {
 	ChangePassword(context.Context, string, string) error
 	InitiatePasswordReset(context.Context, string) error
 	ResetPassword(context.Context, string, string) error
+	TotpEnable(context.Context, string) error
+	TotpEnableConfirm(context.Context, string, string) error
+	TotpDisable(context.Context, string) error
 }
 
 // @Summary Register user

@@ -365,3 +365,15 @@ func (s *Service) ResetPassword(ctx context.Context, otp string, password string
 
 	return nil
 }
+
+func (s *Service) TotpEnable(ctx context.Context, userID string) error {
+	return nil
+}
+
+func (s *Service) TotpEnableConfirm(ctx context.Context, userID string, otp string) error {
+	return nil
+}
+
+func (s *Service) TotpDisable(ctx context.Context, userID string) error {
+	return nil
+}

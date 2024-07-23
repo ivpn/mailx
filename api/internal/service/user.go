@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/base32"
 	"errors"
 	"log"
 	"time"
@@ -366,8 +367,15 @@ func (s *Service) ResetPassword(ctx context.Context, otp string, password string
 	return nil
 }
 
-func (s *Service) TotpEnable(ctx context.Context, userID string) error {
-	return nil
+func (s *Service) TotpEnable(ctx context.Context, userID string) (model.TOTPNew, error) {
+	totpSecret := base32.StdEncoding.EncodeToString(
+		[]byte(utils.RandomString(10, utils.AlphaNumericUserFriendlyUppercase)),
+	)
+
+	return model.TOTPNew{
+		URI:    utils.GenerateURI(totpSecret, userID),
+		Secret: totpSecret,
+	}, nil
 }
 
 func (s *Service) TotpEnableConfirm(ctx context.Context, userID string, otp string) error {

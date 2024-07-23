@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"strconv"
 
 	"ivpn.net/email/api/internal/utils"
 )
@@ -50,4 +51,13 @@ func (u *User) Matches(passwordPlain string) bool {
 
 func (u *User) IsTotpEnabled() bool {
 	return u.TotpSecret != ""
+}
+
+func (u *User) TotpVerify(otp string) (bool, error) {
+	code, err := strconv.Atoi(otp)
+	if err != nil {
+		return false, err
+	}
+
+	return utils.Check(u.TotpSecret, code)
 }

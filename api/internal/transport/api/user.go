@@ -467,6 +467,15 @@ func (h *Handler) ResetPassword(c *fiber.Ctx) error {
 	})
 }
 
+// @Summary Enable TOTP
+// @Description Enable TOTP
+// @Tags user
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} model.TOTPNew
+// @Failure 400 {object} ErrorRes
+// @Router /user/totp/enable [put]
 func (h *Handler) TotpEnable(c *fiber.Ctx) error {
 	// Enable TOTP
 	ID := auth.GetUserID(c)
@@ -480,6 +489,16 @@ func (h *Handler) TotpEnable(c *fiber.Ctx) error {
 	return c.JSON(res)
 }
 
+// @Summary Enable TOTP confirm
+// @Description Enable TOTP confirm
+// @Tags user
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param body body TotpConfirm true "TOTP confirm request"
+// @Success 200 {object} model.TOTPBackup
+// @Failure 400 {object} ErrorRes
+// @Router /user/totp/enable/confirm [put]
 func (h *Handler) TotpEnableConfirm(c *fiber.Ctx) error {
 	// Parse the request
 	req := TotpConfirm{}
@@ -511,6 +530,16 @@ func (h *Handler) TotpEnableConfirm(c *fiber.Ctx) error {
 	return c.JSON(res)
 }
 
+// @Summary Disable TOTP
+// @Description Disable TOTP
+// @Tags user
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param body body TotpConfirm true "TOTP confirm request"
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /user/totp/disable [put]
 func (h *Handler) TotpDisable(c *fiber.Ctx) error {
 	// Parse the request
 	req := TotpConfirm{}

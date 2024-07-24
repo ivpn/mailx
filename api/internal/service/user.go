@@ -391,7 +391,7 @@ func (s *Service) TotpEnable(ctx context.Context, userID string) (model.TOTPNew,
 	}
 
 	return model.TOTPNew{
-		URI:    utils.GenerateURI(totpSecret, userID),
+		URI:    utils.GenerateURI(totpSecret, userID, s.Cfg.SMTPClient.SenderName),
 		Secret: totpSecret,
 	}, nil
 }

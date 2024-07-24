@@ -14,9 +14,6 @@ import (
 
 const windowSize = 2
 
-// issues constant will appear in the Google Authenticator software
-const issuer = ""
-
 // Much of this code assumes int == int64, which probably is not the case.
 
 // ComputeCode computes the response code for a 64-bit challenge 'value' using the secret 'secret'.
@@ -73,7 +70,7 @@ func Check(secret string, code int) (bool, error) {
 // on how to avoid conflicting accounts.
 //
 // See https://github.com/google/google-authenticator/wiki/Conflicting-Accounts
-func GenerateURI(secret, user string) string {
+func GenerateURI(secret, user string, issuer string) string {
 	auth := "totp/"
 
 	q := make(url.Values)

@@ -425,25 +425,13 @@ func (s *Service) TotpEnableConfirm(ctx context.Context, userID string, otp stri
 }
 
 func (s *Service) TotpDisable(ctx context.Context, userID string, otp string) error {
-	isValid, err := s.TotpUseBackup(ctx, userID, otp)
+	isValid, err := s.VerifyTotp(ctx, userID, otp)
 	if err != nil {
 		log.Printf("error disabling TOTP: %s", err.Error())
 		return err
 	}
 
-	if !isValid {
-		user, err := s.Store.GetUser(ctx, userID)
-		if err != nil {
-			return ErrGetUser
-		}
-
-		isValid, err = user.TotpVerify(otp)
-		if err != nil {
-			return ErrInvalidTOTPCode
-		}
-	}
-
-	if !isValid {
+	if isValid {
 		err = s.Store.TotpDisable(ctx, userID)
 		if err != nil {
 			return ErrTotpDisable
@@ -453,6 +441,28 @@ func (s *Service) TotpDisable(ctx context.Context, userID string, otp string) er
 	}
 
 	return ErrTotpDisable
+}
+
+func (s *Service) VerifyTotp(ctx context.Context, userID string, otp string) (bool, error) {
+	isValid, err := s.TotpUseBackup(ctx, userID, otp)
+	if err != nil {
+		log.Printf("error disabling TOTP: %s", err.Error())
+		return false, err
+	}
+
+	if !isValid {
+		user, err := s.Store.GetUser(ctx, userID)
+		if err != nil {
+			return false, ErrGetUser
+		}
+
+		isValid, err = user.VerifyTotp(otp)
+		if err != nil {
+			return false, ErrInvalidTOTPCode
+		}
+	}
+
+	return isValid, nil
 }
 
 func (s *Service) TotpUseBackup(ctx context.Context, userID string, backup string) (bool, error) {

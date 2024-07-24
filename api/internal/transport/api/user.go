@@ -23,7 +23,9 @@ var (
 	ErrInvalidCredentials        = "Invalid credentials"
 	ErrInvalidRequest            = "Invalid request"
 	ErrLogoutUser                = "Could not logout user"
-	DisableTOTPSuccess           = "2FA is disabled"
+	DisableTotpSuccess           = "2FA is disabled"
+	TotpRequired                 = "2FA is required"
+	ErrInvalidTotpCode           = "Invalid 2FA code"
 )
 
 type UserService interface {
@@ -42,6 +44,7 @@ type UserService interface {
 	TotpEnable(context.Context, string) (model.TOTPNew, error)
 	TotpEnableConfirm(context.Context, string, string) (model.TOTPBackup, error)
 	TotpDisable(context.Context, string, string) error
+	VerifyTotp(context.Context, string, string) (bool, error)
 }
 
 // @Summary Register user
@@ -192,6 +195,25 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 		return c.Status(401).JSON(fiber.Map{
 			"error": ErrInvalidCredentials,
 		})
+	}
+
+	// Check if TOTP is required
+	if user.IsTotpEnabled() && req.OTP == "" {
+		return c.Status(400).JSON(fiber.Map{
+			"message": TotpRequired,
+			"code":    70001,
+		})
+	}
+
+	// Verify TOTP
+	if user.IsTotpEnabled() && req.OTP != "" {
+		isValid, err := h.Service.VerifyTotp(c.Context(), user.ID, req.OTP)
+		if err != nil || !isValid {
+			log.Printf("error login: %s", err.Error())
+			return c.Status(400).JSON(fiber.Map{
+				"error": ErrInvalidTotpCode,
+			})
+		}
 	}
 
 	// Create auth token
@@ -569,6 +591,6 @@ func (h *Handler) TotpDisable(c *fiber.Ctx) error {
 	}
 
 	return c.Status(200).JSON(fiber.Map{
-		"message": DisableTOTPSuccess,
+		"message": DisableTotpSuccess,
 	})
 }

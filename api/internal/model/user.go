@@ -53,7 +53,7 @@ func (u *User) IsTotpEnabled() bool {
 	return u.TotpSecret != ""
 }
 
-func (u *User) TotpVerify(otp string) (bool, error) {
+func (u *User) VerifyTotp(otp string) (bool, error) {
 	code, err := strconv.Atoi(otp)
 	if err != nil {
 		return false, err

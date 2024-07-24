@@ -21,6 +21,7 @@ type User struct {
 	TotpSecret     string  `json:"-"`
 	TotpBackup     string  `json:"-"`
 	TotpBackupUsed string  `json:"-"`
+	TotpEnabled    bool    `gorm:"-" json:"totp_enabled"`
 }
 
 type UserStats struct {

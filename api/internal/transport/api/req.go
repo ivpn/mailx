@@ -28,7 +28,7 @@ type SettingsReq struct {
 type UserReq struct {
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required,min=8,max=64"`
-	OTP      string `json:"otp" validate:"len=6"`
+	OTP      string `json:"otp" validate:"min=0,max=6"`
 }
 
 type DeleteUserReq struct {

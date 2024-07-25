@@ -25,37 +25,62 @@
                         </button>
                     </div>
                     <div class="p-4 whitespace-normal text-left text-base">
-                        <div class="mb-5">
+                        <div v-if="!isEnabled()">
+                            <div class="mb-5">
+                                <p class="text-gray-500 mb-3">
+                                    To enable two-factor authentication, please scan the code with a TOTP app (for example: Google Authenticator) and enter the code in the field below.
+                                </p>
+                            </div>
+                            <div class="mb-5 container">
+                                <canvas class="mx-auto" id="totp_qr_code"></canvas>
+                            </div>
+                            <div class="mb-3">
+                                <label for="totp_enable_code" class="block text-gray-500 mb-3">
+                                    Code from TOTP app:
+                                </label>
+                                <input
+                                    v-model="req.otp"
+                                    v-bind:class="{ 'border-gray-500': !codeError, 'border-red-600': codeError }"
+                                    id="totp_enable_code"
+                                    placeholder="6-digit code"
+                                    class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 leading-tight focus:border-bluish-500 mb-2"
+                                    type="text">
+                                    <p v-if="codeError" class="text-red-600 text-sm">Required</p>
+                            </div>
+                            <div class="flex justify-start items-center gap-x-3 pt-4 border-t">
+                                <button @click="totpEnableConfirm"
+                                    class="py-2 px-3 inline-flex items-center gap-x-2 font-medium text-base bg-bluish-500 text-white hover:bg-bluish-600 disabled:opacity-50 disabled:pointer-events-none">
+                                    Enable
+                                </button>
+                                <button @click="close"
+                                    class="text-gray-500 bg-gray-100 hover:bg-gray-200 font-medium text-base py-2 px-3 focus:outline-none focus:shadow-outline">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                        <div v-if="isEnabled()">
                             <p class="text-gray-500 mb-3">
-                                To enable two-factor authentication, please scan the code with a TOTP app (for example: Google Authenticator) and enter the code in the field below.
+                                Two-factor authentication was set up successfully.
                             </p>
+                            <p class="text-gray-500 mb-5">
+                                Please record the following backup codes which you will be able to use instead of TOTP in case you lost access to your device.
+                            </p>
+                            <p class="text-gray-500 mb-5 py-4 px-5 bg-gray-100">
+                                Backup codes:
+                                <span class="text-gray-800">
+                                    {{ resConfirm.backup }}
+                                </span>
+                            </p>
+                            <p class="text-gray-500 mb-5">
+                                Each of these codes can be used only once.
+                            </p>
+                            <div class="flex justify-start items-center gap-x-3 pt-4 border-t">
+                                <button @click="close"
+                                    class="text-gray-500 bg-gray-100 hover:bg-gray-200 font-medium text-base py-2 px-3 focus:outline-none focus:shadow-outline">
+                                    Close
+                                </button>
+                            </div>
                         </div>
-                        <div class="mb-5 container">
-                            <canvas class="mx-auto" id="totp_qr_code"></canvas>
-                        </div>
-                        <div class="mb-3">
-                            <label for="totp_enable_code" class="block text-gray-500 mb-3">
-                                Code from TOTP app:
-                            </label>
-                            <input
-                                v-model="req.code"
-                                v-bind:class="{ 'border-gray-500': !codeError, 'border-red-600': codeError }"
-                                id="totp_enable_code"
-                                placeholder="6-digit code"
-                                class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 leading-tight focus:border-bluish-500 mb-2"
-                                type="text">
-                                <p v-if="codeError" class="text-red-600 text-sm">Required</p>
-                        </div>
-                    </div>
-                    <div class="flex justify-start items-center gap-x-3 py-4 px-4 border-t">
-                        <button @click=""
-                            class="py-2 px-3 inline-flex items-center gap-x-2 font-medium text-base bg-bluish-500 text-white hover:bg-bluish-600 disabled:opacity-50 disabled:pointer-events-none">
-                            Enable
-                        </button>
-                        <button @click="close"
-                            class="text-gray-500 bg-gray-100 hover:bg-gray-200 font-medium text-base py-2 px-3 focus:outline-none focus:shadow-outline">
-                            Cancel
-                        </button>
                     </div>
                     <div class="flex items-start">
                         <p v-if="error" class="px-5 text-red-600 text-sm mb-3">Error: {{ error }}</p>
@@ -73,8 +98,9 @@ import axios from 'axios'
 import overlay from '@preline/overlay'
 import QRious from 'qrious'
 
-const req = ref({ code: '' })
-const res = ref({ uri: '' })
+const req = ref({ otp: '' })
+const resEnable = ref({ uri: '' })
+const resConfirm = ref({ backup: '' })
 const error = ref('')
 const codeError = ref(false)
 
@@ -97,11 +123,29 @@ const addEvents = () => {
 
 const totpEnable = async () => {
     try {
-        const response = await userApi.totpEnable()
-        res.value = response.data
-        generateQRCode(res.value.uri)
+        const res = await userApi.totpEnable()
+        resEnable.value = res.data
+        generateQRCode(resEnable.value.uri)
     } catch (err) {
         if (axios.isAxiosError(err)) {
+            error.value = err.message
+        }
+    }
+}
+
+const totpEnableConfirm = async () => {
+    if (!req.value.otp) {
+        codeError.value = true
+        return
+    }
+
+    try {
+        const res = await userApi.totpEnableConfirm(req.value)
+        resConfirm.value = res.data
+        codeError.value = false
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            resConfirm.value = { backup: '' }
             error.value = err.message
         }
     }
@@ -113,6 +157,10 @@ const generateQRCode = (uri: string) => {
         value: uri,
         size: 150,
     })
+}
+
+const isEnabled = () => {
+    return resConfirm.value.backup != ''
 }
 
 onMounted(() => {

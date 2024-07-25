@@ -1,0 +1,43 @@
+<template>
+    <div class="mb-5">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-5">2-Factor Authentication</h2>
+        <p class="text-sm text-gray-500 mb-5">
+            <span v-if="isEnabled()"
+                class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-emerald-100 text-emerald-800">Enabled</span>
+            <span v-if="!isEnabled()"
+                class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-gray-100 text-gray-500">Disabled</span>
+        </p>
+        <p class="text-gray-500 mb-5">
+            When enabled, 2-factor authentication will be required when you log in.
+        </p>
+        <div class="mb-3 max-w-xs">
+            <button v-if="!isEnabled()" @click="enable"
+                class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-2 px-3 focus:outline-none focus:shadow-outline" type="submit">
+                Enable
+            </button>
+            <button v-if="isEnabled()" @click="disable"
+                class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-2 px-3 focus:outline-none focus:shadow-outline" type="submit">
+                Disable
+            </button>
+        </div>
+        <p v-if="error" class="text-red-600 text-sm mb-3">Error: {{ error }}</p>
+    </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+// import { userApi } from '../api/user.ts'
+// import axios from 'axios'
+
+const error = ref('')
+
+const isEnabled = () => {
+    return false
+}
+
+const enable = () => {
+}
+
+const disable = () => {
+}
+</script>

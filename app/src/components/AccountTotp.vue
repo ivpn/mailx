@@ -11,11 +11,8 @@
             When enabled, 2-factor authentication will be required when you log in.<br>
         </p>
         <div class="mb-3 max-w-xs">
-            <button v-if="!res.totp_enabled" @click="enable"
-                class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-2 px-3 focus:outline-none focus:shadow-outline" type="submit">
-                Enable
-            </button>
-            <button v-if="res.totp_enabled" @click="disable"
+            <AccountTotpEnable v-if="!res.totp_enabled" />
+            <button v-if="res.totp_enabled"
                 class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-2 px-3 focus:outline-none focus:shadow-outline" type="submit">
                 Disable
             </button>
@@ -28,18 +25,13 @@
 import { ref, onMounted } from 'vue'
 import { userApi } from '../api/user.ts'
 import axios from 'axios'
+import AccountTotpEnable from './AccountTotpEnable.vue'
 
 const res = ref({ 
     id: '',
     totp_enabled: false
 })
 const error = ref('')
-
-const enable = () => {
-}
-
-const disable = () => {
-}
 
 const getUser = async () => {
     try {

@@ -30,12 +30,15 @@
                                 To enable two-factor authentication, please scan the code with a TOTP app (for example: Google Authenticator) and enter the code in the field below.
                             </p>
                         </div>
+                        <div class="mb-5 container">
+                            <canvas class="mx-auto" id="totp_qr_code"></canvas>
+                        </div>
                         <div class="mb-3">
                             <label for="totp_enable_code" class="block text-gray-500 mb-3">
                                 Code from TOTP app:
                             </label>
                             <input
-                                v-model="totp.code"
+                                v-model="req.code"
                                 v-bind:class="{ 'border-gray-500': !codeError, 'border-red-600': codeError }"
                                 id="totp_enable_code"
                                 placeholder="6-digit code"
@@ -65,14 +68,18 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { userApi } from '../api/user.ts'
+import axios from 'axios'
 import overlay from '@preline/overlay'
+import QRious from 'qrious'
 
-const totp = ref({ code: '' })
+const req = ref({ code: '' })
+const res = ref({ uri: '' })
 const error = ref('')
 const codeError = ref(false)
 
 const close = () => {
-    totp.value = {} as any
+    req.value = {} as any
     error.value = ''
     const modal = document.querySelector('#modal-totp-enable') as any
     overlay.close(modal)
@@ -82,6 +89,29 @@ const addEvents = () => {
     const modal = overlay.getInstance('#modal-totp-enable' as any, true) as any
     modal.element.on('close', () => {
         close()
+    })
+    modal.element.on('open', () => {
+        totpEnable()
+    })
+}
+
+const totpEnable = async () => {
+    try {
+        const response = await userApi.totpEnable()
+        res.value = response.data
+        generateQRCode(res.value.uri)
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.message
+        }
+    }
+}
+
+const generateQRCode = (uri: string) => {
+    new QRious({
+        element: document.getElementById('totp_qr_code'),
+        value: uri,
+        size: 150,
     })
 }
 

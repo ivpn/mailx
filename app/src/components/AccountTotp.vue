@@ -11,7 +11,7 @@
             When enabled, 2-factor authentication will be required when you log in.<br>
         </p>
         <div class="mb-3 max-w-xs">
-            <AccountTotpEnable v-if="!res.totp_enabled" />
+            <AccountTotpEnable v-if="!res.totp_enabled" @onTotpEnable="reload" />
             <AccountTotpDisable v-if="res.totp_enabled" />
         </div>
         <p v-if="error" class="text-red-600 text-sm mb-3">Error: {{ error }}</p>
@@ -42,7 +42,11 @@ const getUser = async () => {
     }
 }
 
-onMounted(() => {
+const reload = () => {
     getUser()
+}
+
+onMounted(() => {
+    reload()
 })
 </script>

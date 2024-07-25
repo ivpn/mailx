@@ -98,6 +98,8 @@ import axios from 'axios'
 import overlay from '@preline/overlay'
 import QRious from 'qrious'
 
+const emit = defineEmits(['onTotpEnable'])
+
 const req = ref({ otp: '' })
 const resEnable = ref({ uri: '' })
 const resConfirm = ref({ backup: '' })
@@ -143,6 +145,8 @@ const totpEnableConfirm = async () => {
         const res = await userApi.totpEnableConfirm(req.value)
         resConfirm.value = res.data
         codeError.value = false
+        emit('onTotpEnable')
+        close()
     } catch (err) {
         if (axios.isAxiosError(err)) {
             resConfirm.value = { backup: '' }

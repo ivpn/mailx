@@ -12,10 +12,7 @@
         </p>
         <div class="mb-3 max-w-xs">
             <AccountTotpEnable v-if="!res.totp_enabled" />
-            <button v-if="res.totp_enabled"
-                class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-2 px-3 focus:outline-none focus:shadow-outline" type="submit">
-                Disable
-            </button>
+            <AccountTotpDisable v-if="res.totp_enabled" />
         </div>
         <p v-if="error" class="text-red-600 text-sm mb-3">Error: {{ error }}</p>
     </div>
@@ -26,6 +23,7 @@ import { ref, onMounted } from 'vue'
 import { userApi } from '../api/user.ts'
 import axios from 'axios'
 import AccountTotpEnable from './AccountTotpEnable.vue'
+import AccountTotpDisable from './AccountTotpDisable.vue'
 
 const res = ref({ 
     id: '',

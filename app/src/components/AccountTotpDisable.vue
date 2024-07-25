@@ -1,17 +1,17 @@
 <template>
     <div>
-        <button v-bind:data-hs-overlay="'#modal-totp-enable'"
+        <button v-bind:data-hs-overlay="'#modal-totp-disable'"
             class="py-2 px-3 font-medium bg-bluish-500 text-white hover:bg-bluish-600">
-            Enable
+            Disable
         </button>
-        <div v-bind:id="'modal-totp-enable'"
+        <div v-bind:id="'modal-totp-disable'"
             class="hs-overlay hidden size-full fixed top-0 start-0 z-[60] overflow-x-hidden overflow-y-auto pointer-events-none">
             <div
                 class="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 opacity-0 transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
                 <div class="flex flex-col bg-white border shadow-sm rounded pointer-events-auto">
                     <div class="flex justify-between items-center py-3 px-4 border-b">
                         <h3 class="text-xl text-gray-800 font-semibold">
-                            Enable 2-Factor Authentication
+                            Disable 2-Factor Authentication
                         </h3>
                         <button @click="close" type="button"
                             class="flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent text-gray-800 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none">
@@ -27,17 +27,17 @@
                     <div class="p-4 whitespace-normal text-left text-base">
                         <div class="mb-5">
                             <p class="text-gray-500 mb-3">
-                                To enable two-factor authentication, please scan the code with a TOTP app (for example: Google Authenticator) and enter the code in the field below.
+                                To disable two-factor authentication, please enter code from TOTP app or a backup code.
                             </p>
                         </div>
                         <div class="mb-3">
-                            <label for="totp_enable_code" class="block text-gray-500 mb-3">
+                            <label for="totp_disable_code" class="block text-gray-500 mb-3">
                                 Code from TOTP app:
                             </label>
                             <input
                                 v-model="totp.code"
                                 v-bind:class="{ 'border-gray-500': !codeError, 'border-red-600': codeError }"
-                                id="totp_enable_code"
+                                id="totp_disable_code"
                                 placeholder="6-digit code"
                                 class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 leading-tight focus:border-bluish-500 mb-2"
                                 type="text">
@@ -47,7 +47,7 @@
                     <div class="flex justify-start items-center gap-x-3 py-4 px-4 border-t">
                         <button @click=""
                             class="py-2 px-3 inline-flex items-center gap-x-2 font-medium text-base bg-bluish-500 text-white hover:bg-bluish-600 disabled:opacity-50 disabled:pointer-events-none">
-                            Enable
+                            Disable
                         </button>
                         <button @click="close"
                             class="text-gray-500 bg-gray-100 hover:bg-gray-200 font-medium text-base py-2 px-3 focus:outline-none focus:shadow-outline">
@@ -74,12 +74,12 @@ const codeError = ref(false)
 const close = () => {
     totp.value = {} as any
     error.value = ''
-    const modal = document.querySelector('#modal-totp-enable') as any
+    const modal = document.querySelector('#modal-totp-disable') as any
     overlay.close(modal)
 }
 
 const addEvents = () => {
-    const modal = overlay.getInstance('#modal-totp-enable' as any, true) as any
+    const modal = overlay.getInstance('#modal-totp-disable' as any, true) as any
     modal.element.on('close', () => {
         close()
     })

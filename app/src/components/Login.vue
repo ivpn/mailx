@@ -27,6 +27,17 @@
                         id="password" type="password" autocomplete="current-password">
                     <p v-if="passwordError" class="text-red-600 text-sm mb-2">Required</p>
                 </div>
+                <div v-if="otpRequired" class="mb-6">
+                    <label class="block text-gray-500 mb-2" for="password">
+                        Two-factor authentication token:
+                    </label>
+                    <input
+                        v-model="otp"
+                        v-bind:class="{ 'border-gray-500': !otpError, 'border-red-600': otpError }"
+                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2"
+                        id="otp" type="number">
+                    <p v-if="otpError" class="text-red-600 text-sm mb-2">Required</p>
+                </div>
                 <div class="flex items-center justify-between">
                     <button :disabled="isLoading"
                         class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 focus:outline-none focus:shadow-outline"
@@ -56,8 +67,11 @@ import { userApi } from '../api/user.ts'
 
 const email = ref('')
 const password = ref('')
+const otp = ref('')
 const emailError = ref(false)
 const passwordError = ref(false)
+const otpError = ref(false)
+const otpRequired = ref(false)
 const apiError = ref('')
 const isLoading = ref(false)
 
@@ -71,19 +85,27 @@ const validatePassword = () => {
     return !passwordError.value
 }
 
+const validateOtp = () => {
+    otpError.value = otpRequired.value && !otp.value
+    return !otpError.value
+}
+
 const validate = () => {
     const validEmail = validateEmail()
     const validPass = validatePassword()
-    return validEmail && validPass
+    const validotp = validateOtp()
+    return validEmail && validPass && validotp
 }
 
 const login = async () => {
     if (!validate()) return
 
     isLoading.value = true // Start loading
+
     const data = {
         email: email.value,
-        password: password.value
+        password: password.value,
+        otp: otp.value
     }
 
     try {
@@ -100,6 +122,10 @@ const login = async () => {
 
             if (err.response?.status === 429) {
                 apiError.value = 'Too many requests, please try again later'
+            }
+
+            if (err.response?.data.code === 70001) {
+                otpRequired.value = true
             }
         }
     } finally {

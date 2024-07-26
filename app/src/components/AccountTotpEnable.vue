@@ -44,7 +44,7 @@
                                     id="totp_enable_code"
                                     placeholder="6-digit code"
                                     class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 leading-tight focus:border-bluish-500 mb-2"
-                                    type="text">
+                                    type="number">
                                     <p v-if="codeError" class="text-red-600 text-sm">Required</p>
                             </div>
                             <div class="flex justify-start items-center gap-x-3 pt-4 border-t">

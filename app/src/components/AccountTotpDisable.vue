@@ -35,7 +35,7 @@
                                 Code from TOTP app:
                             </label>
                             <input
-                                v-model="totp.code"
+                                v-model="req.otp"
                                 v-bind:class="{ 'border-gray-500': !codeError, 'border-red-600': codeError }"
                                 id="totp_disable_code"
                                 placeholder="6-digit code"
@@ -45,7 +45,7 @@
                         </div>
                     </div>
                     <div class="flex justify-start items-center gap-x-3 py-4 px-4 border-t">
-                        <button @click=""
+                        <button @click="disableTotp"
                             class="py-2 px-3 inline-flex items-center gap-x-2 font-medium text-base bg-bluish-500 text-white hover:bg-bluish-600 disabled:opacity-50 disabled:pointer-events-none">
                             Disable
                         </button>
@@ -65,14 +65,18 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { userApi } from '../api/user.ts'
+import axios from 'axios'
 import overlay from '@preline/overlay'
 
-const totp = ref({ code: '' })
+const emit = defineEmits(['onTotpDisable'])
+
+const req = ref({ otp: '' })
 const error = ref('')
 const codeError = ref(false)
 
 const close = () => {
-    totp.value = {} as any
+    req.value = { otp: '' }
     error.value = ''
     const modal = document.querySelector('#modal-totp-disable') as any
     overlay.close(modal)
@@ -83,6 +87,25 @@ const addEvents = () => {
     modal.element.on('close', () => {
         close()
     })
+}
+
+const disableTotp = async () => {
+    if (!req.value.otp) {
+        codeError.value = true
+        return
+    }
+
+    try {
+        await userApi.totpDisable(req.value)
+        codeError.value = false
+        error.value = ''
+        emit('onTotpDisable')
+        close()
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.message
+        }
+    }
 }
 
 onMounted(() => {

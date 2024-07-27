@@ -390,8 +390,14 @@ func (s *Service) TotpEnable(ctx context.Context, userID string) (model.TOTPNew,
 		return model.TOTPNew{}, ErrSaveOTP
 	}
 
+	user, err := s.Store.GetUser(ctx, userID)
+	if err != nil {
+		log.Printf("error enabling TOTP: %s", err.Error())
+		return model.TOTPNew{}, ErrGetUser
+	}
+
 	return model.TOTPNew{
-		URI:    utils.GenerateURI(totpSecret, userID, s.Cfg.SMTPClient.SenderName),
+		URI:    utils.GenerateURI(totpSecret, user.Email, s.Cfg.SMTPClient.SenderName),
 		Secret: totpSecret,
 	}, nil
 }

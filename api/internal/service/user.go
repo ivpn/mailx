@@ -481,16 +481,6 @@ func (s *Service) VerifyTotp(ctx context.Context, userID string, otp string) (bo
 }
 
 func (s *Service) TotpUseBackup(ctx context.Context, userID string, backup string) (bool, error) {
-	user, err := s.Store.GetUser(ctx, userID)
-	if err != nil {
-		log.Printf("error using TOTP backup: %s", err.Error())
-		return false, ErrGetUser
-	}
-
-	if user.TotpBackupUsed != "" {
-		return false, ErrTotpDisabled
-	}
-
 	backups, used, err := s.Store.TotpGetBackup(ctx, userID)
 	if err != nil {
 		return false, ErrGetTotp
@@ -514,7 +504,7 @@ func (s *Service) TotpUseBackup(ctx context.Context, userID string, backup strin
 	}
 
 	if !found {
-		return false, ErrTotpBackupNotFound
+		return false, nil
 	}
 
 	usedSlice = append(usedSlice, backup)

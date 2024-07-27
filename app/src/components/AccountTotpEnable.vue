@@ -141,6 +141,8 @@ const totpEnableConfirm = async () => {
         return
     }
 
+    req.value.otp = req.value.otp + ''
+
     try {
         const res = await userApi.totpEnableConfirm(req.value)
         resConfirm.value = res.data

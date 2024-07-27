@@ -95,6 +95,8 @@ const disableTotp = async () => {
         return
     }
 
+    req.value.otp = req.value.otp + ''
+
     try {
         await userApi.totpDisable(req.value)
         codeError.value = false

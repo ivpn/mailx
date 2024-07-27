@@ -83,8 +83,9 @@ func (d *Database) TotpEnable(ctx context.Context, ID string, secret string, bac
 
 func (d *Database) TotpDisable(ctx context.Context, ID string) error {
 	return d.Client.Model(&model.User{}).Where("id = ?", ID).Updates(map[string]interface{}{
-		"totp_secret": nil,
-		"totp_backup": nil,
+		"totp_secret":      nil,
+		"totp_backup":      nil,
+		"totp_backup_used": nil,
 	}).Error
 }
 

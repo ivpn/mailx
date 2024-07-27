@@ -208,8 +208,10 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 	// Verify TOTP
 	if user.IsTotpEnabled() && req.OTP != "" {
 		isValid, err := h.Service.VerifyTotp(c.Context(), user.ID, req.OTP)
-		if err != nil || !isValid {
+		if err != nil {
 			log.Printf("error login: %s", err.Error())
+		}
+		if err != nil || !isValid {
 			return c.Status(400).JSON(fiber.Map{
 				"error": ErrInvalidTotpCode,
 			})

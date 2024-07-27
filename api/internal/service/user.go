@@ -409,7 +409,16 @@ func (s *Service) TotpEnableConfirm(ctx context.Context, userID string, otp stri
 		return model.TOTPBackup{}, ErrExpiredOTP
 	}
 
-	if !utils.MatchOTP(otp, secret) {
+	user, err := s.Store.GetUser(ctx, userID)
+	if err != nil {
+		log.Printf("error enabling TOTP: %s", err.Error())
+		return model.TOTPBackup{}, ErrGetUser
+	}
+
+	user.TotpSecret = secret
+
+	isValid, err := user.VerifyTotp(otp)
+	if !isValid || err != nil {
 		return model.TOTPBackup{}, ErrIncorrectOTP
 	}
 

@@ -91,7 +91,7 @@ func (d *Database) TotpDisable(ctx context.Context, ID string) error {
 
 func (d *Database) TotpGetBackup(ctx context.Context, ID string) (string, string, error) {
 	var user model.User
-	err := d.Client.Select("totp_backup").Where("id = ?", ID).First(&user).Error
+	err := d.Client.Select("totp_backup,totp_backup_used").Where("id = ?", ID).First(&user).Error
 	return user.TotpBackup, user.TotpBackupUsed, err
 }
 

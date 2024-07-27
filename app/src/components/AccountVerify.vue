@@ -21,7 +21,9 @@
                     v-model="otp"
                     v-bind:class="{ 'border-gray-500': !otpError, 'border-red-600': otpError }"
                     class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 leading-tight focus:border-bluish-500 mb-2"
-                    id="account-otp" type="number">
+                    id="account-otp"
+                    type="text"
+                    pattern="[0-9]*">
                 <p v-if="otpError" class="text-red-600 text-sm mb-2">Required</p>
             </div>
             <div class="flex flex-row gap-4">

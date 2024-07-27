@@ -25,7 +25,7 @@
                         </button>
                     </div>
                     <div class="p-4 whitespace-normal text-left text-base">
-                        <div v-if="!isEnabled()">
+                        <div v-if="!isEnabled">
                             <div class="mb-5">
                                 <p class="text-gray-500 mb-3">
                                     To enable two-factor authentication, please scan the code with a TOTP app (for example: Google Authenticator) and enter the code in the field below.
@@ -44,7 +44,8 @@
                                     id="totp_enable_code"
                                     placeholder="6-digit code"
                                     class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 leading-tight focus:border-bluish-500 mb-2"
-                                    type="number">
+                                    type="text"
+                                    pattern="[0-9]*">
                                     <p v-if="codeError" class="text-red-600 text-sm">Required</p>
                             </div>
                             <div class="flex justify-start items-center gap-x-3 pt-4 border-t">
@@ -58,7 +59,7 @@
                                 </button>
                             </div>
                         </div>
-                        <div v-if="isEnabled()">
+                        <div v-if="isEnabled">
                             <p class="text-gray-500 mb-3">
                                 Two-factor authentication was set up successfully.
                             </p>
@@ -75,7 +76,7 @@
                                 Each of these codes can be used only once.
                             </p>
                             <div class="flex justify-start items-center gap-x-3 pt-4 border-t">
-                                <button @click="close"
+                                <button @click="complete"
                                     class="text-gray-500 bg-gray-100 hover:bg-gray-200 font-medium text-base py-2 px-3 focus:outline-none focus:shadow-outline">
                                     Close
                                 </button>
@@ -105,12 +106,18 @@ const resEnable = ref({ uri: '' })
 const resConfirm = ref({ backup: '' })
 const error = ref('')
 const codeError = ref(false)
+const isEnabled = ref(false)
 
 const close = () => {
     req.value = {} as any
     error.value = ''
     const modal = document.querySelector('#modal-totp-enable') as any
     overlay.close(modal)
+}
+
+const complete = () => {
+    emit('onTotpEnable')
+    close()
 }
 
 const addEvents = () => {
@@ -146,12 +153,12 @@ const totpEnableConfirm = async () => {
     try {
         const res = await userApi.totpEnableConfirm(req.value)
         resConfirm.value = res.data
+        isEnabled.value = true
         codeError.value = false
-        emit('onTotpEnable')
-        close()
     } catch (err) {
         if (axios.isAxiosError(err)) {
             resConfirm.value = { backup: '' }
+            isEnabled.value = false
             error.value = err.message
         }
     }
@@ -163,10 +170,6 @@ const generateQRCode = (uri: string) => {
         value: uri,
         size: 150,
     })
-}
-
-const isEnabled = () => {
-    return resConfirm.value.backup != ''
 }
 
 onMounted(() => {

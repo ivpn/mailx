@@ -120,13 +120,14 @@ const login = async () => {
         }
     } catch (err) {
         if (axios.isAxiosError(err)) {
-            apiError.value = err.response?.data.error || err.message
+            apiError.value = err.message || err.response?.data.error
 
             if (err.response?.status === 429) {
                 apiError.value = 'Too many requests, please try again later'
             }
 
             if (err.response?.data.code === 70001) {
+                apiError.value = ''
                 otpRequired.value = true
             }
         }

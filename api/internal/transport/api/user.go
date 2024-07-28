@@ -23,6 +23,9 @@ var (
 	ErrInvalidCredentials        = "Invalid credentials"
 	ErrInvalidRequest            = "Invalid request"
 	ErrLogoutUser                = "Could not logout user"
+	DisableTotpSuccess           = "2FA is disabled"
+	TotpRequired                 = "2FA is required"
+	ErrInvalidTotpCode           = "Invalid 2FA code"
 )
 
 type UserService interface {
@@ -38,6 +41,10 @@ type UserService interface {
 	ChangePassword(context.Context, string, string) error
 	InitiatePasswordReset(context.Context, string) error
 	ResetPassword(context.Context, string, string) error
+	TotpEnable(context.Context, string) (model.TOTPNew, error)
+	TotpEnableConfirm(context.Context, string, string) (model.TOTPBackup, error)
+	TotpDisable(context.Context, string, string) error
+	VerifyTotp(context.Context, string, string) (bool, error)
 }
 
 // @Summary Register user
@@ -188,6 +195,27 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 		return c.Status(401).JSON(fiber.Map{
 			"error": ErrInvalidCredentials,
 		})
+	}
+
+	// Check if TOTP is required
+	if user.IsTotpEnabled() && req.OTP == "" {
+		return c.Status(400).JSON(fiber.Map{
+			"message": TotpRequired,
+			"code":    70001,
+		})
+	}
+
+	// Verify TOTP
+	if user.IsTotpEnabled() && req.OTP != "" {
+		isValid, err := h.Service.VerifyTotp(c.Context(), user.ID, req.OTP)
+		if err != nil {
+			log.Printf("error login: %s", err.Error())
+		}
+		if err != nil || !isValid {
+			return c.Status(400).JSON(fiber.Map{
+				"error": ErrInvalidTotpCode,
+			})
+		}
 	}
 
 	// Create auth token
@@ -460,5 +488,111 @@ func (h *Handler) ResetPassword(c *fiber.Ctx) error {
 
 	return c.Status(200).JSON(fiber.Map{
 		"message": ResetPasswordSuccess,
+	})
+}
+
+// @Summary Enable TOTP
+// @Description Enable TOTP
+// @Tags user
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} model.TOTPNew
+// @Failure 400 {object} ErrorRes
+// @Router /user/totp/enable [put]
+func (h *Handler) TotpEnable(c *fiber.Ctx) error {
+	// Enable TOTP
+	ID := auth.GetUserID(c)
+	res, err := h.Service.TotpEnable(c.Context(), ID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(res)
+}
+
+// @Summary Enable TOTP confirm
+// @Description Enable TOTP confirm
+// @Tags user
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param body body TotpConfirm true "TOTP confirm request"
+// @Success 200 {object} model.TOTPBackup
+// @Failure 400 {object} ErrorRes
+// @Router /user/totp/enable/confirm [put]
+func (h *Handler) TotpEnableConfirm(c *fiber.Ctx) error {
+	// Parse the request
+	req := TotpReq{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		log.Printf("error enabling totp: %s", err.Error())
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	// Validate the request
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	// Confirm the TOTP
+	ID := auth.GetUserID(c)
+	res, err := h.Service.TotpEnableConfirm(c.Context(), ID, req.OTP)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(res)
+}
+
+// @Summary Disable TOTP
+// @Description Disable TOTP
+// @Tags user
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param body body TotpConfirm true "TOTP confirm request"
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /user/totp/disable [put]
+func (h *Handler) TotpDisable(c *fiber.Ctx) error {
+	// Parse the request
+	req := TotpReq{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		log.Printf("error enabling totp: %s", err.Error())
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	// Validate the request
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	// Disable the TOTP
+	ID := auth.GetUserID(c)
+	err = h.Service.TotpDisable(c.Context(), ID, req.OTP)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": DisableTotpSuccess,
 	})
 }

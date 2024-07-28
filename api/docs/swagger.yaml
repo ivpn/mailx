@@ -101,6 +101,13 @@ definitions:
       message:
         type: string
     type: object
+  api.TotpConfirm:
+    properties:
+      otp:
+        type: string
+    required:
+    - otp
+    type: object
   api.UserReq:
     properties:
       email:
@@ -197,6 +204,18 @@ definitions:
     x-enum-varnames:
     - Free
     - Managed
+  model.TOTPBackup:
+    properties:
+      backup:
+        type: string
+    type: object
+  model.TOTPNew:
+    properties:
+      secret:
+        type: string
+      uri:
+        type: string
+    type: object
   model.User:
     properties:
       created_at:
@@ -916,6 +935,83 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Get user stats
+      tags:
+      - user
+  /user/totp/disable:
+    put:
+      consumes:
+      - application/json
+      description: Disable TOTP
+      parameters:
+      - description: TOTP confirm request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.TotpConfirm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Disable TOTP
+      tags:
+      - user
+  /user/totp/enable:
+    put:
+      consumes:
+      - application/json
+      description: Enable TOTP
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.TOTPNew'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Enable TOTP
+      tags:
+      - user
+  /user/totp/enable/confirm:
+    put:
+      consumes:
+      - application/json
+      description: Enable TOTP confirm
+      parameters:
+      - description: TOTP confirm request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.TotpConfirm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.TOTPBackup'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Enable TOTP confirm
       tags:
       - user
 swagger: "2.0"

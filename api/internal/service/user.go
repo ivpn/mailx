@@ -2,8 +2,10 @@ package service
 
 import (
 	"context"
+	"encoding/base32"
 	"errors"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/go-sql-driver/mysql"
@@ -13,20 +15,27 @@ import (
 )
 
 var (
-	ErrGetUser        = errors.New("could not get user by ID")
-	ErrGetUserStats   = errors.New("could not get user stats")
-	ErrPostUser       = errors.New("could not create user")
-	ErrActivateUser   = errors.New("could not activate user")
-	ErrDeleteUser     = errors.New("could not delete user")
-	ErrCreateOTP      = errors.New("could not create OTP")
-	ErrSaveOTP        = errors.New("could not save OTP")
-	ErrSendOTP        = errors.New("could not send OTP")
-	ErrExpiredOTP     = errors.New("expired OTP")
-	ErrIncorrectOTP   = errors.New("incorrect OTP")
-	ErrIncorrectEmail = errors.New("incorrect email")
-	ErrIncorrectPass  = errors.New("incorrect password")
-	ErrLogoutUser     = errors.New("could not logout user")
-	ErrChangePassword = errors.New("could not change password")
+	ErrGetUser            = errors.New("could not get user by ID")
+	ErrGetUserStats       = errors.New("could not get user stats")
+	ErrPostUser           = errors.New("could not create user")
+	ErrActivateUser       = errors.New("could not activate user")
+	ErrDeleteUser         = errors.New("could not delete user")
+	ErrCreateOTP          = errors.New("could not create OTP")
+	ErrSaveOTP            = errors.New("could not save OTP")
+	ErrSendOTP            = errors.New("could not send OTP")
+	ErrExpiredOTP         = errors.New("expired OTP")
+	ErrIncorrectOTP       = errors.New("incorrect OTP")
+	ErrIncorrectEmail     = errors.New("incorrect email")
+	ErrIncorrectPass      = errors.New("incorrect password")
+	ErrLogoutUser         = errors.New("could not logout user")
+	ErrChangePassword     = errors.New("could not change password")
+	ErrTotpDisabled       = errors.New("2FA is disabled")
+	ErrGetTotp            = errors.New("could not get 2FA code")
+	ErrTotpBackupUsed     = errors.New("2FA backup is already used")
+	ErrTotpBackupNotFound = errors.New("2FA backup not found")
+	ErrTotpSetBackup      = errors.New("could not set 2FA backup")
+	ErrTotpDisable        = errors.New("could not disable 2FA")
+	ErrInvalidTOTPCode    = errors.New("invalid 2FA code")
 )
 
 type UserStore interface {
@@ -37,6 +46,10 @@ type UserStore interface {
 	DeleteUser(context.Context, string) error
 	GetUserStats(context.Context, string) (model.UserStats, error)
 	ChangePassword(context.Context, model.User) error
+	TotpEnable(context.Context, string, string, string) error
+	TotpDisable(context.Context, string) error
+	TotpGetBackup(context.Context, string) (string, string, error)
+	TotpSetUsedBackup(context.Context, string, string) error
 }
 
 func (s *Service) GetUser(ctx context.Context, userID string) (model.User, error) {
@@ -364,4 +377,142 @@ func (s *Service) ResetPassword(ctx context.Context, otp string, password string
 	}
 
 	return nil
+}
+
+func (s *Service) TotpEnable(ctx context.Context, userID string) (model.TOTPNew, error) {
+	totpSecret := base32.StdEncoding.EncodeToString(
+		[]byte(utils.RandomString(10, utils.AlphaNumericUserFriendlyUppercase)),
+	)
+
+	err := s.Cache.Set(ctx, "totp_"+userID, totpSecret, s.Cfg.Service.OTPExpiration)
+	if err != nil {
+		log.Printf("error enabling TOTP: %s", err.Error())
+		return model.TOTPNew{}, ErrSaveOTP
+	}
+
+	user, err := s.Store.GetUser(ctx, userID)
+	if err != nil {
+		log.Printf("error enabling TOTP: %s", err.Error())
+		return model.TOTPNew{}, ErrGetUser
+	}
+
+	return model.TOTPNew{
+		URI: utils.GenerateURI(totpSecret, user.Email, s.Cfg.SMTPClient.SenderName),
+	}, nil
+}
+
+func (s *Service) TotpEnableConfirm(ctx context.Context, userID string, otp string) (model.TOTPBackup, error) {
+	secret, err := s.Cache.Get(ctx, "totp_"+userID)
+	if err != nil {
+		log.Printf("error enabling TOTP: %s", err.Error())
+		return model.TOTPBackup{}, ErrExpiredOTP
+	}
+
+	user, err := s.Store.GetUser(ctx, userID)
+	if err != nil {
+		log.Printf("error enabling TOTP: %s", err.Error())
+		return model.TOTPBackup{}, ErrGetUser
+	}
+
+	user.TotpSecret = secret
+
+	isValid, err := user.VerifyTotp(otp)
+	if !isValid || err != nil {
+		return model.TOTPBackup{}, ErrIncorrectOTP
+	}
+
+	backupCodes := []string{}
+	for i := 0; i < 8; i++ {
+		backupCodes = append(backupCodes, utils.RandomString(8, utils.AlphaNumericUserFriendly))
+	}
+	totpBackup := strings.Join(backupCodes, " ")
+
+	err = s.Store.TotpEnable(ctx, userID, secret, totpBackup)
+	if err != nil {
+		log.Printf("error enabling TOTP: %s", err.Error())
+		return model.TOTPBackup{}, ErrSaveOTP
+	}
+
+	return model.TOTPBackup{
+		Backup: totpBackup,
+	}, nil
+}
+
+func (s *Service) TotpDisable(ctx context.Context, userID string, otp string) error {
+	isValid, err := s.VerifyTotp(ctx, userID, otp)
+	if err != nil {
+		log.Printf("error disabling TOTP: %s", err.Error())
+		return err
+	}
+
+	if isValid {
+		err = s.Store.TotpDisable(ctx, userID)
+		if err != nil {
+			return ErrTotpDisable
+		}
+
+		return nil
+	}
+
+	return ErrTotpDisable
+}
+
+func (s *Service) VerifyTotp(ctx context.Context, userID string, otp string) (bool, error) {
+	isValid, err := s.TotpUseBackup(ctx, userID, otp)
+	if err != nil {
+		log.Printf("error disabling TOTP: %s", err.Error())
+		return false, err
+	}
+
+	if !isValid {
+		user, err := s.Store.GetUser(ctx, userID)
+		if err != nil {
+			return false, ErrGetUser
+		}
+
+		isValid, err = user.VerifyTotp(otp)
+		if err != nil {
+			return false, ErrInvalidTOTPCode
+		}
+	}
+
+	return isValid, nil
+}
+
+func (s *Service) TotpUseBackup(ctx context.Context, userID string, backup string) (bool, error) {
+	backups, used, err := s.Store.TotpGetBackup(ctx, userID)
+	if err != nil {
+		return false, ErrGetTotp
+	}
+
+	usedSlice := strings.Fields(used)
+
+	for _, code := range usedSlice {
+		if backup == code {
+			return false, ErrTotpBackupUsed
+		}
+	}
+
+	found := false
+
+	for _, code := range strings.Fields(backups) {
+		if backup == code {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		return false, nil
+	}
+
+	usedSlice = append(usedSlice, backup)
+	used = strings.Join(usedSlice, " ")
+
+	err = s.Store.TotpSetUsedBackup(ctx, userID, used)
+	if err != nil {
+		return false, ErrTotpSetBackup
+	}
+
+	return true, nil
 }

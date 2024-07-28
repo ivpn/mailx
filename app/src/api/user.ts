@@ -13,6 +13,9 @@ export const userApi = {
     changePassword: (data: any) => api.put('/user/changepassword', data),
     initiatePasswordReset: (data: any) => api.post('/initiatepasswordreset', data),
     resetPassword: (data: any) => api.put('/resetpassword', data),
+    totpEnable: () => api.put('/user/totp/enable'),
+    totpEnableConfirm: (data: any) => api.put('/user/totp/enable/confirm', data),
+    totpDisable: (data: any) => api.put('/user/totp/disable', data),
     clearSession: () => {
         setCookie('auth', '')
         localStorage.removeItem('email')

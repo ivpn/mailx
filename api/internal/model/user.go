@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"strconv"
 
 	"ivpn.net/email/api/internal/utils"
 )
@@ -13,10 +14,14 @@ var (
 
 type User struct {
 	BaseModel
-	Email         string  `gorm:"unique" json:"email"`
-	PasswordHash  string  `json:"-"`
-	PasswordPlain *string `gorm:"-" json:"-"`
-	IsActive      bool    `json:"is_active"`
+	Email          string  `gorm:"unique" json:"email"`
+	PasswordHash   string  `json:"-"`
+	PasswordPlain  *string `gorm:"-" json:"-"`
+	IsActive       bool    `json:"is_active"`
+	TotpSecret     string  `json:"-"`
+	TotpBackup     string  `json:"-"`
+	TotpBackupUsed string  `json:"-"`
+	TotpEnabled    bool    `gorm:"-" json:"totp_enabled"`
 }
 
 type UserStats struct {
@@ -43,4 +48,17 @@ func (u *User) SetPassword(passwordPlain string) error {
 
 func (u *User) Matches(passwordPlain string) bool {
 	return utils.HashMatches(passwordPlain, u.PasswordHash)
+}
+
+func (u *User) IsTotpEnabled() bool {
+	return u.TotpSecret != ""
+}
+
+func (u *User) VerifyTotp(otp string) (bool, error) {
+	code, err := strconv.Atoi(otp)
+	if err != nil {
+		return false, err
+	}
+
+	return utils.Check(u.TotpSecret, code)
 }

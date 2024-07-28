@@ -9,12 +9,14 @@ import (
 func (d *Database) GetUser(ctx context.Context, ID string) (model.User, error) {
 	var user model.User
 	err := d.Client.Where("id = ?", ID).First(&user).Error
+	user.TotpEnabled = user.TotpSecret != ""
 	return user, err
 }
 
 func (d *Database) GetUserByEmail(ctx context.Context, email string) (model.User, error) {
 	var user model.User
 	err := d.Client.Where("email = ?", email).First(&user).Error
+	user.TotpEnabled = user.TotpSecret != ""
 	return user, err
 }
 
@@ -70,4 +72,29 @@ func (d *Database) GetUserStats(ctx context.Context, ID string) (model.UserStats
 
 func (d *Database) ChangePassword(ctx context.Context, user model.User) error {
 	return d.Client.Save(&user).Error
+}
+
+func (d *Database) TotpEnable(ctx context.Context, ID string, secret string, backupCodes string) error {
+	return d.Client.Model(&model.User{}).Where("id = ?", ID).Updates(map[string]interface{}{
+		"totp_secret": secret,
+		"totp_backup": backupCodes,
+	}).Error
+}
+
+func (d *Database) TotpDisable(ctx context.Context, ID string) error {
+	return d.Client.Model(&model.User{}).Where("id = ?", ID).Updates(map[string]interface{}{
+		"totp_secret":      nil,
+		"totp_backup":      nil,
+		"totp_backup_used": nil,
+	}).Error
+}
+
+func (d *Database) TotpGetBackup(ctx context.Context, ID string) (string, string, error) {
+	var user model.User
+	err := d.Client.Select("totp_backup,totp_backup_used").Where("id = ?", ID).First(&user).Error
+	return user.TotpBackup, user.TotpBackupUsed, err
+}
+
+func (d *Database) TotpSetUsedBackup(ctx context.Context, ID string, backupCodes string) error {
+	return d.Client.Model(&model.User{}).Where("id = ?", ID).Update("totp_backup_used", backupCodes).Error
 }

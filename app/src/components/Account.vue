@@ -6,6 +6,8 @@
         <hr class="mb-8">
         <AccountChangePassword />
         <hr class="mb-8">
+        <AccountTotp />
+        <hr class="mb-8">
         <AccountDelete />
     </div>
 </template>
@@ -15,4 +17,5 @@ import AccountVerify from './AccountVerify.vue'
 import AccountSubscription from './AccountSubscription.vue';
 import AccountChangePassword from './AccountChangePassword.vue';
 import AccountDelete from './AccountDelete.vue'
+import AccountTotp from './AccountTotp.vue'
 </script>

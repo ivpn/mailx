@@ -52,6 +52,6 @@ type ActivateReq struct {
 	OTP string `json:"otp" validate:"required,len=6"`
 }
 
-type TotpConfirm struct {
+type TotpReq struct {
 	OTP string `json:"otp" validate:"required,len=6"`
 }

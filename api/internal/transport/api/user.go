@@ -525,7 +525,7 @@ func (h *Handler) TotpEnable(c *fiber.Ctx) error {
 // @Router /user/totp/enable/confirm [put]
 func (h *Handler) TotpEnableConfirm(c *fiber.Ctx) error {
 	// Parse the request
-	req := TotpConfirm{}
+	req := TotpReq{}
 	err := c.BodyParser(&req)
 	if err != nil {
 		log.Printf("error enabling totp: %s", err.Error())
@@ -566,7 +566,7 @@ func (h *Handler) TotpEnableConfirm(c *fiber.Ctx) error {
 // @Router /user/totp/disable [put]
 func (h *Handler) TotpDisable(c *fiber.Ctx) error {
 	// Parse the request
-	req := TotpConfirm{}
+	req := TotpReq{}
 	err := c.BodyParser(&req)
 	if err != nil {
 		log.Printf("error enabling totp: %s", err.Error())

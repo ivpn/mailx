@@ -36,8 +36,7 @@
                         v-bind:class="{ 'border-gray-500': !otpError, 'border-red-600': otpError }"
                         class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2"
                         id="otp"
-                        type="text"
-                        pattern="[0-9]*">
+                        type="text">
                     <p v-if="otpError" class="text-red-600 text-sm mb-2">Required</p>
                 </div>
                 <div class="flex items-center justify-between">
@@ -120,7 +119,7 @@ const login = async () => {
         }
     } catch (err) {
         if (axios.isAxiosError(err)) {
-            apiError.value = err.message || err.response?.data.error
+            apiError.value = err.response?.data.error || err.message
 
             if (err.response?.status === 429) {
                 apiError.value = 'Too many requests, please try again later'

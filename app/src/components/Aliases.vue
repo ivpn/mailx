@@ -29,12 +29,27 @@
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead>
                                     <tr>
-                                        <th scope="col"
-                                            class="pr-5 py-3 text-start text-xs font-medium text-gray-500">
-                                            CREATED</th>
+                                        <th scope="col" class="pr-5 py-3 text-start text-xs font-medium text-gray-500">
+                                            <button class="inline-flex justify-center items-center">
+                                                CREATED
+                                                <svg class="ms-1 flex-shrink-0 size-5 text-bluish-500 rotate-180" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                    stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="m6 9 6 6 6-6" />
+                                                </svg>
+                                            </button>
+                                        </th>
                                         <th scope="col"
                                             class="px-5 py-3 text-start text-xs font-medium text-gray-500">
-                                            ALIAS</th>
+                                            <button class="inline-flex justify-center items-center">
+                                                ALIAS
+                                                <svg class="ms-1 flex-shrink-0 size-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                    stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="m6 9 6 6 6-6" />
+                                                </svg>
+                                            </button>    
+                                        </th>
                                         <th scope="col"
                                             class="px-5 py-3 text-start text-xs font-medium text-gray-500">
                                             COUNT
@@ -107,12 +122,16 @@ const rowKey = ref(0)
 const limit = ref(25)
 const page = ref(1)
 const total = ref(0)
+const sortBy = ref('created_at')
+const sortOrder = ref('DESC')
 
 const getList = async () => {
     try {
         const res = await aliasApi.getList({
             limit: limit.value,
             page: page.value,
+            sort_by: sortBy.value,
+            sort_order: sortOrder.value
         })
         list.value = res.data.aliases
         total.value = res.data.total

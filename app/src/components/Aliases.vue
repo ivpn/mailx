@@ -29,22 +29,51 @@
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead>
                                     <tr>
-                                        <th scope="col"
-                                            class="pr-5 py-3 text-start text-xs font-medium text-gray-500">
-                                            CREATED</th>
-                                        <th scope="col"
-                                            class="px-5 py-3 text-start text-xs font-medium text-gray-500">
-                                            ALIAS</th>
-                                        <th scope="col"
-                                            class="px-5 py-3 text-start text-xs font-medium text-gray-500">
+                                        <th v-if="!isDashboard" scope="col" class="pr-5 py-3 text-start text-xs font-medium text-gray-500">
+                                            <button
+                                            @click="sort"
+                                            data-sort="created_at"
+                                            class="inline-flex justify-center items-center">
+                                                CREATED
+                                                <svg
+                                                v-bind:class="{ 'text-bluish-500': sortBy === 'created_at', 'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
+                                                class="ms-1 flex-shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                    stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="m6 9 6 6 6-6" />
+                                                </svg>
+                                            </button>
+                                        </th>
+                                        <th v-if="!isDashboard" scope="col" class="px-5 py-3 text-start text-xs font-medium text-gray-500">
+                                            <button
+                                            @click="sort"
+                                            data-sort="name"
+                                            class="inline-flex justify-center items-center">
+                                                ALIAS
+                                                <svg
+                                                v-bind:class="{ 'text-bluish-500': sortBy === 'name', 'rotate-180': sortOrder === 'ASC' && sortBy === 'name' }"
+                                                class="ms-1 flex-shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                    stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="m6 9 6 6 6-6" />
+                                                </svg>
+                                            </button>    
+                                        </th>
+                                        <th v-if="isDashboard" scope="col" class="pr-5 py-3 text-start text-xs font-medium text-gray-500">
+                                            CREATED
+                                        </th>
+                                        <th v-if="isDashboard" scope="col" class="px-5 py-3 text-start text-xs font-medium text-gray-500">
+                                            ALIAS
+                                        </th>
+                                        <th scope="col" class="px-5 py-3 text-start text-xs font-medium text-gray-500">
                                             COUNT
                                         </th>
-                                        <th scope="col"
-                                            class="px-5 py-3 text-start text-xs font-medium text-gray-500">
-                                            ACTIVE</th>
-                                        <th scope="col"
-                                            class="pl-5 py-3 text-end text-xs font-medium text-gray-500">
-                                            ACTIONS</th>
+                                        <th scope="col" class="px-5 py-3 text-start text-xs font-medium text-gray-500">
+                                            ACTIVE
+                                        </th>
+                                        <th scope="col" class="pl-5 py-3 text-end text-xs font-medium text-gray-500">
+                                            ACTIONS
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200">
@@ -107,12 +136,16 @@ const rowKey = ref(0)
 const limit = ref(25)
 const page = ref(1)
 const total = ref(0)
+const sortBy = ref('created_at')
+const sortOrder = ref('DESC')
 
 const getList = async () => {
     try {
         const res = await aliasApi.getList({
             limit: limit.value,
             page: page.value,
+            sort_by: sortBy.value,
+            sort_order: sortOrder.value
         })
         list.value = res.data.aliases
         total.value = res.data.total
@@ -172,6 +205,18 @@ const renderRow = () => {
 const onUpdatePage = (obj: any) => {
     limit.value = obj.limit
     page.value = obj.page
+    getList()
+}
+
+const sort = (e: any) => {
+    const sort = e.target.dataset.sort
+    if (sort === sortBy.value) {
+        sortOrder.value = sortOrder.value === 'ASC' ? 'DESC' : 'ASC'
+    } else {
+        sortBy.value = sort
+        sortOrder.value = 'DESC'
+    }
+
     getList()
 }
 

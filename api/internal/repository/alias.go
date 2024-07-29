@@ -34,7 +34,16 @@ func (d *Database) GetAlias(ctx context.Context, ID string, userID string) (mode
 	return alias, nil
 }
 
-func (d *Database) GetAliases(ctx context.Context, userID string, limit int, offset int) ([]model.Alias, error) {
+func (d *Database) GetAliases(ctx context.Context, userID string, limit int, offset int, sortBy string, sortOrder string) ([]model.Alias, error) {
+	if sortBy == "" {
+		sortBy = "created_at"
+	}
+	sortBy = "a." + sortBy
+
+	if sortOrder == "" {
+		sortOrder = "DESC"
+	}
+
 	aliases := []model.Alias{}
 	query := `
 		SELECT a.*,
@@ -48,7 +57,7 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 		ON a.id = m.alias_id
 		WHERE a.user_id = ? AND a.deleted_at IS NULL
 		GROUP BY a.id
-		ORDER BY a.created_at DESC`
+		ORDER BY ` + sortBy + " " + sortOrder
 
 	if limit > 0 {
 		query += "\nLIMIT " + strconv.Itoa(limit)

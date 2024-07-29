@@ -30,9 +30,14 @@
                                 <thead>
                                     <tr>
                                         <th scope="col" class="pr-5 py-3 text-start text-xs font-medium text-gray-500">
-                                            <button class="inline-flex justify-center items-center">
+                                            <button
+                                            @click="sort"
+                                            data-sort="created_at"
+                                            class="inline-flex justify-center items-center">
                                                 CREATED
-                                                <svg class="ms-1 flex-shrink-0 size-5 text-bluish-500 rotate-180" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                <svg
+                                                v-bind:class="{ 'text-bluish-500': sortBy === 'created_at', 'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
+                                                class="ms-1 flex-shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                                     stroke-linecap="round" stroke-linejoin="round">
                                                     <path d="m6 9 6 6 6-6" />
@@ -41,9 +46,14 @@
                                         </th>
                                         <th scope="col"
                                             class="px-5 py-3 text-start text-xs font-medium text-gray-500">
-                                            <button class="inline-flex justify-center items-center">
+                                            <button
+                                            @click="sort"
+                                            data-sort="name"
+                                            class="inline-flex justify-center items-center">
                                                 ALIAS
-                                                <svg class="ms-1 flex-shrink-0 size-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                <svg
+                                                v-bind:class="{ 'text-bluish-500': sortBy === 'name', 'rotate-180': sortOrder === 'ASC' && sortBy === 'name' }"
+                                                class="ms-1 flex-shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                                     stroke-linecap="round" stroke-linejoin="round">
                                                     <path d="m6 9 6 6 6-6" />
@@ -191,6 +201,18 @@ const renderRow = () => {
 const onUpdatePage = (obj: any) => {
     limit.value = obj.limit
     page.value = obj.page
+    getList()
+}
+
+const sort = (e: any) => {
+    const sort = e.target.dataset.sort
+    if (sort === sortBy.value) {
+        sortOrder.value = sortOrder.value === 'ASC' ? 'DESC' : 'ASC'
+    } else {
+        sortBy.value = sort
+        sortOrder.value = 'DESC'
+    }
+
     getList()
 }
 

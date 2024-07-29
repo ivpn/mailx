@@ -29,7 +29,7 @@
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead>
                                     <tr>
-                                        <th scope="col" class="pr-5 py-3 text-start text-xs font-medium text-gray-500">
+                                        <th v-if="!isDashboard" scope="col" class="pr-5 py-3 text-start text-xs font-medium text-gray-500">
                                             <button
                                             @click="sort"
                                             data-sort="created_at"
@@ -44,8 +44,7 @@
                                                 </svg>
                                             </button>
                                         </th>
-                                        <th scope="col"
-                                            class="px-5 py-3 text-start text-xs font-medium text-gray-500">
+                                        <th v-if="!isDashboard" scope="col" class="px-5 py-3 text-start text-xs font-medium text-gray-500">
                                             <button
                                             @click="sort"
                                             data-sort="name"
@@ -60,16 +59,21 @@
                                                 </svg>
                                             </button>    
                                         </th>
-                                        <th scope="col"
-                                            class="px-5 py-3 text-start text-xs font-medium text-gray-500">
+                                        <th v-if="isDashboard" scope="col" class="pr-5 py-3 text-start text-xs font-medium text-gray-500">
+                                            CREATED
+                                        </th>
+                                        <th v-if="isDashboard" scope="col" class="px-5 py-3 text-start text-xs font-medium text-gray-500">
+                                            ALIAS
+                                        </th>
+                                        <th scope="col" class="px-5 py-3 text-start text-xs font-medium text-gray-500">
                                             COUNT
                                         </th>
-                                        <th scope="col"
-                                            class="px-5 py-3 text-start text-xs font-medium text-gray-500">
-                                            ACTIVE</th>
-                                        <th scope="col"
-                                            class="pl-5 py-3 text-end text-xs font-medium text-gray-500">
-                                            ACTIONS</th>
+                                        <th scope="col" class="px-5 py-3 text-start text-xs font-medium text-gray-500">
+                                            ACTIVE
+                                        </th>
+                                        <th scope="col" class="pl-5 py-3 text-end text-xs font-medium text-gray-500">
+                                            ACTIONS
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200">

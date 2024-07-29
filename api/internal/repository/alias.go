@@ -38,6 +38,7 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 	if sortBy == "" {
 		sortBy = "created_at"
 	}
+	sortBy = "a." + sortBy
 
 	if sortOrder == "" {
 		sortOrder = "DESC"
@@ -56,7 +57,7 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 		ON a.id = m.alias_id
 		WHERE a.user_id = ? AND a.deleted_at IS NULL
 		GROUP BY a.id
-		ORDER BY a.created_at DESC`
+		ORDER BY ` + sortBy + " " + sortOrder
 
 	if limit > 0 {
 		query += "\nLIMIT " + strconv.Itoa(limit)

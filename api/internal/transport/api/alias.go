@@ -72,7 +72,7 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 	}
 
 	sortBy := c.Query("sort_by")
-	sortOrder := c.Query("sort_order")
+	sortOrder := strings.ToUpper(c.Query("sort_order"))
 
 	list, err := h.Service.GetAliases(c.Context(), userID, limit, page, sortBy, sortOrder)
 	if err != nil {

@@ -36,6 +36,7 @@
                                             class="inline-flex justify-center items-center">
                                                 CREATED
                                                 <svg
+                                                data-sort="created_at"
                                                 v-bind:class="{ 'text-bluish-500': sortBy === 'created_at', 'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
                                                 class="ms-1 flex-shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -51,6 +52,7 @@
                                             class="inline-flex justify-center items-center">
                                                 ALIAS
                                                 <svg
+                                                data-sort="name"
                                                 v-bind:class="{ 'text-bluish-500': sortBy === 'name', 'rotate-180': sortOrder === 'ASC' && sortBy === 'name' }"
                                                 class="ms-1 flex-shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"

@@ -159,7 +159,7 @@ const totpEnableConfirm = async () => {
         if (axios.isAxiosError(err)) {
             resConfirm.value = { backup: '' }
             isEnabled.value = false
-            error.value = err.message
+            error.value = err.response?.data.error || err.message
         }
     }
 }

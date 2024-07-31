@@ -45,10 +45,11 @@ type SMTPClientConfig struct {
 }
 
 type ServiceConfig struct {
-	OTPExpiration    time.Duration
-	SubscriptionType string
-	MaxRecipients    int
-	MaxDailyAliases  int
+	OTPExpiration     time.Duration
+	SubscriptionType  string
+	MaxRecipients     int
+	MaxDailyAliases   int
+	MaxDailySendReply int
 }
 
 type Config struct {
@@ -83,6 +84,11 @@ func New() (Config, error) {
 	}
 
 	maxDailyAliases, err := strconv.Atoi(os.Getenv("MAX_DAILY_ALIASES"))
+	if err != nil {
+		return Config{}, err
+	}
+
+	maxDailySendReply, err := strconv.Atoi(os.Getenv("MAX_DAILY_SEND_REPLY"))
 	if err != nil {
 		return Config{}, err
 	}
@@ -122,10 +128,11 @@ func New() (Config, error) {
 		},
 
 		Service: ServiceConfig{
-			OTPExpiration:    otpExp,
-			SubscriptionType: os.Getenv("SUBSCRIPTION_TYPE"),
-			MaxRecipients:    maxRecipients,
-			MaxDailyAliases:  maxDailyAliases,
+			OTPExpiration:     otpExp,
+			SubscriptionType:  os.Getenv("SUBSCRIPTION_TYPE"),
+			MaxRecipients:     maxRecipients,
+			MaxDailyAliases:   maxDailyAliases,
+			MaxDailySendReply: maxDailySendReply,
 		},
 	}, nil
 }

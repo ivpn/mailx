@@ -29,7 +29,7 @@ services:
     container_name: email-db
     restart: always
     healthcheck:
-      test: "/usr/bin/mariadb --user=email --password=email --execute \"SHOW DATABASES;\""
+      test: "/usr/bin/mariadb --user=${DB_USER} --password=${DB_PASSWORD} --execute \"SHOW DATABASES;\""
       interval: 2s
       timeout: 10s
       retries: 5

@@ -25,3 +25,9 @@ func (d *Database) PostMessage(ctx context.Context, message model.Message) error
 func (d *Database) DeleteMessageByUserID(ctx context.Context, userID string) error {
 	return d.Client.Where("user_id = ?", userID).Delete(&model.Message{}).Error
 }
+
+func (d *Database) SendReplyDailyCount(ctx context.Context, userID string) (int, error) {
+	var count int64
+	err := d.Client.Model(&model.Message{}).Where("user_id = ? AND type IN (?, ?) AND created_at > NOW() - INTERVAL 1 DAY", userID, model.Reply, model.Send).Count(&count).Error
+	return int(count), err
+}

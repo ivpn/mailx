@@ -20,6 +20,7 @@ type MessageStore interface {
 	GetMessagesByAlias(context.Context, string) ([]model.Message, error)
 	PostMessage(context.Context, model.Message) error
 	DeleteMessageByUserID(context.Context, string) error
+	SendReplyDailyCount(context.Context, string) (int, error)
 }
 
 func (s *Service) GetMessagesByUser(ctx context.Context, userID string) ([]model.Message, error) {
@@ -57,6 +58,20 @@ func (s *Service) DeleteMessageByUserID(ctx context.Context, userID string) erro
 	if err != nil {
 		log.Printf("error deleting messages by user ID: %s", err.Error())
 		return ErrDeleteMessageByUserID
+	}
+
+	return nil
+}
+
+func (s *Service) ValidateSendReplyDailyCount(ctx context.Context, userID string) error {
+	count, err := s.Store.SendReplyDailyCount(ctx, userID)
+	if err != nil {
+		log.Printf("error getting send/reply daily count: %s", err.Error())
+		return ErrGetMessagesByUser
+	}
+
+	if count >= s.Cfg.Service.MaxDailySendReply {
+		return errors.New("daily limit reached")
 	}
 
 	return nil

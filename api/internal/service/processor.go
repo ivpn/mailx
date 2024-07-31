@@ -88,12 +88,18 @@ func (s *Service) queueMessage(from string, fromName string, settingsFromName st
 		}
 	} else {
 		// Reply | Send
+		err := s.ValidateSendReplyDailyCount(context.Background(), alias.UserID)
+		if err != nil {
+			log.Println("error validating send/reply daily count", err)
+			return err
+		}
+
 		name := alias.FromName
 		if name == "" {
 			name = settingsFromName
 		}
 
-		err := mailer.Reply(alias.Name, name, to, data)
+		err = mailer.Reply(alias.Name, name, to, data)
 		if err != nil {
 			log.Println("error sending message", err)
 			return err

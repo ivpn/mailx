@@ -30,6 +30,9 @@
                                 <p class="text-gray-500 mb-3">
                                     To enable two-factor authentication, please scan the code with a TOTP app (for example: Google Authenticator) and enter the code in the field below.
                                 </p>
+                                <p class="text-gray-500 mb-3">
+                                    If you cannot scan QR code, you can enter the following information manually. Secret: {{ resEnable.secret }}, Account: {{ resEnable.account }}
+                                </p>
                             </div>
                             <div class="mb-5 container">
                                 <canvas class="mx-auto" id="totp_qr_code"></canvas>
@@ -102,7 +105,7 @@ import QRious from 'qrious'
 const emit = defineEmits(['onTotpEnable'])
 
 const req = ref({ otp: '' })
-const resEnable = ref({ uri: '' })
+const resEnable = ref({ uri: '', secret: '', account: '' })
 const resConfirm = ref({ backup: '' })
 const error = ref('')
 const codeError = ref(false)

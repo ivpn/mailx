@@ -1,7 +1,9 @@
 package model
 
 type TOTPNew struct {
-	URI string `json:"uri"`
+	Secret  string `json:"secret"`
+	Account string `json:"account"`
+	URI     string `json:"uri"`
 }
 
 type TOTPBackup struct {

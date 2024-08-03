@@ -1,5 +1,5 @@
 <template>
-    <h2 class="text-2xl font-semibold text-gray-800 mb-5">Delete Account</h2>
+    <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-5">Delete Account</h2>
     <p class="text-gray-500 mb-3">
         Are you sure you want to delete your account? This action cannot be undone.
     </p>

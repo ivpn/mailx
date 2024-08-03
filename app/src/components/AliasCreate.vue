@@ -16,11 +16,11 @@
                 class="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 opacity-0 transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
                 <div class="flex flex-col bg-white border shadow-sm rounded pointer-events-auto">
                     <div class="flex justify-between items-center py-3 px-4 border-b">
-                        <h3 class="text-xl text-gray-800 font-semibold">
+                        <h3 class="text-xl text-gray-800 dark:text-gray-100 font-semibold">
                             Create Alias
                         </h3>
                         <button @click="close" type="button"
-                            class="flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent text-gray-800 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none">
+                            class="flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent text-gray-800 dark:text-gray-100 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none">
                             <span class="sr-only">Close</span>
                             <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -42,7 +42,7 @@
                                         aria-describedby="hs-radio-word-description" checked>
                                 </div>
                                 <label for="hs-radio-word" class="ms-3">
-                                    <span class="block text-sm font-semibold text-gray-800">Word</span>
+                                    <span class="block text-sm font-semibold text-gray-800 dark:text-gray-100">Word</span>
                                     <span id="hs-radio-word-description" class="block text-sm text-gray-500">e.g.
                                         quiet.haze16@{{ alias.domain }}</span>
                                 </label>
@@ -54,7 +54,7 @@
                                         aria-describedby="hs-radio-chars-description">
                                 </div>
                                 <label for="hs-radio-chars" class="ms-3">
-                                    <span class="block text-sm font-semibold text-gray-800">Random</span>
+                                    <span class="block text-sm font-semibold text-gray-800 dark:text-gray-100">Random</span>
                                     <span id="hs-radio-chars-description" class="block text-sm text-gray-500">e.g.
                                         uf1h0hxi@{{ alias.domain }}</span>
                                 </label>
@@ -66,7 +66,7 @@
                                         aria-describedby="hs-radio-uuid-description">
                                 </div>
                                 <label for="hs-radio-uuid" class="ms-3">
-                                    <span class="block text-sm font-semibold text-gray-800">UUID</span>
+                                    <span class="block text-sm font-semibold text-gray-800 dark:text-gray-100">UUID</span>
                                     <span id="hs-radio-uuid-description" class="block text-sm text-gray-500">e.g.
                                         550e8400-e29b-41d4-a716-446655440000@{{ alias.domain }}</span>
                                 </label>

@@ -1,6 +1,6 @@
 <template>
     <div v-if="!res.is_active && isDashboard" class="flex flex-col items-center text-center my-14 pt-6">
-        <h3 class="text-lg font-bold text-gray-800">
+        <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100">
             Verify Your Email
         </h3>
         <p class="my-2 text-gray-500">
@@ -8,7 +8,7 @@
         </p>
     </div>
     <div v-if="!res.is_active && !isDashboard" class="flex flex-col p-5 pb-4 my-8 bg-white">
-        <h1 class="text-3xl font-semibold text-gray-800 mb-4">Verify Your Email</h1>
+        <h1 class="text-3xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Verify Your Email</h1>
         <p class="text-gray-500 mb-3">
             We have sent a 6-digit OTP code to your email address. Please enter the code below to verify your account email. Accounts with unconfirmed email address may be deleted after 7 days.
         </p>
@@ -44,7 +44,7 @@
         <p v-if="error" class="text-red-600 text-sm mb-3">Error: {{ error }}</p>
         <p v-if="resendSuccess && !error && !confirmSuccess" class="text-emerald-600 dark:text-emerald-500 text-sm mb-3">{{ resendSuccess }}</p>
         <p v-if="confirmSuccess" class="text-gray-500 text-sm my-3">
-            <span class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-emerald-100 text-emerald-800">{{ confirmSuccess }}</span>
+            <span class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-800 dark:text-emerald-100">{{ confirmSuccess }}</span>
         </p>
     </div>
 </template>

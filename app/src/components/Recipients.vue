@@ -1,10 +1,10 @@
 <template>
     <div v-if="!list.length && loaded" class="flex flex-col my-14">
         <div class="flex flex-col items-center text-center">
-            <h3 class="text-lg font-bold text-gray-800">
+            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100">
                 Add Recipients
             </h3>
-            <p class="my-2 text-gray-500">
+            <p class="my-2 text-gray-500 dark:text-gray-400">
                 To get started, add a recipient.
             </p>
             <div class="flex gap-4">
@@ -23,7 +23,7 @@
                 <div class="-m-1.5 overflow-x-auto">
                     <div class="p-1.5 min-w-full inline-block align-middle">
                         <div class="overflow-hidden">
-                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
+                            <table class="min-w-full divide-y divide-gray-200 dark:divide-neutral-600">
                                 <thead>
                                     <tr>
                                         <th scope="col"

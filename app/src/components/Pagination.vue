@@ -1,6 +1,6 @@
 <template>
     <div>
-        <hr class="mb-7 dark:border-gray-600">
+        <hr class="mb-7 dark:border-neutral-600">
         <div class="flex flex-row justify-between pb-3">
             <div>
                 <select

@@ -1,32 +1,32 @@
 <template>
-    <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-        <h1 class="text-3xl text-gray-800 font-semibold mb-2">Sign Up</h1>
-        <p class="text-gray-500 mb-8">Have an account? <a class="text-bluish-500 hover:text-bluish-600" href="/login">Log In</a></p>
-        <form class="w-full max-w-sm bg-white px-8 pt-6 pb-8 mb-4" @submit.prevent="register">
+    <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-neutral-900">
+        <h1 class="text-3xl text-gray-800 dark:text-gray-100 font-semibold mb-2">Sign Up</h1>
+        <p class="text-gray-500 dark:text-gray-400 mb-8">Have an account? <a class="text-bluish-500 hover:text-bluish-600" href="/login">Log In</a></p>
+        <form class="w-full max-w-sm bg-white dark:bg-neutral-800 px-8 pt-6 pb-8 mb-4" @submit.prevent="register">
             <div v-if="!apiSuccess">
                 <div class="mb-4">
-                    <label class="block text-gray-500 mb-2" for="email">
+                    <label class="block text-gray-500 dark:text-gray-300 mb-2" for="email">
                         Email Address
                     </label>
                     <input
                         v-model="email"
-                        v-bind:class="{ 'border-gray-500': !emailError, 'border-red-600': emailError }"
+                        v-bind:class="{ 'border-gray-500': !emailError, 'border-red-600 dark:border-red-600': emailError }"
                         placeholder="name@example.net"
-                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2"
+                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 dark:bg-neutral-800 dark:border-gray-500 dark:text-gray-300"
                         id="email" type="email">
                     <p v-if="emailError" class="text-red-600 text-sm">Required</p>
                 </div>
                 <div class="mb-6">
-                    <label class="block text-gray-500 mb-2" for="password">
+                    <label class="block text-gray-500 dark:text-gray-300 mb-2" for="password">
                         Password
                     </label>
                     <input
                         v-model="password"
-                        v-bind:class="{ 'border-gray-500': !passwordError, 'border-red-600': passwordError }"
-                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2"
+                        v-bind:class="{ 'border-gray-500': !passwordError, 'border-red-600 dark:border-red-600': passwordError }"
+                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 dark:bg-neutral-800 dark:border-gray-500 dark:text-gray-300"
                         id="password" type="password">
                     <p v-if="passwordError" class="text-red-600 text-sm mb-2">Required</p>
-                    <p class="text-gray-500 text-sm mb-2">Must be at least 8 characters</p>
+                    <p class="text-gray-500 dark:text-gray-300 text-sm mb-2">Must be at least 8 characters</p>
                 </div>
                 <div class="flex items-center justify-between">
                     <button

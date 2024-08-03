@@ -1,35 +1,35 @@
 <template>
     <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-neutral-900">
-        <h1 class="text-3xl text-gray-800 dark:text-neutral-100 font-semibold mb-2">Log In</h1>
-        <p class="text-gray-500 dark:text-neutral-400 mb-8">Need an account?
+        <h1 class="text-3xl text-gray-800 dark:text-gray-100 font-semibold mb-2">Log In</h1>
+        <p class="text-gray-500 dark:text-gray-400 mb-8">Need an account?
             <a class="text-bluish-500 hover:text-bluish-600" href="/signup">Sign Up</a>
         </p>
         <form class="w-full max-w-sm bg-white dark:bg-neutral-800 px-8 pt-6 pb-8 mb-4" @submit.prevent="login">
             <div v-if="!isLoggedIn()">
                 <div class="mb-4">
-                    <label class="block text-gray-500 dark:text-neutral-300 mb-2" for="email">
+                    <label class="block text-gray-500 dark:text-gray-300 mb-2" for="email">
                         Email Address
                     </label>
                     <input
                         v-model="email"
-                        v-bind:class="{ 'border-gray-500': !emailError, 'border-red-600': emailError }"
-                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 dark:bg-neutral-800 dark:border-neutral-500 dark:text-neutral-300"
+                        v-bind:class="{ 'border-gray-500': !emailError, 'border-red-600 dark:border-red-600': emailError }"
+                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 dark:bg-neutral-800 dark:border-neutral-500 dark:text-gray-300"
                         id="email" type="email" autocomplete="email">
                     <p v-if="emailError" class="text-red-600 text-sm">Required</p>
                 </div>
                 <div class="mb-6">
-                    <label class="block text-gray-500 dark:text-neutral-300 mb-2" for="password">
+                    <label class="block text-gray-500 dark:text-gray-300 mb-2" for="password">
                         Password
                     </label>
                     <input
                         v-model="password"
-                        v-bind:class="{ 'border-gray-500': !passwordError, 'border-red-600': passwordError }"
-                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 dark:bg-neutral-800 dark:border-neutral-500 dark:text-neutral-300"
+                        v-bind:class="{ 'border-gray-500': !passwordError, 'border-red-600 dark:border-red-600': passwordError }"
+                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 dark:bg-neutral-800 dark:border-neutral-500 dark:text-gray-300"
                         id="password" type="password" autocomplete="current-password">
                     <p v-if="passwordError" class="text-red-600 text-sm mb-2">Required</p>
                 </div>
                 <div v-if="otpRequired" class="mb-6">
-                    <label class="block text-gray-500 dark:text-neutral-300 mb-2" for="password">
+                    <label class="block text-gray-500 dark:text-gray-300 mb-2" for="password">
                         Two-factor authentication token:
                     </label>
                     <input
@@ -50,14 +50,14 @@
                 <p v-if="apiError" class="text-red-600 text-sm mt-6">Error: {{ apiError }}</p>
             </div>
             <div v-if="isLoggedIn()" class="pb-2">
-                <p class="text-gray-500 dark:text-neutral-300 mb-6">You are logged in</p>
+                <p class="text-gray-500 dark:text-gray-300 mb-6">You are logged in</p>
                 <a href="/"
                     class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 focus:outline-none focus:shadow-outline">
                     Go to Dashboard
                 </a>
             </div>
         </form>
-        <p class="text-gray-500 dark:text-neutral-300 my-5"><a class="text-bluish-500 hover:text-bluish-600"
+        <p class="text-gray-500 dark:text-gray-300 my-5"><a class="text-bluish-500 hover:text-bluish-600"
             href="/reset/password/initiate">Forgot Your Password?</a></p>
     </div>
 </template>

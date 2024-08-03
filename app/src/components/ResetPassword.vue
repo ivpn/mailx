@@ -34,7 +34,7 @@
                 <p v-if="apiError" class="text-red-600 text-sm mt-6">Error: {{ apiError }}</p>
             </div>
             <div v-if="apiSuccess">
-                <p class="text-emerald-600 text-sm mb-6">{{ apiSuccess }}</p>
+                <p class="text-emerald-600 dark:text-emerald-500 text-sm mb-6">{{ apiSuccess }}</p>
             </div>
         </form>
         <p class="text-gray-500 my-5"><a class="text-bluish-500 hover:text-bluish-600"

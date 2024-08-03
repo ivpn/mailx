@@ -63,7 +63,7 @@
                     </div>
                     <div class="flex items-start">
                         <p v-if="error" class="px-5 text-red-600 text-sm mb-3">Error: {{ error }}</p>
-                        <p v-if="resendSuccess && !error" class="px-5 text-emerald-600 text-sm mb-3">{{ resendSuccess }}</p>
+                        <p v-if="resendSuccess && !error" class="px-5 text-emerald-600 dark:text-emerald-500 text-sm mb-3">{{ resendSuccess }}</p>
                     </div>
                 </div>
             </div>

@@ -1,14 +1,14 @@
 <template>
     <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-5">Delete Account</h2>
-    <p class="text-gray-500 mb-3">
+    <p class="text-gray-500 dark:text-gray-400 mb-3">
         Are you sure you want to delete your account? This action cannot be undone.
     </p>
     <div class="mb-4 max-w-xs">
-        <label class="block text-gray-500 mb-3" for="account-password">
+        <label class="block text-gray-500 dark:text-gray-400 mb-3" for="account-password">
             Password:
         </label>
-        <input v-model="password" v-bind:class="{ 'border-gray-500': !passwordError, 'border-red-600': passwordError }"
-            class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 leading-tight focus:border-bluish-500 mb-2"
+        <input v-model="password" v-bind:class="{ 'border-gray-500': !passwordError, 'border-red-600 dark:border-red-600': passwordError }"
+            class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 leading-tight focus:border-bluish-500 mb-2 dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400"
             id="account-password" type="password">
         <p v-if="passwordError" class="text-red-600 text-sm mb-2">Required</p>
     </div>

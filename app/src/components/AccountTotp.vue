@@ -7,7 +7,7 @@
             <span v-if="!res.totp_enabled"
                 class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-gray-100 text-gray-500 dark:bg-gray-500 dark:text-gray-100">Disabled</span>
         </p>
-        <p class="text-gray-500 mb-5">
+        <p class="text-gray-500 dark:text-gray-400 mb-5">
             When enabled, 2-factor authentication will be required when you log in.<br>
         </p>
         <div class="mb-3 max-w-xs">

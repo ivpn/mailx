@@ -13,7 +13,7 @@
                 Select default domain:
             </label>
             <select id="domain"
-                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 dark:text-gray-400 dark:bg-neutral-800 dark:border-neutral-500 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent">
+                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent">
                 <option
                     v-for="(domain, index) in domains"
                     v-bind:domain
@@ -35,7 +35,7 @@
             </label>
             <select id="recipient"
                 :disabled="!recipients.length"
-                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 dark:text-gray-400 dark:bg-neutral-800 dark:border-neutral-500 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent">
+                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent">
                 <option
                     v-for="recipient in recipients"
                     v-bind:value=recipient
@@ -58,7 +58,7 @@
             </label>
             <input
                 v-model="req.from_name"
-                class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 dark:text-gray-400 dark:bg-neutral-800 dark:border-neutral-500 leading-tight focus:border-bluish-500 mb-2"
+                class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 leading-tight focus:border-bluish-500 mb-2"
                 id="from-name" type="text">
         </div>
         <div class="mb-3">

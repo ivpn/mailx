@@ -212,6 +212,11 @@
   resolved "https://registry.yarnpkg.com/@preline/overlay/-/overlay-2.3.0.tgz#8aa47c4374d369fb8aa715232eb36853e37d7a94"
   integrity sha512-aN9mR81RHEnh8Tg/WTRwdqwrX2JxObV2CMR61Q8hJphDLaZFZT2yPcnMaXawFS+cO839Wd+VvZDSeBFE1DYpEg==
 
+"@preline/theme-switch@^2.4.1":
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/@preline/theme-switch/-/theme-switch-2.4.1.tgz#4985ca65e33eec1bd59b4bd854de837ed84307da"
+  integrity sha512-MLdJFiVKFRUUUYnpqyQbxNNhAwmG9kdJY6yst2WTWASU6HXKNKMJDTDJyN2V3A1AU6Koyd6OMHt7DlmEqz1zxQ==
+
 "@preline/tooltip@^2.1.0":
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/@preline/tooltip/-/tooltip-2.3.0.tgz#7ebb29166b9efbb16e9305a0a566c5d33ce26e29"

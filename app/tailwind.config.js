@@ -30,4 +30,5 @@ export default {
       strategy: 'class',
     }),
   ],
+  darkMode: 'selector',
 }

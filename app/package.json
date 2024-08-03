@@ -11,6 +11,7 @@
   "dependencies": {
     "@preline/dropdown": "^2.1.0",
     "@preline/overlay": "^2.1.0",
+    "@preline/theme-switch": "^2.4.1",
     "@preline/tooltip": "^2.1.0",
     "@tailwindcss/forms": "^0.5.7",
     "apexcharts": "^3.49.0",

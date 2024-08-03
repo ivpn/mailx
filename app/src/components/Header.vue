@@ -1,11 +1,11 @@
 <template>
-    <header class="flex flex-col justify-between w-full bg-white">
+    <header class="flex flex-col justify-between w-full bg-white dark:bg-neutral-800">
         <div class="container mx-auto max-w-screen-lg px-5">
             <div class="flex flex-row justify-between max-w-screen-lg">
                 <Menu />
                 <div class="hs-dropdown relative inline-flex [--placement:bottom-right] my-3">
                     <button id="hs-dropdown-default" type="button"
-                        class="flex items-center hs-dropdown-toggle text-gray-500 pl-4 pr-3 hover:text-gray-800">
+                        class="flex items-center hs-dropdown-toggle text-gray-500 dark:text-gray-400 pl-4 pr-3 hover:text-gray-800 dark:hover:text-gray-100">
                         {{ getEmail() }}
                         <svg class="ms-1 flex-shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"

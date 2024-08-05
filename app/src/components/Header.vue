@@ -2,8 +2,8 @@
     <header class="flex flex-col justify-between w-full bg-white dark:bg-neutral-800">
         <div class="container mx-auto max-w-screen-lg px-5">
             <div class="flex flex-row justify-between max-w-screen-lg">
-                <Menu />
-                <div class="hs-dropdown relative inline-flex [--placement:bottom-right] my-3">
+                <HeaderMenu />
+                <div class="hs-dropdown relative flex items-center [--placement:bottom-right] my-3">
                     <button id="hs-dropdown-default" type="button"
                         class="flex items-center hs-dropdown-toggle text-gray-500 dark:text-gray-400 pl-4 pr-3 hover:text-gray-800 dark:hover:text-gray-100">
                         {{ getEmail() }}
@@ -25,6 +25,7 @@
                             Log out
                         </a>
                     </div>
+                    <ThemeSwitch />
                 </div>
             </div>
         </div>
@@ -32,7 +33,8 @@
 </template>
 
 <script setup lang="ts">
-import Menu from './Menu.vue'
+import HeaderMenu from './HeaderMenu.vue'
+import ThemeSwitch from './ThemeSwitch.vue';
 import dropdown from '@preline/dropdown'
 import { userApi } from '../api/user.ts'
 import { onMounted } from 'vue';

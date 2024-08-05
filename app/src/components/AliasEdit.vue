@@ -1,11 +1,11 @@
 <template>
     <div>
-        <button v-bind:data-hs-overlay="'#modal' + alias.id"
+        <button v-bind:data-hs-overlay="'#modal-alias-edit' + alias.id"
             class="text-bluish-500 hover:text-bluish-600 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
             type="submit">
             Edit
         </button>
-        <div v-bind:id="'modal' + alias.id"
+        <div v-bind:id="'modal-alias-edit' + alias.id"
             class="hs-overlay hidden size-full fixed top-0 start-0 z-[60] overflow-x-hidden overflow-y-auto pointer-events-none">
             <div
                 class="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 opacity-0 transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
@@ -52,7 +52,7 @@
                             </label>
                             <select v-model="alias.recipients" v-bind:id="'recipient_' + alias.id"
                                 :disabled="!recipients.length"
-                                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none">
+                                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400  focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent">
                                 <option v-for="recipient in recipients" v-bind:value=recipient
                                     :selected="recipient == alias.recipients" :key="recipient">
                                     {{ recipient }}
@@ -113,12 +113,12 @@ const close = () => {
     alias.value.recipients = props.alias.recipients
     success.value = ''
     error.value = ''
-    const modal = document.querySelector('#modal' + alias.value.id) as any
+    const modal = document.querySelector('#modal-alias-edit' + alias.value.id) as any
     overlay.close(modal)
 }
 
 const addEvents = () => {
-    const modal = overlay.getInstance('#modal' + alias.value.id as any, true) as any
+    const modal = overlay.getInstance('#modal-alias-edit' + alias.value.id as any, true) as any
     modal.element.on('close', () => {
         close()
     })

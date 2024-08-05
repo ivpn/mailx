@@ -93,7 +93,7 @@
                                 Recipient:
                             </label>
                             <select id="alias_recipient" :disabled="!recipients.length"
-                                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none">
+                                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent">
                                 <option v-for="(recipient, index) in recipients" v-bind:recipient
                                     :selected="recipient == settings.recipient || index === 0" :key="recipient">
                                     {{ recipient }}
@@ -105,7 +105,7 @@
                                 Domain:
                             </label>
                             <select id="alias_domain" :disabled="!domains.length"
-                                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none">
+                                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent">
                                 <option v-for="(domain, index) in domains" v-bind:domain
                                     :selected="domain == alias.domain || index === 0" :key="domain">
                                     {{ domain }}

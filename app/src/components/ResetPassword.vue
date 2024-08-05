@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-        <h1 class="text-3xl text-gray-800 font-semibold mb-8">Set New Password</h1>
+        <h1 class="text-3xl text-gray-800 dark:text-gray-100 font-semibold mb-8">Set New Password</h1>
         <form class="w-full max-w-sm bg-white px-8 pt-6 pb-8 mb-4" @submit.prevent="resetPassword">
             <div v-if="!apiSuccess">
                 <div class="mb-6">
@@ -9,8 +9,8 @@
                     </label>
                     <input
                         v-model="password"
-                        v-bind:class="{ 'border-gray-500': !passwordError, 'border-red-600': passwordError }"
-                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2"
+                        v-bind:class="{ 'border-gray-500 dark:border-neutral-400': !passwordError, 'border-red-600 dark:border-red-600': passwordError }"
+                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 dark:text-gray-300 dark:bg-neutral-800"
                         id="password-new" type="password">
                 </div>
                 <div class="mb-6">
@@ -19,8 +19,8 @@
                     </label>
                     <input
                         v-model="passwordConfirm"
-                        v-bind:class="{ 'border-gray-500': !passwordError, 'border-red-600': passwordError }"
-                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2"
+                        v-bind:class="{ 'border-gray-500 dark:border-neutral-400': !passwordError, 'border-red-600 dark:border-red-600': passwordError }"
+                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 dark:text-gray-300 dark:bg-neutral-800"
                         id="password-new-conmfirm" type="password">
                 </div>
                 <div class="flex items-center justify-between">

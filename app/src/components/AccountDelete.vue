@@ -7,8 +7,8 @@
         <label class="block text-gray-500 dark:text-gray-400 mb-3" for="account-password">
             Password:
         </label>
-        <input v-model="password" v-bind:class="{ 'border-gray-500': !passwordError, 'border-red-600 dark:border-red-600': passwordError }"
-            class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 leading-tight focus:border-bluish-500 mb-2 dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400"
+        <input v-model="password" v-bind:class="{ 'border-gray-500 dark:border-neutral-400': !passwordError, 'border-red-600 dark:border-red-600': passwordError }"
+            class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 leading-tight focus:border-bluish-500 mb-2 dark:text-gray-300 dark:bg-neutral-800"
             id="account-password" type="password">
         <p v-if="passwordError" class="text-red-600 text-sm mb-2">Required</p>
     </div>

@@ -6,8 +6,8 @@
                 New password:
             </label>
             <input v-model="password"
-                v-bind:class="{ 'border-gray-500': !passwordError, 'border-red-600 dark:border-red-600': passwordError }"
-                class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 leading-tight focus:border-bluish-500 mb-2"
+                v-bind:class="{ 'border-gray-500 dark:border-neutral-400': !passwordError, 'border-red-600 dark:border-red-600': passwordError }"
+                class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 dark:text-gray-300 dark:bg-neutral-800 leading-tight focus:border-bluish-500 mb-2"
                 id="new-password" type="password">
         </div>
         <div class="mb-4 max-w-xs">
@@ -15,8 +15,8 @@
                 Confirm new password:
             </label>
             <input v-model="passwordConfirm"
-                v-bind:class="{ 'border-gray-500': !passwordError, 'border-red-600 dark:border-red-600': passwordError }"
-                class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 leading-tight focus:border-bluish-500 mb-2"
+                v-bind:class="{ 'border-gray-500 dark:border-neutral-400': !passwordError, 'border-red-600 dark:border-red-600': passwordError }"
+                class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 dark:text-gray-300 dark:bg-neutral-800 leading-tight focus:border-bluish-500 mb-2"
                 id="new-password-confirm" type="password">
         </div>
         <div class="mb-3 max-w-xs">

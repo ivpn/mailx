@@ -40,7 +40,7 @@
                                             ACTIONS</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-gray-200">
+                                <tbody class="divide-y divide-gray-200 dark:divide-neutral-600">
                                     <RecipientRow  @onDeleteRecipient="deleteRecipient" @onVerifyRecipient="reload" v-for="recipient in list" :recipient="recipient" :key="rowKey" />
                                 </tbody>
                             </table>

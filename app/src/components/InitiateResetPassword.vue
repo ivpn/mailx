@@ -1,17 +1,17 @@
 <template>
-    <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-        <h1 class="text-3xl text-gray-800 font-semibold mb-8">Reset Password</h1>
-        <form class="w-full max-w-sm bg-white px-8 pt-6 pb-8 mb-4" @submit.prevent="initiatePasswordReset">
+    <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-neutral-900">
+        <h1 class="text-3xl text-gray-800 dark:text-gray-100 font-semibold mb-8">Reset Password</h1>
+        <form class="w-full max-w-sm bg-white dark:bg-neutral-800 px-8 pt-6 pb-8 mb-4" @submit.prevent="initiatePasswordReset">
             <div v-if="!apiSuccess">
-                <p class="text-gray-500 mb-8">Please enter your registered email address. You will be sent instructions on how to reset your password.</p>
+                <p class="text-gray-500 dark:text-gray-400 mb-8">Please enter your registered email address. You will be sent instructions on how to reset your password.</p>
                 <div class="mb-4">
-                    <label class="block text-gray-500 mb-2" for="email">
+                    <label class="block text-gray-500 dark:text-gray-400 mb-2" for="email">
                         Email Address
                     </label>
                     <input
                         v-model="email"
-                        v-bind:class="{ 'border-gray-500': !emailError, 'border-red-600': emailError }"
-                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2"
+                        v-bind:class="{ 'border-gray-500': !emailError, 'border-red-600 dark:border-red-600': emailError }"
+                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 dark:bg-neutral-800 dark:border-neutral-500 dark:text-gray-400"
                         id="email" type="email" autocomplete="email">
                     <p v-if="emailError" class="text-red-600 text-sm">Required</p>
                 </div>
@@ -25,7 +25,7 @@
                 <p v-if="apiError" class="text-red-600 text-sm mt-6">Error: {{ apiError }}</p>
             </div>
             <div v-if="apiSuccess">
-                <p class="text-gray-500">If an account with the specified email address exists we will send an email with further instructions on how to reset your password.</p>
+                <p class="text-gray-500 dark:text-gray-400">If an account with the specified email address exists we will send an email with further instructions on how to reset your password.</p>
             </div>
         </form>
         <p class="text-gray-500 my-5"><a class="text-bluish-500 hover:text-bluish-600"

@@ -1,10 +1,10 @@
 <template>
     <div v-if="!list.length && loaded" class="flex flex-col my-14">
         <div class="flex flex-col items-center text-center">
-            <h3 class="text-lg font-bold text-gray-800">
+            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100">
                 Add Recipients
             </h3>
-            <p class="my-2 text-gray-500">
+            <p class="my-2 text-gray-500 dark:text-gray-400">
                 To get started, add a recipient.
             </p>
             <div class="flex gap-4">
@@ -12,9 +12,9 @@
             </div>
         </div>
     </div>
-    <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="flex flex-col p-5 pb-4 my-8 bg-white">
-        <h1 v-if="!isDashboard" class="text-3xl text-gray-800 font-semibold mb-5">Recipients</h1>
-        <h1 v-if="isDashboard" class="text-3xl text-gray-800 font-semibold mb-5">Latest Recipients</h1>
+    <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="flex flex-col p-5 pb-4 my-8 bg-white dark:bg-neutral-800">
+        <h1 v-if="!isDashboard" class="text-3xl text-gray-800 dark:text-gray-100 font-semibold mb-5">Recipients</h1>
+        <h1 v-if="isDashboard" class="text-3xl text-gray-800 dark:text-gray-100 font-semibold mb-5">Latest Recipients</h1>
         <div>
             <div class="flex items-center justify-between mb-6">
                 <RecipientCreate @onCreateRecipient="getList" />
@@ -23,20 +23,20 @@
                 <div class="-m-1.5 overflow-x-auto">
                     <div class="p-1.5 min-w-full inline-block align-middle">
                         <div class="overflow-hidden">
-                            <table class="min-w-full divide-y divide-gray-200">
+                            <table class="min-w-full divide-y divide-gray-200 dark:divide-neutral-600">
                                 <thead>
                                     <tr>
                                         <th scope="col"
-                                            class="pr-5 py-3 text-start text-xs font-medium text-gray-500">
+                                            class="pr-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
                                             CREATED</th>
                                         <th scope="col"
-                                            class="px-5 py-3 text-start text-xs font-medium text-gray-500">
+                                            class="px-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
                                             EMAIL</th>
                                         <th scope="col"
-                                            class="px-5 py-3 text-start text-xs font-medium text-gray-500">
+                                            class="px-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
                                             VERIFIED</th>
                                         <th scope="col"
-                                            class="pl-5 py-3 text-end text-xs font-medium text-gray-500">
+                                            class="pl-5 py-3 text-end text-xs font-medium text-gray-500 dark:text-gray-400">
                                             ACTIONS</th>
                                     </tr>
                                 </thead>

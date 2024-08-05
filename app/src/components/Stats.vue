@@ -1,29 +1,30 @@
 <template>
-    <div class="flex flex-col p-5 pb-4 my-8 bg-white">
-        <h1 class="text-3xl text-gray-800 font-semibold mb-5">Messages</h1>
-        <h2 class="font-semibold text-gray-800 mb-5">Last 7 days</h2>
+    <div class="flex flex-col p-5 pb-4 my-8 bg-white dark:bg-neutral-800">
+        <h1 class="text-3xl text-gray-800 dark:text-gray-100 font-semibold mb-5">Messages</h1>
+        <h2 class="font-semibold text-gray-800 dark:text-gray-100 mb-5">Last 7 days</h2>
         <div id="chart" class="mb-5"></div>
-        <h2 class="font-semibold text-gray-800 mb-5">Last 90 days</h2>
+        <h2 class="font-semibold text-gray-800 dark:text-gray-100 mb-5">Last 90 days</h2>
         <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-center mb-8">
-            <div class="p-4 border-r border-gray-200">
-                <p class="text-3xl font-bold text-gray-800 mb-2">{{ stats.forwards }}</p>
-                <p class="text-gray-500">Forwards</p>
+            <div class="p-4 border-r border-gray-200 dark:border-gray-600">
+                <p class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">{{ stats.forwards }}</p>
+                <p class="text-gray-500 dark:text-gray-400">Forwards</p>
             </div>
-            <div class="p-4 border-r border-white md:border-gray-200">
-                <p class="text-3xl font-bold text-gray-800 mb-2">{{ stats.blocks }}</p>
-                <p class="text-gray-500">Blocks</p>
+            <div class="p-4 border-r border-transparent md:border-gray-200 dark:md:border-gray-600">
+                <p class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">{{ stats.blocks }}</p>
+                <p class="text-gray-500 dark:text-gray-400">Blocks</p>
             </div>
-            <div class="p-4 border-r border-gray-200">
-                <p class="text-3xl font-bold text-gray-800 mb-2">{{ stats.replies }}</p>
-                <p class="text-gray-500">Replies</p>
+            <div class="p-4 border-r border-gray-200 dark:border-gray-600">
+                <p class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">{{ stats.replies }}</p>
+                <p class="text-gray-500 dark:text-gray-400">Replies</p>
             </div>
-            <div class="p-4 border-r border-white md:border-gray-200">
-                <p class="text-3xl font-bold text-gray-800 mb-2">{{ stats.sends }}</p>
-                <p class="text-gray-500">Sends</p>
+            <div class="p-4 border-r border-transparent md:border-gray-200 dark:md:border-gray-600">
+                <p class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">{{ stats.sends }}</p>
+                <p class="text-gray-500 dark:text-gray-400">Sends</p>
             </div>
             <div class="p-4">
-                <p class="text-3xl font-bold text-gray-800 mb-2">{{ getBandwidth(stats.bandwidth) }}</p>
-                <p class="text-gray-500">Bandwidth</p>
+                <p class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">{{ getBandwidth(stats.bandwidth) }}
+                </p>
+                <p class="text-gray-500 dark:text-gray-400">Bandwidth</p>
             </div>
         </div>
         <p v-if="error" class="text-red-600 text-sm mb-3">Error: {{ error }}</p>
@@ -88,6 +89,7 @@ const initChart = () => {
             toolbar: {
                 show: false,
             },
+            background: 'transparent',
         },
         dataLabels: {
             enabled: false,
@@ -99,10 +101,21 @@ const initChart = () => {
         yaxis: {
             forceNiceScale: true,
         },
+        theme: {
+            mode: getTheme()
+        },
     }
 
     const chart = new ApexCharts(document.querySelector('#chart'), options)
     chart.render()
+}
+
+function getTheme(): string {
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        return 'dark'
+    } else {
+        return 'light'
+    }
 }
 
 function getLast7Days(): string[] {
@@ -138,7 +151,7 @@ function getLast7DaysCounts(messages: Message[]): CountData[] {
         const messageDay = (messageDate).toLocaleDateString('en-US', { weekday: 'short' })
 
         if (nowDay === messageDay && now.getDate() !== messageDate.getDate()) return
-        
+
         if (messageDate >= sevenDaysAgo) {
             const typeIndex = msg.type
             const dayIndex = last7Days.indexOf(messageDay)

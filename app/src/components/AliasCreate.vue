@@ -14,13 +14,13 @@
             class="hs-overlay hidden size-full fixed top-0 start-0 z-[60] overflow-x-hidden overflow-y-auto pointer-events-none">
             <div
                 class="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 opacity-0 transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
-                <div class="flex flex-col bg-white border shadow-sm rounded pointer-events-auto">
-                    <div class="flex justify-between items-center py-3 px-4 border-b">
-                        <h3 class="text-xl text-gray-800 font-semibold">
+                <div class="flex flex-col bg-white dark:bg-neutral-800 border dark:border-neutral-600 shadow-sm rounded pointer-events-auto">
+                    <div class="flex justify-between items-center py-3 px-4 border-b dark:border-neutral-600">
+                        <h3 class="text-xl text-gray-800 dark:text-gray-100 font-semibold">
                             Create Alias
                         </h3>
                         <button @click="close" type="button"
-                            class="flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent text-gray-800 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none">
+                            class="flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-neutral-700 disabled:opacity-50 disabled:pointer-events-none">
                             <span class="sr-only">Close</span>
                             <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -32,68 +32,68 @@
                     </div>
                     <div class="p-4 whitespace-normal text-left text-base">
                         <div class="grid space-y-3 mb-5">
-                            <p class="text-gray-500 mb-1">
+                            <p class="text-gray-500 dark:text-gray-400 mb-1">
                                 Alias format:
                             </p>
                             <div class="relative flex items-start">
                                 <div class="flex items-center h-5 mt-1">
                                     <input v-model="alias.format" value="word" id="hs-radio-word" name="hs-radio-with-description" type="radio"
-                                        class="form-radio border-gray-200 rounded-full text-bluish-500 focus:ring-white"
+                                        class="form-radio border-gray-200 rounded-full text-bluish-500 focus:ring-white dark:focus:ring-transparent dark:bg-neutral-800 dark:border-neutral-600 dark:checked:border-transparent dark:focus:ring-offset-gray-800"
                                         aria-describedby="hs-radio-word-description" checked>
                                 </div>
                                 <label for="hs-radio-word" class="ms-3">
-                                    <span class="block text-sm font-semibold text-gray-800">Word</span>
-                                    <span id="hs-radio-word-description" class="block text-sm text-gray-500">e.g.
+                                    <span class="block text-sm font-semibold text-gray-800 dark:text-gray-100">Word</span>
+                                    <span id="hs-radio-word-description" class="block text-sm text-gray-500 dark:text-gray-400">e.g.
                                         quiet.haze16@{{ alias.domain }}</span>
                                 </label>
                             </div>
                             <div class="relative flex items-start">
                                 <div class="flex items-center h-5 mt-1">
                                     <input v-model="alias.format" value="chars" id="hs-radio-chars" name="hs-radio-with-description" type="radio"
-                                        class="form-radio border-gray-200 rounded-full text-bluish-500 focus:ring-white"
+                                        class="form-radio border-gray-200 rounded-full text-bluish-500 focus:ring-white dark:focus:ring-transparent dark:bg-neutral-800 dark:border-neutral-600 dark:checked:border-transparent dark:focus:ring-offset-gray-800"
                                         aria-describedby="hs-radio-chars-description">
                                 </div>
                                 <label for="hs-radio-chars" class="ms-3">
-                                    <span class="block text-sm font-semibold text-gray-800">Random</span>
-                                    <span id="hs-radio-chars-description" class="block text-sm text-gray-500">e.g.
+                                    <span class="block text-sm font-semibold text-gray-800 dark:text-gray-100">Random</span>
+                                    <span id="hs-radio-chars-description" class="block text-sm text-gray-500 dark:text-gray-400">e.g.
                                         uf1h0hxi@{{ alias.domain }}</span>
                                 </label>
                             </div>
                             <div class="relative flex items-start">
                                 <div class="flex items-center h-5 mt-1">
                                     <input v-model="alias.format" value="uuid" id="hs-radio-uuid" name="hs-radio-with-description" type="radio"
-                                        class="form-radio border-gray-200 rounded-full text-bluish-500 focus:ring-white"
+                                        class="form-radio border-gray-200 rounded-full text-bluish-500 focus:ring-white dark:focus:ring-transparent dark:bg-neutral-800 dark:border-neutral-600 dark:checked:border-transparent dark:focus:ring-offset-gray-800"
                                         aria-describedby="hs-radio-uuid-description">
                                 </div>
                                 <label for="hs-radio-uuid" class="ms-3">
-                                    <span class="block text-sm font-semibold text-gray-800">UUID</span>
-                                    <span id="hs-radio-uuid-description" class="block text-sm text-gray-500">e.g.
+                                    <span class="block text-sm font-semibold text-gray-800 dark:text-gray-100">UUID</span>
+                                    <span id="hs-radio-uuid-description" class="block text-sm text-gray-500 dark:text-gray-400">e.g.
                                         550e8400-e29b-41d4-a716-446655440000@{{ alias.domain }}</span>
                                 </label>
                             </div>
                         </div>
                         <div class="mb-5">
-                            <label for="alias_description" class="block text-gray-500 mb-3">
+                            <label for="alias_description" class="block text-gray-500 dark:text-gray-400 mb-3">
                                 Description:
                             </label>
                             <input id="alias_description" v-model="alias.description"
-                                class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 leading-tight focus:border-bluish-500 mb-2"
+                                class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 leading-tight focus:border-bluish-500 mb-2"
                                 type="text">
                         </div>
                         <div class="mb-5">
-                            <label for="alias_from_name" class="block text-gray-500 mb-3">
+                            <label for="alias_from_name" class="block text-gray-500 dark:text-gray-400 mb-3">
                                 From name:
                             </label>
                             <input id="alias_from_name" v-model="alias.from_name"
-                                class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 leading-tight focus:border-bluish-500 mb-2"
+                                class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 leading-tight focus:border-bluish-500 mb-2"
                                 type="text">
                         </div>
                         <div class="mb-6">
-                            <label for="alias_recipient" class="block text-gray-500 mb-3">
+                            <label for="alias_recipient" class="block text-gray-500 dark:text-gray-400 mb-3">
                                 Recipient:
                             </label>
                             <select id="alias_recipient" :disabled="!recipients.length"
-                                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none">
+                                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent">
                                 <option v-for="(recipient, index) in recipients" v-bind:recipient
                                     :selected="recipient == settings.recipient || index === 0" :key="recipient">
                                     {{ recipient }}
@@ -101,11 +101,11 @@
                             </select>
                         </div>
                         <div class="mb-6">
-                            <label class="block text-gray-500 mb-3" for="alias_domain">
+                            <label class="block text-gray-500 dark:text-gray-400 mb-3" for="alias_domain">
                                 Domain:
                             </label>
                             <select id="alias_domain" :disabled="!domains.length"
-                                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none">
+                                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent">
                                 <option v-for="(domain, index) in domains" v-bind:domain
                                     :selected="domain == alias.domain || index === 0" :key="domain">
                                     {{ domain }}
@@ -113,13 +113,13 @@
                             </select>
                         </div>
                     </div>
-                    <div class="flex justify-start items-center gap-x-3 py-4 px-4 border-t">
+                    <div class="flex justify-start items-center gap-x-3 py-4 px-4 border-t dark:border-neutral-600">
                         <button @click="postAlias"
                             class="py-2 px-3 inline-flex items-center gap-x-2 font-medium text-base bg-bluish-500 text-white hover:bg-bluish-600 disabled:opacity-50 disabled:pointer-events-none">
                             Create Alias
                         </button>
                         <button @click="close"
-                            class="text-gray-500 bg-gray-100 hover:bg-gray-200 font-medium text-base py-2 px-3 focus:outline-none focus:shadow-outline">
+                            class="text-gray-500 bg-gray-100 hover:bg-gray-200 dark:text-gray-300 dark:bg-neutral-600 dark:hover:bg-neutral-700 font-medium text-base py-2 px-3 focus:outline-none focus:shadow-outline">
                             Cancel
                         </button>
                     </div>

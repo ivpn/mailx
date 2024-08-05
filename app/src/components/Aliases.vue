@@ -1,13 +1,13 @@
 <template>
     <div v-if="!list.length && loaded" class="flex flex-col my-14">
         <div class="flex flex-col items-center text-center">
-            <h3 class="text-lg font-bold text-gray-800">
+            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100">
                 Create Aliases
             </h3>
-            <p v-if="recipients.length && settings.id" class="my-2 text-gray-500">
+            <p v-if="recipients.length && settings.id" class="my-2 text-gray-500 dark:text-gray-400">
                 To get started, create an alias.
             </p>
-            <p v-if="!recipients.length && loaded" class="my-2 text-gray-500">
+            <p v-if="!recipients.length && loaded" class="my-2 text-gray-500 dark:text-gray-400">
                 To get started, first add a recipient.
             </p>
             <div class="flex gap-4">
@@ -15,9 +15,9 @@
             </div>
         </div>
     </div>
-    <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="flex flex-col p-5 pb-4 my-8 bg-white">
-        <h1 v-if="!isDashboard" class="text-3xl text-gray-800 font-semibold mb-5">Aliases</h1>
-        <h1 v-if="isDashboard" class="text-3xl text-gray-800 font-semibold mb-5">Latest Aliases</h1>
+    <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="flex flex-col p-5 pb-4 my-8 bg-white dark:bg-neutral-800">
+        <h1 v-if="!isDashboard" class="text-3xl text-gray-800 dark:text-gray-100 font-semibold mb-5">Aliases</h1>
+        <h1 v-if="isDashboard" class="text-3xl text-gray-800 dark:text-gray-100 font-semibold mb-5">Latest Aliases</h1>
         <div>
             <div class="flex items-center justify-between mb-6">
                 <AliasCreate v-if="recipients.length && settings.id" @onCreateAlias="getList" :recipients.sync="recipients" :settings.sync="settings" />
@@ -26,10 +26,10 @@
                 <div class="-m-1.5 overflow-x-auto">
                     <div class="p-1.5 min-w-full inline-block align-middle">
                         <div class="overflow-hidden">
-                            <table class="min-w-full divide-y divide-gray-200">
+                            <table class="min-w-full divide-y divide-gray-200 dark:divide-neutral-600">
                                 <thead>
                                     <tr>
-                                        <th v-if="!isDashboard" scope="col" class="pr-5 py-3 text-start text-xs font-medium text-gray-500">
+                                        <th v-if="!isDashboard" scope="col" class="pr-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
                                             <button
                                             @click="sort"
                                             data-sort="created_at"
@@ -45,7 +45,7 @@
                                                 </svg>
                                             </button>
                                         </th>
-                                        <th v-if="!isDashboard" scope="col" class="px-5 py-3 text-start text-xs font-medium text-gray-500">
+                                        <th v-if="!isDashboard" scope="col" class="px-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
                                             <button
                                             @click="sort"
                                             data-sort="name"
@@ -61,24 +61,24 @@
                                                 </svg>
                                             </button>    
                                         </th>
-                                        <th v-if="isDashboard" scope="col" class="pr-5 py-3 text-start text-xs font-medium text-gray-500">
+                                        <th v-if="isDashboard" scope="col" class="pr-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
                                             CREATED
                                         </th>
-                                        <th v-if="isDashboard" scope="col" class="px-5 py-3 text-start text-xs font-medium text-gray-500">
+                                        <th v-if="isDashboard" scope="col" class="px-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
                                             ALIAS
                                         </th>
-                                        <th scope="col" class="px-5 py-3 text-start text-xs font-medium text-gray-500">
+                                        <th scope="col" class="px-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
                                             COUNT
                                         </th>
-                                        <th scope="col" class="px-5 py-3 text-start text-xs font-medium text-gray-500">
+                                        <th scope="col" class="px-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
                                             ACTIVE
                                         </th>
-                                        <th scope="col" class="pl-5 py-3 text-end text-xs font-medium text-gray-500">
+                                        <th scope="col" class="pl-5 py-3 text-end text-xs font-medium text-gray-500 dark:text-gray-400">
                                             ACTIONS
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-gray-200">
+                                <tbody class="divide-y divide-gray-200 dark:divide-neutral-600">
                                     <AliasRow v-if="recipients.length" @onDeleteAlias="deleteAlias" @onEditAlias="getList" v-for="alias in list" :alias="alias" :key="rowKey" :recipients.sync="recipients" />
                                 </tbody>
                             </table>
@@ -87,7 +87,7 @@
                 </div>
             </div>
         </div>
-        <p v-if="isDashboard" class="text-sm text-gray-500 my-4">
+        <p v-if="isDashboard" class="text-sm text-gray-500 dark:text-gray-300 my-4">
             <a href="/aliases" class="text-bluish-500 hover:text-bluish-600 font-medium text-sm py-2"
                 type="submit">All Aliases</a>
         </p>

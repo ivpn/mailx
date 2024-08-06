@@ -40,6 +40,8 @@ import { userApi } from '../api/user.ts'
 import { onMounted } from 'vue';
 
 const logout = async () => {
+    if (!confirm('Do you want to proceed with the logout?')) return
+
     try {
         await userApi.logout()
         userApi.clearSession()

@@ -3,11 +3,11 @@
         <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100">
             Verify Your Email
         </h3>
-        <p class="my-2 text-gray-500">
+        <p class="my-2 text-gray-500 dark:text-gray-400">
             Please <a class="text-bluish-500 hover:text-bluish-600 font-medium" href="/account">verify</a> your account email address.
         </p>
     </div>
-    <div v-if="!res.is_active && !isDashboard" class="flex flex-col p-5 pb-4 my-8 bg-white">
+    <div v-if="!res.is_active && !isDashboard" class="flex flex-col p-5 pb-4 my-8 bg-white dark:bg-neutral-800">
         <h1 class="text-3xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Verify Your Email</h1>
         <p class="text-gray-500 dark:text-gray-400 mb-3">
             We have sent a 6-digit OTP code to your email address. Please enter the code below to verify your account email. Accounts with unconfirmed email address may be deleted after 7 days.

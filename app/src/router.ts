@@ -12,6 +12,7 @@ import InitiateResetPassword from './components/InitiateResetPassword.vue'
 import ResetPassword from './components/ResetPassword.vue'
 import NotFound from './components/NotFound.vue'
 import { type IStaticMethods } from 'preline/preline'
+import env from "./env.json"
 
 declare global {
     interface Window {
@@ -22,59 +23,59 @@ declare global {
 const routes = [
     {
         path: '/',
-        name: 'App',
+        name: env.APP_NAME,
         component: Dashboard,
         children: [
             {
                 path: '',
-                name: 'App',
+                name: env.APP_NAME,
                 component: QuickActions,
             },
             {
                 path: 'aliases',
-                name: 'App - Aliases',
+                name: env.APP_NAME + ' - Aliases',
                 component: Aliases,
             },
             {
                 path: 'recipients',
-                name: 'App - Recipients',
+                name: env.APP_NAME + ' - Recipients',
                 component: Recipients,
             },
             {
                 path: 'stats',
-                name: 'App - Stats',
+                name: env.APP_NAME + ' - Stats',
                 component: Stats,
             },
             {
                 path: 'settings',
-                name: 'App - Settings',
+                name: env.APP_NAME + ' - Settings',
                 component: Settings,
             },
             {
                 path: 'account',
-                name: 'App - Account',
+                name: env.APP_NAME + ' - Account',
                 component: Account,
             },
         ]
     },
     {
         path: '/signup',
-        name: 'App - Sign Up',
+        name: env.APP_NAME + ' - Sign Up',
         component: Signup
     },
     {
         path: '/login',
-        name: 'App - Log In',
+        name: env.APP_NAME + ' - Log In',
         component: Login
     },
     {
         path: '/reset/password/initiate',
-        name: 'App - Reset Password',
+        name: env.APP_NAME + ' - Reset Password',
         component: InitiateResetPassword
     },
     {
         path: '/reset/password/:otp',
-        name: 'App - Set New Password',
+        name: env.APP_NAME + ' - Set New Password',
         component: ResetPassword,
         params: true
     },

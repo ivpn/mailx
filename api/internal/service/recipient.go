@@ -26,6 +26,7 @@ var (
 type RecipienteStore interface {
 	GetRecipient(context.Context, string, string) (model.Recipient, error)
 	GetRecipientByEmail(context.Context, string, string) (model.Recipient, error)
+	GetRecipientsCountByEmail(context.Context, string) (int, error)
 	GetRecipients(context.Context, string) ([]model.Recipient, error)
 	GetRecipientsCount(context.Context, string) (int, error)
 	GetVerifiedRecipients(context.Context, string, string) ([]model.Recipient, error)

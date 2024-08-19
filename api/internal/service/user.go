@@ -90,7 +90,12 @@ func (s *Service) GetUserByPassword(ctx context.Context, userID string, password
 }
 
 func (s *Service) PostUser(ctx context.Context, user model.User) error {
-	err := user.SetPassword(*user.PasswordPlain)
+	rcpCount, err := s.Store.GetRecipientsCountByEmail(ctx, user.Email)
+	if err != nil || rcpCount > 0 {
+		return model.ErrDuplicateEmail
+	}
+
+	err = user.SetPassword(*user.PasswordPlain)
 	if err != nil {
 		log.Printf("error creating user: %s", err.Error())
 		return err

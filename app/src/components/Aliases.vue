@@ -11,7 +11,7 @@
                 To get started, first add a recipient.
             </p>
             <div class="flex gap-4">
-                <AliasCreate v-if="recipients.length && settings.id" @onCreateAlias="getList" :recipients.sync="recipients" :settings.sync="settings" />
+                <AliasCreate v-if="recipients.length && settings.id" @onCreateAlias="getList" :recipients.sync="recipients" :settings.sync="settings" :key="rowKey" />
             </div>
         </div>
     </div>
@@ -20,7 +20,7 @@
         <h1 v-if="isDashboard" class="text-3xl text-gray-800 dark:text-gray-100 font-semibold mb-5">Latest Aliases</h1>
         <div>
             <div class="flex items-center justify-between mb-6">
-                <AliasCreate v-if="recipients.length && settings.id" @onCreateAlias="getList" :recipients.sync="recipients" :settings.sync="settings" />
+                <AliasCreate v-if="recipients.length && settings.id" @onCreateAlias="getList" :recipients.sync="recipients" :settings.sync="settings" :key="rowKey" />
             </div>
             <div class="flex flex-col">
                 <div class="-m-1.5 overflow-x-auto">

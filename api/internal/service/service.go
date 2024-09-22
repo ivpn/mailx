@@ -14,6 +14,7 @@ type Store interface {
 	SubscriptionStore
 	MessageStore
 	SettingsStore
+	SessionStore
 }
 
 type Cache interface {

@@ -9,15 +9,33 @@ import (
 func (d *Database) GetUser(ctx context.Context, ID string) (model.User, error) {
 	var user model.User
 	err := d.Client.Where("id = ?", ID).First(&user).Error
+	if err != nil {
+		return model.User{}, err
+	}
+
+	err = user.UnmarshalCreds()
+	if err != nil {
+		return model.User{}, err
+	}
+
 	user.TotpEnabled = user.TotpSecret != ""
-	return user, err
+	return user, nil
 }
 
 func (d *Database) GetUserByEmail(ctx context.Context, email string) (model.User, error) {
 	var user model.User
 	err := d.Client.Where("email = ?", email).First(&user).Error
+	if err != nil {
+		return model.User{}, err
+	}
+
+	err = user.UnmarshalCreds()
+	if err != nil {
+		return model.User{}, err
+	}
+
 	user.TotpEnabled = user.TotpSecret != ""
-	return user, err
+	return user, nil
 }
 
 func (d *Database) PostUser(ctx context.Context, user model.User) (model.User, error) {

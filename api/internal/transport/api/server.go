@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/gofiber/fiber/v2"
 	"ivpn.net/email/api/config"
 	"ivpn.net/email/api/internal/utils"
@@ -25,6 +26,7 @@ type Handler struct {
 	Server    *fiber.App
 	Validator utils.Validator
 	Cache     Cache
+	WebAuthn  *webauthn.WebAuthn
 }
 
 type Cache interface {

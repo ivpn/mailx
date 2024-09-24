@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -176,4 +177,20 @@ func NewCookie(token string, cfg config.APIConfig) *fiber.Cookie {
 		Secure:   true,
 		Expires:  time.Now().Add(time.Duration(cfg.TokenExpiration)),
 	}
+}
+
+func NewWebAuthn(cfg config.APIConfig) *webauthn.WebAuthn {
+	var webAuthn *webauthn.WebAuthn
+	config := &webauthn.Config{
+		RPDisplayName: cfg.Name,                     // Display Name for your site
+		RPID:          cfg.FQDN,                     // Generally the FQDN for your site
+		RPOrigins:     []string{cfg.ApiAllowOrigin}, // The origin URLs allowed for WebAuthn requests
+	}
+
+	webAuthn, err := webauthn.New(config)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	return webAuthn
 }

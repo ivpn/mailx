@@ -9,6 +9,8 @@ import (
 )
 
 type APIConfig struct {
+	FQDN              string
+	Name              string
 	Port              string
 	ApiAllowOrigin    string
 	ApiAllowIp        string
@@ -95,6 +97,8 @@ func New() (Config, error) {
 
 	return Config{
 		API: APIConfig{
+			FQDN:              os.Getenv("FQDN"),
+			Name:              os.Getenv("API_NAME"),
 			Port:              os.Getenv("API_PORT"),
 			ApiAllowOrigin:    os.Getenv("API_ALLOW_ORIGIN"),
 			ApiAllowIp:        os.Getenv("API_ALLOW_IP"),

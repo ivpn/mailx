@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/go-webauthn/webauthn/webauthn"
+	"ivpn.net/email/api/internal/model"
 )
 
 var (
@@ -14,15 +15,15 @@ var (
 )
 
 type SessionStore interface {
-	GetSession(context.Context, string) (webauthn.SessionData, bool, error)
+	GetSession(context.Context, string) (model.Session, bool, error)
 	SaveSession(context.Context, webauthn.SessionData, string, string) error
 	DeleteSession(context.Context, string) error
 }
 
-func (s *Service) GetSession(ctx context.Context, token string) (webauthn.SessionData, bool, error) {
+func (s *Service) GetSession(ctx context.Context, token string) (model.Session, bool, error) {
 	session, exists, err := s.Store.GetSession(ctx, token)
 	if err != nil {
-		return webauthn.SessionData{}, false, ErrGetSession
+		return model.Session{}, false, ErrGetSession
 	}
 
 	return session, exists, nil

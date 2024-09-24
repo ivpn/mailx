@@ -62,6 +62,7 @@ func migrate(db *gorm.DB) error {
 		&model.Alias{},
 		&model.Message{},
 		&model.Settings{},
+		&model.Session{},
 	)
 	if err != nil {
 		return err

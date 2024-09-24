@@ -12,6 +12,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/golang-jwt/jwt"
 	"ivpn.net/email/api/config"
+	"ivpn.net/email/api/internal/model"
 )
 
 var (
@@ -28,6 +29,11 @@ const (
 
 type Cache interface {
 	Get(context.Context, string) (string, error)
+}
+
+type Service interface {
+	GetSession(context.Context, string) (model.Session, bool, error)
+	GetUser(context.Context, string) (model.User, error)
 }
 
 func New(cfg config.APIConfig, cache Cache) fiber.Handler {
@@ -65,6 +71,30 @@ func New(cfg config.APIConfig, cache Cache) fiber.Handler {
 		}
 
 		c.Locals(USER_ID, claims[USER_ID])
+
+		return c.Next()
+	}
+}
+
+func Webauthn(s Service) fiber.Handler {
+
+	return func(c *fiber.Ctx) error {
+		token := c.Cookies(AUTHN_COOKIE)
+		if token == "" {
+			return c.SendStatus(fiber.StatusUnauthorized)
+		}
+
+		session, ok, err := s.GetSession(c.Context(), token)
+		if err != nil || !ok {
+			return c.SendStatus(fiber.StatusUnauthorized)
+		}
+
+		user, err := s.GetUser(c.Context(), session.UserID)
+		if err != nil {
+			return c.SendStatus(fiber.StatusUnauthorized)
+		}
+
+		c.Locals(USER_ID, user.ID)
 
 		return c.Next()
 	}

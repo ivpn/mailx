@@ -414,13 +414,13 @@ func (h *Handler) ChangePassword(c *fiber.Ctx) error {
 // @Tags user
 // @Accept json
 // @Produce json
-// @Param body body InitiatePasswordResetReq true "Initiate password reset request"
+// @Param body body EmailReq true "Initiate password reset request"
 // @Success 200 {object} SuccessRes
 // @Failure 400 {object} ErrorRes
 // @Router /initiatepasswordreset [post]
 func (h *Handler) InitiatePasswordReset(c *fiber.Ctx) error {
 	// Parse the request
-	req := InitiatePasswordResetReq{}
+	req := EmailReq{}
 	err := c.BodyParser(&req)
 	if err != nil {
 		log.Printf("error initiating password reset: %s", err.Error())

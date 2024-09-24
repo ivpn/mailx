@@ -76,12 +76,12 @@ func (h *Handler) GetRecipients(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Param body body RecipientReq true "Recipient request"
+// @Param body body EmailReq true "Recipient request"
 // @Success 201 {object} SuccessRes
 // @Failure 400 {object} ErrorRes
 // @Router /recipient [post]
 func (h *Handler) PostRecipient(c *fiber.Ctx) error {
-	req := RecipientReq{}
+	req := EmailReq{}
 	err := c.BodyParser(&req)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{

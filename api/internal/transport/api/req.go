@@ -9,7 +9,7 @@ type AliasReq struct {
 	Domain      string `json:"domain" validate:"required"`
 }
 
-type RecipientReq struct {
+type EmailReq struct {
 	Email string `json:"email" validate:"required,email"`
 }
 
@@ -37,10 +37,6 @@ type DeleteUserReq struct {
 
 type ChangePasswordReq struct {
 	Password string `json:"password" validate:"required,min=8,max=64"`
-}
-
-type InitiatePasswordResetReq struct {
-	Email string `json:"email" validate:"required,email"`
 }
 
 type ResetPasswordReq struct {

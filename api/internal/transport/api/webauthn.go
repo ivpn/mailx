@@ -28,7 +28,7 @@ type SessionService interface {
 
 func (h *Handler) BeginRegistration(c *fiber.Ctx) error {
 	// Parse the request
-	req := RecipientReq{}
+	req := EmailReq{}
 	err := c.BodyParser(&req)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{

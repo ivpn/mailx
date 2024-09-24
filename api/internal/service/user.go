@@ -17,6 +17,7 @@ import (
 var (
 	ErrGetUser            = errors.New("could not get user by ID")
 	ErrGetUserStats       = errors.New("could not get user stats")
+	ErrSaveUser           = errors.New("could not save user")
 	ErrPostUser           = errors.New("could not create user")
 	ErrActivateUser       = errors.New("could not activate user")
 	ErrDeleteUser         = errors.New("could not delete user")
@@ -43,9 +44,9 @@ type UserStore interface {
 	GetUserByEmail(context.Context, string) (model.User, error)
 	PostUser(context.Context, model.User) (model.User, error)
 	ActivateUser(context.Context, string) error
+	SaveUser(context.Context, model.User) error
 	DeleteUser(context.Context, string) error
 	GetUserStats(context.Context, string) (model.UserStats, error)
-	ChangePassword(context.Context, model.User) error
 	TotpEnable(context.Context, string, string, string) error
 	TotpDisable(context.Context, string) error
 	TotpGetBackup(context.Context, string) (string, string, error)
@@ -75,6 +76,15 @@ func (s *Service) GetUserByCredentials(ctx context.Context, email string, passwo
 	return user, nil
 }
 
+func (s *Service) GetUserByEmail(ctx context.Context, email string) (model.User, error) {
+	user, err := s.Store.GetUserByEmail(ctx, email)
+	if err != nil {
+		return model.User{}, ErrIncorrectEmail
+	}
+
+	return user, nil
+}
+
 func (s *Service) GetUserByPassword(ctx context.Context, userID string, password string) (model.User, error) {
 	user, err := s.Store.GetUser(ctx, userID)
 	if err != nil {
@@ -87,6 +97,16 @@ func (s *Service) GetUserByPassword(ctx context.Context, userID string, password
 	}
 
 	return user, nil
+}
+
+func (s *Service) SaveUser(ctx context.Context, user model.User) error {
+	err := s.Store.SaveUser(ctx, user)
+	if err != nil {
+		log.Printf("error saving user: %s", err.Error())
+		return ErrSaveUser
+	}
+
+	return nil
 }
 
 func (s *Service) PostUser(ctx context.Context, user model.User) error {
@@ -304,7 +324,7 @@ func (s *Service) ChangePassword(ctx context.Context, userID string, password st
 		return ErrChangePassword
 	}
 
-	err = s.Store.ChangePassword(ctx, user)
+	err = s.Store.SaveUser(ctx, user)
 	if err != nil {
 		log.Printf("error changing password: %s", err.Error())
 		return ErrChangePassword
@@ -375,7 +395,7 @@ func (s *Service) ResetPassword(ctx context.Context, otp string, password string
 		return ErrChangePassword
 	}
 
-	err = s.Store.ChangePassword(ctx, user)
+	err = s.Store.SaveUser(ctx, user)
 	if err != nil {
 		log.Printf("error resetting password: %s", err.Error())
 		return ErrChangePassword

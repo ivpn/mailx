@@ -43,6 +43,10 @@ func (d *Database) PostUser(ctx context.Context, user model.User) (model.User, e
 	return user, err
 }
 
+func (d *Database) SaveUser(ctx context.Context, user model.User) error {
+	return d.Client.Save(&user).Error
+}
+
 func (d *Database) ActivateUser(ctx context.Context, ID string) error {
 	return d.Client.Model(&model.User{}).Where("id = ?", ID).Update("is_active", true).Error
 }
@@ -86,10 +90,6 @@ func (d *Database) GetUserStats(ctx context.Context, ID string) (model.UserStats
 	}
 
 	return userStats, nil
-}
-
-func (d *Database) ChangePassword(ctx context.Context, user model.User) error {
-	return d.Client.Save(&user).Error
 }
 
 func (d *Database) TotpEnable(ctx context.Context, ID string, secret string, backupCodes string) error {

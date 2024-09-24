@@ -26,6 +26,7 @@ var (
 	DisableTotpSuccess           = "2FA is disabled"
 	TotpRequired                 = "2FA is required"
 	ErrInvalidTotpCode           = "Invalid 2FA code"
+	ErrGetUser                   = "Could not get user"
 )
 
 type UserService interface {
@@ -34,6 +35,8 @@ type UserService interface {
 	ActivateUser(context.Context, string, string) error
 	GetUserByCredentials(context.Context, string, string) (model.User, error)
 	GetUserByPassword(context.Context, string, string) (model.User, error)
+	GetUserByEmail(context.Context, string) (model.User, error)
+	SaveUser(context.Context, model.User) error
 	DeleteUser(context.Context, string) error
 	GetUser(context.Context, string) (model.User, error)
 	GetUserStats(context.Context, string) (model.UserStats, error)

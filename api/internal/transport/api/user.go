@@ -227,7 +227,7 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 		})
 	}
 
-	// Set the token in encrypted cookie
+	// Set auth token in cookie
 	c.Cookie(auth.NewCookie(token, h.Cfg))
 
 	return c.Status(200).JSON(fiber.Map{

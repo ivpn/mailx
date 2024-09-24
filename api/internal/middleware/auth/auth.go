@@ -21,8 +21,9 @@ var (
 )
 
 const (
-	AUTH_COOKIE = "auth"
-	USER_ID     = "user_id"
+	AUTH_COOKIE  = "auth"
+	AUTHN_COOKIE = "authn"
+	USER_ID      = "user_id"
 )
 
 type Cache interface {
@@ -175,6 +176,18 @@ func NewCookie(token string, cfg config.APIConfig) *fiber.Cookie {
 		Value:    token,
 		HTTPOnly: true,
 		Secure:   true,
+		Expires:  time.Now().Add(time.Duration(cfg.TokenExpiration)),
+	}
+}
+
+func NewCookieAuthn(token string, path string, cfg config.APIConfig) *fiber.Cookie {
+	return &fiber.Cookie{
+		Name:     AUTHN_COOKIE,
+		Value:    token,
+		Path:     path,
+		HTTPOnly: true,
+		Secure:   true,
+		MaxAge:   int(cfg.TokenExpiration),
 		Expires:  time.Now().Add(time.Duration(cfg.TokenExpiration)),
 	}
 }

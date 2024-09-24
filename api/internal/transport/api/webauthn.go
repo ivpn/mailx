@@ -5,11 +5,19 @@ import (
 
 	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/gofiber/fiber/v2"
+	"ivpn.net/email/api/internal/middleware/auth"
 	"ivpn.net/email/api/internal/model"
 )
 
 var (
-	ErrBeginRegistration = "could not begin registration"
+	BeginRegistrationSuccess  = "Registration started"
+	FinishRegistrationSuccess = "Registration finished"
+	BeginLoginSuccess         = "Login started"
+	FinishLoginSuccess        = "Login finished"
+	ErrBeginRegistration      = "could not begin registration"
+	ErrFinishRegistration     = "could not finish registration"
+	ErrBeginLogin             = "could not begin login"
+	ErrFinishLogin            = "could not finish login"
 )
 
 type SessionService interface {
@@ -67,7 +75,12 @@ func (h *Handler) BeginRegistration(c *fiber.Ctx) error {
 		})
 	}
 
-	return nil
+	// Set token in cookie
+	c.Cookie(auth.NewCookieAuthn(token, c.Path(), h.Cfg))
+
+	return c.Status(201).JSON(fiber.Map{
+		"message": BeginRegistrationSuccess,
+	})
 }
 
 func (h *Handler) FinishRegistration(c *fiber.Ctx) error {

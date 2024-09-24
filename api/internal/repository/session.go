@@ -9,32 +9,28 @@ import (
 	"ivpn.net/email/api/internal/model"
 )
 
-func (d *Database) GetSession(ctx context.Context, token string) (webauthn.SessionData, bool, error) {
+func (d *Database) GetSession(ctx context.Context, token string) (model.Session, bool, error) {
 	var session model.Session
 	q := d.Client.Where("token = ?", token).Find(&session)
 	if q.RowsAffected == 0 {
-		return webauthn.SessionData{}, false, fmt.Errorf("could not get session by token")
+		return model.Session{}, false, fmt.Errorf("could not get session by token")
 	}
 
-	var sessionData webauthn.SessionData
-	err := json.Unmarshal(session.SessionData, &sessionData)
-	if err != nil {
-		return webauthn.SessionData{}, false, err
-	}
+	session.UnmarshalSessionData()
 
-	return sessionData, true, q.Error
+	return session, true, q.Error
 }
 
-func (d *Database) SaveSession(ctx context.Context, session webauthn.SessionData, token string, userID string) error {
-	sessionData, err := json.Marshal(session)
+func (d *Database) SaveSession(ctx context.Context, sessionData webauthn.SessionData, token string, userID string) error {
+	data, err := json.Marshal(sessionData)
 	if err != nil {
 		return err
 	}
 
 	return d.Client.Create(&model.Session{
-		UserID:      userID,
-		Token:       token,
-		SessionData: sessionData,
+		UserID: userID,
+		Token:  token,
+		Data:   data,
 	}).Error
 }
 

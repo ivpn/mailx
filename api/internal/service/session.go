@@ -15,7 +15,7 @@ var (
 
 type SessionStore interface {
 	GetSession(context.Context, string) (webauthn.SessionData, bool, error)
-	SaveSession(context.Context, webauthn.SessionData, string) error
+	SaveSession(context.Context, webauthn.SessionData, string, string) error
 	DeleteSession(context.Context, string) error
 }
 
@@ -28,8 +28,8 @@ func (s *Service) GetSession(ctx context.Context, token string) (webauthn.Sessio
 	return session, exists, nil
 }
 
-func (s *Service) SaveSession(ctx context.Context, session webauthn.SessionData, token string) error {
-	err := s.Store.SaveSession(ctx, session, token)
+func (s *Service) SaveSession(ctx context.Context, session webauthn.SessionData, token string, userID string) error {
+	err := s.Store.SaveSession(ctx, session, token, userID)
 	if err != nil {
 		return ErrSaveSession
 	}

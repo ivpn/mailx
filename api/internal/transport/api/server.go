@@ -7,6 +7,7 @@ import (
 	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/gofiber/fiber/v2"
 	"ivpn.net/email/api/config"
+	"ivpn.net/email/api/internal/middleware/auth"
 	"ivpn.net/email/api/internal/utils"
 )
 
@@ -44,6 +45,7 @@ func Start(cfg config.APIConfig, service Service, cache Cache) error {
 		Server:    app,
 		Validator: utils.NewValidator(),
 		Cache:     cache,
+		WebAuthn:  auth.NewWebAuthn(cfg),
 	}
 
 	h.SetupRoutes(cfg)

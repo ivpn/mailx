@@ -25,13 +25,14 @@ func (d *Database) GetSession(ctx context.Context, token string) (webauthn.Sessi
 	return sessionData, true, q.Error
 }
 
-func (d *Database) SaveSession(ctx context.Context, session webauthn.SessionData, token string) error {
+func (d *Database) SaveSession(ctx context.Context, session webauthn.SessionData, token string, userID string) error {
 	sessionData, err := json.Marshal(session)
 	if err != nil {
 		return err
 	}
 
 	return d.Client.Create(&model.Session{
+		UserID:      userID,
 		Token:       token,
 		SessionData: sessionData,
 	}).Error

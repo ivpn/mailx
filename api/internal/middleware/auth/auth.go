@@ -36,9 +36,27 @@ type Service interface {
 	GetUser(context.Context, string) (model.User, error)
 }
 
-func New(cfg config.APIConfig, cache Cache) fiber.Handler {
+func New(cfg config.APIConfig, cache Cache, service Service) fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
+		// Authn authentication
+		if c.Cookies(AUTHN_COOKIE) != "" {
+			session, ok, err := service.GetSession(c.Context(), c.Cookies(AUTHN_COOKIE))
+			if err != nil || !ok {
+				return c.SendStatus(fiber.StatusUnauthorized)
+			}
+
+			user, err := service.GetUser(c.Context(), session.UserID)
+			if err != nil {
+				return c.SendStatus(fiber.StatusUnauthorized)
+			}
+
+			c.Locals(USER_ID, user.ID)
+
+			return c.Next()
+		}
+
+		// JWT authentication
 		jwtString := GetToken(c)
 		if jwtString == "" {
 			return c.SendStatus(fiber.StatusUnauthorized)
@@ -71,30 +89,6 @@ func New(cfg config.APIConfig, cache Cache) fiber.Handler {
 		}
 
 		c.Locals(USER_ID, claims[USER_ID])
-
-		return c.Next()
-	}
-}
-
-func Webauthn(s Service) fiber.Handler {
-
-	return func(c *fiber.Ctx) error {
-		token := c.Cookies(AUTHN_COOKIE)
-		if token == "" {
-			return c.SendStatus(fiber.StatusUnauthorized)
-		}
-
-		session, ok, err := s.GetSession(c.Context(), token)
-		if err != nil || !ok {
-			return c.SendStatus(fiber.StatusUnauthorized)
-		}
-
-		user, err := s.GetUser(c.Context(), session.UserID)
-		if err != nil {
-			return c.SendStatus(fiber.StatusUnauthorized)
-		}
-
-		c.Locals(USER_ID, user.ID)
 
 		return c.Next()
 	}

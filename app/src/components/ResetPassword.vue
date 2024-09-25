@@ -27,7 +27,7 @@
                     <button :disabled="isLoading"
                         class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 focus:outline-none focus:shadow-outline"
                         type="submit">
-                        Change Password
+                        Update Password
                     </button>
                 </div>
                 <p v-if="passwordError" class="text-red-600 text-sm mt-6">Error: {{ passwordError }}</p>

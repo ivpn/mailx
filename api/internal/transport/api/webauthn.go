@@ -100,7 +100,6 @@ func (h *Handler) BeginRegistration(c *fiber.Ctx) error {
 // @Tags webauthn
 // @Accept json
 // @Produce json
-// @Param credential body CredentialReq true "Credential"
 // @Success 200 {object} SuccessRes
 // @Failure 400 {object} ErrorRes
 // @Router /register/finish [post]

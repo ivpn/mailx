@@ -282,7 +282,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api.InitiatePasswordResetReq"
+                            "$ref": "#/definitions/api.EmailReq"
                         }
                     }
                 ],
@@ -342,6 +342,75 @@ const docTemplate = `{
                 }
             }
         },
+        "/login/begin": {
+            "post": {
+                "description": "Begin login process",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "webauthn"
+                ],
+                "summary": "Begin login",
+                "parameters": [
+                    {
+                        "description": "Email",
+                        "name": "email",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.EmailReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/login/finish": {
+            "post": {
+                "description": "Finish login process",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "webauthn"
+                ],
+                "summary": "Finish login",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
         "/recipient": {
             "post": {
                 "security": [
@@ -367,7 +436,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api.RecipientReq"
+                            "$ref": "#/definitions/api.EmailReq"
                         }
                     }
                 ],
@@ -630,6 +699,75 @@ const docTemplate = `{
                 "responses": {
                     "201": {
                         "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/register/begin": {
+            "post": {
+                "description": "Begin registration process",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "webauthn"
+                ],
+                "summary": "Begin registration",
+                "parameters": [
+                    {
+                        "description": "Email",
+                        "name": "email",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.EmailReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/register/finish": {
+            "post": {
+                "description": "Finish registration process",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "webauthn"
+                ],
+                "summary": "Finish registration",
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/api.SuccessRes"
                         }
@@ -1135,7 +1273,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api.TotpConfirm"
+                            "$ref": "#/definitions/api.TotpReq"
                         }
                     }
                 ],
@@ -1214,7 +1352,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api.TotpConfirm"
+                            "$ref": "#/definitions/api.TotpReq"
                         }
                     }
                 ],
@@ -1300,32 +1438,21 @@ const docTemplate = `{
                 }
             }
         },
+        "api.EmailReq": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                }
+            }
+        },
         "api.ErrorRes": {
             "type": "object",
             "properties": {
                 "error": {
-                    "type": "string"
-                }
-            }
-        },
-        "api.InitiatePasswordResetReq": {
-            "type": "object",
-            "required": [
-                "email"
-            ],
-            "properties": {
-                "email": {
-                    "type": "string"
-                }
-            }
-        },
-        "api.RecipientReq": {
-            "type": "object",
-            "required": [
-                "email"
-            ],
-            "properties": {
-                "email": {
                     "type": "string"
                 }
             }
@@ -1390,14 +1517,16 @@ const docTemplate = `{
                 }
             }
         },
-        "api.TotpConfirm": {
+        "api.TotpReq": {
             "type": "object",
             "required": [
                 "otp"
             ],
             "properties": {
                 "otp": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 8,
+                    "minLength": 6
                 }
             }
         },
@@ -1410,6 +1539,11 @@ const docTemplate = `{
             "properties": {
                 "email": {
                     "type": "string"
+                },
+                "otp": {
+                    "type": "string",
+                    "maxLength": 8,
+                    "minLength": 0
                 },
                 "password": {
                     "type": "string",
@@ -1557,6 +1691,9 @@ const docTemplate = `{
         "model.TOTPNew": {
             "type": "object",
             "properties": {
+                "account": {
+                    "type": "string"
+                },
                 "secret": {
                     "type": "string"
                 },
@@ -1578,6 +1715,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "is_active": {
+                    "type": "boolean"
+                },
+                "totp_enabled": {
                     "type": "boolean"
                 }
             }

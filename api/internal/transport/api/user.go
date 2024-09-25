@@ -522,7 +522,7 @@ func (h *Handler) TotpEnable(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Param body body TotpConfirm true "TOTP confirm request"
+// @Param body body TotpReq true "TOTP confirm request"
 // @Success 200 {object} model.TOTPBackup
 // @Failure 400 {object} ErrorRes
 // @Router /user/totp/enable/confirm [put]
@@ -563,7 +563,7 @@ func (h *Handler) TotpEnableConfirm(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Param body body TotpConfirm true "TOTP confirm request"
+// @Param body body TotpReq true "TOTP confirm request"
 // @Success 200 {object} SuccessRes
 // @Failure 400 {object} ErrorRes
 // @Router /user/totp/disable [put]

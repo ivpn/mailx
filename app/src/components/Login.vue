@@ -40,11 +40,19 @@
                         type="text">
                     <p v-if="otpError" class="text-red-600 text-sm mb-2">Required</p>
                 </div>
-                <div class="flex items-center justify-between">
+                <div class="flex items-center w-full">
                     <button :disabled="isLoading"
-                        class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 focus:outline-none focus:shadow-outline"
+                        class="w-full bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 focus:outline-none focus:shadow-outline"
                         type="submit">
                         Log In
+                    </button>
+                </div>
+                <hr class="w-full my-6 dark:border-neutral-600">
+                <div class="flex items-center w-full">
+                    <button :disabled="isLoading"
+                        class="w-full bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 focus:outline-none focus:shadow-outline"
+                        type="button" @click="loginWithPasskey">
+                        Log In with Passkey
                     </button>
                 </div>
                 <p v-if="apiError" class="text-red-600 text-sm mt-6">Error: {{ apiError }}</p>
@@ -134,6 +142,10 @@ const login = async () => {
     } finally {
         isLoading.value = false // End loading
     }
+}
+
+const loginWithPasskey = async () => {
+    console.log('loginWithPasskey')
 }
 
 const isLoggedIn = () => {

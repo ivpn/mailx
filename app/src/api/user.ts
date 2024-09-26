@@ -3,7 +3,11 @@ import { setCookie } from 'typescript-cookie'
 
 export const userApi = {
     register: (data: any) => api.post('/register', data),
+    registerBegin: (data: any) => api.post('/register/begin', data),
+    registerFinish: (data: any) => api.post('/register/finish', data),
     login: (data: any) => api.post('/login', data),
+    loginBegin: (data: any) => api.post('/login/begin', data),
+    loginFinish: (data: any) => api.post('/login/finish', data),
     logout: () => api.post('/user/logout'),
     delete: (data: any) => api.post('/user/delete', data),
     sendOtp: () => api.post('/user/sendotp'),

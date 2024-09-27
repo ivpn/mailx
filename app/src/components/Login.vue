@@ -145,7 +145,35 @@ const login = async () => {
 }
 
 const loginWithPasskey = async () => {
-    console.log('loginWithPasskey')
+    console.log('Starting login')
+
+    isLoading.value = true // Start loading
+
+    const data = {
+        email: email.value
+    }
+
+    console.log('Request data:', data)
+
+    try {
+        const res = await userApi.loginBegin(data)
+        apiError.value = ''
+
+        const options = await res.data;
+        console.log('Received login options:', options)
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            console.error('Error response from /login/begin:', err);
+
+            apiError.value = err.response?.data.error || err.message
+
+            if (err.response?.status === 429) {
+                apiError.value = 'Too many requests, please try again later'
+            }
+        }
+    } finally {
+        isLoading.value = false // End loading
+    }
 }
 
 const isLoggedIn = () => {

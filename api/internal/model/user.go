@@ -115,6 +115,10 @@ func (u *User) UpdateCredential(credential *webauthn.Credential) {
 }
 
 func (u *User) UnmarshalCreds() error {
+	if u.Credentials == nil {
+		return nil
+	}
+
 	var creds []webauthn.Credential
 	if err := json.Unmarshal(u.Credentials, &creds); err != nil {
 		return err

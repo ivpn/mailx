@@ -99,7 +99,7 @@ func (s *Service) GetUserByPassword(ctx context.Context, userID string, password
 	return user, nil
 }
 
-func (s *Service) GetOrCreateUser(ctx context.Context, user model.User) (model.User, error) {
+func (s *Service) GetOrPostUser(ctx context.Context, user model.User) (model.User, error) {
 	user, err := s.Store.GetUserByEmail(ctx, user.Email)
 	if err != nil {
 		user, err = s.Store.PostUser(ctx, user)

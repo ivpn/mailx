@@ -1,8 +1,8 @@
 module ivpn.net/email/api
 
-go 1.23
+go 1.23.1
 
-toolchain go1.23.1
+toolchain go1.23
 
 require github.com/joho/godotenv v1.5.1
 

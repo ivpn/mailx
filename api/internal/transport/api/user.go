@@ -37,6 +37,7 @@ type UserService interface {
 	GetUserByPassword(context.Context, string, string) (model.User, error)
 	GetUserByEmail(context.Context, string) (model.User, error)
 	SaveUser(context.Context, model.User) error
+	GetOrCreateUser(context.Context, model.User) (model.User, error)
 	DeleteUser(context.Context, string) error
 	GetUser(context.Context, string) (model.User, error)
 	GetUserStats(context.Context, string) (model.UserStats, error)

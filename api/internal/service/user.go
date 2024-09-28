@@ -99,6 +99,19 @@ func (s *Service) GetUserByPassword(ctx context.Context, userID string, password
 	return user, nil
 }
 
+func (s *Service) GetOrCreateUser(ctx context.Context, user model.User) (model.User, error) {
+	user, err := s.Store.GetUserByEmail(ctx, user.Email)
+	if err != nil {
+		user, err = s.Store.PostUser(ctx, user)
+		if err != nil {
+			log.Printf("error creating user: %s", err.Error())
+			return model.User{}, ErrPostUser
+		}
+	}
+
+	return user, nil
+}
+
 func (s *Service) SaveUser(ctx context.Context, user model.User) error {
 	err := s.Store.SaveUser(ctx, user)
 	if err != nil {

@@ -64,8 +64,8 @@ func (h *Handler) BeginRegistration(c *fiber.Ctx) error {
 		IsActive: false,
 	}
 
-	// Save the user
-	err = h.Service.PostUser(c.Context(), user)
+	// Get or create user
+	user, err = h.Service.GetOrCreateUser(c.Context(), user)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),

@@ -76,7 +76,7 @@ func (h *Handler) BeginRegistration(c *fiber.Ctx) error {
 	options, sessionData, err := h.WebAuthn.BeginRegistration(user)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
-			"error": ErrBeginRegistration,
+			"error": err.Error(),
 		})
 	}
 
@@ -134,7 +134,7 @@ func (h *Handler) FinishRegistration(c *fiber.Ctx) error {
 	credential, err := h.WebAuthn.FinishRegistration(user, session.SessionData, r)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
-			"error": ErrFinishRegistration,
+			"error": err.Error(),
 		})
 	}
 
@@ -202,7 +202,7 @@ func (h *Handler) BeginLogin(c *fiber.Ctx) error {
 	options, sessionData, err := h.WebAuthn.BeginLogin(user)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
-			"error": ErrBeginLogin,
+			"error": err.Error(),
 		})
 	}
 
@@ -260,7 +260,7 @@ func (h *Handler) FinishLogin(c *fiber.Ctx) error {
 	credential, err := h.WebAuthn.FinishLogin(user, session.SessionData, r)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
-			"error": ErrFinishLogin,
+			"error": err.Error(),
 		})
 	}
 

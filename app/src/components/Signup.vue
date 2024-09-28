@@ -36,6 +36,14 @@
                         Sign Up
                     </button>
                 </div>
+                <hr class="w-full my-6 dark:border-neutral-600">
+                <div class="flex items-center w-full">
+                    <button :disabled="isLoading"
+                        class="w-full bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 focus:outline-none focus:shadow-outline"
+                        type="button" @click="registerWithPasskey">
+                        Sign Up with Passkey
+                    </button>
+                </div>
                 <p v-if="apiError" class="text-red-600 text-sm mt-6">Error: {{ apiError }}</p>
             </div>
             <div v-if="apiSuccess">
@@ -105,4 +113,37 @@ const register = async () => {
         isLoading.value = false // End loading
     }
 }
+
+const registerWithPasskey = async () => {
+    console.log('Starting signup with passkey')
+
+    isLoading.value = true // Start loading
+
+    const data = {
+        email: email.value
+    }
+
+    console.log('Request data:', data)
+
+    try {
+        const res = await userApi.registerBegin(data)
+        apiError.value = ''
+
+        const options = await res.data
+        console.log('Received register options:', options)
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            console.error('Error response from /register/begin:', err)
+
+            apiError.value = err.response?.data.error || err.message
+
+            if (err.response?.status === 429) {
+                apiError.value = 'Too many requests, please try again later'
+            }
+        }
+    } finally {
+        isLoading.value = false // End loading
+    }
+}
+
 </script>

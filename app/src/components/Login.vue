@@ -145,7 +145,7 @@ const login = async () => {
 }
 
 const loginWithPasskey = async () => {
-    console.log('Starting login')
+    console.log('Starting login  with passkey')
 
     isLoading.value = true // Start loading
 
@@ -159,11 +159,11 @@ const loginWithPasskey = async () => {
         const res = await userApi.loginBegin(data)
         apiError.value = ''
 
-        const options = await res.data;
+        const options = await res.data
         console.log('Received login options:', options)
     } catch (err) {
         if (axios.isAxiosError(err)) {
-            console.error('Error response from /login/begin:', err);
+            console.error('Error response from /login/begin:', err)
 
             apiError.value = err.response?.data.error || err.message
 

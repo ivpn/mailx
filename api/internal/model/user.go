@@ -114,6 +114,19 @@ func (u *User) UpdateCredential(credential *webauthn.Credential) {
 	}
 }
 
+func (u *User) RemoveCredential(credential *webauthn.Credential) {
+	for i, c := range u.creds {
+		if string(c.ID) == string(credential.ID) {
+			u.creds = append(u.creds[:i], u.creds[i+1:]...)
+		}
+	}
+
+	credsJSON, err := json.Marshal(u.creds)
+	if err == nil {
+		u.Credentials = credsJSON
+	}
+}
+
 func (u *User) UnmarshalCreds() error {
 	if u.Credentials == nil {
 		return nil

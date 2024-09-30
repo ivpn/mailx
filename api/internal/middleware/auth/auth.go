@@ -208,7 +208,6 @@ func NewCookieAuthn(token string, path string, cfg config.APIConfig) *fiber.Cook
 	return &fiber.Cookie{
 		Name:     AUTHN_COOKIE,
 		Value:    token,
-		Path:     path,
 		HTTPOnly: true,
 		Secure:   true,
 		MaxAge:   int(cfg.TokenExpiration),

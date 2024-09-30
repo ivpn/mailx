@@ -74,6 +74,7 @@
 import { onMounted, ref } from 'vue'
 import axios from 'axios'
 import { userApi } from '../api/user.ts'
+import { startAuthentication } from '@simplewebauthn/browser'
 
 const email = ref('')
 const password = ref('')
@@ -145,30 +146,33 @@ const login = async () => {
 }
 
 const loginWithPasskey = async () => {
-    console.log('Starting login  with passkey')
-
     isLoading.value = true // Start loading
 
     const data = {
         email: email.value
     }
 
-    console.log('Request data:', data)
-
     try {
-        const res = await userApi.loginBegin(data)
+        var res = await userApi.loginBegin(data)
+        const creds = await startAuthentication(res.data['publicKey'])
+        res = await userApi.loginFinish(creds)
         apiError.value = ''
-
-        const options = await res.data
-        console.log('Received login options:', options)
+        if (res.status === 200) {
+            // Redirect to the dashboard
+            localStorage.setItem('email', data.email)
+            window.location.href = '/'
+        }
     } catch (err) {
         if (axios.isAxiosError(err)) {
-            console.error('Error response from /login/begin:', err)
-
             apiError.value = err.response?.data.error || err.message
 
             if (err.response?.status === 429) {
                 apiError.value = 'Too many requests, please try again later'
+            }
+
+            if (err.response?.data.code === 70001) {
+                apiError.value = ''
+                otpRequired.value = true
             }
         }
     } finally {

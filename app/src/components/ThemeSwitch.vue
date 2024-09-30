@@ -42,12 +42,10 @@ const rowKey = ref(0)
 
 const toggleTheme = () => {
     if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        console.log('enable light')
         document.documentElement.classList.remove('dark')
         document.documentElement.classList.add('light')
         localStorage.theme = 'light'
     } else {
-        console.log('enable dark')
         document.documentElement.classList.remove('light')
         document.documentElement.classList.add('dark')
         localStorage.theme = 'dark'

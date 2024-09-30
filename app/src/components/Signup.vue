@@ -62,6 +62,7 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import { userApi } from '../api/user.ts'
+import { startRegistration } from '@simplewebauthn/browser'
 
 const email = ref('')
 const password = ref('')
@@ -115,26 +116,20 @@ const register = async () => {
 }
 
 const registerWithPasskey = async () => {
-    console.log('Starting signup with passkey')
-
     isLoading.value = true // Start loading
 
     const data = {
         email: email.value
     }
 
-    console.log('Request data:', data)
-
     try {
-        const res = await userApi.registerBegin(data)
+        var res = await userApi.registerBegin(data)
+        const creds = await startRegistration(res.data['publicKey'])
+        res = await userApi.registerFinish(creds)
+        apiSuccess.value = res.data.message
         apiError.value = ''
-
-        const options = await res.data
-        console.log('Received register options:', options)
     } catch (err) {
         if (axios.isAxiosError(err)) {
-            console.error('Error response from /register/begin:', err)
-
             apiError.value = err.response?.data.error || err.message
 
             if (err.response?.status === 429) {

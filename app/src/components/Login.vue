@@ -108,6 +108,10 @@ const validate = () => {
     return validEmail && validPass && validotp
 }
 
+const validateAuthn = () => {
+    return validateEmail()
+}
+
 const login = async () => {
     if (!validate()) return
 
@@ -146,6 +150,8 @@ const login = async () => {
 }
 
 const loginWithPasskey = async () => {
+    if (!validateAuthn()) return
+
     isLoading.value = true // Start loading
 
     const data = {

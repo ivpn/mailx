@@ -23,6 +23,8 @@ var (
 	ErrGetSession             = "could not get session"
 	ErrSaveSession            = "could not save session"
 	ErrDeleteSession          = "could not delete session"
+	ErrDeleteCredential       = "could not delete credential"
+	DeleteCredentialSuccess   = "Credential deleted"
 )
 
 type SessionService interface {
@@ -336,4 +338,29 @@ func (h *Handler) GetCredentials(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(credentials)
+}
+
+// @Summary Delete credential
+// @Description Delete credential by ID
+// @Tags webauthn
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path string true "Credential ID"
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /user/credential/{id} [delete]
+func (h *Handler) DeleteCredential(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
+	ID := c.Params("id")
+	err := h.Service.DeleteCredentialByID(c.Context(), ID, userID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": DeleteCredentialSuccess,
+	})
 }

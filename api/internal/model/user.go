@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"errors"
 	"strconv"
 
@@ -24,8 +23,7 @@ type User struct {
 	TotpBackup     string                `json:"-"`
 	TotpBackupUsed string                `json:"-"`
 	TotpEnabled    bool                  `gorm:"-" json:"totp_enabled"`
-	creds          []webauthn.Credential `gorm:"-" json:"-"`
-	Credentials    []byte                `gorm:"type:blob" json:"-"`
+	Creds          []webauthn.Credential `gorm:"-" json:"-"`
 }
 
 type UserStats struct {
@@ -69,7 +67,7 @@ func (u *User) VerifyTotp(otp string) (bool, error) {
 
 // WebAuthnCredentials implements webauthn.User
 func (u User) WebAuthnCredentials() []webauthn.Credential {
-	return u.creds
+	return u.Creds
 }
 
 // WebAuthnDisplayName implements webauthn.User
@@ -90,53 +88,4 @@ func (u User) WebAuthnIcon() string {
 // WebAuthnName implements webauthn.User
 func (u User) WebAuthnName() string {
 	return u.Email
-}
-
-func (u *User) AddCredential(credential *webauthn.Credential) {
-	u.creds = append(u.creds, *credential)
-
-	credsJSON, err := json.Marshal(u.creds)
-	if err == nil {
-		u.Credentials = credsJSON
-	}
-}
-
-func (u *User) UpdateCredential(credential *webauthn.Credential) {
-	for i, c := range u.creds {
-		if string(c.ID) == string(credential.ID) {
-			u.creds[i] = *credential
-		}
-	}
-
-	credsJSON, err := json.Marshal(u.creds)
-	if err == nil {
-		u.Credentials = credsJSON
-	}
-}
-
-func (u *User) RemoveCredential(credential *webauthn.Credential) {
-	for i, c := range u.creds {
-		if string(c.ID) == string(credential.ID) {
-			u.creds = append(u.creds[:i], u.creds[i+1:]...)
-		}
-	}
-
-	credsJSON, err := json.Marshal(u.creds)
-	if err == nil {
-		u.Credentials = credsJSON
-	}
-}
-
-func (u *User) UnmarshalCreds() error {
-	if u.Credentials == nil {
-		return nil
-	}
-
-	var creds []webauthn.Credential
-	if err := json.Unmarshal(u.Credentials, &creds); err != nil {
-		return err
-	}
-
-	u.creds = creds
-	return nil
 }

@@ -37,3 +37,7 @@ func (d *Database) SaveSession(ctx context.Context, sessionData webauthn.Session
 func (d *Database) DeleteSession(ctx context.Context, token string) error {
 	return d.Client.Where("token = ?", token).Delete(&model.Session{}).Error
 }
+
+func (d *Database) DeleteSessionByUserID(ctx context.Context, userID string) error {
+	return d.Client.Where("user_id = ?", userID).Delete(&model.Session{}).Error
+}

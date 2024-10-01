@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 
+	"github.com/go-webauthn/webauthn/webauthn"
 	"ivpn.net/email/api/internal/model"
 )
 
@@ -13,10 +14,19 @@ func (d *Database) GetUser(ctx context.Context, ID string) (model.User, error) {
 		return model.User{}, err
 	}
 
-	err = user.UnmarshalCreds()
+	var credentials []model.Credential
+	err = d.Client.Where("user_id = ?", user.ID).Find(&credentials).Error
 	if err != nil {
 		return model.User{}, err
 	}
+
+	var creds = []webauthn.Credential{}
+	for _, c := range credentials {
+		c.Unmarshal()
+		creds = append(creds, c.Cred)
+	}
+
+	user.Creds = creds
 
 	user.TotpEnabled = user.TotpSecret != ""
 	return user, nil
@@ -29,10 +39,19 @@ func (d *Database) GetUserByEmail(ctx context.Context, email string) (model.User
 		return model.User{}, err
 	}
 
-	err = user.UnmarshalCreds()
+	var credentials []model.Credential
+	err = d.Client.Where("user_id = ?", user.ID).Find(&credentials).Error
 	if err != nil {
 		return model.User{}, err
 	}
+
+	var creds = []webauthn.Credential{}
+	for _, c := range credentials {
+		c.Unmarshal()
+		creds = append(creds, c.Cred)
+	}
+
+	user.Creds = creds
 
 	user.TotpEnabled = user.TotpSecret != ""
 	return user, nil

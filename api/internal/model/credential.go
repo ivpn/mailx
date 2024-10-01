@@ -9,6 +9,7 @@ import (
 type Credential struct {
 	BaseModel
 	UserID string              `json:"user_id"`
+	CredID []byte              `gorm:"-" json:"cred_id"`
 	Cred   webauthn.Credential `gorm:"-" json:"-"`
 	Data   []byte              `gorm:"type:blob" json:"-"`
 }
@@ -24,5 +25,7 @@ func (c *Credential) Unmarshal() error {
 	}
 
 	c.Cred = cred
+	c.CredID = cred.ID
+
 	return nil
 }

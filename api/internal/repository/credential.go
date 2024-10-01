@@ -9,6 +9,23 @@ import (
 	"ivpn.net/email/api/internal/model"
 )
 
+func (d *Database) GetCredentials(ctx context.Context, userID string) ([]model.Credential, error) {
+	var credentials []model.Credential
+	err := d.Client.Where("user_id = ?", userID).Find(&credentials).Error
+	if err != nil {
+		return nil, err
+	}
+
+	for i := range credentials {
+		err = credentials[i].Unmarshal()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return credentials, nil
+}
+
 func (d *Database) SaveCredential(ctx context.Context, credential webauthn.Credential, userID string) error {
 	data, err := json.Marshal(credential)
 	if err != nil {

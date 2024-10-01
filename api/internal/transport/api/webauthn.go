@@ -32,6 +32,7 @@ type SessionService interface {
 }
 
 type CredentialService interface {
+	GetCredentials(context.Context, string) ([]model.Credential, error)
 	SaveCredential(context.Context, webauthn.Credential, string) error
 	UpdateCredential(context.Context, webauthn.Credential, string) error
 	DeleteCredential(context.Context, webauthn.Credential, string) error
@@ -314,4 +315,25 @@ func (h *Handler) FinishLogin(c *fiber.Ctx) error {
 	return c.Status(200).JSON(fiber.Map{
 		"message": FinishLoginSuccess,
 	})
+}
+
+// @Summary Get credentials
+// @Description Get user credentials
+// @Tags webauthn
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} []model.Credential
+// @Failure 400 {object} ErrorRes
+// @Router /user/credentials [get]
+func (h *Handler) GetCredentials(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
+	credentials, err := h.Service.GetCredentials(c.Context(), userID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(credentials)
 }

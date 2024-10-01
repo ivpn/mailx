@@ -44,6 +44,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Post("/user/delete", limit.New(5, 10*time.Minute), h.DeleteUser)
 	v1.Get("/user", h.GetUser)
 	v1.Get("/user/stats", h.GetUserStats)
+	v1.Get("/user/credentials", h.GetCredentials)
 	v1.Put("/user/changepassword", limit.New(5, 10*time.Minute), h.ChangePassword)
 	v1.Put("/user/totp/enable", limit.New(5, 10*time.Minute), h.TotpEnable)
 	v1.Put("/user/totp/enable/confirm", limit.New(5, 10*time.Minute), h.TotpEnableConfirm)

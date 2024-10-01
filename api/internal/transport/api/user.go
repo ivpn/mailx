@@ -41,7 +41,7 @@ type UserService interface {
 	DeleteUser(context.Context, string) error
 	GetUser(context.Context, string) (model.User, error)
 	GetUserStats(context.Context, string) (model.UserStats, error)
-	LogoutUser(context.Context, string, time.Duration) error
+	LogoutUser(context.Context, string, time.Duration, string) error
 	ChangePassword(context.Context, string, string) error
 	InitiatePasswordReset(context.Context, string) error
 	ResetPassword(context.Context, string, string) error
@@ -249,6 +249,7 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 // @Failure 400 {object} ErrorRes
 // @Router /user/logout [post]
 func (h *Handler) Logout(c *fiber.Ctx) error {
+	authnToken := auth.GetAuthnToken(c)
 	jwt := auth.GetToken(c)
 	jwtSignature := auth.GetTokenSignature(jwt)
 	jwtExp, err := auth.GetTokenExp(h.Cfg, c)
@@ -258,7 +259,7 @@ func (h *Handler) Logout(c *fiber.Ctx) error {
 		})
 	}
 
-	err = h.Service.LogoutUser(c.Context(), jwtSignature, jwtExp)
+	err = h.Service.LogoutUser(c.Context(), jwtSignature, jwtExp, authnToken)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
@@ -266,6 +267,7 @@ func (h *Handler) Logout(c *fiber.Ctx) error {
 	}
 
 	c.ClearCookie(auth.AUTH_COOKIE)
+	c.ClearCookie(auth.AUTHN_COOKIE)
 
 	return c.Status(200).JSON(fiber.Map{
 		"message": LogoutSuccess,

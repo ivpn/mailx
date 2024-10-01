@@ -326,10 +326,16 @@ func (s *Service) GetUserStats(ctx context.Context, userID string) (model.UserSt
 	return stats, nil
 }
 
-func (s *Service) LogoutUser(ctx context.Context, jwtSignature string, jwtExp time.Duration) error {
+func (s *Service) LogoutUser(ctx context.Context, jwtSignature string, jwtExp time.Duration, authnToken string) error {
 	err := s.Cache.Set(ctx, "logout_"+jwtSignature, "true", jwtExp)
 	if err != nil {
 		log.Printf("error saving jwt: %s", err.Error())
+		return ErrLogoutUser
+	}
+
+	err = s.Store.DeleteSession(ctx, authnToken)
+	if err != nil {
+		log.Printf("error deleting session: %s", err.Error())
 		return ErrLogoutUser
 	}
 

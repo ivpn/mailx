@@ -159,6 +159,10 @@ func GetToken(c *fiber.Ctx) string {
 	return tokenString
 }
 
+func GetAuthnToken(c *fiber.Ctx) string {
+	return c.Cookies(AUTHN_COOKIE)
+}
+
 func GetTokenExp(cfg config.APIConfig, c *fiber.Ctx) (time.Duration, error) {
 	jwtString := GetToken(c)
 	token, err := jwt.Parse(jwtString, func(token *jwt.Token) (interface{}, error) {

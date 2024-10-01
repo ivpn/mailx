@@ -15,6 +15,7 @@ type Store interface {
 	MessageStore
 	SettingsStore
 	SessionStore
+	CredentialStore
 }
 
 type Cache interface {

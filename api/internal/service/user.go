@@ -295,6 +295,18 @@ func (s *Service) DeleteUser(ctx context.Context, userID string) error {
 		return ErrDeleteUser
 	}
 
+	err = s.Store.DeleteCredentialByUserID(ctx, userID)
+	if err != nil {
+		log.Printf("error deleting user: %s", err.Error())
+		return ErrDeleteUser
+	}
+
+	err = s.Store.DeleteSessionByUserID(ctx, userID)
+	if err != nil {
+		log.Printf("error deleting user: %s", err.Error())
+		return ErrDeleteUser
+	}
+
 	err = s.Store.DeleteUser(ctx, userID)
 	if err != nil {
 		log.Printf("error deleting user: %s", err.Error())

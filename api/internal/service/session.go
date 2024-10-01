@@ -18,6 +18,7 @@ type SessionStore interface {
 	GetSession(context.Context, string) (model.Session, bool, error)
 	SaveSession(context.Context, webauthn.SessionData, string, string) error
 	DeleteSession(context.Context, string) error
+	DeleteSessionByUserID(context.Context, string) error
 }
 
 func (s *Service) GetSession(ctx context.Context, token string) (model.Session, bool, error) {

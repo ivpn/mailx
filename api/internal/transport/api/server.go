@@ -19,6 +19,7 @@ type Service interface {
 	SettingsService
 	ProcessorService
 	SessionService
+	CredentialService
 }
 
 type Handler struct {

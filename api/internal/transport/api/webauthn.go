@@ -31,6 +31,13 @@ type SessionService interface {
 	DeleteSession(context.Context, string) error
 }
 
+type CredentialService interface {
+	SaveCredential(context.Context, webauthn.Credential, string) error
+	UpdateCredential(context.Context, webauthn.Credential, string) error
+	DeleteCredential(context.Context, webauthn.Credential, string) error
+	DeleteCredentialByID(context.Context, string, string) error
+}
+
 // @Summary Begin registration
 // @Description Begin registration process
 // @Tags webauthn
@@ -139,8 +146,7 @@ func (h *Handler) FinishRegistration(c *fiber.Ctx) error {
 	}
 
 	// Add credential to user
-	user.AddCredential(credential)
-	err = h.Service.SaveUser(c.Context(), user)
+	err = h.Service.SaveCredential(c.Context(), *credential, user.ID)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
@@ -271,8 +277,7 @@ func (h *Handler) FinishLogin(c *fiber.Ctx) error {
 	}
 
 	// Update user credential
-	user.UpdateCredential(credential)
-	err = h.Service.SaveUser(c.Context(), user)
+	err = h.Service.UpdateCredential(c.Context(), *credential, user.ID)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),

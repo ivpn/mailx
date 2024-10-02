@@ -1,27 +1,26 @@
 <template>
     <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-neutral-900">
         <h1 class="text-3xl text-gray-800 dark:text-gray-100 font-semibold mb-2">Sign Up</h1>
-        <p class="text-gray-500 dark:text-gray-400 mb-8">Have an account? <a
-                class="text-bluish-500 hover:text-bluish-600" href="/login">Log In</a></p>
-        <form class="w-full max-w-sm bg-white dark:bg-neutral-800 px-8 pt-6 pb-8 mb-4" @submit.prevent="register">
-            <div class="border-b border-gray-200 dark:border-neutral-600">
+        <p class="text-gray-500 dark:text-gray-400 mb-8">Have an account? <a class="text-bluish-500 hover:text-bluish-600" href="/login">Log In</a></p>
+        <form class="w-full max-w-sm bg-white dark:bg-neutral-800 px-8 pt-6 pb-8 mb-4" @submit.prevent="">
+            <div v-if="passkeySupported" class="border-b border-gray-200 dark:border-neutral-600">
                 <nav class="flex gap-x-1" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
                     <button type="button"
-                        class="hs-tab-active:font-semibold hs-tab-active:border-bluish-500 hs-tab-active:text-bluish-500 py-4 px-1 text-center basis-0 grow inline-flex justify-center items-center gap-x-2 border-b-2 border-transparent text-sm whitespace-nowrap text-gray-500 hover:text-bluish-500 focus:outline-none focus:text-bluish-500 disabled:opacity-50 disabled:pointer-events-none dark:text-neutral-400 dark:hover:text-bluish-500 active"
+                        class="hs-tab-active:font-semibold hs-tab-active:border-bluish-500 hs-tab-active:text-bluish-500 py-4 px-1 text-center basis-0 grow inline-flex justify-center items-center gap-x-2 border-b-2 border-transparent whitespace-nowrap text-gray-500 hover:text-bluish-500 focus:outline-none focus:text-bluish-500 disabled:opacity-50 disabled:pointer-events-none dark:text-neutral-400 dark:hover:text-bluish-500 active"
                         id="tabs-with-underline-item-1" aria-selected="true" data-hs-tab="#tabs-with-underline-1"
                         aria-controls="tabs-with-underline-1" role="tab">
                         Passkey
                     </button>
                     <button type="button"
-                        class="hs-tab-active:font-semibold hs-tab-active:border-bluish-500 hs-tab-active:text-bluish-500 py-4 px-1 text-center basis-0 grow inline-flex justify-center items-center gap-x-2 border-b-2 border-transparent text-sm whitespace-nowrap text-gray-500 hover:text-bluish-500 focus:outline-none focus:text-bluish-500 disabled:opacity-50 disabled:pointer-events-none dark:text-neutral-400 dark:hover:text-bluish-500"
+                        class="hs-tab-active:font-semibold hs-tab-active:border-bluish-500 hs-tab-active:text-bluish-500 py-4 px-1 text-center basis-0 grow inline-flex justify-center items-center gap-x-2 border-b-2 border-transparent whitespace-nowrap text-gray-500 hover:text-bluish-500 focus:outline-none focus:text-bluish-500 disabled:opacity-50 disabled:pointer-events-none dark:text-neutral-400 dark:hover:text-bluish-500"
                         id="tabs-with-underline-item-2" aria-selected="false" data-hs-tab="#tabs-with-underline-2"
                         aria-controls="tabs-with-underline-2" role="tab">
                         Email & Password
                     </button>
                 </nav>
             </div>
-            <div class="mt-6">
-                <div id="tabs-with-underline-1" role="tabpanel" aria-labelledby="tabs-with-underline-item-1">
+            <div v-bind:class="{ 'mt-6': passkeySupported }">
+                <div v-if="passkeySupported" id="tabs-with-underline-1" role="tabpanel" aria-labelledby="tabs-with-underline-item-1">
                     <div v-if="!apiSuccess">
                         <div class="mb-4">
                             <label class="block text-gray-500 dark:text-gray-400 mb-2" for="email_authn">
@@ -44,7 +43,10 @@
                         <p v-if="apiError" class="text-red-600 text-sm mt-6">Error: {{ apiError }}</p>
                     </div>
                 </div>
-                <div id="tabs-with-underline-2" class="hidden" role="tabpanel"
+                <div
+                    id="tabs-with-underline-2"
+                    v-bind:class="{ 'hidden': passkeySupported }"
+                    role="tabpanel"
                     aria-labelledby="tabs-with-underline-item-2">
                     <div v-if="!apiSuccess">
                         <div class="mb-4">
@@ -72,7 +74,7 @@
                         <div class="flex items-center w-full">
                             <button :disabled="isLoading"
                                 class="w-full bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 focus:outline-none focus:shadow-outline"
-                                type="submit">
+                                type="button" @click="register">
                                 Sign Up
                             </button>
                         </div>
@@ -95,7 +97,7 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { userApi } from '../api/user.ts'
-import { startRegistration } from '@simplewebauthn/browser'
+import { startRegistration, browserSupportsWebAuthn } from '@simplewebauthn/browser'
 import tabs from '@preline/tabs'
 
 const email = ref('')
@@ -107,6 +109,7 @@ const passwordError = ref(false)
 const apiSuccess = ref('')
 const apiError = ref('')
 const isLoading = ref(false)
+const passkeySupported = ref(false)
 
 const validateEmail = () => {
     emailError.value = !email.value
@@ -162,7 +165,7 @@ const registerWithPasskey = async () => {
     isLoading.value = true // Start loading
 
     const data = {
-        email: email.value
+        email: emailAuthn.value
     }
 
     try {
@@ -186,5 +189,6 @@ const registerWithPasskey = async () => {
 
 onMounted(() => {
     tabs.autoInit()
+    passkeySupported.value = browserSupportsWebAuthn()
 })
 </script>

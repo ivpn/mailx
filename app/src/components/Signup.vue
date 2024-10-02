@@ -27,11 +27,11 @@
                                 Email Address
                             </label>
                             <input v-model="emailAuthn"
-                                v-bind:class="{ 'border-gray-500': !emailErrorAuthn, 'border-red-600 dark:border-red-600': emailErrorAuthn }"
+                                v-bind:class="{ 'border-gray-500': !emailAuthnError, 'border-red-600 dark:border-red-600': emailAuthnError }"
                                 placeholder="name@example.net"
                                 class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 dark:bg-neutral-800 dark:border-gray-500 dark:text-gray-400"
                                 id="email_authn" type="email">
-                            <p v-if="emailErrorAuthn" class="text-red-600 text-sm">Required</p>
+                            <p v-if="emailAuthnError" class="text-red-600 text-sm">Required</p>
                         </div>
                         <div class="flex items-center w-full">
                             <button :disabled="isLoading"
@@ -104,7 +104,7 @@ const email = ref('')
 const emailAuthn = ref('')
 const password = ref('')
 const emailError = ref(false)
-const emailErrorAuthn = ref(false)
+const emailAuthnError = ref(false)
 const passwordError = ref(false)
 const apiSuccess = ref('')
 const apiError = ref('')
@@ -117,8 +117,8 @@ const validateEmail = () => {
 }
 
 const validateEmailAuthn = () => {
-    emailErrorAuthn.value = !emailAuthn.value
-    return !emailErrorAuthn.value
+    emailAuthnError.value = !emailAuthn.value
+    return !emailAuthnError.value
 }
 
 const validatePassword = () => {

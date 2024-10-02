@@ -22,6 +22,7 @@ export const userApi = {
     totpDisable: (data: any) => api.put('/user/totp/disable', data),
     clearSession: () => {
         setCookie('auth', '')
+        setCookie('authn', '')
         localStorage.removeItem('email')
         window.location.href = '/login'
     },

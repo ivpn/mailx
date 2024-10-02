@@ -4,7 +4,7 @@
         <p class="text-gray-500 dark:text-gray-400 mb-8">Need an account?
             <a class="text-bluish-500 hover:text-bluish-600" href="/signup">Sign Up</a>
         </p>
-        <form class="w-full max-w-sm bg-white dark:bg-neutral-800 px-8 pt-6 pb-8 mb-4" @submit.prevent="login">
+        <form class="w-full max-w-sm bg-white dark:bg-neutral-800 px-8 pt-6 pb-8 mb-4" @submit.prevent="">
             <div v-if="passkeySupported" class="border-b border-gray-200 dark:border-neutral-600">
                 <nav class="flex gap-x-1" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
                     <button type="button"
@@ -89,9 +89,6 @@
                     </div>
                 </div>
             </div>
-
-
-
             <div v-if="isLoggedIn()" class="pb-2">
                 <p class="text-gray-500 dark:text-gray-400 mb-6">You are logged in</p>
                 <a href="/"
@@ -100,8 +97,9 @@
                 </a>
             </div>
         </form>
-        <p class="text-gray-500 dark:text-gray-400 my-5"><a class="text-bluish-500 hover:text-bluish-600"
-                href="/reset/password/initiate">Forgot Your Password?</a></p>
+        <p class="text-gray-500 dark:text-gray-400 my-5">
+            <a class="text-bluish-500 hover:text-bluish-600" href="/reset/password/initiate">Forgot Your Password?</a>
+        </p>
     </div>
 </template>
 

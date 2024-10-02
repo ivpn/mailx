@@ -1,55 +1,88 @@
 <template>
     <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-neutral-900">
         <h1 class="text-3xl text-gray-800 dark:text-gray-100 font-semibold mb-2">Sign Up</h1>
-        <p class="text-gray-500 dark:text-gray-400 mb-8">Have an account? <a class="text-bluish-500 hover:text-bluish-600" href="/login">Log In</a></p>
+        <p class="text-gray-500 dark:text-gray-400 mb-8">Have an account? <a
+                class="text-bluish-500 hover:text-bluish-600" href="/login">Log In</a></p>
         <form class="w-full max-w-sm bg-white dark:bg-neutral-800 px-8 pt-6 pb-8 mb-4" @submit.prevent="register">
-            <div v-if="!apiSuccess">
-                <div class="mb-4">
-                    <label class="block text-gray-500 dark:text-gray-400 mb-2" for="email">
-                        Email Address
-                    </label>
-                    <input
-                        v-model="email"
-                        v-bind:class="{ 'border-gray-500': !emailError, 'border-red-600 dark:border-red-600': emailError }"
-                        placeholder="name@example.net"
-                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 dark:bg-neutral-800 dark:border-gray-500 dark:text-gray-400"
-                        id="email" type="email">
-                    <p v-if="emailError" class="text-red-600 text-sm">Required</p>
-                </div>
-                <div class="mb-6">
-                    <label class="block text-gray-500 dark:text-gray-400 mb-2" for="password">
-                        Password
-                    </label>
-                    <input
-                        v-model="password"
-                        v-bind:class="{ 'border-gray-500': !passwordError, 'border-red-600 dark:border-red-600': passwordError }"
-                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 dark:bg-neutral-800 dark:border-gray-500 dark:text-gray-400"
-                        id="password" type="password">
-                    <p v-if="passwordError" class="text-red-600 text-sm mb-2">Required</p>
-                    <p class="text-gray-500 dark:text-gray-400 text-sm mb-2">Must be at least 8 characters</p>
-                </div>
-                <div class="flex items-center justify-between">
-                    <button
-                        :disabled="isLoading"
-                        class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 focus:outline-none focus:shadow-outline"
-                        type="submit">
-                        Sign Up
+            <div class="border-b border-gray-200 dark:border-neutral-600">
+                <nav class="flex gap-x-1" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
+                    <button type="button"
+                        class="hs-tab-active:font-semibold hs-tab-active:border-bluish-500 hs-tab-active:text-bluish-500 py-4 px-1 text-center basis-0 grow inline-flex justify-center items-center gap-x-2 border-b-2 border-transparent text-sm whitespace-nowrap text-gray-500 hover:text-bluish-500 focus:outline-none focus:text-bluish-500 disabled:opacity-50 disabled:pointer-events-none dark:text-neutral-400 dark:hover:text-bluish-500 active"
+                        id="tabs-with-underline-item-1" aria-selected="true" data-hs-tab="#tabs-with-underline-1"
+                        aria-controls="tabs-with-underline-1" role="tab">
+                        Passkey
                     </button>
-                </div>
-                <hr class="w-full my-6 dark:border-neutral-600">
-                <div class="flex items-center w-full">
-                    <button :disabled="isLoading"
-                        class="w-full bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 focus:outline-none focus:shadow-outline"
-                        type="button" @click="registerWithPasskey">
-                        Sign Up with Passkey
+                    <button type="button"
+                        class="hs-tab-active:font-semibold hs-tab-active:border-bluish-500 hs-tab-active:text-bluish-500 py-4 px-1 text-center basis-0 grow inline-flex justify-center items-center gap-x-2 border-b-2 border-transparent text-sm whitespace-nowrap text-gray-500 hover:text-bluish-500 focus:outline-none focus:text-bluish-500 disabled:opacity-50 disabled:pointer-events-none dark:text-neutral-400 dark:hover:text-bluish-500"
+                        id="tabs-with-underline-item-2" aria-selected="false" data-hs-tab="#tabs-with-underline-2"
+                        aria-controls="tabs-with-underline-2" role="tab">
+                        Email & Password
                     </button>
+                </nav>
+            </div>
+            <div class="mt-6">
+                <div id="tabs-with-underline-1" role="tabpanel" aria-labelledby="tabs-with-underline-item-1">
+                    <div v-if="!apiSuccess">
+                        <div class="mb-4">
+                            <label class="block text-gray-500 dark:text-gray-400 mb-2" for="email_authn">
+                                Email Address
+                            </label>
+                            <input v-model="emailAuthn"
+                                v-bind:class="{ 'border-gray-500': !emailErrorAuthn, 'border-red-600 dark:border-red-600': emailErrorAuthn }"
+                                placeholder="name@example.net"
+                                class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 dark:bg-neutral-800 dark:border-gray-500 dark:text-gray-400"
+                                id="email_authn" type="email">
+                            <p v-if="emailErrorAuthn" class="text-red-600 text-sm">Required</p>
+                        </div>
+                        <div class="flex items-center w-full">
+                            <button :disabled="isLoading"
+                                class="w-full bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 focus:outline-none focus:shadow-outline"
+                                type="button" @click="registerWithPasskey">
+                                Sign Up
+                            </button>
+                        </div>
+                        <p v-if="apiError" class="text-red-600 text-sm mt-6">Error: {{ apiError }}</p>
+                    </div>
                 </div>
-                <p v-if="apiError" class="text-red-600 text-sm mt-6">Error: {{ apiError }}</p>
+                <div id="tabs-with-underline-2" class="hidden" role="tabpanel"
+                    aria-labelledby="tabs-with-underline-item-2">
+                    <div v-if="!apiSuccess">
+                        <div class="mb-4">
+                            <label class="block text-gray-500 dark:text-gray-400 mb-2" for="email">
+                                Email Address
+                            </label>
+                            <input v-model="email"
+                                v-bind:class="{ 'border-gray-500': !emailError, 'border-red-600 dark:border-red-600': emailError }"
+                                placeholder="name@example.net"
+                                class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 dark:bg-neutral-800 dark:border-gray-500 dark:text-gray-400"
+                                id="email" type="email">
+                            <p v-if="emailError" class="text-red-600 text-sm">Required</p>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-gray-500 dark:text-gray-400 mb-2" for="password">
+                                Password
+                            </label>
+                            <input v-model="password"
+                                v-bind:class="{ 'border-gray-500': !passwordError, 'border-red-600 dark:border-red-600': passwordError }"
+                                class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 dark:bg-neutral-800 dark:border-gray-500 dark:text-gray-400"
+                                id="password" type="password">
+                            <p v-if="passwordError" class="text-red-600 text-sm mb-2">Required</p>
+                            <p class="text-gray-500 dark:text-gray-400 text-sm mb-2">Must be at least 8 characters</p>
+                        </div>
+                        <div class="flex items-center w-full">
+                            <button :disabled="isLoading"
+                                class="w-full bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 focus:outline-none focus:shadow-outline"
+                                type="submit">
+                                Sign Up
+                            </button>
+                        </div>
+                        <p v-if="apiError" class="text-red-600 text-sm mt-6">Error: {{ apiError }}</p>
+                    </div>
+                </div>
             </div>
             <div v-if="apiSuccess">
                 <p class="text-emerald-600 dark:text-emerald-500 text-sm mb-6">{{ apiSuccess }}</p>
-                <a
-                    href="/login"
+                <a href="/login"
                     class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 focus:outline-none focus:shadow-outline">
                     Proceed to Log In
                 </a>
@@ -59,14 +92,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { userApi } from '../api/user.ts'
 import { startRegistration } from '@simplewebauthn/browser'
+import tabs from '@preline/tabs'
 
 const email = ref('')
+const emailAuthn = ref('')
 const password = ref('')
 const emailError = ref(false)
+const emailErrorAuthn = ref(false)
 const passwordError = ref(false)
 const apiSuccess = ref('')
 const apiError = ref('')
@@ -75,6 +111,11 @@ const isLoading = ref(false)
 const validateEmail = () => {
     emailError.value = !email.value
     return !emailError.value
+}
+
+const validateEmailAuthn = () => {
+    emailErrorAuthn.value = !emailAuthn.value
+    return !emailErrorAuthn.value
 }
 
 const validatePassword = () => {
@@ -88,13 +129,9 @@ const validate = () => {
     return validEmail && validPass
 }
 
-const validateAuthn = () => {
-    return validateEmail()
-}
-
 const register = async () => {
     if (!validate()) return
-    
+
     isLoading.value = true // Start loading
     const data = {
         email: email.value,
@@ -120,8 +157,8 @@ const register = async () => {
 }
 
 const registerWithPasskey = async () => {
-    if (!validateAuthn()) return
-    
+    if (!validateEmailAuthn()) return
+
     isLoading.value = true // Start loading
 
     const data = {
@@ -147,4 +184,7 @@ const registerWithPasskey = async () => {
     }
 }
 
+onMounted(() => {
+    tabs.autoInit()
+})
 </script>

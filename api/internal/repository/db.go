@@ -40,14 +40,24 @@ func (d *Database) Close() error {
 }
 
 func connect(cfg config.DBConfig) (*gorm.DB, error) {
-	dsn := cfg.User + ":" + cfg.Password + "@tcp(" + cfg.Host + ":" + cfg.Port + ")/" + cfg.Name + "?charset=utf8mb4&parseTime=True&loc=Local"
-
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+	config := &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
-	})
+	}
+
+	dsn_main := cfg.User + ":" + cfg.Password + "@tcp(" + cfg.Host + ":" + cfg.Port + ")/" + cfg.Name + "?charset=utf8mb4&parseTime=True&loc=Local"
+
+	db, err := gorm.Open(mysql.Open(dsn_main), config)
 	if err != nil {
 		return nil, err
 	}
+
+	// DBResolver adds multiple databases support to GORM
+	// https://github.com/go-gorm/dbresolver
+	// db.Use(dbresolver.Register(dbresolver.Config{
+	// 	Sources:  []gorm.Dialector{mysql.Open(dsn_main)},
+	// 	Replicas: []gorm.Dialector{mysql.Open(dsn_main)},
+	// 	Policy:   dbresolver.RandomPolicy{},
+	// }))
 
 	log.Println("DB connection OK")
 

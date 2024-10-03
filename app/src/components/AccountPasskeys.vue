@@ -39,47 +39,17 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200 dark:divide-neutral-600">
-                                <tr>
+                                <tr v-for="cred in list">
                                     <td class="pr-5 py-4 whitespace-nowrap text-start text-sm">
-                                        2021-09-01 12:34:56
+                                        {{ new Date(cred.created_at).toDateString() }}
                                     </td>
                                     <td class="px-5 py-4 whitespace-nowrap text-start text-sm">
-                                        1234567890
+                                        {{ cred.cred_id }}
                                     </td>
                                     <td class="pl-5 py-4 whitespace-nowrap text-end text-sm">
-                                        <button @click=""
+                                        <button @click="deleteCred(cred.id)"
                                             class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600 font-medium text-sm py-2 focus:outline-none focus:shadow-outline"
-                                            type="submit">
-                                            Delete
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="pr-5 py-4 whitespace-nowrap text-start text-sm">
-                                        2021-09-01 12:34:56
-                                    </td>
-                                    <td class="px-5 py-4 whitespace-nowrap text-start text-sm">
-                                        1234567890
-                                    </td>
-                                    <td class="pl-5 py-4 whitespace-nowrap text-end text-sm">
-                                        <button @click=""
-                                            class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600 font-medium text-sm py-2 focus:outline-none focus:shadow-outline"
-                                            type="submit">
-                                            Delete
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="pr-5 py-4 whitespace-nowrap text-start text-sm">
-                                        2021-09-01 12:34:56
-                                    </td>
-                                    <td class="px-5 py-4 whitespace-nowrap text-start text-sm">
-                                        1234567890
-                                    </td>
-                                    <td class="pl-5 py-4 whitespace-nowrap text-end text-sm">
-                                        <button @click=""
-                                            class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600 font-medium text-sm py-2 focus:outline-none focus:shadow-outline"
-                                            type="submit">
+                                            type="button">
                                             Delete
                                         </button>
                                     </td>
@@ -95,5 +65,46 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
+import axios from 'axios'
+import { userApi } from '../api/user.ts'
 
+const credential = {
+    id: '',
+    cred_id: '',
+    created_at: '',
+}
+
+const list = ref([] as typeof credential[])
+const error = ref('')
+
+const getList = async () => {
+    try {
+        const res = await userApi.getCredentials()
+        list.value = res.data
+        error.value = ''
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.message
+        }
+    }
+}
+
+const deleteCred = async (id: string) => {
+    if (!confirm('Are you sure you want to delete Passkey?')) return
+
+    try {
+        await userApi.deleteCredential(id)
+        list.value = list.value.filter((cred: any) => cred.id !== id)
+        error.value = ''
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.message
+        }
+    }
+}
+
+onMounted(() => {
+    getList()
+})
 </script>

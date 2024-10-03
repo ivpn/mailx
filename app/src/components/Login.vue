@@ -39,10 +39,10 @@
                             <button :disabled="isLoading"
                                 class="w-full bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 focus:outline-none focus:shadow-outline"
                                 type="button" @click="loginWithPasskey">
-                                Log In
+                                Log In with Passkey
                             </button>
                         </div>
-                        <p v-if="apiError" class="text-red-600 text-sm mt-6">Error: {{ apiError }}</p>
+                        <p v-if="error" class="text-red-600 text-sm mt-6">Error: {{ error }}</p>
                     </div>
                 </div>
                 <div id="tabs-with-underline-2" v-bind:class="{ 'hidden': passkeySupported }" role="tabpanel"
@@ -85,7 +85,7 @@
                                 Log In
                             </button>
                         </div>
-                        <p v-if="apiError" class="text-red-600 text-sm mt-6">Error: {{ apiError }}</p>
+                        <p v-if="error" class="text-red-600 text-sm mt-6">Error: {{ error }}</p>
                     </div>
                 </div>
             </div>
@@ -107,7 +107,7 @@
 import { onMounted, ref } from 'vue'
 import axios from 'axios'
 import { userApi } from '../api/user.ts'
-import { startAuthentication, browserSupportsWebAuthn } from '@simplewebauthn/browser'
+import { startAuthentication, startRegistration, browserSupportsWebAuthn } from '@simplewebauthn/browser'
 import tabs from '@preline/tabs'
 
 const email = ref('')
@@ -119,7 +119,7 @@ const emailAuthnError = ref(false)
 const passwordError = ref(false)
 const otpError = ref(false)
 const otpRequired = ref(false)
-const apiError = ref('')
+const error = ref('')
 const isLoading = ref(false)
 const passkeySupported = ref(false)
 
@@ -163,7 +163,7 @@ const login = async () => {
 
     try {
         const response = await userApi.login(data)
-        apiError.value = ''
+        error.value = ''
         if (response.status === 200) {
             // Redirect to the dashboard
             localStorage.setItem('email', data.email)
@@ -171,14 +171,14 @@ const login = async () => {
         }
     } catch (err) {
         if (axios.isAxiosError(err)) {
-            apiError.value = err.response?.data.error || err.message
+            error.value = err.response?.data.error || err.message
 
             if (err.response?.status === 429) {
-                apiError.value = 'Too many requests, please try again later'
+                error.value = 'Too many requests, please try again later'
             }
 
             if (err.response?.data.code === 70001) {
-                apiError.value = ''
+                error.value = ''
                 otpRequired.value = true
             }
         }
@@ -200,7 +200,7 @@ const loginWithPasskey = async () => {
         var res = await userApi.loginBegin(data)
         const creds = await startAuthentication(res.data['publicKey'])
         res = await userApi.loginFinish(creds)
-        apiError.value = ''
+        error.value = ''
         if (res.status === 200) {
             // Redirect to the dashboard
             localStorage.setItem('email', data.email)
@@ -208,14 +208,46 @@ const loginWithPasskey = async () => {
         }
     } catch (err) {
         if (axios.isAxiosError(err)) {
-            apiError.value = err.response?.data.error || err.message
+            // Passkey not found, add new passkey
+            if (err.response?.data.code === 70002) {
+                addPasskey()
+                return
+            }
+
+            error.value = err.response?.data.error || err.message
 
             if (err.response?.status === 429) {
-                apiError.value = 'Too many requests, please try again later'
+                error.value = 'Too many requests, please try again later'
             }
         }
     } finally {
         isLoading.value = false // End loading
+    }
+}
+
+const addPasskey = async () => {
+    const data = {
+        email: emailAuthn.value
+    }
+
+    try {
+        var res = await userApi.registerBegin(data)
+        const creds = await startRegistration(res.data['publicKey'])
+        res = await userApi.registerFinish(creds)
+        error.value = ''
+        if (res.status === 200) {
+            // Redirect to the dashboard
+            localStorage.setItem('email', data.email)
+            window.location.href = '/'
+        }
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.response?.data.error || err.message
+
+            if (err.response?.status === 429) {
+                error.value = 'Too many requests, please try again later'
+            }
+        }
     }
 }
 

@@ -167,6 +167,22 @@ func (h *Handler) FinishRegistration(c *fiber.Ctx) error {
 	// Clear cookie
 	c.ClearCookie(auth.AUTHN_TEMP_COOKIE)
 
+	// Save the session
+	sessionData := webauthn.SessionData{
+		UserID:  user.WebAuthnID(),
+		Expires: time.Now().Add(h.Cfg.TokenExpiration),
+	}
+	token = model.GenSessionToken()
+	err = h.Service.SaveSession(c.Context(), sessionData, token, user.ID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrSaveSession,
+		})
+	}
+
+	// Set token in cookie
+	c.Cookie(auth.NewCookieAuthn(token, "/", h.Cfg))
+
 	return c.Status(200).JSON(fiber.Map{
 		"message": FinishRegistrationSuccess,
 	})
@@ -212,6 +228,7 @@ func (h *Handler) BeginLogin(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
+			"code":  70002,
 		})
 	}
 

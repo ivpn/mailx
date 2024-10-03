@@ -213,11 +213,6 @@ const loginWithPasskey = async () => {
             if (err.response?.status === 429) {
                 apiError.value = 'Too many requests, please try again later'
             }
-
-            if (err.response?.data.code === 70001) {
-                apiError.value = ''
-                otpRequired.value = true
-            }
         }
     } finally {
         isLoading.value = false // End loading

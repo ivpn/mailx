@@ -100,7 +100,7 @@ func (h *Handler) BeginRegistration(c *fiber.Ctx) error {
 	}
 
 	// Set token in cookie
-	c.Cookie(auth.NewCookieAuthn(token, c.Path(), h.Cfg))
+	c.Cookie(auth.NewCookieTempAuthn(token, c.Path(), h.Cfg))
 
 	return c.Status(201).JSON(options)
 }
@@ -115,7 +115,7 @@ func (h *Handler) BeginRegistration(c *fiber.Ctx) error {
 // @Router /register/finish [post]
 func (h *Handler) FinishRegistration(c *fiber.Ctx) error {
 	// Get cookie token
-	token := c.Cookies(auth.AUTHN_COOKIE)
+	token := c.Cookies(auth.AUTHN_TEMP_COOKIE)
 
 	// Get session
 	session, ok, err := h.Service.GetSession(c.Context(), token)
@@ -165,7 +165,7 @@ func (h *Handler) FinishRegistration(c *fiber.Ctx) error {
 	}
 
 	// Clear cookie
-	c.ClearCookie(auth.AUTHN_COOKIE)
+	c.ClearCookie(auth.AUTHN_TEMP_COOKIE)
 
 	return c.Status(200).JSON(fiber.Map{
 		"message": FinishRegistrationSuccess,
@@ -225,7 +225,7 @@ func (h *Handler) BeginLogin(c *fiber.Ctx) error {
 	}
 
 	// Set token in cookie
-	c.Cookie(auth.NewCookieAuthn(token, c.Path(), h.Cfg))
+	c.Cookie(auth.NewCookieTempAuthn(token, c.Path(), h.Cfg))
 
 	return c.Status(200).JSON(options)
 }
@@ -240,7 +240,7 @@ func (h *Handler) BeginLogin(c *fiber.Ctx) error {
 // @Router /login/finish [post]
 func (h *Handler) FinishLogin(c *fiber.Ctx) error {
 	// Get cookie token
-	token := c.Cookies(auth.AUTHN_COOKIE)
+	token := c.Cookies(auth.AUTHN_TEMP_COOKIE)
 
 	// Get session
 	session, ok, err := h.Service.GetSession(c.Context(), token)
@@ -296,7 +296,7 @@ func (h *Handler) FinishLogin(c *fiber.Ctx) error {
 	}
 
 	// Clear cookie
-	c.ClearCookie(auth.AUTHN_COOKIE)
+	c.ClearCookie(auth.AUTHN_TEMP_COOKIE)
 
 	// Save the session
 	sessionData := webauthn.SessionData{

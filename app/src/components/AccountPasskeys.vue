@@ -1,23 +1,29 @@
 <template>
     <div class="mb-5">
         <h2 class="text-2xl font-semibold dark:text-gray-100 mb-5">Passkeys</h2>
-        <p class="text-gray-500 dark:text-gray-400 mb-5">
-            Add or remove Passkeys.<br>
-        </p>
-        <div class="flex justify-start items-center gap-x-3 mb-3">
-            <button @click=""
-                class="py-2 px-3 inline-flex items-center gap-x-2 font-medium text-base bg-bluish-500 text-white hover:bg-bluish-600 disabled:opacity-50 disabled:pointer-events-none">
-                <svg class="flex-shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
-                    stroke-linejoin="round">
-                    <path d="M5 12h14"></path>
-                    <path d="M12 5v14"></path>
-                </svg>
-                Add Passkey
-            </button>
+        <div v-if="passkeySupported">
+            <p class="text-gray-500 dark:text-gray-400 mb-5">
+                Add or remove Passkeys.<br>
+            </p>
+            <div class="flex justify-start items-center gap-x-3 mb-3">
+                <button @click="addPasskey"
+                    class="py-2 px-3 inline-flex items-center gap-x-2 font-medium text-base bg-bluish-500 text-white hover:bg-bluish-600 disabled:opacity-50 disabled:pointer-events-none">
+                    <svg class="flex-shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M5 12h14"></path>
+                        <path d="M12 5v14"></path>
+                    </svg>
+                    Add Passkey
+                </button>
+            </div>
         </div>
-
-        <div class="flex flex-col">
+        <div v-if="!passkeySupported">
+            <p class="text-gray-500 dark:text-gray-400 mb-5">
+                Your device does not adding support Passkeys.<br>
+            </p>
+        </div>
+        <div v-if="list.length" class="flex flex-col">
             <div class="-m-1.5 overflow-x-auto">
                 <div class="p-1.5 min-w-full inline-block align-middle">
                     <div class="overflow-hidden">
@@ -39,7 +45,7 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200 dark:divide-neutral-600">
-                                <tr v-for="cred in list">
+                                <tr v-for="cred in list" :key="rowKey">
                                     <td class="pr-5 py-4 whitespace-nowrap text-start text-sm">
                                         {{ new Date(cred.created_at).toDateString() }}
                                     </td>
@@ -60,7 +66,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 </template>
 
@@ -68,6 +73,7 @@
 import { onMounted, ref } from 'vue'
 import axios from 'axios'
 import { userApi } from '../api/user.ts'
+import { startRegistration, browserSupportsWebAuthn } from '@simplewebauthn/browser'
 
 const credential = {
     id: '',
@@ -77,12 +83,15 @@ const credential = {
 
 const list = ref([] as typeof credential[])
 const error = ref('')
+const passkeySupported = ref(false)
+const rowKey = ref(0)
 
 const getList = async () => {
     try {
         const res = await userApi.getCredentials()
         list.value = res.data
         error.value = ''
+        renderRow()
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.message
@@ -97,6 +106,7 @@ const deleteCred = async (id: string) => {
         await userApi.deleteCredential(id)
         list.value = list.value.filter((cred: any) => cred.id !== id)
         error.value = ''
+        renderRow()
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.message
@@ -104,7 +114,34 @@ const deleteCred = async (id: string) => {
     }
 }
 
+const addPasskey = async () => {
+    const data = {
+        email: localStorage.getItem('email')
+    }
+
+    try {
+        var res = await userApi.registerBegin(data)
+        const creds = await startRegistration(res.data['publicKey'])
+        res = await userApi.registerFinish(creds)
+        error.value = ''
+        getList()
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.response?.data.error || err.message
+
+            if (err.response?.status === 429) {
+                error.value = 'Too many requests, please try again later'
+            }
+        }
+    }
+}
+
+const renderRow = () => {
+    rowKey.value++
+}
+
 onMounted(() => {
     getList()
+    passkeySupported.value = browserSupportsWebAuthn()
 })
 </script>

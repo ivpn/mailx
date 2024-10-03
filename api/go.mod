@@ -59,5 +59,4 @@ require (
 	golang.org/x/tools v0.7.0 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gorm.io/plugin/dbresolver v1.5.3 // indirect
 )

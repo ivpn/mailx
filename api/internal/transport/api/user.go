@@ -249,11 +249,16 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 // @Failure 400 {object} ErrorRes
 // @Router /user/logout [post]
 func (h *Handler) Logout(c *fiber.Ctx) error {
+	c.ClearCookie(auth.AUTH_COOKIE)
+	c.ClearCookie(auth.AUTHN_COOKIE)
+	c.ClearCookie(auth.AUTHN_TEMP_COOKIE)
+
 	authnToken := auth.GetAuthnToken(c)
-	jwt := auth.GetToken(c)
-	jwtSignature := auth.GetTokenSignature(jwt)
+	jwtToken := auth.GetToken(c)
+
+	jwtSignature := auth.GetTokenSignature(jwtToken)
 	jwtExp, err := auth.GetTokenExp(h.Cfg, c)
-	if err != nil {
+	if err != nil && jwtToken != "" {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrLogoutUser,
 		})
@@ -265,9 +270,6 @@ func (h *Handler) Logout(c *fiber.Ctx) error {
 			"error": err.Error(),
 		})
 	}
-
-	c.ClearCookie(auth.AUTH_COOKIE)
-	c.ClearCookie(auth.AUTHN_COOKIE)
 
 	return c.Status(200).JSON(fiber.Map{
 		"message": LogoutSuccess,

@@ -102,11 +102,13 @@ func (s *Service) GetUserByPassword(ctx context.Context, userID string, password
 func (s *Service) GetOrPostUser(ctx context.Context, user model.User) (model.User, error) {
 	user, err := s.Store.GetUserByEmail(ctx, user.Email)
 	if err != nil {
-		user, err = s.Store.PostUser(ctx, user)
+		err = s.PostUser(ctx, user)
 		if err != nil {
 			log.Printf("error creating user: %s", err.Error())
 			return model.User{}, ErrPostUser
 		}
+
+		return user, nil
 	}
 
 	return user, nil
@@ -128,10 +130,12 @@ func (s *Service) PostUser(ctx context.Context, user model.User) error {
 		return model.ErrDuplicateEmail
 	}
 
-	err = user.SetPassword(*user.PasswordPlain)
-	if err != nil {
-		log.Printf("error creating user: %s", err.Error())
-		return err
+	if user.PasswordPlain != nil {
+		err = user.SetPassword(*user.PasswordPlain)
+		if err != nil {
+			log.Printf("error creating user: %s", err.Error())
+			return err
+		}
 	}
 
 	user, err = s.Store.PostUser(ctx, user)

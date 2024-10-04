@@ -74,8 +74,9 @@ func (h *Handler) BeginRegistration(c *fiber.Ctx) error {
 		IsActive: false,
 	}
 
-	// Get or create user
-	user, err = h.Service.GetOrPostUser(c.Context(), user)
+	// Create user or get existing one
+	_ = h.Service.PostUser(c.Context(), user)
+	user, err = h.Service.GetUserByEmail(c.Context(), req.Email)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
@@ -102,7 +103,7 @@ func (h *Handler) BeginRegistration(c *fiber.Ctx) error {
 	// Set token in cookie
 	c.Cookie(auth.NewCookieTempAuthn(token, c.Path(), h.Cfg))
 
-	return c.Status(201).JSON(options)
+	return c.Status(200).JSON(options)
 }
 
 // @Summary Finish registration

@@ -37,7 +37,7 @@
                             <button :disabled="isLoading"
                                 class="w-full bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 focus:outline-none focus:shadow-outline"
                                 type="button" @click="registerWithPasskey">
-                                Sign Up
+                                Sign Up with Passkey
                             </button>
                         </div>
                         <p v-if="apiError" class="text-red-600 text-sm mt-6">Error: {{ apiError }}</p>
@@ -174,6 +174,11 @@ const registerWithPasskey = async () => {
         res = await userApi.registerFinish(creds)
         apiSuccess.value = res.data.message
         apiError.value = ''
+        if (res.status === 200) {
+            // Redirect to the dashboard
+            localStorage.setItem('email', data.email)
+            window.location.href = '/'
+        }
     } catch (err) {
         if (axios.isAxiosError(err)) {
             apiError.value = err.response?.data.error || err.message

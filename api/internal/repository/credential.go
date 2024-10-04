@@ -11,7 +11,7 @@ import (
 
 func (d *Database) GetCredentials(ctx context.Context, userID string) ([]model.Credential, error) {
 	var credentials []model.Credential
-	err := d.Client.Where("user_id = ?", userID).Find(&credentials).Error
+	err := d.Client.Where("user_id = ?", userID).Order("created_at desc").Find(&credentials).Error
 	if err != nil {
 		return nil, err
 	}

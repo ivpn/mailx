@@ -1,5 +1,4 @@
 import { api } from './api'
-import { setCookie } from 'typescript-cookie'
 
 export const userApi = {
     register: (data: any) => api.post('/register', data),
@@ -23,8 +22,6 @@ export const userApi = {
     totpEnableConfirm: (data: any) => api.put('/user/totp/enable/confirm', data),
     totpDisable: (data: any) => api.put('/user/totp/disable', data),
     clearSession: () => {
-        setCookie('auth', '')
-        setCookie('authn', '')
         localStorage.removeItem('email')
         window.location.href = '/login'
     },

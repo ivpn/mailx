@@ -43,18 +43,13 @@ func New(cfg config.APIConfig, cache Cache, service Service) fiber.Handler {
 		// Authn authentication
 		if c.Cookies(AUTHN_COOKIE) != "" {
 			session, ok, err := service.GetSession(c.Context(), c.Cookies(AUTHN_COOKIE))
-			if err != nil || !ok {
-				return c.SendStatus(fiber.StatusUnauthorized)
+			if err == nil && ok {
+				user, err := service.GetUser(c.Context(), session.UserID)
+				if err == nil {
+					c.Locals(USER_ID, user.ID)
+					return c.Next()
+				}
 			}
-
-			user, err := service.GetUser(c.Context(), session.UserID)
-			if err != nil {
-				return c.SendStatus(fiber.StatusUnauthorized)
-			}
-
-			c.Locals(USER_ID, user.ID)
-
-			return c.Next()
 		}
 
 		// JWT authentication

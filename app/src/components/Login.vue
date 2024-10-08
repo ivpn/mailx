@@ -107,7 +107,7 @@
 import { onMounted, ref } from 'vue'
 import axios from 'axios'
 import { userApi } from '../api/user.ts'
-import { startAuthentication, startRegistration, browserSupportsWebAuthn } from '@simplewebauthn/browser'
+import { startAuthentication, browserSupportsWebAuthn } from '@simplewebauthn/browser'
 import tabs from '@preline/tabs'
 
 const email = ref('')
@@ -208,12 +208,6 @@ const loginWithPasskey = async () => {
         }
     } catch (err) {
         if (axios.isAxiosError(err)) {
-            // Passkey not found, add new passkey
-            if (err.response?.data.code === 70002) {
-                addPasskey()
-                return
-            }
-
             error.value = err.response?.data.error || err.message
 
             if (err.response?.status === 429) {
@@ -222,32 +216,6 @@ const loginWithPasskey = async () => {
         }
     } finally {
         isLoading.value = false // End loading
-    }
-}
-
-const addPasskey = async () => {
-    const data = {
-        email: emailAuthn.value
-    }
-
-    try {
-        var res = await userApi.registerBegin(data)
-        const creds = await startRegistration(res.data['publicKey'])
-        res = await userApi.registerFinish(creds)
-        error.value = ''
-        if (res.status === 200) {
-            // Redirect to the dashboard
-            localStorage.setItem('email', data.email)
-            window.location.href = '/'
-        }
-    } catch (err) {
-        if (axios.isAxiosError(err)) {
-            error.value = err.response?.data.error || err.message
-
-            if (err.response?.status === 429) {
-                error.value = 'Too many requests, please try again later'
-            }
-        }
     }
 }
 

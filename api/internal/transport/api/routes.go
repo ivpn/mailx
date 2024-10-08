@@ -38,6 +38,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1 := h.Server.Group("/v1")
 	v1.Use(auth.New(cfg, h.Cache, h.Service))
 
+	v1.Post("/register/add", limiter.New(), h.AddPasskey)
 	v1.Post("/user/sendotp", limit.New(5, 10*time.Minute), h.SendUserOTP)
 	v1.Post("/user/activate", limiter.New(), h.Activate)
 	v1.Post("/user/logout", h.Logout)

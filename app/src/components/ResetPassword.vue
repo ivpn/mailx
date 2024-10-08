@@ -7,8 +7,7 @@
                     <label class="block text-gray-500 mb-2" for="password-new">
                         New Password
                     </label>
-                    <input
-                        v-model="password"
+                    <input v-model="password"
                         v-bind:class="{ 'border-gray-500 dark:border-neutral-400': !passwordError, 'border-red-600 dark:border-red-600': passwordError }"
                         class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 dark:text-gray-300 dark:bg-neutral-800"
                         id="password-new" type="password">
@@ -17,12 +16,14 @@
                     <label class="block text-gray-500 mb-2" for="password-new-conmfirm">
                         Confirm
                     </label>
-                    <input
-                        v-model="passwordConfirm"
+                    <input v-model="passwordConfirm"
                         v-bind:class="{ 'border-gray-500 dark:border-neutral-400': !passwordError, 'border-red-600 dark:border-red-600': passwordError }"
                         class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 dark:text-gray-300 dark:bg-neutral-800"
                         id="password-new-conmfirm" type="password">
                 </div>
+                <p class="text-gray-500 dark:text-gray-400 mb-5 text-sm">
+                    Must be 12+ characters, one uppercase, lowercase, number, and special character (e.g. !@#$%^&*(),;.?":{}|<>)
+                </p>
                 <div class="flex items-center justify-between">
                     <button :disabled="isLoading"
                         class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 focus:outline-none focus:shadow-outline"
@@ -37,8 +38,8 @@
                 <p class="text-emerald-600 dark:text-emerald-500 text-sm mb-6">{{ apiSuccess }}</p>
             </div>
         </form>
-        <p class="text-gray-500 my-5"><a class="text-bluish-500 hover:text-bluish-600"
-            href="/login">Back to Log In</a></p>
+        <p class="text-gray-500 my-5"><a class="text-bluish-500 hover:text-bluish-600" href="/login">Back to Log In</a>
+        </p>
     </div>
 </template>
 

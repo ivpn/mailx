@@ -120,7 +120,7 @@ const addPasskey = async () => {
     }
 
     try {
-        var res = await userApi.registerBegin(data)
+        var res = await userApi.registerAdd(data)
         const creds = await startRegistration(res.data['publicKey'])
         res = await userApi.registerFinish(creds)
         error.value = ''

@@ -3,6 +3,7 @@ import { api } from './api'
 export const userApi = {
     register: (data: any) => api.post('/register', data),
     registerBegin: (data: any) => api.post('/register/begin', data),
+    registerAdd: (data: any) => api.post('/register/add', data),
     registerFinish: (data: any) => api.post('/register/finish', data),
     login: (data: any) => api.post('/login', data),
     loginBegin: (data: any) => api.post('/login/begin', data),

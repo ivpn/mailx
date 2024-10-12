@@ -20,7 +20,7 @@
                 id="new-password-confirm" type="password">
         </div>
         <p class="text-gray-500 dark:text-gray-400 mb-5 text-sm">
-            Must be 12+ characters, one uppercase, lowercase, number, and special character (e.g. !@#$%^&*(),;.?":{}|<>)
+            Must be 12+ characters and contain uppercase, lowercase, number, and special character (e.g. !@#$%^&*(),;.?":{}|<>)
         </p>
         <div class="mb-3 max-w-xs">
             <button @click="changePassword"

@@ -26,7 +26,7 @@
                         id="password" type="password">
                     <p v-if="passwordError" class="text-red-600 text-sm mb-2">Required</p>
                     <p class="text-gray-500 dark:text-gray-400 text-sm mb-2">
-                        Must be 12+ characters, one uppercase, lowercase, number, and special character (e.g. !@#$%^&*(),;.?":{}|<>)
+                        Must be 12+ characters and contain uppercase, lowercase, number, and special character (e.g. !@#$%^&*(),;.?":{}|<>)
                     </p>
                 </div>
                 <div class="flex items-center justify-between">

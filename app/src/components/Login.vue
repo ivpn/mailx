@@ -104,7 +104,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, onUpdated, ref } from 'vue'
 import axios from 'axios'
 import { userApi } from '../api/user.ts'
 import { startAuthentication, browserSupportsWebAuthn } from '@simplewebauthn/browser'
@@ -228,7 +228,11 @@ onMounted(() => {
         window.location.href = '/'
     }
 
-    tabs.autoInit()
     passkeySupported.value = browserSupportsWebAuthn()
+    tabs.autoInit()
+})
+
+onUpdated(() => {
+    tabs.autoInit()
 })
 </script>

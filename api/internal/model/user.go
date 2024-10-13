@@ -37,7 +37,7 @@ type UserStats struct {
 }
 
 func (u *User) SetPassword(passwordPlain string) error {
-	hash, err := utils.Hash(passwordPlain)
+	hash, err := utils.HashPassword(passwordPlain)
 	if err != nil {
 		return ErrHashFailed
 	}
@@ -49,7 +49,7 @@ func (u *User) SetPassword(passwordPlain string) error {
 }
 
 func (u *User) Matches(passwordPlain string) bool {
-	return utils.HashMatches(passwordPlain, u.PasswordHash)
+	return utils.HashMatchesPassword(passwordPlain, u.PasswordHash)
 }
 
 func (u *User) IsTotpEnabled() bool {

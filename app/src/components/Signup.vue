@@ -69,7 +69,7 @@
                                 class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 dark:bg-neutral-800 dark:border-gray-500 dark:text-gray-400"
                                 id="password" type="password">
                             <p v-if="passwordError" class="text-red-600 text-sm mb-2">Required</p>
-                            <p class="text-gray-500 dark:text-gray-400 text-sm mb-2">Must be at least 8 characters</p>
+                            <p class="text-gray-500 dark:text-gray-400 text-sm mb-2">Must be 12+ characters and contain uppercase, lowercase, number, and special character (e.g. !@#$%^&*(),;.?":{}|<>)</p>
                         </div>
                         <div class="flex items-center w-full">
                             <button :disabled="isLoading"

@@ -19,6 +19,9 @@
                 class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 dark:text-gray-300 dark:bg-neutral-800 leading-tight focus:border-bluish-500 mb-2"
                 id="new-password-confirm" type="password">
         </div>
+        <p class="text-gray-500 dark:text-gray-400 mb-5 text-sm">
+            Must be 12+ characters and contain uppercase, lowercase, number, and special character (e.g. !@#$%^&*(),;.?":{}|<>)
+        </p>
         <div class="mb-3 max-w-xs">
             <button @click="changePassword"
                 class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-2 px-3 focus:outline-none focus:shadow-outline"

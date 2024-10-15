@@ -16,11 +16,37 @@ func New(db *gorm.DB) {
 		return
 	}
 
-	gocron.Every(1).Hour().Do(jobs.DeleteOldMessages, db)
-	gocron.Every(1).Hour().Do(jobs.DeleteUnverifiedRecipients, db)
-	gocron.Every(1).Hour().Do(jobs.DeleteUnverifiedUsers, db)
-	gocron.Every(1).Hour().Do(jobs.CleanupDeletedAliases, db)
-	gocron.Every(1).Hour().Do(jobs.DeleteExpiredSessions, db, cfg.API)
+	err = gocron.Every(1).Hour().Do(jobs.DeleteOldMessages, db)
+	if err != nil {
+		log.Println("Error scheduling job:", err)
+		return
+	}
+
+	err = gocron.Every(1).Hour().Do(jobs.DeleteUnverifiedRecipients, db)
+	if err != nil {
+		log.Println("Error scheduling job:", err)
+		return
+	}
+
+	err = gocron.Every(1).Hour().Do(jobs.DeleteUnverifiedUsers, db)
+	if err != nil {
+		log.Println("Error scheduling job:", err)
+		return
+	}
+
+	err = gocron.Every(1).Hour().Do(jobs.CleanupDeletedAliases, db)
+	if err != nil {
+		log.Println("Error scheduling job:", err)
+		return
+	}
+
+	err = gocron.Every(1).Hour().Do(jobs.DeleteExpiredSessions, db, cfg.API)
+	if err != nil {
+		log.Println("Error scheduling job:", err)
+		return
+	}
+
 	gocron.Start()
+
 	log.Println("Cron jobs started")
 }

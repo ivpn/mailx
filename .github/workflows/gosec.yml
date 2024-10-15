@@ -12,16 +12,19 @@ jobs:
     env:
       GO111MODULE: on
     steps:
-      - name: Checkout Source
+      - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          ref: ${{ github.event.pull_request.head.ref }}
       - name: Set up sparse checkout
         run: |
           git sparse-checkout init --cone
           git sparse-checkout set api
-      - name: Pull changes
-        run: git pull
+      - name: Pull changes from PR branch
+        run: git pull origin ${{ github.event.pull_request.head.ref }}
+      - name: Move directory
+        run: |
+          mv api/* .
       - name: Run Gosec Security Scanner
         uses: securego/gosec@master
         with:

@@ -1,9 +1,9 @@
 package model
 
 import (
+	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
-	"math/rand"
 
 	"github.com/go-webauthn/webauthn/webauthn"
 )
@@ -16,10 +16,13 @@ type Session struct {
 	SessionData webauthn.SessionData `gorm:"-" json:"-"`
 }
 
-func GenSessionToken() string {
+func GenSessionToken() (string, error) {
 	b := make([]byte, 32)
-	rand.Read(b)
-	return base64.StdEncoding.EncodeToString(b)
+	_, err := rand.Read(b)
+	if err != nil {
+		return "", err
+	}
+	return base64.StdEncoding.EncodeToString(b), nil
 }
 
 func (s *Session) UnmarshalSessionData() error {

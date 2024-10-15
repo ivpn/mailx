@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"log"
 
 	"github.com/go-webauthn/webauthn/webauthn"
 	"ivpn.net/email/api/internal/model"
@@ -22,7 +23,10 @@ func (d *Database) GetUser(ctx context.Context, ID string) (model.User, error) {
 
 	var creds = []webauthn.Credential{}
 	for _, c := range credentials {
-		c.Unmarshal()
+		err := c.Unmarshal()
+		if err != nil {
+			log.Println("error unmarshalling credential:", err)
+		}
 		creds = append(creds, c.Cred)
 	}
 
@@ -47,7 +51,10 @@ func (d *Database) GetUserByEmail(ctx context.Context, email string) (model.User
 
 	var creds = []webauthn.Credential{}
 	for _, c := range credentials {
-		c.Unmarshal()
+		err := c.Unmarshal()
+		if err != nil {
+			log.Println("error unmarshalling credential:", err)
+		}
 		creds = append(creds, c.Cred)
 	}
 

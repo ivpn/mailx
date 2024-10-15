@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"log"
 	"regexp"
 
 	"github.com/go-playground/validator/v10"
@@ -12,7 +13,10 @@ type Validator struct {
 
 func NewValidator() Validator {
 	v := Validator{validator.New()}
-	v.RegisterValidation("password", passwordValidation)
+	err := v.RegisterValidation("password", passwordValidation)
+	if err != nil {
+		log.Println("error registering password validation:", err)
+	}
 	return v
 }
 

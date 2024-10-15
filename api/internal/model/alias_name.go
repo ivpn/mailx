@@ -1,9 +1,9 @@
 package model
 
 import (
+	"crypto/rand"
 	"fmt"
-	"math/rand"
-	"time"
+	"math/big"
 
 	"github.com/google/uuid"
 )
@@ -35,34 +35,62 @@ func GenerateAlias(format string) string {
 }
 
 func generateRandomChars() string {
-	source := rand.NewSource(time.Now().UnixNano())
-	rand.New(source)
-
 	var letterRunes = []rune("abcdefghijklmnopqrstuvwxyz0123456789")
-
 	b := make([]rune, 8)
 	for i := range b {
-		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+		index, err := cryptoRandInt(len(letterRunes))
+		if err != nil {
+			// Handle error, return empty string or fallback
+			return ""
+		}
+		b[i] = letterRunes[index]
 	}
-
 	return string(b)
 }
 
 func generateRandomWords() string {
-	source := rand.NewSource(time.Now().UnixNano())
-	rand.New(source)
+	adjective := randomAdjective()
+	noun := randomNoun()
+	number := randomNumber()
 
-	return randomAdjective() + "." + randomNoun() + randomNumber()
+	return adjective + "." + noun + number
 }
 
 func randomAdjective() string {
-	return Adjectives[rand.Intn(len(Adjectives))]
+	index, err := cryptoRandInt(len(Adjectives))
+	if err != nil {
+		// Handle error, return fallback
+		return ""
+	}
+	return Adjectives[index]
 }
 
 func randomNoun() string {
-	return Nouns[rand.Intn(len(Nouns))]
+	index, err := cryptoRandInt(len(Nouns))
+	if err != nil {
+		// Handle error, return fallback
+		return ""
+	}
+	return Nouns[index]
 }
 
 func randomNumber() string {
-	return fmt.Sprint(rand.Intn(9)) + fmt.Sprint(rand.Intn(9))
+	num1, err := cryptoRandInt(10) // Generates a number between 0-9
+	if err != nil {
+		return "00" // Fallback
+	}
+	num2, err := cryptoRandInt(10)
+	if err != nil {
+		return fmt.Sprintf("%d0", num1)
+	}
+	return fmt.Sprintf("%d%d", num1, num2)
+}
+
+// cryptoRandInt generates a random integer between 0 and max-1 using crypto/rand.
+func cryptoRandInt(max int) (int, error) {
+	nBig, err := rand.Int(rand.Reader, big.NewInt(int64(max)))
+	if err != nil {
+		return 0, err
+	}
+	return int(nBig.Int64()), nil
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 
 	"github.com/go-webauthn/webauthn/webauthn"
 	"ivpn.net/email/api/internal/model"
@@ -16,7 +17,10 @@ func (d *Database) GetSession(ctx context.Context, token string) (model.Session,
 		return model.Session{}, false, fmt.Errorf("could not get session by token")
 	}
 
-	session.UnmarshalSessionData()
+	err := session.UnmarshalSessionData()
+	if err != nil {
+		log.Println("error unmarshalling session data:", err)
+	}
 
 	return session, true, q.Error
 }

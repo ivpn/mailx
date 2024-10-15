@@ -17,6 +17,9 @@ type ProcessorService interface {
 // @Success 200 {string} string "OK"
 // @Router /email [post]
 func (h *Handler) HandleEmail(c *fiber.Ctx) error {
-	h.Service.ProcessMessage(c.Body())
+	err := h.Service.ProcessMessage(c.Body())
+	if err != nil {
+		return err
+	}
 	return c.SendString("OK")
 }

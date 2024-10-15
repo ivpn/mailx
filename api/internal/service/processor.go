@@ -183,7 +183,10 @@ func parseMessage(data []byte) (Msg, error) {
 	}
 
 	buf := new(bytes.Buffer)
-	buf.ReadFrom(msg.Body)
+	_, err = buf.ReadFrom(msg.Body)
+	if err != nil {
+		return Msg{}, err
+	}
 	body := buf.String()
 	msgType := Send
 

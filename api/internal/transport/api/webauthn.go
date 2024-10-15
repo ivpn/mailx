@@ -99,7 +99,12 @@ func (h *Handler) BeginRegistration(c *fiber.Ctx) error {
 	}
 
 	// Save the session
-	token := model.GenSessionToken()
+	token, err := model.GenSessionToken()
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrSaveSession,
+		})
+	}
 	err = h.Service.SaveSession(c.Context(), *sessionData, token, user.ID)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -157,7 +162,12 @@ func (h *Handler) AddPasskey(c *fiber.Ctx) error {
 	}
 
 	// Save the session
-	token := model.GenSessionToken()
+	token, err := model.GenSessionToken()
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrSaveSession,
+		})
+	}
 	err = h.Service.SaveSession(c.Context(), *sessionData, token, user.ID)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -238,7 +248,12 @@ func (h *Handler) FinishRegistration(c *fiber.Ctx) error {
 		UserID:  user.WebAuthnID(),
 		Expires: time.Now().Add(h.Cfg.TokenExpiration),
 	}
-	token = model.GenSessionToken()
+	token, err = model.GenSessionToken()
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrSaveSession,
+		})
+	}
 	err = h.Service.SaveSession(c.Context(), sessionData, token, user.ID)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -299,7 +314,12 @@ func (h *Handler) BeginLogin(c *fiber.Ctx) error {
 	}
 
 	// Save the session
-	token := model.GenSessionToken()
+	token, err := model.GenSessionToken()
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrSaveSession,
+		})
+	}
 	err = h.Service.SaveSession(c.Context(), *sessionData, token, user.ID)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -386,7 +406,12 @@ func (h *Handler) FinishLogin(c *fiber.Ctx) error {
 		UserID:  user.WebAuthnID(),
 		Expires: time.Now().Add(h.Cfg.TokenExpiration),
 	}
-	token = model.GenSessionToken()
+	token, err = model.GenSessionToken()
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrSaveSession,
+		})
+	}
 	err = h.Service.SaveSession(c.Context(), sessionData, token, user.ID)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{

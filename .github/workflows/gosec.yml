@@ -17,6 +17,7 @@ jobs:
       - name: cd into api directory
         run: |
           cd api
+          go mod vendor
       - name: Run Gosec Security Scanner
         uses: securego/gosec@master
         with:

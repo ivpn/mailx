@@ -14,7 +14,15 @@ jobs:
     steps:
       - name: Checkout Source
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Set up sparse checkout
+        run: |
+          git sparse-checkout init --cone
+          git sparse-checkout set api
+      - name: Pull changes
+        run: git pull
       - name: Run Gosec Security Scanner
         uses: securego/gosec@master
         with:
-          args: '-exclude=G101,G505 ./api/...'
+          args: '-exclude=G101,G505 ./...'

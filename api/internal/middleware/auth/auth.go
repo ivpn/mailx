@@ -6,11 +6,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/golang-jwt/jwt"
 	"ivpn.net/email/api/config"
+	"ivpn.net/email/api/internal/model"
 )
 
 var (
@@ -20,17 +22,37 @@ var (
 )
 
 const (
-	AUTH_COOKIE = "auth"
-	USER_ID     = "user_id"
+	AUTH_COOKIE       = "auth"
+	AUTHN_COOKIE      = "authn"
+	AUTHN_TEMP_COOKIE = "authntemp"
+	USER_ID           = "user_id"
 )
 
 type Cache interface {
 	Get(context.Context, string) (string, error)
 }
 
-func New(cfg config.APIConfig, cache Cache) fiber.Handler {
+type Service interface {
+	GetSession(context.Context, string) (model.Session, bool, error)
+	GetUser(context.Context, string) (model.User, error)
+}
+
+func New(cfg config.APIConfig, cache Cache, service Service) fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
+		// Authn authentication
+		if c.Cookies(AUTHN_COOKIE) != "" {
+			session, ok, err := service.GetSession(c.Context(), c.Cookies(AUTHN_COOKIE))
+			if err == nil && ok {
+				user, err := service.GetUser(c.Context(), session.UserID)
+				if err == nil {
+					c.Locals(USER_ID, user.ID)
+					return c.Next()
+				}
+			}
+		}
+
+		// JWT authentication
 		jwtString := GetToken(c)
 		if jwtString == "" {
 			return c.SendStatus(fiber.StatusUnauthorized)
@@ -133,6 +155,10 @@ func GetToken(c *fiber.Ctx) string {
 	return tokenString
 }
 
+func GetAuthnToken(c *fiber.Ctx) string {
+	return c.Cookies(AUTHN_COOKIE)
+}
+
 func GetTokenExp(cfg config.APIConfig, c *fiber.Ctx) (time.Duration, error) {
 	jwtString := GetToken(c)
 	token, err := jwt.Parse(jwtString, func(token *jwt.Token) (interface{}, error) {
@@ -176,4 +202,42 @@ func NewCookie(token string, cfg config.APIConfig) *fiber.Cookie {
 		Secure:   true,
 		Expires:  time.Now().Add(time.Duration(cfg.TokenExpiration)),
 	}
+}
+
+func NewCookieAuthn(token string, path string, cfg config.APIConfig) *fiber.Cookie {
+	return &fiber.Cookie{
+		Name:     AUTHN_COOKIE,
+		Value:    token,
+		HTTPOnly: true,
+		Secure:   true,
+		MaxAge:   int(cfg.TokenExpiration),
+		Expires:  time.Now().Add(time.Duration(cfg.TokenExpiration)),
+	}
+}
+
+func NewCookieTempAuthn(token string, path string, cfg config.APIConfig) *fiber.Cookie {
+	return &fiber.Cookie{
+		Name:     AUTHN_TEMP_COOKIE,
+		Value:    token,
+		HTTPOnly: true,
+		Secure:   true,
+		MaxAge:   int(cfg.TokenExpiration),
+		Expires:  time.Now().Add(time.Duration(cfg.TokenExpiration)),
+	}
+}
+
+func NewWebAuthn(cfg config.APIConfig) *webauthn.WebAuthn {
+	var webAuthn *webauthn.WebAuthn
+	config := &webauthn.Config{
+		RPDisplayName: cfg.Name,                     // Display Name for your site
+		RPID:          cfg.FQDN,                     // Generally the FQDN for your site
+		RPOrigins:     []string{cfg.ApiAllowOrigin}, // The origin URLs allowed for WebAuthn requests
+	}
+
+	webAuthn, err := webauthn.New(config)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	return webAuthn
 }

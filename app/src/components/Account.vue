@@ -8,14 +8,17 @@
         <hr class="mb-8 dark:border-neutral-600">
         <AccountTotp />
         <hr class="mb-8 dark:border-neutral-600">
+        <AccountPasskeys />
+        <hr class="mb-8 dark:border-neutral-600">
         <AccountDelete />
     </div>
 </template>
 
 <script setup lang="ts">
 import AccountVerify from './AccountVerify.vue'
-import AccountSubscription from './AccountSubscription.vue';
-import AccountChangePassword from './AccountChangePassword.vue';
+import AccountSubscription from './AccountSubscription.vue'
+import AccountChangePassword from './AccountChangePassword.vue'
 import AccountDelete from './AccountDelete.vue'
 import AccountTotp from './AccountTotp.vue'
+import AccountPasskeys from './AccountPasskeys.vue'
 </script>

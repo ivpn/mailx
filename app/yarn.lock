@@ -212,6 +212,11 @@
   resolved "https://registry.yarnpkg.com/@preline/overlay/-/overlay-2.3.0.tgz#8aa47c4374d369fb8aa715232eb36853e37d7a94"
   integrity sha512-aN9mR81RHEnh8Tg/WTRwdqwrX2JxObV2CMR61Q8hJphDLaZFZT2yPcnMaXawFS+cO839Wd+VvZDSeBFE1DYpEg==
 
+"@preline/tabs@^2.5.0":
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/@preline/tabs/-/tabs-2.5.0.tgz#08aed74f8ad4165338a66854529f8bdcdd498f46"
+  integrity sha512-JdMwRCtbJ0G9goqU+6214/ncfJX8zthEeLl1i9YYyeFLqTJvXPTIW5MWKyXpR4Gi1RUjr2NnT86Abtjp97bESg==
+
 "@preline/theme-switch@^2.4.1":
   version "2.4.1"
   resolved "https://registry.yarnpkg.com/@preline/theme-switch/-/theme-switch-2.4.1.tgz#4985ca65e33eec1bd59b4bd854de837ed84307da"
@@ -301,6 +306,18 @@
   version "4.22.4"
   resolved "https://registry.yarnpkg.com/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.22.4.tgz#3dd5d53e900df2a40841882c02e56f866c04d202"
   integrity sha512-j8pPKp53/lq9lMXN57S8cFz0MynJk8OWNuUnXct/9KCpKU7DgU3bYMJhwWmcqC0UU29p8Lr0/7KEVcaM6bf47Q==
+
+"@simplewebauthn/browser@^10.0.0":
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/@simplewebauthn/browser/-/browser-10.0.0.tgz#8305a57dacb35ab6a71a8b670c699ee7ef1c11c4"
+  integrity sha512-hG0JMZD+LiLUbpQcAjS4d+t4gbprE/dLYop/CkE01ugU/9sKXflxV5s0DRjdz3uNMFecatRfb4ZLG3XvF8m5zg==
+  dependencies:
+    "@simplewebauthn/types" "^10.0.0"
+
+"@simplewebauthn/types@^10.0.0":
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/@simplewebauthn/types/-/types-10.0.0.tgz#a07259d42fbdff7a014473f78401d262b298ed8e"
+  integrity sha512-SFXke7xkgPRowY2E+8djKbdEznTVnD5R6GO7GPTthpHrokLvNKw8C3lFZypTxLI7KkCfGPfhtqB3d7OVGGa9jQ==
 
 "@tailwindcss/forms@^0.5.7":
   version "0.5.7"

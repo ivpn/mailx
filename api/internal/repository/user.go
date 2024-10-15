@@ -3,26 +3,67 @@ package repository
 import (
 	"context"
 
+	"github.com/go-webauthn/webauthn/webauthn"
 	"ivpn.net/email/api/internal/model"
 )
 
 func (d *Database) GetUser(ctx context.Context, ID string) (model.User, error) {
 	var user model.User
 	err := d.Client.Where("id = ?", ID).First(&user).Error
+	if err != nil {
+		return model.User{}, err
+	}
+
+	var credentials []model.Credential
+	err = d.Client.Where("user_id = ?", user.ID).Find(&credentials).Error
+	if err != nil {
+		return model.User{}, err
+	}
+
+	var creds = []webauthn.Credential{}
+	for _, c := range credentials {
+		c.Unmarshal()
+		creds = append(creds, c.Cred)
+	}
+
+	user.Creds = creds
+
 	user.TotpEnabled = user.TotpSecret != ""
-	return user, err
+	return user, nil
 }
 
 func (d *Database) GetUserByEmail(ctx context.Context, email string) (model.User, error) {
 	var user model.User
 	err := d.Client.Where("email = ?", email).First(&user).Error
+	if err != nil {
+		return model.User{}, err
+	}
+
+	var credentials []model.Credential
+	err = d.Client.Where("user_id = ?", user.ID).Find(&credentials).Error
+	if err != nil {
+		return model.User{}, err
+	}
+
+	var creds = []webauthn.Credential{}
+	for _, c := range credentials {
+		c.Unmarshal()
+		creds = append(creds, c.Cred)
+	}
+
+	user.Creds = creds
+
 	user.TotpEnabled = user.TotpSecret != ""
-	return user, err
+	return user, nil
 }
 
 func (d *Database) PostUser(ctx context.Context, user model.User) (model.User, error) {
 	err := d.Client.Create(&user).Error
 	return user, err
+}
+
+func (d *Database) SaveUser(ctx context.Context, user model.User) error {
+	return d.Client.Save(&user).Error
 }
 
 func (d *Database) ActivateUser(ctx context.Context, ID string) error {
@@ -68,10 +109,6 @@ func (d *Database) GetUserStats(ctx context.Context, ID string) (model.UserStats
 	}
 
 	return userStats, nil
-}
-
-func (d *Database) ChangePassword(ctx context.Context, user model.User) error {
-	return d.Client.Save(&user).Error
 }
 
 func (d *Database) TotpEnable(ctx context.Context, ID string, secret string, backupCodes string) error {

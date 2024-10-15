@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strconv"
 
+	"github.com/go-webauthn/webauthn/webauthn"
 	"ivpn.net/email/api/internal/utils"
 )
 
@@ -14,14 +15,15 @@ var (
 
 type User struct {
 	BaseModel
-	Email          string  `gorm:"unique" json:"email"`
-	PasswordHash   string  `json:"-"`
-	PasswordPlain  *string `gorm:"-" json:"-"`
-	IsActive       bool    `json:"is_active"`
-	TotpSecret     string  `json:"-"`
-	TotpBackup     string  `json:"-"`
-	TotpBackupUsed string  `json:"-"`
-	TotpEnabled    bool    `gorm:"-" json:"totp_enabled"`
+	Email          string                `gorm:"unique" json:"email"`
+	PasswordHash   string                `json:"-"`
+	PasswordPlain  *string               `gorm:"-" json:"-"`
+	IsActive       bool                  `json:"is_active"`
+	TotpSecret     string                `json:"-"`
+	TotpBackup     string                `json:"-"`
+	TotpBackupUsed string                `json:"-"`
+	TotpEnabled    bool                  `gorm:"-" json:"totp_enabled"`
+	Creds          []webauthn.Credential `gorm:"-" json:"-"`
 }
 
 type UserStats struct {
@@ -61,4 +63,29 @@ func (u *User) VerifyTotp(otp string) (bool, error) {
 	}
 
 	return utils.Check(u.TotpSecret, code)
+}
+
+// WebAuthnCredentials implements webauthn.User
+func (u User) WebAuthnCredentials() []webauthn.Credential {
+	return u.Creds
+}
+
+// WebAuthnDisplayName implements webauthn.User
+func (u User) WebAuthnDisplayName() string {
+	return u.Email
+}
+
+// WebAuthnID implements webauthn.User
+func (u User) WebAuthnID() []byte {
+	return []byte(u.ID)
+}
+
+// WebAuthnIcon implements webauthn.User
+func (u User) WebAuthnIcon() string {
+	return ""
+}
+
+// WebAuthnName implements webauthn.User
+func (u User) WebAuthnName() string {
+	return u.Email
 }

@@ -42,24 +42,17 @@ definitions:
     required:
     - password
     type: object
+  api.EmailReq:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
   api.ErrorRes:
     properties:
       error:
         type: string
-    type: object
-  api.InitiatePasswordResetReq:
-    properties:
-      email:
-        type: string
-    required:
-    - email
-    type: object
-  api.RecipientReq:
-    properties:
-      email:
-        type: string
-    required:
-    - email
     type: object
   api.ResetPasswordReq:
     properties:
@@ -101,9 +94,11 @@ definitions:
       message:
         type: string
     type: object
-  api.TotpConfirm:
+  api.TotpReq:
     properties:
       otp:
+        maxLength: 8
+        minLength: 6
         type: string
     required:
     - otp
@@ -111,6 +106,10 @@ definitions:
   api.UserReq:
     properties:
       email:
+        type: string
+      otp:
+        maxLength: 8
+        minLength: 0
         type: string
       password:
         maxLength: 64
@@ -160,6 +159,19 @@ definitions:
         type: integer
       sends:
         type: integer
+    type: object
+  model.Credential:
+    properties:
+      created_at:
+        type: string
+      cred_id:
+        items:
+          type: integer
+        type: array
+      id:
+        type: string
+      user_id:
+        type: string
     type: object
   model.Recipient:
     properties:
@@ -211,6 +223,8 @@ definitions:
     type: object
   model.TOTPNew:
     properties:
+      account:
+        type: string
       secret:
         type: string
       uri:
@@ -225,6 +239,8 @@ definitions:
       id:
         type: string
       is_active:
+        type: boolean
+      totp_enabled:
         type: boolean
     type: object
   model.UserStats:
@@ -415,7 +431,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/api.InitiatePasswordResetReq'
+          $ref: '#/definitions/api.EmailReq'
       produces:
       - application/json
       responses:
@@ -456,6 +472,51 @@ paths:
       summary: Login user
       tags:
       - user
+  /login/begin:
+    post:
+      consumes:
+      - application/json
+      description: Begin login process
+      parameters:
+      - description: Email
+        in: body
+        name: email
+        required: true
+        schema:
+          $ref: '#/definitions/api.EmailReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Begin login
+      tags:
+      - webauthn
+  /login/finish:
+    post:
+      consumes:
+      - application/json
+      description: Finish login process
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Finish login
+      tags:
+      - webauthn
   /recipient:
     post:
       consumes:
@@ -467,7 +528,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/api.RecipientReq'
+          $ref: '#/definitions/api.EmailReq'
       produces:
       - application/json
       responses:
@@ -646,6 +707,51 @@ paths:
       summary: Register user
       tags:
       - user
+  /register/begin:
+    post:
+      consumes:
+      - application/json
+      description: Begin registration process
+      parameters:
+      - description: Email
+        in: body
+        name: email
+        required: true
+        schema:
+          $ref: '#/definitions/api.EmailReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Begin registration
+      tags:
+      - webauthn
+  /register/finish:
+    post:
+      consumes:
+      - application/json
+      description: Finish registration process
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Finish registration
+      tags:
+      - webauthn
   /resetpassword:
     put:
       consumes:
@@ -846,6 +952,56 @@ paths:
       summary: Change password
       tags:
       - user
+  /user/credential/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete credential by ID
+      parameters:
+      - description: Credential ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete credential
+      tags:
+      - webauthn
+  /user/credentials:
+    get:
+      consumes:
+      - application/json
+      description: Get user credentials
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Credential'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get credentials
+      tags:
+      - webauthn
   /user/delete:
     post:
       consumes:
@@ -948,7 +1104,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/api.TotpConfirm'
+          $ref: '#/definitions/api.TotpReq'
       produces:
       - application/json
       responses:
@@ -997,7 +1153,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/api.TotpConfirm'
+          $ref: '#/definitions/api.TotpReq'
       produces:
       - application/json
       responses:

@@ -26,6 +26,7 @@ var (
 	DisableTotpSuccess           = "2FA is disabled"
 	TotpRequired                 = "2FA is required"
 	ErrInvalidTotpCode           = "Invalid 2FA code"
+	ErrGetUser                   = "Could not get user"
 )
 
 type UserService interface {
@@ -34,10 +35,13 @@ type UserService interface {
 	ActivateUser(context.Context, string, string) error
 	GetUserByCredentials(context.Context, string, string) (model.User, error)
 	GetUserByPassword(context.Context, string, string) (model.User, error)
+	GetUserByEmail(context.Context, string) (model.User, error)
+	SaveUser(context.Context, model.User) error
+	GetOrPostUser(context.Context, model.User) (model.User, error)
 	DeleteUser(context.Context, string) error
 	GetUser(context.Context, string) (model.User, error)
 	GetUserStats(context.Context, string) (model.UserStats, error)
-	LogoutUser(context.Context, string, time.Duration) error
+	LogoutUser(context.Context, string, time.Duration, string) error
 	ChangePassword(context.Context, string, string) error
 	InitiatePasswordReset(context.Context, string) error
 	ResetPassword(context.Context, string, string) error
@@ -227,7 +231,7 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 		})
 	}
 
-	// Set the token in encrypted cookie
+	// Set auth token in cookie
 	c.Cookie(auth.NewCookie(token, h.Cfg))
 
 	return c.Status(200).JSON(fiber.Map{
@@ -245,23 +249,27 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 // @Failure 400 {object} ErrorRes
 // @Router /user/logout [post]
 func (h *Handler) Logout(c *fiber.Ctx) error {
-	jwt := auth.GetToken(c)
-	jwtSignature := auth.GetTokenSignature(jwt)
+	c.ClearCookie(auth.AUTH_COOKIE)
+	c.ClearCookie(auth.AUTHN_COOKIE)
+	c.ClearCookie(auth.AUTHN_TEMP_COOKIE)
+
+	authnToken := auth.GetAuthnToken(c)
+	jwtToken := auth.GetToken(c)
+
+	jwtSignature := auth.GetTokenSignature(jwtToken)
 	jwtExp, err := auth.GetTokenExp(h.Cfg, c)
-	if err != nil {
+	if err != nil && jwtToken != "" {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrLogoutUser,
 		})
 	}
 
-	err = h.Service.LogoutUser(c.Context(), jwtSignature, jwtExp)
+	err = h.Service.LogoutUser(c.Context(), jwtSignature, jwtExp, authnToken)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
-
-	c.ClearCookie(auth.AUTH_COOKIE)
 
 	return c.Status(200).JSON(fiber.Map{
 		"message": LogoutSuccess,
@@ -414,13 +422,13 @@ func (h *Handler) ChangePassword(c *fiber.Ctx) error {
 // @Tags user
 // @Accept json
 // @Produce json
-// @Param body body InitiatePasswordResetReq true "Initiate password reset request"
+// @Param body body EmailReq true "Initiate password reset request"
 // @Success 200 {object} SuccessRes
 // @Failure 400 {object} ErrorRes
 // @Router /initiatepasswordreset [post]
 func (h *Handler) InitiatePasswordReset(c *fiber.Ctx) error {
 	// Parse the request
-	req := InitiatePasswordResetReq{}
+	req := EmailReq{}
 	err := c.BodyParser(&req)
 	if err != nil {
 		log.Printf("error initiating password reset: %s", err.Error())
@@ -519,7 +527,7 @@ func (h *Handler) TotpEnable(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Param body body TotpConfirm true "TOTP confirm request"
+// @Param body body TotpReq true "TOTP confirm request"
 // @Success 200 {object} model.TOTPBackup
 // @Failure 400 {object} ErrorRes
 // @Router /user/totp/enable/confirm [put]
@@ -560,7 +568,7 @@ func (h *Handler) TotpEnableConfirm(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Param body body TotpConfirm true "TOTP confirm request"
+// @Param body body TotpReq true "TOTP confirm request"
 // @Success 200 {object} SuccessRes
 // @Failure 400 {object} ErrorRes
 // @Router /user/totp/disable [put]

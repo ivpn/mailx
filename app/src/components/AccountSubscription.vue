@@ -1,6 +1,6 @@
 <template>
     <div class="mb-5">
-        <h2 class="text-2xl font-semibold  dark:text-gray-100 mb-5">Subscription</h2>
+        <h2 class="text-2xl font-semibold dark:text-gray-100 mb-5">Subscription</h2>
         <p v-if="res.id" class="text-sm text-gray-500 mb-5">
             <span v-if="isActive()"
                 class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-800 dark:text-emerald-100">Active</span>

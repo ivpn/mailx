@@ -77,7 +77,7 @@
                                 Description:
                             </label>
                             <input id="alias_description" v-model="alias.description"
-                                class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 leading-tight focus:border-bluish-500 mb-2"
+                                class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 leading-tight focus:border-bluish-500 mb-2"
                                 type="text">
                         </div>
                         <div class="mb-5">
@@ -85,7 +85,7 @@
                                 From name:
                             </label>
                             <input id="alias_from_name" v-model="alias.from_name"
-                                class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 leading-tight focus:border-bluish-500 mb-2"
+                                class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 leading-tight focus:border-bluish-500 mb-2"
                                 type="text">
                         </div>
                         <div class="mb-6">
@@ -93,7 +93,7 @@
                                 Recipient:
                             </label>
                             <select id="alias_recipient" :disabled="!recipients.length"
-                                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent">
+                                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent">
                                 <option v-for="(recipient, index) in recipients" v-bind:recipient
                                     :selected="recipient == settings.recipient || index === 0" :key="recipient">
                                     {{ recipient }}
@@ -105,7 +105,7 @@
                                 Domain:
                             </label>
                             <select id="alias_domain" :disabled="!domains.length"
-                                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent">
+                                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent">
                                 <option v-for="(domain, index) in domains" v-bind:domain
                                     :selected="domain == alias.domain || index === 0" :key="domain">
                                     {{ domain }}

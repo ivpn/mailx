@@ -1,6 +1,6 @@
 <template>
     <div class="mb-5">
-        <h2 class="text-2xl font-semibold dark:text-gray-100 mb-5">Passkeys</h2>
+        <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-5">Passkeys</h2>
         <div v-if="passkeySupported">
             <p class="text-gray-500 dark:text-gray-400 mb-5">
                 Add or remove Passkeys.<br>
@@ -46,13 +46,13 @@
                             </thead>
                             <tbody class="divide-y divide-gray-200 dark:divide-neutral-600">
                                 <tr v-for="cred in list" :key="rowKey">
-                                    <td class="pr-5 py-4 whitespace-nowrap text-start text-sm">
+                                    <td class="pr-5 py-4 whitespace-nowrap text-start text-sm text-gray-800 dark:text-gray-100">
                                         {{ new Date(cred.created_at).toDateString() }}
                                     </td>
-                                    <td class="px-5 py-4 whitespace-nowrap text-start text-sm">
+                                    <td class="px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800 dark:text-gray-100">
                                         {{ cred.cred_id }}
                                     </td>
-                                    <td class="pl-5 py-4 whitespace-nowrap text-end text-sm">
+                                    <td class="pl-5 py-4 whitespace-nowrap text-end text-sm text-gray-800 dark:text-gray-100">
                                         <button @click="deleteCred(cred.id)"
                                             class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600 font-medium text-sm py-2 focus:outline-none focus:shadow-outline"
                                             type="button">

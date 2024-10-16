@@ -38,7 +38,7 @@
                             <input
                                 v-model="req.otp"
                                 v-bind:class="{ 'border-gray-500 dark:border-neutral-400': !otpError, 'border-red-600 dark:border-red-600': otpError }"
-                                class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 dark:text-gray-300 dark:bg-neutral-800 leading-tight focus:border-bluish-500 mb-2"
+                                class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 leading-tight focus:border-bluish-500 mb-2"
                                 id="otp"
                                 type="text"
                                 pattern="[0-9]*">

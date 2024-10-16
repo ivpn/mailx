@@ -46,7 +46,7 @@
                                     v-bind:class="{ 'border-gray-500 dark:border-neutral-400': !codeError, 'border-red-600 dark:border-red-600': codeError }"
                                     id="totp_enable_code"
                                     placeholder="6-digit code"
-                                    class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 dark:text-gray-300 dark:bg-neutral-800 leading-tight focus:border-bluish-500 mb-2"
+                                    class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 leading-tight focus:border-bluish-500 mb-2"
                                     type="text"
                                     pattern="[0-9]*">
                                     <p v-if="codeError" class="text-red-600 text-sm">Required</p>

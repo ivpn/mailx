@@ -198,6 +198,22 @@ const loginWithPasskey = async () => {
 
     try {
         var res = await userApi.loginBegin(data)
+        startAuth(data, res)
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.response?.data.error || err.message
+
+            if (err.response?.status === 429) {
+                error.value = 'Too many requests, please try again later'
+            }
+        }
+    } finally {
+        isLoading.value = false // End loading
+    }
+}
+
+const startAuth = async (data: any, res: any) => {
+    try {
         const creds = await startAuthentication(res.data['publicKey'])
         res = await userApi.loginFinish(creds)
         error.value = ''
@@ -206,13 +222,15 @@ const loginWithPasskey = async () => {
             localStorage.setItem('email', data.email)
             window.location.href = '/'
         }
-    } catch (err) {
+    } catch (err: Error) {
         if (axios.isAxiosError(err)) {
             error.value = err.response?.data.error || err.message
 
             if (err.response?.status === 429) {
                 error.value = 'Too many requests, please try again later'
             }
+        } else {
+            error.value = err.message
         }
     } finally {
         isLoading.value = false // End loading

@@ -320,6 +320,7 @@ func (h *Handler) BeginLogin(c *fiber.Ctx) error {
 			"error": ErrSaveSession,
 		})
 	}
+	sessionData.Expires = time.Now().Add(h.Cfg.TokenExpiration)
 	err = h.Service.SaveSession(c.Context(), *sessionData, token, user.ID)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{

@@ -26,6 +26,12 @@ func (d *Database) GetCredentials(ctx context.Context, userID string) ([]model.C
 	return credentials, nil
 }
 
+func (d *Database) GetCredentialsCount(ctx context.Context, userID string) (int, error) {
+	var count int64
+	err := d.Client.Model(&model.Credential{}).Where("user_id = ?", userID).Count(&count).Error
+	return int(count), err
+}
+
 func (d *Database) SaveCredential(ctx context.Context, credential webauthn.Credential, userID string) error {
 	data, err := json.Marshal(credential)
 	if err != nil {

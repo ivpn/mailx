@@ -3,20 +3,23 @@ package service
 import (
 	"context"
 	"errors"
+	"log"
 
 	"github.com/go-webauthn/webauthn/webauthn"
 	"ivpn.net/email/api/internal/model"
 )
 
 var (
-	ErrGetCredentials   = errors.New("could not get credentials")
-	ErrSaveCredential   = errors.New("could not save credential")
-	ErrUpdateCredential = errors.New("could not update credential")
-	ErrDeleteCredential = errors.New("could not delete credential")
+	ErrGetCredentials        = errors.New("could not get credentials")
+	ErrSaveCredential        = errors.New("could not save credential")
+	ErrUpdateCredential      = errors.New("could not update credential")
+	ErrDeleteCredential      = errors.New("could not delete credential")
+	ErrMaxExceededCredential = errors.New("maximum number of passkeys reached")
 )
 
 type CredentialStore interface {
 	GetCredentials(context.Context, string) ([]model.Credential, error)
+	GetCredentialsCount(context.Context, string) (int, error)
 	SaveCredential(context.Context, webauthn.Credential, string) error
 	UpdateCredential(context.Context, webauthn.Credential, string) error
 	DeleteCredential(context.Context, webauthn.Credential, string) error
@@ -34,7 +37,17 @@ func (s *Service) GetCredentials(ctx context.Context, userID string) ([]model.Cr
 }
 
 func (s *Service) SaveCredential(ctx context.Context, credential webauthn.Credential, userID string) error {
-	err := s.Store.SaveCredential(ctx, credential, userID)
+	count, err := s.Store.GetCredentialsCount(ctx, userID)
+	if err != nil {
+		log.Printf("error saving credential: %s", err.Error())
+		return ErrSaveCredential
+	}
+
+	if count >= s.Cfg.Service.MaxCredentials {
+		return ErrMaxExceededCredential
+	}
+
+	err = s.Store.SaveCredential(ctx, credential, userID)
 	if err != nil {
 		return ErrSaveCredential
 	}

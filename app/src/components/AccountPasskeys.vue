@@ -121,10 +121,7 @@ const addPasskey = async () => {
 
     try {
         var res = await userApi.registerAdd(data)
-        const creds = await startRegistration(res.data['publicKey'])
-        res = await userApi.registerFinish(creds)
-        error.value = ''
-        getList()
+        startAddPasskey(res)
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.response?.data.error || err.message
@@ -132,6 +129,25 @@ const addPasskey = async () => {
             if (err.response?.status === 429) {
                 error.value = 'Too many requests, please try again later'
             }
+        }
+    }
+}
+
+const startAddPasskey = async (res: any) => {
+    try {
+        const creds = await startRegistration(res.data['publicKey'])
+        res = await userApi.registerFinish(creds)
+        error.value = ''
+        getList()
+    } catch (err: any) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.response?.data.error || err.message
+
+            if (err.response?.status === 429) {
+                error.value = 'Too many requests, please try again later'
+            }
+        } else {
+            error.value = 'The operation was aborted or failed'
         }
     }
 }

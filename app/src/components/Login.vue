@@ -230,7 +230,7 @@ const startAuth = async (data: any, res: any) => {
                 error.value = 'Too many requests, please try again later'
             }
         } else {
-            error.value = err.message
+            error.value = 'The operation was aborted or failed'
         }
     } finally {
         isLoading.value = false // End loading

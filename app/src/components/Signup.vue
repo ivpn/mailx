@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-neutral-900">
-        <h1 class="text-3xl text-gray-800 dark:text-gray-100 font-semibold mb-2">Sign Up</h1>
+        <h1 class="text-3xl text-gray-500 dark:text-gray-400 font-semibold mb-2">Sign Up</h1>
         <p class="text-gray-500 dark:text-gray-400 mb-8">Have an account? <a class="text-bluish-500 hover:text-bluish-600" href="/login">Log In</a></p>
         <form class="w-full max-w-sm bg-white dark:bg-neutral-800 px-8 pt-6 pb-8 mb-4" @submit.prevent="">
             <div v-if="passkeySupported" class="border-b border-gray-200 dark:border-neutral-600">

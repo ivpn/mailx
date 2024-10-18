@@ -21,7 +21,7 @@
         </div>
         <div v-if="!passkeySupported">
             <p class="text-gray-500 dark:text-gray-400 mb-5">
-                Your device does not adding support Passkeys.<br>
+                Your browser/device does not support adding Passkeys.<br>
             </p>
         </div>
         <div v-if="list.length" class="flex flex-col">

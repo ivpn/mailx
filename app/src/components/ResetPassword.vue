@@ -9,7 +9,7 @@
                     </label>
                     <input v-model="password"
                         v-bind:class="{ 'border-gray-500 dark:border-neutral-400': !passwordError, 'border-red-600 dark:border-red-600': passwordError }"
-                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 dark:text-gray-300 dark:bg-neutral-800"
+                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800"
                         id="password-new" type="password">
                 </div>
                 <div class="mb-6">
@@ -18,7 +18,7 @@
                     </label>
                     <input v-model="passwordConfirm"
                         v-bind:class="{ 'border-gray-500 dark:border-neutral-400': !passwordError, 'border-red-600 dark:border-red-600': passwordError }"
-                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 dark:text-gray-300 dark:bg-neutral-800"
+                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800"
                         id="password-new-conmfirm" type="password">
                 </div>
                 <p class="text-gray-500 dark:text-gray-400 mb-5 text-sm">

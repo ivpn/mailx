@@ -11,7 +11,7 @@
                     <input
                         v-model="email"
                         v-bind:class="{ 'border-gray-500': !emailError, 'border-red-600 dark:border-red-600': emailError }"
-                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 dark:bg-neutral-800 dark:border-neutral-500 dark:text-gray-400"
+                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800"
                         id="email" type="email" autocomplete="email">
                     <p v-if="emailError" class="text-red-600 text-sm">Required</p>
                 </div>

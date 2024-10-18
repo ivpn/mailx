@@ -17,6 +17,7 @@
                     Add Passkey
                 </button>
             </div>
+            <p v-if="error" class="text-red-600 text-sm mt-6 mb-4">Error: {{ error }}</p>
         </div>
         <div v-if="!passkeySupported">
             <p class="text-gray-500 dark:text-gray-400 mb-5">

@@ -1,6 +1,11 @@
 <template>
     <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-neutral-900">
-        <h1 class="text-3xl text-gray-500 dark:text-gray-400 font-semibold mb-2">Sign Up</h1>
+        <h1 class="text-3xl text-gray-800 dark:text-gray-100 font-semibold my-8">MailX</h1>
+        <h2 class="text-2xl text-gray-800 dark:text-gray-100 mb-8">
+            Email forwarding service operated by
+            <a class="text-bluish-500 hover:text-bluish-600" href="https://www.ivpn.net/">IVPN</a>
+        </h2>
+        <h2 class="text-xl text-gray-500 dark:text-gray-400 mb-2">Sign Up</h2>
         <p class="text-gray-500 dark:text-gray-400 mb-8">Have an account? <a class="text-bluish-500 hover:text-bluish-600" href="/login">Log In</a></p>
         <form class="w-full max-w-sm bg-white dark:bg-neutral-800 px-8 pt-6 pb-8 mb-4" @submit.prevent="">
             <div v-if="passkeySupported" class="border-b border-gray-200 dark:border-neutral-600">
@@ -90,6 +95,21 @@
                 </a>
             </div>
         </form>
+        <p class="text-gray-500 dark:text-gray-400 mt-3 mb-8 text-center">
+            Here to try MailX? You need an active IVPN account.<br>
+            Sign up or log in on <a class="text-bluish-500 hover:text-bluish-600" href="https://www.ivpn.net/account/">ivpn.net</a> and look for "Email Beta" in your account settings.
+        </p>
+        <div class="grid grid-cols-3 gap-4 text-center mb-8">
+            <p>
+                <a class="text-bluish-500 hover:text-bluish-600" href="/privacy/">Privacy Policy</a>
+            </p>
+            <p>
+                <a class="text-bluish-500 hover:text-bluish-600" href="/tos/">Terms of Service</a>
+            </p>
+            <p>
+                <a class="text-bluish-500 hover:text-bluish-600" href="https://www.ivpn.net/">IVPN Limited</a>
+            </p>
+        </div>
     </div>
 </template>
 

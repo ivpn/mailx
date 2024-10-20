@@ -30,10 +30,11 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	h.Server.Post("/v1/login/begin", limiter.New(), h.BeginLogin)
 	h.Server.Post("/v1/login/finish", limiter.New(), h.FinishLogin)
 
-	sub := h.Server.Group("/v1/subscription/update")
+	sub := h.Server.Group("/v1/subscription")
 	sub.Use(auth.NewPSK(cfg))
 	sub.Use(auth.NewPSKCORS(cfg))
-	sub.Put("", h.UpdateSubscription)
+	sub.Post("/add", h.AddSubscription)
+	sub.Put("/update", h.UpdateSubscription)
 
 	v1 := h.Server.Group("/v1")
 	v1.Use(auth.New(cfg, h.Cache, h.Service))
@@ -52,7 +53,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Put("/user/totp/enable/confirm", limit.New(5, 10*time.Minute), h.TotpEnableConfirm)
 	v1.Put("/user/totp/disable", limit.New(5, 10*time.Minute), h.TotpDisable)
 
-	v1.Get("/subscription", h.GetSubscription)
+	v1.Get("/sub", h.GetSubscription)
 
 	v1.Get("/settings", h.GetSettings)
 	v1.Put("/settings", h.UpdateSettings)

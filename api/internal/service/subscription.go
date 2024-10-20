@@ -54,6 +54,10 @@ func (s *Service) PostSubscription(ctx context.Context, userID string) error {
 	return nil
 }
 
+func (s *Service) AddSubscription(ctx context.Context, subscription model.Subscription) error {
+	return nil
+}
+
 func (s *Service) UpdateSubscription(ctx context.Context, subscription model.Subscription) error {
 	subscription.Type = model.Managed
 	err := s.Store.UpdateSubscription(ctx, subscription)

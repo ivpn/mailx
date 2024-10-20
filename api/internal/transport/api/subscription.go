@@ -16,7 +16,7 @@ var (
 
 type SubscriptionService interface {
 	GetSubscription(context.Context, string) (model.Subscription, error)
-	AddSubscription(context.Context, model.Subscription) error
+	AddSubscription(context.Context, model.Subscription, string) error
 	UpdateSubscription(context.Context, model.Subscription) error
 }
 
@@ -68,18 +68,10 @@ func (h *Handler) AddSubscription(c *fiber.Ctx) error {
 		})
 	}
 
-	activeUntil, err := dateparse.ParseAny(req.ActiveUntil)
-	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"error": ErrInvalidRequest,
-		})
-	}
-
 	sub := model.Subscription{}
 	sub.ID = req.ID
-	sub.ActiveUntil = activeUntil
 
-	err = h.Service.AddSubscription(c.Context(), sub)
+	err = h.Service.AddSubscription(c.Context(), sub, req.ActiveUntil)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),

@@ -11,6 +11,7 @@ import (
 
 var (
 	ErrGetSubscription    = errors.New("could not get subscription by user ID")
+	ErrAddSubscription    = errors.New("could not add subscription")
 	ErrPostSubscription   = errors.New("could not create subscription")
 	ErrUpdateSubscription = errors.New("could not update subscription")
 	ErrDeleteSubscription = errors.New("could not delete subscription")
@@ -54,7 +55,13 @@ func (s *Service) PostSubscription(ctx context.Context, userID string) error {
 	return nil
 }
 
-func (s *Service) AddSubscription(ctx context.Context, subscription model.Subscription) error {
+func (s *Service) AddSubscription(ctx context.Context, subscription model.Subscription, activeUntil string) error {
+	err := s.Cache.Set(ctx, "sub_"+subscription.ID, activeUntil, s.Cfg.Service.OTPExpiration)
+	if err != nil {
+		log.Printf("error adding subscription: %s", err.Error())
+		return ErrAddSubscription
+	}
+
 	return nil
 }
 

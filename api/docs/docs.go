@@ -692,7 +692,47 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api.UserReq"
+                            "$ref": "#/definitions/api.SignupUserReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/register/add": {
+            "post": {
+                "description": "Begin Add Passkey process",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "webauthn"
+                ],
+                "summary": "Add Passkey",
+                "parameters": [
+                    {
+                        "description": "Email",
+                        "name": "email",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.EmailReq"
                         }
                     }
                 ],
@@ -732,7 +772,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api.EmailReq"
+                            "$ref": "#/definitions/api.SignupEmailReq"
                         }
                     }
                 ],
@@ -898,7 +938,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/subscription": {
+        "/sub": {
             "get": {
                 "security": [
                     {
@@ -921,6 +961,51 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/model.Subscription"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/subscription/add": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Add subscription",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "subscription"
+                ],
+                "summary": "Add subscription",
+                "parameters": [
+                    {
+                        "description": "Subscription request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.SubscriptionReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
                     "400": {
@@ -1494,27 +1579,17 @@ const docTemplate = `{
         },
         "api.ChangePasswordReq": {
             "type": "object",
-            "required": [
-                "password"
-            ],
             "properties": {
                 "password": {
-                    "type": "string",
-                    "maxLength": 64,
-                    "minLength": 8
+                    "type": "string"
                 }
             }
         },
         "api.DeleteUserReq": {
             "type": "object",
-            "required": [
-                "password"
-            ],
             "properties": {
                 "password": {
-                    "type": "string",
-                    "maxLength": 64,
-                    "minLength": 8
+                    "type": "string"
                 }
             }
         },
@@ -1540,17 +1615,14 @@ const docTemplate = `{
         "api.ResetPasswordReq": {
             "type": "object",
             "required": [
-                "otp",
-                "password"
+                "otp"
             ],
             "properties": {
                 "otp": {
                     "type": "string"
                 },
                 "password": {
-                    "type": "string",
-                    "maxLength": 64,
-                    "minLength": 8
+                    "type": "string"
                 }
             }
         },
@@ -1570,6 +1642,39 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "recipient": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.SignupEmailReq": {
+            "type": "object",
+            "required": [
+                "email",
+                "sub_id"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "sub_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.SignupUserReq": {
+            "type": "object",
+            "required": [
+                "email",
+                "sub_id"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "sub_id": {
                     "type": "string"
                 }
             }
@@ -1613,8 +1718,7 @@ const docTemplate = `{
         "api.UserReq": {
             "type": "object",
             "required": [
-                "email",
-                "password"
+                "email"
             ],
             "properties": {
                 "email": {
@@ -1626,9 +1730,7 @@ const docTemplate = `{
                     "minLength": 0
                 },
                 "password": {
-                    "type": "string",
-                    "maxLength": 64,
-                    "minLength": 8
+                    "type": "string"
                 }
             }
         },

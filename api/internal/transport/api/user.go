@@ -30,14 +30,13 @@ var (
 )
 
 type UserService interface {
-	PostUser(context.Context, model.User) error
+	PostUser(context.Context, model.User, string) error
 	SendUserOTP(context.Context, string) error
 	ActivateUser(context.Context, string, string) error
 	GetUserByCredentials(context.Context, string, string) (model.User, error)
 	GetUserByPassword(context.Context, string, string) (model.User, error)
 	GetUserByEmail(context.Context, string) (model.User, error)
 	SaveUser(context.Context, model.User) error
-	GetOrPostUser(context.Context, model.User) (model.User, error)
 	DeleteUser(context.Context, string) error
 	GetUser(context.Context, string) (model.User, error)
 	GetUserStats(context.Context, string) (model.UserStats, error)
@@ -56,13 +55,13 @@ type UserService interface {
 // @Tags user
 // @Accept json
 // @Produce json
-// @Param body body UserReq true "User request"
+// @Param body body SignupUserReq true "User request"
 // @Success 201 {object} SuccessRes
 // @Failure 400 {object} ErrorRes
 // @Router /register [post]
 func (h *Handler) Register(c *fiber.Ctx) error {
 	// Parse the request
-	req := UserReq{}
+	req := SignupUserReq{}
 	err := c.BodyParser(&req)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -86,7 +85,7 @@ func (h *Handler) Register(c *fiber.Ctx) error {
 	}
 
 	// Save the user
-	err = h.Service.PostUser(c.Context(), user)
+	err = h.Service.PostUser(c.Context(), user, req.SubID)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),

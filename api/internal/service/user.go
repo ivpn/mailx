@@ -15,28 +15,29 @@ import (
 )
 
 var (
-	ErrGetUser            = errors.New("could not get user by ID")
-	ErrGetUserStats       = errors.New("could not get user stats")
-	ErrSaveUser           = errors.New("could not save user")
-	ErrPostUser           = errors.New("could not create user")
-	ErrActivateUser       = errors.New("could not activate user")
-	ErrDeleteUser         = errors.New("could not delete user")
-	ErrCreateOTP          = errors.New("could not create OTP")
-	ErrSaveOTP            = errors.New("could not save OTP")
-	ErrSendOTP            = errors.New("could not send OTP")
-	ErrExpiredOTP         = errors.New("expired OTP")
-	ErrIncorrectOTP       = errors.New("incorrect OTP")
-	ErrIncorrectEmail     = errors.New("incorrect email")
-	ErrIncorrectPass      = errors.New("incorrect password")
-	ErrLogoutUser         = errors.New("could not logout user")
-	ErrChangePassword     = errors.New("could not change password")
-	ErrTotpDisabled       = errors.New("2FA is disabled")
-	ErrGetTotp            = errors.New("could not get 2FA code")
-	ErrTotpBackupUsed     = errors.New("2FA backup is already used")
-	ErrTotpBackupNotFound = errors.New("2FA backup not found")
-	ErrTotpSetBackup      = errors.New("could not set 2FA backup")
-	ErrTotpDisable        = errors.New("could not disable 2FA")
-	ErrInvalidTOTPCode    = errors.New("invalid 2FA code")
+	ErrGetUser             = errors.New("could not get user by ID")
+	ErrGetUserStats        = errors.New("could not get user stats")
+	ErrSaveUser            = errors.New("could not save user")
+	ErrPostUser            = errors.New("could not create user")
+	ErrActivateUser        = errors.New("could not activate user")
+	ErrDeleteUser          = errors.New("could not delete user")
+	ErrCreateOTP           = errors.New("could not create OTP")
+	ErrSaveOTP             = errors.New("could not save OTP")
+	ErrSendOTP             = errors.New("could not send OTP")
+	ErrExpiredOTP          = errors.New("expired OTP")
+	ErrIncorrectOTP        = errors.New("incorrect OTP")
+	ErrIncorrectEmail      = errors.New("incorrect email")
+	ErrIncorrectPass       = errors.New("incorrect password")
+	ErrLogoutUser          = errors.New("could not logout user")
+	ErrChangePassword      = errors.New("could not change password")
+	ErrTotpDisabled        = errors.New("2FA is disabled")
+	ErrGetTotp             = errors.New("could not get 2FA code")
+	ErrTotpBackupUsed      = errors.New("2FA backup is already used")
+	ErrTotpBackupNotFound  = errors.New("2FA backup not found")
+	ErrTotpSetBackup       = errors.New("could not set 2FA backup")
+	ErrTotpDisable         = errors.New("could not disable 2FA")
+	ErrInvalidTOTPCode     = errors.New("invalid 2FA code")
+	ErrInvalidSubscription = errors.New("invalid subscription")
 )
 
 type UserStore interface {
@@ -99,21 +100,6 @@ func (s *Service) GetUserByPassword(ctx context.Context, userID string, password
 	return user, nil
 }
 
-func (s *Service) GetOrPostUser(ctx context.Context, user model.User) (model.User, error) {
-	user, err := s.Store.GetUserByEmail(ctx, user.Email)
-	if err != nil {
-		err = s.PostUser(ctx, user)
-		if err != nil {
-			log.Printf("error creating user: %s", err.Error())
-			return model.User{}, ErrPostUser
-		}
-
-		return user, nil
-	}
-
-	return user, nil
-}
-
 func (s *Service) SaveUser(ctx context.Context, user model.User) error {
 	err := s.Store.SaveUser(ctx, user)
 	if err != nil {
@@ -124,7 +110,12 @@ func (s *Service) SaveUser(ctx context.Context, user model.User) error {
 	return nil
 }
 
-func (s *Service) PostUser(ctx context.Context, user model.User) error {
+func (s *Service) PostUser(ctx context.Context, user model.User, subID string) error {
+	activeUntil, err := s.Cache.Get(ctx, "sub_"+subID)
+	if err != nil {
+		return ErrInvalidSubscription
+	}
+
 	rcpCount, err := s.Store.GetRecipientsCountByEmail(ctx, user.Email)
 	if err != nil || rcpCount > 0 {
 		return model.ErrDuplicateEmail
@@ -149,7 +140,7 @@ func (s *Service) PostUser(ctx context.Context, user model.User) error {
 		}
 	}
 
-	err = s.PostSubscription(ctx, user.ID)
+	err = s.PostSubscription(ctx, user.ID, subID, activeUntil)
 	if err != nil {
 		log.Printf("error creating user: %s", err.Error())
 		return ErrPostUser

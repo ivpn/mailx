@@ -46,13 +46,13 @@ type CredentialService interface {
 // @Tags webauthn
 // @Accept json
 // @Produce json
-// @Param email body EmailReq true "Email"
+// @Param email body SignupEmailReq true "Email"
 // @Success 201 {object} SuccessRes
 // @Failure 400 {object} ErrorRes
 // @Router /register/begin [post]
 func (h *Handler) BeginRegistration(c *fiber.Ctx) error {
 	// Parse the request
-	req := EmailReq{}
+	req := SignupEmailReq{}
 	err := c.BodyParser(&req)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -75,7 +75,7 @@ func (h *Handler) BeginRegistration(c *fiber.Ctx) error {
 	}
 
 	// Save user
-	err = h.Service.PostUser(c.Context(), user)
+	err = h.Service.PostUser(c.Context(), user, req.SubID)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),

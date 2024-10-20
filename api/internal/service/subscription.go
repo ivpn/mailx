@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 	"log"
-	"time"
 
+	"github.com/araddon/dateparse"
 	"ivpn.net/email/api/internal/model"
 )
 
@@ -33,20 +33,21 @@ func (s *Service) GetSubscription(ctx context.Context, userID string) (model.Sub
 	return subscription, nil
 }
 
-func (s *Service) PostSubscription(ctx context.Context, userID string) error {
-	activeUntil := time.Now().AddDate(0, -1, 0)
-
-	if s.Cfg.Service.SubscriptionType == string(model.Managed) {
-		activeUntil = time.Now().AddDate(1, 0, 0)
+func (s *Service) PostSubscription(ctx context.Context, userID string, subID string, activeUntil string) error {
+	activeUntilTime, err := dateparse.ParseAny(activeUntil)
+	if err != nil {
+		log.Printf("error posting subscription: %s", err.Error())
+		return ErrPostSubscription
 	}
 
 	sub := model.Subscription{
-		Type:        model.Free,
+		Type:        model.Managed,
 		UserID:      userID,
-		ActiveUntil: activeUntil,
+		ActiveUntil: activeUntilTime,
 	}
+	sub.ID = subID
 
-	err := s.Store.PostSubscription(ctx, sub)
+	err = s.Store.PostSubscription(ctx, sub)
 	if err != nil {
 		log.Printf("error posting subscription: %s", err.Error())
 		return ErrPostSubscription

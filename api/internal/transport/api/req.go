@@ -1,5 +1,31 @@
 package api
 
+type UserReq struct {
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"password"`
+	OTP      string `json:"otp" validate:"min=0,max=8"`
+}
+
+type EmailReq struct {
+	Email string `json:"email" validate:"required,email"`
+}
+
+type SignupUserReq struct {
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"password"`
+	SubID    string `json:"sub_id" validate:"required,uuid"`
+}
+
+type SignupEmailReq struct {
+	Email string `json:"email" validate:"required,email"`
+	SubID string `json:"sub_id" validate:"required,uuid"`
+}
+
+type SubscriptionReq struct {
+	ID          string `json:"id" validate:"required,uuid"`
+	ActiveUntil string `json:"active_until" validate:"required"`
+}
+
 type AliasReq struct {
 	Description string `json:"description"`
 	Enabled     bool   `json:"enabled"`
@@ -9,26 +35,11 @@ type AliasReq struct {
 	Domain      string `json:"domain" validate:"required"`
 }
 
-type EmailReq struct {
-	Email string `json:"email" validate:"required,email"`
-}
-
-type SubscriptionReq struct {
-	ID          string `json:"id" validate:"required,uuid"`
-	ActiveUntil string `json:"active_until" validate:"required"`
-}
-
 type SettingsReq struct {
 	ID        string `json:"id" validate:"required,uuid"`
 	Domain    string `json:"domain"`
 	Recipient string `json:"recipient"`
 	FromName  string `json:"from_name"`
-}
-
-type UserReq struct {
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"password"`
-	OTP      string `json:"otp" validate:"min=0,max=8"`
 }
 
 type DeleteUserReq struct {

@@ -13,12 +13,12 @@ type EmailReq struct {
 type SignupUserReq struct {
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"password"`
-	SubID    string `json:"sub_id" validate:"required,uuid"`
+	SubID    string `json:"subid" validate:"required,uuid"`
 }
 
 type SignupEmailReq struct {
 	Email string `json:"email" validate:"required,email"`
-	SubID string `json:"sub_id" validate:"required,uuid"`
+	SubID string `json:"subid" validate:"required,uuid"`
 }
 
 type SubscriptionReq struct {

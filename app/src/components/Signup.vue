@@ -115,6 +115,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUpdated } from 'vue'
+import { useRoute } from 'vue-router'
 import axios from 'axios'
 import { userApi } from '../api/user.ts'
 import { startRegistration, browserSupportsWebAuthn } from '@simplewebauthn/browser'
@@ -130,6 +131,7 @@ const apiSuccess = ref('')
 const apiError = ref('')
 const isLoading = ref(false)
 const passkeySupported = ref(false)
+const subid = ref('')
 
 const validateEmail = () => {
     emailError.value = !email.value
@@ -158,7 +160,8 @@ const register = async () => {
     isLoading.value = true // Start loading
     const data = {
         email: email.value,
-        password: password.value
+        password: password.value,
+        subid: subid.value
     }
 
     try {
@@ -185,7 +188,8 @@ const registerWithPasskey = async () => {
     isLoading.value = true // Start loading
 
     const data = {
-        email: emailAuthn.value
+        email: emailAuthn.value,
+        subid: subid.value
     }
 
     try {
@@ -212,7 +216,16 @@ const registerWithPasskey = async () => {
     }
 }
 
+const parseSubid = () => {
+    const route = useRoute()
+    subid.value = route.params.subid as string
+    if (!subid.value || !subid.value.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
+        window.location.href = '/login'
+    }
+}
+
 onMounted(() => {
+    parseSubid()
     passkeySupported.value = browserSupportsWebAuthn()
     tabs.autoInit()
 })

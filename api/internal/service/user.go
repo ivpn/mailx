@@ -37,7 +37,7 @@ var (
 	ErrTotpSetBackup       = errors.New("could not set 2FA backup")
 	ErrTotpDisable         = errors.New("could not disable 2FA")
 	ErrInvalidTOTPCode     = errors.New("invalid 2FA code")
-	ErrInvalidSubscription = errors.New("invalid subscription")
+	ErrInvalidSubscription = errors.New("invalid signup URL")
 )
 
 type UserStore interface {

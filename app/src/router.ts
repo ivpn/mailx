@@ -59,7 +59,7 @@ const routes = [
         ]
     },
     {
-        path: '/signup',
+        path: '/signup/:subid',
         name: env.APP_NAME + ' - Sign Up',
         component: Signup
     },

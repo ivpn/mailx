@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/araddon/dateparse"
+	"github.com/go-sql-driver/mysql"
 	"ivpn.net/email/api/internal/model"
 )
 
@@ -50,7 +51,12 @@ func (s *Service) PostSubscription(ctx context.Context, userID string, subID str
 	err = s.Store.PostSubscription(ctx, sub)
 	if err != nil {
 		log.Printf("error posting subscription: %s", err.Error())
-		return ErrPostSubscription
+		var mysqlErr *mysql.MySQLError
+		if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
+			return model.ErrDuplicateSubscription
+		} else {
+			return ErrPostSubscription
+		}
 	}
 
 	err = s.Cache.Del(ctx, "sub_"+subID)

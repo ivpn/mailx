@@ -1,6 +1,9 @@
 package model
 
-import "time"
+import (
+	"errors"
+	"time"
+)
 
 type SubscriptionType string
 
@@ -9,8 +12,14 @@ const (
 	Managed SubscriptionType = "Managed"
 )
 
+var (
+	ErrDuplicateSubscription = errors.New("subscription already exists")
+)
+
 type Subscription struct {
-	BaseModel
+	ID          string           `gorm:"unique" json:"id"`
+	CreatedAt   time.Time        `json:"created_at"`
+	UpdatedAt   time.Time        `json:"-"`
 	UserID      string           `json:"-"`
 	Type        SubscriptionType `json:"type"`
 	ActiveUntil time.Time        `json:"active_until"`

@@ -13,8 +13,7 @@
         </div>
     </div>
     <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="flex flex-col p-5 pb-4 my-8 bg-white dark:bg-neutral-800">
-        <h1 v-if="!isDashboard" class="text-3xl text-gray-800 dark:text-gray-100 font-semibold mb-5">Recipients</h1>
-        <h1 v-if="isDashboard" class="text-3xl text-gray-800 dark:text-gray-100 font-semibold mb-5">Latest Recipients</h1>
+        <h1 class="text-3xl text-gray-800 dark:text-gray-100 font-semibold mb-5">Recipients</h1>
         <div>
             <div class="flex items-center justify-between mb-6">
                 <RecipientCreate @onCreateRecipient="getList" />

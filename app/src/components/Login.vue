@@ -9,13 +9,17 @@
         <form class="w-full max-w-sm bg-white dark:bg-neutral-800 px-8 pt-6 pb-8 mb-4" @submit.prevent="">
             <div v-if="passkeySupported" class="border-b border-gray-200 dark:border-neutral-600">
                 <nav class="flex gap-x-1" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
-                    <button type="button"
+                    <button
+                        type="button"
+                        @click="onTabChange"
                         class="hs-tab-active:font-semibold hs-tab-active:border-bluish-500 hs-tab-active:text-bluish-500 pt-2 pb-4 px-1 text-center basis-0 grow inline-flex justify-center items-center gap-x-2 border-b-2 border-transparent whitespace-nowrap text-gray-500 hover:text-bluish-500 focus:outline-none focus:text-bluish-500 disabled:opacity-50 disabled:pointer-events-none dark:text-neutral-400 dark:hover:text-bluish-500 active"
                         id="tabs-with-underline-item-1" aria-selected="true" data-hs-tab="#tabs-with-underline-1"
                         aria-controls="tabs-with-underline-1" role="tab">
                         Passkey
                     </button>
-                    <button type="button"
+                    <button
+                        type="button"
+                        @click="onTabChange"
                         class="hs-tab-active:font-semibold hs-tab-active:border-bluish-500 hs-tab-active:text-bluish-500 pt-2 pb-4 px-1 text-center basis-0 grow inline-flex justify-center items-center gap-x-2 border-b-2 border-transparent whitespace-nowrap text-gray-500 hover:text-bluish-500 focus:outline-none focus:text-bluish-500 disabled:opacity-50 disabled:pointer-events-none dark:text-neutral-400 dark:hover:text-bluish-500"
                         id="tabs-with-underline-item-2" aria-selected="false" data-hs-tab="#tabs-with-underline-2"
                         aria-controls="tabs-with-underline-2" role="tab">
@@ -75,8 +79,8 @@
                                 Two-factor authentication token:
                             </label>
                             <input v-model="otp"
-                                v-bind:class="{ 'border-gray-500': !otpError, 'border-red-600': otpError }"
-                                class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2"
+                                v-bind:class="{ 'border-gray-500': !otpError, 'border-red-600 dark:border-red-600': otpError }"
+                                class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 dark:bg-neutral-800 dark:border-neutral-500 dark:text-gray-400"
                                 id="otp" type="text">
                             <p v-if="otpError" class="text-red-600 text-sm mb-2">Required</p>
                         </div>
@@ -256,6 +260,10 @@ const startAuth = async (data: any, res: any) => {
 
 const isLoggedIn = () => {
     return localStorage.getItem('email') != '' && localStorage.getItem('email') != null
+}
+
+const onTabChange = () => {
+    otpRequired.value = false
 }
 
 onMounted(() => {

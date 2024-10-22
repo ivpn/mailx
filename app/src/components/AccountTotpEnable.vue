@@ -75,7 +75,7 @@
                                     {{ resConfirm.backup }}
                                 </span>
                             </p>
-                            <p class="text-gray-500 mb-5">
+                            <p class="text-gray-500 dark:text-gray-400 mb-5">
                                 Each of these codes can be used only once.
                             </p>
                             <div class="flex justify-start items-center gap-x-3 pt-4 border-t dark:border-neutral-600">

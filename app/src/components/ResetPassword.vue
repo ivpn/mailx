@@ -1,10 +1,10 @@
 <template>
-    <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+    <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-neutral-900">
         <h1 class="text-3xl text-gray-800 dark:text-gray-100 font-semibold mb-8">Set New Password</h1>
-        <form class="w-full max-w-sm bg-white px-8 pt-6 pb-8 mb-4" @submit.prevent="resetPassword">
+        <form class="w-full max-w-sm bg-white dark:bg-neutral-800 px-8 pt-6 pb-8 mb-4" @submit.prevent="resetPassword">
             <div v-if="!apiSuccess">
                 <div class="mb-6">
-                    <label class="block text-gray-500 mb-2" for="password-new">
+                    <label class="block text-gray-500 dark:text-gray-400 mb-2" for="password-new">
                         New Password
                     </label>
                     <input v-model="password"
@@ -13,7 +13,7 @@
                         id="password-new" type="password">
                 </div>
                 <div class="mb-6">
-                    <label class="block text-gray-500 mb-2" for="password-new-conmfirm">
+                    <label class="block text-gray-500 dark:text-gray-400 mb-2" for="password-new-conmfirm">
                         Confirm
                     </label>
                     <input v-model="passwordConfirm"

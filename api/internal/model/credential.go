@@ -9,7 +9,7 @@ import (
 type Credential struct {
 	BaseModel
 	UserID string              `json:"user_id"`
-	CredID []byte              `gorm:"-" json:"cred_id"`
+	CredID []byte              `gorm:"-" json:"-"`
 	Cred   webauthn.Credential `gorm:"-" json:"-"`
 	Data   []byte              `gorm:"type:blob" json:"-"`
 }

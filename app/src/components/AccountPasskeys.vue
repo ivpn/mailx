@@ -51,7 +51,7 @@
                                         {{ new Date(cred.created_at).toDateString() }}
                                     </td>
                                     <td class="px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800 dark:text-gray-100">
-                                        {{ cred.cred_id }}
+                                        {{ cred.id }}
                                     </td>
                                     <td class="pl-5 py-4 whitespace-nowrap text-end text-sm text-gray-800 dark:text-gray-100">
                                         <button @click="deleteCred(cred.id)"
@@ -78,7 +78,6 @@ import { startRegistration, browserSupportsWebAuthn } from '@simplewebauthn/brow
 
 const credential = {
     id: '',
-    cred_id: '',
     created_at: '',
 }
 

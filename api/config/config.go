@@ -34,7 +34,12 @@ type DBConfig struct {
 }
 
 type RedisConfig struct {
-	Addr string
+	Addr                  string
+	TLSEnabled            bool
+	CertFile              string
+	KeyFile               string
+	CACertFile            string
+	TLSInsecureSkipVerify bool // Optional: Only for testing, use false in production
 }
 
 type SMTPClientConfig struct {
@@ -126,7 +131,12 @@ func New() (Config, error) {
 			Password: os.Getenv("DB_PASSWORD"),
 		},
 		Redis: RedisConfig{
-			Addr: os.Getenv("REDIS_ADDR"),
+			Addr:                  os.Getenv("REDIS_ADDR"),
+			TLSEnabled:            os.Getenv("REDIS_TLS_ENABLED") == "true",
+			CertFile:              os.Getenv("REDIS_CERT_FILE"),
+			KeyFile:               os.Getenv("REDIS_KEY_FILE"),
+			CACertFile:            os.Getenv("REDIS_CA_CERT_FILE"),
+			TLSInsecureSkipVerify: os.Getenv("REDIS_TLS_INSECURE_SKIP_VERIFY") == "true",
 		},
 		SMTPClient: SMTPClientConfig{
 			Host:       os.Getenv("SMTP_CLIENT_HOST"),

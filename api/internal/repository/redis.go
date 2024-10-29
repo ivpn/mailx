@@ -17,8 +17,35 @@ type Redis struct {
 }
 
 func NewRedis(cfg config.RedisConfig) (*Redis, error) {
+	var client *redis.Client
+	client, err := newClient(cfg)
+
+	if cfg.MasterName != "" && len(cfg.Addrs) > 0 {
+		client, err = newFailoverClient(cfg)
+	}
+
+	_, err = client.Ping(context.Background()).Result()
+	if err != nil {
+		return nil, err
+	}
+
+	return &Redis{Client: client}, nil
+}
+
+func newClient(cfg config.RedisConfig) (*redis.Client, error) {
 	options := &redis.Options{
 		Addr: cfg.Addr,
+	}
+
+	return redis.NewClient(options), nil
+}
+
+func newFailoverClient(cfg config.RedisConfig) (*redis.Client, error) {
+	options := &redis.FailoverOptions{
+		MasterName:    cfg.MasterName,
+		SentinelAddrs: cfg.Addrs,
+		Password:      "",
+		DB:            0,
 	}
 
 	if cfg.TLSEnabled {
@@ -44,14 +71,7 @@ func NewRedis(cfg config.RedisConfig) (*Redis, error) {
 		}
 	}
 
-	client := redis.NewClient(options)
-
-	_, err := client.Ping(context.Background()).Result()
-	if err != nil {
-		return nil, err
-	}
-
-	return &Redis{Client: client}, nil
+	return redis.NewFailoverClient(options), nil
 }
 
 func (r *Redis) Close() error {

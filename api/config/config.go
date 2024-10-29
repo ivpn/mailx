@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -35,6 +36,8 @@ type DBConfig struct {
 
 type RedisConfig struct {
 	Addr                  string
+	Addrs                 []string
+	MasterName            string
 	TLSEnabled            bool
 	CertFile              string
 	KeyFile               string
@@ -106,6 +109,8 @@ func New() (Config, error) {
 		return Config{}, err
 	}
 
+	redisAddrs := strings.Split(os.Getenv("REDIS_ADDRESSES"), ",")
+
 	return Config{
 		API: APIConfig{
 			FQDN:              os.Getenv("FQDN"),
@@ -132,6 +137,8 @@ func New() (Config, error) {
 		},
 		Redis: RedisConfig{
 			Addr:                  os.Getenv("REDIS_ADDR"),
+			Addrs:                 redisAddrs,
+			MasterName:            os.Getenv("REDIS_MASTER_NAME"),
 			TLSEnabled:            os.Getenv("REDIS_TLS_ENABLED") == "true",
 			CertFile:              os.Getenv("REDIS_CERT_FILE"),
 			KeyFile:               os.Getenv("REDIS_KEY_FILE"),

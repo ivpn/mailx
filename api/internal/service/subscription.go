@@ -35,12 +35,8 @@ func (s *Service) GetSubscription(ctx context.Context, userID string) (model.Sub
 func (s *Service) PostSubscription(ctx context.Context, userID string) error {
 	activeUntil := time.Now().AddDate(0, -1, 0)
 
-	if s.Cfg.Service.SubscriptionType == string(model.Managed) {
-		activeUntil = time.Now().AddDate(1, 0, 0)
-	}
-
 	sub := model.Subscription{
-		Type:        model.Free,
+		Type:        model.Managed,
 		UserID:      userID,
 		ActiveUntil: activeUntil,
 	}

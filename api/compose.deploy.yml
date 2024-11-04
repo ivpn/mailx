@@ -10,7 +10,8 @@ services:
       - ${API_PORT}:${API_PORT}
     volumes:
       - api:/var/log
-    network_mode: host
+    networks:
+      email:
   
   app:
     build: ../app
@@ -19,7 +20,15 @@ services:
     restart: always
     ports:
       - ${APP_PORT}:${APP_PORT}
-    network_mode: host
+    networks:
+      email:
 
 volumes:
   api:
+
+networks:
+  email:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${NETWORK_SUBNET}

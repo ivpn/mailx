@@ -54,6 +54,3 @@ volumes:
 networks:
   email:
     driver: bridge
-    ipam:
-      config:
-        - subnet: ${NETWORK_SUBNET}

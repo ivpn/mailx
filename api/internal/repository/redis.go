@@ -27,6 +27,11 @@ func NewRedis(cfg config.RedisConfig) (*Redis, error) {
 		client, err = newFailoverClient(cfg)
 	}
 
+	if err != nil {
+		log.Println("Failed to connect to Redis:", err.Error())
+		return nil, err
+	}
+
 	_, err = client.Ping(context.Background()).Result()
 	if err != nil {
 		return nil, err

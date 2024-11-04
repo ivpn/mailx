@@ -38,6 +38,8 @@ type RedisConfig struct {
 	Addr                  string
 	Addrs                 []string
 	MasterName            string
+	FailoverUsername      string
+	FailoverPassword      string
 	TLSEnabled            bool
 	CertFile              string
 	KeyFile               string
@@ -139,6 +141,8 @@ func New() (Config, error) {
 			Addr:                  os.Getenv("REDIS_ADDR"),
 			Addrs:                 redisAddrs,
 			MasterName:            os.Getenv("REDIS_MASTER_NAME"),
+			FailoverUsername:      os.Getenv("REDIS_FAILOVER_USERNAME"),
+			FailoverPassword:      os.Getenv("REDIS_FAILOVER_PASSWORD"),
 			TLSEnabled:            os.Getenv("REDIS_TLS_ENABLED") == "true",
 			CertFile:              os.Getenv("REDIS_CERT_FILE"),
 			KeyFile:               os.Getenv("REDIS_KEY_FILE"),

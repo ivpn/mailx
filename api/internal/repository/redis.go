@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -17,6 +18,8 @@ type Redis struct {
 }
 
 func NewRedis(cfg config.RedisConfig) (*Redis, error) {
+	log.Println("Connecting to Redis")
+
 	var client *redis.Client
 	client, err := newClient(cfg)
 
@@ -41,14 +44,20 @@ func newClient(cfg config.RedisConfig) (*redis.Client, error) {
 }
 
 func newFailoverClient(cfg config.RedisConfig) (*redis.Client, error) {
+	log.Println("Creating failover client")
 	options := &redis.FailoverOptions{
-		MasterName:    cfg.MasterName,
-		SentinelAddrs: cfg.Addrs,
-		Password:      "",
-		DB:            0,
+		MasterName:       cfg.MasterName,
+		Username:         cfg.FailoverUsername,
+		Password:         cfg.FailoverPassword,
+		SentinelUsername: cfg.FailoverUsername,
+		SentinelPassword: cfg.FailoverPassword,
+		SentinelAddrs:    cfg.Addrs,
+		DB:               0,
 	}
 
 	if cfg.TLSEnabled {
+		log.Println("Using TLS to connect to Redis")
+
 		cert, err := tls.LoadX509KeyPair(cfg.CertFile, cfg.KeyFile)
 		if err != nil {
 			return nil, fmt.Errorf("failed to load client certificate: %v", err)

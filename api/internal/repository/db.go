@@ -45,21 +45,32 @@ func connect(cfg config.DBConfig) (*gorm.DB, error) {
 		Logger: logger.Default.LogMode(logger.Silent),
 	}
 
-	dsn_a := cfg.User + ":" + cfg.Password + "@tcp(:" + cfg.Port + ")/" + cfg.Name + "?charset=utf8mb4&parseTime=True&loc=Local"
-	dsn_b := cfg.User + ":" + cfg.Password + "@tcp(:" + cfg.Port + ")/" + cfg.Name + "?charset=utf8mb4&parseTime=True&loc=Local"
-	dsn_c := cfg.User + ":" + cfg.Password + "@tcp(:" + cfg.Port + ")/" + cfg.Name + "?charset=utf8mb4&parseTime=True&loc=Local"
+	host_main := cfg.Host
 
-	db, err := gorm.Open(mysql.Open(dsn_a), config)
+	if len(cfg.Hosts) > 0 {
+		host_main = cfg.Hosts[0]
+	}
+
+	dsn_main := cfg.User + ":" + cfg.Password + "@tcp(" + host_main + ":" + cfg.Port + ")/" + cfg.Name + "?charset=utf8mb4&parseTime=True&loc=Local"
+
+	db, err := gorm.Open(mysql.Open(dsn_main), config)
 	if err != nil {
 		return nil, err
 	}
 
 	// DBResolver adds multiple databases support to GORM
 	// https://github.com/go-gorm/dbresolver
-	db.Use(dbresolver.Register(dbresolver.Config{
-		Sources: []gorm.Dialector{mysql.Open(dsn_b), mysql.Open(dsn_c)},
-		Policy:  dbresolver.RandomPolicy{},
-	}))
+	if len(cfg.Hosts) > 0 {
+		hosts := make([]gorm.Dialector, 0)
+		for _, host := range cfg.Hosts {
+			hosts = append(hosts, mysql.Open(cfg.User+":"+cfg.Password+"@tcp("+host+":"+cfg.Port+")/"+cfg.Name+"?charset=utf8mb4&parseTime=True&loc=Local"))
+		}
+
+		db.Use(dbresolver.Register(dbresolver.Config{
+			Sources: hosts,
+			Policy:  dbresolver.RandomPolicy{},
+		}))
+	}
 
 	log.Println("DB connection OK")
 

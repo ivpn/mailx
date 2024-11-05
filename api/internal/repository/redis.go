@@ -18,8 +18,6 @@ type Redis struct {
 }
 
 func NewRedis(cfg config.RedisConfig) (*Redis, error) {
-	log.Println("Connecting to Redis")
-
 	var client *redis.Client
 	client, err := newClient(cfg)
 
@@ -37,10 +35,13 @@ func NewRedis(cfg config.RedisConfig) (*Redis, error) {
 		return nil, err
 	}
 
+	log.Println("Redis connection OK")
+
 	return &Redis{Client: client}, nil
 }
 
 func newClient(cfg config.RedisConfig) (*redis.Client, error) {
+	log.Println("Creating Redis client")
 	options := &redis.Options{
 		Addr: cfg.Addr,
 	}
@@ -49,7 +50,7 @@ func newClient(cfg config.RedisConfig) (*redis.Client, error) {
 }
 
 func newFailoverClient(cfg config.RedisConfig) (*redis.Client, error) {
-	log.Println("Creating failover client")
+	log.Println("Creating Redis failover client")
 	options := &redis.FailoverOptions{
 		MasterName:       cfg.MasterName,
 		Username:         cfg.FailoverUsername,

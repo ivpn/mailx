@@ -8,14 +8,10 @@ services:
     restart: always
     ports:
       - ${API_PORT}:${API_PORT}
-    depends_on:
-      db:
-        condition: service_healthy
     volumes:
       - api:/var/log
-    networks:
-      email:
-  
+    network_mode: host
+
   app:
     build: ../app
     container_name: email-app
@@ -23,33 +19,10 @@ services:
     restart: always
     ports:
       - ${APP_PORT}:${APP_PORT}
-    networks:
-      email:
-
-  db:
-    image: mariadb
-    container_name: email-db
-    restart: always
-    healthcheck:
-      test: "/usr/bin/mariadb --user=${DB_USER} --password=${DB_PASSWORD} --execute \"SHOW DATABASES;\""
-      interval: 2s
-      timeout: 10s
-      retries: 5
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_USER: ${DB_USER}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - db:/var/lib/mysql
-    labels:
-      - docker-volume-backup.stop-during-backup=db
-    networks:
-      email:
+    network_mode: host
 
 volumes:
   api:
-  db:
 
 networks:
   email:

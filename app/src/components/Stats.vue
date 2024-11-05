@@ -62,6 +62,9 @@ const getStats = async () => {
     try {
         const response = await userApi.stats()
         stats.value = response.data
+        if (!stats.value.messages) {
+            stats.value.messages = []
+        }
         error.value = ''
         initChart()
     } catch (err) {

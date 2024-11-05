@@ -66,10 +66,13 @@ func connect(cfg config.DBConfig) (*gorm.DB, error) {
 			hosts = append(hosts, mysql.Open(cfg.User+":"+cfg.Password+"@tcp("+host+":"+cfg.Port+")/"+cfg.Name+"?charset=utf8mb4&parseTime=True&loc=Local"))
 		}
 
-		db.Use(dbresolver.Register(dbresolver.Config{
+		err = db.Use(dbresolver.Register(dbresolver.Config{
 			Sources: hosts,
 			Policy:  dbresolver.RandomPolicy{},
 		}))
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	log.Println("DB connection OK")

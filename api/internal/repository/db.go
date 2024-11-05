@@ -6,6 +6,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"gorm.io/plugin/dbresolver"
 	"ivpn.net/email/api/config"
 	"ivpn.net/email/api/internal/model"
 )
@@ -44,7 +45,13 @@ func connect(cfg config.DBConfig) (*gorm.DB, error) {
 		Logger: logger.Default.LogMode(logger.Silent),
 	}
 
-	dsn_main := cfg.User + ":" + cfg.Password + "@tcp(" + cfg.Host + ":" + cfg.Port + ")/" + cfg.Name + "?charset=utf8mb4&parseTime=True&loc=Local"
+	host_main := cfg.Host
+
+	if len(cfg.Hosts) > 0 {
+		host_main = cfg.Hosts[0]
+	}
+
+	dsn_main := cfg.User + ":" + cfg.Password + "@tcp(" + host_main + ":" + cfg.Port + ")/" + cfg.Name + "?charset=utf8mb4&parseTime=True&loc=Local"
 
 	db, err := gorm.Open(mysql.Open(dsn_main), config)
 	if err != nil {
@@ -53,11 +60,20 @@ func connect(cfg config.DBConfig) (*gorm.DB, error) {
 
 	// DBResolver adds multiple databases support to GORM
 	// https://github.com/go-gorm/dbresolver
-	// db.Use(dbresolver.Register(dbresolver.Config{
-	// 	Sources:  []gorm.Dialector{mysql.Open(dsn_main)},
-	// 	Replicas: []gorm.Dialector{mysql.Open(dsn_main)},
-	// 	Policy:   dbresolver.RandomPolicy{},
-	// }))
+	if len(cfg.Hosts) > 0 {
+		hosts := make([]gorm.Dialector, 0)
+		for _, host := range cfg.Hosts {
+			hosts = append(hosts, mysql.Open(cfg.User+":"+cfg.Password+"@tcp("+host+":"+cfg.Port+")/"+cfg.Name+"?charset=utf8mb4&parseTime=True&loc=Local"))
+		}
+
+		err = db.Use(dbresolver.Register(dbresolver.Config{
+			Sources: hosts,
+			Policy:  dbresolver.RandomPolicy{},
+		}))
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	log.Println("DB connection OK")
 

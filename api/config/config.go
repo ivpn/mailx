@@ -27,6 +27,7 @@ type APIConfig struct {
 
 type DBConfig struct {
 	Host     string
+	Hosts    []string
 	Port     string
 	Name     string
 	User     string
@@ -110,6 +111,7 @@ func New() (Config, error) {
 		return Config{}, err
 	}
 
+	dbHosts := strings.Split(os.Getenv("DB_HOSTS"), ",")
 	redisAddrs := strings.Split(os.Getenv("REDIS_ADDRESSES"), ",")
 
 	return Config{
@@ -130,6 +132,7 @@ func New() (Config, error) {
 		},
 		DB: DBConfig{
 			Host:     os.Getenv("DB_HOST"),
+			Hosts:    dbHosts,
 			Port:     os.Getenv("DB_PORT"),
 			Name:     os.Getenv("DB_NAME"),
 			User:     os.Getenv("DB_USER"),

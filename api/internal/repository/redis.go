@@ -21,7 +21,7 @@ func NewRedis(cfg config.RedisConfig) (*Redis, error) {
 	var client *redis.Client
 	client, err := newClient(cfg)
 
-	if cfg.MasterName != "" && len(cfg.Addrs) > 0 {
+	if cfg.MasterName != "" && len(cfg.Addrs) > 0 && cfg.Addrs[0] != "" {
 		client, err = newFailoverClient(cfg)
 	}
 

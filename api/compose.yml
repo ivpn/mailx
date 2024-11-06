@@ -23,6 +23,8 @@ services:
     restart: always
     ports:
       - ${APP_PORT}:${APP_PORT}
+    networks:
+      email:
 
   db:
     image: mariadb
@@ -75,6 +77,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - db:/backup/db:ro
       - ${HOME}/backups:/archive
+    networks:
+      email:
 
 volumes:
   api:

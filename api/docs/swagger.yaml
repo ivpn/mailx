@@ -27,20 +27,12 @@ definitions:
   api.ChangePasswordReq:
     properties:
       password:
-        maxLength: 64
-        minLength: 8
         type: string
-    required:
-    - password
     type: object
   api.DeleteUserReq:
     properties:
       password:
-        maxLength: 64
-        minLength: 8
         type: string
-    required:
-    - password
     type: object
   api.EmailReq:
     properties:
@@ -59,12 +51,9 @@ definitions:
       otp:
         type: string
       password:
-        maxLength: 64
-        minLength: 8
         type: string
     required:
     - otp
-    - password
     type: object
   api.SettingsReq:
     properties:
@@ -112,12 +101,9 @@ definitions:
         minLength: 0
         type: string
       password:
-        maxLength: 64
-        minLength: 8
         type: string
     required:
     - email
-    - password
     type: object
   model.Alias:
     properties:
@@ -164,10 +150,6 @@ definitions:
     properties:
       created_at:
         type: string
-      cred_id:
-        items:
-          type: integer
-        type: array
       id:
         type: string
       user_id:
@@ -707,6 +689,32 @@ paths:
       summary: Register user
       tags:
       - user
+  /register/add:
+    post:
+      consumes:
+      - application/json
+      description: Begin Add Passkey process
+      parameters:
+      - description: Email
+        in: body
+        name: email
+        required: true
+        schema:
+          $ref: '#/definitions/api.EmailReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Add Passkey
+      tags:
+      - webauthn
   /register/begin:
     post:
       consumes:

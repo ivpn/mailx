@@ -712,6 +712,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/register/add": {
+            "post": {
+                "description": "Begin Add Passkey process",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "webauthn"
+                ],
+                "summary": "Add Passkey",
+                "parameters": [
+                    {
+                        "description": "Email",
+                        "name": "email",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.EmailReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
         "/register/begin": {
             "post": {
                 "description": "Begin registration process",
@@ -1494,27 +1534,17 @@ const docTemplate = `{
         },
         "api.ChangePasswordReq": {
             "type": "object",
-            "required": [
-                "password"
-            ],
             "properties": {
                 "password": {
-                    "type": "string",
-                    "maxLength": 64,
-                    "minLength": 8
+                    "type": "string"
                 }
             }
         },
         "api.DeleteUserReq": {
             "type": "object",
-            "required": [
-                "password"
-            ],
             "properties": {
                 "password": {
-                    "type": "string",
-                    "maxLength": 64,
-                    "minLength": 8
+                    "type": "string"
                 }
             }
         },
@@ -1540,17 +1570,14 @@ const docTemplate = `{
         "api.ResetPasswordReq": {
             "type": "object",
             "required": [
-                "otp",
-                "password"
+                "otp"
             ],
             "properties": {
                 "otp": {
                     "type": "string"
                 },
                 "password": {
-                    "type": "string",
-                    "maxLength": 64,
-                    "minLength": 8
+                    "type": "string"
                 }
             }
         },
@@ -1613,8 +1640,7 @@ const docTemplate = `{
         "api.UserReq": {
             "type": "object",
             "required": [
-                "email",
-                "password"
+                "email"
             ],
             "properties": {
                 "email": {
@@ -1626,9 +1652,7 @@ const docTemplate = `{
                     "minLength": 0
                 },
                 "password": {
-                    "type": "string",
-                    "maxLength": 64,
-                    "minLength": 8
+                    "type": "string"
                 }
             }
         },
@@ -1700,12 +1724,6 @@ const docTemplate = `{
             "properties": {
                 "created_at": {
                     "type": "string"
-                },
-                "cred_id": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
                 },
                 "id": {
                     "type": "string"

@@ -25,5 +25,8 @@ volumes:
   api:
 
 networks:
-  email:
+  net:
     driver: bridge
+    ipam:
+      config:
+        - subnet: ${NETWORK_SUBNET}

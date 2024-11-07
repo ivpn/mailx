@@ -43,11 +43,11 @@ services:
       timeout: 3s
       retries: 0
     networks:
-      email_email:
+      email_net:
         # We need to provide static IP for this container in order to
         # whitelist it in email-api container (to allow API calls from this IP)
         ipv4_address: ${CONTAINER_IP}
 
 networks:
-  email_email:
+  email_net:
     external: true

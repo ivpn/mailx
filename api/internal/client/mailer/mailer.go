@@ -29,6 +29,13 @@ func New(cfg config.SMTPClientConfig) Mailer {
 		log.Println(err)
 	}
 
+	if cfg.User == "" || cfg.Password == "" {
+		return Mailer{
+			dialer: &gomail.Dialer{Host: cfg.Host, Port: port},
+			Sender: cfg.Sender,
+		}
+	}
+
 	return Mailer{
 		dialer: gomail.NewDialer(cfg.Host, port, cfg.User, cfg.Password),
 		Sender: cfg.Sender,

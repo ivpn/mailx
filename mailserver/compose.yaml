@@ -47,6 +47,8 @@ services:
         # We need to provide static IP for this container in order to
         # whitelist it in email-api container (to allow API calls from this IP)
         ipv4_address: ${CONTAINER_IP}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # Ensures access to the host's IP
 
 networks:
   email_net:

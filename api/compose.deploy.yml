@@ -10,7 +10,11 @@ services:
       - ${API_PORT}:${API_PORT}
     volumes:
       - api:/var/log
-    network_mode: host
+    networks:
+      net:
+        ipv4_address: ${API_CONTAINER_IP}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # Ensures access to the host's IP
 
   app:
     build: ../app
@@ -19,7 +23,8 @@ services:
     restart: always
     ports:
       - ${APP_PORT}:${APP_PORT}
-    network_mode: host
+    networks:
+      net:
 
 volumes:
   api:

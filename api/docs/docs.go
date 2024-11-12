@@ -752,6 +752,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/register/add": {
+            "post": {
+                "description": "Begin Add Passkey process",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "webauthn"
+                ],
+                "summary": "Add Passkey",
+                "parameters": [
+                    {
+                        "description": "Email",
+                        "name": "email",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.EmailReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
         "/register/begin": {
             "post": {
                 "description": "Begin registration process",
@@ -1802,12 +1842,6 @@ const docTemplate = `{
             "properties": {
                 "created_at": {
                     "type": "string"
-                },
-                "cred_id": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
                 },
                 "id": {
                     "type": "string"

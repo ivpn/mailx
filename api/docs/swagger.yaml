@@ -172,10 +172,6 @@ definitions:
     properties:
       created_at:
         type: string
-      cred_id:
-        items:
-          type: integer
-        type: array
       id:
         type: string
       user_id:

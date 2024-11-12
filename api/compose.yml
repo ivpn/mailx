@@ -14,7 +14,8 @@ services:
     volumes:
       - api:/var/log
     networks:
-      email:
+      net:
+        ipv4_address: ${API_CONTAINER_IP}
   
   app:
     build: ../app
@@ -23,6 +24,8 @@ services:
     restart: always
     ports:
       - ${APP_PORT}:${APP_PORT}
+    networks:
+      net:
 
   db:
     image: mariadb
@@ -43,7 +46,7 @@ services:
     labels:
       - docker-volume-backup.stop-during-backup=db
     networks:
-      email:
+      net:
   
   redis:
     image: redis
@@ -52,7 +55,7 @@ services:
     volumes:
       - redis:/data
     networks:
-      email:
+      net:
   
   backup:
     image: offen/docker-volume-backup:v2
@@ -75,6 +78,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - db:/backup/db:ro
       - ${HOME}/backups:/archive
+    networks:
+      net:
 
 volumes:
   api:
@@ -82,7 +87,7 @@ volumes:
   redis:
 
 networks:
-  email:
+  net:
     driver: bridge
     ipam:
       config:

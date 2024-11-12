@@ -9,6 +9,7 @@ smtpd_sender_restrictions =
     reject_unknown_sender_domain,
     reject_unauth_pipelining
 
-smtpd_relay_restrictions = permit_mynetworks, 
+smtpd_relay_restrictions =
+    permit_mynetworks, 
     permit_sasl_authenticated,
     reject_unauth_destination

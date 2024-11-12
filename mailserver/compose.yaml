@@ -26,7 +26,7 @@ services:
       - ENABLE_AMAVIS=0
       - ENABLE_SPAMASSASSIN=0
       - ENABLE_FETCHMAIL=0
-      - PERMIT_DOCKER=container
+      - PERMIT_DOCKER=host
       - SMTP_ONLY=1
       - ENABLE_RSPAMD=${ENABLE_RSPAMD}
       - ENABLE_FAIL2BAN=${ENABLE_FAIL2BAN}
@@ -43,11 +43,13 @@ services:
       timeout: 3s
       retries: 0
     networks:
-      email_email:
+      email_net:
         # We need to provide static IP for this container in order to
         # whitelist it in email-api container (to allow API calls from this IP)
         ipv4_address: ${CONTAINER_IP}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # Ensures access to the host's IP
 
 networks:
-  email_email:
+  email_net:
     external: true

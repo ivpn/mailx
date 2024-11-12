@@ -14,7 +14,7 @@ services:
       net:
         ipv4_address: ${API_CONTAINER_IP}
     extra_hosts:
-      - "host.docker.internal:host-gateway"  # Ensures access to the host's IP
+      - "host.docker.internal:host-gateway"
 
   app:
     build: ../app

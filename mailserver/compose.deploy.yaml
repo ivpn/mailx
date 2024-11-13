@@ -12,7 +12,6 @@ services:
       - "587:587"  # ESMTP (explicit TLS => STARTTLS)
     volumes:
       - ./docker-data/certbot/certs/live/:/etc/letsencrypt
-      - /etc/letsencrypt/:/etc/letsencrypt/
       - ./docker-data/dms/mail-data/:/var/mail/
       - ./docker-data/dms/mail-logs/:/var/log/mail/
       - ./docker-data/dms/config/:/tmp/docker-mailserver/
@@ -38,10 +37,6 @@ services:
     # Uncomment if using `ENABLE_FAIL2BAN=1`:
     cap_add:
       - NET_ADMIN
-    healthcheck:
-      test: "ss --listening --tcp | grep -P 'LISTEN.+:smtp' || exit 1"
-      timeout: 3s
-      retries: 0
     networks:
       email_net:
         # We need to provide static IP for this container in order to

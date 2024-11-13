@@ -127,7 +127,7 @@ func NewPSKCORS(cfg config.APIConfig) fiber.Handler {
 	})
 }
 
-func NewMailserverCORS(cfg config.APIConfig) fiber.Handler {
+func NewIPCORS(cfg config.APIConfig) fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
 		if c.IP() != cfg.ApiAllowIp {

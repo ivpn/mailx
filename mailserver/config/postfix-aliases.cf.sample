@@ -1,1 +1,1 @@
-curl_email: "|curl --data-binary @- http://email-api:3000/v1/email"
+curl_email: "|curl --data-binary @- -H  \"Authorization: Bearer <api-token>\" -X POST http://email-api:3000/v1/email"

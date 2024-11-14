@@ -14,7 +14,10 @@ import (
 )
 
 func (h *Handler) SetupRoutes(cfg config.APIConfig) {
-	h.Server.Post("/v1/email", auth.NewMailserverCORS(cfg), h.HandleEmail)
+	email := h.Server.Group("/v1/email")
+	email.Use(auth.NewIPCORS(cfg))
+	email.Use(auth.NewPSK(cfg))
+	email.Post("", h.HandleEmail)
 
 	h.Server.Use(auth.NewAPICORS(cfg))
 	h.Server.Use(helmet.New())

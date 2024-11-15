@@ -1,6 +1,6 @@
 echo "pwcheck_method: auxprop
 auxprop_plugin: sasldb
-mech_list: PLAIN LOGIN DIGEST-MD5 CRAM-MD5" > /etc/postfix/sasl/smtpd.conf
+mech_list: CRAM-MD5" > /etc/postfix/sasl/smtpd.conf
 
 echo $SMTP_PASS | saslpasswd2 -c -u "$DOMAIN" $SMTP_USER
 

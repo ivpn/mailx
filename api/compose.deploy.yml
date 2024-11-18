@@ -5,14 +5,13 @@ services:
     build: .
     container_name: email-api
     image: email-api
-    restart: always
+    restart: unless-stopped
     ports:
       - ${API_PORT}:${API_PORT}
     volumes:
       - api:/var/log
     networks:
       net:
-        ipv4_address: ${API_CONTAINER_IP}
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
@@ -20,7 +19,7 @@ services:
     build: ../app
     container_name: email-app
     image: email-app
-    restart: always
+    restart: unless-stopped
     ports:
       - ${APP_PORT}:${APP_PORT}
     networks:
@@ -32,6 +31,3 @@ volumes:
 networks:
   net:
     driver: bridge
-    ipam:
-      config:
-        - subnet: ${NETWORK_SUBNET}

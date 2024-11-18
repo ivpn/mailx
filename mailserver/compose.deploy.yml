@@ -37,12 +37,3 @@ services:
     # Uncomment if using `ENABLE_FAIL2BAN=1`:
     cap_add:
       - NET_ADMIN
-    networks:
-      email_net:
-        # We need to provide static IP for this container in order to
-        # whitelist it in email-api container (to allow API calls from this IP)
-        ipv4_address: ${CONTAINER_IP}
-
-networks:
-  email_net:
-    external: true

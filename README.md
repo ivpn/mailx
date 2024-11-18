@@ -42,6 +42,7 @@ mkdir -p mailserver/docker-data/dms/config
 cp mailserver/config/postfix-main.cf.sample mailserver/docker-data/dms/config/postfix-main.cf
 cp mailserver/config/postfix-virtual.cf.sample mailserver/docker-data/dms/config/postfix-virtual.cf
 cp mailserver/config/postfix-aliases.cf.sample mailserver/docker-data/dms/config/postfix-aliases.cf
+cp mailserver/config/user-patches.sh.sample mailserver/docker-data/dms/config/user-patches.sh
 ```
 
 > [!IMPORTANT]

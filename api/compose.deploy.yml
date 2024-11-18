@@ -12,7 +12,6 @@ services:
       - api:/var/log
     networks:
       net:
-        ipv4_address: ${API_CONTAINER_IP}
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
@@ -32,6 +31,3 @@ volumes:
 networks:
   net:
     driver: bridge
-    ipam:
-      config:
-        - subnet: ${NETWORK_SUBNET}

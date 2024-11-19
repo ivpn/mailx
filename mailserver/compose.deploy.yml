@@ -32,6 +32,10 @@ services:
       - ENABLE_CLAMAV=${ENABLE_CLAMAV}
       - SSL_TYPE=${SSL_TYPE}
       - LOG_LEVEL=${LOG_LEVEL}
+      - ENABLE_SASLAUTHD=1
+      - DOMAIN=${DOMAIN}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
     restart: always
     stop_grace_period: 1m
     # Uncomment if using `ENABLE_FAIL2BAN=1`:

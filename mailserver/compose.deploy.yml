@@ -41,6 +41,10 @@ services:
     # Uncomment if using `ENABLE_FAIL2BAN=1`:
     cap_add:
       - NET_ADMIN
+    healthcheck:
+      test: "ss --listening --tcp | grep -P 'LISTEN.+:smtp' || exit 1"
+      timeout: 3s
+      retries: 3
     networks:
       net:
         ipv4_address: ${CONTAINER_IP}

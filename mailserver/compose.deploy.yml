@@ -41,3 +41,13 @@ services:
     # Uncomment if using `ENABLE_FAIL2BAN=1`:
     cap_add:
       - NET_ADMIN
+    networks:
+      net:
+        ipv4_address: ${CONTAINER_IP}
+
+networks:
+  net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${NETWORK_SUBNET}

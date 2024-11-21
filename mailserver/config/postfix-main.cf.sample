@@ -1,9 +1,9 @@
 smtpd_sender_restrictions =
+    permit_mynetworks,
+    permit_sasl_authenticated,
     reject_sender_login_mismatch,
     reject_non_fqdn_sender,
     reject_unlisted_sender,
-    permit_mynetworks,
-    permit_sasl_authenticated,
     reject_unauth_destination,
     reject_invalid_hostname,
     reject_unknown_sender_domain,
@@ -13,3 +13,10 @@ smtpd_relay_restrictions =
     permit_mynetworks, 
     permit_sasl_authenticated,
     reject_unauth_destination
+
+smtpd_helo_restrictions =
+    permit_mynetworks
+    permit_sasl_authenticated
+    reject_invalid_helo_hostname
+    reject_non_fqdn_helo_hostname
+    reject_unknown_helo_hostname

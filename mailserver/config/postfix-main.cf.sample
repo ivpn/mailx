@@ -1,3 +1,8 @@
+smtpd_tls_security_level = may
+smtp_tls_security_level = may
+smtp_tls_protocols = !SSLv2, !SSLv3
+smtpd_tls_protocols = !SSLv2, !SSLv3
+
 smtpd_sender_restrictions =
     permit_mynetworks,
     permit_sasl_authenticated,
@@ -20,3 +25,12 @@ smtpd_helo_restrictions =
     reject_invalid_helo_hostname
     reject_non_fqdn_helo_hostname
     reject_unknown_helo_hostname
+
+smtpd_recipient_restrictions =
+   permit_mynetworks,
+   reject_unauth_destination,
+   check_policy_service unix:private/policy,
+   reject_rhsbl_helo dbl.spamhaus.org,
+   reject_rhsbl_reverse_client dbl.spamhaus.org,
+   reject_rhsbl_sender dbl.spamhaus.org,
+   reject_rbl_client zen.spamhaus.org

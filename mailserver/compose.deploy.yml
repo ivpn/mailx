@@ -38,6 +38,7 @@ services:
       - DOMAIN=${DOMAIN}
       - SMTP_USER=${SMTP_USER}
       - SMTP_PASS=${SMTP_PASS}
+      - ENABLE_MTA_STS=1
     restart: always
     stop_grace_period: 1m
     # Uncomment if using `ENABLE_FAIL2BAN=1`:

@@ -25,11 +25,3 @@ smtpd_helo_restrictions =
     reject_invalid_helo_hostname
     reject_non_fqdn_helo_hostname
     reject_unknown_helo_hostname
-
-smtpd_recipient_restrictions =
-    permit_mynetworks,
-    permit_sasl_authenticated,
-    reject_unauth_destination,
-    reject_invalid_helo_hostname,
-    reject_non_fqdn_helo_hostname, 
-    reject_unknown_recipient_domain

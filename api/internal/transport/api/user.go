@@ -311,7 +311,7 @@ func (h *Handler) DeleteUser(c *fiber.Ctx) error {
 	user, err := h.Service.GetUserByPassword(c.Context(), ID, req.Password)
 	if err != nil || user.ID != ID {
 		log.Printf("error deleting user: %s", err.Error())
-		return c.Status(401).JSON(fiber.Map{
+		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidCredentials,
 		})
 	}

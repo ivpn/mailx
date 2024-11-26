@@ -210,7 +210,7 @@ func NewCookieAuthn(token string, path string, cfg config.APIConfig) *fiber.Cook
 		Value:    token,
 		HTTPOnly: true,
 		Secure:   true,
-		MaxAge:   int(cfg.TokenExpiration),
+		MaxAge:   int(cfg.TokenExpiration.Seconds()),
 		Expires:  time.Now().Add(time.Duration(cfg.TokenExpiration)),
 	}
 }
@@ -221,7 +221,7 @@ func NewCookieTempAuthn(token string, path string, cfg config.APIConfig) *fiber.
 		Value:    token,
 		HTTPOnly: true,
 		Secure:   true,
-		MaxAge:   int(cfg.TokenExpiration),
+		MaxAge:   int(cfg.TokenExpiration.Seconds()),
 		Expires:  time.Now().Add(time.Duration(cfg.TokenExpiration)),
 	}
 }

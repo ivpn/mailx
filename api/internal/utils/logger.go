@@ -11,6 +11,6 @@ func NewLogger(cfg config.APIConfig) {
 	log.SetOutput(&lumberjack.Logger{
 		Filename:   cfg.LogFile,
 		MaxBackups: 3,
-		MaxAge:     14, //days
+		MaxAge:     7, //days
 	})
 }

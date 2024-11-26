@@ -23,7 +23,7 @@ var (
 	ErrActivateRecipient       = errors.New("could not activate recipient")
 )
 
-type RecipienteStore interface {
+type RecipientsStore interface {
 	GetRecipient(context.Context, string, string) (model.Recipient, error)
 	GetRecipientByEmail(context.Context, string, string) (model.Recipient, error)
 	GetRecipientsCountByEmail(context.Context, string) (int, error)

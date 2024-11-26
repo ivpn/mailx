@@ -7,7 +7,7 @@ services:
     # More information about the mail-server ports:
     # https://docker-mailserver.github.io/docker-mailserver/latest/config/security/understanding-the-ports/
     ports:
-      - "25:25"    # SMTP  (explicit TLS => STARTTLS, Authentication is DISABLED => use port 465/587 instead)
+      - "2025:25"    # SMTP  (explicit TLS => STARTTLS, Authentication is DISABLED => use port 465/587 instead)
       - "465:465"  # ESMTP (implicit TLS)
       - "587:587"  # ESMTP (explicit TLS => STARTTLS)
     volumes:
@@ -32,8 +32,29 @@ services:
       - ENABLE_CLAMAV=${ENABLE_CLAMAV}
       - SSL_TYPE=${SSL_TYPE}
       - LOG_LEVEL=${LOG_LEVEL}
+      - LOGROTATE_INTERVAL=${LOGROTATE_INTERVAL}
+      - LOGROTATE_COUNT=${LOGROTATE_COUNT}
+      - ENABLE_SASLAUTHD=1
+      - DOMAIN=${DOMAIN}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - ENABLE_MTA_STS=1
     restart: always
     stop_grace_period: 1m
     # Uncomment if using `ENABLE_FAIL2BAN=1`:
     cap_add:
       - NET_ADMIN
+    healthcheck:
+      test: "ss --listening --tcp | grep -P 'LISTEN.+:smtp' || exit 1"
+      timeout: 3s
+      retries: 3
+    networks:
+      net:
+        ipv4_address: ${CONTAINER_IP}
+
+networks:
+  net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${NETWORK_SUBNET}

@@ -8,7 +8,7 @@ import (
 )
 
 type Store interface {
-	RecipienteStore
+	RecipientsStore
 	AliasStore
 	UserStore
 	SubscriptionStore

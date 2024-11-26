@@ -21,7 +21,7 @@
                 <p class="dark:text-gray-100">{{ new Date(alias.created_at).toDateString() }}</p>
             </div>
         </td>
-        <td class="px-5 py-4 text-start text-sm text-gray-800">
+        <td class="px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800">
             <div class="hs-tooltip inline-block">
                 <span class="hs-tooltip-toggle">
                     <button class="dark:text-gray-100 truncate max-w-[320px]" @click="copyAlias(alias.name)">

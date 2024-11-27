@@ -3,6 +3,8 @@ smtp_tls_security_level = may
 smtp_tls_protocols = !SSLv2, !SSLv3
 smtpd_tls_protocols = !SSLv2, !SSLv3
 
+always_add_missing_headers = yes
+
 smtpd_sender_restrictions =
     permit_mynetworks,
     permit_sasl_authenticated,

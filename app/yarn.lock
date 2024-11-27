@@ -1464,10 +1464,10 @@ typescript-cookie@^1.0.6:
   resolved "https://registry.yarnpkg.com/typescript-cookie/-/typescript-cookie-1.0.6.tgz#009b0665706b2cc856f796e76cf408a16ef011c5"
   integrity sha512-s+BZr7/9BUG6Kg7jGGcOY/4XJcP+iZRFdF3q4FPTfRSP83ivLWF94OcH8PrzGmnS8Ab9qP7ENu/ikLwNFsIafA==
 
-typescript@^5.2.2:
-  version "5.4.5"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.4.5.tgz#42ccef2c571fdbd0f6718b1d1f5e6e5ef006f611"
-  integrity sha512-vcI4UpRgg81oIRUFwR0WSIHKt11nJ7SAVlYNIu+QpqeyXP+gpQJy/Z4+F0aGxSE4MqwjyXvW/TzgkLAx2AGHwQ==
+typescript@5.6.3:
+  version "5.6.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.6.3.tgz#5f3449e31c9d94febb17de03cc081dd56d81db5b"
+  integrity sha512-hjcS1mhfuyi4WW8IWtjP7brDrG2cuDZukyrYrSauoXGNgx0S7zceP07adYkJycEr56BOUTNPzbInooiN3fn1qw==
 
 update-browserslist-db@^1.0.16:
   version "1.0.16"
@@ -1505,7 +1505,7 @@ vue-router@4:
   dependencies:
     "@vue/devtools-api" "^6.5.1"
 
-vue-tsc@^2.1.10:
+vue-tsc@2.1.10:
   version "2.1.10"
   resolved "https://registry.yarnpkg.com/vue-tsc/-/vue-tsc-2.1.10.tgz#4d61a64e5fad763b8b40c1884259fd48986f0b4e"
   integrity sha512-RBNSfaaRHcN5uqVqJSZh++Gy/YUzryuv9u1aFWhsammDJXNtUiJMNoJ747lZcQ68wUQFx6E73y4FY3D8E7FGMA==

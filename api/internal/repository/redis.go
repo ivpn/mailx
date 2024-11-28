@@ -53,8 +53,8 @@ func newFailoverClient(cfg config.RedisConfig) (*redis.Client, error) {
 	log.Println("Creating Redis failover client")
 	options := &redis.FailoverOptions{
 		MasterName:       cfg.MasterName,
-		Username:         cfg.FailoverUsername,
-		Password:         cfg.FailoverPassword,
+		Username:         cfg.Username,
+		Password:         cfg.Password,
 		SentinelUsername: cfg.FailoverUsername,
 		SentinelPassword: cfg.FailoverPassword,
 		SentinelAddrs:    cfg.Addrs,

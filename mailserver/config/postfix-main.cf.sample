@@ -5,6 +5,11 @@ smtpd_tls_protocols = !SSLv2, !SSLv3
 
 always_add_missing_headers = yes
 
+milter_default_action = accept
+milter_protocol = 6
+smtpd_milters = $rspamd_milter
+non_smtpd_milters = $rspamd_milter
+
 smtpd_sender_restrictions =
     permit_mynetworks,
     permit_sasl_authenticated,

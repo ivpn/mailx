@@ -2,6 +2,7 @@ package repository
 
 import (
 	"log"
+	"time"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -71,8 +72,12 @@ func connect(cfg config.DBConfig) (*gorm.DB, error) {
 
 		err = db.Use(dbresolver.Register(dbresolver.Config{
 			Sources: hosts,
-			Policy:  dbresolver.RandomPolicy{},
-		}))
+		}).
+			SetMaxIdleConns(100).
+			SetMaxOpenConns(200).
+			SetConnMaxIdleTime(time.Hour).
+			SetConnMaxLifetime(24 * time.Hour))
+
 		if err != nil {
 			return nil, err
 		}

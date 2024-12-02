@@ -76,8 +76,9 @@ func connect(cfg config.DBConfig) (*gorm.DB, error) {
 		}
 
 		err = db.Use(dbresolver.Register(dbresolver.Config{
-			Sources: hosts,
-			Policy:  dbresolver.RandomPolicy{},
+			Sources:  hosts,
+			Replicas: hosts,
+			Policy:   dbresolver.RandomPolicy{},
 		}).
 			SetMaxIdleConns(100).
 			SetMaxOpenConns(200).

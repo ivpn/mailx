@@ -8,6 +8,7 @@ import (
 	"ivpn.net/email/api/internal/repository"
 	"ivpn.net/email/api/internal/service"
 	"ivpn.net/email/api/internal/transport/api"
+	"ivpn.net/email/api/internal/utils"
 )
 
 func Run() error {
@@ -15,6 +16,8 @@ func Run() error {
 	if err != nil {
 		return err
 	}
+
+	utils.NewLogger(cfg.API)
 
 	db, err := repository.NewDB(cfg.DB)
 	if err != nil {

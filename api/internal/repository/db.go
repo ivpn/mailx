@@ -59,8 +59,6 @@ func connect(cfg config.DBConfig) (*gorm.DB, error) {
 		return nil, err
 	}
 
-	log.Println("[DB] Connection established to main host:", host_main)
-
 	// DBResolver adds multiple databases support to GORM
 	// https://github.com/go-gorm/dbresolver
 	if len(cfg.Hosts) > 0 && cfg.Hosts[0] != "" {
@@ -72,7 +70,6 @@ func connect(cfg config.DBConfig) (*gorm.DB, error) {
 			}
 
 			hosts = append(hosts, mysql.Open(cfg.User+":"+cfg.Password+"@tcp("+host+":"+cfg.Port+")/"+cfg.Name+"?charset=utf8mb4&parseTime=True&loc=Local"))
-			log.Println("[DB] Sources host added:", host)
 		}
 
 		err = db.Use(dbresolver.Register(dbresolver.Config{
@@ -84,8 +81,6 @@ func connect(cfg config.DBConfig) (*gorm.DB, error) {
 			SetMaxOpenConns(200).
 			SetConnMaxIdleTime(time.Hour).
 			SetConnMaxLifetime(24 * time.Hour))
-
-		log.Println("[DB] SetMaxIdleConns(100)")
 
 		if err != nil {
 			return nil, err

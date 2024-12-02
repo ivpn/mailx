@@ -66,12 +66,18 @@ func connect(cfg config.DBConfig) (*gorm.DB, error) {
 	if len(cfg.Hosts) > 0 && cfg.Hosts[0] != "" {
 		hosts := make([]gorm.Dialector, 0)
 		for _, host := range cfg.Hosts {
+			// Skip the main host
+			if host == host_main {
+				continue
+			}
+
 			hosts = append(hosts, mysql.Open(cfg.User+":"+cfg.Password+"@tcp("+host+":"+cfg.Port+")/"+cfg.Name+"?charset=utf8mb4&parseTime=True&loc=Local"))
 			log.Println("[DB] Sources host added:", host)
 		}
 
 		err = db.Use(dbresolver.Register(dbresolver.Config{
 			Sources: hosts,
+			Policy:  dbresolver.RandomPolicy{},
 		}).
 			SetMaxIdleConns(100).
 			SetMaxOpenConns(200).

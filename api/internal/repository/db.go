@@ -78,6 +78,8 @@ func connect(cfg config.DBConfig) (*gorm.DB, error) {
 			SetConnMaxIdleTime(time.Hour).
 			SetConnMaxLifetime(24 * time.Hour))
 
+		log.Println("[DB] SetMaxIdleConns(100)")
+
 		if err != nil {
 			return nil, err
 		}

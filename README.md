@@ -95,6 +95,9 @@ postmap /etc/postfix/virtual
 # Update the alias table
 newaliases
 
+# Enable DKIM signing, this will output the contents of DKIM TXT DNS record (mail._domainkey.domain.com)
+setup config dkim
+
 # Restart Postfix
 supervisorctl restart postfix
 

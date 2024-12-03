@@ -2,6 +2,7 @@ package repository
 
 import (
 	"log"
+	"time"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -63,13 +64,24 @@ func connect(cfg config.DBConfig) (*gorm.DB, error) {
 	if len(cfg.Hosts) > 0 && cfg.Hosts[0] != "" {
 		hosts := make([]gorm.Dialector, 0)
 		for _, host := range cfg.Hosts {
+			// Skip the main host
+			if host == host_main {
+				continue
+			}
+
 			hosts = append(hosts, mysql.Open(cfg.User+":"+cfg.Password+"@tcp("+host+":"+cfg.Port+")/"+cfg.Name+"?charset=utf8mb4&parseTime=True&loc=Local"))
 		}
 
 		err = db.Use(dbresolver.Register(dbresolver.Config{
-			Sources: hosts,
-			Policy:  dbresolver.RandomPolicy{},
-		}))
+			Sources:  hosts,
+			Replicas: hosts,
+			Policy:   dbresolver.RandomPolicy{},
+		}).
+			SetMaxIdleConns(100).
+			SetMaxOpenConns(200).
+			SetConnMaxIdleTime(time.Hour).
+			SetConnMaxLifetime(24 * time.Hour))
+
 		if err != nil {
 			return nil, err
 		}

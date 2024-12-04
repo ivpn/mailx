@@ -88,6 +88,3 @@ volumes:
 networks:
   net:
     driver: bridge
-    ipam:
-      config:
-        - subnet: ${NETWORK_SUBNET}

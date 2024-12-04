@@ -1,8 +1,10 @@
 package api
 
 import (
+	"log"
 	"time"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/healthcheck"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
@@ -23,6 +25,11 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	h.Server.Use(auth.NewIPCORS(cfg))
 	h.Server.Use(helmet.New())
 	h.Server.Use(healthcheck.New())
+
+	h.Server.Get("/v1/telnet", func(c *fiber.Ctx) error {
+		log.Println("telnet IP()", c.IP())
+		return c.SendString("OK")
+	})
 
 	h.Server.Post("/v1/register", limiter.New(), h.Register)
 	h.Server.Post("/v1/login", limiter.New(), h.Login)

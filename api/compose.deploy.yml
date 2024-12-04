@@ -7,7 +7,7 @@ services:
     image: email-api
     restart: unless-stopped
     ports:
-      - ${API_CONTAINER_IP}:${API_PORT}:${API_PORT}
+      - ${API_PORT}:${API_PORT}
     volumes:
       - api:/var/log
     networks:
@@ -22,7 +22,7 @@ services:
     image: email-app
     restart: unless-stopped
     ports:
-      - ${APP_CONTAINER_IP}:${APP_PORT}:${APP_PORT}
+      - ${APP_PORT}:${APP_PORT}
     networks:
       net:
         ipv4_address: ${APP_CONTAINER_IP}

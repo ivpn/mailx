@@ -20,6 +20,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	email.Post("", h.HandleEmail)
 
 	h.Server.Use(auth.NewAPICORS(cfg))
+	h.Server.Use(auth.NewIPCORS(cfg))
 	h.Server.Use(helmet.New())
 	h.Server.Use(healthcheck.New())
 

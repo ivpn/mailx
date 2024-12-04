@@ -15,7 +15,6 @@ services:
       - api:/var/log
     networks:
       net:
-        ipv4_address: ${API_CONTAINER_IP}
   
   app:
     build: ../app

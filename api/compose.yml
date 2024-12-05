@@ -15,7 +15,6 @@ services:
       - api:/var/log
     networks:
       net:
-        ipv4_address: ${API_CONTAINER_IP}
   
   app:
     build: ../app
@@ -89,6 +88,3 @@ volumes:
 networks:
   net:
     driver: bridge
-    ipam:
-      config:
-        - subnet: ${NETWORK_SUBNET}

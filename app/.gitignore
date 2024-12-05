@@ -24,3 +24,5 @@ env.json
 *.njsproj
 *.sln
 *.sw?
+
+access_rules.conf

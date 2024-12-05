@@ -50,11 +50,7 @@ services:
       retries: 3
     networks:
       net:
-        ipv4_address: ${CONTAINER_IP}
 
 networks:
   net:
     driver: bridge
-    ipam:
-      config:
-        - subnet: ${NETWORK_SUBNET}

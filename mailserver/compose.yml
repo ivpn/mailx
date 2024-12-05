@@ -39,6 +39,7 @@ services:
       - DOMAIN=${DOMAIN}
       - SMTP_USER=${SMTP_USER}
       - SMTP_PASS=${SMTP_PASS}
+      - ENABLE_MTA_STS=1
     restart: always
     stop_grace_period: 1m
     # Uncomment if using `ENABLE_FAIL2BAN=1`:
@@ -50,9 +51,6 @@ services:
       retries: 0
     networks:
       email_net:
-        # We need to provide static IP for this container in order to
-        # whitelist it in email-api container (to allow API calls from this IP)
-        ipv4_address: ${CONTAINER_IP}
 
 networks:
   email_net:

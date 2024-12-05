@@ -37,6 +37,7 @@
 ```bash
 cp api/.env.sample api/.env
 cp app/src/env.sample.json app/src/env.json
+cp app/access_rules.sample.conf app/access_rules.conf
 cp mailserver/.env.sample mailserver/.env
 mkdir -p mailserver/docker-data/dms/config
 cp mailserver/config/postfix-main.cf.sample mailserver/docker-data/dms/config/postfix-main.cf
@@ -51,6 +52,9 @@ cp mailserver/config/user-patches.sh.sample mailserver/docker-data/dms/config/us
 > - app/src/env.json: `DOMAINS`
 > - mailserver/.env: `HOSTNAME`
 > - mailserver/docker-data/dms/config/postfix-virtual.cf: `@your-domain.net curl_email`
+
+> [!TIP]
+> Run `docker network inspect bridge`. Use "Gateway" value for `API_ALLOW_IP`. Set `API_ALLOW_IP="*"` to disable IP based access control.
 
 > [!TIP]
 > For local testing, you can use [MailHog](https://github.com/mailhog/MailHog) or [MailTrap](https://mailtrap.io/email-sandbox/) as outbound SMTP client (`SMTP_CLIENT_*`).

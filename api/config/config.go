@@ -14,7 +14,6 @@ type APIConfig struct {
 	Name              string
 	Port              string
 	ApiAllowOrigin    string
-	ApiAllowIp        string
 	TokenSecret       string
 	TokenExpiration   time.Duration
 	PSK               string
@@ -122,7 +121,6 @@ func New() (Config, error) {
 			Name:              os.Getenv("API_NAME"),
 			Port:              os.Getenv("API_PORT"),
 			ApiAllowOrigin:    os.Getenv("API_ALLOW_ORIGIN"),
-			ApiAllowIp:        os.Getenv("API_ALLOW_IP"),
 			TokenSecret:       os.Getenv("TOKEN_SECRET"),
 			TokenExpiration:   tokenExp,
 			PSK:               os.Getenv("PSK"),

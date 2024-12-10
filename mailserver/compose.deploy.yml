@@ -2,7 +2,7 @@ services:
   mailserver:
     image: ghcr.io/docker-mailserver/docker-mailserver:latest
     container_name: mailserver
-    hostname: ${HOSTNAME}
+    hostname: ${DMS_HOSTNAME}
     env_file: mailserver.env
     # More information about the mail-server ports:
     # https://docker-mailserver.github.io/docker-mailserver/latest/config/security/understanding-the-ports/
@@ -11,6 +11,7 @@ services:
       - "127.0.0.1:465:465"  # ESMTP (implicit TLS)
       - "127.0.0.1:587:587"  # ESMTP (explicit TLS => STARTTLS)
     volumes:
+      - ./docker-data/certbot/certs/live/:/etc/letsencrypt
       - /etc/letsencrypt/:/etc/letsencrypt/
       - ./docker-data/dms/mail-data/:/var/mail/
       - ./docker-data/dms/mail-logs/:/var/log/mail/

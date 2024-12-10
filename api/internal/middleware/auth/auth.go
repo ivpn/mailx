@@ -127,17 +127,6 @@ func NewPSKCORS(cfg config.APIConfig) fiber.Handler {
 	})
 }
 
-func NewIPCORS(cfg config.APIConfig) fiber.Handler {
-
-	return func(c *fiber.Ctx) error {
-		if cfg.ApiAllowIp != "*" && c.IP() != cfg.ApiAllowIp {
-			return c.SendStatus(fiber.StatusUnauthorized)
-		}
-
-		return c.Next()
-	}
-}
-
 func GetUserID(c *fiber.Ctx) string {
 	return c.Locals(USER_ID).(string)
 }

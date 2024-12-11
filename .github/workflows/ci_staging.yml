@@ -20,15 +20,15 @@ jobs:
       - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.ref }}
+          ref: 'staging'
       
       - name: Set up sparse checkout
         run: |
           git sparse-checkout init --cone
           git sparse-checkout set api
 
-      - name: Pull changes from PR branch
-        run: git pull origin ${{ github.event.pull_request.head.ref }}
+      - name: Pull changes from branch
+        run: git pull origin staging
       
       - name: Build $API_IMAGE
         run: docker build -t $REGISTRY/$API_IMAGE:$GIT_SHA api/.

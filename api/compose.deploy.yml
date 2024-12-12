@@ -31,3 +31,7 @@ volumes:
 networks:
   net:
     driver: bridge
+    ipam:
+     config:
+       - subnet: ${NET_SUBNET}
+         gateway: ${NET_GATEWAY}

@@ -33,26 +33,29 @@ jobs:
       - name: Set GIT_SHA
         run: echo "GIT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
-      - name: Build $API_IMAGE
+      - name: Build api image
         run: docker build -t $REGISTRY/$API_IMAGE:${{ env.GIT_SHA }} api/.
 
-      - name: Tag $API_IMAGE
+      - name: Tag api image
         run: docker tag $REGISTRY/$API_IMAGE:${{ env.GIT_SHA }} $REGISTRY/$API_IMAGE:$TAG
 
-      - name: Build $APP_IMAGE
+      - name: Build app image
         run: docker build -t $REGISTRY/$APP_IMAGE:${{ env.GIT_SHA }} app/.
 
-      - name: Tag $APP_IMAGE
+      - name: Tag app image
         run: docker tag $REGISTRY/$APP_IMAGE:${{ env.GIT_SHA }} $REGISTRY/$APP_IMAGE:$TAG
 
-      - name: Push $API_IMAGE:${{ env.GIT_SHA }}
+      - name: Log in to registry
+        run: echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login ${{ secrets.REGISTRY_NAME }} -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
+
+      - name: Push api:${{ env.GIT_SHA }}
         run: docker push $REGISTRY/$API_IMAGE:${{ env.GIT_SHA }}
 
-      - name: Push $API_IMAGE:$TAG
+      - name: Push api:$TAG
         run: docker push $REGISTRY/$API_IMAGE:$TAG
     
-      - name: Push $APP_IMAGE:${{ env.GIT_SHA }}
+      - name: Push app:${{ env.GIT_SHA }}
         run: docker push $REGISTRY/$APP_IMAGE:${{ env.GIT_SHA }}
 
-      - name: Push $APP_IMAGE:$TAG
+      - name: Push app:$TAG
         run: docker push $REGISTRY/$APP_IMAGE:$TAG

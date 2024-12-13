@@ -51,11 +51,11 @@ jobs:
       - name: Push api:${{ env.GIT_SHA }}
         run: docker push $REGISTRY/$API_IMAGE:${{ env.GIT_SHA }}
 
-      - name: Push api:$TAG
+      - name: Push api:${{ env.TAG }}
         run: docker push $REGISTRY/$API_IMAGE:$TAG
     
       - name: Push app:${{ env.GIT_SHA }}
         run: docker push $REGISTRY/$APP_IMAGE:${{ env.GIT_SHA }}
 
-      - name: Push app:$TAG
+      - name: Push app:${{ env.TAG }}
         run: docker push $REGISTRY/$APP_IMAGE:$TAG

@@ -1,10 +1,9 @@
 import axios from 'axios'
-import env from "../env.json"
 import { userApi } from './user.ts'
 
 export const api = axios.create({
     withCredentials: true,
-    baseURL: env.API_URL + '/v1'
+    baseURL: import.meta.env.VITE_API_URL + '/v1'
 })
 
 api.interceptors.response.use(

@@ -79,7 +79,6 @@ import { onMounted, ref } from 'vue'
 import axios from 'axios'
 import { settingsApi } from '../api/settings.ts'
 import { recipientApi } from '../api/recipient.ts'
-import env from "../env.json"
 
 const req = ref({
     id: '',
@@ -87,7 +86,8 @@ const req = ref({
     recipient: '',
     from_name: ''
 })
-const domains = ref(env.DOMAINS)
+const envDomains = import.meta.env.VITE_DOMAINS.split(',')
+const domains = ref(envDomains)
 const recipients = ref([])
 const success = ref('')
 const error = ref('')

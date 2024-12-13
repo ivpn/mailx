@@ -137,8 +137,8 @@ import { ref, onMounted } from 'vue'
 import overlay from '@preline/overlay'
 import axios from 'axios'
 import { aliasApi } from '../api/alias.ts'
-import env from "../env.json"
 
+const envDomains = import.meta.env.VITE_DOMAINS.split(',')
 const props = defineProps(['recipients', 'settings'])
 const emit = defineEmits(['onCreateAlias'])
 const alias = ref({
@@ -147,11 +147,11 @@ const alias = ref({
     format: 'word',
     from_name: '',
     recipients: '',
-    domain: env.DOMAINS[0],
+    domain: envDomains[0],
 })
 const recipients = ref(props.recipients)
 const settings = ref(props.settings)
-const domains = ref(env.DOMAINS)
+const domains = ref(envDomains)
 const error = ref('')
 
 const postAlias = async () => {

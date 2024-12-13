@@ -23,6 +23,12 @@ jobs:
 
       - name: Pull changes from branch
         run: git pull origin staging
+
+      - name: create app/.env file
+        run: |
+          echo "VITE_API_URL=${{ secrets.STAGING_VITE_API_URL }}" >> app/.env
+          echo "VITE_DOMAINS=${{ secrets.STAGING_VITE_DOMAINS }}" >> app/.env
+          echo "VITE_APP_NAME=${{ secrets.STAGING_VITE_APP_NAME }}" >> app/.env
       
       - name: Set GIT_SHA
         run: echo "GIT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV

@@ -36,7 +36,7 @@
 ### Config
 ```bash
 cp api/.env.sample api/.env
-cp app/src/env.sample.json app/src/env.json
+cp app/.env.sample app/.env
 cp mailserver/.env.sample mailserver/.env
 mkdir -p mailserver/docker-data/dms/config
 cp mailserver/config/postfix-main.cf.sample mailserver/docker-data/dms/config/postfix-main.cf

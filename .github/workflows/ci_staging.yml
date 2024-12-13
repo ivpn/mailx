@@ -9,7 +9,6 @@ env:
   API_IMAGE: email/api
   APP_IMAGE: email/app
   TAG: staging
-  GIT_SHA: ${GITHUB_SHA::7}
   REGISTRY: ${{ secrets.REGISTRY_NAME }}
 
 jobs:
@@ -30,26 +29,29 @@ jobs:
       - name: Pull changes from branch
         run: git pull origin staging
       
+      - name: Set GIT_SHA
+        run: echo "GIT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
       - name: Build $API_IMAGE
-        run: docker build -t $REGISTRY/$API_IMAGE:$GIT_SHA api/.
+        run: docker build -t $REGISTRY/$API_IMAGE:${{ env.GIT_SHA }} api/.
 
       - name: Tag $API_IMAGE
-        run: docker tag $REGISTRY/$API_IMAGE:$GIT_SHA $REGISTRY/$API_IMAGE:$TAG
+        run: docker tag $REGISTRY/$API_IMAGE:${{ env.GIT_SHA }} $REGISTRY/$API_IMAGE:$TAG
 
       - name: Build $APP_IMAGE
-        run: docker build -t $REGISTRY/$APP_IMAGE:$GIT_SHA app/.
+        run: docker build -t $REGISTRY/$APP_IMAGE:${{ env.GIT_SHA }} app/.
 
       - name: Tag $APP_IMAGE
-        run: docker tag $REGISTRY/$APP_IMAGE:$GIT_SHA $REGISTRY/$APP_IMAGE:$TAG
+        run: docker tag $REGISTRY/$APP_IMAGE:${{ env.GIT_SHA }} $REGISTRY/$APP_IMAGE:$TAG
 
-      - name: Push $API_IMAGE:$GIT_SHA
-        run: docker push $REGISTRY/$API_IMAGE:$GIT_SHA
+      - name: Push $API_IMAGE:${{ env.GIT_SHA }}
+        run: docker push $REGISTRY/$API_IMAGE:${{ env.GIT_SHA }}
 
       - name: Push $API_IMAGE:$TAG
         run: docker push $REGISTRY/$API_IMAGE:$TAG
     
-      - name: Push $APP_IMAGE:$GIT_SHA
-        run: docker push $REGISTRY/$APP_IMAGE:$GIT_SHA
+      - name: Push $APP_IMAGE:${{ env.GIT_SHA }}
+        run: docker push $REGISTRY/$APP_IMAGE:${{ env.GIT_SHA }}
 
       - name: Push $APP_IMAGE:$TAG
         run: docker push $REGISTRY/$APP_IMAGE:$TAG

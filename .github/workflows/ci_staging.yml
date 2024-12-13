@@ -20,11 +20,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: 'staging'
-      
-      - name: Set up sparse checkout
-        run: |
-          git sparse-checkout init --cone
-          git sparse-checkout set api
 
       - name: Pull changes from branch
         run: git pull origin staging

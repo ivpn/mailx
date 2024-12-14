@@ -5,8 +5,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/joho/godotenv"
 )
 
 type APIConfig struct {
@@ -75,11 +73,6 @@ type Config struct {
 }
 
 func New() (Config, error) {
-	err := godotenv.Load("./.env")
-	if err != nil {
-		return Config{}, err
-	}
-
 	tokenExpStr := os.Getenv("TOKEN_EXPIRATION")
 	tokenExp, err := time.ParseDuration(tokenExpStr)
 	if err != nil {

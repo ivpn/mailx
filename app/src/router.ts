@@ -97,6 +97,8 @@ router.beforeEach((to, _) => {
 })
 
 router.afterEach((failure) => {
+    // Reinitialize Preline plugins
+    // https://preline.co/docs/preline-javascript.html
     if (!failure) {
         setTimeout(() => {
             window.HSStaticMethods.autoInit();

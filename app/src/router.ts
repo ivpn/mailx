@@ -82,7 +82,7 @@ const routes = [
         params: true
     },
     {
-        path: '/terms',
+        path: '/tos',
         name: AppName + ' - Terms',
         component: Terms
     },

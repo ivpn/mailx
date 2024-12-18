@@ -6,5 +6,10 @@
         <h2 class="text-2xl mt-10 mb-5">1. Introduction</h2>
         <p class="mb-5">These Terms and Conditions ("Terms") govern your use of MailX, an email forwarding service operated by IVPN Limited ("we," "us," or "our"). By subscribing to or using our service, you ("you" or "user") agree to abide by these Terms.</p>
 
+        <Footer />
     </div>
 </template>
+
+<script setup lang="ts">
+import Footer from './Footer.vue'
+</script>

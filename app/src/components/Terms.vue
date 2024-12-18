@@ -1,5 +1,8 @@
 <template>
     <div class="container mx-auto max-w-screen-lg p-10">
+
+        <p class="text-gray-500 py-5"><a href="/login">Back to Log In</a></p>
+
         <h1 class="text-3xl mb-5">Terms of Service</h1>
         <p class="text-sm mb-5 text-gray-500 dark:text-gray-400">Last updated: 22 October 2024</p>
 
@@ -64,7 +67,6 @@
         <p>If you have any questions about these Terms, please contact us by emailing support@mailx.net.</p>
         <p>This document constitutes the entire Terms and Conditions for your use of the MailX email forwarding service operated by IVPN Limited.</p>
 
-        
     </div>
     <Footer />
 </template>

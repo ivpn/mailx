@@ -64,7 +64,7 @@
         <hr>
 
         <h2>Contact Us</h2>
-        <p>If you have any questions about these Terms, please contact us by emailing support@mailx.net.</p>
+        <p>If you have any questions about these Terms, please contact us by emailing <a href="mailto:support@mailx.net">support@mailx.net</a>.</p>
         <p>This document constitutes the entire Terms and Conditions for your use of the MailX email forwarding service operated by IVPN Limited.</p>
 
     </div>

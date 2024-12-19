@@ -20,15 +20,14 @@
 
 ## Mailserver
 
-- [Postfix](http://www.postfix.org)
-- [Rspamd](https://rspamd.com/)
-- [Fail2ban](https://www.fail2ban.org/wiki/index.php/Main_Page)
+- [Docker Mailserver](https://github.com/docker-mailserver/docker-mailserver)  
 
 ## Installation
 
-### Requirements
+### Prerequisites
 
-- Docker
+- Docker: [Install Docker](https://docs.docker.com/get-docker/)
+- Docker Compose: [Install Docker Compose](https://docs.docker.com/compose/install/)
 
 > [!IMPORTANT]
 > Docker Mailserver officially supports Linux. If you want to run it on macOS, please read [this](https://github.com/docker-mailserver/docker-mailserver/issues/3648).

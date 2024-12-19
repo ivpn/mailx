@@ -10,6 +10,7 @@ import Signup from './components/Signup.vue'
 import Login from './components/Login.vue'
 import InitiateResetPassword from './components/InitiateResetPassword.vue'
 import ResetPassword from './components/ResetPassword.vue'
+import Terms from './components/Terms.vue'
 import NotFound from './components/NotFound.vue'
 import { type IStaticMethods } from 'preline/preline'
 
@@ -79,6 +80,11 @@ const routes = [
         name: AppName + ' - Set New Password',
         component: ResetPassword,
         params: true
+    },
+    {
+        path: '/tos',
+        name: AppName + ' - Terms',
+        component: Terms
     },
     {
         path: '/:pathMatch(.*)*',

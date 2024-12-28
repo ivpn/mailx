@@ -221,10 +221,10 @@ const sort = (e: any) => {
     getList()
 }
 
-onMounted(() => {
-    getList()
-    getRecipients()
-    getSettings()
+onMounted(async () => {
+    await getRecipients()
+    await getSettings()
+    await getList()
 })
 
 </script>

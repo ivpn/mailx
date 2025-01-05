@@ -87,8 +87,8 @@
             </div>
         </div>
         <p v-if="isDashboard" class="text-sm text-gray-500 dark:text-gray-300 my-4">
-            <a href="/aliases" class="text-bluish-500 hover:text-bluish-600 font-medium text-sm py-2"
-                type="submit">All Aliases</a>
+            <router-link to="/aliases" class="text-bluish-500 hover:text-bluish-600 font-medium text-sm py-2"
+                type="submit">All Aliases</router-link>
         </p>
         <p v-if="error" class="text-red-600 text-sm mb-4">Error: {{ error }}</p>
         <Pagination v-if="list.length && !isDashboard" :list.sync="list" :limit="limit" :page="page" :total="total" :key="rowKey" @onUpdatePage="onUpdatePage" />

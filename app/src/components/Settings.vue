@@ -27,7 +27,7 @@
             Default Recipient
         </h2>
         <p class="text-gray-500 dark:text-gray-400 mb-3">
-            The default recipient to be selected by default in the drop down options when creating a new recipient. You can add recipients <a class="text-bluish-500 hover:text-bluish-600" href="/recipients">here</a>.
+            The default recipient to be selected by default in the drop down options when creating a new recipient. You can add recipients <router-link class="text-bluish-500 hover:text-bluish-600" to="/recipients">here</router-link>.
         </p>
         <div class="max-w-xs mb-6">
             <label class="block text-gray-500 dark:text-gray-400 mb-3" for="recipient">

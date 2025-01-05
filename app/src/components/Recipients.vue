@@ -49,8 +49,7 @@
             </div>
         </div>
         <p v-if="isDashboard" class="text-sm text-gray-500 my-4">
-            <a href="/recipients" class="text-bluish-500 hover:text-bluish-600 font-medium text-sm py-2"
-                type="submit">All Recipients</a>
+            <router-link to="/recipients" class="text-bluish-500 hover:text-bluish-600 font-medium text-sm py-2">All Recipients</router-link>
         </p>
         <p v-if="error" class="text-red-600 text-sm mb-4">Error: {{ error }}</p>
     </div>

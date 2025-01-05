@@ -1,7 +1,7 @@
 <template>
     <div class="container mx-auto max-w-screen-lg p-10">
 
-        <p class="text-gray-500 py-5"><a href="/login">Back to Log In</a></p>
+        <p class="text-gray-500 py-5"><router-link to="/login">Back to Log In</router-link></p>
 
         <h1 class="text-3xl mb-5">Terms of Service</h1>
         <p class="text-sm mb-5 text-gray-500 dark:text-gray-400">Last updated: 22 October 2024</p>

@@ -15,10 +15,10 @@
                     </button>
                     <div class="hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-60 bg-white dark:dark:bg-neutral-800 border border-gray-200 dark:border-neutral-600 shadow-sm p-2 mt-2 after:h-4 after:absolute after:-bottom-4 after:start-0 after:w-full before:h-4 before:absolute before:-top-4 before:start-0 before:w-full"
                         aria-labelledby="hs-dropdown-default">
-                        <a class="flex items-center gap-x-3.5 py-2 px-3 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-700 focus:outline-none"
-                            href="/account">
+                        <router-link class="flex items-center gap-x-3.5 py-2 px-3 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-700 focus:outline-none"
+                            to="/account">
                             Account
-                        </a>
+                        </router-link>
                         <a @click.prevent="logout"
                             class="flex items-center gap-x-3.5 py-2 px-3 text-red-600 hover:bg-gray-100 dark:hover:bg-neutral-700 focus:outline-none"
                             href="#">

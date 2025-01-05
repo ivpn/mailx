@@ -4,7 +4,7 @@
             Verify Your Email
         </h3>
         <p class="my-2 text-gray-500 dark:text-gray-400">
-            Please <a class="text-bluish-500 hover:text-bluish-600 font-medium" href="/account">verify</a> your account email address.
+            Please <router-link class="text-bluish-500 hover:text-bluish-600 font-medium" to="/account">verify</router-link> your account email address.
         </p>
     </div>
     <div v-if="!res.is_active && !isDashboard" class="flex flex-col p-5 pb-4 my-8 bg-white dark:bg-neutral-800">

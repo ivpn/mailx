@@ -97,14 +97,14 @@
             </div>
             <div v-if="isLoggedIn()" class="pb-2">
                 <p class="text-gray-500 dark:text-gray-400 mb-6">You are logged in</p>
-                <a href="/"
+                <router-link to="/"
                     class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 focus:outline-none focus:shadow-outline">
                     Go to Dashboard
-                </a>
+                </router-link>
             </div>
         </form>
         <p class="text-gray-500 dark:text-gray-400 my-3">
-            <a class="text-bluish-500 hover:text-bluish-600" href="/reset/password/initiate">Forgot Your Password?</a>
+            <router-link class="text-bluish-500 hover:text-bluish-600" to="/reset/password/initiate">Forgot Your Password?</router-link>
         </p>
         <Footer />
     </div>

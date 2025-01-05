@@ -6,10 +6,10 @@
         </p>
         <div class="grid grid-cols-3 gap-4 text-center mb-8">
             <p>
-                <a class="text-bluish-500 hover:text-bluish-600" href="/privacy">Privacy Policy</a>
+                <router-link class="text-bluish-500 hover:text-bluish-600" to="/privacy">Privacy Policy</router-link>
             </p>
             <p>
-                <a class="text-bluish-500 hover:text-bluish-600" href="/tos">Terms of Service</a>
+                <router-link class="text-bluish-500 hover:text-bluish-600" to="/tos">Terms of Service</router-link>
             </p>
             <p>
                 <a class="text-bluish-500 hover:text-bluish-600" href="https://www.ivpn.net/">IVPN Limited</a>

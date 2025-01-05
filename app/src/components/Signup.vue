@@ -6,7 +6,7 @@
             <a class="text-bluish-500 hover:text-bluish-600" href="https://www.ivpn.net/">IVPN</a>
         </h2>
         <h2 class="text-xl text-gray-500 dark:text-gray-400 mb-2">Sign Up</h2>
-        <p class="text-gray-500 dark:text-gray-400 mb-8">Have an account? <a class="text-bluish-500 hover:text-bluish-600" href="/login">Log In</a></p>
+        <p class="text-gray-500 dark:text-gray-400 mb-8">Have an account? <router-link class="text-bluish-500 hover:text-bluish-600" to="/login">Log In</router-link></p>
         <form class="w-full max-w-sm bg-white dark:bg-neutral-800 px-8 pt-6 pb-8 mb-4" @submit.prevent="">
             <div v-if="passkeySupported" class="border-b border-gray-200 dark:border-neutral-600">
                 <nav class="flex gap-x-1" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
@@ -89,10 +89,10 @@
             </div>
             <div v-if="apiSuccess">
                 <p class="text-emerald-600 dark:text-emerald-500 text-sm mb-6">{{ apiSuccess }}</p>
-                <a href="/login"
+                <router-link to="/login"
                     class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 focus:outline-none focus:shadow-outline">
                     Proceed to Log In
-                </a>
+                </router-link>
             </div>
         </form>
         <Footer />

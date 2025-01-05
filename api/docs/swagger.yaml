@@ -72,11 +72,11 @@ definitions:
     properties:
       email:
         type: string
-      sub_id:
+      subid:
         type: string
     required:
     - email
-    - sub_id
+    - subid
     type: object
   api.SignupUserReq:
     properties:
@@ -84,11 +84,11 @@ definitions:
         type: string
       password:
         type: string
-      sub_id:
+      subid:
         type: string
     required:
     - email
-    - sub_id
+    - subid
     type: object
   api.SubscriptionReq:
     properties:

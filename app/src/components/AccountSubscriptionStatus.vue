@@ -1,5 +1,5 @@
 <template>
-    <div v-if="!isActive() && !isAccountRoute()" class="flex flex-col p-5 my-8 bg-white dark:bg-neutral-800">
+    <div v-if="!isActive && !isAccountRoute()" class="flex flex-col p-5 my-8 bg-white dark:bg-neutral-800">
         <p class="text-gray-500 dark:text-gray-400 mb-2">Account subscription is inactive</p>
         <router-link class="text-bluish-500 hover:text-bluish-600" to="/account">View Details</router-link>
     </div>
@@ -17,17 +17,15 @@ const res = ref({
 
 const route = ref('/')
 const currentRoute = useRoute()
+const isActive = ref(true)
 
 const getSubscription = async () => {
     try {
         const response = await subscriptionApi.get()
         res.value = response.data
+        isActive.value = res.value.active_until > new Date().toISOString()
     } catch (err) {
     }
-}
-
-const isActive = () => {
-    return res.value.active_until > new Date().toISOString()
 }
 
 const isAccountRoute = () => {

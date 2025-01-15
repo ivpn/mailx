@@ -222,7 +222,7 @@ const loginWithPasskey = async () => {
 
 const startAuth = async (data: any, res: any) => {
     try {
-        const creds = await startAuthentication(res.data['publicKey'])
+        const creds = await startAuthentication({ optionsJSON: res.data['publicKey'] })
         res = await userApi.loginFinish(creds)
         error.value = ''
         if (res.status === 200) {

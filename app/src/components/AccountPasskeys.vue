@@ -135,7 +135,7 @@ const addPasskey = async () => {
 
 const startAddPasskey = async (res: any) => {
     try {
-        const creds = await startRegistration(res.data['publicKey'])
+        const creds = await startRegistration({ optionsJSON: res.data['publicKey'] })
         res = await userApi.registerFinish(creds)
         error.value = ''
         getList()

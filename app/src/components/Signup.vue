@@ -181,7 +181,7 @@ const registerWithPasskey = async () => {
 
     try {
         var res = await userApi.registerBegin(data)
-        const creds = await startRegistration(res.data['publicKey'])
+        const creds = await startRegistration({ optionsJSON: res.data['publicKey'] })
         res = await userApi.registerFinish(creds)
         apiSuccess.value = res.data.message
         apiError.value = ''

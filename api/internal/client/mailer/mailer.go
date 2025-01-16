@@ -8,7 +8,7 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/DusanKasan/parsemail"
+	"github.com/OfimaticSRL/parsemail"
 	"gopkg.in/gomail.v2"
 	"ivpn.net/email/api/config"
 	"ivpn.net/email/api/internal/model"

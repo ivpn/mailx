@@ -85,10 +85,14 @@
                                     {{ recipient }}
                                 </option>
                             </select>
+                            <p v-if="errorRecipients" class="pt-3 text-red-600 text-sm">{{ errorRecipients }}</p>
                         </div>
                     </div>
                     <div class="flex justify-start items-center gap-x-3 py-4 px-4 border-t dark:border-neutral-600">
-                        <button v-if="!success" @click="updateAlias"
+                        <button
+                            v-if="!success"
+                            @click="updateAlias"
+                            v-bind:disabled="errorRecipients.length > 0"
                             class="py-2 px-3 inline-flex items-center gap-x-2 font-medium text-base bg-bluish-500 text-white hover:bg-bluish-600 disabled:opacity-50 disabled:pointer-events-none">
                             Save
                         </button>
@@ -120,6 +124,7 @@ const recipients = ref(props.recipients)
 const selectRecipients = ref(props.recipients)
 const success = ref('')
 const error = ref('')
+const errorRecipients = ref('')
 
 const updateAlias = async () => {
     try {
@@ -151,6 +156,11 @@ const addEvents = () => {
     const modal = overlay.getInstance('#modal-alias-edit' + alias.value.id as any, true) as any
     modal.element.on('close', () => {
         close()
+    })
+
+    const multiselect = select.getInstance('#recipient_' + alias.value.id as any, true) as any
+    multiselect.element.on('change', (val) => {
+        errorRecipients.value = val.length === 0 ? 'Select one or more recipients' : ''
     })
 }
 

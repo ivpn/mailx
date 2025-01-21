@@ -45,7 +45,7 @@ func (s *Service) ProcessMessage(data []byte) error {
 	}
 
 	for _, to := range msg.To {
-		recipient, alias, relayType, err := s.findRecipient(msg.From, to, msg.Type)
+		recipients, alias, relayType, err := s.findRecipients(msg.From, to, msg.Type)
 		if err != nil {
 			log.Println("error processing message", err)
 			continue
@@ -57,15 +57,17 @@ func (s *Service) ProcessMessage(data []byte) error {
 			continue
 		}
 
-		utils.Background(func() {
-			err = s.queueMessage(msg.From, msg.FromName, settings.FromName, recipient, data, alias, relayType)
-			if err != nil {
-				log.Println("error queueing message", err)
-				return
-			}
+		for _, recipient := range recipients {
+			utils.Background(func() {
+				err = s.queueMessage(msg.From, msg.FromName, settings.FromName, recipient, data, alias, relayType)
+				if err != nil {
+					log.Println("error queueing message", err)
+					return
+				}
 
-			s.saveMessage(alias, relayType, data)
-		})
+				s.saveMessage(alias, relayType, data)
+			})
+		}
 	}
 
 	return err
@@ -121,42 +123,42 @@ func (s *Service) saveMessage(alias model.Alias, msgType model.MessageType, data
 	}
 }
 
-func (s *Service) findRecipient(from string, email string, msgType MsgType) (string, model.Alias, model.MessageType, error) {
+func (s *Service) findRecipients(from string, email string, msgType MsgType) ([]string, model.Alias, model.MessageType, error) {
 	name, replyTo := model.ParseReplyTo(email)
 
 	alias, err := s.GetAliasByName(name)
 	if err != nil {
-		return "", model.Alias{}, 0, err
+		return []string{}, model.Alias{}, 0, err
 	}
 
 	if !alias.Enabled {
 		// Block
 		s.saveMessage(alias, model.Block, []byte{})
-		return "", model.Alias{}, 0, ErrDisabledAlias
+		return []string{}, model.Alias{}, 0, ErrDisabledAlias
 	}
 
 	sub, err := s.GetSubscription(context.Background(), alias.UserID)
 	if err != nil {
-		return "", model.Alias{}, 0, err
+		return []string{}, model.Alias{}, 0, err
 	}
 
 	if sub.ActiveUntil.Before(time.Now()) {
-		return "", model.Alias{}, 0, ErrInactiveSubscription
+		return []string{}, model.Alias{}, 0, ErrInactiveSubscription
 	}
 
 	err = utils.ValidateEmail(replyTo)
 	if err == nil {
 		rcps, err := s.GetVerifiedRecipients(context.Background(), from, alias.UserID)
 		if err != nil || len(rcps) == 0 {
-			return "", model.Alias{}, 0, ErrNoRecipients
+			return []string{}, model.Alias{}, 0, ErrNoRecipients
 		}
 
-		return replyTo, alias, model.MessageType(msgType), nil
+		return []string{replyTo}, alias, model.MessageType(msgType), nil
 	}
 
-	r := strings.Split(alias.Recipients, ",")[0]
+	recipients := strings.Split(alias.Recipients, ",")
 
-	return r, alias, model.Forward, nil
+	return recipients, alias, model.Forward, nil
 }
 
 func parseMessage(data []byte) (Msg, error) {

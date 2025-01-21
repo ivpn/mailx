@@ -237,6 +237,11 @@
   resolved "https://registry.yarnpkg.com/@preline/overlay/-/overlay-2.3.0.tgz#8aa47c4374d369fb8aa715232eb36853e37d7a94"
   integrity sha512-aN9mR81RHEnh8Tg/WTRwdqwrX2JxObV2CMR61Q8hJphDLaZFZT2yPcnMaXawFS+cO839Wd+VvZDSeBFE1DYpEg==
 
+"@preline/select@^2.5.2":
+  version "2.5.2"
+  resolved "https://registry.yarnpkg.com/@preline/select/-/select-2.5.2.tgz#107c5af409043ab3169ec7f525fa33fccaf9517b"
+  integrity sha512-NnxpAhVcYynZNG+8ymGOITtPVHVvJsRdT50QM0MOz+eTf2JQlhMYknv8m8CQTSuU0acAeP28v4VUnHG80tMw/Q==
+
 "@preline/tabs@^2.5.0":
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/@preline/tabs/-/tabs-2.5.0.tgz#08aed74f8ad4165338a66854529f8bdcdd498f46"

@@ -259,20 +259,20 @@ func (s *Service) ActivateUser(ctx context.Context, ID string, otp string) error
 	return nil
 }
 
-func (s *Service) DeleteUserRequest(ctx context.Context, userID string) (error, string) {
+func (s *Service) DeleteUserRequest(ctx context.Context, userID string) (string, error) {
 	otp, err := utils.GenerateRandomString(8)
 	if err != nil {
 		log.Printf("error deleting user request: %s", err.Error())
-		return ErrDeleteUser, ""
+		return "", ErrDeleteUser
 	}
 
 	err = s.Cache.Set(ctx, "delete_account_"+userID, otp, s.Cfg.Service.OTPExpiration)
 	if err != nil {
 		log.Printf("error deleting user request: %s", err.Error())
-		return ErrSaveOTP, ""
+		return "", ErrSaveOTP
 	}
 
-	return nil, otp
+	return otp, nil
 }
 
 func (s *Service) DeleteUser(ctx context.Context, userID string, OTP string) error {

@@ -95,12 +95,8 @@ const promptDeleteAccount = () => {
 }
 
 const deleteAccount = async () => {
-    const req = {
-        otp: otp.value
-    }
-
     try {
-        await userApi.delete(req)
+        await userApi.delete(req.value)
         alert('Account is deleted successfully. You will be logged out.')
         userApi.clearSession()
     } catch (err) {

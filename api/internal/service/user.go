@@ -277,9 +277,14 @@ func (s *Service) DeleteUserRequest(ctx context.Context, userID string) (string,
 
 func (s *Service) DeleteUser(ctx context.Context, userID string, OTP string) error {
 	otp, err := s.Cache.Get(ctx, "delete_account_"+userID)
-	if err != nil || otp != OTP {
+	if err != nil {
 		log.Printf("error deleting user: %s", err.Error())
-		return ErrExpiredOTP
+		return ErrIncorrectOTP
+	}
+
+	if otp != OTP {
+		log.Printf("error deleting user: OTP does not match")
+		return ErrIncorrectOTP
 	}
 
 	err = s.Store.DeleteAliasByUserID(ctx, userID)

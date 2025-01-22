@@ -42,7 +42,7 @@ func CreateOTP() (*OTP, error) {
 }
 
 func CreateLongOTP() (*OTP, error) {
-	str, err := generateRandomString(length)
+	str, err := GenerateRandomString(length)
 	if err != nil {
 		return nil, ErrCreateOTP
 	}
@@ -63,7 +63,7 @@ func MatchOTP(secret string, hash string) bool {
 	return HashMatches(secret, hash)
 }
 
-func generateRandomString(length int) (string, error) {
+func GenerateRandomString(length int) (string, error) {
 	result := make([]byte, length)
 	charsetLength := big.NewInt(int64(len(charset)))
 

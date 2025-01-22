@@ -259,8 +259,30 @@ func (s *Service) ActivateUser(ctx context.Context, ID string, otp string) error
 	return nil
 }
 
-func (s *Service) DeleteUser(ctx context.Context, userID string) error {
-	err := s.Store.DeleteAliasByUserID(ctx, userID)
+func (s *Service) DeleteUserRequest(ctx context.Context, userID string) (error, string) {
+	otp, err := utils.GenerateRandomString(8)
+	if err != nil {
+		log.Printf("error deleting user request: %s", err.Error())
+		return ErrDeleteUser, ""
+	}
+
+	err = s.Cache.Set(ctx, "delete_account_"+userID, otp, s.Cfg.Service.OTPExpiration)
+	if err != nil {
+		log.Printf("error deleting user request: %s", err.Error())
+		return ErrSaveOTP, ""
+	}
+
+	return nil, otp
+}
+
+func (s *Service) DeleteUser(ctx context.Context, userID string, OTP string) error {
+	otp, err := s.Cache.Get(ctx, "delete_account_"+userID)
+	if err != nil || otp != OTP {
+		log.Printf("error deleting user: %s", err.Error())
+		return ErrExpiredOTP
+	}
+
+	err = s.Store.DeleteAliasByUserID(ctx, userID)
 	if err != nil {
 		log.Printf("error deleting user: %s", err.Error())
 		return ErrDeleteUser

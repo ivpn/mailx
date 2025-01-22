@@ -296,7 +296,7 @@ func (h *Handler) DeleteUserRequest(c *fiber.Ctx) error {
 	}
 
 	return c.Status(200).JSON(fiber.Map{
-		"confirm": otp,
+		"otp": otp,
 	})
 }
 

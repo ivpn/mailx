@@ -36,8 +36,8 @@
                             </div>
                             <div class="mb-5">
                                 <p class="text-gray-500 dark:text-gray-400 mb-3">
-                                    To confirm permanent deletion of your account, please enter the following code in the field below:
-                                    <span class="text-black dark:text-white">12345678</span>
+                                    To confirm permanent deletion of your account, please enter the following symbols in the field below:
+                                    <span class="text-black dark:text-white">{{ otp }}</span>
                                 </p>
                             </div>
                             <div class="mb-5">
@@ -45,7 +45,7 @@
                                     v-model="req.otp"
                                     v-bind:class="{ 'border-gray-500 dark:border-neutral-400': !otpError, 'border-red-600 dark:border-red-600': otpError }"
                                     id="totp_enable_code"
-                                    placeholder="8-digit code"
+                                    placeholder="8-symbol code"
                                     class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 leading-tight focus:border-bluish-500 mb-2"
                                     type="text"
                                     pattern="[0-9]*">
@@ -84,7 +84,7 @@ const otpError = ref(false)
 const error = ref('')
 
 const validateOtp = () => {
-    otpError.value = !otp.value
+    otpError.value = !req.value.otp
     return !otpError.value
 }
 
@@ -114,7 +114,25 @@ const deleteAccount = async () => {
     }
 }
 
+const deleteAccountRequest = async () => {
+    try {
+        const res = await userApi.deleteRequest()
+        otp.value = res.data.otp
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.response?.data.error || err.message
+
+            if (err.response?.status === 429) {
+                error.value = 'Too many requests, please try again later'
+            }
+        }
+    }
+}
+
 const close = () => {
+    req.value = {} as any
+    otp.value = ''
+    error.value = ''
     const modal = document.querySelector('#modal-delete-account') as any
     overlay.close(modal)
 }
@@ -125,7 +143,7 @@ const addEvents = () => {
         close()
     })
     modal.element.on('open', () => {
-        // TODO: on open
+        deleteAccountRequest()
     })
 }
 

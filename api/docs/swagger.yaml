@@ -31,8 +31,10 @@ definitions:
     type: object
   api.DeleteUserReq:
     properties:
-      password:
+      otp:
         type: string
+    required:
+    - otp
     type: object
   api.EmailReq:
     properties:
@@ -1086,6 +1088,27 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Delete user
+      tags:
+      - user
+  /user/delete/request:
+    post:
+      consumes:
+      - application/json
+      description: Delete user request
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete user request
       tags:
       - user
   /user/logout:

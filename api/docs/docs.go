@@ -1311,6 +1311,40 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/delete/request": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete user request",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Delete user request",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
         "/user/logout": {
             "post": {
                 "security": [
@@ -1587,8 +1621,11 @@ const docTemplate = `{
         },
         "api.DeleteUserReq": {
             "type": "object",
+            "required": [
+                "otp"
+            ],
             "properties": {
-                "password": {
+                "otp": {
                     "type": "string"
                 }
             }

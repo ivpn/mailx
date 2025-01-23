@@ -46,6 +46,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Post("/user/sendotp", limit.New(5, 10*time.Minute), h.SendUserOTP)
 	v1.Post("/user/activate", limiter.New(), h.Activate)
 	v1.Post("/user/logout", h.Logout)
+	v1.Post("/user/delete/request", limit.New(5, 10*time.Minute), h.DeleteUserRequest)
 	v1.Post("/user/delete", limit.New(5, 10*time.Minute), h.DeleteUser)
 	v1.Get("/user", h.GetUser)
 	v1.Get("/user/stats", h.GetUserStats)

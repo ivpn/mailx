@@ -43,7 +43,7 @@ type SettingsReq struct {
 }
 
 type DeleteUserReq struct {
-	Password string `json:"password" validate:"password"`
+	OTP string `json:"otp" validate:"required,len=8"`
 }
 
 type ChangePasswordReq struct {

@@ -37,7 +37,8 @@ type UserService interface {
 	GetUserByPassword(context.Context, string, string) (model.User, error)
 	GetUserByEmail(context.Context, string) (model.User, error)
 	SaveUser(context.Context, model.User) error
-	DeleteUser(context.Context, string) error
+	DeleteUserRequest(context.Context, string) (string, error)
+	DeleteUser(context.Context, string, string) error
 	GetUser(context.Context, string) (model.User, error)
 	GetUserStats(context.Context, string) (model.UserStats, error)
 	LogoutUser(context.Context, string, time.Duration, string) error
@@ -275,6 +276,30 @@ func (h *Handler) Logout(c *fiber.Ctx) error {
 	})
 }
 
+// @Summary Delete user request
+// @Description Delete user request
+// @Tags user
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /user/delete/request [post]
+func (h *Handler) DeleteUserRequest(c *fiber.Ctx) error {
+	ID := auth.GetUserID(c)
+
+	otp, err := h.Service.DeleteUserRequest(c.Context(), ID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"otp": otp,
+	})
+}
+
 // @Summary Delete user
 // @Description Delete user
 // @Tags user
@@ -306,17 +331,8 @@ func (h *Handler) DeleteUser(c *fiber.Ctx) error {
 		})
 	}
 
-	// Get the user
-	user, err := h.Service.GetUserByPassword(c.Context(), ID, req.Password)
-	if err != nil || user.ID != ID {
-		log.Printf("error deleting user: %s", err.Error())
-		return c.Status(400).JSON(fiber.Map{
-			"error": ErrInvalidCredentials,
-		})
-	}
-
 	// Delete the user
-	err = h.Service.DeleteUser(c.Context(), ID)
+	err = h.Service.DeleteUser(c.Context(), ID, req.OTP)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),

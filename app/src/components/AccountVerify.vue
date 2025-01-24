@@ -53,6 +53,7 @@
 import { onMounted, ref } from 'vue'
 import axios from 'axios'
 import { userApi } from '../api/user.ts'
+import events from '../events.ts'
 
 const res = ref({
     id: '',
@@ -122,7 +123,12 @@ const validateOtp = () => {
     return !otpError.value
 }
 
+const onUpdateEmail = () => {
+    getUser()
+}
+
 onMounted(() => {
     getUser()
+    events.on('onUpdateEmail', onUpdateEmail)
 })
 </script>

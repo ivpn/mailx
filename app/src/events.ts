@@ -2,7 +2,7 @@ import mitt from 'mitt'
 
 // Define events
 type Events = {
-    'onUpdateEmail': { email: string }
+    'user.update': { email: string }
 }
 
 export default mitt<Events>()

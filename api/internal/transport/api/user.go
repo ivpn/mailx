@@ -473,6 +473,14 @@ func (h *Handler) ChangeEmail(c *fiber.Ctx) error {
 		})
 	}
 
+	// Send OTP
+	err = h.Service.SendUserOTP(c.Context(), ID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
 	return c.Status(200).JSON(fiber.Map{
 		"message": ChangeEmailSuccess,
 	})

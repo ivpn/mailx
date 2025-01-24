@@ -20,7 +20,7 @@ var (
 	ActivateUserSuccess          = "Email is confirmed"
 	InitiatePasswordResetSuccess = "Password reset initiated"
 	ResetPasswordSuccess         = "Your password has been changed successfully"
-	ChangeEmailSuccess           = "Your email has been changed successfully"
+	ChangeEmailSuccess           = "Your email has been changed successfully. We have sent a 6-digit OTP code to your email address for verification."
 	ErrInvalidCredentials        = "Invalid credentials"
 	ErrInvalidRequest            = "Invalid request"
 	ErrLogoutUser                = "Could not logout user"

@@ -18,6 +18,7 @@ export const userApi = {
     deleteCredential: (id: string) => api.delete('/user/credential/' + id),
     stats: () => api.get('/user/stats'),
     changePassword: (data: any) => api.put('/user/changepassword', data),
+    changeEmail: (data: any) => api.put('/user/changeemail', data),
     initiatePasswordReset: (data: any) => api.post('/initiatepasswordreset', data),
     resetPassword: (data: any) => api.put('/resetpassword', data),
     totpEnable: () => api.put('/user/totp/enable'),

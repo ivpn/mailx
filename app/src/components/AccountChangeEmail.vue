@@ -11,15 +11,6 @@
                     class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 leading-tight focus:border-bluish-500 mb-2"
                     id="new-email" type="email">
             </div>
-            <div class="mb-4 max-w-xs">
-                <label class="block text-gray-500 dark:text-gray-400 mb-3" for="new-email-confirm">
-                    Confirm new email:
-                </label>
-                <input v-model="emailConfirm"
-                    v-bind:class="{ 'border-gray-500 dark:border-neutral-400': !emailError, 'border-red-600 dark:border-red-600': emailError }"
-                    class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 leading-tight focus:border-bluish-500 mb-2"
-                    id="new-email-confirm" type="email">
-            </div>
             <div class="mb-3 max-w-xs">
                 <button @click="changeEmail"
                     class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-2 px-3 focus:outline-none focus:shadow-outline"
@@ -41,7 +32,6 @@ import axios from 'axios'
 import events from '../events.ts'
 
 const email = ref('')
-const emailConfirm = ref('')
 const emailError = ref('')
 const error = ref('')
 const success = ref('')
@@ -50,12 +40,8 @@ const validateEmail = () => {
     success.value = ''
     emailError.value = ''
 
-    if (!email.value || !emailConfirm.value) {
-        emailError.value = 'Please fill required fields'
-    }
-
-    if (email.value !== emailConfirm.value) {
-        emailError.value = 'Emails do not match'
+    if (!email.value) {
+        emailError.value = 'Required'
     }
 
     return !emailError.value
@@ -75,7 +61,6 @@ const changeEmail = async () => {
         success.value = res.data.message
         error.value = ''
         email.value = ''
-        emailConfirm.value = ''
     } catch (err) {
         if (axios.isAxiosError(err)) {
             success.value = ''

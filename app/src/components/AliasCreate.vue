@@ -172,7 +172,7 @@ const alias = ref({
 })
 const recipients = ref(props.recipients)
 const settings = ref(props.settings)
-const selectRecipients = ref([settings.value.recipient])
+const selectRecipients = ref([settings.value.recipient ? settings.value.recipient : props.recipients[0]])
 const domains = ref(envDomains)
 const error = ref('')
 const errorRecipients = ref('')

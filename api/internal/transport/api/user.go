@@ -20,6 +20,7 @@ var (
 	ActivateUserSuccess          = "Email is confirmed"
 	InitiatePasswordResetSuccess = "Password reset initiated"
 	ResetPasswordSuccess         = "Your password has been changed successfully"
+	ChangeEmailSuccess           = "Your email has been changed successfully. We have sent a 6-digit OTP code to your email address for verification."
 	ErrInvalidCredentials        = "Invalid credentials"
 	ErrInvalidRequest            = "Invalid request"
 	ErrLogoutUser                = "Could not logout user"
@@ -43,6 +44,7 @@ type UserService interface {
 	GetUserStats(context.Context, string) (model.UserStats, error)
 	LogoutUser(context.Context, string, time.Duration, string) error
 	ChangePassword(context.Context, string, string) error
+	ChangeEmail(context.Context, string, string) error
 	InitiatePasswordReset(context.Context, string) error
 	ResetPassword(context.Context, string, string) error
 	TotpEnable(context.Context, string) (model.TOTPNew, error)
@@ -429,6 +431,58 @@ func (h *Handler) ChangePassword(c *fiber.Ctx) error {
 
 	return c.Status(200).JSON(fiber.Map{
 		"message": ResetPasswordSuccess,
+	})
+}
+
+// @Summary Change email
+// @Description Change email
+// @Tags user
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param body body EmailReq true "Change email request"
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /user/changeemail [put]
+func (h *Handler) ChangeEmail(c *fiber.Ctx) error {
+	ID := auth.GetUserID(c)
+
+	// Parse the request
+	req := EmailReq{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		log.Printf("error changing email: %s", err.Error())
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	// Validate the request
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	// Change the email
+	err = h.Service.ChangeEmail(c.Context(), ID, req.Email)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	// Send OTP
+	err = h.Service.SendUserOTP(c.Context(), ID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": ChangeEmailSuccess,
 	})
 }
 

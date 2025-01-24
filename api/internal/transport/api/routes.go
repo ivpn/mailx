@@ -53,6 +53,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Get("/user/credentials", h.GetCredentials)
 	v1.Delete("/user/credential/:id", h.DeleteCredential)
 	v1.Put("/user/changepassword", limit.New(5, 10*time.Minute), h.ChangePassword)
+	v1.Put("/user/changeemail", limit.New(5, 10*time.Minute), h.ChangeEmail)
 	v1.Put("/user/totp/enable", limit.New(5, 10*time.Minute), h.TotpEnable)
 	v1.Put("/user/totp/enable/confirm", limit.New(5, 10*time.Minute), h.TotpEnableConfirm)
 	v1.Put("/user/totp/disable", limit.New(5, 10*time.Minute), h.TotpDisable)

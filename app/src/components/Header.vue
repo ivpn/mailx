@@ -6,7 +6,7 @@
                 <div class="hs-dropdown relative flex items-center [--placement:bottom-right] my-3">
                     <button id="hs-dropdown-default" type="button"
                         class="flex items-center hs-dropdown-toggle text-gray-500 dark:text-gray-400 pl-4 pr-3 hover:text-gray-800 dark:hover:text-gray-100">
-                        {{ getEmail() }}
+                        {{ email }}
                         <svg class="ms-1 flex-shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round">
@@ -34,10 +34,13 @@
 
 <script setup lang="ts">
 import HeaderMenu from './HeaderMenu.vue'
-import ThemeSwitch from './ThemeSwitch.vue';
+import ThemeSwitch from './ThemeSwitch.vue'
 import dropdown from '@preline/dropdown'
 import { userApi } from '../api/user.ts'
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue'
+import events from '../events.ts'
+
+const email = ref(localStorage.getItem('email'))
 
 const logout = async () => {
     if (!confirm('Do you want to proceed with the logout?')) return
@@ -48,11 +51,12 @@ const logout = async () => {
     } catch { }
 }
 
-const getEmail = () => {
-    return localStorage.getItem('email')
+const onUpdateEmail = (event: any) => {
+    email.value = event.email
 }
 
 onMounted(() => {
     dropdown.autoInit()
+    events.on('onUpdateEmail', onUpdateEmail)
 })
 </script>

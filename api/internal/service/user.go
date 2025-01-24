@@ -30,6 +30,7 @@ var (
 	ErrIncorrectPass       = errors.New("incorrect password")
 	ErrLogoutUser          = errors.New("could not logout user")
 	ErrChangePassword      = errors.New("could not change password")
+	ErrChangeEmail         = errors.New("could not change email")
 	ErrTotpDisabled        = errors.New("2FA is disabled")
 	ErrGetTotp             = errors.New("could not get 2FA code")
 	ErrTotpBackupUsed      = errors.New("2FA backup is already used")
@@ -381,6 +382,25 @@ func (s *Service) ChangePassword(ctx context.Context, userID string, password st
 	if err != nil {
 		log.Printf("error changing password: %s", err.Error())
 		return ErrChangePassword
+	}
+
+	return nil
+}
+
+func (s *Service) ChangeEmail(ctx context.Context, userID string, email string) error {
+	user, err := s.Store.GetUser(ctx, userID)
+	if err != nil {
+		log.Printf("error changing email: %s", err.Error())
+		return ErrGetUser
+	}
+
+	user.Email = email
+	user.IsActive = false
+
+	err = s.Store.SaveUser(ctx, user)
+	if err != nil {
+		log.Printf("error changing email: %s", err.Error())
+		return ErrChangeEmail
 	}
 
 	return nil

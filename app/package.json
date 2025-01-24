@@ -20,6 +20,7 @@
     "apexcharts": "^3.49.0",
     "axios": "^1.7.4",
     "jwt-decode": "^4.0.0",
+    "mitt": "^3.0.1",
     "postcss-import": "^16.1.0",
     "preline": "^2.1.0",
     "qrious": "^4.0.2",

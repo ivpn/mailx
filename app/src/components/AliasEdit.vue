@@ -82,7 +82,8 @@
                             class="py-2 px-3 inline-flex items-center gap-x-2 font-medium text-base bg-bluish-500 text-white hover:bg-bluish-600 disabled:opacity-50 disabled:pointer-events-none">
                             Save
                         </button>
-                        <button @click="close"
+                        <button
+                            @click="close"
                             class="text-gray-500 bg-gray-100 hover:bg-gray-200 dark:text-gray-300 dark:bg-neutral-600 dark:hover:bg-neutral-700 font-medium text-base py-2 px-3 focus:outline-none focus:shadow-outline">
                             Cancel
                         </button>
@@ -113,8 +114,9 @@ const error = ref('')
 const errorRecipients = ref('')
 
 const updateAlias = async () => {
+    alias.value.recipients = selectRecipients.value.toString()
+
     try {
-        alias.value.recipients = selectRecipients.value.join(',')
         const res = await aliasApi.update(alias.value.id, alias.value)
         success.value = res.data.message
         error.value = ''

@@ -70,7 +70,7 @@
         <td class="pl-5 py-4 whitespace-nowrap text-end text-sm">
             <div class="flex gap-5 justify-end">
                 <AliasSend :alias="alias" />
-                <AliasEdit :alias="alias" :recipients="recipients" @onEditAlias="onEditAlias" :key="rowKey" />
+                <AliasEdit :alias="alias" :recipients="recipients" :key="rowKey" />
                 <button
                     @click="deleteAlias"
                     class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600 font-medium text-sm py-2 focus:outline-none focus:shadow-outline"
@@ -88,11 +88,11 @@ import tooltip from '@preline/tooltip'
 import AliasEdit from './AliasEdit.vue'
 import AliasSend from './AliasSend.vue'
 import { aliasApi } from '../api/alias.ts'
+import events from '../events.ts'
 
 const props = defineProps(['alias', 'recipients'])
 const alias = ref(props.alias)
 const recipients = ref(props.recipients)
-const emit = defineEmits(['onDeleteAlias', 'onEditAlias'])
 const copyText = ref('Click to copy')
 const rowKey = ref(0)
 
@@ -105,11 +105,7 @@ const updateAlias = async () => {
 }
 
 const deleteAlias = () => {
-    emit('onDeleteAlias', alias.value.id)
-}
-
-const onEditAlias = () => {
-    emit('onEditAlias')
+    events.emit('alias.delete', { id: alias.value.id })
 }
 
 const copyAlias = (alias: string) => {

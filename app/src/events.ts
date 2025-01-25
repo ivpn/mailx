@@ -4,7 +4,8 @@ import mitt from 'mitt'
 type Events = {
     'user.update': { email: string }
     'alias.create': {}
-    'alias.update': { alias: string }
+    'alias.update': {}
+    'alias.delete': { id: string }
 }
 
 export default mitt<Events>()

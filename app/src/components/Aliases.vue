@@ -78,7 +78,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200 dark:divide-neutral-600">
-                                    <AliasRow @onDeleteAlias="deleteAlias" @onEditAlias="getList" v-for="alias in list" :alias="alias" :key="rowKey" :recipients.sync="recipients" />
+                                    <AliasRow v-for="alias in list" :alias="alias" :key="rowKey" :recipients.sync="recipients" />
                                 </tbody>
                             </table>
                         </div>
@@ -210,6 +210,10 @@ const onUpdatePage = (obj: any) => {
     getList()
 }
 
+const onDeleteAlias = (payload: { id: string }) => {
+    deleteAlias(payload.id)
+}
+
 const sort = (e: any) => {
     const sort = e.target.dataset.sort
     if (sort === sortBy.value) {
@@ -227,6 +231,8 @@ onMounted(async () => {
     await getSettings()
     await getList()
     events.on('alias.create', getList)
+    events.on('alias.update', getList)
+    events.on('alias.delete', onDeleteAlias)
 })
 
 </script>

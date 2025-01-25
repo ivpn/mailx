@@ -8,7 +8,7 @@
                 To get started, add a recipient.
             </p>
             <div class="flex gap-4">
-                <RecipientCreate @onCreateRecipient="getList" />
+                <RecipientCreate />
             </div>
         </div>
     </div>
@@ -16,7 +16,7 @@
         <h1 class="text-3xl text-gray-800 dark:text-gray-100 font-semibold mb-5">Recipients</h1>
         <div>
             <div class="flex items-center justify-between mb-6">
-                <RecipientCreate @onCreateRecipient="getList" />
+                <RecipientCreate />
             </div>
             <div class="flex flex-col">
                 <div class="-m-1.5 overflow-x-auto">
@@ -40,7 +40,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200 dark:divide-neutral-600">
-                                    <RecipientRow  @onDeleteRecipient="deleteRecipient" @onVerifyRecipient="reload" v-for="recipient in list" :recipient="recipient" :key="rowKey" />
+                                    <RecipientRow v-for="recipient in list" :recipient="recipient" :key="rowKey" />
                                 </tbody>
                             </table>
                         </div>
@@ -61,6 +61,7 @@ import axios from 'axios'
 import { recipientApi } from '../api/recipient.ts'
 import RecipientRow from './RecipientRow.vue'
 import RecipientCreate from './RecipientCreate.vue'
+import events from '../events.ts'
 
 const recipient = {
     id: '',
@@ -104,6 +105,10 @@ const deleteRecipient = async (id: string) => {
     }
 }
 
+const onDeleteRecipient = (payload: { id: string }) => {
+    deleteRecipient(payload.id)
+}
+
 const reload = () => {
     if (!isDashboard) getList()
     if (isDashboard) location.reload()
@@ -115,5 +120,8 @@ const renderRow = () => {
 
 onMounted(() => {
     getList()
+    events.on('recipient.create', getList)
+    events.on('recipient.verify', reload)
+    events.on('recipient.delete', onDeleteRecipient)
 })
 </script>

@@ -8,6 +8,9 @@ type Events = {
     'alias.delete': { id: string }
     'totp.enable': {}
     'totp.disable': {}
+    'recipient.create': {}
+    'recipient.verify': {}
+    'recipient.delete': { id: string }
 }
 
 export default mitt<Events>()

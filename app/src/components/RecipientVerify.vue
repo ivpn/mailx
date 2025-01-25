@@ -76,11 +76,11 @@ import { ref, onMounted } from 'vue'
 import overlay from '@preline/overlay'
 import axios from 'axios'
 import { recipientApi } from '../api/recipient.ts'
+import events from '../events.ts'
 
 const req = ref({
     otp: '',
 })
-const emit = defineEmits(['onVerifyRecipient'])
 const props = defineProps(['recipient'])
 const recipient = ref(props.recipient)
 const resendSuccess = ref('')
@@ -100,7 +100,7 @@ const verifyRecipient = async () => {
     try {
         await recipientApi.activate(recipient.value.id, req.value)
         error.value = ''
-        emit('onVerifyRecipient')
+        events.emit('recipient.verify', {})
         close()
     } catch (err) {
         if (axios.isAxiosError(err)) {

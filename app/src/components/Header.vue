@@ -57,6 +57,6 @@ const onUpdateEmail = (event: any) => {
 
 onMounted(() => {
     dropdown.autoInit()
-    events.on('onUpdateEmail', onUpdateEmail)
+    events.on('user.update', onUpdateEmail)
 })
 </script>

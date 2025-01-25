@@ -6,6 +6,8 @@ type Events = {
     'alias.create': {}
     'alias.update': {}
     'alias.delete': { id: string }
+    'totp.enable': {}
+    'totp.disable': {}
 }
 
 export default mitt<Events>()

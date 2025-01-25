@@ -69,8 +69,7 @@ import { ref, onMounted } from 'vue'
 import { userApi } from '../api/user.ts'
 import axios from 'axios'
 import overlay from '@preline/overlay'
-
-const emit = defineEmits(['onTotpDisable'])
+import events from '../events.ts'
 
 const req = ref({ otp: '' })
 const error = ref('')
@@ -102,7 +101,7 @@ const disableTotp = async () => {
         await userApi.totpDisable(req.value)
         codeError.value = false
         error.value = ''
-        emit('onTotpDisable')
+        events.emit('totp.disable', {})
         close()
     } catch (err) {
         if (axios.isAxiosError(err)) {

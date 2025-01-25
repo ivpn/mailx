@@ -101,8 +101,7 @@ import { userApi } from '../api/user.ts'
 import axios from 'axios'
 import overlay from '@preline/overlay'
 import QRious from 'qrious'
-
-const emit = defineEmits(['onTotpEnable'])
+import events from '../events.ts'
 
 const req = ref({ otp: '' })
 const resEnable = ref({ uri: '', secret: '', account: '' })
@@ -119,7 +118,7 @@ const close = () => {
 }
 
 const complete = () => {
-    emit('onTotpEnable')
+    events.emit('totp.enable', {})
     close()
 }
 

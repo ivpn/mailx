@@ -57,7 +57,7 @@ const changeEmail = async () => {
     try {
         const res = await userApi.changeEmail(req)
         localStorage.setItem('email', req.email)
-        events.emit('onUpdateEmail', { email: req.email })
+        events.emit('user.update', { email: req.email })
         success.value = res.data.message
         error.value = ''
         email.value = ''

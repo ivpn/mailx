@@ -11,7 +11,7 @@
                 To get started, first add a recipient.
             </p>
             <div class="flex gap-4">
-                <AliasCreate v-if="recipients.length && settings.id" @onCreateAlias="getList" :recipients.sync="recipients" :settings.sync="settings" />
+                <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" />
             </div>
         </div>
     </div>
@@ -19,7 +19,7 @@
         <h1 class="text-3xl text-gray-800 dark:text-gray-100 font-semibold mb-5">Aliases</h1>
         <div>
             <div class="flex items-center justify-between mb-6">
-                <AliasCreate v-if="recipients.length && settings.id" @onCreateAlias="getList" :recipients.sync="recipients" :settings.sync="settings" />
+                <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" />
             </div>
             <div class="flex flex-col">
                 <div class="-m-1.5 overflow-x-auto">
@@ -78,7 +78,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200 dark:divide-neutral-600">
-                                    <AliasRow @onDeleteAlias="deleteAlias" @onEditAlias="getList" v-for="alias in list" :alias="alias" :key="rowKey" :recipients.sync="recipients" />
+                                    <AliasRow v-for="alias in list" :alias="alias" :key="rowKey" :recipients.sync="recipients" />
                                 </tbody>
                             </table>
                         </div>
@@ -104,6 +104,7 @@ import { settingsApi } from '../api/settings.ts'
 import AliasRow from './AliasRow.vue'
 import AliasCreate from './AliasCreate.vue'
 import Pagination from './Pagination.vue'
+import events from '../events.ts'
 
 const alias = {
     id: '',
@@ -209,6 +210,10 @@ const onUpdatePage = (obj: any) => {
     getList()
 }
 
+const onDeleteAlias = (payload: { id: string }) => {
+    deleteAlias(payload.id)
+}
+
 const sort = (e: any) => {
     const sort = e.target.dataset.sort
     if (sort === sortBy.value) {
@@ -225,6 +230,9 @@ onMounted(async () => {
     await getRecipients()
     await getSettings()
     await getList()
+    events.on('alias.create', getList)
+    events.on('alias.update', getList)
+    events.on('alias.delete', onDeleteAlias)
 })
 
 </script>

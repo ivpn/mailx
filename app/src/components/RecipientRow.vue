@@ -25,7 +25,7 @@
         </td>
         <td class="pl-5 py-4 whitespace-nowrap text-end text-sm">
             <div class="flex gap-5 justify-end">
-                <RecipientVerify v-if="!recipient.is_active" :recipient="recipient" @onVerifyRecipient="onVerifyRecipient" />
+                <RecipientVerify v-if="!recipient.is_active" :recipient="recipient" />
                 <button
                     @click="deleteRecipient"
                     class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
@@ -41,19 +41,14 @@
 import { ref, onMounted } from 'vue'
 import tooltip from '@preline/tooltip'
 import RecipientVerify from './RecipientVerify.vue'
-// import { recipientApi } from '../api/recipient.ts'
+import events from '../events.ts'
 
 const props = defineProps(['recipient'])
 const recipient = ref(props.recipient)
-const emit = defineEmits(['onDeleteRecipient', 'onVerifyRecipient'])
 const copyText = ref('Click to copy')
 
 const deleteRecipient = () => {
-    emit('onDeleteRecipient', recipient.value.id)
-}
-
-const onVerifyRecipient = () => {
-    emit('onVerifyRecipient')
+    events.emit('recipient.delete', { id: recipient.value.id })
 }
 
 const copyAlias = (alias: string) => {

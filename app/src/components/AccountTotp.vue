@@ -11,8 +11,8 @@
             When enabled, 2-factor authentication will be required when you log in.<br>
         </p>
         <div class="mb-3 max-w-xs">
-            <AccountTotpEnable v-if="!res.totp_enabled" @onTotpEnable="getUser" />
-            <AccountTotpDisable v-if="res.totp_enabled" @onTotpDisable="getUser" />
+            <AccountTotpEnable v-if="!res.totp_enabled" />
+            <AccountTotpDisable v-if="res.totp_enabled" />
         </div>
         <p v-if="error" class="text-red-600 text-sm mb-3">Error: {{ error }}</p>
     </div>
@@ -24,6 +24,7 @@ import { userApi } from '../api/user.ts'
 import axios from 'axios'
 import AccountTotpEnable from './AccountTotpEnable.vue'
 import AccountTotpDisable from './AccountTotpDisable.vue'
+import events from '../events.ts'
 
 const res = ref({ 
     id: '',
@@ -44,5 +45,7 @@ const getUser = async () => {
 
 onMounted(() => {
     getUser()
+    events.on('totp.enable', getUser)
+    events.on('totp.disable', getUser)
 })
 </script>

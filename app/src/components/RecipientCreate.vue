@@ -74,8 +74,8 @@ import { ref, onMounted } from 'vue'
 import overlay from '@preline/overlay'
 import axios from 'axios'
 import { recipientApi } from '../api/recipient.ts'
+import events from '../events.ts'
 
-const emit = defineEmits(['onCreateRecipient'])
 const recipient = ref({
     email: '',
 })
@@ -95,7 +95,7 @@ const postRecipient = async () => {
     try {
         await recipientApi.create(recipient.value)
         error.value = ''
-        emit('onCreateRecipient')
+        events.emit('recipient.create', {})
         close()
     } catch (err) {
         if (axios.isAxiosError(err)) {

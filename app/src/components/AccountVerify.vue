@@ -123,12 +123,12 @@ const validateOtp = () => {
     return !otpError.value
 }
 
-const onUpdateEmail = () => {
+const onUserUpdate = () => {
     getUser()
 }
 
 onMounted(() => {
     getUser()
-    events.on('onUpdateEmail', onUpdateEmail)
+    events.on('user.update', onUserUpdate)
 })
 </script>

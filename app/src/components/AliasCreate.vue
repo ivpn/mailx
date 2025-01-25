@@ -158,10 +158,10 @@ import overlay from '@preline/overlay'
 import select from '@preline/select'
 import axios from 'axios'
 import { aliasApi } from '../api/alias.ts'
+import events from '../events.ts'
 
 const envDomains = import.meta.env.VITE_DOMAINS.split(',')
 const props = defineProps(['recipients', 'settings'])
-const emit = defineEmits(['onCreateAlias'])
 const alias = ref({
     description: '',
     enabled: true,
@@ -187,8 +187,8 @@ const postAlias = async () => {
 
     try {
         await aliasApi.create(alias.value)
+        events.emit('alias.create', {})
         error.value = ''
-        emit('onCreateAlias')
         close()
     } catch (err) {
         if (axios.isAxiosError(err)) {

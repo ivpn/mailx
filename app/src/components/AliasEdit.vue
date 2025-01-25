@@ -103,9 +103,9 @@ import overlay from '@preline/overlay'
 import select from '@preline/select'
 import axios from 'axios'
 import { aliasApi } from '../api/alias.ts'
+import events from '../events.ts'
 
 const props = defineProps(['alias', 'recipients'])
-const emit = defineEmits(['onEditAlias'])
 let alias = ref(Object.assign({}, props.alias))
 const recipients = ref(props.recipients)
 const selectRecipients = ref(props.alias.recipients)
@@ -120,7 +120,7 @@ const updateAlias = async () => {
         const res = await aliasApi.update(alias.value.id, alias.value)
         success.value = res.data.message
         error.value = ''
-        emit('onEditAlias')
+        events.emit('alias.update', {})
         close()
     } catch (err) {
         if (axios.isAxiosError(err)) {

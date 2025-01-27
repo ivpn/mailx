@@ -19,6 +19,7 @@ type Alias struct {
 	Description string         `gorm:"default:''" json:"description"`
 	Recipients  string         `gorm:"default:''" json:"recipients"`
 	FromName    string         `gorm:"default:''" json:"from_name"`
+	CatchAll    bool           `json:"catch_all"`
 	Stats       AliasStats     `gorm:"-" json:"stats"`
 }
 

@@ -12,6 +12,7 @@ const (
 	AliasFormatRandomWords = "words"
 	AliasFormatRandomChars = "chars"
 	AliasFormatUUID        = "uuid"
+	AliasFormatCatchAll    = "catch_all"
 )
 
 var (
@@ -32,6 +33,10 @@ func GenerateAlias(format string) string {
 	default:
 		return generateRandomWords()
 	}
+}
+
+func GenerateCatchAllAlias(sufix string) string {
+	return fmt.Sprintf("*+%s", sufix)
 }
 
 func generateRandomChars() string {

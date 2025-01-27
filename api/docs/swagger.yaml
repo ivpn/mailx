@@ -984,6 +984,34 @@ paths:
       summary: Activate user
       tags:
       - user
+  /user/changeemail:
+    put:
+      consumes:
+      - application/json
+      description: Change email
+      parameters:
+      - description: Change email request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.EmailReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Change email
+      tags:
+      - user
   /user/changepassword:
     put:
       consumes:

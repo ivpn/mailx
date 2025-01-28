@@ -33,7 +33,7 @@ type AliasReq struct {
 	FromName       string `json:"from_name"`
 	Format         string `json:"format"`
 	Domain         string `json:"domain" validate:"required"`
-	CatchAllSuffix string `json:"catch_all_suffix" validate:"min=6,max=12"`
+	CatchAllSuffix string `json:"catch_all_suffix" validate:"alphanum,min=6,max=12"`
 }
 
 type SettingsReq struct {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"strings"
 
 	"github.com/go-sql-driver/mysql"
 	"ivpn.net/email/api/internal/model"
@@ -76,7 +77,7 @@ func (s *Service) GetAliasByName(name string) (model.Alias, error) {
 	return alias, nil
 }
 
-func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format string, domain string) error {
+func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format string, domain string, sufix string) error {
 	count, err := s.Store.GetAliasDailyCount(ctx, alias.UserID)
 	if err != nil {
 		log.Printf("error creating alias: %s", err.Error())
@@ -87,11 +88,35 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 		return ErrPostAliasLimit
 	}
 
+	// Catch-all alias
+	if format == model.AliasFormatCatchAll {
+		userAliases, err := s.Store.GetAliases(ctx, alias.UserID, 0, 0, "", "", "true")
+		if err != nil {
+			log.Printf("error fetching user aliases: %s", err.Error())
+			return ErrPostAlias
+		}
+
+		for _, userAlias := range userAliases {
+			if strings.Contains(userAlias.Name, domain) {
+				return model.ErrDuplicateAlias
+			}
+		}
+
+		alias.Name = model.GenerateAlias(format, sufix) + "@" + domain
+		alias.CatchAll = true
+		err = s.Store.PostAlias(ctx, alias)
+		if err != nil {
+			log.Printf("error creating catch-all alias: %s", err.Error())
+			return ErrPostAlias
+		}
+	}
+
+	// Standard alias
 	for i := 0; i < 5; i++ {
 		alias.Name = model.GenerateAlias(format, "") + "@" + domain
 		err := s.Store.PostAlias(ctx, alias)
 		if err != nil {
-			log.Printf("error creating alias: %s", err.Error())
+			log.Printf("error creating standard alias: %s", err.Error())
 			var mysqlErr *mysql.MySQLError
 			if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
 				continue

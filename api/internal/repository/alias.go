@@ -34,7 +34,7 @@ func (d *Database) GetAlias(ctx context.Context, ID string, userID string) (mode
 	return alias, nil
 }
 
-func (d *Database) GetAliases(ctx context.Context, userID string, limit int, offset int, sortBy string, sortOrder string) ([]model.Alias, error) {
+func (d *Database) GetAliases(ctx context.Context, userID string, limit int, offset int, sortBy string, sortOrder string, catchAll string) ([]model.Alias, error) {
 	if sortBy == "" {
 		sortBy = "created_at"
 	}
@@ -42,6 +42,14 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 
 	if sortOrder == "" {
 		sortOrder = "DESC"
+	}
+
+	if catchAll == "true" {
+		catchAll = "AND a.catch_all = true"
+	} else if catchAll == "false" {
+		catchAll = "AND a.catch_all = false"
+	} else {
+		catchAll = ""
 	}
 
 	aliases := []model.Alias{}
@@ -55,7 +63,7 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 		FROM aliases a
 		LEFT JOIN messages m
 		ON a.id = m.alias_id
-		WHERE a.user_id = ? AND a.deleted_at IS NULL
+		WHERE a.user_id = ? AND a.deleted_at IS NULL ` + catchAll + `
 		GROUP BY a.id
 		ORDER BY ` + sortBy + " " + sortOrder
 

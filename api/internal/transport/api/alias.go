@@ -20,7 +20,7 @@ var (
 
 type AliasService interface {
 	GetAlias(context.Context, string, string) (model.Alias, error)
-	GetAliases(context.Context, string, int, int, string, string) (model.AliasList, error)
+	GetAliases(context.Context, string, int, int, string, string, string) (model.AliasList, error)
 	PostAlias(context.Context, model.Alias, string, string) error
 	UpdateAlias(context.Context, model.Alias) error
 	DeleteAlias(context.Context, string, string) error
@@ -73,8 +73,9 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 
 	sortBy := c.Query("sort_by")
 	sortOrder := strings.ToUpper(c.Query("sort_order"))
+	catchAll := c.Query("catch_all")
 
-	list, err := h.Service.GetAliases(c.Context(), userID, limit, page, sortBy, sortOrder)
+	list, err := h.Service.GetAliases(c.Context(), userID, limit, page, sortBy, sortOrder, catchAll)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),

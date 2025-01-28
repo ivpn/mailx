@@ -7,15 +7,6 @@ import (
 	"github.com/google/uuid"
 )
 
-func isAlphanumeric(s string) bool {
-	for _, r := range s {
-		if !((r >= 'a' && r <= 'z') || (r >= '0' && r <= '9')) {
-			return false
-		}
-	}
-	return true
-}
-
 func TestGenerateAlias(t *testing.T) {
 	tests := []struct {
 		format string
@@ -52,4 +43,13 @@ func TestGenerateAlias(t *testing.T) {
 			}
 		})
 	}
+}
+
+func isAlphanumeric(s string) bool {
+	for _, r := range s {
+		if !((r >= 'a' && r <= 'z') || (r >= '0' && r <= '9')) {
+			return false
+		}
+	}
+	return true
 }

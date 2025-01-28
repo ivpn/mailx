@@ -4,41 +4,6 @@ import (
 	"testing"
 )
 
-func TestParseReplyTo(t *testing.T) {
-	tests := []struct {
-		email         string
-		expectedAlias string
-		expectedRcp   string
-	}{
-		{
-			email:         "user+reply=example.com@domain.com",
-			expectedAlias: "user@domain.com",
-			expectedRcp:   "reply@example.com",
-		},
-		{
-			email:         "user@domain.com",
-			expectedAlias: "user@domain.com",
-			expectedRcp:   "",
-		},
-		{
-			email:         "user+reply@domain.com",
-			expectedAlias: "user+reply@domain.com",
-			expectedRcp:   "",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.email, func(t *testing.T) {
-			alias, rcp := ParseReplyTo(tt.email)
-			if alias != tt.expectedAlias {
-				t.Errorf("expected alias %s, got %s", tt.expectedAlias, alias)
-			}
-			if rcp != tt.expectedRcp {
-				t.Errorf("expected rcp %s, got %s", tt.expectedRcp, rcp)
-			}
-		})
-	}
-}
 func TestGenerateReplyTo(t *testing.T) {
 	tests := []struct {
 		alias         string
@@ -99,6 +64,52 @@ func TestPlainTextToHTML(t *testing.T) {
 			html := PlainTextToHTML(tt.plainText)
 			if html != tt.expectedHTML {
 				t.Errorf("expected HTML %s, got %s", tt.expectedHTML, html)
+			}
+		})
+	}
+}
+
+func TestParseReplyTo(t *testing.T) {
+	tests := []struct {
+		email         string
+		expectedAlias string
+		expectedRcp   string
+	}{
+		{
+			email:         "user+reply=example.com@domain.com",
+			expectedAlias: "user@domain.com",
+			expectedRcp:   "reply@example.com",
+		},
+		{
+			email:         "user@domain.com",
+			expectedAlias: "user@domain.com",
+			expectedRcp:   "",
+		},
+		{
+			email:         "user+reply@domain.com",
+			expectedAlias: "*+reply@domain.com",
+			expectedRcp:   "",
+		},
+		{
+			email:         "user+reply=example.com@domain.com",
+			expectedAlias: "user@domain.com",
+			expectedRcp:   "reply@example.com",
+		},
+		{
+			email:         "user+catchall@domain.com",
+			expectedAlias: "*+catchall@domain.com",
+			expectedRcp:   "",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.email, func(t *testing.T) {
+			alias, rcp := ParseReplyTo(tt.email)
+			if alias != tt.expectedAlias {
+				t.Errorf("expected alias %s, got %s", tt.expectedAlias, alias)
+			}
+			if rcp != tt.expectedRcp {
+				t.Errorf("expected rcp %s, got %s", tt.expectedRcp, rcp)
 			}
 		})
 	}

@@ -37,11 +37,15 @@ func ParseReplyTo(email string) (string, string) {
 
 		// Get alias name up to "+" and domain after "@"
 		alias = email[:strings.Index(email, "+")] + email[strings.Index(email, "@"):]
-	} else {
-		rcp = ""
+		return alias, rcp
 	}
 
-	return alias, rcp
+	// If there is "+" in the email, convert alias to catch-all format
+	if rcp != "" && strings.Contains(email, "+") {
+		alias = "*" + email[strings.Index(email, "+"):]
+	}
+
+	return alias, ""
 }
 
 func GenerateReplyTo(alias string, to string) string {

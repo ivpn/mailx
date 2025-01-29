@@ -109,6 +109,8 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 			log.Printf("error creating catch-all alias: %s", err.Error())
 			return ErrPostAlias
 		}
+
+		return nil
 	}
 
 	// Standard alias

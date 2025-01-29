@@ -114,7 +114,7 @@
             </div>
         </div>
         <div v-bind:class="{ 'hidden': !listCatchAll.length || !loadedCatchAll }" class="flex flex-col p-5 pb-4 my-8 bg-white dark:bg-neutral-800">
-            <h1 class="text-3xl text-gray-800 dark:text-gray-100 font-semibold mb-5">Aliases</h1>
+            <h1 class="text-3xl text-gray-800 dark:text-gray-100 font-semibold mb-5">Catch-all Aliases</h1>
             <div>
                 <div class="flex items-center justify-between mb-6">
                     <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=true />

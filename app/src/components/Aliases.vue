@@ -276,7 +276,7 @@ const deleteAlias = async (id: string) => {
     try {
         await aliasApi.delete(id)
         error.value = ''
-        getList()
+        fetch()
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.message

@@ -24,7 +24,7 @@ var (
 type AliasStore interface {
 	GetAlias(context.Context, string, string) (model.Alias, error)
 	GetAliases(context.Context, string, int, int, string, string, string) ([]model.Alias, error)
-	GetAliasCount(context.Context, string) (int, error)
+	GetAliasCount(context.Context, string, string) (int, error)
 	GetAliasDailyCount(context.Context, string) (int, error)
 	GetAliasByName(string) (model.Alias, error)
 	PostAlias(context.Context, model.Alias) error
@@ -55,7 +55,7 @@ func (s *Service) GetAliases(ctx context.Context, userID string, limit int, page
 		return model.AliasList{}, ErrGetAliases
 	}
 
-	total, err := s.Store.GetAliasCount(ctx, userID)
+	total, err := s.Store.GetAliasCount(ctx, userID, catchAll)
 	if err != nil {
 		log.Printf("error fetching alias count: %s", err.Error())
 		return model.AliasList{}, ErrGetAliases

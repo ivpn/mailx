@@ -81,7 +81,7 @@
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-gray-200 dark:divide-neutral-600">
-                                        <AliasRow v-for="alias in list" :alias="alias" :key="rowKey" :recipients.sync="recipients" />
+                                        <AliasRow v-for="alias in list" :alias="alias" :key="rowKey" :recipients.sync="recipients" :catchAll=false />
                                     </tbody>
                                 </table>
                             </div>
@@ -144,7 +144,7 @@
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-gray-200 dark:divide-neutral-600">
-                                        <AliasRow v-for="alias in listCatchAll" :alias="alias" :key="rowKey" :recipients.sync="recipients" />
+                                        <AliasRow v-for="alias in listCatchAll" :alias="alias" :key="rowKey" :recipients.sync="recipients" :catchAll=true />
                                     </tbody>
                                 </table>
                             </div>
@@ -271,10 +271,12 @@ const getSettings = async () => {
     }
 }
 
-const deleteAlias = async (id: string) => {
-    if (!confirm('Are you sure you want to delete alias?')) return
+const deleteAlias = async (payload: any) => {
+    const errMessage = payload.catchAll ? 'WARNING: You will not be able to create the same catch-all alias in the next 90 days. Are you sure you want to delete alias? ' : 'Are you sure you want to delete alias?'
+
+    if (!confirm(errMessage)) return
     try {
-        await aliasApi.delete(id)
+        await aliasApi.delete(payload.id)
         error.value = ''
         fetch()
     } catch (err) {
@@ -294,8 +296,8 @@ const onUpdatePage = (obj: any) => {
     getList()
 }
 
-const onDeleteAlias = (payload: { id: string }) => {
-    deleteAlias(payload.id)
+const onDeleteAlias = (payload: { id: string, catchAll: boolean }) => {
+    deleteAlias(payload)
 }
 
 const sort = (e: any) => {

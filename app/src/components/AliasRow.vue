@@ -90,7 +90,7 @@ import AliasSend from './AliasSend.vue'
 import { aliasApi } from '../api/alias.ts'
 import events from '../events.ts'
 
-const props = defineProps(['alias', 'recipients'])
+const props = defineProps(['alias', 'recipients', 'catchAll'])
 const alias = ref(props.alias)
 const recipients = ref(props.recipients)
 const copyText = ref('Click to copy')
@@ -105,7 +105,7 @@ const updateAlias = async () => {
 }
 
 const deleteAlias = () => {
-    events.emit('alias.delete', { id: alias.value.id })
+    events.emit('alias.delete', { id: alias.value.id, catchAll: props.catchAll })
 }
 
 const copyAlias = (alias: string) => {

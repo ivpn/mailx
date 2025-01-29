@@ -320,7 +320,7 @@ const fetch = () => {
 onMounted(async () => {
     await getRecipients()
     await getSettings()
-    await fetch()
+    fetch()
     events.on('alias.create', fetch)
     events.on('alias.update', fetch)
     events.on('alias.delete', onDeleteAlias)

@@ -44,6 +44,10 @@ const validateEmail = () => {
         emailError.value = 'Required'
     }
 
+    if (email.value == localStorage.getItem('email')) {
+        emailError.value = 'The new email matches the current one'
+    }
+
     return !emailError.value
 }
 

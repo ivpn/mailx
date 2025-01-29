@@ -99,7 +99,7 @@
     </div>
 
     <!-- Catch-all Aliases -->
-    <div>
+    <div v-if="!isDashboard">
         <div v-if="!listCatchAll.length && loadedCatchAll" class="flex flex-col my-14">
             <div class="flex flex-col items-center text-center">
                 <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-5">

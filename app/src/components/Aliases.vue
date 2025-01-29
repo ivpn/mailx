@@ -14,7 +14,7 @@
                     To get started, first add a recipient.
                 </p>
                 <div class="flex gap-4">
-                    <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" />
+                    <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=false />
                 </div>
             </div>
         </div>
@@ -22,7 +22,7 @@
             <h1 class="text-3xl text-gray-800 dark:text-gray-100 font-semibold mb-5">Aliases</h1>
             <div>
                 <div class="flex items-center justify-between mb-6">
-                    <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" />
+                    <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=false />
                 </div>
                 <div class="flex flex-col">
                     <div class="-m-1.5 overflow-x-auto">
@@ -109,7 +109,7 @@
                     To get started, first add a recipient.
                 </p>
                 <div class="flex gap-4">
-                    <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" />
+                    <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=true />
                 </div>
             </div>
         </div>
@@ -117,7 +117,7 @@
             <h1 class="text-3xl text-gray-800 dark:text-gray-100 font-semibold mb-5">Aliases</h1>
             <div>
                 <div class="flex items-center justify-between mb-6">
-                    <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" />
+                    <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=true />
                 </div>
                 <div class="flex flex-col">
                     <div class="-m-1.5 overflow-x-auto">

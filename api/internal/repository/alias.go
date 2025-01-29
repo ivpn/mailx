@@ -84,7 +84,7 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 	for rows.Next() {
 		var alias model.Alias
 		var forwards, blocks, replies, sends, bandwidth int
-		if err := rows.Scan(&alias.ID, &alias.CreatedAt, &alias.UpdatedAt, &alias.DeletedAt, &alias.Name, &alias.UserID, &alias.Enabled, &alias.Description, &alias.Recipients, &alias.FromName, &forwards, &blocks, &replies, &sends, &bandwidth); err != nil {
+		if err := rows.Scan(&alias.ID, &alias.CreatedAt, &alias.UpdatedAt, &alias.DeletedAt, &alias.Name, &alias.UserID, &alias.Enabled, &alias.Description, &alias.Recipients, &alias.FromName, &alias.CatchAll, &forwards, &blocks, &replies, &sends, &bandwidth); err != nil {
 			return nil, err
 		}
 		alias.Stats = model.AliasStats{

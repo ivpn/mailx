@@ -125,6 +125,12 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 		})
 	}
 
+	if req.Format == model.AliasFormatCatchAll && req.CatchAllSuffix == "" {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
 	alias := model.Alias{
 		UserID:      userID,
 		Description: req.Description,

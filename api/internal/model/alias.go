@@ -7,7 +7,8 @@ import (
 )
 
 var (
-	ErrDuplicateAlias = errors.New("alias already exists")
+	ErrDuplicateAlias       = errors.New("alias already exists")
+	ErrDuplicateAliasDomain = errors.New("catch-all alias already exists for this domain")
 )
 
 type Alias struct {

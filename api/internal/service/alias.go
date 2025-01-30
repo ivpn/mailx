@@ -98,7 +98,7 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 
 		for _, userAlias := range userAliases {
 			if strings.Contains(userAlias.Name, domain) {
-				return model.ErrDuplicateAlias
+				return model.ErrDuplicateAliasDomain
 			}
 		}
 

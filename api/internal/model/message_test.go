@@ -91,8 +91,8 @@ func TestParseReplyTo(t *testing.T) {
 			expectedRcp:   "",
 		},
 		{
-			email:         "user+reply=example.com@domain.com",
-			expectedAlias: "user@domain.com",
+			email:         "user+catchall+reply=example.com@domain.com",
+			expectedAlias: "*+catchall@domain.com",
 			expectedRcp:   "reply@example.com",
 		},
 		{

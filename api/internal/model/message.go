@@ -27,8 +27,31 @@ type Message struct {
 func ParseReplyTo(email string) (string, string) {
 	alias := email
 
+	// Check if "+" exists in the email
+	plusIndex := strings.Index(email, "+")
+	if plusIndex == -1 {
+		return alias, ""
+	}
+
 	// Get respond to email between "+" and "@"
-	rcp := email[strings.Index(email, "+")+1 : strings.Index(email, "@")]
+	rcp := email[plusIndex+1 : strings.Index(email, "@")]
+	if plusIndex == -1 {
+		return alias, ""
+	}
+
+	// Get respond to email between "+" and "@"
+	rcp = email[plusIndex+1 : strings.Index(email, "@")]
+
+	// Check if respond to email is not empty and contains "=" and "+"
+	if rcp != "" && strings.Contains(rcp, "=") && strings.Contains(rcp, "+") {
+		// Get rcp after "+" and replace "=" with "@" to get valid respond to email
+		rcp = rcp[strings.Index(rcp, "+")+1:]
+		rcp = strings.Replace(rcp, "=", "@", 1)
+
+		// Get the string between the two "+" and the domain after "@"
+		alias = "*" + email[strings.Index(email, "+"):strings.LastIndex(email, "+")] + email[strings.Index(email, "@"):]
+		return alias, rcp
+	}
 
 	// Check if respond to email is not empty and contains "="
 	if rcp != "" && strings.Contains(rcp, "=") {

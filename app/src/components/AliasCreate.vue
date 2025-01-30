@@ -79,8 +79,10 @@
                                     Alias sufix (6-12 alphanumeric characters):
                                 </label>
                                 <input id="alias_catch_all_suffix" v-model="alias.catch_all_suffix"
+                                    v-bind:class="{ 'border-gray-500': !errorCatchAllSuffix, 'border-red-600 dark:border-red-600': errorCatchAllSuffix }"
                                     class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 leading-tight focus:border-bluish-500 mb-3"
                                     type="text">
+                                <p v-if="errorCatchAllSuffix" class="text-red-600 text-sm mb-3">Catch-all suffix must be between 6 and 12 characters</p>
                                 <p class="text-white dark:text-gray-100 mb-1">
                                     *+{{ alias.catch_all_suffix }}@{{ alias.domain }}
                                 </p>
@@ -192,8 +194,11 @@ const selectRecipients = ref([settings.value.recipient ? settings.value.recipien
 const domains = ref(envDomains)
 const error = ref('')
 const errorRecipients = ref('')
+const errorCatchAllSuffix = ref(false)
 
 const postAlias = async () => {
+    if (!validate()) return
+
     const domainInput = document.getElementById('alias_domain') as HTMLInputElement
     alias.value.domain = domainInput.value
     alias.value.recipients = selectRecipients.value.join(',')
@@ -236,6 +241,16 @@ const addEvents = () => {
     multiselect.element.on('change', (val: any) => {
         errorRecipients.value = val.length === 0 ? 'Select one or more recipients' : ''
     })
+}
+
+const validate = () => {
+    if (props.catchAll && (alias.value.catch_all_suffix.length < 6 || alias.value.catch_all_suffix.length > 12)) {
+        errorCatchAllSuffix.value = true
+    } else {
+        errorCatchAllSuffix.value = false
+    }
+
+    return !errorCatchAllSuffix.value
 }
 
 onMounted(() => {

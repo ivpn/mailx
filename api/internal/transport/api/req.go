@@ -27,12 +27,13 @@ type SubscriptionReq struct {
 }
 
 type AliasReq struct {
-	Description string `json:"description"`
-	Enabled     bool   `json:"enabled"`
-	Recipients  string `json:"recipients" validate:"required"`
-	FromName    string `json:"from_name"`
-	Format      string `json:"format"`
-	Domain      string `json:"domain" validate:"required"`
+	Description    string `json:"description"`
+	Enabled        bool   `json:"enabled"`
+	Recipients     string `json:"recipients" validate:"required"`
+	FromName       string `json:"from_name"`
+	Format         string `json:"format"`
+	Domain         string `json:"domain" validate:"required"`
+	CatchAllSuffix string `json:"catch_all_suffix" validate:"omitempty,alphanum,min=6,max=12"`
 }
 
 type SettingsReq struct {

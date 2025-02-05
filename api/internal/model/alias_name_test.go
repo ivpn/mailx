@@ -8,33 +8,41 @@ import (
 )
 
 func TestGenerateAlias(t *testing.T) {
-	t.Run("RandomChars", func(t *testing.T) {
-		alias := GenerateAlias(AliasFormatRandomChars)
-		if len(alias) != 8 {
-			t.Errorf("Expected alias length to be 8, got %d", len(alias))
-		}
-		if !isAlphanumeric(alias) {
-			t.Errorf("Expected alias to be alphanumeric, got %s", alias)
-		}
-	})
+	tests := []struct {
+		format string
+		suffix string
+	}{
+		{AliasFormatRandomChars, ""},
+		{AliasFormatUUID, ""},
+		{AliasFormatCatchAll, "test"},
+		{AliasFormatRandomWords, ""},
+	}
 
-	t.Run("UUID", func(t *testing.T) {
-		alias := GenerateAlias(AliasFormatUUID)
-		if _, err := uuid.Parse(alias); err != nil {
-			t.Errorf("Expected alias to be a valid UUID, got %s", alias)
-		}
-	})
-
-	t.Run("RandomWords", func(t *testing.T) {
-		alias := GenerateAlias("words")
-		parts := strings.Split(alias, ".")
-		if len(parts) != 2 {
-			t.Errorf("Expected alias to have two parts separated by a dot, got %s", alias)
-		}
-		if !isAlphanumeric(parts[1]) {
-			t.Errorf("Expected second part of alias to be alphanumeric, got %s", parts[1])
-		}
-	})
+	for _, tt := range tests {
+		t.Run(tt.format, func(t *testing.T) {
+			alias := GenerateAlias(tt.format, tt.suffix)
+			switch tt.format {
+			case AliasFormatRandomChars:
+				if len(alias) != 8 || !isAlphanumeric(alias) {
+					t.Errorf("expected 8 alphanumeric characters, got %s", alias)
+				}
+			case AliasFormatUUID:
+				if _, err := uuid.Parse(alias); err != nil {
+					t.Errorf("expected valid UUID, got %s", alias)
+				}
+			case AliasFormatCatchAll:
+				expected := "*+" + tt.suffix
+				if alias != expected {
+					t.Errorf("expected %s, got %s", expected, alias)
+				}
+			case AliasFormatRandomWords:
+				parts := strings.Split(alias, ".")
+				if len(parts) != 2 || !isAlphanumeric(parts[1]) {
+					t.Errorf("expected format adjective.noun, got %s", alias)
+				}
+			}
+		})
+	}
 }
 
 func isAlphanumeric(s string) bool {

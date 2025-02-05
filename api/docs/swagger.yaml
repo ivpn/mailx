@@ -8,6 +8,10 @@ definitions:
     type: object
   api.AliasReq:
     properties:
+      catch_all_suffix:
+        maxLength: 12
+        minLength: 6
+        type: string
       description:
         type: string
       domain:
@@ -131,6 +135,8 @@ definitions:
     type: object
   model.Alias:
     properties:
+      catch_all:
+        type: boolean
       created_at:
         type: string
       description:

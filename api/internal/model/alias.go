@@ -7,7 +7,8 @@ import (
 )
 
 var (
-	ErrDuplicateAlias = errors.New("alias already exists")
+	ErrDuplicateAlias       = errors.New("alias already exists")
+	ErrDuplicateAliasDomain = errors.New("catch-all alias already exists for this domain")
 )
 
 type Alias struct {
@@ -19,6 +20,7 @@ type Alias struct {
 	Description string         `gorm:"default:''" json:"description"`
 	Recipients  string         `gorm:"default:''" json:"recipients"`
 	FromName    string         `gorm:"default:''" json:"from_name"`
+	CatchAll    bool           `json:"catch_all"`
 	Stats       AliasStats     `gorm:"-" json:"stats"`
 }
 

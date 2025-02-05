@@ -1636,6 +1636,11 @@ const docTemplate = `{
                 "recipients"
             ],
             "properties": {
+                "catch_all_suffix": {
+                    "type": "string",
+                    "maxLength": 12,
+                    "minLength": 6
+                },
                 "description": {
                     "type": "string"
                 },
@@ -1819,6 +1824,9 @@ const docTemplate = `{
         "model.Alias": {
             "type": "object",
             "properties": {
+                "catch_all": {
+                    "type": "boolean"
+                },
                 "created_at": {
                     "type": "string"
                 },

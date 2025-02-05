@@ -34,7 +34,7 @@ func (d *Database) GetAlias(ctx context.Context, ID string, userID string) (mode
 	return alias, nil
 }
 
-func (d *Database) GetAliases(ctx context.Context, userID string, limit int, offset int, sortBy string, sortOrder string) ([]model.Alias, error) {
+func (d *Database) GetAliases(ctx context.Context, userID string, limit int, offset int, sortBy string, sortOrder string, catchAll string) ([]model.Alias, error) {
 	if sortBy == "" {
 		sortBy = "created_at"
 	}
@@ -42,6 +42,14 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 
 	if sortOrder == "" {
 		sortOrder = "DESC"
+	}
+
+	if catchAll == "true" {
+		catchAll = "AND a.catch_all = true"
+	} else if catchAll == "false" {
+		catchAll = "AND a.catch_all = false"
+	} else {
+		catchAll = ""
 	}
 
 	aliases := []model.Alias{}
@@ -55,7 +63,7 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 		FROM aliases a
 		LEFT JOIN messages m
 		ON a.id = m.alias_id
-		WHERE a.user_id = ? AND a.deleted_at IS NULL
+		WHERE a.user_id = ? AND a.deleted_at IS NULL ` + catchAll + `
 		GROUP BY a.id
 		ORDER BY ` + sortBy + " " + sortOrder
 
@@ -76,7 +84,7 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 	for rows.Next() {
 		var alias model.Alias
 		var forwards, blocks, replies, sends, bandwidth int
-		if err := rows.Scan(&alias.ID, &alias.CreatedAt, &alias.UpdatedAt, &alias.DeletedAt, &alias.Name, &alias.UserID, &alias.Enabled, &alias.Description, &alias.Recipients, &alias.FromName, &forwards, &blocks, &replies, &sends, &bandwidth); err != nil {
+		if err := rows.Scan(&alias.ID, &alias.CreatedAt, &alias.UpdatedAt, &alias.DeletedAt, &alias.Name, &alias.UserID, &alias.Enabled, &alias.Description, &alias.Recipients, &alias.FromName, &alias.CatchAll, &forwards, &blocks, &replies, &sends, &bandwidth); err != nil {
 			return nil, err
 		}
 		alias.Stats = model.AliasStats{
@@ -92,9 +100,17 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 	return aliases, nil
 }
 
-func (d *Database) GetAliasCount(ctx context.Context, userID string) (int, error) {
+func (d *Database) GetAliasCount(ctx context.Context, userID string, catchAll string) (int, error) {
+	if catchAll == "true" {
+		catchAll = " AND catch_all = true"
+	} else if catchAll == "false" {
+		catchAll = " AND catch_all = false"
+	} else {
+		catchAll = ""
+	}
+
 	var count int64
-	err := d.Client.Model(&model.Alias{}).Where("user_id = ?", userID).Count(&count).Error
+	err := d.Client.Model(&model.Alias{}).Where("user_id = ?"+catchAll, userID).Count(&count).Error
 	return int(count), err
 }
 

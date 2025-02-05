@@ -182,7 +182,7 @@ func (s *Service) DeleteRecipient(ctx context.Context, ID string, userID string)
 	}
 
 	// Get aliases
-	aliases, err := s.Store.GetAliases(ctx, userID, 0, 0, "", "")
+	aliases, err := s.Store.GetAliases(ctx, userID, 0, 0, "", "", "")
 	if err != nil {
 		return err
 	}

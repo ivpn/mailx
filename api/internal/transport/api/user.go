@@ -5,10 +5,10 @@ import (
 	"log"
 	"time"
 
+	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/gofiber/fiber/v2"
 	"ivpn.net/email/api/internal/middleware/auth"
 	"ivpn.net/email/api/internal/model"
-	"ivpn.net/email/api/internal/utils"
 )
 
 var (
@@ -42,7 +42,7 @@ type UserService interface {
 	DeleteUser(context.Context, string, string) error
 	GetUser(context.Context, string) (model.User, error)
 	GetUserStats(context.Context, string) (model.UserStats, error)
-	LogoutUser(context.Context, string, time.Duration, string) error
+	LogoutUser(context.Context, string) error
 	ChangePassword(context.Context, string, string) error
 	ChangeEmail(context.Context, string, string) error
 	InitiatePasswordReset(context.Context, string) error
@@ -224,17 +224,26 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 		}
 	}
 
-	// Create auth token
-	token, err := utils.CreateAuthToken(h.Cfg, user.ID, user.Email)
+	// Save the session
+	sessionData := webauthn.SessionData{
+		UserID:  user.WebAuthnID(),
+		Expires: time.Now().Add(h.Cfg.TokenExpiration),
+	}
+	token, err := model.GenSessionToken()
 	if err != nil {
-		log.Printf("error login: %s", err.Error())
 		return c.Status(400).JSON(fiber.Map{
-			"error": ErrInvalidCredentials,
+			"error": ErrSaveSession,
+		})
+	}
+	err = h.Service.SaveSession(c.Context(), sessionData, token, user.ID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrSaveSession,
 		})
 	}
 
-	// Set auth token in cookie
-	c.Cookie(auth.NewCookie(token, h.Cfg))
+	// Set token in cookie
+	c.Cookie(auth.NewCookieAuthn(token, "/", h.Cfg))
 
 	return c.Status(200).JSON(fiber.Map{
 		"message": LoginSuccess,
@@ -251,22 +260,12 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 // @Failure 400 {object} ErrorRes
 // @Router /user/logout [post]
 func (h *Handler) Logout(c *fiber.Ctx) error {
-	c.ClearCookie(auth.AUTH_COOKIE)
 	c.ClearCookie(auth.AUTHN_COOKIE)
 	c.ClearCookie(auth.AUTHN_TEMP_COOKIE)
 
 	authnToken := auth.GetAuthnToken(c)
-	jwtToken := auth.GetToken(c)
 
-	jwtSignature := auth.GetTokenSignature(jwtToken)
-	jwtExp, err := auth.GetTokenExp(h.Cfg, c)
-	if err != nil && jwtToken != "" {
-		return c.Status(400).JSON(fiber.Map{
-			"error": ErrLogoutUser,
-		})
-	}
-
-	err = h.Service.LogoutUser(c.Context(), jwtSignature, jwtExp, authnToken)
+	err := h.Service.LogoutUser(c.Context(), authnToken)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),

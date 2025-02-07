@@ -11,7 +11,6 @@ require (
 	github.com/go-webauthn/webauthn v0.11.2
 	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/gofiber/swagger v1.0.0
-	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.6.0
 	github.com/jasonlvhit/gocron v0.0.1
 	github.com/redis/go-redis/v9 v9.5.1

@@ -10,7 +10,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/golang-jwt/jwt"
 	"ivpn.net/email/api/config"
 	"ivpn.net/email/api/internal/model"
 )
@@ -40,7 +39,6 @@ type Service interface {
 func New(cfg config.APIConfig, cache Cache, service Service) fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
-		// Authn authentication
 		if c.Cookies(AUTHN_COOKIE) != "" {
 			session, ok, err := service.GetSession(c.Context(), c.Cookies(AUTHN_COOKIE))
 			if err == nil && ok {
@@ -52,41 +50,7 @@ func New(cfg config.APIConfig, cache Cache, service Service) fiber.Handler {
 			}
 		}
 
-		// JWT authentication
-		jwtString := GetToken(c)
-		if jwtString == "" {
-			return c.SendStatus(fiber.StatusUnauthorized)
-		}
-
-		jwtSignature := GetTokenSignature(jwtString)
-		jwtInvalid, _ := cache.Get(c.Context(), "logout_"+jwtSignature)
-		if jwtInvalid != "" {
-			return c.SendStatus(fiber.StatusUnauthorized)
-		}
-
-		token, err := jwt.Parse(jwtString, func(token *jwt.Token) (interface{}, error) {
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-			}
-
-			return []byte(cfg.TokenSecret), nil
-		})
-		if err != nil {
-			return c.SendStatus(fiber.StatusUnauthorized)
-		}
-
-		claims, ok := token.Claims.(jwt.MapClaims)
-		if !ok || !token.Valid {
-			return c.SendStatus(fiber.StatusUnauthorized)
-		}
-
-		if claims[USER_ID] == nil {
-			return c.SendStatus(fiber.StatusUnauthorized)
-		}
-
-		c.Locals(USER_ID, claims[USER_ID])
-
-		return c.Next()
+		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 }
 
@@ -146,51 +110,6 @@ func GetToken(c *fiber.Ctx) string {
 
 func GetAuthnToken(c *fiber.Ctx) string {
 	return c.Cookies(AUTHN_COOKIE)
-}
-
-func GetTokenExp(cfg config.APIConfig, c *fiber.Ctx) (time.Duration, error) {
-	jwtString := GetToken(c)
-	token, err := jwt.Parse(jwtString, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-
-		return []byte(cfg.TokenSecret), nil
-	})
-	if err != nil {
-		return 0, err
-	}
-
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok {
-		return 0, ErrNoClaims
-	}
-
-	exp, ok := claims["exp"].(float64)
-	if !ok {
-		return 0, ErrNoExp
-	}
-
-	return time.Until(time.Unix(int64(exp), 0)), nil
-}
-
-func GetTokenSignature(jwt string) string {
-	parts := strings.Split(jwt, ".")
-	if len(parts) != 3 {
-		return ""
-	}
-
-	return parts[2]
-}
-
-func NewCookie(token string, cfg config.APIConfig) *fiber.Cookie {
-	return &fiber.Cookie{
-		Name:     AUTH_COOKIE,
-		Value:    token,
-		HTTPOnly: true,
-		Secure:   true,
-		Expires:  time.Now().Add(time.Duration(cfg.TokenExpiration)),
-	}
 }
 
 func NewCookieAuthn(token string, path string, cfg config.APIConfig) *fiber.Cookie {

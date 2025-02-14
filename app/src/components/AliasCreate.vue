@@ -38,31 +38,34 @@
                             </p>
                             <div class="relative flex items-start">
                                 <div class="flex items-center h-5 mt-1">
-                                    <input v-model="alias.format" value="word" id="hs-radio-word" name="hs-radio-with-description" type="radio"
+                                    <input
+                                        v-model="alias.format" value="words" id="hs-radio-words" name="hs-radio-with-description" type="radio"
                                         class="form-radio border-gray-200 rounded-full text-bluish-500 focus:ring-white dark:focus:ring-transparent dark:bg-neutral-800 dark:border-neutral-600 dark:checked:border-transparent dark:focus:ring-offset-gray-800"
-                                        aria-describedby="hs-radio-word-description" checked>
+                                        aria-describedby="hs-radio-words-description">
                                 </div>
-                                <label for="hs-radio-word" class="ms-3">
-                                    <span class="block text-sm font-semibold text-gray-800 dark:text-gray-100">Word</span>
-                                    <span id="hs-radio-word-description" class="block text-sm text-gray-500 dark:text-gray-400">e.g.
+                                <label for="hs-radio-words" class="ms-3">
+                                    <span class="block text-sm font-semibold text-gray-800 dark:text-gray-100">Words</span>
+                                    <span id="hs-radio-words-description" class="block text-sm text-gray-500 dark:text-gray-400">e.g.
                                         quiet.haze16@{{ alias.domain }}</span>
                                 </label>
                             </div>                            
                             <div class="relative flex items-start">
                                 <div class="flex items-center h-5 mt-1">
-                                    <input v-model="alias.format" value="chars" id="hs-radio-chars" name="hs-radio-with-description" type="radio"
+                                    <input 
+                                        v-model="alias.format" value="random" id="hs-radio-random" name="hs-radio-with-description" type="radio"
                                         class="form-radio border-gray-200 rounded-full text-bluish-500 focus:ring-white dark:focus:ring-transparent dark:bg-neutral-800 dark:border-neutral-600 dark:checked:border-transparent dark:focus:ring-offset-gray-800"
-                                        aria-describedby="hs-radio-chars-description">
+                                        aria-describedby="hs-radio-random-description">
                                 </div>
-                                <label for="hs-radio-chars" class="ms-3">
+                                <label for="hs-radio-random" class="ms-3">
                                     <span class="block text-sm font-semibold text-gray-800 dark:text-gray-100">Random</span>
-                                    <span id="hs-radio-chars-description" class="block text-sm text-gray-500 dark:text-gray-400">e.g.
+                                    <span id="hs-radio-random-description" class="block text-sm text-gray-500 dark:text-gray-400">e.g.
                                         uf1h0hxi@{{ alias.domain }}</span>
                                 </label>
                             </div>
                             <div class="relative flex items-start">
                                 <div class="flex items-center h-5 mt-1">
-                                    <input v-model="alias.format" value="uuid" id="hs-radio-uuid" name="hs-radio-with-description" type="radio"
+                                    <input
+                                        v-model="alias.format" value="uuid" id="hs-radio-uuid" name="hs-radio-with-description" type="radio"
                                         class="form-radio border-gray-200 rounded-full text-bluish-500 focus:ring-white dark:focus:ring-transparent dark:bg-neutral-800 dark:border-neutral-600 dark:checked:border-transparent dark:focus:ring-offset-gray-800"
                                         aria-describedby="hs-radio-uuid-description">
                                 </div>
@@ -181,7 +184,7 @@ const props = defineProps(['recipients', 'settings', 'catchAll'])
 const alias = ref({
     description: '',
     enabled: true,
-    format: 'word',
+    format: '',
     from_name: '',
     recipients: '',
     domain: envDomains[0],
@@ -225,7 +228,7 @@ const postAlias = async () => {
 }
 
 const close = () => {
-    alias.value = { format: 'word' } as any
+    setAliasFormat()
     error.value = ''
     const modal = document.querySelector('#modal-create-alias' + props.catchAll) as any
     overlay.close(modal)
@@ -253,9 +256,14 @@ const validate = () => {
     return !errorCatchAllSuffix.value
 }
 
+const setAliasFormat = () => {
+    alias.value.format = props.settings.alias_format || 'words'
+}
+
 onMounted(() => {
     overlay.autoInit()
     select.autoInit()
     addEvents()
+    setAliasFormat()
 })
 </script>

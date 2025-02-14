@@ -202,8 +202,7 @@ const errorCatchAllSuffix = ref(false)
 const postAlias = async () => {
     if (!validate()) return
 
-    const domainInput = document.getElementById('alias_domain') as HTMLInputElement
-    alias.value.domain = domainInput.value
+    alias.value.domain = (document.getElementById('alias_domain') as HTMLInputElement).value
     alias.value.recipients = selectRecipients.value.join(',')
     alias.value.enabled = true
 
@@ -247,8 +246,8 @@ const addEvents = () => {
 }
 
 const validate = () => {
-    if (props.catchAll && (alias.value.catch_all_suffix.length < 6 || alias.value.catch_all_suffix.length > 12)) {
-        errorCatchAllSuffix.value = true
+    if (props.catchAll) {
+        errorCatchAllSuffix.value = alias.value.catch_all_suffix.length < 6 || alias.value.catch_all_suffix.length > 12
     } else {
         errorCatchAllSuffix.value = false
     }

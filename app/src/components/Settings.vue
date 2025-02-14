@@ -46,6 +46,28 @@
             </select>
         </div>
         <h2 class="font-semibold text-gray-800 dark:text-gray-100 mb-3">
+            Default Alias Format
+        </h2>
+        <p class="text-gray-500 dark:text-gray-400 mb-3">
+            The default alias format to be selected by default when creating a new alias. You can add aliases <router-link class="text-bluish-500 hover:text-bluish-600" to="/aliases">here</router-link>.
+        </p>
+        <div class="max-w-xs mb-6">
+            <label class="block text-gray-500 dark:text-gray-400 mb-3" for="format">
+                Select default alias format:
+            </label>
+            <select id="format"
+                :disabled="!aliasFormats.length"
+                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent">
+                <option
+                    v-for="format in aliasFormats"
+                    v-bind:value=format.toLowerCase()
+                    :selected="format.toLowerCase() == req.alias_format"
+                    :key="format">
+                    {{ format }}
+                </option>
+            </select>
+        </div>
+        <h2 class="font-semibold text-gray-800 dark:text-gray-100 mb-3">
             From Name
         </h2>
         <p class="text-gray-500 dark:text-gray-400 mb-3">
@@ -84,13 +106,15 @@ const req = ref({
     id: '',
     domain: '',
     recipient: '',
-    from_name: ''
+    from_name: '',
+    alias_format: ''
 })
 const envDomains = import.meta.env.VITE_DOMAINS.split(',')
 const domains = ref(envDomains)
 const recipients = ref([])
 const success = ref('')
 const error = ref('')
+const aliasFormats = ref(['Words', 'Random', 'UUID'])
 
 const getSettings = async () => {
     try {
@@ -110,6 +134,9 @@ const saveSettings = async () => {
 
     const recipientInput = document.getElementById('recipient') as HTMLInputElement
     req.value.recipient = recipientInput.value
+
+    const formatInput = document.getElementById('format') as HTMLInputElement
+    req.value.alias_format = formatInput.value
 
     try {
         const res = await settingsApi.update(req.value)

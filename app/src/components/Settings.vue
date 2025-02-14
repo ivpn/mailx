@@ -129,14 +129,9 @@ const getSettings = async () => {
 }
 
 const saveSettings = async () => {
-    const domainInput = document.getElementById('domain') as HTMLInputElement
-    req.value.domain = domainInput.value
-
-    const recipientInput = document.getElementById('recipient') as HTMLInputElement
-    req.value.recipient = recipientInput.value
-
-    const formatInput = document.getElementById('format') as HTMLInputElement
-    req.value.alias_format = formatInput.value
+    req.value.domain = (document.getElementById('domain') as HTMLSelectElement).value
+    req.value.recipient = (document.getElementById('recipient') as HTMLSelectElement).value
+    req.value.alias_format = (document.getElementById('format') as HTMLSelectElement).value
 
     try {
         const res = await settingsApi.update(req.value)
@@ -153,8 +148,9 @@ const saveSettings = async () => {
 const getRecipients = async () => {
     try {
         const res = await recipientApi.getList()
-        const list = res.data.filter((item: { is_active: boolean }) => item.is_active)
-        recipients.value = list.map((recipient: { email: string }) => recipient.email)
+        recipients.value = res.data
+            .filter((item: { is_active: boolean }) => item.is_active)
+            .map((recipient: { email: string }) => recipient.email)
         error.value = ''
     } catch (err) {
         if (axios.isAxiosError(err)) {

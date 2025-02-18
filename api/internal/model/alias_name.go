@@ -10,7 +10,7 @@ import (
 
 const (
 	AliasFormatRandomWords = "words"
-	AliasFormatRandomChars = "chars"
+	AliasFormatRandomChars = "random"
 	AliasFormatUUID        = "uuid"
 	AliasFormatCatchAll    = "catch_all"
 )

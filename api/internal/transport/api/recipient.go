@@ -114,6 +114,57 @@ func (h *Handler) PostRecipient(c *fiber.Ctx) error {
 	})
 }
 
+// @Summary Update recipient
+// @Description Update recipient
+// @Tags recipient
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param body body RecipientReq true "Recipient request"
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /recipient [put]
+func (h *Handler) UpdateRecipient(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
+
+	req := RecipientReq{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	rcp, err := h.Service.GetRecipient(c.Context(), req.ID, userID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	rcp.PGPKey = req.PGPKey
+	rcp.PGPEnabled = req.PGPEnabled
+	rcp.PGPInline = req.PGPInline
+
+	err = h.Service.UpdateRecipient(c.Context(), rcp)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": UpdateRecipientSuccess,
+	})
+}
+
 // @Summary Send recipient OTP
 // @Description Send recipient OTP
 // @Tags recipient

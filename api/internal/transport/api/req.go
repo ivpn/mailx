@@ -36,6 +36,13 @@ type AliasReq struct {
 	CatchAllSuffix string `json:"catch_all_suffix" validate:"omitempty,alphanum,min=6,max=12"`
 }
 
+type RecipientReq struct {
+	ID         string `json:"id" validate:"required,uuid"`
+	PGPKey     string `json:"pgp_key"`
+	PGPEnabled bool   `json:"pgp_enabled"`
+	PGPInline  bool   `json:"pgp_inline"`
+}
+
 type SettingsReq struct {
 	ID          string `json:"id" validate:"required,uuid"`
 	Domain      string `json:"domain"`

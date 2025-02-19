@@ -14,7 +14,7 @@ type Recipient struct {
 	UserID     string `json:"-"`
 	Email      string `gorm:"unique" json:"email"`
 	IsActive   bool   `json:"is_active"`
-	PGPKey     string `json:"pgp_key"`
+	PGPKey     string `json:"-"`
 	PGPEnabled bool   `json:"pgp_enabled"`
 	PGPInline  bool   `json:"pgp_inline"`
 }

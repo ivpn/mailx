@@ -412,6 +412,49 @@ const docTemplate = `{
             }
         },
         "/recipient": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update recipient",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "recipient"
+                ],
+                "summary": "Update recipient",
+                "parameters": [
+                    {
+                        "description": "Recipient request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.RecipientReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -1699,6 +1742,26 @@ const docTemplate = `{
                 }
             }
         },
+        "api.RecipientReq": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "pgp_enabled": {
+                    "type": "boolean"
+                },
+                "pgp_inline": {
+                    "type": "boolean"
+                },
+                "pgp_key": {
+                    "type": "string"
+                }
+            }
+        },
         "api.ResetPasswordReq": {
             "type": "object",
             "required": [
@@ -1719,6 +1782,9 @@ const docTemplate = `{
                 "id"
             ],
             "properties": {
+                "alias_format": {
+                    "type": "string"
+                },
                 "domain": {
                     "type": "string"
                 },
@@ -1915,12 +1981,21 @@ const docTemplate = `{
                 },
                 "is_active": {
                     "type": "boolean"
+                },
+                "pgp_enabled": {
+                    "type": "boolean"
+                },
+                "pgp_inline": {
+                    "type": "boolean"
                 }
             }
         },
         "model.Settings": {
             "type": "object",
             "properties": {
+                "alias_format": {
+                    "type": "string"
+                },
                 "created_at": {
                     "type": "string"
                 },

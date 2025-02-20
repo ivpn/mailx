@@ -73,7 +73,7 @@ func (s *Service) ProcessMessage(data []byte) error {
 	return err
 }
 
-func (s *Service) queueMessage(from string, fromName string, settingsFromName string, to string, data []byte, alias model.Alias, msgType model.MessageType) error {
+func (s *Service) queueMessage(from string, fromName string, settingsFromName string, rcp model.Recipient, data []byte, alias model.Alias, msgType model.MessageType) error {
 	mailer := mailer.New(s.Cfg.SMTPClient)
 
 	// Forward
@@ -83,7 +83,7 @@ func (s *Service) queueMessage(from string, fromName string, settingsFromName st
 			"from":  from,
 		}
 		generatedFrom := model.GenerateReplyTo(alias.Name, from)
-		err := mailer.Forward(generatedFrom, fromName, to, data, "header.tmpl", templateData)
+		err := mailer.Forward(generatedFrom, fromName, rcp, data, "header.tmpl", templateData)
 		if err != nil {
 			log.Println("error forwarding message", err)
 			return err
@@ -101,7 +101,7 @@ func (s *Service) queueMessage(from string, fromName string, settingsFromName st
 			name = settingsFromName
 		}
 
-		err = mailer.Reply(alias.Name, name, to, data)
+		err = mailer.Reply(alias.Name, name, rcp, data)
 		if err != nil {
 			log.Println("error sending message", err)
 			return err
@@ -123,40 +123,45 @@ func (s *Service) saveMessage(alias model.Alias, msgType model.MessageType, data
 	}
 }
 
-func (s *Service) findRecipients(from string, email string, msgType MsgType) ([]string, model.Alias, model.MessageType, error) {
+func (s *Service) findRecipients(from string, email string, msgType MsgType) ([]model.Recipient, model.Alias, model.MessageType, error) {
 	name, replyTo := model.ParseReplyTo(email)
 
 	alias, err := s.GetAliasByName(name)
 	if err != nil {
-		return []string{}, model.Alias{}, 0, err
+		return []model.Recipient{}, model.Alias{}, 0, err
 	}
 
 	if !alias.Enabled {
 		// Block
 		s.saveMessage(alias, model.Block, []byte{})
-		return []string{}, model.Alias{}, 0, ErrDisabledAlias
+		return []model.Recipient{}, model.Alias{}, 0, ErrDisabledAlias
 	}
 
 	sub, err := s.GetSubscription(context.Background(), alias.UserID)
 	if err != nil {
-		return []string{}, model.Alias{}, 0, err
+		return []model.Recipient{}, model.Alias{}, 0, err
 	}
 
 	if sub.ActiveUntil.Before(time.Now()) {
-		return []string{}, model.Alias{}, 0, ErrInactiveSubscription
+		return []model.Recipient{}, model.Alias{}, 0, ErrInactiveSubscription
+	}
+
+	rcps, err := s.GetVerifiedRecipients(context.Background(), from, alias.UserID)
+	if err != nil || len(rcps) == 0 {
+		return []model.Recipient{}, model.Alias{}, 0, ErrNoRecipients
 	}
 
 	err = utils.ValidateEmail(replyTo)
 	if err == nil {
-		rcps, err := s.GetVerifiedRecipients(context.Background(), from, alias.UserID)
-		if err != nil || len(rcps) == 0 {
-			return []string{}, model.Alias{}, 0, ErrNoRecipients
-		}
-
-		return []string{replyTo}, alias, model.MessageType(msgType), nil
+		return []model.Recipient{{Email: replyTo}}, alias, model.MessageType(msgType), nil
 	}
 
-	recipients := strings.Split(alias.Recipients, ",")
+	var recipients []model.Recipient
+	for _, rcp := range rcps {
+		if strings.Contains(alias.Recipients, rcp.Email) {
+			recipients = append(recipients, rcp)
+		}
+	}
 
 	return recipients, alias, model.Forward, nil
 }

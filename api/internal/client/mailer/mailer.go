@@ -59,7 +59,7 @@ func (mailer Mailer) Send(to string, subject string, body string) error {
 	return nil
 }
 
-func (mailer Mailer) Reply(from string, name string, to string, data []byte) error {
+func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data []byte) error {
 	var reader = bytes.NewReader(data)
 	email, err := parsemail.Parse(reader)
 	if err != nil {
@@ -72,7 +72,7 @@ func (mailer Mailer) Reply(from string, name string, to string, data []byte) err
 
 	m := gomail.NewMessage()
 	m.SetAddressHeader("From", from, name)
-	m.SetHeader("To", to)
+	m.SetHeader("To", rcp.Email)
 	m.SetHeader("Subject", email.Subject)
 	m.SetBody("text/plain", email.TextBody)
 	m.AddAlternative("text/html", email.HTMLBody)
@@ -108,7 +108,7 @@ func (mailer Mailer) Reply(from string, name string, to string, data []byte) err
 	return nil
 }
 
-func (mailer Mailer) Forward(from string, name string, to string, data []byte, templateFile string, templateData interface{}) error {
+func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data []byte, templateFile string, templateData interface{}) error {
 	var reader = bytes.NewReader(data)
 	email, err := parsemail.Parse(reader)
 	if err != nil {
@@ -138,7 +138,7 @@ func (mailer Mailer) Forward(from string, name string, to string, data []byte, t
 
 	m := gomail.NewMessage()
 	m.SetAddressHeader("From", from, name)
-	m.SetHeader("To", to)
+	m.SetHeader("To", rcp.Email)
 	m.SetHeader("Subject", email.Subject)
 	m.SetBody("text/plain", header.String()+email.TextBody)
 	m.AddAlternative("text/html", headerHtml.String()+email.HTMLBody)

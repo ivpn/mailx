@@ -146,14 +146,19 @@ func (s *Service) findRecipients(from string, email string, msgType MsgType) ([]
 		return []model.Recipient{}, model.Alias{}, 0, ErrInactiveSubscription
 	}
 
-	rcps, err := s.GetVerifiedRecipients(context.Background(), from, alias.UserID)
-	if err != nil || len(rcps) == 0 {
-		return []model.Recipient{}, model.Alias{}, 0, ErrNoRecipients
-	}
-
 	err = utils.ValidateEmail(replyTo)
 	if err == nil {
+		rcps, err := s.GetVerifiedRecipients(context.Background(), from, alias.UserID)
+		if err != nil || len(rcps) == 0 {
+			return []model.Recipient{}, model.Alias{}, 0, ErrNoRecipients
+		}
+
 		return []model.Recipient{{Email: replyTo}}, alias, model.MessageType(msgType), nil
+	}
+
+	rcps, err := s.GetRecipients(context.Background(), alias.UserID)
+	if err != nil || len(rcps) == 0 {
+		return []model.Recipient{}, model.Alias{}, 0, ErrNoRecipients
 	}
 
 	var recipients []model.Recipient

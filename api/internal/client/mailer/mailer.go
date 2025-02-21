@@ -137,8 +137,8 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 		email.HTMLBody = model.PlainTextToHTML(email.TextBody)
 	}
 
+	// PGP/Inline encryption
 	if rcp.PGPEnabled && rcp.PGPKey != "" && rcp.PGPInline {
-		// Encrypt only plaintext message with PGP key
 		pgp := crypto.PGP()
 		publicKey, _ := crypto.NewKeyFromArmored(rcp.PGPKey)
 		encHandle, _ := pgp.Encryption().Recipient(publicKey).New()
@@ -153,6 +153,27 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 	m.SetHeader("Subject", email.Subject)
 	m.SetBody("text/plain", header.String()+email.TextBody)
 	m.AddAlternative("text/html", headerHtml.String()+email.HTMLBody)
+
+	// PGP/MIME encryption
+	if rcp.PGPEnabled && rcp.PGPKey != "" && !rcp.PGPInline {
+		pgp := crypto.PGP()
+		publicKey, _ := crypto.NewKeyFromArmored(rcp.PGPKey)
+		encHandle, _ := pgp.Encryption().Recipient(publicKey).New()
+
+		var rawMessage bytes.Buffer
+		rawMessage.WriteString(header.String() + email.TextBody)
+		pgpMessage, _ := encHandle.Encrypt(rawMessage.Bytes())
+		armored, _ := pgpMessage.ArmorBytes()
+
+		var rawMessageHtml bytes.Buffer
+		rawMessageHtml.WriteString(headerHtml.String() + email.HTMLBody)
+		pgpMessageHtml, _ := encHandle.Encrypt(rawMessageHtml.Bytes())
+		armoredHtml, _ := pgpMessageHtml.ArmorBytes()
+
+		m.SetHeader("Content-Type", "multipart/encrypted; protocol=\"application/pgp-encrypted\"")
+		m.SetBody("text/plain", string(armored))
+		m.AddAlternative("text/html", string(armoredHtml))
+	}
 
 	for _, a := range email.Attachments {
 		m.Attach(a.Filename, gomail.SetCopyFunc(func(w io.Writer) error {

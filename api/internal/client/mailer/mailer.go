@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/OfimaticSRL/parsemail"
+	"github.com/ProtonMail/gopenpgp/v3/crypto"
 	"gopkg.in/gomail.v2"
 	"ivpn.net/email/api/config"
 	"ivpn.net/email/api/internal/model"
@@ -134,6 +135,16 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 
 	if email.HTMLBody == "" {
 		email.HTMLBody = model.PlainTextToHTML(email.TextBody)
+	}
+
+	if rcp.PGPEnabled && rcp.PGPKey != "" && rcp.PGPInline {
+		// Encrypt only plaintext message with PGP key
+		pgp := crypto.PGP()
+		publicKey, _ := crypto.NewKeyFromArmored(rcp.PGPKey)
+		encHandle, _ := pgp.Encryption().Recipient(publicKey).New()
+		pgpMessage, _ := encHandle.Encrypt([]byte(email.TextBody))
+		armored, _ := pgpMessage.ArmorBytes()
+		email.TextBody = string(armored)
 	}
 
 	m := gomail.NewMessage()

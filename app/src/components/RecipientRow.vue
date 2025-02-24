@@ -23,13 +23,25 @@
                 <span v-if="!recipient.is_active" class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-gray-100 text-gray-500 dark:bg-gray-500 dark:text-gray-100">Unverified</span>
             </p>
         </td>
+        <td class="px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800">
+            <button
+                class="text-bluish-500 hover:text-bluish-600 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
+                type="button">
+                Add PGP key
+            </button>
+        </td>
         <td class="pl-5 py-4 whitespace-nowrap text-end text-sm">
             <div class="flex gap-5 justify-end">
-                <RecipientVerify v-if="!recipient.is_active" :recipient="recipient" />
+                <RecipientVerify v-if="recipient.is_active" :recipient="recipient" />
+                <button
+                    class="text-bluish-500 hover:text-bluish-600 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
+                    type="button">
+                    Edit
+                </button>
                 <button
                     @click="deleteRecipient"
                     class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
-                    type="submit">
+                    type="button">
                     Delete
                 </button>
             </div>

@@ -34,6 +34,9 @@
                                         <th scope="col"
                                             class="px-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
                                             VERIFIED</th>
+                                            <th scope="col"
+                                            class="px-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
+                                            ENCRYPTION</th>
                                         <th scope="col"
                                             class="pl-5 py-3 text-end text-xs font-medium text-gray-500 dark:text-gray-400">
                                             ACTIONS</th>

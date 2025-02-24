@@ -73,5 +73,5 @@ func pgpKeyValidation(fl validator.FieldLevel) bool {
 	}
 
 	// Check that the key starts with a valid PGP header
-	return strings.HasPrefix(key, "-----BEGIN PGP PUBLIC KEY BLOCK-----")
+	return strings.HasPrefix(key, "-----BEGIN PGP PUBLIC KEY BLOCK-----") && strings.HasSuffix(key, "-----END PGP PUBLIC KEY BLOCK-----")
 }

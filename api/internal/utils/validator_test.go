@@ -38,7 +38,7 @@ func TestNewValidator(t *testing.T) {
 	}
 
 	// Test if the custom PGP key validation is registered correctly
-	err = v.Var("-----BEGIN PGP PUBLIC KEY BLOCK-----", "pgp")
+	err = v.Var("-----BEGIN PGP PUBLIC KEY BLOCK----- ... -----END PGP PUBLIC KEY BLOCK-----", "pgp")
 	if err != nil {
 		t.Errorf("expected PGP key to be valid, but got error: %v", err)
 	}

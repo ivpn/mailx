@@ -78,7 +78,7 @@ func (s *Service) queueMessage(from string, fromName string, settingsFromName st
 
 	// Forward
 	if msgType == model.Forward {
-		templateData := map[string]interface{}{
+		templateData := map[string]any{
 			"alias": alias.Name,
 			"from":  from,
 		}

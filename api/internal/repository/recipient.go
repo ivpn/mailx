@@ -49,7 +49,7 @@ func (d *Database) PostRecipient(ctx context.Context, recipient model.Recipient)
 }
 
 func (d *Database) UpdateRecipient(ctx context.Context, recipient model.Recipient) error {
-	return d.Client.Model(&recipient).Where("user_id = ?", recipient.UserID).Updates(map[string]interface{}{
+	return d.Client.Model(&recipient).Where("user_id = ?", recipient.UserID).Updates(map[string]any{
 		"pgp_key":     recipient.PGPKey,
 		"pgp_enabled": recipient.PGPEnabled,
 		"pgp_inline":  recipient.PGPInline,

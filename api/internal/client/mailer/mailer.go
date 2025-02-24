@@ -109,7 +109,7 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 	return nil
 }
 
-func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data []byte, templateFile string, templateData interface{}) error {
+func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data []byte, templateFile string, templateData any) error {
 	var reader = bytes.NewReader(data)
 	email, err := parsemail.Parse(reader)
 	if err != nil {
@@ -228,7 +228,7 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 	return nil
 }
 
-func (mailer Mailer) SendTemplate(to string, subject string, templateFile string, templateData interface{}) error {
+func (mailer Mailer) SendTemplate(to string, subject string, templateFile string, templateData any) error {
 	tmpl, err := template.New("email").ParseFS(templateFS, "templates/"+templateFile)
 	if err != nil {
 		return err

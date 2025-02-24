@@ -20,7 +20,7 @@ func NewValidator() Validator {
 		log.Println("error registering password validation:", err)
 	}
 
-	err = v.RegisterValidation("pgpKey", pgpKeyValidation)
+	err = v.RegisterValidation("pgp", pgpKeyValidation)
 	if err != nil {
 		log.Println("error registering pgp key validation:", err)
 	}
@@ -66,5 +66,12 @@ func passwordValidation(fl validator.FieldLevel) bool {
 
 func pgpKeyValidation(fl validator.FieldLevel) bool {
 	key := fl.Field().String()
-	return len(key) == 0 || strings.Contains(key, "-----BEGIN PGP PUBLIC KEY BLOCK-----")
+
+	// “omitempty” double check
+	if key == "" {
+		return true
+	}
+
+	// Check that the key starts with a valid PGP header
+	return strings.HasPrefix(key, "-----BEGIN PGP PUBLIC KEY BLOCK-----")
 }

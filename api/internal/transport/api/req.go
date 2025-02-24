@@ -38,7 +38,7 @@ type AliasReq struct {
 
 type RecipientReq struct {
 	ID         string `json:"id" validate:"required,uuid"`
-	PGPKey     string `json:"pgp_key" validate:"pgpKey"`
+	PGPKey     string `json:"pgp_key" validate:"omitempty,pgp"`
 	PGPEnabled bool   `json:"pgp_enabled"`
 	PGPInline  bool   `json:"pgp_inline"`
 }

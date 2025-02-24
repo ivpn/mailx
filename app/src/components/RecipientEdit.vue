@@ -100,6 +100,7 @@ const updateRecipient = async () => {
 
 const close = () => {
     error.value = ''
+    success.value = ''
     const modal = document.querySelector('#modal-edit-recipient' + recipient.value.id) as any
     overlay.close(modal)
 }

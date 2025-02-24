@@ -24,11 +24,7 @@
             </p>
         </td>
         <td class="px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800">
-            <button
-                class="text-bluish-500 hover:text-bluish-600 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
-                type="button">
-                Add PGP key
-            </button>
+            <RecipientAddPGPKey :recipient="recipient" />
         </td>
         <td class="pl-5 py-4 whitespace-nowrap text-end text-sm">
             <div class="flex gap-5 justify-end">
@@ -50,6 +46,7 @@ import { ref, onMounted } from 'vue'
 import tooltip from '@preline/tooltip'
 import RecipientVerify from './RecipientVerify.vue'
 import RecipientEdit from './RecipientEdit.vue'
+import RecipientAddPGPKey from './RecipientAddPGPKey.vue'
 import events from '../events.ts'
 
 const props = defineProps(['recipient'])

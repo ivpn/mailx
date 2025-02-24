@@ -1987,6 +1987,9 @@ const docTemplate = `{
                 },
                 "pgp_inline": {
                     "type": "boolean"
+                },
+                "pgp_key": {
+                    "type": "string"
                 }
             }
         },

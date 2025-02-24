@@ -214,6 +214,8 @@ definitions:
         type: boolean
       pgp_inline:
         type: boolean
+      pgp_key:
+        type: string
     type: object
   model.Settings:
     properties:

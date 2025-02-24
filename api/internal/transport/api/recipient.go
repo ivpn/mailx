@@ -149,7 +149,10 @@ func (h *Handler) UpdateRecipient(c *fiber.Ctx) error {
 		})
 	}
 
-	rcp.PGPKey = req.PGPKey
+	if req.PGPKey != "" {
+		rcp.PGPKey = req.PGPKey
+	}
+
 	rcp.PGPEnabled = req.PGPEnabled
 	rcp.PGPInline = req.PGPInline
 

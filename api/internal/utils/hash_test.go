@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"testing"
 
 	"github.com/alexedwards/argon2id"
@@ -74,5 +76,25 @@ func TestHashMatchesPassword(t *testing.T) {
 
 	if HashMatchesPassword("wrongsecret", hash) {
 		t.Fatalf("expected hash not to match the wrong secret")
+	}
+}
+func TestHashPGPKey(t *testing.T) {
+	key := "mykey"
+	expectedHash := sha256.Sum256([]byte(key))
+	expectedHashString := hex.EncodeToString(expectedHash[:])
+
+	hash := HashPGPKey(key)
+	if hash != expectedHashString {
+		t.Fatalf("expected %v, got %v", expectedHashString, hash)
+	}
+
+	// Test with an empty key
+	emptyKey := ""
+	expectedEmptyHash := sha256.Sum256([]byte(emptyKey))
+	expectedEmptyHashString := hex.EncodeToString(expectedEmptyHash[:])
+
+	emptyHash := HashPGPKey(emptyKey)
+	if emptyHash != expectedEmptyHashString {
+		t.Fatalf("expected %v, got %v", expectedEmptyHashString, emptyHash)
 	}
 }

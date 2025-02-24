@@ -64,6 +64,12 @@ func (s *Service) GetRecipients(ctx context.Context, userID string) ([]model.Rec
 		return []model.Recipient{}, ErrGetRecipients
 	}
 
+	for i, rcp := range rcps {
+		if rcp.PGPKey != "" {
+			rcps[i].PGPKey = utils.HashPGPKey(rcp.PGPKey)
+		}
+	}
+
 	return rcps, nil
 }
 

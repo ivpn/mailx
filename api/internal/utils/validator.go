@@ -3,6 +3,7 @@ package utils
 import (
 	"log"
 	"regexp"
+	"strings"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -13,10 +14,17 @@ type Validator struct {
 
 func NewValidator() Validator {
 	v := Validator{validator.New()}
+
 	err := v.RegisterValidation("password", passwordValidation)
 	if err != nil {
 		log.Println("error registering password validation:", err)
 	}
+
+	err = v.RegisterValidation("pgpKey", pgpKeyValidation)
+	if err != nil {
+		log.Println("error registering pgp key validation:", err)
+	}
+
 	return v
 }
 
@@ -54,4 +62,9 @@ func passwordValidation(fl validator.FieldLevel) bool {
 	}
 
 	return true
+}
+
+func pgpKeyValidation(fl validator.FieldLevel) bool {
+	key := fl.Field().String()
+	return len(key) == 0 || strings.Contains(key, "-----BEGIN PGP PUBLIC KEY BLOCK-----")
 }

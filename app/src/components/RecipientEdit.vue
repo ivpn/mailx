@@ -9,7 +9,8 @@
             class="hs-overlay hidden size-full fixed top-0 start-0 z-[60] overflow-x-hidden overflow-y-auto pointer-events-none">
             <div
                 class="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 opacity-0 transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
-                <div class="flex flex-col bg-white dark:bg-neutral-800 border dark:border-neutral-600 shadow-sm rounded pointer-events-auto">
+                <div
+                    class="flex flex-col bg-white dark:bg-neutral-800 border dark:border-neutral-600 shadow-sm rounded pointer-events-auto">
                     <div class="flex justify-between items-center py-3 px-4 border-b dark:border-neutral-600">
                         <h3 class="text-xl text-gray-800 dark:text-gray-100 font-semibold">
                             Edit recipient
@@ -26,7 +27,8 @@
                         </button>
                     </div>
                     <div class="p-4 whitespace-normal text-left text-base">
-                        <h1 class="text-xl text-gray-800 dark:text-gray-100 font-semibold mb-7">{{ recipient.email }}</h1>
+                        <h1 class="text-xl text-gray-800 dark:text-gray-100 font-semibold mb-7">{{ recipient.email }}
+                        </h1>
                         <div class="mb-5">
                             <h3 class="font-semibold text-gray-800 dark:text-gray-100 mb-3">
                                 PGP/Inline Encryption
@@ -35,13 +37,13 @@
                                 To use this option, please add a PGP key first.
                             </p>
                             <p class="text-gray-500 dark:text-gray-400 mb-3">
-                                Enable this option to use PGP/Inline instead of the default PGP/MIME encryption for forwarded emails.
+                                Enable this option to use PGP/Inline instead of the default PGP/MIME encryption for
+                                forwarded emails.
                             </p>
                         </div>
                         <div class="mb-5">
-                            <input
-                                v-bind:disabled="!recipient.pgp_key"
-                                type="checkbox" v-bind:checked="recipient.pgp_inline" @change="updateRecipient"
+                            <input v-bind:disabled="!recipient.pgp_key" type="checkbox"
+                                v-bind:checked="recipient.pgp_inline" @change="updateRecipient"
                                 class="form-checkbox relative w-11 h-6 p-px bg-gray-100 dark:bg-neutral-600 border-transparent text-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:ring-white dark:focus:ring-neutral-800 disabled:opacity-50 disabled:pointer-events-none checked:bg-none checked:text-bluish-500 checked:border-bluish-500 focus:ring-offset-transparent
 
                                 before:inline-block before:size-5 before:bg-white dark:before:bg-neutral-400 checked:before:bg-bluish-200 before:translate-x-0 checked:before:translate-x-full before:rounded-full before:shadow before:transform before:transition before:ease-in-out before:duration-200">
@@ -49,7 +51,8 @@
                     </div>
                     <div class="flex items-start">
                         <p v-if="error" class="px-5 text-red-600 text-sm mb-5">Error: {{ error }}</p>
-                        <p v-if="success" class="px-5 text-emerald-600 dark:text-emerald-500 text-sm mb-5">{{ success }}</p>
+                        <p v-if="success" class="px-5 text-emerald-600 dark:text-emerald-500 text-sm mb-5">{{ success }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -65,38 +68,32 @@ import { recipientApi } from '../api/recipient.ts'
 import events from '../events.ts'
 
 const props = defineProps(['recipient'])
-// const req = ref({
-//     id: props.recipient.id,
-//     pgp_enabled: props.recipient.pgp_enabled,
-//     pgp_inline: props.recipient.pgp_inline
-// })
 const recipient = ref(props.recipient)
 const error = ref('')
 const success = ref('')
 
 const updateRecipient = async () => {
+    // Toggle pgp_inline option
+    recipient.value.pgp_inline = !recipient.value.pgp_inline
+
+    const payload = {
+        id: recipient.value.id,
+        pgp_enabled: recipient.value.pgp_enabled,
+        pgp_inline: recipient.value.pgp_inline
+    }
+
     try {
-
-        recipient.value.pgp_inline = !recipient.value.pgp_inline
-
-        const req = {
-            id: recipient.value.id,
-            pgp_enabled: recipient.value.pgp_enabled,
-            pgp_inline: recipient.value.pgp_inline
-        }
-
-        console.log(req)
-        const res = await recipientApi.update(req)
+        const res = await recipientApi.update(payload)
         error.value = ''
-        events.emit('recipient.update', {})
         success.value = res.data.message
+
+        events.emit('recipient.update', {})
     } catch (err) {
         if (axios.isAxiosError(err)) {
-            error.value = err.response?.data.error || err.message
-
-            if (err.response?.status === 429) {
-                error.value = 'Too many requests, please try again later'
-            }
+            const errorMsg = err.response?.data.error || err.message
+            error.value = err.response?.status === 429
+                ? 'Too many requests, please try again later'
+                : errorMsg
         }
     }
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"ivpn.net/email/api/internal/middleware/auth"
 	"ivpn.net/email/api/internal/model"
+	"ivpn.net/email/api/internal/utils"
 )
 
 var (
@@ -61,14 +62,20 @@ func (h *Handler) GetRecipient(c *fiber.Ctx) error {
 // @Router /recipients [get]
 func (h *Handler) GetRecipients(c *fiber.Ctx) error {
 	userID := auth.GetUserID(c)
-	recipients, err := h.Service.GetRecipients(c.Context(), userID)
+	rcps, err := h.Service.GetRecipients(c.Context(), userID)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
 
-	return c.JSON(recipients)
+	for i, rcp := range rcps {
+		if rcp.PGPKey != "" {
+			rcps[i].PGPKey = utils.HashPGPKey(rcp.PGPKey)
+		}
+	}
+
+	return c.JSON(rcps)
 }
 
 // @Summary Create recipient

@@ -72,6 +72,11 @@ func pgpKeyValidation(fl validator.FieldLevel) bool {
 		return true
 	}
 
+	// Ignore hash
+	if len(key) == 64 {
+		return true
+	}
+
 	// Check that the key starts with a valid PGP header
 	return strings.HasPrefix(key, "-----BEGIN PGP PUBLIC KEY BLOCK-----") && strings.HasSuffix(key, "-----END PGP PUBLIC KEY BLOCK-----")
 }

@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"ivpn.net/email/api/internal/middleware/auth"
@@ -149,7 +150,7 @@ func (h *Handler) UpdateRecipient(c *fiber.Ctx) error {
 		})
 	}
 
-	if req.PGPKey != "" {
+	if req.PGPKey == "" || strings.HasPrefix(req.PGPKey, "-----BEGIN PGP PUBLIC KEY BLOCK-----") {
 		rcp.PGPKey = req.PGPKey
 	}
 

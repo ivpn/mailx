@@ -124,6 +124,7 @@ const renderRow = () => {
 onMounted(() => {
     getList()
     events.on('recipient.create', getList)
+    events.on('recipient.update', reload)
     events.on('recipient.verify', reload)
     events.on('recipient.delete', onDeleteRecipient)
 })

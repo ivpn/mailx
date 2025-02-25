@@ -32,7 +32,7 @@
                                 Enter your public PGP key:
                             </label>
                             <textarea
-                                v-model="recipient.pgp_key"
+                                v-model="pgp_key"
                                 v-bind:class="{ 'border-gray-500 dark:border-neutral-400': !pgpError, 'border-red-600 dark:border-red-600': pgpError }"
                                 id="recipient_pgp"
                                 placeholder="Starts with '-----BEGIN P GP PUBLIC KEY BLOCK-----'"
@@ -70,11 +70,12 @@ import events from '../events.ts'
 
 const props = defineProps(['recipient'])
 const recipient = ref(props.recipient)
+const pgp_key = ref('')
 const error = ref('')
 const pgpError = ref(false)
 
 const validatePgp = () => {
-    pgpError.value = !recipient.value.pgp_key
+    pgpError.value = !pgp_key.value
     return !pgpError.value
 }
 
@@ -86,7 +87,7 @@ const addKey = async () => {
     const payload = {
         id: recipient.value.id,
         pgp_enabled: true,
-        pgp_key: recipient.value.pgp_key
+        pgp_key: pgp_key.value
     }
 
     try {

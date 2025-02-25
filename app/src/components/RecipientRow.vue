@@ -77,6 +77,7 @@ const updateRecipient = async () => {
 
     const payload = {
         id: recipient.value.id,
+        pgp_key: recipient.value.pgp_key,
         pgp_enabled: recipient.value.pgp_enabled
     }
 
@@ -86,7 +87,18 @@ const updateRecipient = async () => {
 }
 
 const deletePgpKey = async () => {
-    
+    if (!confirm('Are you sure you want to delete PGP public key?')) return
+
+    const payload = {
+        id: recipient.value.id,
+        pgp_key: '',
+        pgp_enabled: false,
+    }
+
+    try {
+        await recipientApi.update(payload)
+        events.emit('recipient.update', {})
+    } catch {}
 }
 
 const copyAlias = (alias: string) => {

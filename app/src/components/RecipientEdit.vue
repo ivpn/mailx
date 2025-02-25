@@ -43,7 +43,7 @@
                         </div>
                         <div class="mb-5">
                             <input v-bind:disabled="!recipient.pgp_key" type="checkbox"
-                                v-bind:checked="recipient.pgp_inline" @change="updateRecipient"
+                                v-bind:checked="pgp_inline" @change="updateRecipient"
                                 class="form-checkbox relative w-11 h-6 p-px bg-gray-100 dark:bg-neutral-600 border-transparent text-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:ring-white dark:focus:ring-neutral-800 disabled:opacity-50 disabled:pointer-events-none checked:bg-none checked:text-bluish-500 checked:border-bluish-500 focus:ring-offset-transparent
 
                                 before:inline-block before:size-5 before:bg-white dark:before:bg-neutral-400 checked:before:bg-bluish-200 before:translate-x-0 checked:before:translate-x-full before:rounded-full before:shadow before:transform before:transition before:ease-in-out before:duration-200">
@@ -65,29 +65,28 @@ import { ref, onMounted } from 'vue'
 import overlay from '@preline/overlay'
 import axios from 'axios'
 import { recipientApi } from '../api/recipient.ts'
-import events from '../events.ts'
 
 const props = defineProps(['recipient'])
 const recipient = ref(props.recipient)
+const pgp_inline = ref(props.recipient.pgp_inline)
 const error = ref('')
 const success = ref('')
 
 const updateRecipient = async () => {
     // Toggle pgp_inline option
-    recipient.value.pgp_inline = !recipient.value.pgp_inline
+    pgp_inline.value = !pgp_inline.value
 
     const payload = {
         id: recipient.value.id,
+        pgp_key: recipient.value.pgp_key,
         pgp_enabled: recipient.value.pgp_enabled,
-        pgp_inline: recipient.value.pgp_inline
+        pgp_inline: pgp_inline.value
     }
 
     try {
         const res = await recipientApi.update(payload)
         error.value = ''
         success.value = res.data.message
-
-        events.emit('recipient.update', {})
     } catch (err) {
         if (axios.isAxiosError(err)) {
             const errorMsg = err.response?.data.error || err.message

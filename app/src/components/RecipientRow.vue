@@ -60,6 +60,7 @@ import tooltip from '@preline/tooltip'
 import RecipientVerify from './RecipientVerify.vue'
 import RecipientEdit from './RecipientEdit.vue'
 import RecipientAddPGPKey from './RecipientAddPGPKey.vue'
+import { recipientApi } from '../api/recipient.ts'
 import events from '../events.ts'
 
 const props = defineProps(['recipient'])
@@ -71,7 +72,17 @@ const deleteRecipient = () => {
 }
 
 const updateRecipient = async () => {
+    // Toggle pgp_enabled option
+    recipient.value.pgp_enabled = !recipient.value.pgp_enabled
 
+    const payload = {
+        id: recipient.value.id,
+        pgp_enabled: recipient.value.pgp_enabled
+    }
+
+    try {
+        await recipientApi.update(payload)
+    } catch {}
 }
 
 const deletePgpKey = async () => {

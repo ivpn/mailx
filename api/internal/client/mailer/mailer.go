@@ -160,19 +160,17 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 		publicKey, _ := crypto.NewKeyFromArmored(rcp.PGPKey)
 		encHandle, _ := pgp.Encryption().Recipient(publicKey).New()
 
-		var rawMessage bytes.Buffer
-		rawMessage.WriteString(header.String() + email.TextBody)
-		pgpMessage, _ := encHandle.Encrypt(rawMessage.Bytes())
+		pgpMessage, _ := encHandle.Encrypt([]byte(header.String() + email.TextBody))
 		armored, _ := pgpMessage.ArmorBytes()
+		email.TextBody = string(armored)
 
-		var rawMessageHtml bytes.Buffer
-		rawMessageHtml.WriteString(headerHtml.String() + email.HTMLBody)
-		pgpMessageHtml, _ := encHandle.Encrypt(rawMessageHtml.Bytes())
+		pgpMessageHtml, _ := encHandle.Encrypt([]byte(headerHtml.String() + email.HTMLBody))
 		armoredHtml, _ := pgpMessageHtml.ArmorBytes()
+		email.HTMLBody = string(armoredHtml)
 
 		m.SetHeader("Content-Type", "multipart/encrypted; protocol=\"application/pgp-encrypted\"")
-		m.SetBody("text/plain", string(armored))
-		m.AddAlternative("text/html", string(armoredHtml))
+		m.SetBody("text/plain", email.TextBody)
+		m.AddAlternative("text/html", email.HTMLBody)
 	}
 
 	for _, a := range email.Attachments {

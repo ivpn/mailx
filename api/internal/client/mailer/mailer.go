@@ -162,14 +162,14 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 			}
 
 			// PGP/MIME encryption
-			// if rcp.PGPEnabled && rcp.PGPKey != "" && !rcp.PGPInline {
-			// 	pgp := crypto.PGP()
-			// 	publicKey, _ := crypto.NewKeyFromArmored(rcp.PGPKey)
-			// 	encHandle, _ := pgp.Encryption().Recipient(publicKey).New()
-			// 	pgpMessage, _ := encHandle.Encrypt(data)
-			// 	armored, _ := pgpMessage.ArmorBytes()
-			// 	data = armored
-			// }
+			if rcp.PGPEnabled && rcp.PGPKey != "" && !rcp.PGPInline {
+				pgp := crypto.PGP()
+				publicKey, _ := crypto.NewKeyFromArmored(rcp.PGPKey)
+				encHandle, _ := pgp.Encryption().Recipient(publicKey).New()
+				pgpMessage, _ := encHandle.Encrypt(data)
+				armored, _ := pgpMessage.ArmorBytes()
+				data = armored
+			}
 
 			_, err = w.Write(data)
 			return err
@@ -184,14 +184,14 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 			}
 
 			// PGP/MIME encryption
-			// if rcp.PGPEnabled && rcp.PGPKey != "" && !rcp.PGPInline {
-			// 	pgp := crypto.PGP()
-			// 	publicKey, _ := crypto.NewKeyFromArmored(rcp.PGPKey)
-			// 	encHandle, _ := pgp.Encryption().Recipient(publicKey).New()
-			// 	pgpMessage, _ := encHandle.Encrypt(data)
-			// 	armored, _ := pgpMessage.ArmorBytes()
-			// 	data = armored
-			// }
+			if rcp.PGPEnabled && rcp.PGPKey != "" && !rcp.PGPInline {
+				pgp := crypto.PGP()
+				publicKey, _ := crypto.NewKeyFromArmored(rcp.PGPKey)
+				encHandle, _ := pgp.Encryption().Recipient(publicKey).New()
+				pgpMessage, _ := encHandle.Encrypt(data)
+				armored, _ := pgpMessage.ArmorBytes()
+				data = armored
+			}
 
 			_, err = w.Write(data)
 			return err
@@ -200,18 +200,21 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 
 	// PGP/MIME encryption
 	if rcp.PGPEnabled && rcp.PGPKey != "" && !rcp.PGPInline {
-		var buf bytes.Buffer
-		_, _ = m.WriteTo(&buf)
-
 		pgp := crypto.PGP()
 		publicKey, _ := crypto.NewKeyFromArmored(rcp.PGPKey)
 		encHandle, _ := pgp.Encryption().Recipient(publicKey).New()
-		pgpMessage, _ := encHandle.Encrypt(buf.Bytes())
+
+		pgpMessage, _ := encHandle.Encrypt([]byte(header.String() + email.TextBody))
 		armored, _ := pgpMessage.ArmorBytes()
+		email.TextBody = string(armored)
+
+		pgpMessageHtml, _ := encHandle.Encrypt([]byte(headerHtml.String() + email.HTMLBody))
+		armoredHtml, _ := pgpMessageHtml.ArmorBytes()
+		email.HTMLBody = string(armoredHtml)
 
 		m.SetHeader("Content-Type", "multipart/encrypted; protocol=\"application/pgp-encrypted\"")
-		m.SetBody("text/plain", string(armored))
-		m.AddAlternative("text/html", "")
+		m.SetBody("text/plain", email.TextBody)
+		m.AddAlternative("text/html", email.HTMLBody)
 	}
 
 	err = mailer.dialer.DialAndSend(m)

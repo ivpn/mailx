@@ -161,16 +161,6 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 				return err
 			}
 
-			// PGP/MIME encryption
-			// if rcp.PGPEnabled && rcp.PGPKey != "" && !rcp.PGPInline {
-			// 	pgp := crypto.PGP()
-			// 	publicKey, _ := crypto.NewKeyFromArmored(rcp.PGPKey)
-			// 	encHandle, _ := pgp.Encryption().Recipient(publicKey).New()
-			// 	pgpMessage, _ := encHandle.Encrypt(data)
-			// 	armored, _ := pgpMessage.ArmorBytes()
-			// 	data = armored
-			// }
-
 			_, err = w.Write(data)
 			return err
 		}))
@@ -182,16 +172,6 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 			if err != nil {
 				return err
 			}
-
-			// PGP/MIME encryption
-			// if rcp.PGPEnabled && rcp.PGPKey != "" && !rcp.PGPInline {
-			// 	pgp := crypto.PGP()
-			// 	publicKey, _ := crypto.NewKeyFromArmored(rcp.PGPKey)
-			// 	encHandle, _ := pgp.Encryption().Recipient(publicKey).New()
-			// 	pgpMessage, _ := encHandle.Encrypt(data)
-			// 	armored, _ := pgpMessage.ArmorBytes()
-			// 	data = armored
-			// }
 
 			_, err = w.Write(data)
 			return err

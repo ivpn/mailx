@@ -201,12 +201,14 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 	// PGP/MIME encryption
 	if rcp.PGPEnabled && rcp.PGPKey != "" && !rcp.PGPInline {
 		var buf bytes.Buffer
-		m.WriteTo(&buf)
+		_, err = m.WriteTo(&buf)
+		if err != nil {
+			return err
+		}
 
 		pgp := crypto.PGP()
 		publicKey, _ := crypto.NewKeyFromArmored(rcp.PGPKey)
 		encHandle, _ := pgp.Encryption().Recipient(publicKey).New()
-
 		pgpMessage, _ := encHandle.Encrypt(buf.Bytes())
 		armored, _ := pgpMessage.ArmorBytes()
 

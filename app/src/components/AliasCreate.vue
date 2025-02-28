@@ -227,7 +227,7 @@ const postAlias = async () => {
 }
 
 const close = () => {
-    setAliasFormat()
+    resetAlias()
     error.value = ''
     const modal = document.querySelector('#modal-create-alias' + props.catchAll) as any
     overlay.close(modal)
@@ -255,14 +255,23 @@ const validate = () => {
     return !errorCatchAllSuffix.value
 }
 
-const setAliasFormat = () => {
-    alias.value.format = props.settings.alias_format || 'words'
+const resetAlias = () => {
+    alias.value = {
+        description: '',
+        enabled: true,
+        format: props.settings.alias_format || 'words',
+        from_name: '',
+        recipients: '',
+        domain: envDomains[0],
+        catch_all: props.catchAll ? 'true' : 'false',
+        catch_all_suffix: ''
+    }
 }
 
 onMounted(() => {
     overlay.autoInit()
     select.autoInit()
     addEvents()
-    setAliasFormat()
+    resetAlias()
 })
 </script>

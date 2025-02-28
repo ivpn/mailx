@@ -72,7 +72,7 @@
                 <AliasSend :alias="alias" />
                 <AliasEdit :alias="alias" :recipients="recipients" :key="rowKey" />
                 <button
-                    @click="deleteAlias"
+                    @click.stop="deleteAlias"
                     class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600 font-medium text-sm py-2 focus:outline-none focus:shadow-outline"
                     type="submit">
                     Delete
@@ -105,6 +105,9 @@ const updateAlias = async () => {
 }
 
 const deleteAlias = () => {
+    const errMessage = props.catchAll ? 'WARNING: You will not be able to create the same catch-all alias in the next 90 days. Are you sure you want to delete alias? ' : 'Are you sure you want to delete alias?'
+    if (!confirm(errMessage)) return
+
     events.emit('alias.delete', { id: alias.value.id, catchAll: props.catchAll })
 }
 

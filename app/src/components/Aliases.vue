@@ -272,9 +272,6 @@ const getSettings = async () => {
 }
 
 const deleteAlias = async (payload: any) => {
-    const errMessage = payload.catchAll ? 'WARNING: You will not be able to create the same catch-all alias in the next 90 days. Are you sure you want to delete alias? ' : 'Are you sure you want to delete alias?'
-
-    if (!confirm(errMessage)) return
     try {
         await aliasApi.delete(payload.id)
         error.value = ''

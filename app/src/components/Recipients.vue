@@ -96,7 +96,6 @@ const getList = async () => {
 }
 
 const deleteRecipient = async (id: string) => {
-    if (!confirm('Are you sure you want to delete recipient? Note that aliases with this recipient will be disabled.')) return
     try {
         await recipientApi.delete(id)
         error.value = ''

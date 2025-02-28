@@ -44,7 +44,7 @@
                 <RecipientVerify v-if="!recipient.is_active" :recipient="recipient" />
                 <RecipientEdit :recipient="recipient" />
                 <button
-                    @click="deleteRecipient"
+                    @click.stop="deleteRecipient"
                     class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
                     type="button">
                     Delete
@@ -68,6 +68,8 @@ const recipient = ref(props.recipient)
 const copyText = ref('Click to copy')
 
 const deleteRecipient = () => {
+    if (!confirm('Are you sure you want to delete recipient? Note that aliases with this recipient will be disabled.')) return
+    
     events.emit('recipient.delete', { id: recipient.value.id })
 }
 

@@ -36,8 +36,8 @@
                                 Email Address
                             </label>
                             <input v-model="emailAuthn"
-                                v-bind:class="{ 'border-gray-500': !emailAuthnError, 'border-red-600 dark:border-red-600': emailAuthnError }"
-                                class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 dark:bg-neutral-800 dark:border-neutral-500 dark:text-gray-400"
+                                v-bind:class="{ 'default': !emailAuthnError, 'error': emailAuthnError }"
+                                class="input"
                                 id="email_authn" type="email" autocomplete="email_authn">
                             <p v-if="emailAuthnError" class="text-red-600 text-sm">Required</p>
                         </div>

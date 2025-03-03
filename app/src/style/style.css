@@ -2,6 +2,7 @@
 @import "components/cta.css";
 @import "components/form.css";
 @import "components/tabs.css";
+@import "components/text.css";
 
 @tailwind base;
 @tailwind components;

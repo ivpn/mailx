@@ -90,7 +90,7 @@
                 </div>
             </div>
             <p v-if="isDashboard" class="text-sm text-gray-500 dark:text-gray-300 my-4">
-                <router-link to="/aliases" class="text-bluish-500 hover:text-bluish-600 font-medium text-sm py-2"
+                <router-link to="/aliases" class="cta-plain"
                     type="submit">All Aliases</router-link>
             </p>
             <p v-if="error" class="text-red-600 text-sm mb-4">Error: {{ error }}</p>

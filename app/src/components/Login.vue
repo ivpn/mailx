@@ -3,7 +3,7 @@
         <h1 class="text-3xl text-gray-800 dark:text-gray-100 font-semibold my-8">MailX</h1>
         <h2 class="text-2xl text-gray-800 dark:text-gray-100 mb-8">
             Email forwarding service operated by
-            <a class="text-bluish-500 hover:text-bluish-600" href="https://www.ivpn.net/">IVPN</a>
+            <a class="link" href="https://www.ivpn.net/">IVPN</a>
         </h2>
         <h2 class="text-xl text-gray-500 dark:text-gray-400 mb-8">Log In</h2>
         <form class="w-full max-w-sm bg-white dark:bg-neutral-800 px-8 pt-6 pb-8 mb-4" @submit.prevent="">
@@ -104,7 +104,7 @@
             </div>
         </form>
         <p class="text-gray-500 dark:text-gray-400 my-3">
-            <router-link class="text-bluish-500 hover:text-bluish-600" to="/reset/password/initiate">Forgot Your Password?</router-link>
+            <router-link class="link" to="/reset/password/initiate">Forgot Your Password?</router-link>
         </p>
         <Footer />
     </div>

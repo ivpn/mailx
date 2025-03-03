@@ -52,7 +52,7 @@
             </div>
         </div>
         <p v-if="isDashboard" class="text-sm text-gray-500 my-4">
-            <router-link to="/recipients" class="text-bluish-500 hover:text-bluish-600 font-medium text-sm py-2">All Recipients</router-link>
+            <router-link to="/recipients" class="cta-plain">All Recipients</router-link>
         </p>
         <p v-if="error" class="text-red-600 text-sm mb-4">Error: {{ error }}</p>
     </div>

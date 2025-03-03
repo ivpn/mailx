@@ -1,0 +1,5 @@
+@layer components {
+    .link {
+        @apply text-bluish-500 hover:text-bluish-600;
+    }
+}

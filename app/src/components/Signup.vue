@@ -11,13 +11,13 @@
             <div v-if="passkeySupported" class="border-b border-gray-200 dark:border-neutral-600">
                 <nav class="flex gap-x-1" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
                     <button type="button"
-                        class="hs-tab-active:font-semibold hs-tab-active:border-bluish-500 hs-tab-active:text-bluish-500 pt-2 pb-4 px-1 text-center basis-0 grow inline-flex justify-center items-center gap-x-2 border-b-2 border-transparent whitespace-nowrap text-gray-500 hover:text-bluish-500 focus:outline-none focus:text-bluish-500 disabled:opacity-50 disabled:pointer-events-none dark:text-neutral-400 dark:hover:text-bluish-500 active"
+                        class="tab active"
                         id="tabs-with-underline-item-1" aria-selected="true" data-hs-tab="#tabs-with-underline-1"
                         aria-controls="tabs-with-underline-1" role="tab">
                         Passkey
                     </button>
                     <button type="button"
-                        class="hs-tab-active:font-semibold hs-tab-active:border-bluish-500 hs-tab-active:text-bluish-500 pt-2 pb-4 px-1 text-center basis-0 grow inline-flex justify-center items-center gap-x-2 border-b-2 border-transparent whitespace-nowrap text-gray-500 hover:text-bluish-500 focus:outline-none focus:text-bluish-500 disabled:opacity-50 disabled:pointer-events-none dark:text-neutral-400 dark:hover:text-bluish-500"
+                        class="tab"
                         id="tabs-with-underline-item-2" aria-selected="false" data-hs-tab="#tabs-with-underline-2"
                         aria-controls="tabs-with-underline-2" role="tab">
                         Email & Password

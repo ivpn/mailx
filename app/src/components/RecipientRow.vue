@@ -23,13 +23,30 @@
                 <span v-if="!recipient.is_active" class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-gray-100 text-gray-500 dark:bg-gray-500 dark:text-gray-100">Unverified</span>
             </p>
         </td>
+        <td class="px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800">
+            <RecipientAddPGPKey v-if="!recipient.pgp_key" :recipient="recipient" />
+            <div v-if="recipient.pgp_key">
+                <input v-bind:disabled="!recipient.pgp_key" type="checkbox"
+                    v-bind:checked="recipient.pgp_enabled" @change="updateRecipient"
+                    class="form-checkbox relative w-11 h-6 p-px bg-gray-100 dark:bg-neutral-600 border-transparent text-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:ring-white dark:focus:ring-neutral-800 disabled:opacity-50 disabled:pointer-events-none checked:bg-none checked:text-bluish-500 checked:border-bluish-500 focus:ring-offset-transparent
+
+                    before:inline-block before:size-5 before:bg-white dark:before:bg-neutral-400 checked:before:bg-bluish-200 before:translate-x-0 checked:before:translate-x-full before:rounded-full before:shadow before:transform before:transition before:ease-in-out before:duration-200 mr-5">
+                <button
+                    @click="deletePgpKey"
+                    class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
+                    type="button">
+                    Delete Key
+                </button>
+            </div>
+        </td>
         <td class="pl-5 py-4 whitespace-nowrap text-end text-sm">
             <div class="flex gap-5 justify-end">
                 <RecipientVerify v-if="!recipient.is_active" :recipient="recipient" />
+                <RecipientEdit :recipient="recipient" />
                 <button
-                    @click="deleteRecipient"
+                    @click.stop="deleteRecipient"
                     class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
-                    type="submit">
+                    type="button">
                     Delete
                 </button>
             </div>
@@ -41,6 +58,9 @@
 import { ref, onMounted } from 'vue'
 import tooltip from '@preline/tooltip'
 import RecipientVerify from './RecipientVerify.vue'
+import RecipientEdit from './RecipientEdit.vue'
+import RecipientAddPGPKey from './RecipientAddPGPKey.vue'
+import { recipientApi } from '../api/recipient.ts'
 import events from '../events.ts'
 
 const props = defineProps(['recipient'])
@@ -48,7 +68,39 @@ const recipient = ref(props.recipient)
 const copyText = ref('Click to copy')
 
 const deleteRecipient = () => {
+    if (!confirm('Are you sure you want to delete recipient? Note that aliases with this recipient will be disabled.')) return
+    
     events.emit('recipient.delete', { id: recipient.value.id })
+}
+
+const updateRecipient = async () => {
+    // Toggle pgp_enabled option
+    recipient.value.pgp_enabled = !recipient.value.pgp_enabled
+
+    const payload = {
+        id: recipient.value.id,
+        pgp_key: recipient.value.pgp_key,
+        pgp_enabled: recipient.value.pgp_enabled
+    }
+
+    try {
+        await recipientApi.update(payload)
+    } catch {}
+}
+
+const deletePgpKey = async () => {
+    if (!confirm('Are you sure you want to delete PGP public key?')) return
+
+    const payload = {
+        id: recipient.value.id,
+        pgp_key: '',
+        pgp_enabled: false,
+    }
+
+    try {
+        await recipientApi.update(payload)
+        events.emit('recipient.update', {})
+    } catch {}
 }
 
 const copyAlias = (alias: string) => {

@@ -93,7 +93,7 @@ func (r *Redis) Close() error {
 	return r.Client.Close()
 }
 
-func (r *Redis) Set(ctx context.Context, key string, value interface{}, expiration time.Duration) error {
+func (r *Redis) Set(ctx context.Context, key string, value any, expiration time.Duration) error {
 	return r.Client.Set(ctx, key, value, expiration).Err()
 }
 

@@ -19,7 +19,7 @@ type Store interface {
 }
 
 type Cache interface {
-	Set(context.Context, string, interface{}, time.Duration) error
+	Set(context.Context, string, any, time.Duration) error
 	Get(context.Context, string) (string, error)
 	Del(context.Context, string) error
 }

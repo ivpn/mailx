@@ -34,6 +34,9 @@
                                         <th scope="col"
                                             class="px-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
                                             VERIFIED</th>
+                                            <th scope="col"
+                                            class="px-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
+                                            ENCRYPTION</th>
                                         <th scope="col"
                                             class="pl-5 py-3 text-end text-xs font-medium text-gray-500 dark:text-gray-400">
                                             ACTIONS</th>
@@ -93,7 +96,6 @@ const getList = async () => {
 }
 
 const deleteRecipient = async (id: string) => {
-    if (!confirm('Are you sure you want to delete recipient? Note that aliases with this recipient will be disabled.')) return
     try {
         await recipientApi.delete(id)
         error.value = ''
@@ -121,6 +123,7 @@ const renderRow = () => {
 onMounted(() => {
     getList()
     events.on('recipient.create', getList)
+    events.on('recipient.update', reload)
     events.on('recipient.verify', reload)
     events.on('recipient.delete', onDeleteRecipient)
 })

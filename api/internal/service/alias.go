@@ -114,7 +114,7 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 	}
 
 	// Standard alias
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		alias.Name = model.GenerateAlias(format, "") + "@" + domain
 		err := s.Store.PostAlias(ctx, alias)
 		if err != nil {

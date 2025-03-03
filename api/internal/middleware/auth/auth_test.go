@@ -59,7 +59,7 @@ func TestGetToken(t *testing.T) {
 func TestGetUserID(t *testing.T) {
 	tests := []struct {
 		name           string
-		userID         interface{}
+		userID         any
 		expectedResult string
 		expectError    bool
 	}{

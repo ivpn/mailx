@@ -1,6 +1,9 @@
 package utils
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
+
 	"github.com/alexedwards/argon2id"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -12,6 +15,11 @@ func Hash(secret string) (string, error) {
 	}
 
 	return string(hash), nil
+}
+
+func HashPGPKey(key string) string {
+	hash := sha256.Sum256([]byte(key))
+	return hex.EncodeToString(hash[:])
 }
 
 func HashMatches(secret string, hash string) bool {

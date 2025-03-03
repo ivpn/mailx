@@ -52,6 +52,19 @@ definitions:
       error:
         type: string
     type: object
+  api.RecipientReq:
+    properties:
+      id:
+        type: string
+      pgp_enabled:
+        type: boolean
+      pgp_inline:
+        type: boolean
+      pgp_key:
+        type: string
+    required:
+    - id
+    type: object
   api.ResetPasswordReq:
     properties:
       otp:
@@ -63,6 +76,8 @@ definitions:
     type: object
   api.SettingsReq:
     properties:
+      alias_format:
+        type: string
       domain:
         type: string
       from_name:
@@ -195,9 +210,17 @@ definitions:
         type: string
       is_active:
         type: boolean
+      pgp_enabled:
+        type: boolean
+      pgp_inline:
+        type: boolean
+      pgp_key:
+        type: string
     type: object
   model.Settings:
     properties:
+      alias_format:
+        type: string
       created_at:
         type: string
       domain:
@@ -555,6 +578,33 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Create recipient
+      tags:
+      - recipient
+    put:
+      consumes:
+      - application/json
+      description: Update recipient
+      parameters:
+      - description: Recipient request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.RecipientReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update recipient
       tags:
       - recipient
   /recipient/{id}:

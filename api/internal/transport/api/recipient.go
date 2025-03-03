@@ -2,10 +2,12 @@ package api
 
 import (
 	"context"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"ivpn.net/email/api/internal/middleware/auth"
 	"ivpn.net/email/api/internal/model"
+	"ivpn.net/email/api/internal/utils"
 )
 
 var (
@@ -60,14 +62,20 @@ func (h *Handler) GetRecipient(c *fiber.Ctx) error {
 // @Router /recipients [get]
 func (h *Handler) GetRecipients(c *fiber.Ctx) error {
 	userID := auth.GetUserID(c)
-	recipients, err := h.Service.GetRecipients(c.Context(), userID)
+	rcps, err := h.Service.GetRecipients(c.Context(), userID)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
 
-	return c.JSON(recipients)
+	for i, rcp := range rcps {
+		if rcp.PGPKey != "" {
+			rcps[i].PGPKey = utils.HashPGPKey(rcp.PGPKey)
+		}
+	}
+
+	return c.JSON(rcps)
 }
 
 // @Summary Create recipient
@@ -111,6 +119,60 @@ func (h *Handler) PostRecipient(c *fiber.Ctx) error {
 
 	return c.Status(201).JSON(fiber.Map{
 		"message": PostRecipientSuccess,
+	})
+}
+
+// @Summary Update recipient
+// @Description Update recipient
+// @Tags recipient
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param body body RecipientReq true "Recipient request"
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /recipient [put]
+func (h *Handler) UpdateRecipient(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
+
+	req := RecipientReq{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	rcp, err := h.Service.GetRecipient(c.Context(), req.ID, userID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	if req.PGPKey == "" || strings.HasPrefix(req.PGPKey, "-----BEGIN PGP PUBLIC KEY BLOCK-----") {
+		rcp.PGPKey = req.PGPKey
+	}
+
+	rcp.PGPEnabled = req.PGPEnabled
+	rcp.PGPInline = req.PGPInline
+
+	err = h.Service.UpdateRecipient(c.Context(), rcp)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": UpdateRecipientSuccess,
 	})
 }
 

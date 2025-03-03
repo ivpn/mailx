@@ -9,6 +9,7 @@ type Events = {
     'totp.enable': {}
     'totp.disable': {}
     'recipient.create': {}
+    'recipient.update': {}
     'recipient.verify': {}
     'recipient.delete': { id: string }
 }

@@ -11,6 +11,7 @@ import (
 	"ivpn.net/email/api/internal/client/mailer"
 	"ivpn.net/email/api/internal/model"
 	"ivpn.net/email/api/internal/utils"
+	"slices"
 )
 
 var (
@@ -165,7 +166,7 @@ func (s *Service) PostUser(ctx context.Context, user model.User, subID string) e
 	}
 
 	utils.Background(func() {
-		data := map[string]interface{}{
+		data := map[string]any{
 			"otp":  otp.Secret,
 			"from": s.Cfg.SMTPClient.SenderName,
 		}
@@ -201,7 +202,7 @@ func (s *Service) SendUserOTP(ctx context.Context, userID string) error {
 	}
 
 	utils.Background(func() {
-		data := map[string]interface{}{
+		data := map[string]any{
 			"otp":  otp.Secret,
 			"from": s.Cfg.SMTPClient.SenderName,
 		}
@@ -419,7 +420,7 @@ func (s *Service) InitiatePasswordReset(ctx context.Context, email string) error
 	}
 
 	utils.Background(func() {
-		data := map[string]interface{}{
+		data := map[string]any{
 			"otp":        otp.Secret,
 			"from":       s.Cfg.SMTPClient.SenderName,
 			"origin":     s.Cfg.API.ApiAllowOrigin,
@@ -515,7 +516,7 @@ func (s *Service) TotpEnableConfirm(ctx context.Context, userID string, otp stri
 	}
 
 	backupCodes := []string{}
-	for i := 0; i < 8; i++ {
+	for range 8 {
 		backupCodes = append(backupCodes, utils.RandomString(8, utils.AlphaNumericUserFriendly))
 	}
 	totpBackup := strings.Join(backupCodes, " ")
@@ -580,20 +581,11 @@ func (s *Service) TotpUseBackup(ctx context.Context, userID string, backup strin
 
 	usedSlice := strings.Fields(used)
 
-	for _, code := range usedSlice {
-		if backup == code {
-			return false, ErrTotpBackupUsed
-		}
+	if slices.Contains(usedSlice, backup) {
+		return false, ErrTotpBackupUsed
 	}
 
-	found := false
-
-	for _, code := range strings.Fields(backups) {
-		if backup == code {
-			found = true
-			break
-		}
-	}
+	found := slices.Contains(strings.Fields(backups), backup)
 
 	if !found {
 		return false, nil

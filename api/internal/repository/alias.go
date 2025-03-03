@@ -131,7 +131,7 @@ func (d *Database) PostAlias(ctx context.Context, alias model.Alias) error {
 }
 
 func (d *Database) UpdateAlias(ctx context.Context, alias model.Alias) error {
-	return d.Client.Model(&alias).Where("user_id = ?", alias.UserID).Updates(map[string]interface{}{
+	return d.Client.Model(&alias).Where("user_id = ?", alias.UserID).Updates(map[string]any{
 		"description": alias.Description,
 		"enabled":     alias.Enabled,
 		"recipients":  alias.Recipients,

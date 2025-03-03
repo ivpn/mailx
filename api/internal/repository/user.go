@@ -110,7 +110,7 @@ func (d *Database) GetUserStats(ctx context.Context, ID string) (model.UserStats
 	if err != nil {
 		return model.UserStats{}, err
 	}
-	userStats.Messages = make([]interface{}, len(messages))
+	userStats.Messages = make([]any, len(messages))
 	for i, msg := range messages {
 		userStats.Messages[i] = msg
 	}
@@ -119,14 +119,14 @@ func (d *Database) GetUserStats(ctx context.Context, ID string) (model.UserStats
 }
 
 func (d *Database) TotpEnable(ctx context.Context, ID string, secret string, backupCodes string) error {
-	return d.Client.Model(&model.User{}).Where("id = ?", ID).Updates(map[string]interface{}{
+	return d.Client.Model(&model.User{}).Where("id = ?", ID).Updates(map[string]any{
 		"totp_secret": secret,
 		"totp_backup": backupCodes,
 	}).Error
 }
 
 func (d *Database) TotpDisable(ctx context.Context, ID string) error {
-	return d.Client.Model(&model.User{}).Where("id = ?", ID).Updates(map[string]interface{}{
+	return d.Client.Model(&model.User{}).Where("id = ?", ID).Updates(map[string]any{
 		"totp_secret":      nil,
 		"totp_backup":      nil,
 		"totp_backup_used": nil,

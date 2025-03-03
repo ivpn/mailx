@@ -112,7 +112,7 @@ func (s *Service) PostRecipient(ctx context.Context, recipient model.Recipient) 
 	}
 
 	utils.Background(func() {
-		data := map[string]interface{}{
+		data := map[string]any{
 			"otp":  otp.Secret,
 			"from": s.Cfg.SMTPClient.SenderName,
 		}
@@ -148,7 +148,7 @@ func (s *Service) SendRecipientOTP(ctx context.Context, ID string, userID string
 	}
 
 	utils.Background(func() {
-		data := map[string]interface{}{
+		data := map[string]any{
 			"otp":  otp.Secret,
 			"from": s.Cfg.SMTPClient.SenderName,
 		}

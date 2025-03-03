@@ -17,6 +17,12 @@ tasks:
   run:
     cmds:
       - docker compose up -d
+  modernize:
+    cmds:
+      - go run golang.org/x/tools/gopls/internal/analysis/modernize/cmd/modernize@latest -test ./...
+  modernize_fix:
+    cmds:
+      - go run golang.org/x/tools/gopls/internal/analysis/modernize/cmd/modernize@latest -fix -test ./...
   test:
     cmds:
       - go test ./... -v

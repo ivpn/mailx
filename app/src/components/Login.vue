@@ -43,7 +43,7 @@
                         </div>
                         <div class="flex items-center w-full">
                             <button :disabled="isLoading"
-                                class="w-full bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 focus:outline-none focus:shadow-outline"
+                                class="cta-blue"
                                 type="button" @click="loginWithPasskey">
                                 Log In with Passkey
                             </button>
@@ -86,7 +86,7 @@
                         </div>
                         <div class="flex items-center w-full">
                             <button :disabled="isLoading"
-                                class="w-full bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 focus:outline-none focus:shadow-outline"
+                                class="cta-blue"
                                 type="button" @click="login">
                                 Log In
                             </button>

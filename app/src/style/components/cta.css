@@ -1,0 +1,5 @@
+@layer components {
+    .cta-blue {
+        @apply w-full bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 focus:outline-none focus:ring-2 focus:ring-bluish-500 focus:ring-opacity-50;
+    }
+}

@@ -59,8 +59,8 @@
                                 Email Address
                             </label>
                             <input v-model="email"
-                                v-bind:class="{ 'border-gray-500': !emailError, 'border-red-600 dark:border-red-600': emailError }"
-                                class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 dark:bg-neutral-800 dark:border-neutral-500 dark:text-gray-400"
+                                v-bind:class="{ 'default': !emailError, 'error': emailError }"
+                                class="input"
                                 id="email" type="email" autocomplete="email">
                             <p v-if="emailError" class="text-red-600 text-sm">Required</p>
                         </div>
@@ -69,8 +69,8 @@
                                 Password
                             </label>
                             <input v-model="password"
-                                v-bind:class="{ 'border-gray-500': !passwordError, 'border-red-600 dark:border-red-600': passwordError }"
-                                class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 dark:bg-neutral-800 dark:border-neutral-500 dark:text-gray-400"
+                                v-bind:class="{ 'default': !passwordError, 'error': passwordError }"
+                                class="input"
                                 id="password" type="password" autocomplete="current-password">
                             <p v-if="passwordError" class="text-red-600 text-sm mb-2">Required</p>
                         </div>
@@ -79,8 +79,8 @@
                                 Two-factor authentication token:
                             </label>
                             <input v-model="otp"
-                                v-bind:class="{ 'border-gray-500': !otpError, 'border-red-600 dark:border-red-600': otpError }"
-                                class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 dark:bg-neutral-800 dark:border-neutral-500 dark:text-gray-400"
+                                v-bind:class="{ 'default': !otpError, 'error': otpError }"
+                                class="input"
                                 id="otp" type="text">
                             <p v-if="otpError" class="text-red-600 text-sm mb-2">Required</p>
                         </div>

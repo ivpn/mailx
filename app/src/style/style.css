@@ -1,6 +1,7 @@
 
 @import "fonts/fonts.css";
 @import "components/cta.css";
+@import "components/form.css";
 
 @tailwind base;
 @tailwind components;

@@ -1,16 +1,11 @@
 <template>
     <nav>
         <div class="flex flex-row items-center gap-8">
-            <router-link v-bind:class="{ 'text-gray-800 dark:text-gray-100 border-bluish-500 border-b-2': route == '/', 'text-gray-500 dark:text-gray-400 border-b-2 border-white dark:border-neutral-800': route != '/' }"
-                class="py-6 font-medium hover:text-gray-800 dark:hover:text-gray-100" to="/">Dashboard</router-link>
-            <router-link v-bind:class="{ 'text-gray-800 dark:text-gray-100 border-bluish-500 border-b-2': route == '/aliases', 'text-gray-500 dark:text-gray-400 border-b-2 border-white dark:border-neutral-800': route != '/aliases' }"
-                class="py-6 font-medium hover:text-gray-800 dark:hover:text-gray-100" to="/aliases">Aliases</router-link>
-            <router-link v-bind:class="{ 'text-gray-800 dark:text-gray-100 border-bluish-500 border-b-2': route == '/recipients', 'text-gray-500 dark:text-gray-400 border-b-2 border-white dark:border-neutral-800': route != '/recipients' }"
-                class="py-6 font-medium hover:text-gray-800 dark:hover:text-gray-100" to="/recipients">Recipients</router-link>
-            <router-link v-bind:class="{ 'text-gray-800 dark:text-gray-100 border-bluish-500 border-b-2': route == '/stats', 'text-gray-500 dark:text-gray-400 border-b-2 border-white dark:border-neutral-800': route != '/stats' }"
-                class="py-6 font-medium hover:text-gray-800 dark:hover:text-gray-100" to="/stats">Stats</router-link>
-            <router-link v-bind:class="{ 'text-gray-800 dark:text-gray-100 border-bluish-500 border-b-2': route == '/settings', 'text-gray-500 dark:text-gray-400 border-b-2 border-white dark:border-neutral-800': route != '/settings' }"
-                class="py-6 font-medium hover:text-gray-800 dark:hover:text-gray-100" to="/settings">Settings</router-link>
+            <router-link v-bind:class="{ 'active': route == '/' }" to="/">Dashboard</router-link>
+            <router-link v-bind:class="{ 'active': route == '/aliases' }" to="/aliases">Aliases</router-link>
+            <router-link v-bind:class="{ 'active': route == '/recipients' }" to="/recipients">Recipients</router-link>
+            <router-link v-bind:class="{ 'active': route == '/stats' }" to="/stats">Stats</router-link>
+            <router-link v-bind:class="{ 'active': route == '/settings' }" to="/settings">Settings</router-link>
         </div>
     </nav>
 </template>

@@ -26,11 +26,13 @@
         <td class="px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800">
             <RecipientAddPGPKey v-if="!recipient.pgp_key" :recipient="recipient" />
             <div v-if="recipient.pgp_key">
-                <input v-bind:disabled="!recipient.pgp_key" type="checkbox"
-                    v-bind:checked="recipient.pgp_enabled" @change="updateRecipient"
-                    class="form-checkbox relative w-11 h-6 p-px bg-gray-100 dark:bg-neutral-600 border-transparent text-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:ring-white dark:focus:ring-neutral-800 disabled:opacity-50 disabled:pointer-events-none checked:bg-none checked:text-bluish-500 checked:border-bluish-500 focus:ring-offset-transparent
-
-                    before:inline-block before:size-5 before:bg-white dark:before:bg-neutral-400 checked:before:bg-bluish-200 before:translate-x-0 checked:before:translate-x-full before:rounded-full before:shadow before:transform before:transition before:ease-in-out before:duration-200 mr-5">
+                <input
+                    @change="updateRecipient"
+                    v-bind:checked="recipient.pgp_enabled"
+                    v-bind:disabled="!recipient.pgp_key"
+                    type="checkbox"
+                    class="mr-5"
+                >
                 <button
                     @click="deletePgpKey"
                     class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"

@@ -9,7 +9,8 @@
                 v-model="password"
                 v-bind:class="{ 'error': passwordError }"
                 id="new-password"
-                type="password">
+                type="password"
+            >
         </div>
         <div class="mb-4 max-w-xs">
             <label for="new-password-confirm">
@@ -19,7 +20,8 @@
                 v-model="passwordConfirm"
                 v-bind:class="{ 'error': passwordError }"
                 id="new-password-confirm"
-                type="password">
+                type="password"
+            >
         </div>
         <p class="text-sm">
             Must be 12+ characters and contain uppercase, lowercase, number, and special character (e.g. !@#$%^&*(),;.?":{}|<>)

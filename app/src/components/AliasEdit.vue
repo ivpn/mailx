@@ -69,7 +69,7 @@
                                     {{ recipient }}
                                 </option>
                             </select>
-                            <p v-if="errorRecipients" class="pt-3 text-red-600 text-sm">{{ errorRecipients }}</p>
+                            <p v-if="errorRecipients" class="error pt-3">{{ errorRecipients }}</p>
                         </div>
                     </div>
                     <div class="flex justify-start items-center gap-x-3 py-4 px-4 border-t dark:border-neutral-600">
@@ -87,7 +87,7 @@
                         </button>
                     </div>
                     <div class="flex items-start">
-                        <p v-if="error" class="px-5 text-red-600 text-sm mb-3">Error: {{ error }}</p>
+                        <p v-if="error" class="error px-5">Error: {{ error }}</p>
                     </div>
                 </div>
             </div>

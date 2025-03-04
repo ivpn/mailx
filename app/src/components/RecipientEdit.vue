@@ -28,10 +28,10 @@
                         <h3>{{ recipient.email }}</h3>
                         <div class="mb-5">
                             <h4>PGP/Inline Encryption</h4>
-                            <p v-if="!recipient.pgp_key" class="text-gray-800 dark:text-gray-100 mb-3">
+                            <p v-if="!recipient.pgp_key">
                                 To use this option, please add a PGP key first.
                             </p>
-                            <p class="text-gray-500 dark:text-gray-400 mb-3">
+                            <p>
                                 Enable this option to use PGP/Inline instead of the default PGP/MIME encryption for
                                 forwarded emails.
                             </p>
@@ -45,8 +45,8 @@
                         </div>
                     </div>
                     <div class="flex items-start">
-                        <p v-if="error" class="px-5 text-red-600 text-sm mb-5">Error: {{ error }}</p>
-                        <p v-if="success" class="px-5 text-emerald-600 dark:text-emerald-500 text-sm mb-5">{{ success }}
+                        <p v-if="error" class="error px-5">Error: {{ error }}</p>
+                        <p v-if="success" class="success px-5">{{ success }}
                         </p>
                     </div>
                 </div>

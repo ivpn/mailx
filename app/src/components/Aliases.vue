@@ -5,10 +5,10 @@
         <div v-if="!list.length && loaded" class="flex flex-col my-14">
             <div class="flex flex-col items-center text-center">
                 <h3>Create Aliases</h3>
-                <p v-if="recipients.length && settings.id" class="my-2 text-gray-500 dark:text-gray-400">
+                <p v-if="recipients.length && settings.id" class="my-2">
                     To get started, create an alias.
                 </p>
-                <p v-if="!recipients.length && loaded" class="my-2 text-gray-500 dark:text-gray-400">
+                <p v-if="!recipients.length && loaded" class="my-2">
                     To get started, first add a recipient.
                 </p>
                 <div class="flex gap-4">
@@ -87,11 +87,11 @@
                     </div>
                 </div>
             </div>
-            <p v-if="isDashboard" class="text-sm text-gray-500 dark:text-gray-300 my-4">
+            <p v-if="isDashboard" class="text-sm my-4">
                 <router-link to="/aliases" class="cta-plain"
                     type="submit">All Aliases</router-link>
             </p>
-            <p v-if="error" class="text-red-600 text-sm mb-4">Error: {{ error }}</p>
+            <p v-if="error" class="error">Error: {{ error }}</p>
             <Pagination v-if="list.length && !isDashboard" :list.sync="list" :limit="limit" :page="page" :total="total" :key="rowKey" @onUpdatePage="onUpdatePage" />
         </div>
     </div>
@@ -101,7 +101,7 @@
         <div v-if="!listCatchAll.length && loadedCatchAll" class="flex flex-col my-14">
             <div class="flex flex-col items-center text-center">
                 <h3>Create Catch-all Aliases</h3>
-                <p v-if="!recipients.length && loadedCatchAll" class="my-2 text-gray-500 dark:text-gray-400">
+                <p v-if="!recipients.length && loadedCatchAll" class="my-2">
                     To get started, first add a recipient.
                 </p>
                 <div class="flex gap-4">

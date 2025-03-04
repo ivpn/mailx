@@ -19,7 +19,7 @@
                 class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 leading-tight focus:border-bluish-500 mb-2"
                 id="new-password-confirm" type="password">
         </div>
-        <p class="text-gray-500 dark:text-gray-400 mb-5 text-sm">
+        <p class="text-sm">
             Must be 12+ characters and contain uppercase, lowercase, number, and special character (e.g. !@#$%^&*(),;.?":{}|<>)
         </p>
         <div class="mb-3 max-w-xs">
@@ -29,9 +29,9 @@
                 Change Password
             </button>
         </div>
-        <p v-if="passwordError" class="text-red-600 text-sm mb-3">Error: {{ passwordError }}</p>
-        <p v-if="error" class="text-red-600 text-sm mb-3">Error: {{ error }}</p>
-        <p v-if="success" class="text-emerald-600 dark:text-emerald-500 text-sm mb-3">{{ success }}</p>
+        <p v-if="passwordError" class="error">Error: {{ passwordError }}</p>
+        <p v-if="error" class="error">Error: {{ error }}</p>
+        <p v-if="success" class="success">{{ success }}</p>
     </div>
 </template>
 

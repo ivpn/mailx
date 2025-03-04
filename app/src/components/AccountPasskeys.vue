@@ -2,7 +2,7 @@
     <div class="mb-5">
         <h2>Passkeys</h2>
         <div v-if="passkeySupported">
-            <p class="text-gray-500 dark:text-gray-400 mb-5">
+            <p>
                 Add or remove Passkeys.<br>
             </p>
             <div class="flex justify-start items-center gap-x-3 mb-3">
@@ -17,10 +17,10 @@
                     Add Passkey
                 </button>
             </div>
-            <p v-if="error" class="text-red-600 text-sm mt-6 mb-4">Error: {{ error }}</p>
+            <p v-if="error" class="error mt-6 mb-4">Error: {{ error }}</p>
         </div>
         <div v-if="!passkeySupported">
-            <p class="text-gray-500 dark:text-gray-400 mb-5">
+            <p>
                 Your browser/device does not support adding Passkeys.<br>
             </p>
         </div>

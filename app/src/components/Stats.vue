@@ -7,26 +7,26 @@
         <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-center mb-8">
             <div class="p-4 border-r border-gray-200 dark:border-gray-600">
                 <h1 class="mb-2">{{ stats.forwards }}</h1>
-                <p class="text-gray-500 dark:text-gray-400">Forwards</p>
+                <p class="m-0">Forwards</p>
             </div>
             <div class="p-4 border-r border-transparent md:border-gray-200 dark:md:border-gray-600">
                 <h1 class="mb-2">{{ stats.blocks }}</h1>
-                <p class="text-gray-500 dark:text-gray-400">Blocks</p>
+                <p class="m-0">Blocks</p>
             </div>
             <div class="p-4 border-r border-gray-200 dark:border-gray-600">
                 <h1 class="mb-2">{{ stats.replies }}</h1>
-                <p class="text-gray-500 dark:text-gray-400">Replies</p>
+                <p class="m-0">Replies</p>
             </div>
             <div class="p-4 border-r border-transparent md:border-gray-200 dark:md:border-gray-600">
                 <h1 class="mb-2">{{ stats.sends }}</h1>
-                <p class="text-gray-500 dark:text-gray-400">Sends</p>
+                <p class="m-0">Sends</p>
             </div>
             <div class="p-4">
                 <h1 class="mb-2">{{ getBandwidth(stats.bandwidth) }}</h1>
-                <p class="text-gray-500 dark:text-gray-400">Bandwidth</p>
+                <p class="m-0">Bandwidth</p>
             </div>
         </div>
-        <p v-if="error" class="text-red-600 text-sm mb-3">Error: {{ error }}</p>
+        <p v-if="error" class="error">Error: {{ error }}</p>
     </div>
 </template>
 

@@ -27,7 +27,7 @@
                     </div>
                     <div class="p-4 whitespace-normal text-left text-base">
                         <div class="mb-5">
-                            <p class="text-gray-500 dark:text-gray-400 mb-3">
+                            <p>
                                 Generate the proper email address to send a message from this alias. Note that to send emails using an alias, you need to do so from a verified recipient.
                             </p>
                         </div>
@@ -51,12 +51,10 @@
                                 v-model="toEmail"
                                 class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 leading-tight focus:border-bluish-500 mb-2"
                                 type="text">
-                            <p v-if="emailError" class="text-red-600 text-sm">Valid email required</p>
+                            <p v-if="emailError" class="error">Valid email required</p>
                         </div>
                         <div v-bind:class="{ 'hidden': generatedEmail == '' }" class="mb-5">
-                            <p class="text-gray-500 dark:text-gray-400 mb-3">
-                                Send message to this email:
-                            </p>
+                            <p>Send message to this email:</p>
                             <div class="hs-tooltip text-gray-800 dark:text-gray-100 mb-3">
                                 <span class="hs-tooltip-toggle">
                                     <button @click="copy(generatedEmail)">

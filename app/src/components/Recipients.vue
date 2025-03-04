@@ -2,9 +2,7 @@
     <div v-if="!list.length && loaded" class="flex flex-col my-14">
         <div class="flex flex-col items-center text-center">
             <h3>Add Recipients</h3>
-            <p class="my-2 text-gray-500 dark:text-gray-400">
-                To get started, add a recipient.
-            </p>
+            <p>To get started, add a recipient.</p>
             <div class="flex gap-4">
                 <RecipientCreate />
             </div>
@@ -49,10 +47,10 @@
                 </div>
             </div>
         </div>
-        <p v-if="isDashboard" class="text-sm text-gray-500 my-4">
+        <p v-if="isDashboard" class="my-4">
             <router-link to="/recipients" class="cta-plain">All Recipients</router-link>
         </p>
-        <p v-if="error" class="text-red-600 text-sm mb-4">Error: {{ error }}</p>
+        <p v-if="error" class="error">Error: {{ error }}</p>
     </div>
 </template>
 

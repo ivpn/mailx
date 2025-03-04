@@ -39,7 +39,7 @@
                                 v-bind:class="{ 'default': !emailAuthnError, 'error': emailAuthnError }"
                                 class="input"
                                 id="email_authn" type="email" autocomplete="email_authn">
-                            <p v-if="emailAuthnError" class="text-red-600 text-sm">Required</p>
+                            <p v-if="emailAuthnError" class="error">Required</p>
                         </div>
                         <div class="flex items-center w-full">
                             <button :disabled="isLoading"
@@ -48,7 +48,7 @@
                                 Log In with Passkey
                             </button>
                         </div>
-                        <p v-if="error" class="text-red-600 text-sm mt-6">Error: {{ error }}</p>
+                        <p v-if="error" class="error mt-6">Error: {{ error }}</p>
                     </div>
                 </div>
                 <div id="tabs-with-underline-2" v-bind:class="{ 'hidden': passkeySupported }" role="tabpanel"
@@ -62,7 +62,7 @@
                                 v-bind:class="{ 'default': !emailError, 'error': emailError }"
                                 class="input"
                                 id="email" type="email" autocomplete="email">
-                            <p v-if="emailError" class="text-red-600 text-sm">Required</p>
+                            <p v-if="emailError" class="error">Required</p>
                         </div>
                         <div class="mb-6">
                             <label class="block text-gray-500 dark:text-gray-400 mb-2" for="password">
@@ -72,7 +72,7 @@
                                 v-bind:class="{ 'default': !passwordError, 'error': passwordError }"
                                 class="input"
                                 id="password" type="password" autocomplete="current-password">
-                            <p v-if="passwordError" class="text-red-600 text-sm mb-2">Required</p>
+                            <p v-if="passwordError" class="error mb-2">Required</p>
                         </div>
                         <div v-if="otpRequired" class="mb-6">
                             <label class="block text-gray-500 dark:text-gray-400 mb-2" for="password">
@@ -82,7 +82,7 @@
                                 v-bind:class="{ 'default': !otpError, 'error': otpError }"
                                 class="input"
                                 id="otp" type="text">
-                            <p v-if="otpError" class="text-red-600 text-sm mb-2">Required</p>
+                            <p v-if="otpError" class="error">Required</p>
                         </div>
                         <div class="flex items-center w-full">
                             <button :disabled="isLoading"
@@ -91,19 +91,19 @@
                                 Log In
                             </button>
                         </div>
-                        <p v-if="error" class="text-red-600 text-sm mt-6">Error: {{ error }}</p>
+                        <p v-if="error" class="error mt-6">Error: {{ error }}</p>
                     </div>
                 </div>
             </div>
             <div v-if="isLoggedIn()" class="pb-2">
-                <p class="text-gray-500 dark:text-gray-400 mb-6">You are logged in</p>
+                <p>You are logged in</p>
                 <router-link to="/"
                     class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 focus:outline-none focus:shadow-outline">
                     Go to Dashboard
                 </router-link>
             </div>
         </form>
-        <p class="text-gray-500 dark:text-gray-400 my-3">
+        <p>
             <router-link to="/reset/password/initiate">Forgot Your Password?</router-link>
         </p>
         <Footer />

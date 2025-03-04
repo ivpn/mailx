@@ -7,7 +7,7 @@
     </div>
     <div v-if="!res.is_active && !isDashboard" class="flex flex-col p-5 pb-4 my-8 bg-white dark:bg-neutral-800">
         <h1>Verify Your Email</h1>
-        <p class="text-gray-500 dark:text-gray-400 mb-3">
+        <p>
             We have sent a 6-digit OTP code to your email address. Please enter the code below to verify your account email. Accounts with unconfirmed email address may be deleted after 7 days.
         </p>
         <div v-if="!confirmSuccess" class="mb-4 max-w-xs">
@@ -22,7 +22,7 @@
                     id="account-otp"
                     type="text"
                     pattern="[0-9]*">
-                <p v-if="otpError" class="text-red-600 text-sm mb-2">Required</p>
+                <p v-if="otpError" class="error">Required</p>
             </div>
             <div class="flex flex-row gap-4">
                 <button
@@ -39,9 +39,9 @@
                 </button>
             </div>
         </div>
-        <p v-if="error" class="text-red-600 text-sm mb-3">Error: {{ error }}</p>
-        <p v-if="resendSuccess && !error && !confirmSuccess" class="text-emerald-600 dark:text-emerald-500 text-sm mb-3">{{ resendSuccess }}</p>
-        <p v-if="confirmSuccess" class="text-gray-500 text-sm my-3">
+        <p v-if="error" class="error">Error: {{ error }}</p>
+        <p v-if="resendSuccess && !error && !confirmSuccess" class="success">{{ resendSuccess }}</p>
+        <p v-if="confirmSuccess" class="text-sm my-3">
             <span class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-800 dark:text-emerald-100">{{ confirmSuccess }}</span>
         </p>
     </div>

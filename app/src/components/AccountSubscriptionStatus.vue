@@ -1,6 +1,6 @@
 <template>
     <div v-if="!isActive && !isAccountRoute()" class="flex flex-col p-5 my-8 bg-white dark:bg-neutral-800">
-        <p class="text-gray-500 dark:text-gray-400 mb-2">Account subscription is inactive</p>
+        <p class="mb-2">Account subscription is inactive</p>
         <router-link to="/account">View Details</router-link>
     </div>
 </template>

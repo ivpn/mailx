@@ -25,7 +25,7 @@
                     </div>
                     <div class="p-4 whitespace-normal text-left text-base">
                         <div class="mb-5">
-                            <p class="text-gray-500 dark:text-gray-400 mb-3">
+                            <p>
                                 We have sent a 6-digit OTP code to this recipient email address. Please enter the code below to verify the recipient email. Recipients with unconfirmed email address may be deleted after 7 days.
                             </p>
                         </div>
@@ -40,7 +40,7 @@
                                 id="otp"
                                 type="text"
                                 pattern="[0-9]*">
-                            <p v-if="otpError" class="text-red-600 text-sm mb-2">Required</p>
+                            <p v-if="otpError" class="error">Required</p>
                         </div>
                     </div>
                     <div class="flex justify-start items-center gap-x-3 py-4 px-4 border-t dark:border-neutral-600">
@@ -60,8 +60,8 @@
                         </button>
                     </div>
                     <div class="flex items-start">
-                        <p v-if="error" class="px-5 text-red-600 text-sm mb-3">Error: {{ error }}</p>
-                        <p v-if="resendSuccess && !error" class="px-5 text-emerald-600 dark:text-emerald-500 text-sm mb-3">{{ resendSuccess }}</p>
+                        <p v-if="error" class="error px-5">Error: {{ error }}</p>
+                        <p v-if="resendSuccess && !error" class="success px-5">{{ resendSuccess }}</p>
                     </div>
                 </div>
             </div>

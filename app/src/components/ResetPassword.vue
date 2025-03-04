@@ -21,7 +21,7 @@
                         class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800"
                         id="password-new-conmfirm" type="password">
                 </div>
-                <p class="text-gray-500 dark:text-gray-400 mb-5 text-sm">
+                <p class="text-sm">
                     Must be 12+ characters and contain uppercase, lowercase, number, and special character (e.g. !@#$%^&*(),;.?":{}|<>)
                 </p>
                 <div class="flex items-center justify-between">
@@ -31,14 +31,14 @@
                         Update Password
                     </button>
                 </div>
-                <p v-if="passwordError" class="text-red-600 text-sm mt-6">Error: {{ passwordError }}</p>
-                <p v-if="apiError" class="text-red-600 text-sm mt-6">Error: {{ apiError }}</p>
+                <p v-if="passwordError" class="error mt-6">Error: {{ passwordError }}</p>
+                <p v-if="apiError" class="error mt-6">Error: {{ apiError }}</p>
             </div>
             <div v-if="apiSuccess">
-                <p class="text-emerald-600 dark:text-emerald-500 text-sm mb-6">{{ apiSuccess }}</p>
+                <p class="success mb-6">{{ apiSuccess }}</p>
             </div>
         </form>
-        <p class="text-gray-500 my-5">
+        <p class="my-5">
             <router-link to="/login">Back to Log In</router-link>
         </p>
     </div>

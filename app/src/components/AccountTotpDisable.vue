@@ -24,7 +24,7 @@
                     </div>
                     <div class="p-4 whitespace-normal text-left text-base">
                         <div class="mb-5">
-                            <p class="text-gray-500 dark:text-gray-400 mb-3">
+                            <p>
                                 To disable two-factor authentication, please enter code from TOTP app or a backup code.
                             </p>
                         </div>
@@ -40,7 +40,7 @@
                                 class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 leading-tight focus:border-bluish-500 mb-2"
                                 type="text"
                                 pattern="[0-9]*">
-                                <p v-if="codeError" class="text-red-600 text-sm">Required</p>
+                                <p v-if="codeError" class="error">Required</p>
                         </div>
                     </div>
                     <div class="flex justify-start items-center gap-x-3 py-4 px-4 border-t dark:border-neutral-600">
@@ -54,7 +54,7 @@
                         </button>
                     </div>
                     <div class="flex items-start">
-                        <p v-if="error" class="px-5 text-red-600 text-sm mb-3">Error: {{ error }}</p>
+                        <p v-if="error" class="error px-5">Error: {{ error }}</p>
                     </div>
                 </div>
             </div>

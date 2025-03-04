@@ -1,7 +1,7 @@
 <template>
     <div class="mb-5">
         <h2>Subscription</h2>
-        <p v-if="res.id" class="text-sm text-gray-500 mb-5">
+        <p v-if="res.id" class="text-sm">
             <span v-if="isActive()"
                 class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-800 dark:text-emerald-100">Active</span>
             <span v-if="!isActive()"
@@ -9,7 +9,7 @@
         </p>
         <div v-if="isActive()" class="mb-3">
             <h4>Active until:</h4>
-            <p class="text-gray-500 dark:text-gray-400 mb-3">
+            <p class="mb-3">
                 {{ activeUntilDate() }}
             </p>
         </div>
@@ -28,7 +28,7 @@
                 </span>
             </div>
         </div>
-        <p v-if="error" class="text-red-600 text-sm mb-3">Error: {{ error }}</p>
+        <p v-if="error" class="error">Error: {{ error }}</p>
     </div>
 </template>
 

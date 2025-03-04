@@ -18,7 +18,7 @@
                         Inactive
                     </span>
                 </div>
-                <p class="dark:text-gray-100">{{ new Date(alias.created_at).toDateString() }}</p>
+                <p>{{ new Date(alias.created_at).toDateString() }}</p>
             </div>
         </td>
         <td class="px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800">
@@ -34,7 +34,7 @@
                     </span>
                 </span>
             </div>
-            <p class="text-gray-500 dark:text-gray-400">{{ alias.description }}</p>
+            <p>{{ alias.description }}</p>
         </td>
         <td class="px-5 py-4 whitespace-nowrap text-start text-sm">
             <div class="hs-tooltip inline-block">

@@ -6,7 +6,7 @@
             <a href="https://www.ivpn.net/">IVPN</a>
         </h2>
         <h3>Sign Up</h3>
-        <p class="text-gray-500 dark:text-gray-400 mb-8">Have an account? <router-link to="/login">Log In</router-link></p>
+        <p>Have an account? <router-link to="/login">Log In</router-link></p>
         <form class="w-full max-w-sm bg-white dark:bg-neutral-800 px-8 pt-6 pb-8 mb-4" @submit.prevent="">
             <div v-if="passkeySupported" class="border-b border-gray-200 dark:border-neutral-600">
                 <nav class="flex gap-x-1" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
@@ -36,7 +36,7 @@
                                 placeholder="name@example.net"
                                 class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 dark:bg-neutral-800 dark:border-gray-500 dark:text-gray-400"
                                 id="email_authn" type="email">
-                            <p v-if="emailAuthnError" class="text-red-600 text-sm">Required</p>
+                            <p v-if="emailAuthnError" class="error">Required</p>
                         </div>
                         <div class="flex items-center w-full">
                             <button :disabled="isLoading"
@@ -45,7 +45,7 @@
                                 Sign Up with Passkey
                             </button>
                         </div>
-                        <p v-if="apiError" class="text-red-600 text-sm mt-6">Error: {{ apiError }}</p>
+                        <p v-if="apiError" class="error mt-6">Error: {{ apiError }}</p>
                     </div>
                 </div>
                 <div
@@ -63,7 +63,7 @@
                                 placeholder="name@example.net"
                                 class="input"
                                 id="email" type="email">
-                            <p v-if="emailError" class="text-red-600 text-sm">Required</p>
+                            <p v-if="emailError" class="error">Required</p>
                         </div>
                         <div class="mb-6">
                             <label class="block text-gray-500 dark:text-gray-400 mb-2" for="password">
@@ -73,8 +73,8 @@
                                 v-bind:class="{ 'default': !passwordError, 'error': passwordError }"
                                 class="input"
                                 id="password" type="password">
-                            <p v-if="passwordError" class="text-red-600 text-sm mb-2">Required</p>
-                            <p class="text-gray-500 dark:text-gray-400 text-sm mb-2">Must be 12+ characters and contain uppercase, lowercase, number, and special character (e.g. !@#$%^&*(),;.?":{}|<>)</p>
+                            <p v-if="passwordError" class="error">Required</p>
+                            <p class="text-sm mb-2">Must be 12+ characters and contain uppercase, lowercase, number, and special character (e.g. !@#$%^&*(),;.?":{}|<>)</p>
                         </div>
                         <div class="flex items-center w-full">
                             <button :disabled="isLoading"
@@ -83,12 +83,12 @@
                                 Sign Up
                             </button>
                         </div>
-                        <p v-if="apiError" class="text-red-600 text-sm mt-6">Error: {{ apiError }}</p>
+                        <p v-if="apiError" class="error mt-6">Error: {{ apiError }}</p>
                     </div>
                 </div>
             </div>
             <div v-if="apiSuccess">
-                <p class="text-emerald-600 dark:text-emerald-500 text-sm mb-6">{{ apiSuccess }}</p>
+                <p class="success mb-6">{{ apiSuccess }}</p>
                 <router-link to="/login"
                     class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 focus:outline-none focus:shadow-outline">
                     Proceed to Log In

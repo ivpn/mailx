@@ -33,7 +33,7 @@
                     </div>
                     <div class="p-4 whitespace-normal text-left text-base">
                         <div v-if="!props.catchAll" class="grid space-y-3 mb-5">
-                            <p class="text-gray-500 dark:text-gray-400 mb-1">
+                            <p class="mb-1">
                                 Alias format:
                             </p>
                             <div class="relative flex items-start">
@@ -85,7 +85,7 @@
                                     v-bind:class="{ 'border-gray-500': !errorCatchAllSuffix, 'border-red-600 dark:border-red-600': errorCatchAllSuffix }"
                                     class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 leading-tight focus:border-bluish-500 mb-3"
                                     type="text">
-                                <p v-if="errorCatchAllSuffix" class="text-red-600 text-sm mb-3">Catch-all suffix must be between 6 and 12 characters</p>
+                                <p v-if="errorCatchAllSuffix" class="error">Catch-all suffix must be between 6 and 12 characters</p>
                                 <p class="text-white dark:text-gray-100 mb-1">
                                     *+{{ alias.catch_all_suffix }}@{{ alias.domain }}
                                 </p>
@@ -134,7 +134,7 @@
                                     {{ recipient }}
                                 </option>
                             </select>
-                            <p v-if="errorRecipients" class="pt-3 text-red-600 text-sm">{{ errorRecipients }}</p>
+                            <p v-if="errorRecipients" class="error pt-3">{{ errorRecipients }}</p>
                         </div>
 
                         <div class="mb-6">
@@ -163,7 +163,7 @@
                         </button>
                     </div>
                     <div class="flex items-start">
-                        <p v-if="error" class="px-5 text-red-600 text-sm mb-3">Error: {{ error }}</p>
+                        <p v-if="error" class="error px-5">Error: {{ error }}</p>
                     </div>
                 </div>
             </div>

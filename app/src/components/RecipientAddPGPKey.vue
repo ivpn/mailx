@@ -39,7 +39,7 @@
                                 class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 leading-tight focus:border-bluish-500 mb-2 h-[350px]"
                             >
                             </textarea>
-                            <p v-if="pgpError" class="text-red-600 text-sm">Required</p>
+                            <p v-if="pgpError" class="error">Required</p>
                         </div>
                     </div>
                     <div class="flex justify-start items-center gap-x-3 py-4 px-4 border-t dark:border-neutral-600">
@@ -53,7 +53,7 @@
                         </button>
                     </div>
                     <div class="flex items-start">
-                        <p v-if="error" class="px-5 text-red-600 text-sm mb-5">Error: {{ error }}</p>
+                        <p v-if="error" class="error px-5">Error: {{ error }}</p>
                     </div>
                 </div>
             </div>

@@ -2,7 +2,7 @@
     <div class="flex flex-col p-5 pb-4 my-8 bg-white dark:bg-neutral-800">
         <h1>Settings</h1>
         <h4>Default Domain</h4>
-        <p class="text-gray-500 dark:text-gray-400 mb-3">
+        <p>
             The default alias domain is the domain to be selected by default in the drop down options when generating a
             new alias.
         </p>
@@ -22,7 +22,7 @@
             </select>
         </div>
         <h4>Default Recipient</h4>
-        <p class="text-gray-500 dark:text-gray-400 mb-3">
+        <p>
             The default recipient to be selected by default in the drop down options when creating a new recipient. You can add recipients <router-link to="/recipients">here</router-link>.
         </p>
         <div class="max-w-xs mb-6">
@@ -42,7 +42,7 @@
             </select>
         </div>
         <h4>Default Alias Format</h4>
-        <p class="text-gray-500 dark:text-gray-400 mb-3">
+        <p>
             The default alias format to be selected by default when creating a new alias. You can add aliases <router-link to="/aliases">here</router-link>.
         </p>
         <div class="max-w-xs mb-6">
@@ -62,7 +62,7 @@
             </select>
         </div>
         <h4>From Name</h4>
-        <p class="text-gray-500 dark:text-gray-400 mb-3">
+        <p>
             The 'From Name' is shown when you send an email from an alias or reply anonymously to a forwarded email. If
             left blank, then the email alias will be used as the 'From Name'.
         </p>
@@ -83,8 +83,8 @@
                 Save Settings
             </button>
         </div>
-        <p v-if="error" class="text-red-600 text-sm mb-3">Error: {{ error }}</p>
-        <p v-if="success" class="text-emerald-600 dark:text-emerald-500 text-sm mb-3">{{ success }}</p>
+        <p v-if="error" class="error">Error: {{ error }}</p>
+        <p v-if="success" class="success">{{ success }}</p>
     </div>
 </template>
 

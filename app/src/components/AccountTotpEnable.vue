@@ -25,10 +25,10 @@
                     <div class="p-4 whitespace-normal text-left text-base">
                         <div v-if="!isEnabled">
                             <div class="mb-5">
-                                <p class="text-gray-500 dark:text-gray-400 mb-3">
+                                <p>
                                     To enable two-factor authentication, please scan the code with a TOTP app (for example: Google Authenticator) and enter the code in the field below.
                                 </p>
-                                <p class="text-gray-500 dark:text-gray-400 mb-3">
+                                <p>
                                     If you cannot scan QR code, you can enter the following information manually. Secret: {{ resEnable.secret }}, Account: {{ resEnable.account }}
                                 </p>
                             </div>
@@ -47,7 +47,7 @@
                                     class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 leading-tight focus:border-bluish-500 mb-2"
                                     type="text"
                                     pattern="[0-9]*">
-                                    <p v-if="codeError" class="text-red-600 text-sm">Required</p>
+                                    <p v-if="codeError" class="error">Required</p>
                             </div>
                             <div class="flex justify-start items-center gap-x-3 pt-4 border-t dark:border-neutral-600">
                                 <button @click="totpEnableConfirm"
@@ -61,19 +61,19 @@
                             </div>
                         </div>
                         <div v-if="isEnabled">
-                            <p class="text-gray-500 dark:text-gray-400 mb-3">
+                            <p>
                                 Two-factor authentication was set up successfully.
                             </p>
-                            <p class="text-gray-500 dark:text-gray-400 mb-5">
+                            <p>
                                 Please record the following backup codes which you will be able to use instead of TOTP in case you lost access to your device.
                             </p>
-                            <p class="text-gray-500 dark:text-gray-400 mb-5 py-4 px-5 bg-gray-100 dark:bg-neutral-800">
+                            <p class="py-4 px-5 bg-gray-100 dark:bg-neutral-800">
                                 Backup codes:
                                 <span class="text-gray-800 dark:text-gray-100">
                                     {{ resConfirm.backup }}
                                 </span>
                             </p>
-                            <p class="text-gray-500 dark:text-gray-400 mb-5">
+                            <p>
                                 Each of these codes can be used only once.
                             </p>
                             <div class="flex justify-start items-center gap-x-3 pt-4 border-t dark:border-neutral-600">
@@ -85,7 +85,7 @@
                         </div>
                     </div>
                     <div class="flex items-start">
-                        <p v-if="error" class="px-5 text-red-600 text-sm mb-3">Error: {{ error }}</p>
+                        <p v-if="error" class="px-5 error">Error: {{ error }}</p>
                     </div>
                 </div>
             </div>

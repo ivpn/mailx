@@ -10,8 +10,7 @@
             <label for="domain">
                 Select default domain:
             </label>
-            <select id="domain"
-                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent">
+            <select id="domain">
                 <option
                     v-for="(domain, index) in domains"
                     v-bind:domain
@@ -29,9 +28,7 @@
             <label for="recipient">
                 Select default recipient:
             </label>
-            <select id="recipient"
-                :disabled="!recipients.length"
-                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent">
+            <select id="recipient" :disabled="!recipients.length">
                 <option
                     v-for="recipient in recipients"
                     v-bind:value=recipient
@@ -49,9 +46,7 @@
             <label for="format">
                 Select default alias format:
             </label>
-            <select id="format"
-                :disabled="!aliasFormats.length"
-                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent">
+            <select id="format" :disabled="!aliasFormats.length">
                 <option
                     v-for="format in aliasFormats"
                     v-bind:value=format.toLowerCase()

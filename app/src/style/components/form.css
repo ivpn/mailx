@@ -13,6 +13,14 @@
         @apply form-checkbox relative w-11 h-6 p-px bg-gray-100 dark:bg-neutral-600 border-transparent text-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:ring-white dark:focus:ring-neutral-800 disabled:opacity-50 disabled:pointer-events-none checked:bg-none checked:text-bluish-500 checked:border-bluish-500 focus:ring-offset-transparent before:inline-block before:size-5 before:bg-white dark:before:bg-neutral-400 checked:before:bg-bluish-200 before:translate-x-0 checked:before:translate-x-full before:rounded-full before:shadow before:transform before:transition before:ease-in-out before:duration-200;
     }
 
+    input[type=radio] {
+        @apply form-radio border-gray-200 rounded-full text-bluish-500 focus:ring-white dark:focus:ring-transparent dark:bg-neutral-800 dark:border-neutral-600 dark:checked:border-transparent dark:focus:ring-offset-gray-800;
+    }
+
+    select {
+        @apply form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-500 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent;
+    }
+
     label {
         @apply block text-gray-500 dark:text-gray-400 mb-3;
     }

@@ -39,9 +39,13 @@
                             <div class="relative flex items-start">
                                 <div class="flex items-center h-5 mt-1">
                                     <input
-                                        v-model="alias.format" value="words" id="hs-radio-words" name="hs-radio-with-description" type="radio"
-                                        class="form-radio border-gray-200 rounded-full text-bluish-500 focus:ring-white dark:focus:ring-transparent dark:bg-neutral-800 dark:border-neutral-600 dark:checked:border-transparent dark:focus:ring-offset-gray-800"
-                                        aria-describedby="hs-radio-words-description">
+                                        v-model="alias.format"
+                                        value="words"
+                                        id="hs-radio-words"
+                                        name="hs-radio-with-description"
+                                        aria-describedby="hs-radio-words-description"
+                                        type="radio"
+                                    >
                                 </div>
                                 <label for="hs-radio-words" class="ms-3">
                                     <span class="block text-sm font-semibold text-gray-800 dark:text-gray-100">Words</span>
@@ -52,9 +56,13 @@
                             <div class="relative flex items-start">
                                 <div class="flex items-center h-5 mt-1">
                                     <input 
-                                        v-model="alias.format" value="random" id="hs-radio-random" name="hs-radio-with-description" type="radio"
-                                        class="form-radio border-gray-200 rounded-full text-bluish-500 focus:ring-white dark:focus:ring-transparent dark:bg-neutral-800 dark:border-neutral-600 dark:checked:border-transparent dark:focus:ring-offset-gray-800"
-                                        aria-describedby="hs-radio-random-description">
+                                        v-model="alias.format"
+                                        value="random"
+                                        id="hs-radio-random"
+                                        name="hs-radio-with-description"
+                                        aria-describedby="hs-radio-random-description"
+                                        type="radio"
+                                    >
                                 </div>
                                 <label for="hs-radio-random" class="ms-3">
                                     <span class="block text-sm font-semibold text-gray-800 dark:text-gray-100">Random</span>
@@ -65,9 +73,13 @@
                             <div class="relative flex items-start">
                                 <div class="flex items-center h-5 mt-1">
                                     <input
-                                        v-model="alias.format" value="uuid" id="hs-radio-uuid" name="hs-radio-with-description" type="radio"
-                                        class="form-radio border-gray-200 rounded-full text-bluish-500 focus:ring-white dark:focus:ring-transparent dark:bg-neutral-800 dark:border-neutral-600 dark:checked:border-transparent dark:focus:ring-offset-gray-800"
-                                        aria-describedby="hs-radio-uuid-description">
+                                        v-model="alias.format"
+                                        value="uuid"
+                                        id="hs-radio-uuid"
+                                        name="hs-radio-with-description"
+                                        aria-describedby="hs-radio-uuid-description"
+                                        type="radio"
+                                    >
                                 </div>
                                 <label for="hs-radio-uuid" class="ms-3">
                                     <span class="block text-sm font-semibold text-gray-800 dark:text-gray-100">UUID</span>
@@ -145,8 +157,7 @@
                             <label for="alias_domain">
                                 Domain:
                             </label>
-                            <select id="alias_domain" :disabled="!domains.length"
-                                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent">
+                            <select id="alias_domain" :disabled="!domains.length">
                                 <option v-for="(domain, index) in domains" v-bind:domain
                                     :selected="domain == alias.domain || index === 0" :key="domain">
                                     {{ domain }}

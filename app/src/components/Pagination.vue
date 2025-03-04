@@ -3,14 +3,11 @@
         <hr class="mb-7 dark:border-neutral-600">
         <div class="flex flex-row justify-between pb-3">
             <div>
-                <select
-                v-model="limit"
-                @change="updateLimit"
-                class="form-select py-2 px-4 pe-9 block w-full border border-gray-200 dark:border-neutral-600 bg-transparent text-gray-500 dark:text-gray-300 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent">
-                <option>25</option>
-                <option>50</option>
-                <option>75</option>
-            </select>
+                <select v-model="limit" @change="updateLimit">
+                    <option>25</option>
+                    <option>50</option>
+                    <option>75</option>
+                </select>
             </div>
             <nav class="flex items-center gap-x-1">
                 <button type="button"
@@ -25,7 +22,7 @@
                 </button>
                 <div class="flex items-center gap-x-1">
                     <span
-                        class="min-h-[38px] min-w-[38px] flex justify-center items-center border border-gray-200 dark:border-neutral-600 text-gray-800 dark:text-gray-400 py-2 px-3 text-sm focus:outline-none disabled:opacity-50 disabled:pointer-events-none">{{ page }}</span>
+                        class="min-h-[38px] min-w-[38px] flex justify-center items-center border border-gray-500 dark:border-neutral-500 text-gray-800 dark:text-gray-400 py-2 px-3 text-sm focus:outline-none disabled:opacity-50 disabled:pointer-events-none">{{ page }}</span>
                     <span
                         class="min-h-[38px] flex justify-center items-center text-gray-500 dark:text-gray-400 py-2 px-1.5 text-sm">of</span>
                     <span

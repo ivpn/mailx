@@ -10,4 +10,8 @@
             @apply border-red-600 dark:border-red-600;
         }
     }
+
+    label {
+        @apply block text-gray-500 dark:text-gray-400 mb-3;
+    }
 }

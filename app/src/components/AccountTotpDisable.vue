@@ -29,7 +29,7 @@
                             </p>
                         </div>
                         <div class="mb-3">
-                            <label for="totp_disable_code" class="block text-gray-500 dark:text-gray-400 mb-3">
+                            <label for="totp_disable_code">
                                 Code from TOTP app:
                             </label>
                             <input

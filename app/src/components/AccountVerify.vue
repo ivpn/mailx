@@ -1,7 +1,7 @@
 <template>
     <div v-if="!res.is_active && isDashboard" class="flex flex-col items-center text-center my-14 pt-6">
         <h3>Verify Your Email</h3>
-        <p class="my-2 text-gray-500 dark:text-gray-400">
+        <p>
             Please <router-link class="cta-plain" to="/account">verify</router-link> your account email address.
         </p>
     </div>
@@ -12,7 +12,7 @@
         </p>
         <div v-if="!confirmSuccess" class="mb-4 max-w-xs">
             <div class="mb-4">
-                <label class="block text-gray-500 dark:text-gray-400 mb-3" for="account-otp">
+                <label for="account-otp">
                     6-digit OTP code:
                 </label>
                 <input

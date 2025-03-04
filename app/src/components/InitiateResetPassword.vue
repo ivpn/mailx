@@ -5,7 +5,7 @@
             <div v-if="!apiSuccess">
                 <p>Please enter your registered email address. You will be sent instructions on how to reset your password.</p>
                 <div class="mb-4">
-                    <label class="block text-gray-500 dark:text-gray-400 mb-2" for="email">
+                    <label for="email">
                         Email Address
                     </label>
                     <input

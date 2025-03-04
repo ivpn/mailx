@@ -78,7 +78,7 @@
                         </div>
                         <div v-if="props.catchAll">
                             <div class="mb-5">
-                                <label for="alias_catch_all_suffix" class="block text-gray-500 dark:text-gray-400 mb-3">
+                                <label for="alias_catch_all_suffix">
                                     Alias sufix (6-12 alphanumeric characters):
                                 </label>
                                 <input id="alias_catch_all_suffix" v-model="alias.catch_all_suffix"
@@ -92,7 +92,7 @@
                             </div>
                         </div>
                         <div class="mb-5">
-                            <label for="alias_description" class="block text-gray-500 dark:text-gray-400 mb-3">
+                            <label for="alias_description">
                                 Description:
                             </label>
                             <input id="alias_description" v-model="alias.description"
@@ -100,7 +100,7 @@
                                 type="text">
                         </div>
                         <div class="mb-5">
-                            <label for="alias_from_name" class="block text-gray-500 dark:text-gray-400 mb-3">
+                            <label for="alias_from_name">
                                 From name:
                             </label>
                             <input id="alias_from_name" v-model="alias.from_name"
@@ -108,9 +108,7 @@
                                 type="text">
                         </div>
                         <div class="mb-6">
-                            <label
-                                for="create-alias-recipient"
-                                class="block text-gray-500 dark:text-gray-400 mb-3">
+                            <label for="create-alias-recipient">
                                 Recipients:
                             </label>
                             <select
@@ -138,7 +136,7 @@
                         </div>
 
                         <div class="mb-6">
-                            <label class="block text-gray-500 dark:text-gray-400 mb-3" for="alias_domain">
+                            <label for="alias_domain">
                                 Domain:
                             </label>
                             <select id="alias_domain" :disabled="!domains.length"

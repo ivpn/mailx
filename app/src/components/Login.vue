@@ -32,7 +32,7 @@
                     aria-labelledby="tabs-with-underline-item-1">
                     <div v-if="!isLoggedIn()">
                         <div class="mb-4">
-                            <label class="block text-gray-500 dark:text-gray-400 mb-2" for="email_authn">
+                            <label for="email_authn">
                                 Email Address
                             </label>
                             <input v-model="emailAuthn"
@@ -55,7 +55,7 @@
                     aria-labelledby="tabs-with-underline-item-2">
                     <div v-if="!isLoggedIn()">
                         <div class="mb-4">
-                            <label class="block text-gray-500 dark:text-gray-400 mb-2" for="email">
+                            <label for="email">
                                 Email Address
                             </label>
                             <input v-model="email"
@@ -65,7 +65,7 @@
                             <p v-if="emailError" class="error">Required</p>
                         </div>
                         <div class="mb-6">
-                            <label class="block text-gray-500 dark:text-gray-400 mb-2" for="password">
+                            <label for="password">
                                 Password
                             </label>
                             <input v-model="password"
@@ -75,7 +75,7 @@
                             <p v-if="passwordError" class="error mb-2">Required</p>
                         </div>
                         <div v-if="otpRequired" class="mb-6">
-                            <label class="block text-gray-500 dark:text-gray-400 mb-2" for="password">
+                            <label for="password">
                                 Two-factor authentication token:
                             </label>
                             <input v-model="otp"

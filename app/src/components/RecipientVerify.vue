@@ -30,7 +30,7 @@
                             </p>
                         </div>
                         <div class="mb-3">
-                            <label class="block text-gray-500 dark:text-gray-400 mb-3" for="otp">
+                            <label for="otp">
                                 6-digit OTP code:
                             </label>
                             <input

@@ -28,7 +28,7 @@
                     </div>
                     <div class="p-4 whitespace-normal text-left text-base">
                         <div class="mb-3">
-                            <label for="recipient_pgp" class="block text-gray-500 dark:text-gray-400 mb-3">
+                            <label for="recipient_pgp">
                                 Enter your public PGP key:
                             </label>
                             <textarea

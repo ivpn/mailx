@@ -36,7 +36,7 @@
                                 <canvas class="mx-auto" id="totp_qr_code"></canvas>
                             </div>
                             <div class="mb-3">
-                                <label for="totp_enable_code" class="block text-gray-500 dark:text-gray-400 mb-3">
+                                <label for="totp_enable_code">
                                     Code from TOTP app:
                                 </label>
                                 <input

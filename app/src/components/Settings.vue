@@ -7,7 +7,7 @@
             new alias.
         </p>
         <div class="max-w-xs mb-6">
-            <label class="block text-gray-500 dark:text-gray-400 mb-3" for="domain">
+            <label for="domain">
                 Select default domain:
             </label>
             <select id="domain"
@@ -26,7 +26,7 @@
             The default recipient to be selected by default in the drop down options when creating a new recipient. You can add recipients <router-link to="/recipients">here</router-link>.
         </p>
         <div class="max-w-xs mb-6">
-            <label class="block text-gray-500 dark:text-gray-400 mb-3" for="recipient">
+            <label for="recipient">
                 Select default recipient:
             </label>
             <select id="recipient"
@@ -46,7 +46,7 @@
             The default alias format to be selected by default when creating a new alias. You can add aliases <router-link to="/aliases">here</router-link>.
         </p>
         <div class="max-w-xs mb-6">
-            <label class="block text-gray-500 dark:text-gray-400 mb-3" for="format">
+            <label for="format">
                 Select default alias format:
             </label>
             <select id="format"
@@ -67,7 +67,7 @@
             left blank, then the email alias will be used as the 'From Name'.
         </p>
         <div class="max-w-xs mb-5">
-            <label class="block text-gray-500 dark:text-gray-400 mb-3" for="from-name">
+            <label for="from-name">
                 From name:
             </label>
             <input

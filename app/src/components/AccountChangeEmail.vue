@@ -3,7 +3,7 @@
         <h2>Change Email</h2>
         <div v-if="!success">
             <div class="mb-4 max-w-xs">
-                <label class="block text-gray-500 dark:text-gray-400 mb-3" for="new-email">
+                <label for="new-email">
                     New email:
                 </label>
                 <input v-model="email"

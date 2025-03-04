@@ -2,7 +2,7 @@
     <div class="mb-5">
         <h2>Change Password</h2>
         <div class="mb-4 max-w-xs">
-            <label class="block text-gray-500 dark:text-gray-400 mb-3" for="new-password">
+            <label for="new-password">
                 New password:
             </label>
             <input v-model="password"
@@ -11,7 +11,7 @@
                 id="new-password" type="password">
         </div>
         <div class="mb-4 max-w-xs">
-            <label class="block text-gray-500 dark:text-gray-400 mb-3" for="new-password-confirm">
+            <label for="new-password-confirm">
                 Confirm new password:
             </label>
             <input v-model="passwordConfirm"

@@ -1,6 +1,6 @@
 <template>
     <div class="mb-5">
-        <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-5">Passkeys</h2>
+        <h2>Passkeys</h2>
         <div v-if="passkeySupported">
             <p class="text-gray-500 dark:text-gray-400 mb-5">
                 Add or remove Passkeys.<br>

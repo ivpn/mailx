@@ -1,8 +1,6 @@
 <template>
     <div v-if="!res.is_active && isDashboard" class="flex flex-col items-center text-center my-14 pt-6">
-        <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100">
-            Verify Your Email
-        </h3>
+        <h3>Verify Your Email</h3>
         <p class="my-2 text-gray-500 dark:text-gray-400">
             Please <router-link class="cta-plain" to="/account">verify</router-link> your account email address.
         </p>

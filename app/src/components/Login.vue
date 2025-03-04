@@ -1,11 +1,11 @@
 <template>
     <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-neutral-900">
         <h1>MailX</h1>
-        <h2 class="text-2xl text-gray-800 dark:text-gray-100 mb-8">
+        <h2>
             Email forwarding service operated by
             <a class="link" href="https://www.ivpn.net/">IVPN</a>
         </h2>
-        <h2 class="text-xl text-gray-500 dark:text-gray-400 mb-8">Log In</h2>
+        <h3>Log In</h3>
         <form class="w-full max-w-sm bg-white dark:bg-neutral-800 px-8 pt-6 pb-8 mb-4" @submit.prevent="">
             <div v-if="passkeySupported" class="border-b border-gray-200 dark:border-neutral-600">
                 <nav class="flex gap-x-1" aria-label="Tabs" role="tablist" aria-orientation="horizontal">

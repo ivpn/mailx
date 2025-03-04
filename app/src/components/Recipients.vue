@@ -1,9 +1,7 @@
 <template>
     <div v-if="!list.length && loaded" class="flex flex-col my-14">
         <div class="flex flex-col items-center text-center">
-            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100">
-                Add Recipients
-            </h3>
+            <h3>Add Recipients</h3>
             <p class="my-2 text-gray-500 dark:text-gray-400">
                 To get started, add a recipient.
             </p>

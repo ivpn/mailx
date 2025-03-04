@@ -4,9 +4,7 @@
     <div>
         <div v-if="!list.length && loaded" class="flex flex-col my-14">
             <div class="flex flex-col items-center text-center">
-                <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100">
-                    Create Aliases
-                </h3>
+                <h3>Create Aliases</h3>
                 <p v-if="recipients.length && settings.id" class="my-2 text-gray-500 dark:text-gray-400">
                     To get started, create an alias.
                 </p>
@@ -102,9 +100,7 @@
     <div v-if="!isDashboard">
         <div v-if="!listCatchAll.length && loadedCatchAll" class="flex flex-col my-14">
             <div class="flex flex-col items-center text-center">
-                <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-5">
-                    Create Catch-all Aliases
-                </h3>
+                <h3>Create Catch-all Aliases</h3>
                 <p v-if="!recipients.length && loadedCatchAll" class="my-2 text-gray-500 dark:text-gray-400">
                     To get started, first add a recipient.
                 </p>

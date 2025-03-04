@@ -1,6 +1,6 @@
 <template>
     <div class="mb-5">
-        <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-5">Change Email</h2>
+        <h2>Change Email</h2>
         <div v-if="!success">
             <div class="mb-4 max-w-xs">
                 <label class="block text-gray-500 dark:text-gray-400 mb-3" for="new-email">

@@ -1,9 +1,9 @@
 <template>
     <div class="flex flex-col p-5 pb-4 my-8 bg-white dark:bg-neutral-800">
         <h1>Messages</h1>
-        <h2 class="font-semibold text-gray-800 dark:text-gray-100 mb-5">Last 7 days</h2>
+        <h3>Last 7 days</h3>
         <div id="chart" class="mb-5"></div>
-        <h2 class="font-semibold text-gray-800 dark:text-gray-100 mb-5">Last 90 days</h2>
+        <h3>Last 90 days</h3>
         <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-center mb-8">
             <div class="p-4 border-r border-gray-200 dark:border-gray-600">
                 <h1 class="mb-2">{{ stats.forwards }}</h1>

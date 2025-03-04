@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-5">Delete Account</h2>
+        <h2>Delete Account</h2>
         <button
             v-bind:data-hs-overlay="'#modal-delete-account'"
             class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600 font-medium py-2 focus:outline-none focus:shadow-outline">
@@ -13,9 +13,7 @@
                 class="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 opacity-0 transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
                 <div class="flex flex-col bg-white dark:bg-neutral-800 border dark:border-neutral-600 shadow-sm rounded pointer-events-auto">
                     <div class="flex justify-between items-center py-3 px-4 border-b dark:border-neutral-600">
-                        <h2 class="text-xl text-gray-800 dark:text-gray-100 font-semibold">
-                            Delete Account
-                        </h2>
+                        <h3>Delete Account</h3>
                         <button @click="close" type="button"
                             class="flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-neutral-700 disabled:opacity-50 disabled:pointer-events-none">
                             <span class="sr-only">Close</span>

@@ -1,6 +1,6 @@
 <template>
     <div class="mb-5">
-        <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-5">Subscription</h2>
+        <h2>Subscription</h2>
         <p v-if="res.id" class="text-sm text-gray-500 mb-5">
             <span v-if="isActive()"
                 class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-800 dark:text-emerald-100">Active</span>
@@ -8,17 +8,13 @@
                 class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-gray-100 text-gray-500 dark:bg-gray-500 dark:text-gray-100">Inactive</span>
         </p>
         <div v-if="isActive()" class="mb-3">
-            <h3 class="font-semibold text-gray-800 dark:text-gray-100 mb-3">
-                Active until:
-            </h3>
+            <h4>Active until:</h4>
             <p class="text-gray-500 dark:text-gray-400 mb-3">
                 {{ activeUntilDate() }}
             </p>
         </div>
         <div class="mb-3">
-            <h3 class="font-semibold text-gray-800 dark:text-gray-100 mb-3">
-                Subscription ID:
-            </h3>
+            <h4>Subscription ID:</h4>
             <div class="hs-tooltip text-gray-500 dark:text-gray-400 mb-3">
                 <span class="hs-tooltip-toggle">
                     <button @click="copyAlias(res.id)">

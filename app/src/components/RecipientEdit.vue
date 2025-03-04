@@ -12,9 +12,9 @@
                 <div
                     class="flex flex-col bg-white dark:bg-neutral-800 border dark:border-neutral-600 shadow-sm rounded pointer-events-auto">
                     <div class="flex justify-between items-center py-3 px-4 border-b dark:border-neutral-600">
-                        <h3 class="text-xl text-gray-800 dark:text-gray-100 font-semibold">
+                        <h2 class="text-xl text-gray-800 dark:text-gray-100 font-semibold">
                             Edit recipient
-                        </h3>
+                        </h2>
                         <button @click="close" type="button"
                             class="flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-neutral-700  disabled:opacity-50 disabled:pointer-events-none">
                             <span class="sr-only">Close</span>
@@ -27,8 +27,7 @@
                         </button>
                     </div>
                     <div class="p-4 whitespace-normal text-left text-base">
-                        <h1 class="text-xl text-gray-800 dark:text-gray-100 font-semibold mb-7">{{ recipient.email }}
-                        </h1>
+                        <h3>{{ recipient.email }}</h3>
                         <div class="mb-5">
                             <h3 class="font-semibold text-gray-800 dark:text-gray-100 mb-3">
                                 PGP/Inline Encryption

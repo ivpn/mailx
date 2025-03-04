@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-neutral-900">
-        <h1 class="text-3xl text-gray-800 dark:text-gray-100 font-semibold my-8">MailX</h1>
+        <h1>MailX</h1>
         <h2 class="text-2xl text-gray-800 dark:text-gray-100 mb-8">
             Email forwarding service operated by
             <a class="link" href="https://www.ivpn.net/">IVPN</a>

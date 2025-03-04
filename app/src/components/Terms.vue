@@ -3,7 +3,7 @@
 
         <p class="text-gray-500 py-5"><router-link to="/login">Back to Log In</router-link></p>
 
-        <h1 class="text-3xl mb-5">Terms of Service</h1>
+        <h1>Terms of Service</h1>
         <p class="text-sm mb-5 text-gray-500 dark:text-gray-400">Last updated: 22 October 2024</p>
 
         <h2>1. Introduction</h2>
@@ -76,12 +76,8 @@ import Footer from './Footer.vue'
 </script>
 
 <style scoped>
-h1 {
-    @apply text-3xl mb-5;
-}
-
 h2 {
-    @apply text-2xl mt-12 mb-5;
+    @apply mt-12;
 }
 
 p {

@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-neutral-900">
-        <h1 class="text-3xl text-gray-800 dark:text-gray-100 font-semibold mb-8">Reset Password</h1>
+        <h1>Reset Password</h1>
         <form class="w-full max-w-sm bg-white dark:bg-neutral-800 px-8 pt-6 pb-8 mb-4" @submit.prevent="initiatePasswordReset">
             <div v-if="!apiSuccess">
                 <p class="text-gray-500 dark:text-gray-400 mb-8">Please enter your registered email address. You will be sent instructions on how to reset your password.</p>

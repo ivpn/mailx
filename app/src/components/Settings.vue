@@ -1,9 +1,9 @@
 <template>
     <div class="flex flex-col p-5 pb-4 my-8 bg-white dark:bg-neutral-800">
-        <h1 class="text-3xl text-gray-800 dark:text-gray-100 font-semibold mb-5">Settings</h1>
-        <h2 class="font-semibold text-gray-800 dark:text-gray-100 mb-3">
+        <h1>Settings</h1>
+        <h3 class="font-semibold text-gray-800 dark:text-gray-100 mb-3">
             Default Domain
-        </h2>
+        </h3>
         <p class="text-gray-500 dark:text-gray-400 mb-3">
             The default alias domain is the domain to be selected by default in the drop down options when generating a
             new alias.
@@ -23,9 +23,9 @@
                 </option>
             </select>
         </div>
-        <h2 class="font-semibold text-gray-800 dark:text-gray-100 mb-3">
+        <h3 class="font-semibold text-gray-800 dark:text-gray-100 mb-3">
             Default Recipient
-        </h2>
+        </h3>
         <p class="text-gray-500 dark:text-gray-400 mb-3">
             The default recipient to be selected by default in the drop down options when creating a new recipient. You can add recipients <router-link class="link" to="/recipients">here</router-link>.
         </p>
@@ -45,9 +45,9 @@
                 </option>
             </select>
         </div>
-        <h2 class="font-semibold text-gray-800 dark:text-gray-100 mb-3">
+        <h3 class="font-semibold text-gray-800 dark:text-gray-100 mb-3">
             Default Alias Format
-        </h2>
+        </h3>
         <p class="text-gray-500 dark:text-gray-400 mb-3">
             The default alias format to be selected by default when creating a new alias. You can add aliases <router-link class="link" to="/aliases">here</router-link>.
         </p>
@@ -67,9 +67,9 @@
                 </option>
             </select>
         </div>
-        <h2 class="font-semibold text-gray-800 dark:text-gray-100 mb-3">
+        <h3 class="font-semibold text-gray-800 dark:text-gray-100 mb-3">
             From Name
-        </h2>
+        </h3>
         <p class="text-gray-500 dark:text-gray-400 mb-3">
             The 'From Name' is shown when you send an email from an alias or reply anonymously to a forwarded email. If
             left blank, then the email alias will be used as the 'From Name'.

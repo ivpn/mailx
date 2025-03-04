@@ -8,17 +8,17 @@
                 class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-gray-100 text-gray-500 dark:bg-gray-500 dark:text-gray-100">Inactive</span>
         </p>
         <div v-if="isActive()" class="mb-3">
-            <h2 class="font-semibold text-gray-800 dark:text-gray-100 mb-3">
+            <h3 class="font-semibold text-gray-800 dark:text-gray-100 mb-3">
                 Active until:
-            </h2>
+            </h3>
             <p class="text-gray-500 dark:text-gray-400 mb-3">
                 {{ activeUntilDate() }}
             </p>
         </div>
         <div class="mb-3">
-            <h2 class="font-semibold text-gray-800 dark:text-gray-100 mb-3">
+            <h3 class="font-semibold text-gray-800 dark:text-gray-100 mb-3">
                 Subscription ID:
-            </h2>
+            </h3>
             <div class="hs-tooltip text-gray-500 dark:text-gray-400 mb-3">
                 <span class="hs-tooltip-toggle">
                     <button @click="copyAlias(res.id)">

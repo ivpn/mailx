@@ -34,21 +34,23 @@
                             </label>
                             <input
                                 v-model="req.otp"
-                                v-bind:class="{ 'border-gray-500 dark:border-neutral-400': !codeError, 'border-red-600 dark:border-red-600': codeError }"
+                                v-bind:class="{ 'error': codeError }"
                                 id="totp_disable_code"
                                 placeholder="6-digit code"
-                                class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 leading-tight focus:border-bluish-500 mb-2"
                                 type="text"
-                                pattern="[0-9]*">
-                                <p v-if="codeError" class="error">Required</p>
+                                pattern="[0-9]*"
+                            >
+                            <p v-if="codeError" class="error">Required</p>
                         </div>
                     </div>
                     <div class="flex justify-start items-center gap-x-3 py-4 px-4 border-t dark:border-neutral-600">
-                        <button @click="disableTotp"
+                        <button
+                            @click="disableTotp"
                             class="py-2 px-3 inline-flex items-center gap-x-2 font-medium text-base bg-bluish-500 text-white hover:bg-bluish-600 disabled:opacity-50 disabled:pointer-events-none">
                             Disable
                         </button>
-                        <button @click="close"
+                        <button
+                            @click="close"
                             class="text-gray-500 bg-gray-100 hover:bg-gray-200 dark:text-gray-300 dark:bg-neutral-600 dark:hover:bg-neutral-700 font-medium text-base py-2 px-3 focus:outline-none focus:shadow-outline">
                             Cancel
                         </button>

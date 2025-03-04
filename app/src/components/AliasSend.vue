@@ -36,9 +36,11 @@
                                 class="block text-gray-500 dark:text-gray-400 mb-3">
                                 From alias:
                             </label>
-                            <input v-bind:id="'from_alias_' + alias.id" v-bind:value="alias.name" disabled
-                                class="disabled appearance-none outline-none border border-gray-500 dark:text-gray-300 dark:border-neutral-400 w-full py-3 px-4 text-gray-500 leading-tight focus:border-bluish-500 mb-2"
-                                type="text">
+                            <input
+                                v-bind:id="'from_alias_' + alias.id"
+                                v-bind:value="alias.name" disabled
+                                type="text"
+                            >
                         </div>
                         <div class="mb-5">
                             <label v-bind:for="'to_email_' + alias.id"
@@ -47,10 +49,10 @@
                             </label>
                             <input
                                 v-bind:id="'to_email_' + alias.id"
-                                v-bind:class="{ 'border-gray-500 dark:border-neutral-400': !emailError, 'border-red-600 dark:border-red-600': emailError }"
+                                v-bind:class="{ 'error': emailError }"
                                 v-model="toEmail"
-                                class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 leading-tight focus:border-bluish-500 mb-2"
-                                type="text">
+                                type="text"
+                            >
                             <p v-if="emailError" class="error">Valid email required</p>
                         </div>
                         <div v-bind:class="{ 'hidden': generatedEmail == '' }" class="mb-5">

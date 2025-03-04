@@ -31,11 +31,13 @@
                             <label for="email_authn">
                                 Email Address
                             </label>
-                            <input v-model="emailAuthn"
-                                v-bind:class="{ 'border-gray-500': !emailAuthnError, 'border-red-600 dark:border-red-600': emailAuthnError }"
+                            <input
+                                v-model="emailAuthn"
+                                v-bind:class="{ 'error': emailAuthnError }"
                                 placeholder="name@example.net"
-                                class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 dark:bg-neutral-800 dark:border-gray-500 dark:text-gray-400"
-                                id="email_authn" type="email">
+                                id="email_authn"
+                                type="email"
+                            >
                             <p v-if="emailAuthnError" class="error">Required</p>
                         </div>
                         <div class="flex items-center w-full">
@@ -58,21 +60,25 @@
                             <label for="email">
                                 Email Address
                             </label>
-                            <input v-model="email"
-                                v-bind:class="{ 'default': !emailError, 'error': emailError }"
+                            <input
+                                v-model="email"
+                                v-bind:class="{ 'error': emailError }"
                                 placeholder="name@example.net"
-                                class="input"
-                                id="email" type="email">
+                                id="email"
+                                type="email"
+                            >
                             <p v-if="emailError" class="error">Required</p>
                         </div>
                         <div class="mb-6">
                             <label for="password">
                                 Password
                             </label>
-                            <input v-model="password"
-                                v-bind:class="{ 'default': !passwordError, 'error': passwordError }"
-                                class="input"
-                                id="password" type="password">
+                            <input
+                                v-model="password"
+                                v-bind:class="{ 'error': passwordError }"
+                                id="password"
+                                type="password"
+                            >
                             <p v-if="passwordError" class="error">Required</p>
                             <p class="text-sm mb-2">Must be 12+ characters and contain uppercase, lowercase, number, and special character (e.g. !@#$%^&*(),;.?":{}|<>)</p>
                         </div>

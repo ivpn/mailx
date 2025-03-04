@@ -41,20 +41,22 @@
                             <div class="mb-5">
                                 <input
                                     v-model="req.otp"
-                                    v-bind:class="{ 'border-gray-500 dark:border-neutral-400': !otpError, 'border-red-600 dark:border-red-600': otpError }"
+                                    v-bind:class="{ 'error': otpError }"
                                     id="totp_enable_code"
                                     placeholder="8-symbol code"
-                                    class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 leading-tight focus:border-bluish-500 mb-2"
                                     type="text"
-                                    pattern="[0-9]*">
-                                    <p v-if="otpError" class="error">Required</p>
+                                    pattern="[0-9]*"
+                                >
+                                <p v-if="otpError" class="error">Required</p>
                             </div>
                             <div class="flex justify-start items-center gap-x-3 pt-4 border-t dark:border-neutral-600">
-                                <button @click="promptDeleteAccount"
+                                <button
+                                    @click="promptDeleteAccount"
                                     class="py-2 px-3 inline-flex items-center gap-x-2 font-medium text-base bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 disabled:pointer-events-none">
                                     Delete Account
                                 </button>
-                                <button @click="close"
+                                <button
+                                    @click="close"
                                     class="text-gray-500 bg-gray-100 hover:bg-gray-200 dark:text-gray-300 dark:bg-neutral-600 dark:hover:bg-neutral-700 font-medium text-base py-2 px-3 focus:outline-none focus:shadow-outline">
                                     Cancel
                                 </button>

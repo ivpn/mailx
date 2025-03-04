@@ -5,25 +5,28 @@
             <label for="new-password">
                 New password:
             </label>
-            <input v-model="password"
-                v-bind:class="{ 'border-gray-500 dark:border-neutral-400': !passwordError, 'border-red-600 dark:border-red-600': passwordError }"
-                class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 leading-tight focus:border-bluish-500 mb-2"
-                id="new-password" type="password">
+            <input
+                v-model="password"
+                v-bind:class="{ 'error': passwordError }"
+                id="new-password"
+                type="password">
         </div>
         <div class="mb-4 max-w-xs">
             <label for="new-password-confirm">
                 Confirm new password:
             </label>
-            <input v-model="passwordConfirm"
-                v-bind:class="{ 'border-gray-500 dark:border-neutral-400': !passwordError, 'border-red-600 dark:border-red-600': passwordError }"
-                class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 leading-tight focus:border-bluish-500 mb-2"
-                id="new-password-confirm" type="password">
+            <input
+                v-model="passwordConfirm"
+                v-bind:class="{ 'error': passwordError }"
+                id="new-password-confirm"
+                type="password">
         </div>
         <p class="text-sm">
             Must be 12+ characters and contain uppercase, lowercase, number, and special character (e.g. !@#$%^&*(),;.?":{}|<>)
         </p>
         <div class="mb-3 max-w-xs">
-            <button @click="changePassword"
+            <button
+                @click="changePassword"
                 class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-2 px-3 focus:outline-none focus:shadow-outline"
                 type="submit">
                 Change Password

@@ -30,22 +30,25 @@
                                 class="block text-gray-500 dark:text-gray-400 mb-3">
                                 Description:
                             </label>
-                            <input v-bind:id="'description_' + alias.id" v-model="alias.description"
-                                class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 leading-tight focus:border-bluish-500 mb-2"
-                                type="text">
+                            <input
+                                v-bind:id="'description_' + alias.id"
+                                v-model="alias.description"
+                                type="text"
+                            >
                         </div>
                         <div class="mb-5">
                             <label v-bind:for="'from_' + alias.id"
                                 class="block text-gray-500 dark:text-gray-400 mb-3">
                                 From name:
                             </label>
-                            <input v-bind:id="'from_' + alias.id" v-model="alias.from_name"
-                                class="appearance-none outline-none w-full py-3 px-4 mb-2 border border-gray-500 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 leading-tight focus:border-bluish-500"
-                                type="text">
+                            <input
+                                v-bind:id="'from_' + alias.id"
+                                v-model="alias.from_name"
+                                type="text"
+                            >
                         </div>
                         <div class="mb-6">
-                            <label v-bind:for="'recipient_' + alias.id"
-                                class="block text-gray-500 dark:text-gray-400 mb-3">
+                            <label v-bind:for="'recipient_' + alias.id">
                                 Recipients:
                             </label>
                             <select

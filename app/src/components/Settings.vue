@@ -72,8 +72,9 @@
             </label>
             <input
                 v-model="req.from_name"
-                class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 leading-tight focus:border-bluish-500 mb-2"
-                id="from-name" type="text">
+                id="from-name"
+                type="text"
+            >
         </div>
         <div class="mb-3">
             <button

@@ -7,25 +7,30 @@
                     <label for="password-new">
                         New Password
                     </label>
-                    <input v-model="password"
-                        v-bind:class="{ 'border-gray-500 dark:border-neutral-400': !passwordError, 'border-red-600 dark:border-red-600': passwordError }"
-                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800"
-                        id="password-new" type="password">
+                    <input
+                        v-model="password"
+                        v-bind:class="{ 'error': passwordError }"
+                        id="password-new"
+                        type="password"
+                    >
                 </div>
                 <div class="mb-6">
                     <label for="password-new-conmfirm">
                         Confirm
                     </label>
-                    <input v-model="passwordConfirm"
-                        v-bind:class="{ 'border-gray-500 dark:border-neutral-400': !passwordError, 'border-red-600 dark:border-red-600': passwordError }"
-                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800"
-                        id="password-new-conmfirm" type="password">
+                    <input
+                        v-model="passwordConfirm"
+                        v-bind:class="{ 'error': passwordError }"
+                        id="password-new-conmfirm"
+                        type="password"
+                    >
                 </div>
                 <p class="text-sm">
                     Must be 12+ characters and contain uppercase, lowercase, number, and special character (e.g. !@#$%^&*(),;.?":{}|<>)
                 </p>
                 <div class="flex items-center justify-between">
-                    <button :disabled="isLoading"
+                    <button
+                        :disabled="isLoading"
                         class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 focus:outline-none focus:shadow-outline"
                         type="submit">
                         Update Password

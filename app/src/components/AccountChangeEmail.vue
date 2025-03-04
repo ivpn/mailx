@@ -6,13 +6,16 @@
                 <label for="new-email">
                     New email:
                 </label>
-                <input v-model="email"
-                    v-bind:class="{ 'border-gray-500 dark:border-neutral-400': !emailError, 'border-red-600 dark:border-red-600': emailError }"
-                    class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 leading-tight focus:border-bluish-500 mb-2"
-                    id="new-email" type="email">
+                <input
+                    v-model="email"
+                    v-bind:class="{ 'error': emailError }"
+                    id="new-email"
+                    type="email"
+                >
             </div>
             <div class="mb-3 max-w-xs">
-                <button @click="changeEmail"
+                <button
+                    @click="changeEmail"
                     class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-2 px-3 focus:outline-none focus:shadow-outline"
                     type="submit">
                     Change Email

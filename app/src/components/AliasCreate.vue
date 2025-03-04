@@ -81,10 +81,12 @@
                                 <label for="alias_catch_all_suffix">
                                     Alias sufix (6-12 alphanumeric characters):
                                 </label>
-                                <input id="alias_catch_all_suffix" v-model="alias.catch_all_suffix"
-                                    v-bind:class="{ 'border-gray-500': !errorCatchAllSuffix, 'border-red-600 dark:border-red-600': errorCatchAllSuffix }"
-                                    class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 leading-tight focus:border-bluish-500 mb-3"
-                                    type="text">
+                                <input 
+                                    v-model="alias.catch_all_suffix"
+                                    v-bind:class="{ 'error': errorCatchAllSuffix }"
+                                    id="alias_catch_all_suffix"
+                                    type="text"
+                                >
                                 <p v-if="errorCatchAllSuffix" class="error">Catch-all suffix must be between 6 and 12 characters</p>
                                 <p class="text-white dark:text-gray-100 mb-1">
                                     *+{{ alias.catch_all_suffix }}@{{ alias.domain }}
@@ -95,17 +97,21 @@
                             <label for="alias_description">
                                 Description:
                             </label>
-                            <input id="alias_description" v-model="alias.description"
-                                class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 leading-tight focus:border-bluish-500 mb-2"
-                                type="text">
+                            <input
+                                v-model="alias.description"
+                                id="alias_description"
+                                type="text"
+                            >
                         </div>
                         <div class="mb-5">
                             <label for="alias_from_name">
                                 From name:
                             </label>
-                            <input id="alias_from_name" v-model="alias.from_name"
-                                class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 leading-tight focus:border-bluish-500 mb-2"
-                                type="text">
+                            <input
+                                v-model="alias.from_name"
+                                id="alias_from_name"
+                                type="text"
+                            >
                         </div>
                         <div class="mb-6">
                             <label for="create-alias-recipient">
@@ -155,7 +161,8 @@
                             class="py-2 px-3 inline-flex items-center gap-x-2 font-medium text-base bg-bluish-500 text-white hover:bg-bluish-600 disabled:opacity-50 disabled:pointer-events-none">
                             Create Alias
                         </button>
-                        <button @click="close"
+                        <button
+                            @click="close"
                             class="text-gray-500 bg-gray-100 hover:bg-gray-200 dark:text-gray-300 dark:bg-neutral-600 dark:hover:bg-neutral-700 font-medium text-base py-2 px-3 focus:outline-none focus:shadow-outline">
                             Cancel
                         </button>

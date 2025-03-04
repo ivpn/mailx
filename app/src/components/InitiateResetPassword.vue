@@ -10,13 +10,16 @@
                     </label>
                     <input
                         v-model="email"
-                        v-bind:class="{ 'border-gray-500': !emailError, 'border-red-600 dark:border-red-600': emailError }"
-                        class="appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800"
-                        id="email" type="email" autocomplete="email">
+                        v-bind:class="{ 'error': emailError }"
+                        id="email"
+                        type="email"
+                        autocomplete="email"
+                    >
                     <p v-if="emailError" class="error">Required</p>
                 </div>
                 <div class="flex items-center justify-between">
-                    <button :disabled="isLoading"
+                    <button
+                        :disabled="isLoading"
                         class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 focus:outline-none focus:shadow-outline"
                         type="submit">
                         Send Reset Instructions

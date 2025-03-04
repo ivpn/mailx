@@ -28,21 +28,24 @@
                 </nav>
             </div>
             <div v-bind:class="{ 'mt-6': passkeySupported }">
-                <div v-if="passkeySupported" id="tabs-with-underline-1" role="tabpanel"
-                    aria-labelledby="tabs-with-underline-item-1">
+                <div v-if="passkeySupported" id="tabs-with-underline-1" role="tabpanel" aria-labelledby="tabs-with-underline-item-1">
                     <div v-if="!isLoggedIn()">
                         <div class="mb-4">
                             <label for="email_authn">
                                 Email Address
                             </label>
-                            <input v-model="emailAuthn"
-                                v-bind:class="{ 'default': !emailAuthnError, 'error': emailAuthnError }"
-                                class="input"
-                                id="email_authn" type="email" autocomplete="email_authn">
+                            <input
+                                v-model="emailAuthn"
+                                v-bind:class="{ 'error': emailAuthnError }"
+                                id="email_authn"
+                                type="email"
+                                autocomplete="email_authn"
+                            >
                             <p v-if="emailAuthnError" class="error">Required</p>
                         </div>
                         <div class="flex items-center w-full">
-                            <button :disabled="isLoading"
+                            <button
+                                :disabled="isLoading"
                                 class="cta-blue"
                                 type="button" @click="loginWithPasskey">
                                 Log In with Passkey
@@ -58,34 +61,43 @@
                             <label for="email">
                                 Email Address
                             </label>
-                            <input v-model="email"
-                                v-bind:class="{ 'default': !emailError, 'error': emailError }"
-                                class="input"
-                                id="email" type="email" autocomplete="email">
+                            <input
+                                v-model="email"
+                                v-bind:class="{ 'error': emailError }"
+                                id="email"
+                                type="email"
+                                autocomplete="email"
+                            >
                             <p v-if="emailError" class="error">Required</p>
                         </div>
                         <div class="mb-6">
                             <label for="password">
                                 Password
                             </label>
-                            <input v-model="password"
-                                v-bind:class="{ 'default': !passwordError, 'error': passwordError }"
-                                class="input"
-                                id="password" type="password" autocomplete="current-password">
+                            <input
+                                v-model="password"
+                                v-bind:class="{ 'error': passwordError }"
+                                id="password"
+                                type="password"
+                                autocomplete="current-password"
+                            >
                             <p v-if="passwordError" class="error mb-2">Required</p>
                         </div>
                         <div v-if="otpRequired" class="mb-6">
                             <label for="password">
                                 Two-factor authentication token:
                             </label>
-                            <input v-model="otp"
-                                v-bind:class="{ 'default': !otpError, 'error': otpError }"
-                                class="input"
-                                id="otp" type="text">
+                            <input
+                                v-model="otp"
+                                v-bind:class="{ 'error': otpError }"
+                                id="otp"
+                                type="text"
+                            >
                             <p v-if="otpError" class="error">Required</p>
                         </div>
                         <div class="flex items-center w-full">
-                            <button :disabled="isLoading"
+                            <button
+                                :disabled="isLoading"
                                 class="cta-blue"
                                 type="button" @click="login">
                                 Log In

@@ -40,20 +40,22 @@
                             </label>
                             <input
                                 v-model="recipient.email"
-                                v-bind:class="{ 'border-gray-500 dark:border-neutral-400': !emailError, 'border-red-600 dark:border-red-600': emailError }"
+                                v-bind:class="{ 'error': emailError }"
                                 id="recipient_email"
                                 placeholder="name@example.net"
-                                class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 leading-tight focus:border-bluish-500 mb-2"
-                                type="text">
+                                type="text"
+                            >
                             <p v-if="emailError" class="error">Required</p>
                         </div>
                     </div>
                     <div class="flex justify-start items-center gap-x-3 py-4 px-4 border-t dark:border-neutral-600">
-                        <button @click="postRecipient"
+                        <button
+                            @click="postRecipient"
                             class="py-2 px-3 inline-flex items-center gap-x-2 font-medium text-base bg-bluish-500 text-white hover:bg-bluish-600 disabled:opacity-50 disabled:pointer-events-none">
                             Add Recipient
                         </button>
-                        <button @click="close"
+                        <button
+                            @click="close"
                             class="text-gray-500 bg-gray-100 hover:bg-gray-200 dark:text-gray-300 dark:bg-neutral-600 dark:hover:bg-neutral-700 font-medium text-base py-2 px-3 focus:outline-none focus:shadow-outline">
                             Cancel
                         </button>

@@ -39,4 +39,8 @@
     a {
         @apply text-bluish-500 hover:text-bluish-600;
     }
+
+    hr {
+        @apply border-t border-gray-500 dark:border-neutral-600 mb-8;
+    }
 }

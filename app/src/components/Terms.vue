@@ -93,6 +93,6 @@ ul {
 }
 
 hr {
-    @apply border-t border-gray-500 my-10;
+    @apply my-10;
 }
 </style>

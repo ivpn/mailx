@@ -3,15 +3,15 @@
     <div class="flex flex-col p-5 my-8 bg-white dark:bg-neutral-800">
         <h1>Account Settings</h1>
         <AccountSubscription />
-        <hr class="mb-8 dark:border-neutral-600">
+        <hr>
         <AccountChangeEmail />
-        <hr class="mb-8 dark:border-neutral-600">
+        <hr>
         <AccountChangePassword />
-        <hr class="mb-8 dark:border-neutral-600">
+        <hr>
         <AccountTotp />
-        <hr class="mb-8 dark:border-neutral-600">
+        <hr>
         <AccountPasskeys />
-        <hr class="mb-8 dark:border-neutral-600">
+        <hr>
         <AccountDelete />
     </div>
 </template>

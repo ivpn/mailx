@@ -33,10 +33,9 @@
                             </label>
                             <textarea
                                 v-model="pgp_key"
-                                v-bind:class="{ 'border-gray-500 dark:border-neutral-400': !pgpError, 'border-red-600 dark:border-red-600': pgpError }"
+                                v-bind:class="{ 'error': pgpError }"
                                 id="recipient_pgp"
                                 placeholder="Starts with '-----BEGIN PGP PUBLIC KEY BLOCK-----'"
-                                class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 leading-tight focus:border-bluish-500 mb-2 h-[350px]"
                             >
                             </textarea>
                             <p v-if="pgpError" class="error">Required</p>

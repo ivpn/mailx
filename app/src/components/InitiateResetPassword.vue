@@ -28,8 +28,9 @@
                 <p class="text-gray-500 dark:text-gray-400">If an account with the specified email address exists we will send an email with further instructions on how to reset your password.</p>
             </div>
         </form>
-        <p class="text-gray-500 my-5"><router-link class="link"
-            to="/login">Back to Log In</router-link></p>
+        <p class="text-gray-500 my-5">
+            <router-link to="/login">Back to Log In</router-link>
+        </p>
     </div>
 </template>
 

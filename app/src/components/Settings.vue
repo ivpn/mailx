@@ -23,7 +23,7 @@
         </div>
         <h4>Default Recipient</h4>
         <p class="text-gray-500 dark:text-gray-400 mb-3">
-            The default recipient to be selected by default in the drop down options when creating a new recipient. You can add recipients <router-link class="link" to="/recipients">here</router-link>.
+            The default recipient to be selected by default in the drop down options when creating a new recipient. You can add recipients <router-link to="/recipients">here</router-link>.
         </p>
         <div class="max-w-xs mb-6">
             <label class="block text-gray-500 dark:text-gray-400 mb-3" for="recipient">
@@ -43,7 +43,7 @@
         </div>
         <h4>Default Alias Format</h4>
         <p class="text-gray-500 dark:text-gray-400 mb-3">
-            The default alias format to be selected by default when creating a new alias. You can add aliases <router-link class="link" to="/aliases">here</router-link>.
+            The default alias format to be selected by default when creating a new alias. You can add aliases <router-link to="/aliases">here</router-link>.
         </p>
         <div class="max-w-xs mb-6">
             <label class="block text-gray-500 dark:text-gray-400 mb-3" for="format">

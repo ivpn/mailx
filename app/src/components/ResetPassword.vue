@@ -39,7 +39,7 @@
             </div>
         </form>
         <p class="text-gray-500 my-5">
-            <router-link class="link" to="/login">Back to Log In</router-link>
+            <router-link to="/login">Back to Log In</router-link>
         </p>
     </div>
 </template>

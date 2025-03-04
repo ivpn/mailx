@@ -19,11 +19,11 @@
                             to="/account">
                             Account
                         </router-link>
-                        <a @click.prevent="logout"
-                            class="flex items-center gap-x-3.5 py-2 px-3 text-red-600 hover:bg-gray-100 dark:hover:bg-neutral-700 focus:outline-none"
+                        <button @click.stop="logout"
+                            class="flex items-center gap-x-3.5 py-2 px-3 text-red-600 hover:bg-gray-100 dark:hover:bg-neutral-700 focus:outline-none w-full"
                             href="#">
                             Log out
-                        </a>
+                        </button>
                     </div>
                     <ThemeSwitch />
                 </div>

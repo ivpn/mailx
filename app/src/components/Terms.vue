@@ -82,10 +82,6 @@ h2 {
 
 p {
     @apply mb-5 leading-7;
-
-    a {
-        @apply text-bluish-500 hover:text-bluish-600;
-    }
 }
 
 ul {

@@ -35,8 +35,7 @@
                 >
                 <button
                     @click="deletePgpKey"
-                    class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
-                    type="button">
+                    class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline">
                     Delete Key
                 </button>
             </div>
@@ -47,8 +46,7 @@
                 <RecipientEdit :recipient="recipient" />
                 <button
                     @click.stop="deleteRecipient"
-                    class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
-                    type="button">
+                    class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline">
                     Delete
                 </button>
             </div>

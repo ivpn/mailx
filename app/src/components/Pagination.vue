@@ -10,7 +10,7 @@
                 </select>
             </div>
             <nav class="flex items-center gap-x-1">
-                <button type="button"
+                <button
                     @click="prev"
                     class="min-h-[38px] min-w-[38px] py-2 px-2.5 inline-flex justify-center items-center gap-x-2 text-sm text-gray-800 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-700 focus:outline-none disabled:opacity-50 disabled:pointer-events-none">
                     <svg class="flex-shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -28,7 +28,7 @@
                     <span
                         class="min-h-[38px] flex justify-center items-center text-gray-500 dark:text-gray-400 py-2 px-1.5 text-sm">{{ pages }}</span>
                 </div>
-                <button type="button"
+                <button
                     @click="next"
                     class="min-h-[38px] min-w-[38px] py-2 px-2.5 inline-flex justify-center items-center gap-x-2 text-sm text-gray-800 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-700 focus:outline-none disabled:opacity-50 disabled:pointer-events-none">
                     <span aria-hidden="true" class="sr-only">Next</span>

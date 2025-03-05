@@ -21,5 +21,17 @@
         &.delete {
             @apply text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600;
         }
+
+        &.close {
+            @apply flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-neutral-700 disabled:opacity-50 disabled:pointer-events-none;
+        }
+
+        &.sort {
+            @apply inline-flex justify-center items-center text-xs text-gray-500 dark:text-gray-400;
+        }
+
+        &.plain {
+            @apply text-gray-800 dark:text-gray-100 hover:text-gray-800 dark:hover:text-gray-100;
+        }
     }
 }

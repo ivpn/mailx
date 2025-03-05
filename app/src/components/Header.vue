@@ -4,7 +4,7 @@
             <div class="flex flex-row justify-between max-w-screen-lg">
                 <HeaderMenu />
                 <div class="hs-dropdown relative flex items-center [--placement:bottom-right] my-3">
-                    <button id="hs-dropdown-default" type="button"
+                    <button id="hs-dropdown-default"
                         class="flex items-center hs-dropdown-toggle text-gray-500 dark:text-gray-400 pl-4 pr-3 hover:text-gray-800 dark:hover:text-gray-100">
                         {{ email }}
                         <svg class="ms-1 flex-shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"

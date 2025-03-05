@@ -4,7 +4,6 @@
             v-if="isLight()"
             :key="rowKey"
             @click="toggleTheme"
-            type="button"
             class="hs-dark-mode inline-flex items-center gap-x-2 py-2 px-2 bg-neutral-100 hover:text-gray-800 rounded-full text-sm text-gray-500 dark:text-gray-400 focus:outline-none"
             data-hs-theme-click-value="dark">
             <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -16,7 +15,6 @@
             v-if="isDark()"
             :key="rowKey"
             @click="toggleTheme"
-            type="button"
             class="hs-dark-mode inline-flex items-center gap-x-2 py-2 px-2 bg-neutral-700 hover:text-gray-100 rounded-full text-sm text-gray-500 dark:text-gray-400 focus:outline-none"
             data-hs-theme-click-value="light">
             <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"

@@ -10,7 +10,6 @@
             <div v-if="passkeySupported" class="border-b border-gray-200 dark:border-neutral-600">
                 <nav class="flex gap-x-1" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
                     <button
-                        type="button"
                         @click="onTabChange"
                         class="tab active"
                         id="tabs-with-underline-item-1" aria-selected="true" data-hs-tab="#tabs-with-underline-1"
@@ -18,7 +17,6 @@
                         Passkey
                     </button>
                     <button
-                        type="button"
                         @click="onTabChange"
                         class="tab"
                         id="tabs-with-underline-item-2" aria-selected="false" data-hs-tab="#tabs-with-underline-2"
@@ -46,7 +44,7 @@
                         <div class="flex items-center w-full">
                             <button
                                 :disabled="isLoading"
-                                type="button" @click="loginWithPasskey">
+                                @click="loginWithPasskey">
                                 Log In with Passkey
                             </button>
                         </div>
@@ -97,7 +95,7 @@
                         <div class="flex items-center w-full">
                             <button
                                 :disabled="isLoading"
-                                type="button" @click="login">
+                                @click="login">
                                 Log In
                             </button>
                         </div>

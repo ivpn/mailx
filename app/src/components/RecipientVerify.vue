@@ -1,8 +1,7 @@
 <template>
     <div>
         <button
-            v-bind:data-hs-overlay="'#modal-verify-recipient' + recipient.id"
-            type="button">
+            v-bind:data-hs-overlay="'#modal-verify-recipient' + recipient.id">
             Verify
         </button>
         <div v-bind:id="'modal-verify-recipient' + recipient.id"
@@ -12,7 +11,7 @@
                 <div class="flex flex-col bg-white dark:bg-neutral-800 border dark:border-neutral-600 shadow-sm rounded pointer-events-auto">
                     <div class="flex justify-between items-center py-3 px-4 border-b dark:border-neutral-600">
                         <h3>Verify recipient</h3>
-                        <button @click="close" type="button"
+                        <button @click="close"
                             class="flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-neutral-700  disabled:opacity-50 disabled:pointer-events-none">
                             <span class="sr-only">Close</span>
                             <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -51,8 +50,7 @@
                         </button>
                         <button
                             @click="sendOtp"
-                            class="text-gray-500 bg-gray-100 hover:bg-gray-200 dark:text-gray-300 dark:bg-neutral-600 dark:hover:bg-neutral-700 font-medium text-base py-2 px-3 focus:outline-none focus:shadow-outline"
-                            type="submit">
+                            class="text-gray-500 bg-gray-100 hover:bg-gray-200 dark:text-gray-300 dark:bg-neutral-600 dark:hover:bg-neutral-700 font-medium text-base py-2 px-3 focus:outline-none focus:shadow-outline">
                             Resend OTP
                         </button>
                         <button

@@ -29,8 +29,7 @@
         <div class="mb-3 max-w-xs">
             <button
                 @click="changePassword"
-                class="cta"
-                type="submit">
+                class="cta">
                 Change Password
             </button>
         </div>

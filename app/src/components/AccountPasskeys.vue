@@ -6,9 +6,7 @@
                 Add or remove Passkeys.<br>
             </p>
             <div class="flex justify-start items-center gap-x-3 mb-3">
-                <button
-                    @click="addPasskey"
-                    class="cta">
+                <button @click="addPasskey" class="cta">
                     <svg class="flex-shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
                         stroke-linejoin="round">
@@ -55,9 +53,7 @@
                                         {{ cred.id }}
                                     </td>
                                     <td class="pl-5 py-4 whitespace-nowrap text-end text-sm text-gray-800 dark:text-gray-100">
-                                        <button
-                                            @click="deleteCred(cred.id)"
-                                            class="delete">
+                                        <button @click="deleteCred(cred.id)" class="delete">
                                             Delete
                                         </button>
                                     </td>

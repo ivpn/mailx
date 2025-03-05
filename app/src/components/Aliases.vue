@@ -29,11 +29,11 @@
                                 <table class="table-auto w-full divide-y divide-gray-200 dark:divide-neutral-600">
                                     <thead>
                                         <tr>
-                                            <th v-if="!isDashboard" scope="col" class="pr-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
+                                            <th v-if="!isDashboard" scope="col" class="pr-5 py-3 text-start">
                                                 <button
                                                 @click="sort"
                                                 data-sort="created_at"
-                                                class="inline-flex justify-center items-center">
+                                                class="sort">
                                                     CREATED
                                                     <svg
                                                     data-sort="created_at"
@@ -45,11 +45,11 @@
                                                     </svg>
                                                 </button>
                                             </th>
-                                            <th v-if="!isDashboard" scope="col" class="px-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
+                                            <th v-if="!isDashboard" scope="col" class="px-5 py-3 text-start">
                                                 <button
                                                 @click="sort"
                                                 data-sort="name"
-                                                class="inline-flex justify-center items-center">
+                                                class="sort">
                                                     ALIAS
                                                     <svg
                                                     data-sort="name"

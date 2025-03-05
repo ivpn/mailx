@@ -24,7 +24,7 @@
         <td class="px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800">
             <div class="hs-tooltip inline-block">
                 <span class="hs-tooltip-toggle">
-                    <button class="dark:text-gray-100 truncate max-w-[320px]" @click="copyAlias(alias.name)">
+                    <button class="plain truncate max-w-[320px]" @click="copyAlias(alias.name)">
                         {{ alias.name }}
                     </button>
                     <span
@@ -71,10 +71,7 @@
             <div class="flex gap-5 justify-end">
                 <AliasSend :alias="alias" />
                 <AliasEdit :alias="alias" :recipients="recipients" :key="rowKey" />
-                <button
-                    @click.stop="deleteAlias"
-                    class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600 font-medium text-sm py-2 focus:outline-none focus:shadow-outline"
-                    type="submit">
+                <button @click.stop="deleteAlias" class="delete">
                     Delete
                 </button>
             </div>

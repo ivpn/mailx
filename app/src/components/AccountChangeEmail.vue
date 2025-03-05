@@ -16,8 +16,7 @@
             <div class="mb-3 max-w-xs">
                 <button
                     @click="changeEmail"
-                    class="cta"
-                    type="submit">
+                    class="cta">
                     Change Email
                 </button>
             </div>

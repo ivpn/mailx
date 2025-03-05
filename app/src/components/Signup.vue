@@ -10,13 +10,13 @@
         <form class="w-full max-w-sm bg-white dark:bg-neutral-800 px-8 pt-6 pb-8 mb-4" @submit.prevent="">
             <div v-if="passkeySupported" class="border-b border-gray-200 dark:border-neutral-600">
                 <nav class="flex gap-x-1" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
-                    <button type="button"
+                    <button
                         class="tab active"
                         id="tabs-with-underline-item-1" aria-selected="true" data-hs-tab="#tabs-with-underline-1"
                         aria-controls="tabs-with-underline-1" role="tab">
                         Passkey
                     </button>
-                    <button type="button"
+                    <button
                         class="tab"
                         id="tabs-with-underline-item-2" aria-selected="false" data-hs-tab="#tabs-with-underline-2"
                         aria-controls="tabs-with-underline-2" role="tab">
@@ -43,8 +43,7 @@
                         <div class="flex items-center w-full">
                             <button
                                 @click="registerWithPasskey"
-                                :disabled="isLoading"
-                                type="button">
+                                :disabled="isLoading">
                                 Sign Up with Passkey
                             </button>
                         </div>
@@ -86,8 +85,7 @@
                         <div class="flex items-center w-full">
                             <button
                                 @click="register"
-                                :disabled="isLoading"
-                                type="button">
+                                :disabled="isLoading">
                                 Sign Up
                             </button>
                         </div>

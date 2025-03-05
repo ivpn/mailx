@@ -1,8 +1,6 @@
 <template>
     <div>
-        <button
-            v-bind:data-hs-overlay="'#modal-edit-recipient' + recipient.id"
-            type="button">
+        <button v-bind:data-hs-overlay="'#modal-edit-recipient' + recipient.id">
             Edit
         </button>
         <div v-bind:id="'modal-edit-recipient' + recipient.id"
@@ -13,7 +11,7 @@
                     class="flex flex-col bg-white dark:bg-neutral-800 border dark:border-neutral-600 shadow-sm rounded pointer-events-auto">
                     <div class="flex justify-between items-center py-3 px-4 border-b dark:border-neutral-600">
                         <h3>Edit recipient</h3>
-                        <button @click="close" type="button"
+                        <button @click="close"
                             class="flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-neutral-700  disabled:opacity-50 disabled:pointer-events-none">
                             <span class="sr-only">Close</span>
                             <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24"

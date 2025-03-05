@@ -2,7 +2,7 @@
     <div v-if="!res.is_active && isDashboard" class="flex flex-col items-center text-center my-14 pt-6">
         <h3>Verify Your Email</h3>
         <p>
-            Please <router-link class="cta-plain" to="/account">verify</router-link> your account email address.
+            Please <router-link to="/account">verify</router-link> your account email address.
         </p>
     </div>
     <div v-if="!res.is_active && !isDashboard" class="flex flex-col p-5 pb-4 my-8 bg-white dark:bg-neutral-800">

@@ -3,7 +3,6 @@
         <button
             v-bind:disabled="!alias.recipients.length"
             v-bind:data-hs-overlay="'#modal-send-alias' + alias.id"
-            class="cta-plain"
             type="submit">
             Send
         </button>

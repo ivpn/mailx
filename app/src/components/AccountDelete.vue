@@ -3,7 +3,7 @@
         <h2>Delete Account</h2>
         <button
             v-bind:data-hs-overlay="'#modal-delete-account'"
-            class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600 font-medium py-2 focus:outline-none focus:shadow-outline">
+            class="delete">
             Delete Account
         </button>
 
@@ -14,7 +14,7 @@
                 <div class="flex flex-col bg-white dark:bg-neutral-800 border dark:border-neutral-600 shadow-sm rounded pointer-events-auto">
                     <div class="flex justify-between items-center py-3 px-4 border-b dark:border-neutral-600">
                         <h3>Delete Account</h3>
-                        <button @click="close" type="button"
+                        <button @click="close"
                             class="flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-neutral-700 disabled:opacity-50 disabled:pointer-events-none">
                             <span class="sr-only">Close</span>
                             <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -52,12 +52,12 @@
                             <div class="flex justify-start items-center gap-x-3 pt-4 border-t dark:border-neutral-600">
                                 <button
                                     @click="promptDeleteAccount"
-                                    class="py-2 px-3 inline-flex items-center gap-x-2 font-medium text-base bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 disabled:pointer-events-none">
+                                    class="cta delete">
                                     Delete Account
                                 </button>
                                 <button
                                     @click="close"
-                                    class="text-gray-500 bg-gray-100 hover:bg-gray-200 dark:text-gray-300 dark:bg-neutral-600 dark:hover:bg-neutral-700 font-medium text-base py-2 px-3 focus:outline-none focus:shadow-outline">
+                                    class="cta cancel">
                                     Cancel
                                 </button>
                             </div>

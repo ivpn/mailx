@@ -1,7 +1,7 @@
 <template>
     <div>
-        <button v-bind:data-hs-overlay="'#modal-alias-edit' + alias.id"
-            class="cta-plain"
+        <button
+            v-bind:data-hs-overlay="'#modal-alias-edit' + alias.id"
             type="submit">
             Edit
         </button>

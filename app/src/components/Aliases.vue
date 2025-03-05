@@ -88,8 +88,7 @@
                 </div>
             </div>
             <p v-if="isDashboard" class="text-sm my-4">
-                <router-link to="/aliases" class="cta-plain"
-                    type="submit">All Aliases</router-link>
+                <router-link to="/aliases">All Aliases</router-link>
             </p>
             <p v-if="error" class="error">Error: {{ error }}</p>
             <Pagination v-if="list.length && !isDashboard" :list.sync="list" :limit="limit" :page="page" :total="total" :key="rowKey" @onUpdatePage="onUpdatePage" />

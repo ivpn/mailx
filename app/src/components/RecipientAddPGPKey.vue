@@ -1,7 +1,7 @@
 <template>
     <div>
-        <button v-bind:data-hs-overlay="'#modal-add-key-recipient' + recipient.id"
-            class="cta-plain"
+        <button
+            v-bind:data-hs-overlay="'#modal-add-key-recipient' + recipient.id"
             type="button">
             Add PGP key
         </button>

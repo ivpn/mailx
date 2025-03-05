@@ -1,7 +1,7 @@
 <template>
     <div>
-        <button v-bind:data-hs-overlay="'#modal-verify-recipient' + recipient.id"
-            class="cta-plain"
+        <button
+            v-bind:data-hs-overlay="'#modal-verify-recipient' + recipient.id"
             type="button">
             Verify
         </button>

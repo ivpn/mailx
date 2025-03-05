@@ -46,7 +46,6 @@
                         <div class="flex items-center w-full">
                             <button
                                 :disabled="isLoading"
-                                class="cta-blue"
                                 type="button" @click="loginWithPasskey">
                                 Log In with Passkey
                             </button>
@@ -98,7 +97,6 @@
                         <div class="flex items-center w-full">
                             <button
                                 :disabled="isLoading"
-                                class="cta-blue"
                                 type="button" @click="login">
                                 Log In
                             </button>
@@ -109,8 +107,7 @@
             </div>
             <div v-if="isLoggedIn()" class="pb-2">
                 <p>You are logged in</p>
-                <router-link to="/"
-                    class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 focus:outline-none focus:shadow-outline">
+                <router-link to="/" tag="button" class="cta full">
                     Go to Dashboard
                 </router-link>
             </div>

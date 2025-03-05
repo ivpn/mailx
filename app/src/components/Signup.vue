@@ -41,9 +41,10 @@
                             <p v-if="emailAuthnError" class="error">Required</p>
                         </div>
                         <div class="flex items-center w-full">
-                            <button :disabled="isLoading"
-                                class="cta-blue"
-                                type="button" @click="registerWithPasskey">
+                            <button
+                                @click="registerWithPasskey"
+                                :disabled="isLoading"
+                                type="button">
                                 Sign Up with Passkey
                             </button>
                         </div>
@@ -83,9 +84,10 @@
                             <p class="text-sm mb-2">Must be 12+ characters and contain uppercase, lowercase, number, and special character (e.g. !@#$%^&*(),;.?":{}|<>)</p>
                         </div>
                         <div class="flex items-center w-full">
-                            <button :disabled="isLoading"
-                                class="cta-blue"
-                                type="button" @click="register">
+                            <button
+                                @click="register"
+                                :disabled="isLoading"
+                                type="button">
                                 Sign Up
                             </button>
                         </div>
@@ -95,8 +97,7 @@
             </div>
             <div v-if="apiSuccess">
                 <p class="success mb-6">{{ apiSuccess }}</p>
-                <router-link to="/login"
-                    class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-3 px-4 focus:outline-none focus:shadow-outline">
+                <router-link to="/login" tag="button" class="cta full">
                     Proceed to Log In
                 </router-link>
             </div>

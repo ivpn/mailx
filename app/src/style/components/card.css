@@ -1,0 +1,5 @@
+@layer components {
+    .card {
+        @apply flex flex-col p-5 my-8 bg-white dark:bg-neutral-800;
+    }
+}

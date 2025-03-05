@@ -1,6 +1,6 @@
 <template>
     <AccountVerify />
-    <div class="flex flex-col p-5 my-8 bg-white dark:bg-neutral-800">
+    <div class="card">
         <h1>Account Settings</h1>
         <AccountSubscription />
         <hr>

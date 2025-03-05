@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col p-5 pb-4 my-8 bg-white dark:bg-neutral-800">
+    <div class="card">
         <h1>Settings</h1>
         <h4>Default Domain</h4>
         <p>

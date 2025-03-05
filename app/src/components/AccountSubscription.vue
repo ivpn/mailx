@@ -17,7 +17,7 @@
             <h4>Subscription ID:</h4>
             <div class="hs-tooltip text-gray-500 dark:text-gray-400 mb-3">
                 <span class="hs-tooltip-toggle">
-                    <button @click="copyAlias(res.id)">
+                    <button @click="copyAlias(res.id)" class="plain">
                         {{ res.id }}
                     </button>
                     <span

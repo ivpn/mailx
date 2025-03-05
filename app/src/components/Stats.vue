@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col p-5 pb-4 my-8 bg-white dark:bg-neutral-800">
+    <div class="card">
         <h1>Messages</h1>
         <h3>Last 7 days</h3>
         <div id="chart" class="mb-5"></div>

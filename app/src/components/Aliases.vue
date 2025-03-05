@@ -16,7 +16,7 @@
                 </div>
             </div>
         </div>
-        <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="flex flex-col p-5 pb-4 my-8 bg-white dark:bg-neutral-800">
+        <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="card">
             <h1>Aliases</h1>
             <div>
                 <div class="flex items-center justify-between mb-6">
@@ -108,7 +108,7 @@
                 </div>
             </div>
         </div>
-        <div v-bind:class="{ 'hidden': !listCatchAll.length || !loadedCatchAll }" class="flex flex-col p-5 pb-4 my-8 bg-white dark:bg-neutral-800">
+        <div v-bind:class="{ 'hidden': !listCatchAll.length || !loadedCatchAll }" class="card">
             <h1>Catch-all Aliases</h1>
             <div>
                 <div class="flex items-center justify-between mb-6">

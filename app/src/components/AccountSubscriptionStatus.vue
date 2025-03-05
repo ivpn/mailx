@@ -1,5 +1,5 @@
 <template>
-    <div v-if="!isActive && !isAccountRoute()" class="flex flex-col p-5 my-8 bg-white dark:bg-neutral-800">
+    <div v-if="!isActive && !isAccountRoute()" class="card">
         <p class="mb-2">Account subscription is inactive</p>
         <router-link to="/account">View Details</router-link>
     </div>

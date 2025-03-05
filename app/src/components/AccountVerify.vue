@@ -5,7 +5,7 @@
             Please <router-link to="/account">verify</router-link> your account email address.
         </p>
     </div>
-    <div v-if="!res.is_active && !isDashboard" class="flex flex-col p-5 pb-4 my-8 bg-white dark:bg-neutral-800">
+    <div v-if="!res.is_active && !isDashboard" class="card">
         <h1>Verify Your Email</h1>
         <p>
             We have sent a 6-digit OTP code to your email address. Please enter the code below to verify your account email. Accounts with unconfirmed email address may be deleted after 7 days.

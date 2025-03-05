@@ -11,14 +11,13 @@
                 <nav class="flex gap-x-1" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
                     <button
                         @click="onTabChange"
-                        class="tab active"
+                        class="active"
                         id="tabs-with-underline-item-1" aria-selected="true" data-hs-tab="#tabs-with-underline-1"
                         aria-controls="tabs-with-underline-1" role="tab">
                         Passkey
                     </button>
                     <button
                         @click="onTabChange"
-                        class="tab"
                         id="tabs-with-underline-item-2" aria-selected="false" data-hs-tab="#tabs-with-underline-2"
                         aria-controls="tabs-with-underline-2" role="tab">
                         Email & Password
@@ -42,9 +41,7 @@
                             <p v-if="emailAuthnError" class="error">Required</p>
                         </div>
                         <div class="flex items-center w-full">
-                            <button
-                                :disabled="isLoading"
-                                @click="loginWithPasskey">
+                            <button :disabled="isLoading" @click="loginWithPasskey">
                                 Log In with Passkey
                             </button>
                         </div>
@@ -93,9 +90,7 @@
                             <p v-if="otpError" class="error">Required</p>
                         </div>
                         <div class="flex items-center w-full">
-                            <button
-                                :disabled="isLoading"
-                                @click="login">
+                            <button :disabled="isLoading" @click="login" class="cta full">
                                 Log In
                             </button>
                         </div>

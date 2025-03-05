@@ -11,13 +11,12 @@
             <div v-if="passkeySupported" class="border-b border-gray-200 dark:border-neutral-600">
                 <nav class="flex gap-x-1" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
                     <button
-                        class="tab active"
+                        class="active"
                         id="tabs-with-underline-item-1" aria-selected="true" data-hs-tab="#tabs-with-underline-1"
                         aria-controls="tabs-with-underline-1" role="tab">
                         Passkey
                     </button>
                     <button
-                        class="tab"
                         id="tabs-with-underline-item-2" aria-selected="false" data-hs-tab="#tabs-with-underline-2"
                         aria-controls="tabs-with-underline-2" role="tab">
                         Email & Password
@@ -41,9 +40,7 @@
                             <p v-if="emailAuthnError" class="error">Required</p>
                         </div>
                         <div class="flex items-center w-full">
-                            <button
-                                @click="registerWithPasskey"
-                                :disabled="isLoading">
+                            <button @click="registerWithPasskey" :disabled="isLoading" class="cta full">
                                 Sign Up with Passkey
                             </button>
                         </div>
@@ -83,9 +80,7 @@
                             <p class="text-sm mb-2">Must be 12+ characters and contain uppercase, lowercase, number, and special character (e.g. !@#$%^&*(),;.?":{}|<>)</p>
                         </div>
                         <div class="flex items-center w-full">
-                            <button
-                                @click="register"
-                                :disabled="isLoading">
+                            <button @click="register" :disabled="isLoading" class="cta full">
                                 Sign Up
                             </button>
                         </div>

@@ -72,9 +72,7 @@
             >
         </div>
         <div class="mb-3">
-            <button
-                @click="saveSettings"
-                class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-2 px-3 focus:outline-none focus:shadow-outline">
+            <button @click="saveSettings" class="cta">
                 Save Settings
             </button>
         </div>

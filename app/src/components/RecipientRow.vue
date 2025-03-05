@@ -6,7 +6,7 @@
         <td class="px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800 dark:text-gray-100">
             <div class="hs-tooltip inline-block">
                 <span class="hs-tooltip-toggle">
-                    <button class=" dark:text-gray-100 truncate max-w-[320px]" @click="copyAlias(recipient.email)">
+                    <button class="plain truncate max-w-[320px]" @click="copyAlias(recipient.email)">
                         {{ recipient.email }}
                     </button>
                     <span
@@ -33,9 +33,7 @@
                     type="checkbox"
                     class="mr-5"
                 >
-                <button
-                    @click="deletePgpKey"
-                    class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline">
+                <button @click="deletePgpKey" class="delete">
                     Delete Key
                 </button>
             </div>
@@ -44,9 +42,7 @@
             <div class="flex gap-5 justify-end">
                 <RecipientVerify v-if="!recipient.is_active" :recipient="recipient" />
                 <RecipientEdit :recipient="recipient" />
-                <button
-                    @click.stop="deleteRecipient"
-                    class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline">
+                <button @click.stop="deleteRecipient" class="delete">
                     Delete
                 </button>
             </div>

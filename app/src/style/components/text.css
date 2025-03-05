@@ -33,7 +33,7 @@
 
     table td > p,
     table td > div > p {
-        @apply text-white dark:text-gray-100 mb-0;
+        @apply text-gray-800 dark:text-gray-100 mb-0;
     }
 
     a {

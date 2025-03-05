@@ -1,7 +1,6 @@
 <template>
     <div>
-        <button v-bind:data-hs-overlay="'#modal-create-recipient'"
-            class="mt-3 py-2 pl-2 pr-3 inline-flex justify-center items-center gap-x-2 font-medium text-base bg-bluish-500 text-white hover:bg-bluish-600">
+        <button v-bind:data-hs-overlay="'#modal-create-recipient'" class="cta">
             <svg class="flex-shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
                 stroke-linejoin="round">
@@ -17,8 +16,7 @@
                 <div class="flex flex-col bg-white dark:bg-neutral-800 border dark:border-neutral-600 shadow-sm rounded pointer-events-auto">
                     <div class="flex justify-between items-center py-3 px-4 border-b dark:border-neutral-600">
                         <h3>Add Recipient</h3>
-                        <button @click="close"
-                            class="flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-neutral-700  disabled:opacity-50 disabled:pointer-events-none">
+                        <button @click="close" class="close">
                             <span class="sr-only">Close</span>
                             <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -49,14 +47,10 @@
                         </div>
                     </div>
                     <div class="flex justify-start items-center gap-x-3 py-4 px-4 border-t dark:border-neutral-600">
-                        <button
-                            @click="postRecipient"
-                            class="py-2 px-3 inline-flex items-center gap-x-2 font-medium text-base bg-bluish-500 text-white hover:bg-bluish-600 disabled:opacity-50 disabled:pointer-events-none">
+                        <button @click="postRecipient" class="cta">
                             Add Recipient
                         </button>
-                        <button
-                            @click="close"
-                            class="text-gray-500 bg-gray-100 hover:bg-gray-200 dark:text-gray-300 dark:bg-neutral-600 dark:hover:bg-neutral-700 font-medium text-base py-2 px-3 focus:outline-none focus:shadow-outline">
+                        <button @click="close" class="cta cancel">
                             Cancel
                         </button>
                     </div>

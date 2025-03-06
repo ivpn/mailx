@@ -2,10 +2,8 @@
     <div class="mb-5">
         <h2>Subscription</h2>
         <p v-if="res.id" class="text-sm">
-            <span v-if="isActive()"
-                class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-800 dark:text-emerald-100">Active</span>
-            <span v-if="!isActive()"
-                class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-gray-100 text-gray-500 dark:bg-gray-500 dark:text-gray-100">Inactive</span>
+            <span v-if="isActive()" class="badge success">Active</span>
+            <span v-if="!isActive()" class="badge">Inactive</span>
         </p>
         <div v-if="isActive()" class="mb-3">
             <h4>Active until:</h4>

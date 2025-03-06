@@ -36,7 +36,7 @@
         <p v-if="error" class="error">Error: {{ error }}</p>
         <p v-if="resendSuccess && !error && !confirmSuccess" class="success">{{ resendSuccess }}</p>
         <p v-if="confirmSuccess" class="text-sm my-3">
-            <span class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-800 dark:text-emerald-100">{{ confirmSuccess }}</span>
+            <span class="badge success">{{ confirmSuccess }}</span>
         </p>
     </div>
 </template>

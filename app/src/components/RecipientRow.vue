@@ -19,8 +19,8 @@
         </td>
         <td class="px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800">
             <p>
-                <span v-if="recipient.is_active" class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-800 dark:text-emerald-100">Verified</span>
-                <span v-if="!recipient.is_active" class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-gray-100 text-gray-500 dark:bg-gray-500 dark:text-gray-100">Unverified</span>
+                <span v-if="recipient.is_active" class="badge success">Verified</span>
+                <span v-if="!recipient.is_active" class="badge">Unverified</span>
             </p>
         </td>
         <td class="px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800">

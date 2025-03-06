@@ -2,10 +2,8 @@
     <div v-if="res.id" class="mb-5">
         <h2>2-Factor Authentication</h2>
         <p class="text-sm">
-            <span v-if="res.totp_enabled"
-                class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-800 dark:text-emerald-100">Enabled</span>
-            <span v-if="!res.totp_enabled"
-                class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-gray-100 text-gray-500 dark:bg-gray-500 dark:text-gray-100">Disabled</span>
+            <span v-if="res.totp_enabled" class="badge success">Enabled</span>
+            <span v-if="!res.totp_enabled" class="badge">Disabled</span>
         </p>
         <p>
             When enabled, 2-factor authentication will be required when you log in.<br>

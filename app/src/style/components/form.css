@@ -2,7 +2,7 @@
     input[type=email],
     input[type=text],
     input[type=password] {
-        @apply border-gray-500 appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 bg-white dark:bg-neutral-800 dark:border-neutral-500 dark:text-gray-400;
+        @apply text-gray-600 border-gray-500 appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluish-500 mb-2 bg-white dark:bg-neutral-800 dark:border-neutral-500 dark:text-gray-400;
 
         &.error {
             @apply border-red-600 dark:border-red-600;
@@ -18,11 +18,11 @@
     }
 
     select {
-        @apply form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-500 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent;
+        @apply form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-600 bg-white dark:text-gray-400 dark:bg-neutral-800 dark:border-neutral-500 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent;
     }
 
     textarea {
-        @apply border-gray-500 dark:border-neutral-500 appearance-none outline-none border w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 leading-tight focus:border-bluish-500 mb-2 h-[350px];
+        @apply border-gray-500 dark:border-neutral-500 appearance-none outline-none border w-full py-3 px-4 text-gray-600 bg-white dark:text-gray-300 dark:bg-neutral-800 leading-tight focus:border-bluish-500 mb-2 h-[350px];
 
         &.error {
             @apply border-red-600 dark:border-red-600;
@@ -31,5 +31,12 @@
 
     label {
         @apply block text-gray-500 dark:text-gray-400 mb-3;
+    }
+    
+    .hs-select {
+
+        button {
+            @apply font-normal text-base text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-400;
+        }
     }
 }

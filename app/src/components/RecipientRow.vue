@@ -33,7 +33,7 @@
                     type="checkbox"
                     class="mr-5"
                 >
-                <button @click="deletePgpKey" class="delete">
+                <button @click.stop="deletePgpKey" class="delete">
                     Delete Key
                 </button>
             </div>

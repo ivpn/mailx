@@ -52,7 +52,7 @@
                             </div>
                             <div class="flex justify-start items-center gap-x-3 pt-4 border-t dark:border-neutral-600">
                                 <button
-                                    @click="promptDeleteAccount"
+                                    @click.stop="promptDeleteAccount"
                                     class="cta delete">
                                     Delete Account
                                 </button>

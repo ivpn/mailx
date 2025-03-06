@@ -4,6 +4,7 @@
 @import "components/tabs.css";
 @import "components/text.css";
 @import "components/card.css";
+@import "components/plugin.css";
 
 @tailwind base;
 @tailwind components;

@@ -3,12 +3,10 @@
         <button v-bind:data-hs-overlay="'#modal-alias-edit' + alias.id">
             Edit
         </button>
-        <div v-bind:id="'modal-alias-edit' + alias.id"
-            class="hs-overlay hidden size-full fixed top-0 start-0 z-[60] overflow-x-hidden overflow-y-auto pointer-events-none">
-            <div
-                class="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 opacity-0 transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
-                <div class="flex flex-col bg-white dark:bg-neutral-800 border dark:border-neutral-600 shadow-sm rounded pointer-events-auto">
-                    <div class="flex justify-between items-center py-3 px-4 border-b dark:border-neutral-600">
+        <div v-bind:id="'modal-alias-edit' + alias.id" class="hs-overlay hidden">
+            <div>
+                <div>
+                    <header>
                         <h3>Edit alias</h3>
                         <button @click="close" class="close">
                             <span class="sr-only">Close</span>
@@ -19,8 +17,8 @@
                                 <path d="m6 6 12 12"></path>
                             </svg>
                         </button>
-                    </div>
-                    <div class="p-4 whitespace-normal text-left text-base">
+                    </header>
+                    <article>
                         <h3>{{ alias.name }}</h3>
                         <div class="mb-5">
                             <label v-bind:for="'description_' + alias.id"
@@ -71,22 +69,22 @@
                             </select>
                             <p v-if="errorRecipients" class="error pt-3">{{ errorRecipients }}</p>
                         </div>
-                    </div>
-                    <div class="flex justify-start items-center gap-x-3 py-4 px-4 border-t dark:border-neutral-600">
-                        <button
-                            v-if="!success"
-                            @click="updateAlias"
-                            v-bind:disabled="errorRecipients.length > 0"
-                            class="cta">
-                            Save
-                        </button>
-                        <button @click="close" class="cta cancel">
-                            Cancel
-                        </button>
-                    </div>
-                    <div class="flex items-start">
+                    </article>
+                    <footer>
+                        <nav>
+                            <button
+                                v-if="!success"
+                                @click="updateAlias"
+                                v-bind:disabled="errorRecipients.length > 0"
+                                class="cta">
+                                Save
+                            </button>
+                            <button @click="close" class="cta cancel">
+                                Cancel
+                            </button>
+                        </nav>
                         <p v-if="error" class="error px-5">Error: {{ error }}</p>
-                    </div>
+                    </footer>
                 </div>
             </div>
         </div>

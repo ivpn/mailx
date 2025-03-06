@@ -9,12 +9,10 @@
             </svg>
             Add Recipient
         </button>
-        <div v-bind:id="'modal-create-recipient'"
-            class="hs-overlay hidden size-full fixed top-0 start-0 z-[60] overflow-x-hidden overflow-y-auto pointer-events-none">
-            <div
-                class="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 opacity-0 transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
-                <div class="flex flex-col bg-white dark:bg-neutral-800 border dark:border-neutral-600 shadow-sm rounded pointer-events-auto">
-                    <div class="flex justify-between items-center py-3 px-4 border-b dark:border-neutral-600">
+        <div v-bind:id="'modal-create-recipient'" class="hs-overlay hidden">
+            <div>
+                <div>
+                    <header>
                         <h3>Add Recipient</h3>
                         <button @click="close" class="close">
                             <span class="sr-only">Close</span>
@@ -25,8 +23,8 @@
                                 <path d="m6 6 12 12"></path>
                             </svg>
                         </button>
-                    </div>
-                    <div class="p-4 whitespace-normal text-left text-base">
+                    </header>
+                    <article>
                         <div class="mb-5">
                             <p>
                                 Add a email address to receive forwarded emails. A 6 digit verification code will be sent to this email address. If expired, you can resend the verification code. Unverified recipients will not receive any forwarded emails and may be deleted after 7 days.
@@ -45,18 +43,18 @@
                             >
                             <p v-if="emailError" class="error">Required</p>
                         </div>
-                    </div>
-                    <div class="flex justify-start items-center gap-x-3 py-4 px-4 border-t dark:border-neutral-600">
-                        <button @click="postRecipient" class="cta">
-                            Add Recipient
-                        </button>
-                        <button @click="close" class="cta cancel">
-                            Cancel
-                        </button>
-                    </div>
-                    <div class="flex items-start">
+                    </article>
+                    <footer>
+                        <nav>
+                            <button @click="postRecipient" class="cta">
+                                Add Recipient
+                            </button>
+                            <button @click="close" class="cta cancel">
+                                Cancel
+                            </button>
+                        </nav>
                         <p v-if="error" class="error px-5">Error: {{ error }}</p>
-                    </div>
+                    </footer>
                 </div>
             </div>
         </div>

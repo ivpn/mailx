@@ -3,13 +3,10 @@
         <button v-bind:data-hs-overlay="'#modal-edit-recipient' + recipient.id">
             Edit
         </button>
-        <div v-bind:id="'modal-edit-recipient' + recipient.id"
-            class="hs-overlay hidden size-full fixed top-0 start-0 z-[60] overflow-x-hidden overflow-y-auto pointer-events-none">
-            <div
-                class="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 opacity-0 transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
-                <div
-                    class="flex flex-col bg-white dark:bg-neutral-800 border dark:border-neutral-600 shadow-sm rounded pointer-events-auto">
-                    <div class="flex justify-between items-center py-3 px-4 border-b dark:border-neutral-600">
+        <div v-bind:id="'modal-edit-recipient' + recipient.id" class="hs-overlay hidden">
+            <div>
+                <div>
+                    <header>
                         <h3>Edit recipient</h3>
                         <button @click="close" class="close">
                             <span class="sr-only">Close</span>
@@ -20,8 +17,8 @@
                                 <path d="m6 6 12 12"></path>
                             </svg>
                         </button>
-                    </div>
-                    <div class="p-4 whitespace-normal text-left text-base">
+                    </header>
+                    <article>
                         <h3>{{ recipient.email }}</h3>
                         <div class="mb-5">
                             <h4>PGP/Inline Encryption</h4>
@@ -41,12 +38,11 @@
                                 type="checkbox"
                             >
                         </div>
-                    </div>
-                    <div class="flex items-start">
+                    </article>
+                    <footer>
                         <p v-if="error" class="error px-5">Error: {{ error }}</p>
-                        <p v-if="success" class="success px-5">{{ success }}
-                        </p>
-                    </div>
+                        <p v-if="success" class="success px-5">{{ success }}</p>
+                    </footer>
                 </div>
             </div>
         </div>

@@ -5,7 +5,7 @@
                 <HeaderMenu />
                 <div class="hs-dropdown relative flex items-center [--placement:bottom-right] my-3">
                     <button id="hs-dropdown-default"
-                        class="flex items-center hs-dropdown-toggle text-gray-500 dark:text-gray-400 pl-4 pr-3 hover:text-gray-800 dark:hover:text-gray-100">
+                        class="flex items-center hs-dropdown-toggle text-gray-500 dark:text-gray-400 pl-4 pr-3 hover:text-gray-800 dark:hover:text-gray-100 font-normal text-base">
                         {{ email }}
                         <svg class="ms-1 flex-shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -15,13 +15,14 @@
                     </button>
                     <div class="hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-60 bg-white dark:dark:bg-neutral-800 border border-gray-200 dark:border-neutral-600 shadow-sm p-2 mt-2 after:h-4 after:absolute after:-bottom-4 after:start-0 after:w-full before:h-4 before:absolute before:-top-4 before:start-0 before:w-full"
                         aria-labelledby="hs-dropdown-default">
-                        <router-link class="flex items-center gap-x-3.5 py-2 px-3 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-700 focus:outline-none"
-                            to="/account">
+                        <button
+                            @click="$router.push('/account')"
+                            class="flex items-center gap-x-3.5 py-2 px-3 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-700 hover:text-gray-500 dark:hover:text-gray-400 focus:outline-none w-full font-normal text-base">
                             Account
-                        </router-link>
-                        <button @click.stop="logout"
-                            class="flex items-center gap-x-3.5 py-2 px-3 text-red-600 hover:bg-gray-100 dark:hover:bg-neutral-700 focus:outline-none w-full"
-                            href="#">
+                        </button>
+                        <button
+                            @click.stop="logout"
+                            class="flex items-center gap-x-3.5 py-2 px-3 text-red-600 hover:bg-gray-100 dark:hover:bg-neutral-700 hover:text-red-600 dark:hover:text-red-600 focus:outline-none w-full font-normal text-base">
                             Log out
                         </button>
                     </div>

@@ -6,6 +6,7 @@
 @import "components/card.css";
 @import "components/plugin.css";
 @import "components/table.css";
+@import "components/badge.css";
 
 @tailwind base;
 @tailwind components;

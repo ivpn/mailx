@@ -1,7 +1,6 @@
 <template>
     <div>
-        <button v-bind:data-hs-overlay="'#modal-totp-disable'"
-            class="py-2 px-3 font-medium bg-bluish-500 text-white hover:bg-bluish-600">
+        <button v-bind:data-hs-overlay="'#modal-totp-disable'" class="cta">
             Disable
         </button>
         <div v-bind:id="'modal-totp-disable'" class="hs-overlay hidden">

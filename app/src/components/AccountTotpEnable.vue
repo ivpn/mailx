@@ -45,14 +45,6 @@
                                 >
                                 <p v-if="codeError" class="error">Required</p>
                             </div>
-                            <div class="flex justify-start items-center gap-x-3 pt-4 border-t dark:border-neutral-600">
-                                <button @click="totpEnableConfirm" class="cta">
-                                    Enable
-                                </button>
-                                <button @click="close" class="cta cancel">
-                                    Cancel
-                                </button>
-                            </div>
                         </div>
                         <div v-if="isEnabled">
                             <p>
@@ -73,7 +65,15 @@
                         </div>
                     </article>
                     <footer>
-                        <nav>
+                        <nav v-if="!isEnabled">
+                            <button @click="totpEnableConfirm" class="cta">
+                                Enable
+                            </button>
+                            <button @click="close" class="cta cancel">
+                                Cancel
+                            </button>
+                        </nav>
+                        <nav v-if="isEnabled">
                             <button @click="complete" class="cta cancel">
                                 Close
                             </button>

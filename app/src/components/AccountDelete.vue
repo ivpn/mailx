@@ -6,7 +6,6 @@
             class="delete">
             Delete Account
         </button>
-
         <div v-bind:id="'modal-delete-account'" class="hs-overlay hidden">
             <div>
                 <div>

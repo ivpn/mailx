@@ -18,7 +18,7 @@
                 <div class="-m-1.5 overflow-x-auto">
                     <div class="p-1.5 min-w-full inline-block align-middle">
                         <div class="overflow-x-auto">
-                            <table class="table-auto w-full divide-y divide-gray-200 dark:divide-neutral-600">
+                            <table>
                                 <thead>
                                     <tr>
                                         <th scope="col"
@@ -38,7 +38,7 @@
                                             ACTIONS</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-gray-200 dark:divide-neutral-600">
+                                <tbody>
                                     <RecipientRow v-for="recipient in list" :recipient="recipient" :key="rowKey" />
                                 </tbody>
                             </table>

@@ -23,46 +23,31 @@
                 Your browser/device does not support adding Passkeys.<br>
             </p>
         </div>
-        <div v-if="list.length" class="flex flex-col">
-            <div class="-m-1.5 overflow-x-auto">
-                <div class="p-1.5 min-w-full inline-block align-middle">
-                    <div class="overflow-hidden">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-neutral-600">
-                            <thead>
-                                <tr>
-                                    <th scope="col"
-                                        class="pr-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
-                                        CREATED
-                                    </th>
-                                    <th scope="col"
-                                        class="px-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
-                                        ID
-                                    </th>
-                                    <th scope="col"
-                                        class="pl-5 py-3 text-end text-xs font-medium text-gray-500 dark:text-gray-400">
-                                        ACTIONS
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-200 dark:divide-neutral-600">
-                                <tr v-for="cred in list" :key="rowKey">
-                                    <td class="pr-5 py-4 whitespace-nowrap text-start text-sm text-gray-800 dark:text-gray-100">
-                                        {{ new Date(cred.created_at).toDateString() }}
-                                    </td>
-                                    <td class="px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800 dark:text-gray-100">
-                                        {{ cred.id }}
-                                    </td>
-                                    <td class="pl-5 py-4 whitespace-nowrap text-end text-sm text-gray-800 dark:text-gray-100">
-                                        <button @click="deleteCred(cred.id)" class="delete">
-                                            Delete
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+        <div v-if="list.length" class="flex flex-col overflow-x-auto">
+            <table>
+                <thead>
+                    <tr>
+                        <th>CREATED</th>
+                        <th>ID</th>
+                        <th>ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="cred in list" :key="rowKey">
+                        <td>
+                            {{ new Date(cred.created_at).toDateString() }}
+                        </td>
+                        <td>
+                            {{ cred.id }}
+                        </td>
+                        <td>
+                            <button @click="deleteCred(cred.id)" class="delete">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </template>

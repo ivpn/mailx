@@ -26,7 +26,7 @@
                     <div class="-m-1.5 overflow-x-auto">
                         <div class="p-1.5 min-w-full inline-block align-middle">
                             <div class="overflow-x-auto">
-                                <table class="table-auto w-full divide-y divide-gray-200 dark:divide-neutral-600">
+                                <table>
                                     <thead>
                                         <tr>
                                             <th v-if="!isDashboard" scope="col" class="pr-5 py-3 text-start">
@@ -78,7 +78,7 @@
                                             </th>
                                         </tr>
                                     </thead>
-                                    <tbody class="divide-y divide-gray-200 dark:divide-neutral-600">
+                                    <tbody>
                                         <AliasRow v-for="alias in list" :alias="alias" :key="rowKey" :recipients.sync="recipients" :catchAll=false />
                                     </tbody>
                                 </table>
@@ -118,7 +118,7 @@
                     <div class="-m-1.5 overflow-x-auto">
                         <div class="p-1.5 min-w-full inline-block align-middle">
                             <div class="overflow-x-auto">
-                                <table class="table-auto w-full divide-y divide-gray-200 dark:divide-neutral-600">
+                                <table>
                                     <thead>
                                         <tr>
                                             <th scope="col" class="pr-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
@@ -138,7 +138,7 @@
                                             </th>
                                         </tr>
                                     </thead>
-                                    <tbody class="divide-y divide-gray-200 dark:divide-neutral-600">
+                                    <tbody>
                                         <AliasRow v-for="alias in listCatchAll" :alias="alias" :key="rowKey" :recipients.sync="recipients" :catchAll=true />
                                     </tbody>
                                 </table>

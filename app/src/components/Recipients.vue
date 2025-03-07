@@ -14,37 +14,21 @@
             <div class="flex items-center justify-between mb-6">
                 <RecipientCreate />
             </div>
-            <div class="flex flex-col">
-                <div class="-m-1.5 overflow-x-auto">
-                    <div class="p-1.5 min-w-full inline-block align-middle">
-                        <div class="overflow-x-auto">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th scope="col"
-                                            class="pr-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
-                                            CREATED</th>
-                                        <th scope="col"
-                                            class="px-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
-                                            EMAIL</th>
-                                        <th scope="col"
-                                            class="px-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
-                                            VERIFIED</th>
-                                            <th scope="col"
-                                            class="px-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
-                                            ENCRYPTION</th>
-                                        <th scope="col"
-                                            class="pl-5 py-3 text-end text-xs font-medium text-gray-500 dark:text-gray-400">
-                                            ACTIONS</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <RecipientRow v-for="recipient in list" :recipient="recipient" :key="rowKey" />
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>CREATED</th>
+                            <th>EMAIL</th>
+                            <th>VERIFIED</th>
+                            <th>ENCRYPTION</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <RecipientRow v-for="recipient in list" :recipient="recipient" :key="rowKey" />
+                    </tbody>
+                </table>
             </div>
         </div>
         <p v-if="isDashboard" class="my-4">

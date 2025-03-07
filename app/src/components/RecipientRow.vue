@@ -1,9 +1,9 @@
 <template>
     <tr>
-        <td class="pr-5 py-4 whitespace-nowrap text-start text-sm text-gray-800 dark:text-gray-100">
+        <td>
             <p>{{ new Date(recipient.created_at).toDateString() }}</p>
         </td>
-        <td class="px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800 dark:text-gray-100">
+        <td>
             <div class="hs-tooltip inline-block">
                 <span class="hs-tooltip-toggle">
                     <button class="plain truncate max-w-[320px]" @click="copyAlias(recipient.email)">
@@ -15,13 +15,13 @@
                 </span>
             </div>
         </td>
-        <td class="px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800">
+        <td>
             <p>
                 <span v-if="recipient.is_active" class="badge success">Verified</span>
                 <span v-if="!recipient.is_active" class="badge">Unverified</span>
             </p>
         </td>
-        <td class="px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800">
+        <td>
             <RecipientAddPGPKey v-if="!recipient.pgp_key" :recipient="recipient" />
             <div v-if="recipient.pgp_key">
                 <input
@@ -36,7 +36,7 @@
                 </button>
             </div>
         </td>
-        <td class="pl-5 py-4 whitespace-nowrap text-end text-sm">
+        <td>
             <div class="flex gap-5 justify-end">
                 <RecipientVerify v-if="!recipient.is_active" :recipient="recipient" />
                 <RecipientEdit :recipient="recipient" />

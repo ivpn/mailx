@@ -1,5 +1,5 @@
 <template>
-    <div class="page center">
+    <div class="page center pt-10">
         <h1>MailX</h1>
         <h2 class="mb-10">
             Email forwarding service operated by

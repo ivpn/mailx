@@ -1,5 +1,5 @@
 <template>
-    <div class="page center">
+    <div class="page center pt-10">
         <h1>MailX</h1>
         <h2 class="mb-10">
             Email forwarding service operated by
@@ -41,7 +41,7 @@
                             <p v-if="emailAuthnError" class="error">Required</p>
                         </div>
                         <div class="flex items-center w-full">
-                            <button :disabled="isLoading" @click="loginWithPasskey">
+                            <button :disabled="isLoading" @click="loginWithPasskey" class="cta full">
                                 Log In with Passkey
                             </button>
                         </div>

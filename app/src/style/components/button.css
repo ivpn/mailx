@@ -15,7 +15,7 @@
         }
 
         &.full {
-            @apply w-full;
+            @apply w-full text-center block;
         }
 
         &.delete {

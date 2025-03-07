@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-neutral-900">
+    <div class="page center">
         <h1>MailX</h1>
         <h2 class="mb-10">
             Email forwarding service operated by

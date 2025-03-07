@@ -1,5 +1,5 @@
 <template>
-    <div class="min-h-screen bg-gray-100 dark:bg-neutral-900">
+    <div class="page">
         <Header />
         <div class="container mx-auto max-w-screen-lg px-5 pb-5">
             <SubscriptionStatus />

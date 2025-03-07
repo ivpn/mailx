@@ -1,6 +1,6 @@
 <template>
     <tr>
-        <td class="pr-5 py-4 whitespace-nowrap text-start text-sm text-gray-800">
+        <td>
             <div class="mt-1 flex items-center gap-2">
                 <div v-if="alias.enabled" class="hs-tooltip flex-none rounded-full bg-emerald-500/20 p-1">
                     <div class="h-1.5 w-1.5 rounded-full bg-emerald-400"></div>
@@ -17,7 +17,7 @@
                 <p>{{ new Date(alias.created_at).toDateString() }}</p>
             </div>
         </td>
-        <td class="px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800">
+        <td>
             <div class="hs-tooltip inline-block">
                 <span class="hs-tooltip-toggle">
                     <button class="plain truncate max-w-[320px]" @click="copyAlias(alias.name)">
@@ -30,7 +30,7 @@
             </div>
             <p>{{ alias.description }}</p>
         </td>
-        <td class="px-5 py-4 whitespace-nowrap text-start text-sm">
+        <td>
             <div class="hs-tooltip inline-block">
                 <span class="hs-tooltip-toggle dark:text-gray-100">
                     {{ alias.stats.forwards }}/{{ alias.stats.blocks }}/{{ alias.stats.replies }}/{{ alias.stats.sends }}
@@ -43,7 +43,7 @@
                 </span>
             </div>
         </td>
-        <td class="px-5 py-4 whitespace-nowrap text-start text-sm">
+        <td>
             <div class="flex items-center hs-tooltip">
                 <input
                     @change="updateAlias"
@@ -56,7 +56,7 @@
                 </span>
             </div>
         </td>
-        <td class="pl-5 py-4 whitespace-nowrap text-end text-sm">
+        <td>
             <div class="flex gap-5 justify-end">
                 <AliasSend :alias="alias" />
                 <AliasEdit :alias="alias" :recipients="recipients" :key="rowKey" />

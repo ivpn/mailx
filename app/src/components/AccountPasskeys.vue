@@ -23,7 +23,7 @@
                 Your browser/device does not support adding Passkeys.<br>
             </p>
         </div>
-        <div v-if="list.length" class="flex flex-col overflow-x-auto">
+        <div v-if="list.length" class="table-container">
             <table>
                 <thead>
                     <tr>

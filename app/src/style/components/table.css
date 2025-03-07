@@ -33,4 +33,8 @@
             }
         }
     }
+
+    .table-container {
+        @apply flex flex-col overflow-x-auto;
+    }
 }

@@ -22,69 +22,53 @@
                 <div class="flex items-center justify-between mb-6">
                     <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=false />
                 </div>
-                <div class="flex flex-col">
-                    <div class="-m-1.5 overflow-x-auto">
-                        <div class="p-1.5 min-w-full inline-block align-middle">
-                            <div class="overflow-x-auto">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th v-if="!isDashboard" scope="col" class="pr-5 py-3 text-start">
-                                                <button
-                                                @click="sort"
-                                                data-sort="created_at"
-                                                class="sort">
-                                                    CREATED
-                                                    <svg
-                                                    data-sort="created_at"
-                                                    v-bind:class="{ 'text-bluish-500': sortBy === 'created_at', 'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
-                                                    class="ms-1 flex-shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                                        stroke-linecap="round" stroke-linejoin="round">
-                                                        <path d="m6 9 6 6 6-6" />
-                                                    </svg>
-                                                </button>
-                                            </th>
-                                            <th v-if="!isDashboard" scope="col" class="px-5 py-3 text-start">
-                                                <button
-                                                @click="sort"
-                                                data-sort="name"
-                                                class="sort">
-                                                    ALIAS
-                                                    <svg
-                                                    data-sort="name"
-                                                    v-bind:class="{ 'text-bluish-500': sortBy === 'name', 'rotate-180': sortOrder === 'ASC' && sortBy === 'name' }"
-                                                    class="ms-1 flex-shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                                        stroke-linecap="round" stroke-linejoin="round">
-                                                        <path d="m6 9 6 6 6-6" />
-                                                    </svg>
-                                                </button>    
-                                            </th>
-                                            <th v-if="isDashboard" scope="col" class="pr-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
-                                                CREATED
-                                            </th>
-                                            <th v-if="isDashboard" scope="col" class="px-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
-                                                ALIAS
-                                            </th>
-                                            <th scope="col" class="px-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
-                                                COUNT
-                                            </th>
-                                            <th scope="col" class="px-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
-                                                ACTIVE
-                                            </th>
-                                            <th scope="col" class="pl-5 py-3 text-end text-xs font-medium text-gray-500 dark:text-gray-400">
-                                                ACTIONS
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <AliasRow v-for="alias in list" :alias="alias" :key="rowKey" :recipients.sync="recipients" :catchAll=false />
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th v-if="!isDashboard">
+                                    <button
+                                    @click="sort"
+                                    data-sort="created_at"
+                                    class="sort">
+                                        CREATED
+                                        <svg
+                                        data-sort="created_at"
+                                        v-bind:class="{ 'text-bluish-500': sortBy === 'created_at', 'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
+                                        class="ms-1 flex-shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="m6 9 6 6 6-6" />
+                                        </svg>
+                                    </button>
+                                </th>
+                                <th v-if="!isDashboard">
+                                    <button
+                                    @click="sort"
+                                    data-sort="name"
+                                    class="sort">
+                                        ALIAS
+                                        <svg
+                                        data-sort="name"
+                                        v-bind:class="{ 'text-bluish-500': sortBy === 'name', 'rotate-180': sortOrder === 'ASC' && sortBy === 'name' }"
+                                        class="ms-1 flex-shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="m6 9 6 6 6-6" />
+                                        </svg>
+                                    </button>    
+                                </th>
+                                <th v-if="isDashboard">CREATED</th>
+                                <th v-if="isDashboard">ALIAS</th>
+                                <th>COUNT</th>
+                                <th>ACTIVE</th>
+                                <th>ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <AliasRow v-for="alias in list" :alias="alias" :key="rowKey" :recipients.sync="recipients" :catchAll=false />
+                        </tbody>
+                    </table>
                 </div>
             </div>
             <p v-if="isDashboard" class="text-sm my-4">
@@ -114,37 +98,21 @@
                 <div class="flex items-center justify-between mb-6">
                     <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=true />
                 </div>
-                <div class="flex flex-col">
-                    <div class="-m-1.5 overflow-x-auto">
-                        <div class="p-1.5 min-w-full inline-block align-middle">
-                            <div class="overflow-x-auto">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th scope="col" class="pr-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
-                                                CREATED
-                                            </th>
-                                            <th scope="col" class="px-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
-                                                ALIAS
-                                            </th>
-                                            <th scope="col" class="px-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
-                                                COUNT
-                                            </th>
-                                            <th scope="col" class="px-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
-                                                ACTIVE
-                                            </th>
-                                            <th scope="col" class="pl-5 py-3 text-end text-xs font-medium text-gray-500 dark:text-gray-400">
-                                                ACTIONS
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <AliasRow v-for="alias in listCatchAll" :alias="alias" :key="rowKey" :recipients.sync="recipients" :catchAll=true />
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>CREATED</th>
+                                <th>ALIAS</th>
+                                <th>COUNT</th>
+                                <th>ACTIVE</th>
+                                <th>ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <AliasRow v-for="alias in listCatchAll" :alias="alias" :key="rowKey" :recipients.sync="recipients" :catchAll=true />
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

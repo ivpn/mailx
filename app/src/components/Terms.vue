@@ -84,14 +84,6 @@ p {
     @apply leading-7;
 }
 
-ul {
-    @apply list-disc ml-5;
-
-    li {
-        @apply mb-5 leading-7;
-    }
-}
-
 hr {
     @apply my-10;
 }

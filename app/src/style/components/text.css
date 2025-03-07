@@ -39,4 +39,12 @@
     hr {
         @apply border-t border-gray-500 dark:border-neutral-600 mb-8;
     }
+
+    ul {
+        @apply list-disc ml-5;
+    
+        li {
+            @apply mb-5 leading-7;
+        }
+    }
 }

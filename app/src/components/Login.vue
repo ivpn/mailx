@@ -6,7 +6,7 @@
             <a href="https://www.ivpn.net/">IVPN</a>
         </h2>
         <h3>Log In</h3>
-        <form class="w-full max-w-sm bg-white dark:bg-neutral-800 px-8 pt-6 pb-8 mb-4" @submit.prevent="">
+        <form class="card center" @submit.prevent="">
             <div v-if="passkeySupported" class="border-b border-gray-200 dark:border-neutral-600">
                 <nav class="flex gap-x-1" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
                     <button

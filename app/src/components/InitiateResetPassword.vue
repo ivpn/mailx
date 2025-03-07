@@ -1,7 +1,7 @@
 <template>
-    <div class="page center">
+    <div class="page center pt-10">
         <h1>Reset Password</h1>
-        <form class="w-full max-w-sm bg-white dark:bg-neutral-800 px-8 pt-6 pb-8 mb-4" @submit.prevent="initiatePasswordReset">
+        <form class="card center" @submit.prevent="initiatePasswordReset">
             <div v-if="!apiSuccess">
                 <p>Please enter your registered email address. You will be sent instructions on how to reset your password.</p>
                 <div class="mb-4">

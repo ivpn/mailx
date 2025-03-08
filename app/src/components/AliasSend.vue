@@ -55,7 +55,7 @@
                                     <button @click="copy(generatedEmail)" class="plain">
                                         {{ generatedEmail }}
                                     </button>
-                                    <span class="hs-tooltip-content" role="tooltip">
+                                    <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                                         {{ copyText }}
                                     </span>
                                 </span>

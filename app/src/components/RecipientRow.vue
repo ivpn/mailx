@@ -9,7 +9,7 @@
                     <button class="plain truncate max-w-[320px]" @click="copyAlias(recipient.email)">
                         {{ recipient.email }}
                     </button>
-                    <span class="hs-tooltip-content" role="tooltip">
+                    <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                         {{ copyText }}: {{ recipient.email }}
                     </span>
                 </span>

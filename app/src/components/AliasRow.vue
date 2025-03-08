@@ -4,13 +4,13 @@
             <div class="mt-1 flex items-center gap-2">
                 <div v-if="alias.enabled" class="hs-tooltip flex-none rounded-full bg-emerald-500/20 p-1">
                     <div class="h-1.5 w-1.5 rounded-full bg-emerald-400"></div>
-                    <span class="hs-tooltip-content" role="tooltip">
+                    <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                         Active
                     </span>
                 </div>
                 <div v-if="!alias.enabled" class="hs-tooltip flex-none rounded-full bg-gray-500/20 p-1">
                     <div class="h-1.5 w-1.5 rounded-full bg-gray-400 dark:bg-neutral-500"></div>
-                    <span class="hs-tooltip-content" role="tooltip">
+                    <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                         Inactive
                     </span>
                 </div>
@@ -23,7 +23,7 @@
                     <button class="plain truncate max-w-[320px]" @click="copyAlias(alias.name)">
                         {{ alias.name }}
                     </button>
-                    <span class="hs-tooltip-content" role="tooltip">
+                    <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                         {{ copyText }}: {{ alias.name }}
                     </span>
                 </span>
@@ -34,7 +34,7 @@
             <div class="hs-tooltip inline-block">
                 <span class="hs-tooltip-toggle dark:text-gray-100">
                     {{ alias.stats.forwards }}/{{ alias.stats.blocks }}/{{ alias.stats.replies }}/{{ alias.stats.sends }}
-                    <span class="hs-tooltip-content" role="tooltip">
+                    <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                         {{ alias.stats.forwards }} Forwards<br>
                         {{ alias.stats.blocks }} Blocks<br>
                         {{ alias.stats.replies }} Replies<br>
@@ -51,7 +51,7 @@
                     v-bind:disabled="!alias.recipients.length"
                     type="checkbox"
                 >
-                <span v-if="!alias.recipients.length" class="hs-tooltip-content" role="tooltip">
+                <span v-if="!alias.recipients.length" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                     Disabled
                 </span>
             </div>

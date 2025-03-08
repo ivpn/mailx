@@ -18,7 +18,7 @@
                     <button @click="copyAlias(res.id)" class="plain">
                         {{ res.id }}
                     </button>
-                    <span class="hs-tooltip-content" role="tooltip">
+                    <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                         {{ copyText }}
                     </span>
                 </span>

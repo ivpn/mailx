@@ -31,7 +31,7 @@
                 </table>
             </div>
         </div>
-        <p v-if="isDashboard" class="my-4">
+        <p v-if="isDashboard" class="text-sm my-4">
             <router-link to="/recipients">All Recipients</router-link>
         </p>
         <p v-if="error" class="error">Error: {{ error }}</p>

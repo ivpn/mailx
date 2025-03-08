@@ -27,8 +27,7 @@
                             </p>
                         </div>
                         <div class="mb-5">
-                            <label v-bind:for="'from_alias_' + alias.id"
-                                class="block text-gray-500 dark:text-gray-400 mb-3">
+                            <label v-bind:for="'from_alias_' + alias.id">
                                 From alias:
                             </label>
                             <input
@@ -38,8 +37,7 @@
                             >
                         </div>
                         <div class="mb-5">
-                            <label v-bind:for="'to_email_' + alias.id"
-                                class="block text-gray-500 dark:text-gray-400 mb-3">
+                            <label v-bind:for="'to_email_' + alias.id">
                                 To email:
                             </label>
                             <input

@@ -1,11 +1,9 @@
 package service
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"log"
-	"net/mail"
 	"strings"
 	"time"
 
@@ -21,24 +19,8 @@ var (
 	ErrInactiveRecipient    = errors.New("inactive recipient")
 )
 
-type MsgType int
-
-const (
-	Reply MsgType = 2
-	Send  MsgType = 3
-)
-
-type Msg struct {
-	From     string
-	FromName string
-	To       []string
-	Subject  string
-	Body     string
-	Type     MsgType
-}
-
 func (s *Service) ProcessMessage(data []byte) error {
-	msg, err := parseMessage(data)
+	msg, err := model.ParseMsg(data)
 	if err != nil {
 		log.Println("error parsing message", err)
 		return err
@@ -123,7 +105,7 @@ func (s *Service) saveMessage(alias model.Alias, msgType model.MessageType, data
 	}
 }
 
-func (s *Service) findRecipients(from string, email string, msgType MsgType) ([]model.Recipient, model.Alias, model.MessageType, error) {
+func (s *Service) findRecipients(from string, email string, msgType model.MessageType) ([]model.Recipient, model.Alias, model.MessageType, error) {
 	name, replyTo := model.ParseReplyTo(email)
 
 	alias, err := s.GetAliasByName(name)
@@ -169,57 +151,4 @@ func (s *Service) findRecipients(from string, email string, msgType MsgType) ([]
 	}
 
 	return recipients, alias, model.Forward, nil
-}
-
-func parseMessage(data []byte) (Msg, error) {
-	msg, err := mail.ReadMessage(bytes.NewReader(data))
-	if err != nil {
-		return Msg{}, err
-	}
-
-	subject := msg.Header.Get("Subject")
-
-	to := make([]string, 0)
-	for _, t := range strings.Split(msg.Header.Get("To"), ",") {
-		address, err := mail.ParseAddress(t)
-		if err != nil {
-			return Msg{}, err
-		}
-
-		to = append(to, address.Address)
-	}
-
-	from, err := mail.ParseAddress(msg.Header.Get("From"))
-	if err != nil {
-		return Msg{}, err
-	}
-
-	buf := new(bytes.Buffer)
-	_, err = buf.ReadFrom(msg.Body)
-	if err != nil {
-		return Msg{}, err
-	}
-	body := buf.String()
-	msgType := Send
-
-	if isReply(msg) {
-		msgType = Reply
-	}
-
-	return Msg{
-		From:     from.Address,
-		FromName: from.Name,
-		To:       to,
-		Subject:  subject,
-		Body:     body,
-		Type:     msgType,
-	}, nil
-}
-
-func isReply(m *mail.Message) bool {
-	if m.Header.Get("In-Reply-To") != "" || m.Header.Get("References") != "" {
-		return true
-	}
-
-	return false
 }

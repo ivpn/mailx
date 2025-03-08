@@ -7,23 +7,21 @@
         </h2>
         <h3>Log In</h3>
         <form class="card center" @submit.prevent="">
-            <div v-if="passkeySupported" class="border-b border-gray-200 dark:border-neutral-600">
-                <nav class="flex gap-x-1" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
-                    <button
-                        @click="onTabChange"
-                        class="active"
-                        id="tabs-with-underline-item-1" aria-selected="true" data-hs-tab="#tabs-with-underline-1"
-                        aria-controls="tabs-with-underline-1" role="tab">
-                        Passkey
-                    </button>
-                    <button
-                        @click="onTabChange"
-                        id="tabs-with-underline-item-2" aria-selected="false" data-hs-tab="#tabs-with-underline-2"
-                        aria-controls="tabs-with-underline-2" role="tab">
-                        Email & Password
-                    </button>
-                </nav>
-            </div>
+            <nav v-if="passkeySupported" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
+                <button
+                    @click="onTabChange"
+                    class="active"
+                    id="tabs-with-underline-item-1" aria-selected="true" data-hs-tab="#tabs-with-underline-1"
+                    aria-controls="tabs-with-underline-1" role="tab">
+                    Passkey
+                </button>
+                <button
+                    @click="onTabChange"
+                    id="tabs-with-underline-item-2" aria-selected="false" data-hs-tab="#tabs-with-underline-2"
+                    aria-controls="tabs-with-underline-2" role="tab">
+                    Email & Password
+                </button>
+            </nav>
             <div v-bind:class="{ 'mt-6': passkeySupported }">
                 <div v-if="passkeySupported" id="tabs-with-underline-1" role="tabpanel" aria-labelledby="tabs-with-underline-item-1">
                     <div v-if="!isLoggedIn()">

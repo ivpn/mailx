@@ -1,5 +1,13 @@
-
 @import "fonts/fonts.css";
+@import "components/page.css";
+@import "components/button.css";
+@import "components/form.css";
+@import "components/tabs.css";
+@import "components/text.css";
+@import "components/plugin.css";
+@import "components/table.css";
+@import "components/badge.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

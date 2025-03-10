@@ -1,0 +1,40 @@
+@layer components {
+    table {
+        @apply table-auto w-full divide-y divide-gray-200 dark:divide-neutral-600;
+
+        thead {
+
+            th {
+                @apply px-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400;
+
+                &:first-child {
+                    @apply text-start px-0 pr-5;
+                }
+
+                &:last-child {
+                    @apply text-end px-0 pl-5;
+                }
+            }
+        }
+
+        tbody {
+            @apply divide-y divide-gray-200 dark:divide-neutral-600;
+
+            td {
+                @apply px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800 dark:text-gray-100;
+
+                &:first-child {
+                    @apply text-start px-0 pr-5;
+                }
+
+                &:last-child {
+                    @apply text-end px-0 pl-5;
+                }
+            }
+        }
+    }
+
+    .table-container {
+        @apply flex flex-col overflow-x-auto;
+    }
+}

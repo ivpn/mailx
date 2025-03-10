@@ -1,20 +1,14 @@
 <template>
     <div>
-        <button v-bind:data-hs-overlay="'#modal-totp-enable'"
-            class="py-2 px-3 font-medium bg-bluish-500 text-white hover:bg-bluish-600">
+        <button v-bind:data-hs-overlay="'#modal-totp-enable'" class="cta">
             Enable
         </button>
-        <div v-bind:id="'modal-totp-enable'"
-            class="hs-overlay hidden size-full fixed top-0 start-0 z-[60] overflow-x-hidden overflow-y-auto pointer-events-none">
-            <div
-                class="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 opacity-0 transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
-                <div class="flex flex-col bg-white dark:bg-neutral-800 border dark:border-neutral-600 shadow-sm rounded pointer-events-auto">
-                    <div class="flex justify-between items-center py-3 px-4 border-b dark:border-neutral-600">
-                        <h3 class="text-xl text-gray-800 dark:text-gray-100 font-semibold">
-                            Enable 2-Factor Authentication
-                        </h3>
-                        <button @click="close" type="button"
-                            class="flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-neutral-700 disabled:opacity-50 disabled:pointer-events-none">
+        <div v-bind:id="'modal-totp-enable'" class="hs-overlay hidden">
+            <div>
+                <div>
+                    <header>
+                        <h3>Enable 2-Factor Authentication</h3>
+                        <button @click="close" class="close">
                             <span class="sr-only">Close</span>
                             <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -23,14 +17,14 @@
                                 <path d="m6 6 12 12"></path>
                             </svg>
                         </button>
-                    </div>
-                    <div class="p-4 whitespace-normal text-left text-base">
+                    </header>
+                    <article>
                         <div v-if="!isEnabled">
                             <div class="mb-5">
-                                <p class="text-gray-500 dark:text-gray-400 mb-3">
+                                <p>
                                     To enable two-factor authentication, please scan the code with a TOTP app (for example: Google Authenticator) and enter the code in the field below.
                                 </p>
-                                <p class="text-gray-500 dark:text-gray-400 mb-3">
+                                <p>
                                     If you cannot scan QR code, you can enter the following information manually. Secret: {{ resEnable.secret }}, Account: {{ resEnable.account }}
                                 </p>
                             </div>
@@ -38,57 +32,54 @@
                                 <canvas class="mx-auto" id="totp_qr_code"></canvas>
                             </div>
                             <div class="mb-3">
-                                <label for="totp_enable_code" class="block text-gray-500 dark:text-gray-400 mb-3">
+                                <label for="totp_enable_code">
                                     Code from TOTP app:
                                 </label>
                                 <input
                                     v-model="req.otp"
-                                    v-bind:class="{ 'border-gray-500 dark:border-neutral-400': !codeError, 'border-red-600 dark:border-red-600': codeError }"
+                                    v-bind:class="{ 'error': codeError }"
                                     id="totp_enable_code"
                                     placeholder="6-digit code"
-                                    class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 leading-tight focus:border-bluish-500 mb-2"
                                     type="text"
-                                    pattern="[0-9]*">
-                                    <p v-if="codeError" class="text-red-600 text-sm">Required</p>
-                            </div>
-                            <div class="flex justify-start items-center gap-x-3 pt-4 border-t dark:border-neutral-600">
-                                <button @click="totpEnableConfirm"
-                                    class="py-2 px-3 inline-flex items-center gap-x-2 font-medium text-base bg-bluish-500 text-white hover:bg-bluish-600 disabled:opacity-50 disabled:pointer-events-none">
-                                    Enable
-                                </button>
-                                <button @click="close"
-                                    class="text-gray-500 bg-gray-100 hover:bg-gray-200 dark:text-gray-300 dark:bg-neutral-600 dark:hover:bg-neutral-700 font-medium text-base py-2 px-3 focus:outline-none focus:shadow-outline">
-                                    Cancel
-                                </button>
+                                    pattern="[0-9]*"
+                                >
+                                <p v-if="codeError" class="error">Required</p>
                             </div>
                         </div>
                         <div v-if="isEnabled">
-                            <p class="text-gray-500 dark:text-gray-400 mb-3">
+                            <p>
                                 Two-factor authentication was set up successfully.
                             </p>
-                            <p class="text-gray-500 dark:text-gray-400 mb-5">
+                            <p>
                                 Please record the following backup codes which you will be able to use instead of TOTP in case you lost access to your device.
                             </p>
-                            <p class="text-gray-500 dark:text-gray-400 mb-5 py-4 px-5 bg-gray-100 dark:bg-neutral-800">
+                            <p class="py-4 px-5 bg-gray-100 dark:bg-neutral-800">
                                 Backup codes:
                                 <span class="text-gray-800 dark:text-gray-100">
                                     {{ resConfirm.backup }}
                                 </span>
                             </p>
-                            <p class="text-gray-500 dark:text-gray-400 mb-5">
+                            <p>
                                 Each of these codes can be used only once.
                             </p>
-                            <div class="flex justify-start items-center gap-x-3 pt-4 border-t dark:border-neutral-600">
-                                <button @click="complete"
-                                    class="text-gray-500 bg-gray-100 hover:bg-gray-200 dark:text-gray-300 dark:bg-neutral-600 dark:hover:bg-neutral-700 font-medium text-base py-2 px-3 focus:outline-none focus:shadow-outline">
-                                    Close
-                                </button>
-                            </div>
                         </div>
-                    </div>
-                    <div class="flex items-start">
-                        <p v-if="error" class="px-5 text-red-600 text-sm mb-3">Error: {{ error }}</p>
-                    </div>
+                    </article>
+                    <footer>
+                        <nav v-if="!isEnabled">
+                            <button @click="totpEnableConfirm" class="cta">
+                                Enable
+                            </button>
+                            <button @click="close" class="cta cancel">
+                                Cancel
+                            </button>
+                        </nav>
+                        <nav v-if="isEnabled">
+                            <button @click="complete" class="cta cancel">
+                                Close
+                            </button>
+                        </nav>
+                        <p v-if="error" class="px-5 error">Error: {{ error }}</p>
+                    </footer>
                 </div>
             </div>
         </div>

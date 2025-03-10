@@ -1,27 +1,29 @@
 <template>
     <div class="mb-5">
-        <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-5">Change Email</h2>
+        <h2>Change Email</h2>
         <div v-if="!success">
             <div class="mb-4 max-w-xs">
-                <label class="block text-gray-500 dark:text-gray-400 mb-3" for="new-email">
+                <label for="new-email">
                     New email:
                 </label>
-                <input v-model="email"
-                    v-bind:class="{ 'border-gray-500 dark:border-neutral-400': !emailError, 'border-red-600 dark:border-red-600': emailError }"
-                    class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 leading-tight focus:border-bluish-500 mb-2"
-                    id="new-email" type="email">
+                <input
+                    v-model="email"
+                    v-bind:class="{ 'error': emailError }"
+                    id="new-email"
+                    type="email"
+                >
             </div>
             <div class="mb-3 max-w-xs">
-                <button @click="changeEmail"
-                    class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-2 px-3 focus:outline-none focus:shadow-outline"
-                    type="submit">
+                <button
+                    @click="changeEmail"
+                    class="cta">
                     Change Email
                 </button>
             </div>
         </div>
-        <p v-if="emailError" class="text-red-600 text-sm mb-3">Error: {{ emailError }}</p>
-        <p v-if="error" class="text-red-600 text-sm mb-3">Error: {{ error }}</p>
-        <p v-if="success" class="text-emerald-600 dark:text-emerald-500 text-sm mb-3">{{ success }}</p>
+        <p v-if="emailError" class="error mb-3">Error: {{ emailError }}</p>
+        <p v-if="error" class="error mb-3">Error: {{ error }}</p>
+        <p v-if="success" class="success text-sm mb-3">{{ success }}</p>
     </div>
 </template>
 

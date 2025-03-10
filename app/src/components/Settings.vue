@@ -1,19 +1,16 @@
 <template>
-    <div class="flex flex-col p-5 pb-4 my-8 bg-white dark:bg-neutral-800">
-        <h1 class="text-3xl text-gray-800 dark:text-gray-100 font-semibold mb-5">Settings</h1>
-        <h2 class="font-semibold text-gray-800 dark:text-gray-100 mb-3">
-            Default Domain
-        </h2>
-        <p class="text-gray-500 dark:text-gray-400 mb-3">
+    <div class="card">
+        <h1>Settings</h1>
+        <h4>Default Domain</h4>
+        <p>
             The default alias domain is the domain to be selected by default in the drop down options when generating a
             new alias.
         </p>
         <div class="max-w-xs mb-6">
-            <label class="block text-gray-500 dark:text-gray-400 mb-3" for="domain">
+            <label for="domain">
                 Select default domain:
             </label>
-            <select id="domain"
-                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent">
+            <select id="domain">
                 <option
                     v-for="(domain, index) in domains"
                     v-bind:domain
@@ -23,19 +20,15 @@
                 </option>
             </select>
         </div>
-        <h2 class="font-semibold text-gray-800 dark:text-gray-100 mb-3">
-            Default Recipient
-        </h2>
-        <p class="text-gray-500 dark:text-gray-400 mb-3">
-            The default recipient to be selected by default in the drop down options when creating a new recipient. You can add recipients <router-link class="text-bluish-500 hover:text-bluish-600" to="/recipients">here</router-link>.
+        <h4>Default Recipient</h4>
+        <p>
+            The default recipient to be selected by default in the drop down options when creating a new recipient. You can add recipients <router-link to="/recipients">here</router-link>.
         </p>
         <div class="max-w-xs mb-6">
-            <label class="block text-gray-500 dark:text-gray-400 mb-3" for="recipient">
+            <label for="recipient">
                 Select default recipient:
             </label>
-            <select id="recipient"
-                :disabled="!recipients.length"
-                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent">
+            <select id="recipient" :disabled="!recipients.length">
                 <option
                     v-for="recipient in recipients"
                     v-bind:value=recipient
@@ -45,19 +38,15 @@
                 </option>
             </select>
         </div>
-        <h2 class="font-semibold text-gray-800 dark:text-gray-100 mb-3">
-            Default Alias Format
-        </h2>
-        <p class="text-gray-500 dark:text-gray-400 mb-3">
-            The default alias format to be selected by default when creating a new alias. You can add aliases <router-link class="text-bluish-500 hover:text-bluish-600" to="/aliases">here</router-link>.
+        <h4>Default Alias Format</h4>
+        <p>
+            The default alias format to be selected by default when creating a new alias. You can add aliases <router-link to="/aliases">here</router-link>.
         </p>
         <div class="max-w-xs mb-6">
-            <label class="block text-gray-500 dark:text-gray-400 mb-3" for="format">
+            <label for="format">
                 Select default alias format:
             </label>
-            <select id="format"
-                :disabled="!aliasFormats.length"
-                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent">
+            <select id="format" :disabled="!aliasFormats.length">
                 <option
                     v-for="format in aliasFormats"
                     v-bind:value=format.toLowerCase()
@@ -67,32 +56,28 @@
                 </option>
             </select>
         </div>
-        <h2 class="font-semibold text-gray-800 dark:text-gray-100 mb-3">
-            From Name
-        </h2>
-        <p class="text-gray-500 dark:text-gray-400 mb-3">
+        <h4>From Name</h4>
+        <p>
             The 'From Name' is shown when you send an email from an alias or reply anonymously to a forwarded email. If
             left blank, then the email alias will be used as the 'From Name'.
         </p>
         <div class="max-w-xs mb-5">
-            <label class="block text-gray-500 dark:text-gray-400 mb-3" for="from-name">
+            <label for="from-name">
                 From name:
             </label>
             <input
                 v-model="req.from_name"
-                class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 leading-tight focus:border-bluish-500 mb-2"
-                id="from-name" type="text">
+                id="from-name"
+                type="text"
+            >
         </div>
         <div class="mb-3">
-            <button
-                @click="saveSettings"
-                class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-2 px-3 focus:outline-none focus:shadow-outline"
-                type="submit">
+            <button @click="saveSettings" class="cta">
                 Save Settings
             </button>
         </div>
-        <p v-if="error" class="text-red-600 text-sm mb-3">Error: {{ error }}</p>
-        <p v-if="success" class="text-emerald-600 dark:text-emerald-500 text-sm mb-3">{{ success }}</p>
+        <p v-if="error" class="error">Error: {{ error }}</p>
+        <p v-if="success" class="success">{{ success }}</p>
     </div>
 </template>
 

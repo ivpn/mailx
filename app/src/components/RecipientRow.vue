@@ -1,52 +1,46 @@
 <template>
     <tr>
-        <td class="pr-5 py-4 whitespace-nowrap text-start text-sm text-gray-800 dark:text-gray-100">
+        <td>
             <p>{{ new Date(recipient.created_at).toDateString() }}</p>
         </td>
-        <td class="px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800 dark:text-gray-100">
+        <td>
             <div class="hs-tooltip inline-block">
                 <span class="hs-tooltip-toggle">
-                    <button class=" dark:text-gray-100 truncate max-w-[320px]" @click="copyAlias(recipient.email)">
+                    <button class="plain truncate max-w-[320px]" @click="copyAlias(recipient.email)">
                         {{ recipient.email }}
                     </button>
-                    <span
-                        class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 dark:bg-neutral-900 text-xs font-medium text-white rounded shadow-sm"
-                        role="tooltip">
+                    <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                         {{ copyText }}: {{ recipient.email }}
                     </span>
                 </span>
             </div>
         </td>
-        <td class="px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800">
+        <td>
             <p>
-                <span v-if="recipient.is_active" class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-800 dark:text-emerald-100">Verified</span>
-                <span v-if="!recipient.is_active" class="inline-flex items-center py-1.5 px-2 rounded-md text-xs font-medium bg-gray-100 text-gray-500 dark:bg-gray-500 dark:text-gray-100">Unverified</span>
+                <span v-if="recipient.is_active" class="badge success">Verified</span>
+                <span v-if="!recipient.is_active" class="badge">Unverified</span>
             </p>
         </td>
-        <td class="px-5 py-4 whitespace-nowrap text-start text-sm text-gray-800">
+        <td>
             <RecipientAddPGPKey v-if="!recipient.pgp_key" :recipient="recipient" />
             <div v-if="recipient.pgp_key">
-                <input v-bind:disabled="!recipient.pgp_key" type="checkbox"
-                    v-bind:checked="recipient.pgp_enabled" @change="updateRecipient"
-                    class="form-checkbox relative w-11 h-6 p-px bg-gray-100 dark:bg-neutral-600 border-transparent text-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:ring-white dark:focus:ring-neutral-800 disabled:opacity-50 disabled:pointer-events-none checked:bg-none checked:text-bluish-500 checked:border-bluish-500 focus:ring-offset-transparent
-
-                    before:inline-block before:size-5 before:bg-white dark:before:bg-neutral-400 checked:before:bg-bluish-200 before:translate-x-0 checked:before:translate-x-full before:rounded-full before:shadow before:transform before:transition before:ease-in-out before:duration-200 mr-5">
-                <button
-                    @click="deletePgpKey"
-                    class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
-                    type="button">
+                <input
+                    @change="updateRecipient"
+                    v-bind:checked="recipient.pgp_enabled"
+                    v-bind:disabled="!recipient.pgp_key"
+                    type="checkbox"
+                    class="mr-5"
+                >
+                <button @click.stop="deletePgpKey" class="delete">
                     Delete Key
                 </button>
             </div>
         </td>
-        <td class="pl-5 py-4 whitespace-nowrap text-end text-sm">
+        <td>
             <div class="flex gap-5 justify-end">
                 <RecipientVerify v-if="!recipient.is_active" :recipient="recipient" />
                 <RecipientEdit :recipient="recipient" />
-                <button
-                    @click.stop="deleteRecipient"
-                    class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600 font-medium text-sm py-2 rounded-md focus:outline-none focus:shadow-outline"
-                    type="button">
+                <button @click.stop="deleteRecipient" class="delete">
                     Delete
                 </button>
             </div>

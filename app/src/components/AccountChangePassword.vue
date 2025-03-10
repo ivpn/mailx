@@ -1,37 +1,41 @@
 <template>
     <div class="mb-5">
-        <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-5">Change Password</h2>
+        <h2>Change Password</h2>
         <div class="mb-4 max-w-xs">
-            <label class="block text-gray-500 dark:text-gray-400 mb-3" for="new-password">
+            <label for="new-password">
                 New password:
             </label>
-            <input v-model="password"
-                v-bind:class="{ 'border-gray-500 dark:border-neutral-400': !passwordError, 'border-red-600 dark:border-red-600': passwordError }"
-                class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 leading-tight focus:border-bluish-500 mb-2"
-                id="new-password" type="password">
+            <input
+                v-model="password"
+                v-bind:class="{ 'error': passwordError }"
+                id="new-password"
+                type="password"
+            >
         </div>
         <div class="mb-4 max-w-xs">
-            <label class="block text-gray-500 dark:text-gray-400 mb-3" for="new-password-confirm">
+            <label for="new-password-confirm">
                 Confirm new password:
             </label>
-            <input v-model="passwordConfirm"
-                v-bind:class="{ 'border-gray-500 dark:border-neutral-400': !passwordError, 'border-red-600 dark:border-red-600': passwordError }"
-                class="appearance-none outline-none border w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 leading-tight focus:border-bluish-500 mb-2"
-                id="new-password-confirm" type="password">
+            <input
+                v-model="passwordConfirm"
+                v-bind:class="{ 'error': passwordError }"
+                id="new-password-confirm"
+                type="password"
+            >
         </div>
-        <p class="text-gray-500 dark:text-gray-400 mb-5 text-sm">
+        <p class="text-sm">
             Must be 12+ characters and contain uppercase, lowercase, number, and special character (e.g. !@#$%^&*(),;.?":{}|<>)
         </p>
         <div class="mb-3 max-w-xs">
-            <button @click="changePassword"
-                class="bg-bluish-500 hover:bg-bluish-600 text-white font-medium py-2 px-3 focus:outline-none focus:shadow-outline"
-                type="submit">
+            <button
+                @click="changePassword"
+                class="cta">
                 Change Password
             </button>
         </div>
-        <p v-if="passwordError" class="text-red-600 text-sm mb-3">Error: {{ passwordError }}</p>
-        <p v-if="error" class="text-red-600 text-sm mb-3">Error: {{ error }}</p>
-        <p v-if="success" class="text-emerald-600 dark:text-emerald-500 text-sm mb-3">{{ success }}</p>
+        <p v-if="passwordError" class="error">Error: {{ passwordError }}</p>
+        <p v-if="error" class="error">Error: {{ error }}</p>
+        <p v-if="success" class="success">{{ success }}</p>
     </div>
 </template>
 

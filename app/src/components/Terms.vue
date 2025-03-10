@@ -1,10 +1,10 @@
 <template>
     <div class="container mx-auto max-w-screen-lg p-10">
-
-        <p class="text-gray-500 py-5"><router-link to="/login">Back to Log In</router-link></p>
-
-        <h1 class="text-3xl mb-5">Terms of Service</h1>
-        <p class="text-sm mb-5 text-gray-500 dark:text-gray-400">Last updated: 22 October 2024</p>
+        <p class="py-5">
+            <router-link to="/login">Back to Log In</router-link>
+        </p>
+        <h1>Terms of Service</h1>
+        <p class="text-sm">Last updated: 22 October 2024</p>
 
         <h2>1. Introduction</h2>
         <p>These Terms and Conditions ("Terms") govern your use of MailX, an email forwarding service operated by IVPN Limited ("we," "us," or "our"). By subscribing to or using our service, you ("you" or "user") agree to abide by these Terms.</p>
@@ -76,31 +76,15 @@ import Footer from './Footer.vue'
 </script>
 
 <style scoped>
-h1 {
-    @apply text-3xl mb-5;
-}
-
 h2 {
-    @apply text-2xl mt-12 mb-5;
+    @apply mt-12;
 }
 
 p {
-    @apply mb-5 leading-7;
-
-    a {
-        @apply text-bluish-500 hover:text-bluish-600;
-    }
-}
-
-ul {
-    @apply list-disc ml-5;
-
-    li {
-        @apply mb-5 leading-7;
-    }
+    @apply leading-7;
 }
 
 hr {
-    @apply border-t border-gray-500 my-10;
+    @apply my-10;
 }
 </style>

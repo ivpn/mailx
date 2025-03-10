@@ -1,7 +1,6 @@
 <template>
     <div>
-        <button v-bind:data-hs-overlay="'#modal-create-alias' + props.catchAll"
-            class="mt-3 py-2 pl-2 pr-3 inline-flex justify-center items-center gap-x-2 font-medium text-base bg-bluish-500 text-white hover:bg-bluish-600">
+        <button v-bind:data-hs-overlay="'#modal-create-alias' + props.catchAll" class="cta">
             <svg class="flex-shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
                 stroke-linejoin="round">
@@ -10,18 +9,15 @@
             </svg>
             Create Alias
         </button>
-        <div v-bind:id="'modal-create-alias' + props.catchAll"
-            class="hs-overlay hidden size-full fixed top-0 start-0 z-[60] overflow-x-hidden overflow-y-auto pointer-events-none">
-            <div
-                class="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 opacity-0 transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
-                <div class="flex flex-col bg-white dark:bg-neutral-800 border dark:border-neutral-600 shadow-sm rounded pointer-events-auto">
-                    <div class="flex justify-between items-center py-3 px-4 border-b dark:border-neutral-600">
-                        <h3 class="text-xl text-gray-800 dark:text-gray-100 font-semibold">
+        <div v-bind:id="'modal-create-alias' + props.catchAll" class="hs-overlay hidden">
+            <div>
+                <div>
+                    <header>
+                        <h3>
                             <span v-if="!props.catchAll">Create Alias</span>
                             <span v-if="props.catchAll">Create Catch-all Alias</span>
                         </h3>
-                        <button @click="close" type="button"
-                            class="flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-neutral-700 disabled:opacity-50 disabled:pointer-events-none">
+                        <button @click="close" class="close">
                             <span class="sr-only">Close</span>
                             <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -30,18 +26,22 @@
                                 <path d="m6 6 12 12"></path>
                             </svg>
                         </button>
-                    </div>
-                    <div class="p-4 whitespace-normal text-left text-base">
+                    </header>
+                    <article>
                         <div v-if="!props.catchAll" class="grid space-y-3 mb-5">
-                            <p class="text-gray-500 dark:text-gray-400 mb-1">
+                            <p class="mb-1">
                                 Alias format:
                             </p>
                             <div class="relative flex items-start">
                                 <div class="flex items-center h-5 mt-1">
                                     <input
-                                        v-model="alias.format" value="words" id="hs-radio-words" name="hs-radio-with-description" type="radio"
-                                        class="form-radio border-gray-200 rounded-full text-bluish-500 focus:ring-white dark:focus:ring-transparent dark:bg-neutral-800 dark:border-neutral-600 dark:checked:border-transparent dark:focus:ring-offset-gray-800"
-                                        aria-describedby="hs-radio-words-description">
+                                        v-model="alias.format"
+                                        value="words"
+                                        id="hs-radio-words"
+                                        name="hs-radio-with-description"
+                                        aria-describedby="hs-radio-words-description"
+                                        type="radio"
+                                    >
                                 </div>
                                 <label for="hs-radio-words" class="ms-3">
                                     <span class="block text-sm font-semibold text-gray-800 dark:text-gray-100">Words</span>
@@ -52,9 +52,13 @@
                             <div class="relative flex items-start">
                                 <div class="flex items-center h-5 mt-1">
                                     <input 
-                                        v-model="alias.format" value="random" id="hs-radio-random" name="hs-radio-with-description" type="radio"
-                                        class="form-radio border-gray-200 rounded-full text-bluish-500 focus:ring-white dark:focus:ring-transparent dark:bg-neutral-800 dark:border-neutral-600 dark:checked:border-transparent dark:focus:ring-offset-gray-800"
-                                        aria-describedby="hs-radio-random-description">
+                                        v-model="alias.format"
+                                        value="random"
+                                        id="hs-radio-random"
+                                        name="hs-radio-with-description"
+                                        aria-describedby="hs-radio-random-description"
+                                        type="radio"
+                                    >
                                 </div>
                                 <label for="hs-radio-random" class="ms-3">
                                     <span class="block text-sm font-semibold text-gray-800 dark:text-gray-100">Random</span>
@@ -65,9 +69,13 @@
                             <div class="relative flex items-start">
                                 <div class="flex items-center h-5 mt-1">
                                     <input
-                                        v-model="alias.format" value="uuid" id="hs-radio-uuid" name="hs-radio-with-description" type="radio"
-                                        class="form-radio border-gray-200 rounded-full text-bluish-500 focus:ring-white dark:focus:ring-transparent dark:bg-neutral-800 dark:border-neutral-600 dark:checked:border-transparent dark:focus:ring-offset-gray-800"
-                                        aria-describedby="hs-radio-uuid-description">
+                                        v-model="alias.format"
+                                        value="uuid"
+                                        id="hs-radio-uuid"
+                                        name="hs-radio-with-description"
+                                        aria-describedby="hs-radio-uuid-description"
+                                        type="radio"
+                                    >
                                 </div>
                                 <label for="hs-radio-uuid" class="ms-3">
                                     <span class="block text-sm font-semibold text-gray-800 dark:text-gray-100">UUID</span>
@@ -78,39 +86,43 @@
                         </div>
                         <div v-if="props.catchAll">
                             <div class="mb-5">
-                                <label for="alias_catch_all_suffix" class="block text-gray-500 dark:text-gray-400 mb-3">
+                                <label for="alias_catch_all_suffix">
                                     Alias sufix (6-12 alphanumeric characters):
                                 </label>
-                                <input id="alias_catch_all_suffix" v-model="alias.catch_all_suffix"
-                                    v-bind:class="{ 'border-gray-500': !errorCatchAllSuffix, 'border-red-600 dark:border-red-600': errorCatchAllSuffix }"
-                                    class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 leading-tight focus:border-bluish-500 mb-3"
-                                    type="text">
-                                <p v-if="errorCatchAllSuffix" class="text-red-600 text-sm mb-3">Catch-all suffix must be between 6 and 12 characters</p>
+                                <input 
+                                    v-model="alias.catch_all_suffix"
+                                    v-bind:class="{ 'error': errorCatchAllSuffix }"
+                                    id="alias_catch_all_suffix"
+                                    type="text"
+                                >
+                                <p v-if="errorCatchAllSuffix" class="error">Catch-all suffix must be between 6 and 12 characters</p>
                                 <p class="text-white dark:text-gray-100 mb-1">
                                     *+{{ alias.catch_all_suffix }}@{{ alias.domain }}
                                 </p>
                             </div>
                         </div>
                         <div class="mb-5">
-                            <label for="alias_description" class="block text-gray-500 dark:text-gray-400 mb-3">
+                            <label for="alias_description">
                                 Description:
                             </label>
-                            <input id="alias_description" v-model="alias.description"
-                                class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 leading-tight focus:border-bluish-500 mb-2"
-                                type="text">
+                            <input
+                                v-model="alias.description"
+                                id="alias_description"
+                                type="text"
+                            >
                         </div>
                         <div class="mb-5">
-                            <label for="alias_from_name" class="block text-gray-500 dark:text-gray-400 mb-3">
+                            <label for="alias_from_name">
                                 From name:
                             </label>
-                            <input id="alias_from_name" v-model="alias.from_name"
-                                class="appearance-none outline-none border border-gray-500 w-full py-3 px-4 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 leading-tight focus:border-bluish-500 mb-2"
-                                type="text">
+                            <input
+                                v-model="alias.from_name"
+                                id="alias_from_name"
+                                type="text"
+                            >
                         </div>
                         <div class="mb-6">
-                            <label
-                                for="create-alias-recipient"
-                                class="block text-gray-500 dark:text-gray-400 mb-3">
+                            <label for="create-alias-recipient">
                                 Recipients:
                             </label>
                             <select
@@ -121,7 +133,7 @@
                                 data-hs-select='{
                                 "placeholder": "Select recipient",
                                 "toggleTag": "<button type=\"button\" aria-expanded=\"false\"></button>",
-                                "toggleClasses": "hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 relative py-3 ps-4 pe-9 flex gap-x-2 text-nowrap w-full cursor-pointer border border-gray-500 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 leading-tight focus:border-bluish-500",
+                                "toggleClasses": "hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 relative py-3 ps-4 pe-9 flex gap-x-2 text-nowrap w-full cursor-pointer border border-gray-500 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-500 leading-tight focus:border-bluish-500",
                                 "dropdownClasses": "mt-2 z-50 w-full max-h-72 p-1 space-y-0.5 bg-white border border-gray-200 overflow-hidden overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 dark:bg-neutral-900 dark:border-neutral-700",
                                 "optionClasses": "py-2 px-4 w-full text-gray-800 cursor-pointer hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:text-neutral-200 dark:focus:bg-neutral-800",
                                 "optionTemplate": "<div class=\"flex justify-between items-center w-full\"><span data-title></span><span class=\"hidden hs-selected:block\"><svg class=\"shrink-0 size-3.5 text-bluish-600 dark:text-bluish-500 \" xmlns=\"http:.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"20 6 9 17 4 12\"/></svg></span></div>",
@@ -134,37 +146,35 @@
                                     {{ recipient }}
                                 </option>
                             </select>
-                            <p v-if="errorRecipients" class="pt-3 text-red-600 text-sm">{{ errorRecipients }}</p>
+                            <p v-if="errorRecipients" class="error pt-3">{{ errorRecipients }}</p>
                         </div>
 
                         <div class="mb-6">
-                            <label class="block text-gray-500 dark:text-gray-400 mb-3" for="alias_domain">
+                            <label for="alias_domain">
                                 Domain:
                             </label>
-                            <select id="alias_domain" :disabled="!domains.length"
-                                class="form-select py-2.5 px-4 pe-9 block w-full border border-gray-500 text-gray-500 bg-white dark:text-gray-300 dark:bg-neutral-800 dark:border-neutral-400 focus:border-bluish-500 disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent">
+                            <select id="alias_domain" :disabled="!domains.length">
                                 <option v-for="(domain, index) in domains" v-bind:domain
                                     :selected="domain == alias.domain || index === 0" :key="domain">
                                     {{ domain }}
                                 </option>
                             </select>
                         </div>
-                    </div>
-                    <div class="flex justify-start items-center gap-x-3 py-4 px-4 border-t dark:border-neutral-600">
-                        <button
-                            v-bind:disabled="errorRecipients.length > 0"
-                            @click="postAlias"
-                            class="py-2 px-3 inline-flex items-center gap-x-2 font-medium text-base bg-bluish-500 text-white hover:bg-bluish-600 disabled:opacity-50 disabled:pointer-events-none">
-                            Create Alias
-                        </button>
-                        <button @click="close"
-                            class="text-gray-500 bg-gray-100 hover:bg-gray-200 dark:text-gray-300 dark:bg-neutral-600 dark:hover:bg-neutral-700 font-medium text-base py-2 px-3 focus:outline-none focus:shadow-outline">
-                            Cancel
-                        </button>
-                    </div>
-                    <div class="flex items-start">
-                        <p v-if="error" class="px-5 text-red-600 text-sm mb-3">Error: {{ error }}</p>
-                    </div>
+                    </article>
+                    <footer>
+                        <nav>
+                            <button
+                                v-bind:disabled="errorRecipients.length > 0"
+                                @click="postAlias"
+                                class="cta">
+                                Create Alias
+                            </button>
+                            <button @click="close" class="cta cancel">
+                                Cancel
+                            </button>
+                        </nav>
+                        <p v-if="error" class="error px-5">Error: {{ error }}</p>
+                    </footer>
                 </div>
             </div>
         </div>

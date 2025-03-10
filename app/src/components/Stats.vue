@@ -1,33 +1,32 @@
 <template>
-    <div class="flex flex-col p-5 pb-4 my-8 bg-white dark:bg-neutral-800">
-        <h1 class="text-3xl text-gray-800 dark:text-gray-100 font-semibold mb-5">Messages</h1>
-        <h2 class="font-semibold text-gray-800 dark:text-gray-100 mb-5">Last 7 days</h2>
+    <div class="card">
+        <h1>Messages</h1>
+        <h3>Last 7 days</h3>
         <div id="chart" class="mb-5"></div>
-        <h2 class="font-semibold text-gray-800 dark:text-gray-100 mb-5">Last 90 days</h2>
+        <h3>Last 90 days</h3>
         <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-center mb-8">
             <div class="p-4 border-r border-gray-200 dark:border-gray-600">
-                <p class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">{{ stats.forwards }}</p>
-                <p class="text-gray-500 dark:text-gray-400">Forwards</p>
+                <h1 class="mb-2">{{ stats.forwards }}</h1>
+                <p class="m-0">Forwards</p>
             </div>
             <div class="p-4 border-r border-transparent md:border-gray-200 dark:md:border-gray-600">
-                <p class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">{{ stats.blocks }}</p>
-                <p class="text-gray-500 dark:text-gray-400">Blocks</p>
+                <h1 class="mb-2">{{ stats.blocks }}</h1>
+                <p class="m-0">Blocks</p>
             </div>
             <div class="p-4 border-r border-gray-200 dark:border-gray-600">
-                <p class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">{{ stats.replies }}</p>
-                <p class="text-gray-500 dark:text-gray-400">Replies</p>
+                <h1 class="mb-2">{{ stats.replies }}</h1>
+                <p class="m-0">Replies</p>
             </div>
             <div class="p-4 border-r border-transparent md:border-gray-200 dark:md:border-gray-600">
-                <p class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">{{ stats.sends }}</p>
-                <p class="text-gray-500 dark:text-gray-400">Sends</p>
+                <h1 class="mb-2">{{ stats.sends }}</h1>
+                <p class="m-0">Sends</p>
             </div>
             <div class="p-4">
-                <p class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">{{ getBandwidth(stats.bandwidth) }}
-                </p>
-                <p class="text-gray-500 dark:text-gray-400">Bandwidth</p>
+                <h1 class="mb-2">{{ getBandwidth(stats.bandwidth) }}</h1>
+                <p class="m-0">Bandwidth</p>
             </div>
         </div>
-        <p v-if="error" class="text-red-600 text-sm mb-3">Error: {{ error }}</p>
+        <p v-if="error" class="error">Error: {{ error }}</p>
     </div>
 </template>
 

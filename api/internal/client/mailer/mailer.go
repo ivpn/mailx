@@ -137,16 +137,6 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 		email.HTMLBody = model.PlainTextToHTML(email.TextBody)
 	}
 
-	// PGP/Inline encryption
-	if rcp.PGPEnabled && rcp.PGPKey != "" && rcp.PGPInline {
-		pgp := crypto.PGP()
-		publicKey, _ := crypto.NewKeyFromArmored(rcp.PGPKey)
-		encHandle, _ := pgp.Encryption().Recipient(publicKey).New()
-		pgpMessage, _ := encHandle.Encrypt([]byte(email.TextBody))
-		armored, _ := pgpMessage.ArmorBytes()
-		email.TextBody = string(armored)
-	}
-
 	m := gomail.NewMessage()
 	m.SetAddressHeader("From", from, name)
 	m.SetHeader("To", rcp.Email)
@@ -176,6 +166,20 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 			_, err = w.Write(data)
 			return err
 		}))
+	}
+
+	// PGP/Inline encryption
+	if rcp.PGPEnabled && rcp.PGPKey != "" && rcp.PGPInline {
+		pgp := crypto.PGP()
+		publicKey, _ := crypto.NewKeyFromArmored(rcp.PGPKey)
+		encHandle, _ := pgp.Encryption().Recipient(publicKey).New()
+		pgpMessage, _ := encHandle.Encrypt([]byte(email.TextBody))
+		armored, _ := pgpMessage.ArmorBytes()
+		email.TextBody = string(armored)
+
+		m.SetHeader("Content-Type", "text/plain")
+		m.SetBody("text/plain", email.TextBody)
+		m.AddAlternative("text/html", "")
 	}
 
 	// PGP/MIME encryption

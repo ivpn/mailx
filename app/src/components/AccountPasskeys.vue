@@ -41,7 +41,7 @@
                             {{ cred.id }}
                         </td>
                         <td>
-                            <button @click="deleteCred(cred.id)" class="delete">
+                            <button @click.stop="deleteCred(cred.id)" class="delete">
                                 Delete
                             </button>
                         </td>

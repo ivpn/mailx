@@ -200,8 +200,7 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 		msg.SetHeader("To", rcp.Email)
 		msg.SetHeader("Subject", email.Subject)
 		msg.SetHeader("Content-Type", "multipart/encrypted; protocol=\"application/pgp-encrypted\"")
-		msg.SetHeader("Content-Description", "OpenPGP encrypted message\r\n")
-		msg.SetHeader("Content-Description", "PGP/MIME version identificatione\r\nVersion: 1\r\n")
+		msg.SetHeader("Content-Description", "OpenPGP encrypted message")
 		msg.SetHeader("Content-Disposition", "inline; filename=\"encrypted.asc\"")
 		msg.AddAlternative("application/octet-stream; name=\"encrypted.asc\"\r\n", string(armored))
 

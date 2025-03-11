@@ -137,6 +137,12 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 		email.HTMLBody = model.PlainTextToHTML(email.TextBody)
 	}
 
+	m := gomail.NewMessage()
+	m.SetAddressHeader("From", from, name)
+	m.SetHeader("To", rcp.Email)
+	m.SetHeader("Subject", email.Subject)
+	m.SetBody("text/plain", header.String()+email.TextBody)
+
 	// PGP/Inline encryption
 	if rcp.PGPEnabled && rcp.PGPKey != "" && rcp.PGPInline {
 		pgp := crypto.PGP()
@@ -145,14 +151,11 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 		pgpMessage, _ := encHandle.Encrypt([]byte(email.TextBody))
 		armored, _ := pgpMessage.ArmorBytes()
 		email.TextBody = string(armored)
+		m.SetHeader("Content-Type", "text/plain")
+		m.SetBody("text/plain", email.TextBody)
+	} else {
+		m.AddAlternative("text/html", headerHtml.String()+email.HTMLBody)
 	}
-
-	m := gomail.NewMessage()
-	m.SetAddressHeader("From", from, name)
-	m.SetHeader("To", rcp.Email)
-	m.SetHeader("Subject", email.Subject)
-	m.SetBody("text/plain", header.String()+email.TextBody)
-	m.AddAlternative("text/html", headerHtml.String()+email.HTMLBody)
 
 	for _, a := range email.Attachments {
 		m.Attach(a.Filename, gomail.SetCopyFunc(func(w io.Writer) error {
@@ -198,8 +201,9 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 		msg.SetHeader("Subject", email.Subject)
 		msg.SetHeader("Content-Type", "multipart/encrypted; protocol=\"application/pgp-encrypted\"")
 		msg.SetHeader("Content-Description", "OpenPGP encrypted message")
+		msg.SetHeader("Content-Disposition", "inline; filename=\"encrypted.asc\"")
 		msg.SetBody("application/pgp-encrypted", "Version: 1")
-		msg.AddAlternative("application/octet-stream", string(armored))
+		msg.AddAlternative("application/octet-stream; name=\"encrypted.asc\"\r\n", string(armored))
 
 		err = mailer.dialer.DialAndSend(msg)
 		if err != nil {

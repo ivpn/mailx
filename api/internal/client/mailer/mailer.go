@@ -202,6 +202,7 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 		msg.SetHeader("Content-Type", "multipart/encrypted; protocol=\"application/pgp-encrypted\"")
 		msg.SetHeader("Content-Description", "OpenPGP encrypted message")
 		msg.SetHeader("Content-Disposition", "inline; filename=\"encrypted.asc\"")
+		msg.SetBody("application/pgp-encrypted", "Version: 1")
 		msg.AddAlternative("application/octet-stream; name=\"encrypted.asc\"\r\n", string(armored))
 
 		err = mailer.dialer.DialAndSend(msg)

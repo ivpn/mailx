@@ -2,15 +2,11 @@ package mailer
 
 import (
 	"bytes"
-	"crypto/rand"
 	"embed"
-	"encoding/base64"
-	"fmt"
 	"html/template"
 	"io"
 	"log"
 	"strconv"
-	"strings"
 
 	"github.com/OfimaticSRL/parsemail"
 	"github.com/ProtonMail/gopenpgp/v3/crypto"
@@ -203,32 +199,10 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 		msg.SetAddressHeader("From", from, name)
 		msg.SetHeader("To", rcp.Email)
 		msg.SetHeader("Subject", email.Subject)
-		// msg.SetHeader("Content-Type", "multipart/encrypted; protocol=\"application/pgp-encrypted\"")
-		// msg.SetHeader("Content-Description", "OpenPGP encrypted message\r\n")
-		// msg.SetHeader("Content-Description", "inline; filename=\"encrypted.asc\"\r\n")
-		// msg.SetBody("application/pgp-encrypted", "Version: 1\r\n")
-		// msg.AddAlternative("application/octet-stream; name=\"encrypted.asc\"\r\n", string(armored))
-
-		randomBytes := make([]byte, 6)
-		_, err := rand.Read(randomBytes)
-		if err != nil {
-			return err
-		}
-		boundary := base64.StdEncoding.EncodeToString(randomBytes)
-		boundary = strings.NewReplacer("+", "-", "/", "_").Replace(boundary)
-		var body strings.Builder
-		body.WriteString("OpenPGP/MIME encrypted message\r\n\r\n")
-		body.WriteString(fmt.Sprintf("--%s\r\n", boundary))
-		body.WriteString("Content-Type: application/pgp-encrypted\r\n")
-		body.WriteString("Content-Description: PGP/MIME version identification\r\n\r\n")
-		body.WriteString("Version: 1\r\n\r\n")
-		body.WriteString(fmt.Sprintf("--%s\r\n", boundary))
-		body.WriteString("Content-Type: application/octet-stream; name=\"encrypted.asc\"\r\n")
-		body.WriteString("Content-Description: OpenPGP encrypted message\r\n")
-		body.WriteString("Content-Disposition: inline; filename=\"encrypted.asc\"\r\n\r\n")
-		body.WriteString(string(armored) + "\r\n\r\n")
-		body.WriteString(fmt.Sprintf("--%s--", boundary))
-		msg.AddAlternative("application/octet-stream; name=\"encrypted.asc\"\r\n", body.String())
+		msg.SetHeader("Content-Type", "multipart/encrypted; protocol=\"application/pgp-encrypted\"")
+		msg.SetHeader("Content-Description", "OpenPGP encrypted message")
+		msg.SetBody("application/pgp-encrypted", "Version: 1")
+		msg.AddAlternative("application/octet-stream; name=\"encrypted.asc\"\r\n", string(armored))
 
 		err = mailer.dialer.DialAndSend(msg)
 		if err != nil {

@@ -202,7 +202,15 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 		msg.SetHeader("Content-Type", "multipart/encrypted; protocol=\"application/pgp-encrypted\"")
 		msg.SetHeader("Content-Description", "OpenPGP encrypted message")
 		msg.SetBody("application/pgp-encrypted", "Version: 1")
+
+		// The encrypted data is included as an alternative body part
 		msg.AddAlternative("application/octet-stream", string(armored))
+
+		// Attach the encrypted message as a downloadable file
+		msg.Attach("encrypted.asc", gomail.SetCopyFunc(func(w io.Writer) error {
+			_, err := w.Write(armored)
+			return err
+		}))
 
 		err = mailer.dialer.DialAndSend(msg)
 		if err != nil {

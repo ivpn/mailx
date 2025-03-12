@@ -21,3 +21,4 @@ docker-data/
 test/duplicate_configs/
 test/config/dovecot-masters.cf
 test/config/postfix-accounts.cf
+.qodo

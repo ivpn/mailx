@@ -3,7 +3,7 @@
         <div class="container mx-auto max-w-screen-lg px-0">
             <div class="flex flex-col max-w-screen-lg">
                 <MainMenu />
-                <div class="hs-dropdown">
+                <!-- <div class="hs-dropdown">
                     <button id="hs-dropdown-default">
                         {{ email }}
                         <svg class="ms-1 flex-shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -20,8 +20,11 @@
                             Log out
                         </button>
                     </div>
-                    <!-- <ThemeSwitch /> -->
-                </div>
+                    <ThemeSwitch />
+                </div> -->
+                <button @click.stop="logout">
+                    Log out
+                </button>
             </div>
         </div>
     </header>

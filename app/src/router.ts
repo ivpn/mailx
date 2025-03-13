@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Dashboard from './components/Dashboard.vue'
 import QuickActions from './components/QuickActions.vue'
-import Aliases from './components/Aliases.vue'
 import Recipients from './components/Recipients.vue'
 import Stats from './components/Stats.vue'
 import Settings from './components/Settings.vue'
@@ -32,11 +31,6 @@ const routes = [
                 path: '',
                 name: AppName,
                 component: QuickActions,
-            },
-            {
-                path: 'aliases',
-                name: AppName + ' - Aliases',
-                component: Aliases,
             },
             {
                 path: 'recipients',

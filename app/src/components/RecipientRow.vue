@@ -18,7 +18,7 @@
         <td>
             <p>
                 <span v-if="recipient.is_active" class="badge success">Verified</span>
-                <span v-if="recipient.is_active" class="badge">Unverified</span>
+                <span v-if="!recipient.is_active" class="badge">Unverified</span>
             </p>
         </td>
         <td>

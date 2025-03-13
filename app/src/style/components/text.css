@@ -1,18 +1,18 @@
 @layer components {
     h1 {
-        @apply text-3xl font-semibold text-gray-800 dark:text-gray-100 mb-5;
+        @apply text-3xl font-semibold foreground-primary mb-5;
     }
 
     h2 {
-        @apply text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-5;
+        @apply text-2xl font-semibold foreground-primary mb-5;
     }
 
     h3 {
-        @apply text-xl font-semibold text-gray-800 dark:text-gray-100 mb-5;
+        @apply text-xl font-semibold foreground-primary mb-5;
     }
 
     h4 {
-        @apply font-semibold text-gray-800 dark:text-gray-100 mb-3;
+        @apply font-semibold foreground-primary mb-3;
     }
 
     p {
@@ -29,7 +29,7 @@
 
     table td > p,
     table td > div > p {
-        @apply text-gray-800 dark:text-gray-100 mb-0;
+        @apply foreground-primary mb-0;
     }
 
     a {

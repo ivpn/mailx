@@ -44,7 +44,7 @@
                                     >
                                 </div>
                                 <label for="hs-radio-words" class="ms-3">
-                                    <span class="block text-sm font-semibold text-gray-800 dark:text-gray-100">Words</span>
+                                    <span class="block text-sm font-semibold foreground-primary">Words</span>
                                     <span id="hs-radio-words-description" class="block text-sm text-gray-500 dark:text-gray-400">e.g.
                                         quiet.haze16@{{ alias.domain }}</span>
                                 </label>
@@ -61,7 +61,7 @@
                                     >
                                 </div>
                                 <label for="hs-radio-random" class="ms-3">
-                                    <span class="block text-sm font-semibold text-gray-800 dark:text-gray-100">Random</span>
+                                    <span class="block text-sm font-semibold foreground-primary">Random</span>
                                     <span id="hs-radio-random-description" class="block text-sm text-gray-500 dark:text-gray-400">e.g.
                                         uf1h0hxi@{{ alias.domain }}</span>
                                 </label>
@@ -78,7 +78,7 @@
                                     >
                                 </div>
                                 <label for="hs-radio-uuid" class="ms-3">
-                                    <span class="block text-sm font-semibold text-gray-800 dark:text-gray-100">UUID</span>
+                                    <span class="block text-sm font-semibold foreground-primary">UUID</span>
                                     <span id="hs-radio-uuid-description" class="block text-sm text-gray-500 dark:text-gray-400">e.g.
                                         550e8400-e29b-41d4-a716-446655440000@{{ alias.domain }}</span>
                                 </label>

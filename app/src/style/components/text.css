@@ -16,14 +16,14 @@
     }
 
     p {
-        @apply text-gray-500 dark:text-gray-400 mb-5;
+        @apply foreground-secondary mb-5 font-primary font-light;
 
         &.error {
-            @apply text-red-600 text-sm mb-3;
+            @apply foreground-error text-sm mb-3;
         }
     
         &.success {
-            @apply text-emerald-600 dark:text-emerald-500 text-sm mb-3;
+            @apply foreground-success text-sm mb-3;
         }
     }
 
@@ -37,7 +37,7 @@
     }
 
     hr {
-        @apply border-t border-gray-500 dark:border-neutral-600 mb-8;
+        @apply border-t border-neutral-400 dark:border-neutral-600 mb-8;
     }
 
     ul {

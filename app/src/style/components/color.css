@@ -36,14 +36,6 @@
     }
 
     .foreground-secondary {
-        @apply text-neutral-800 dark:text-neutral-200;
-    }
-
-    .foreground-tertiary {
-        @apply text-neutral-700 dark:text-neutral-300;
-    }
-
-    .foreground-quaternary {
         @apply text-neutral-600 dark:text-neutral-400;
     }
 
@@ -60,7 +52,7 @@
     }
 
     .foreground-success {
-        @apply text-emerald-500;
+        @apply text-emerald-600 dark:text-emerald-500;
     }
 
     .foreground-error {

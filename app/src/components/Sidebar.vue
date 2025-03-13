@@ -1,7 +1,7 @@
 <template>
     <header class="background-secondary flex flex-col justify-between h-full">
         <nav>
-            <h1 class="py-8 pl-8 m-0">MailX</h1>
+            <h1 class="py-5 pl-8 m-0 foreground-accent">MailX</h1>
             <div class="flex flex-col items-center">
                 <router-link v-bind:class="{ 'active': route == '/' }" to="/">Aliases</router-link>
                 <router-link v-bind:class="{ 'active': route == '/recipients' }" to="/recipients">Recipients</router-link>

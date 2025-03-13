@@ -8,7 +8,7 @@
     }
 
     .card {
-        @apply flex flex-col p-5 my-0;
+        @apply flex flex-col py-5 px-8;
 
         &.center {
             @apply w-full max-w-sm px-8 pt-6 pb-8 mb-4;

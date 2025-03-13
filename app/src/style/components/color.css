@@ -52,7 +52,11 @@
     }
 
     .foreground-accent {
-        @apply bg-bluish-500;
+        @apply text-bluish-500;
+    }
+
+    .foreground-accent-alternate {
+        @apply text-bluish-600;
     }
 
     .foreground-success {

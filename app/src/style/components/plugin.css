@@ -39,10 +39,10 @@
     }
 
     .hs-dropdown {
-        @apply relative flex items-center [--placement:bottom-right] my-3;
+        @apply relative flex items-center [--placement:bottom-right];
 
         & > button {
-            @apply flex items-center text-gray-500 dark:text-gray-400 pl-4 pr-3 hover:text-gray-800 dark:hover:text-gray-100 font-normal text-base;
+            @apply flex items-center text-gray-500 dark:text-gray-400 py-6 hover:text-gray-800 dark:hover:text-gray-100 font-normal text-base;
         }
 
         .hs-dropdown-menu {

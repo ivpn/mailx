@@ -1,6 +1,6 @@
 <template>
     <nav>
-        <div class="flex flex-row items-center gap-8">
+        <div class="flex flex-col items-center">
             <router-link v-bind:class="{ 'active': route == '/' }" to="/">Dashboard</router-link>
             <router-link v-bind:class="{ 'active': route == '/aliases' }" to="/aliases">Aliases</router-link>
             <router-link v-bind:class="{ 'active': route == '/recipients' }" to="/recipients">Recipients</router-link>

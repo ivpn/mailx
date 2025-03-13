@@ -1,8 +1,8 @@
 <template>
     <header class="card flex flex-col w-full p-0 m-0">
-        <div class="container mx-auto max-w-screen-lg px-5">
-            <div class="flex flex-row justify-between max-w-screen-lg">
-                <HeaderMenu />
+        <div class="container mx-auto max-w-screen-lg px-0">
+            <div class="flex flex-col max-w-screen-lg">
+                <MainMenu />
                 <div class="hs-dropdown">
                     <button id="hs-dropdown-default">
                         {{ email }}
@@ -20,7 +20,7 @@
                             Log out
                         </button>
                     </div>
-                    <ThemeSwitch />
+                    <!-- <ThemeSwitch /> -->
                 </div>
             </div>
         </div>
@@ -28,8 +28,8 @@
 </template>
 
 <script setup lang="ts">
-import HeaderMenu from './HeaderMenu.vue'
-import ThemeSwitch from './ThemeSwitch.vue'
+import MainMenu from './MainMenu.vue'
+// import ThemeSwitch from './ThemeSwitch.vue'
 import dropdown from '@preline/dropdown'
 import { userApi } from '../api/user.ts'
 import { onMounted, ref } from 'vue'

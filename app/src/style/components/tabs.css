@@ -2,10 +2,10 @@
     nav {
 
         a {
-            @apply text-gray-500 dark:text-gray-400 border-b-2 border-white dark:border-neutral-800 py-6 font-medium hover:text-gray-800 dark:hover:text-gray-100;
+            @apply text-gray-500 dark:text-gray-400 border-r-2 border-white dark:border-neutral-800 py-6 font-medium hover:text-gray-800 dark:hover:text-gray-100 w-full;
 
             &.active {
-                @apply text-gray-800 dark:text-gray-100 border-bluish-500 border-b-2;
+                @apply text-gray-800 dark:text-gray-100 border-bluish-500 border-r-2;
             }
         }
     }

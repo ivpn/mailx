@@ -1,9 +1,9 @@
 <template>
     <div class="page">
-        <div class="w-64 flex-shrink-0 fixed h-full">
+        <div class="w-[223px] flex-shrink-0 fixed h-full">
             <Sidebar />
         </div>
-        <div class="ml-64 flex-1">
+        <div class="ml-[223px] flex-1">
             <SubscriptionStatus />
             <router-view></router-view>
         </div>

@@ -1,5 +1,5 @@
 <template>
-    <header class="flex flex-col justify-between h-full">
+    <header class="background-secondary flex flex-col justify-between h-full">
         <nav>
             <h1 class="py-8 pl-8 m-0">MailX</h1>
             <div class="flex flex-col items-center">

@@ -1,4 +1,5 @@
 @import "fonts/fonts.css";
+@import "components/color.css";
 @import "components/page.css";
 @import "components/button.css";
 @import "components/form.css";

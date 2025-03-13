@@ -2,10 +2,10 @@
     nav {
 
         a {
-            @apply text-gray-500 dark:text-gray-400 dark:border-neutral-800 py-4 font-medium hover:text-gray-800 dark:hover:text-gray-100 w-full cursor-pointer pl-8;
+            @apply foreground-primary dark:border-neutral-800 py-4 font-medium hover:text-gray-800 dark:hover:text-gray-100 w-full cursor-pointer pl-8;
 
             &.active {
-                @apply text-gray-800 dark:text-gray-100 border-bluish-500 border-r-2 dark:bg-neutral-800;
+                @apply border-bluish-500 border-r-2 background-tertiary;
             }
         }
     }

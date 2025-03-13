@@ -1,0 +1,97 @@
+@layer components {
+    .background-primary {
+        @apply bg-neutral-100 dark:bg-neutral-900;
+    }
+
+    .background-secondary {
+        @apply bg-neutral-200 dark:bg-neutral-800;
+    }
+
+    .background-tertiary {
+        @apply bg-neutral-300 dark:bg-neutral-700;
+    }
+
+    .background-quaternary {
+        @apply bg-neutral-400 dark:bg-neutral-600;
+    }
+
+    .background-quinary {
+        @apply bg-neutral-500;
+    }
+
+    .background-accent {
+        @apply bg-bluish-500;
+    }
+
+    .background-success {
+        @apply bg-emerald-500;
+    }
+
+    .background-error {
+        @apply bg-red-500;
+    }
+
+    .foreground-primary {
+        @apply text-neutral-900 dark:text-neutral-100;
+    }
+
+    .foreground-secondary {
+        @apply text-neutral-800 dark:text-neutral-200;
+    }
+
+    .foreground-tertiary {
+        @apply text-neutral-700 dark:text-neutral-300;
+    }
+
+    .foreground-quaternary {
+        @apply text-neutral-600 dark:text-neutral-400;
+    }
+
+    .foreground-quinary {
+        @apply text-neutral-500;
+    }
+
+    .foreground-accent {
+        @apply bg-bluish-500;
+    }
+
+    .foreground-success {
+        @apply text-emerald-500;
+    }
+
+    .foreground-error {
+        @apply text-red-500;
+    }
+
+    .border-primary {
+        @apply border-neutral-100 dark:border-neutral-900;
+    }
+
+    .border-secondary {
+        @apply border-neutral-200 dark:border-neutral-800;
+    }
+
+    .border-tertiary {
+        @apply border-neutral-300 dark:border-neutral-700;
+    }
+
+    .border-quaternary {
+        @apply border-neutral-400 dark:border-neutral-600;
+    }
+
+    .border-quinary {
+        @apply border-neutral-500;
+    }
+
+    .border-accent {
+        @apply border-bluish-500;
+    }
+
+    .border-success {
+        @apply border-emerald-500;
+    }
+
+    .border-error {
+        @apply border-red-500;
+    }
+}

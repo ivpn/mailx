@@ -1,6 +1,6 @@
 @layer components {
     .page {
-        @apply min-h-screen bg-gray-100 dark:bg-neutral-900;
+        @apply min-h-screen;
 
         &.center {
             @apply flex flex-col items-center justify-center;
@@ -8,7 +8,7 @@
     }
 
     .card {
-        @apply flex flex-col p-5 my-0 bg-white dark:bg-neutral-800;
+        @apply flex flex-col p-5 my-0;
 
         &.center {
             @apply w-full max-w-sm px-8 pt-6 pb-8 mb-4;

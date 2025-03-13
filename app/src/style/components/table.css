@@ -1,11 +1,11 @@
 @layer components {
     table {
-        @apply table-auto w-full divide-y divide-gray-200 dark:divide-neutral-600;
+        @apply table-auto w-full divide-y divide-zinc-200 dark:divide-neutral-600;
 
         thead {
 
             th {
-                @apply px-5 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400;
+                @apply px-5 py-3 text-start text-sm font-normal foreground-secondary;
 
                 &:first-child {
                     @apply text-start px-0 pr-5;
@@ -18,7 +18,7 @@
         }
 
         tbody {
-            @apply divide-y divide-gray-200 dark:divide-neutral-600;
+            @apply divide-y divide-zinc-200 dark:divide-neutral-600;
 
             td {
                 @apply px-5 py-4 whitespace-nowrap text-start text-sm foreground-primary;

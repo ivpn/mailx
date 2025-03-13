@@ -10,7 +10,7 @@
             }
 
             &.cancel {
-                @apply text-gray-500 bg-gray-100 hover:bg-gray-200 dark:text-gray-300 dark:bg-neutral-600 dark:hover:bg-neutral-700;
+                @apply text-zinc-500 bg-zinc-100 hover:bg-zinc-200 dark:text-zinc-300 dark:bg-neutral-600 dark:hover:bg-neutral-700;
             }
         }
 
@@ -23,11 +23,11 @@
         }
 
         &.close {
-            @apply flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent foreground-primary hover:bg-gray-100 dark:hover:bg-neutral-700 disabled:opacity-50 disabled:pointer-events-none;
+            @apply flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent foreground-primary hover:bg-zinc-100 dark:hover:bg-neutral-700 disabled:opacity-50 disabled:pointer-events-none;
         }
 
         &.sort {
-            @apply inline-flex justify-center items-center text-xs text-gray-500 dark:text-gray-400;
+            @apply inline-flex justify-center items-center text-sm foreground-secondary;
         }
 
         &.plain {

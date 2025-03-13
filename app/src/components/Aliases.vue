@@ -31,7 +31,7 @@
                                     @click="sort"
                                     data-sort="created_at"
                                     class="sort">
-                                        CREATED
+                                        Created
                                         <svg
                                         data-sort="created_at"
                                         v-bind:class="{ 'text-bluish-500': sortBy === 'created_at', 'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
@@ -47,7 +47,7 @@
                                     @click="sort"
                                     data-sort="name"
                                     class="sort">
-                                        ALIAS
+                                        Alias
                                         <svg
                                         data-sort="name"
                                         v-bind:class="{ 'text-bluish-500': sortBy === 'name', 'rotate-180': sortOrder === 'ASC' && sortBy === 'name' }"
@@ -58,11 +58,11 @@
                                         </svg>
                                     </button>    
                                 </th>
-                                <th v-if="isDashboard">CREATED</th>
-                                <th v-if="isDashboard">ALIAS</th>
-                                <th>COUNT</th>
-                                <th>ACTIVE</th>
-                                <th>ACTIONS</th>
+                                <th v-if="isDashboard">Created</th>
+                                <th v-if="isDashboard">Alias</th>
+                                <th>Count</th>
+                                <th>Active</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -102,11 +102,11 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>CREATED</th>
-                                <th>ALIAS</th>
-                                <th>COUNT</th>
-                                <th>ACTIVE</th>
-                                <th>ACTIONS</th>
+                                <th>Created</th>
+                                <th>Alias</th>
+                                <th>Count</th>
+                                <th>Active</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>

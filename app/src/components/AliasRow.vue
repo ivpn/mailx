@@ -8,8 +8,8 @@
                         Active
                     </span>
                 </div>
-                <div v-if="!alias.enabled" class="hs-tooltip flex-none rounded-full bg-gray-500/20 p-1">
-                    <div class="h-1.5 w-1.5 rounded-full bg-gray-400 dark:bg-neutral-500"></div>
+                <div v-if="!alias.enabled" class="hs-tooltip flex-none rounded-full bg-zinc-500/20 p-1">
+                    <div class="h-1.5 w-1.5 rounded-full bg-zinc-400 dark:bg-neutral-500"></div>
                     <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                         Inactive
                     </span>
@@ -19,20 +19,20 @@
         </td>
         <td>
             <div class="hs-tooltip inline-block">
-                <span class="hs-tooltip-toggle">
+                <p class="hs-tooltip-toggle">
                     <button class="plain truncate max-w-[320px]" @click="copyAlias(alias.name)">
                         {{ alias.name }}
                     </button>
                     <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                         {{ copyText }}: {{ alias.name }}
                     </span>
-                </span>
+                </p>
             </div>
             <p>{{ alias.description }}</p>
         </td>
         <td>
             <div class="hs-tooltip inline-block">
-                <span class="hs-tooltip-toggle dark:text-gray-100">
+                <p class="hs-tooltip-toggle dark:text-zinc-100">
                     {{ alias.stats.forwards }}/{{ alias.stats.blocks }}/{{ alias.stats.replies }}/{{ alias.stats.sends }}
                     <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                         {{ alias.stats.forwards }} Forwards<br>
@@ -40,7 +40,7 @@
                         {{ alias.stats.replies }} Replies<br>
                         {{ alias.stats.sends }} Sends
                     </span>
-                </span>
+                </p>
             </div>
         </td>
         <td>

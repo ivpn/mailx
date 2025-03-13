@@ -27,9 +27,9 @@
             <table>
                 <thead>
                     <tr>
-                        <th>CREATED</th>
+                        <th>Created</th>
                         <th>ID</th>
-                        <th>ACTIONS</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>

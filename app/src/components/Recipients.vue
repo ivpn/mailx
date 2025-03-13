@@ -18,11 +18,11 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>CREATED</th>
-                            <th>EMAIL</th>
-                            <th>VERIFIED</th>
-                            <th>ENCRYPTION</th>
-                            <th>ACTIONS</th>
+                            <th>Created</th>
+                            <th>Email</th>
+                            <th>Verified</th>
+                            <th>Encryption</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>

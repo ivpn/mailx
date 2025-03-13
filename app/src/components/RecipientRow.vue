@@ -5,20 +5,20 @@
         </td>
         <td>
             <div class="hs-tooltip inline-block">
-                <span class="hs-tooltip-toggle">
+                <p class="hs-tooltip-toggle">
                     <button class="plain truncate max-w-[320px]" @click="copyAlias(recipient.email)">
                         {{ recipient.email }}
                     </button>
                     <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                         {{ copyText }}: {{ recipient.email }}
                     </span>
-                </span>
+                </p>
             </div>
         </td>
         <td>
             <p>
                 <span v-if="recipient.is_active" class="badge success">Verified</span>
-                <span v-if="!recipient.is_active" class="badge">Unverified</span>
+                <span v-if="recipient.is_active" class="badge">Unverified</span>
             </p>
         </td>
         <td>

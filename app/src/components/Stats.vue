@@ -5,19 +5,19 @@
         <div id="chart" class="mb-5"></div>
         <h3>Last 90 days</h3>
         <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-center mb-8">
-            <div class="p-4 border-r border-gray-200 dark:border-gray-600">
+            <div class="p-4 border-r border-zinc-200 dark:border-zinc-600">
                 <h1 class="mb-2">{{ stats.forwards }}</h1>
                 <p class="m-0">Forwards</p>
             </div>
-            <div class="p-4 border-r border-transparent md:border-gray-200 dark:md:border-gray-600">
+            <div class="p-4 border-r border-transparent md:border-zinc-200 dark:md:border-zinc-600">
                 <h1 class="mb-2">{{ stats.blocks }}</h1>
                 <p class="m-0">Blocks</p>
             </div>
-            <div class="p-4 border-r border-gray-200 dark:border-gray-600">
+            <div class="p-4 border-r border-zinc-200 dark:border-zinc-600">
                 <h1 class="mb-2">{{ stats.replies }}</h1>
                 <p class="m-0">Replies</p>
             </div>
-            <div class="p-4 border-r border-transparent md:border-gray-200 dark:md:border-gray-600">
+            <div class="p-4 border-r border-transparent md:border-zinc-200 dark:md:border-zinc-600">
                 <h1 class="mb-2">{{ stats.sends }}</h1>
                 <p class="m-0">Sends</p>
             </div>

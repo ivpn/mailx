@@ -1,22 +1,22 @@
 @layer components {
     .background-primary {
-        @apply bg-neutral-100 dark:bg-neutral-900;
+        @apply bg-zinc-100 dark:bg-zinc-900;
     }
 
     .background-secondary {
-        @apply bg-neutral-200 dark:bg-neutral-800;
+        @apply bg-zinc-200 dark:bg-zinc-800;
     }
 
     .background-tertiary {
-        @apply bg-neutral-300 dark:bg-neutral-700;
+        @apply bg-zinc-300 dark:bg-zinc-700;
     }
 
     .background-quaternary {
-        @apply bg-neutral-400 dark:bg-neutral-600;
+        @apply bg-zinc-400 dark:bg-zinc-600;
     }
 
     .background-quinary {
-        @apply bg-neutral-500;
+        @apply bg-zinc-500;
     }
 
     .background-accent {
@@ -24,7 +24,7 @@
     }
 
     .background-success {
-        @apply bg-emerald-500;
+        @apply bg-emerald-500 dark:bg-emerald-600;
     }
 
     .background-error {
@@ -32,15 +32,15 @@
     }
 
     .foreground-primary {
-        @apply text-neutral-900 dark:text-neutral-100;
+        @apply text-zinc-900 dark:text-zinc-100;
     }
 
     .foreground-secondary {
-        @apply text-neutral-600 dark:text-neutral-400;
+        @apply text-zinc-600 dark:text-zinc-400;
     }
 
     .foreground-quinary {
-        @apply text-neutral-500;
+        @apply text-zinc-500;
     }
 
     .foreground-accent {
@@ -59,24 +59,28 @@
         @apply text-red-500;
     }
 
+    .foreground-error-alternate {
+        @apply text-red-600;
+    }
+
     .border-primary {
-        @apply border-neutral-100 dark:border-neutral-900;
+        @apply border-zinc-100 dark:border-zinc-900;
     }
 
     .border-secondary {
-        @apply border-neutral-200 dark:border-neutral-800;
+        @apply border-zinc-200 dark:border-zinc-800;
     }
 
     .border-tertiary {
-        @apply border-neutral-300 dark:border-neutral-700;
+        @apply border-zinc-300 dark:border-zinc-700;
     }
 
     .border-quaternary {
-        @apply border-neutral-400 dark:border-neutral-600;
+        @apply border-zinc-400 dark:border-zinc-600;
     }
 
     .border-quinary {
-        @apply border-neutral-500;
+        @apply border-zinc-500;
     }
 
     .border-accent {

@@ -28,22 +28,7 @@
                     <table>
                         <thead>
                             <tr>
-                                <th v-if="!isDashboard">
-                                    <button
-                                    @click="sort"
-                                    data-sort="created_at"
-                                    class="sort">
-                                        Created
-                                        <svg
-                                        data-sort="created_at"
-                                        v-bind:class="{ 'text-bluish-500': sortBy === 'created_at', 'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
-                                        class="ms-1 flex-shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="m6 9 6 6 6-6" />
-                                        </svg>
-                                    </button>
-                                </th>
+                                <th>Status</th>
                                 <th v-if="!isDashboard">
                                     <button
                                     @click="sort"
@@ -62,8 +47,24 @@
                                 </th>
                                 <th v-if="isDashboard">Created</th>
                                 <th v-if="isDashboard">Alias</th>
+                                <th>Domain</th>
                                 <th>Count</th>
-                                <th>Active</th>
+                                <th v-if="!isDashboard">
+                                    <button
+                                    @click="sort"
+                                    data-sort="created_at"
+                                    class="sort">
+                                        Created
+                                        <svg
+                                        data-sort="created_at"
+                                        v-bind:class="{ 'text-bluish-500': sortBy === 'created_at', 'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
+                                        class="ms-1 flex-shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="m6 9 6 6 6-6" />
+                                        </svg>
+                                    </button>
+                                </th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -106,10 +107,11 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>Created</th>
+                                <th>Status</th>
                                 <th>Alias</th>
+                                <th>Domain</th>
                                 <th>Count</th>
-                                <th>Active</th>
+                                <th>Created</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>

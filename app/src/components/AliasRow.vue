@@ -16,7 +16,7 @@
         <td>
             <div class="hs-tooltip inline-block">
                 <p class="hs-tooltip-toggle">
-                    <button class="plain truncate max-w-[320px]" @click="copyAlias(alias.name)">
+                    <button class="plain truncate max-w-[320px] text-base" @click="copyAlias(alias.name)">
                         {{ alias.name.split('@')[0] }}
                     </button>
                     <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
@@ -24,10 +24,10 @@
                     </span>
                 </p>
             </div>
-            <p>{{ alias.description }}</p>
+            <p class="foreground-secondary">{{ alias.description }}</p>
         </td>
         <td>
-            @{{ alias.name.split('@')[1] }}
+            <p>@{{ alias.name.split('@')[1] }}</p>
         </td>
         <td>
             <div class="hs-tooltip inline-block">

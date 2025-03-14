@@ -6,7 +6,7 @@
             <a href="https://www.ivpn.net/">IVPN</a>
         </h2>
         <h3>Log In</h3>
-        <form class="card center" @submit.prevent="">
+        <form class="card-secondary center" @submit.prevent="">
             <nav v-if="passkeySupported" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
                 <button
                     @click="onTabChange"
@@ -39,7 +39,7 @@
                             <p v-if="emailAuthnError" class="error">Required</p>
                         </div>
                         <div class="flex items-center w-full">
-                            <button :disabled="isLoading" @click="loginWithPasskey" class="cta full">
+                            <button :disabled="isLoading" @click="loginWithPasskey" class="cta lg full">
                                 Log In with Passkey
                             </button>
                         </div>
@@ -88,7 +88,7 @@
                             <p v-if="otpError" class="error">Required</p>
                         </div>
                         <div class="flex items-center w-full">
-                            <button :disabled="isLoading" @click="login" class="cta full">
+                            <button :disabled="isLoading" @click="login" class="cta lg full">
                                 Log In
                             </button>
                         </div>
@@ -98,7 +98,7 @@
             </div>
             <div v-if="isLoggedIn()" class="pb-2">
                 <p>You are logged in</p>
-                <router-link to="/" tag="button" class="cta full">
+                <router-link to="/" tag="button" class="cta lg full">
                     Go to Dashboard
                 </router-link>
             </div>

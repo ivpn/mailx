@@ -7,19 +7,19 @@
         }
     }
 
-    .card {
-        @apply flex flex-col py-5 px-8;
-
-        &.center {
-            @apply w-full max-w-sm px-8 pt-6 pb-8 mb-4;
-        }
-    }
-
     .card-container {
         @apply pt-5 pb-10 px-8;
     }
 
     .card-primary {
         @apply flex flex-col py-5 px-8 border-quaternary border rounded-lg;
+    }
+
+    .card-secondary {
+        @apply flex flex-col py-5 px-8 rounded-lg background-secondary;
+
+        &.center {
+            @apply w-full max-w-sm px-8 pt-6 pb-8 mb-4;
+        }
     }
 }

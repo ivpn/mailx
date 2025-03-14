@@ -12,6 +12,10 @@
             &.cancel {
                 @apply text-zinc-500 bg-zinc-100 hover:bg-zinc-200 dark:text-zinc-300 dark:bg-neutral-600 dark:hover:bg-neutral-700;
             }
+
+            &.lg {
+                @apply py-3 px-4;
+            }
         }
 
         &.full {

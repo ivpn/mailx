@@ -16,12 +16,14 @@
                 </div>
             </div>
         </div>
-        <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="card">
-            <h1>Aliases</h1>
-            <div>
+        <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="card-container">
+            <div class="flex flex-row justify-between">
+                <h1>Aliases</h1>
                 <div class="flex items-center justify-between mb-6">
                     <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=false />
                 </div>
+            </div>
+            <div class="card-primary">
                 <div class="table-container">
                     <table>
                         <thead>
@@ -70,12 +72,12 @@
                         </tbody>
                     </table>
                 </div>
+                <p v-if="isDashboard" class="text-sm my-4">
+                    <router-link to="/aliases">All Aliases</router-link>
+                </p>
+                <p v-if="error" class="error">Error: {{ error }}</p>
+                <Pagination v-if="list.length && !isDashboard" :list.sync="list" :limit="limit" :page="page" :total="total" :key="rowKey" @onUpdatePage="onUpdatePage" />
             </div>
-            <p v-if="isDashboard" class="text-sm my-4">
-                <router-link to="/aliases">All Aliases</router-link>
-            </p>
-            <p v-if="error" class="error">Error: {{ error }}</p>
-            <Pagination v-if="list.length && !isDashboard" :list.sync="list" :limit="limit" :page="page" :total="total" :key="rowKey" @onUpdatePage="onUpdatePage" />
         </div>
     </div>
 
@@ -92,12 +94,14 @@
                 </div>
             </div>
         </div>
-        <div v-bind:class="{ 'hidden': !listCatchAll.length || !loadedCatchAll }" class="card">
-            <h1>Catch-all Aliases</h1>
-            <div>
+        <div v-bind:class="{ 'hidden': !listCatchAll.length || !loadedCatchAll }" class="card-container">
+            <div class="flex flex-row justify-between">
+                <h1>Catch-all Aliases</h1>
                 <div class="flex items-center justify-between mb-6">
                     <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=true />
                 </div>
+            </div>
+            <div class="card-primary">
                 <div class="table-container">
                     <table>
                         <thead>

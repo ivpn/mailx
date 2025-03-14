@@ -39,10 +39,6 @@
         @apply text-zinc-600 dark:text-zinc-400;
     }
 
-    .foreground-quinary {
-        @apply text-zinc-500;
-    }
-
     .foreground-accent {
         @apply text-bluish-500;
     }
@@ -64,23 +60,19 @@
     }
 
     .border-primary {
-        @apply border-zinc-100 dark:border-zinc-900;
+        @apply border-zinc-800 dark:border-zinc-200;
     }
 
     .border-secondary {
-        @apply border-zinc-200 dark:border-zinc-800;
+        @apply border-zinc-600 dark:border-zinc-400;
     }
 
     .border-tertiary {
-        @apply border-zinc-300 dark:border-zinc-700;
-    }
-
-    .border-quaternary {
         @apply border-zinc-400 dark:border-zinc-600;
     }
 
-    .border-quinary {
-        @apply border-zinc-500;
+    .border-quaternary {
+        @apply border-zinc-300 dark:border-zinc-700;
     }
 
     .border-accent {

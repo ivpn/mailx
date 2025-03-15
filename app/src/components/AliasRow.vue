@@ -16,7 +16,7 @@
         <td>
             <div class="hs-tooltip inline-block">
                 <p class="hs-tooltip-toggle">
-                    <button class="plain truncate max-w-[320px] text-base" @click="copyAlias(alias.name)">
+                    <button class="plain truncate max-w-[320px] text-base p-0" @click="copyAlias(alias.name)">
                         {{ alias.name.split('@')[0] }}
                     </button>
                     <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
@@ -27,7 +27,7 @@
             <p class="foreground-secondary">{{ alias.description }}</p>
         </td>
         <td>
-            <p>@{{ alias.name.split('@')[1] }}</p>
+            <p class="py-3">@{{ alias.name.split('@')[1] }}</p>
         </td>
         <td>
             <div class="hs-tooltip inline-block">
@@ -56,7 +56,7 @@
                         Inactive
                     </span>
                 </div> -->
-                <p>{{ new Date(alias.created_at).toDateString() }}</p>
+                <p>{{ formatDistanceToNow(new Date(alias.created_at)) }}</p>
             </div>
         </td>
         <td>
@@ -78,6 +78,7 @@ import AliasEdit from './AliasEdit.vue'
 import AliasSend from './AliasSend.vue'
 import { aliasApi } from '../api/alias.ts'
 import events from '../events.ts'
+import { formatDistanceToNow } from 'date-fns'
 
 const props = defineProps(['alias', 'recipients', 'catchAll'])
 const alias = ref(props.alias)

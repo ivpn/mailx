@@ -1,0 +1,14 @@
+@layer components {
+    .icon {
+        @apply icon-primary w-5 h-5 inline-block bg-no-repeat;
+
+        width: 1.25em;
+        height: 1.25em;
+        mask-size: 1.25em;
+        mask-size: 1.25em;
+
+        &.at-line {
+            mask-image: url("../../assets/icons/icon-at-line.svg");
+        }
+    }
+}

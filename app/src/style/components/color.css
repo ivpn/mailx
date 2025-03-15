@@ -59,6 +59,26 @@
         @apply text-red-600;
     }
 
+    .icon-primary {
+        @apply bg-zinc-900 dark:bg-zinc-100;
+    }
+
+    .icon-secondary {
+        @apply bg-zinc-600 dark:bg-zinc-400;
+    }
+
+    .icon-accent {
+        @apply bg-bluish-500;
+    }
+
+    .icon-success {
+        @apply bg-emerald-600 dark:bg-emerald-500;
+    }
+
+    .icon-error {
+        @apply bg-red-500;
+    }
+
     .border-primary {
         @apply border-zinc-800 dark:border-zinc-200;
     }

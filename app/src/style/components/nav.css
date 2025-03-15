@@ -2,7 +2,7 @@
     nav {
 
         a {
-            @apply foreground-primary hover:foreground-primary py-4 font-medium w-full cursor-pointer px-8;
+            @apply foreground-primary hover:foreground-primary py-4 font-medium w-full cursor-pointer px-8 flex flex-row items-center gap-x-2;
 
             &.active {
                 @apply border-accent border-r-2 background-tertiary;

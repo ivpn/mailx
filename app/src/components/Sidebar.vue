@@ -3,7 +3,10 @@
         <nav>
             <h1 class="py-5 pl-8 m-0 foreground-accent">MailX</h1>
             <div class="flex flex-col items-center">
-                <router-link v-bind:class="{ 'active': route == '/' }" to="/">Aliases</router-link>
+                <router-link v-bind:class="{ 'active': route == '/' }" to="/">
+                    <span class="icon at-line"></span>
+                    Aliases
+                </router-link>
                 <router-link v-bind:class="{ 'active': route == '/recipients' }" to="/recipients">Recipients</router-link>
                 <router-link v-bind:class="{ 'active': route == '/stats' }" to="/stats">Stats</router-link>
                 <router-link v-bind:class="{ 'active': route == '/settings' }" to="/settings">Settings</router-link>

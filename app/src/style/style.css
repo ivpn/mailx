@@ -8,6 +8,7 @@
 @import "components/plugin.css";
 @import "components/table.css";
 @import "components/badge.css";
+@import "components/icon.css";
 
 @tailwind base;
 @tailwind components;

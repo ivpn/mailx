@@ -4,18 +4,31 @@
             <h1 class="py-5 pl-8 m-0 foreground-accent">MailX</h1>
             <div class="flex flex-col items-center">
                 <router-link v-bind:class="{ 'active': route == '/' }" to="/">
-                    <span class="icon at-line"></span>
+                    <span class="icon at"></span>
                     Aliases
                 </router-link>
-                <router-link v-bind:class="{ 'active': route == '/recipients' }" to="/recipients">Recipients</router-link>
-                <router-link v-bind:class="{ 'active': route == '/stats' }" to="/stats">Stats</router-link>
-                <router-link v-bind:class="{ 'active': route == '/settings' }" to="/settings">Settings</router-link>
-                <router-link v-bind:class="{ 'active': route == '/account' }" to="/account">Account</router-link>
+                <router-link v-bind:class="{ 'active': route == '/recipients' }" to="/recipients">
+                    <span class="icon mailbox"></span>
+                    Recipients
+                </router-link>
+                <router-link v-bind:class="{ 'active': route == '/stats' }" to="/stats">
+                    <span class="icon chart"></span>
+                    Stats
+                </router-link>
+                <router-link v-bind:class="{ 'active': route == '/settings' }" to="/settings">
+                    <span class="icon settings"></span>
+                    Settings
+                </router-link>
+                <router-link v-bind:class="{ 'active': route == '/account' }" to="/account">
+                    <span class="icon user"></span>
+                    Account
+                </router-link>
             </div>
         </nav>
         <nav>
             <div class="flex flex-col items-center py-5">
                 <a @click.stop="logout">
+                    <span class="icon logout"></span>
                     Log out
                 </a>
             </div>

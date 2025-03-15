@@ -7,8 +7,28 @@
         mask-size: 1.25em;
         mask-size: 1.25em;
 
-        &.at-line {
-            mask-image: url("../../assets/icons/icon-at-line.svg");
+        &.at {
+            mask-image: url("../../assets/icons/icon-at.svg");
+        }
+
+        &.chart {
+            mask-image: url("../../assets/icons/icon-chart.svg");
+        }
+
+        &.logout {
+            mask-image: url("../../assets/icons/icon-logout.svg");
+        }
+
+        &.mailbox {
+            mask-image: url("../../assets/icons/icon-mailbox.svg");
+        }
+
+        &.settings {
+            mask-image: url("../../assets/icons/icon-settings.svg");
+        }
+
+        &.user {
+            mask-image: url("../../assets/icons/icon-user.svg");
         }
     }
 }

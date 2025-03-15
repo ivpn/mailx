@@ -20,7 +20,11 @@
     }
 
     .background-accent {
-        @apply bg-bluish-500;
+        @apply bg-bluedark-9;
+    }
+
+    .background-accent-alternate {
+        @apply bg-bluedark-10;
     }
 
     .background-success {
@@ -28,7 +32,11 @@
     }
 
     .background-error {
-        @apply bg-red-500;
+        @apply bg-red-600;
+    }
+
+    .background-error-alternate {
+        @apply bg-red-700;
     }
 
     .foreground-primary {
@@ -39,12 +47,16 @@
         @apply text-zinc-600 dark:text-zinc-400;
     }
 
+    .foreground-tertiary {
+        @apply text-zinc-500 dark:text-zinc-300;
+    }
+
     .foreground-accent {
-        @apply text-bluish-500;
+        @apply text-bluedark-9;
     }
 
     .foreground-accent-alternate {
-        @apply text-bluish-600;
+        @apply text-bluedark-10;
     }
 
     .foreground-success {

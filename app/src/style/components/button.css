@@ -1,16 +1,16 @@
 @layer components {
     button {
-        @apply text-bluish-500 hover:text-bluish-600 text-sm focus:outline-none disabled:opacity-50 disabled:pointer-events-none py-2;
+        @apply foreground-accent hover:foreground-accent-alternate text-sm focus:outline-none disabled:opacity-50 disabled:pointer-events-none py-2;
 
         &.cta {
-            @apply text-base text-white bg-bluish-500 hover:bg-bluish-600 py-2 px-3 inline-flex items-center gap-x-2 rounded;
+            @apply text-base foreground-primary background-accent hover:background-accent-alternate py-2 px-3 inline-flex items-center gap-x-2 rounded;
 
             &.delete {
-                @apply bg-red-600 hover:bg-red-700 text-white hover:text-white;
+                @apply background-error hover:background-error-alternate foreground-primary hover:foreground-primary;
             }
 
             &.cancel {
-                @apply text-zinc-500 bg-zinc-100 hover:bg-zinc-200 dark:text-zinc-300 dark:bg-neutral-600 dark:hover:bg-neutral-700;
+                @apply foreground-tertiary bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-600 dark:hover:bg-zinc-700;
             }
 
             &.lg {
@@ -27,7 +27,7 @@
         }
 
         &.close {
-            @apply flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent foreground-primary hover:bg-zinc-100 dark:hover:bg-neutral-700 disabled:opacity-50 disabled:pointer-events-none;
+            @apply flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent foreground-primary hover:bg-zinc-100 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:pointer-events-none;
         }
 
         &.sort {

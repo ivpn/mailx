@@ -18,7 +18,7 @@
         </div>
         <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="card-container">
             <div class="flex flex-row justify-between">
-                <h1>Aliases</h1>
+                <h2>Aliases</h2>
                 <div class="flex items-center justify-between mb-6">
                     <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=false />
                 </div>

@@ -2,10 +2,10 @@
     .icon {
         @apply icon-primary w-5 h-5 inline-block bg-no-repeat;
 
-        width: 1.25em;
-        height: 1.25em;
-        mask-size: 1.25em;
-        mask-size: 1.25em;
+        width: 1.35em;
+        height: 1.35em;
+        mask-size: 1.35em;
+        mask-size: 1.35em;
 
         &.at {
             mask-image: url("../../assets/icons/icon-at.svg");

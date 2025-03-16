@@ -49,7 +49,7 @@ export default {
           11: '#7AB6FF',
           12: '#CCE3FF',
         },
-        neutrallight: {
+        nl: {
           1: '#FCFCFD',
           2: '#F9F9FB',
           3: '#EFF0F3',
@@ -63,7 +63,7 @@ export default {
           11: '#62636C',
           12: '#1E1F24',
         },
-        neutraldark: {
+        nd: {
           1: '#111113',
           2: '#19191B',
           3: '#222325',

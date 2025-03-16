@@ -107,6 +107,10 @@
         @apply border-zinc-300 dark:border-zinc-700;
     }
 
+    .divide-quaternary {
+        @apply divide-zinc-300 dark:divide-zinc-700;
+    }
+
     .border-accent {
         @apply border-bd-9;
     }

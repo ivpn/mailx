@@ -38,5 +38,21 @@
         &.scan {
             mask-image: url("../../assets/icons/icon-scan.svg");
         }
+
+        &.reply {
+            mask-image: url("../../assets/icons/icon-reply.svg");
+        }
+
+        &.forward {
+            mask-image: url("../../assets/icons/icon-forward.svg");
+        }
+
+        &.send {
+            mask-image: url("../../assets/icons/icon-send.svg");
+        }
+
+        &.block {
+            mask-image: url("../../assets/icons/icon-block.svg");
+        }
     }
 }

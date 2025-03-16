@@ -1,6 +1,4 @@
 <template>
-
-    <!-- Standard Aliases -->
     <div>
         <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=false :label="'New Alias'" />
         <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=true :label="'New Catch-all Alias'" />
@@ -14,7 +12,7 @@
                     To get started, first add a recipient.
                 </p>
                 <div class="flex gap-4">
-                    <!-- <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=false /> -->
+                    <!-- New Alias dropdown -->
                 </div>
             </div>
         </div>
@@ -46,7 +44,7 @@
                         <thead>
                             <tr>
                                 <th>Status</th>
-                                <th v-if="!isDashboard">
+                                <th>
                                     <button
                                     @click="sort"
                                     data-sort="name"
@@ -62,11 +60,25 @@
                                         </svg>
                                     </button>    
                                 </th>
-                                <th v-if="isDashboard">Created</th>
-                                <th v-if="isDashboard">Alias</th>
                                 <th>Domain</th>
+                                <th>
+                                    <button
+                                    @click="sort"
+                                    data-sort="catch_all"
+                                    class="sort">
+                                        Type
+                                        <svg
+                                        data-sort="catch_all"
+                                        v-bind:class="{ 'text-bluedark-9': sortBy === 'catch_all', 'rotate-180': sortOrder === 'ASC' && sortBy === 'catch_all' }"
+                                        class="ms-1 flex-shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="m6 9 6 6 6-6" />
+                                        </svg>
+                                    </button>    
+                                </th>
                                 <th>Count</th>
-                                <th v-if="!isDashboard">
+                                <th>
                                     <button
                                     @click="sort"
                                     data-sort="created_at"
@@ -90,57 +102,11 @@
                         </tbody>
                     </table>
                 </div>
-                <p v-if="isDashboard" class="text-sm my-4">
-                    <router-link to="/aliases">All Aliases</router-link>
-                </p>
                 <p v-if="error" class="error">Error: {{ error }}</p>
-                <Pagination v-if="list.length && !isDashboard" :list.sync="list" :limit="limit" :page="page" :total="total" :key="rowKey" @onUpdatePage="onUpdatePage" />
+                <Pagination v-if="list.length" :list.sync="list" :limit="limit" :page="page" :total="total" :key="rowKey" @onUpdatePage="onUpdatePage" />
             </div>
         </div>
     </div>
-
-    <!-- Catch-all Aliases -->
-    <div v-if="!isDashboard">
-        <div v-if="!listCatchAll.length && loadedCatchAll" class="flex flex-col my-14">
-            <div class="flex flex-col items-center text-center">
-                <h3>Create Catch-all Aliases</h3>
-                <p v-if="!recipients.length && loadedCatchAll" class="my-2">
-                    To get started, first add a recipient.
-                </p>
-                <div class="flex gap-4">
-                    <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=true />
-                </div>
-            </div>
-        </div>
-        <div v-bind:class="{ 'hidden': !listCatchAll.length || !loadedCatchAll }" class="card-container">
-            <div class="flex flex-row justify-between">
-                <h1>Catch-all Aliases</h1>
-                <div class="flex items-center justify-between mb-6">
-                    <!-- <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=true /> -->
-                </div>
-            </div>
-            <div class="card-primary">
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Status</th>
-                                <th>Alias</th>
-                                <th>Domain</th>
-                                <th>Count</th>
-                                <th>Created</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <AliasRow v-for="alias in listCatchAll" :alias="alias" :key="rowKey" :recipients.sync="recipients" :catchAll=true />
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
 </template>
 
 <script setup lang="ts">
@@ -171,10 +137,7 @@ const alias = {
     }
 }
 
-const props = defineProps(['dashboard'])
-const isDashboard = props.dashboard
 const list = ref([] as typeof alias[])
-const listCatchAll = ref([] as typeof alias[])
 const recipients = ref([])
 const settings = ref({
     id: '',
@@ -184,7 +147,6 @@ const settings = ref({
 })
 const error = ref('')
 const loaded = ref(false)
-const loadedCatchAll = ref(false)
 const rowKey = ref(0)
 const limit = ref(25)
 const page = ref(1)
@@ -198,34 +160,13 @@ const getList = async () => {
             limit: limit.value,
             page: page.value,
             sort_by: sortBy.value,
-            sort_order: sortOrder.value,
-            catch_all: "false"
+            sort_order: sortOrder.value
         })
         list.value = res.data.aliases
         total.value = res.data.total
-        if (isDashboard) list.value = list.value.slice(0, 5)
         loaded.value = true
         error.value = ''
         renderRow()
-    } catch (err) {
-        if (axios.isAxiosError(err)) {
-            error.value = err.message
-        }
-    }
-}
-
-const getListCatchAll = async () => {
-    try {
-        const res = await aliasApi.getList({
-            limit: limit.value,
-            page: page.value,
-            sort_by: sortBy.value,
-            sort_order: sortOrder.value,
-            catch_all: "true"
-        })
-        listCatchAll.value = res.data.aliases
-        loadedCatchAll.value = true
-        error.value = ''
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.message
@@ -298,7 +239,6 @@ const sort = (e: any) => {
 
 const fetch = () => {
     getList()
-    getListCatchAll()
 }
 
 onMounted(async () => {

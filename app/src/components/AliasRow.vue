@@ -30,6 +30,12 @@
             <p class="py-3">@{{ alias.name.split('@')[1] }}</p>
         </td>
         <td>
+            <p class="py-3">
+                <span v-if="!alias.catch_all">Alias</span>
+                <span v-if="alias.catch_all">Catch-all</span>
+            </p>
+        </td>
+        <td>
             <div class="hs-tooltip inline-block">
                 <p class="hs-tooltip-toggle dark:text-zinc-100">
                     {{ alias.stats.forwards }}/{{ alias.stats.blocks }}/{{ alias.stats.replies }}/{{ alias.stats.sends }}

@@ -8,7 +8,7 @@
     }
 
     .card-container {
-        @apply pt-5 pb-10 px-8;
+        @apply p-8 pt-6;
     }
 
     .card-primary {

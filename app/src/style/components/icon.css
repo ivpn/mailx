@@ -30,5 +30,13 @@
         &.user {
             mask-image: url("../../assets/icons/icon-user.svg");
         }
+
+        &.arrow-down-fill {
+            mask-image: url("../../assets/icons/icon-arrow-down-fill.svg");
+        }
+
+        &.scan {
+            mask-image: url("../../assets/icons/icon-scan.svg");
+        }
     }
 }

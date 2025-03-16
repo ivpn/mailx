@@ -2,6 +2,8 @@
 
     <!-- Standard Aliases -->
     <div>
+        <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=false :label="'New Alias'" />
+        <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=true :label="'New Catch-all Alias'" />
         <div v-if="!list.length && loaded" class="flex flex-col my-14">
             <div class="flex flex-col items-center text-center">
                 <h3>Create Aliases</h3>
@@ -12,7 +14,7 @@
                     To get started, first add a recipient.
                 </p>
                 <div class="flex gap-4">
-                    <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=false />
+                    <!-- <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=false /> -->
                 </div>
             </div>
         </div>
@@ -20,7 +22,22 @@
             <div class="flex flex-row justify-between">
                 <h2>Aliases</h2>
                 <div class="flex items-center justify-between mb-6">
-                    <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=false />
+                    <div class="hs-dropdown">
+                        <button id="hs-dropdown-new-alias" class="cta">
+                            New Alias
+                            <span class="icon arrow-down-fill"></span>
+                        </button>
+                        <div class="hs-dropdown-menu hs-dropdown-open:opacity-100 hidden" aria-labelledby="hs-dropdown-new-alias">
+                            <button data-hs-overlay="#modal-create-alias-false">
+                                <span class="icon at bg-bluedark-9 text-sm"></span>
+                                Alias
+                            </button>
+                            <button data-hs-overlay="#modal-create-alias-true">
+                                <span class="icon scan bg-bluedark-9 text-sm"></span>
+                                Catch-all Alias
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="card-primary">
@@ -99,7 +116,7 @@
             <div class="flex flex-row justify-between">
                 <h1>Catch-all Aliases</h1>
                 <div class="flex items-center justify-between mb-6">
-                    <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=true />
+                    <!-- <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=true /> -->
                 </div>
             </div>
             <div class="card-primary">
@@ -136,6 +153,7 @@ import AliasRow from './AliasRow.vue'
 import AliasCreate from './AliasCreate.vue'
 import Pagination from './Pagination.vue'
 import events from '../events.ts'
+import dropdown from '@preline/dropdown'
 
 const alias = {
     id: '',
@@ -284,6 +302,7 @@ const fetch = () => {
 }
 
 onMounted(async () => {
+    dropdown.autoInit()
     await getRecipients()
     await getSettings()
     fetch()
@@ -291,5 +310,4 @@ onMounted(async () => {
     events.on('alias.update', fetch)
     events.on('alias.delete', onDeleteAlias)
 })
-
 </script>

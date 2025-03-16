@@ -39,20 +39,16 @@
     }
 
     .hs-dropdown {
-        @apply relative flex items-center [--placement:bottom-right];
-
-        & > button {
-            @apply flex items-center text-zinc-500 dark:text-zinc-400 py-6 hover:text-zinc-800 dark:hover:text-zinc-100 font-normal text-base;
-        }
+        @apply relative [--placement:bottom-right];
 
         .hs-dropdown-menu {
-            @apply transition-[opacity,margin] opacity-0 min-w-60 bg-white dark:dark:bg-neutral-800 border border-zinc-200 dark:border-neutral-600 shadow-sm p-2 mt-2 after:h-4 after:absolute after:-bottom-4 after:start-0 after:w-full before:h-4 before:absolute before:-top-4 before:start-0 before:w-full;
+            @apply transition-[opacity,margin] opacity-0 background-primary border border-tertiary shadow-sm p-2 mt-2 drop-shadow-[4px_4px_0_rgba(82,82,91,100)];
 
             button {
-                @apply flex items-center gap-x-3.5 py-2 px-3 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-neutral-700 hover:text-zinc-500 dark:hover:text-zinc-400 focus:outline-none w-full font-normal text-base;
+                @apply w-full flex items-center gap-x-2 px-3 py-2 text-sm foreground-primary hover:background-secondary;
 
                 &.delete {
-                    @apply text-red-600 hover:text-red-600 dark:hover:text-red-600;
+                    @apply foreground-error;
                 }
             }
         }

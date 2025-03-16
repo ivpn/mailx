@@ -1,21 +1,11 @@
 <template>
     <div>
-        <button v-bind:data-hs-overlay="'#modal-create-alias' + props.catchAll" class="cta">
-            <svg class="flex-shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
-                stroke-linejoin="round">
-                <path d="M5 12h14"></path>
-                <path d="M12 5v14"></path>
-            </svg>
-            Create Alias
-        </button>
-        <div v-bind:id="'modal-create-alias' + props.catchAll" class="hs-overlay hidden">
+        <div v-bind:id="'modal-create-alias-' + props.catchAll" class="hs-overlay hidden">
             <div>
                 <div>
                     <header>
                         <h3>
-                            <span v-if="!props.catchAll">Create Alias</span>
-                            <span v-if="props.catchAll">Create Catch-all Alias</span>
+                            {{ props.label }}
                         </h3>
                         <button @click="close" class="close">
                             <span class="sr-only">Close</span>
@@ -190,7 +180,7 @@ import { aliasApi } from '../api/alias.ts'
 import events from '../events.ts'
 
 const envDomains = import.meta.env.VITE_DOMAINS.split(',')
-const props = defineProps(['recipients', 'settings', 'catchAll'])
+const props = defineProps(['recipients', 'settings', 'catchAll', 'label'])
 const alias = ref({
     description: '',
     enabled: true,
@@ -239,12 +229,12 @@ const postAlias = async () => {
 const close = () => {
     resetAlias()
     error.value = ''
-    const modal = document.querySelector('#modal-create-alias' + props.catchAll) as any
+    const modal = document.querySelector('#modal-create-alias-' + props.catchAll) as any
     overlay.close(modal)
 }
 
 const addEvents = () => {
-    const modal = overlay.getInstance('#modal-create-alias' + props.catchAll as any, true) as any
+    const modal = overlay.getInstance('#modal-create-alias-' + props.catchAll as any, true) as any
     modal.element.on('close', () => {
         close()
     })

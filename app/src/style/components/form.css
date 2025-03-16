@@ -2,7 +2,7 @@
     input[type=email],
     input[type=text],
     input[type=password] {
-        @apply text-zinc-600 border-zinc-500 appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bluedark-9 mb-2 bg-white dark:bg-neutral-800 dark:border-neutral-500 dark:text-zinc-400;
+        @apply text-zinc-600 border-zinc-500 appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bd-9 mb-2 bg-white dark:bg-neutral-800 dark:border-neutral-500 dark:text-zinc-400;
 
         &.error {
             @apply border-red-600 dark:border-red-600;
@@ -10,19 +10,19 @@
     }
 
     input[type=checkbox] {
-        @apply form-checkbox relative w-11 h-6 p-px bg-zinc-100 dark:bg-neutral-600 border-transparent text-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:ring-white dark:focus:ring-neutral-900 disabled:opacity-50 disabled:pointer-events-none checked:bg-none checked:text-bluedark-9 checked:border-bluedark-9 focus:ring-offset-transparent before:inline-block before:size-5 before:bg-white dark:before:bg-neutral-400 checked:before:bg-white before:translate-x-0 checked:before:translate-x-full before:rounded-full before:shadow before:transform before:transition before:ease-in-out before:duration-200;
+        @apply form-checkbox relative w-11 h-6 p-px bg-zinc-100 dark:bg-neutral-600 border-transparent text-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:ring-white dark:focus:ring-neutral-900 disabled:opacity-50 disabled:pointer-events-none checked:bg-none checked:text-bd-9 checked:border-bd-9 focus:ring-offset-transparent before:inline-block before:size-5 before:bg-white dark:before:bg-neutral-400 checked:before:bg-white before:translate-x-0 checked:before:translate-x-full before:rounded-full before:shadow before:transform before:transition before:ease-in-out before:duration-200;
     }
 
     input[type=radio] {
-        @apply form-radio border-zinc-200 rounded-full text-bluedark-9 focus:ring-white dark:focus:ring-transparent dark:bg-neutral-800 dark:border-neutral-600 dark:checked:border-transparent dark:focus:ring-offset-zinc-800;
+        @apply form-radio border-zinc-200 rounded-full text-bd-9 focus:ring-white dark:focus:ring-transparent dark:bg-neutral-800 dark:border-neutral-600 dark:checked:border-transparent dark:focus:ring-offset-zinc-800;
     }
 
     select {
-        @apply form-select py-2.5 px-4 pe-9 block w-full border border-zinc-500 text-zinc-600 bg-white dark:text-zinc-400 dark:bg-neutral-800 dark:border-neutral-500 focus:border-bluedark-9 disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent cursor-pointer;
+        @apply form-select py-2.5 px-4 pe-9 block w-full border border-zinc-500 text-zinc-600 bg-white dark:text-zinc-400 dark:bg-neutral-800 dark:border-neutral-500 focus:border-bd-9 disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent cursor-pointer;
     }
 
     textarea {
-        @apply border-zinc-500 dark:border-neutral-500 appearance-none outline-none border w-full py-3 px-4 text-zinc-600 bg-white dark:text-zinc-300 dark:bg-neutral-800 leading-tight focus:border-bluedark-9 mb-2 h-[350px];
+        @apply border-zinc-500 dark:border-neutral-500 appearance-none outline-none border w-full py-3 px-4 text-zinc-600 bg-white dark:text-zinc-300 dark:bg-neutral-800 leading-tight focus:border-bd-9 mb-2 h-[350px];
 
         &.error {
             @apply border-red-600 dark:border-red-600;

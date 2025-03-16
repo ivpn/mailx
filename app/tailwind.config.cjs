@@ -21,7 +21,7 @@ export default {
           900: '#1d468b',
           950: '#162c55',
         },
-        bluelight: {
+        bl: {
           1: '#FBFDFF',
           2: '#F5F9FF',
           3: '#E9F3FF',
@@ -35,7 +35,7 @@ export default {
           11: '#0068EB',
           12: '#04316A',
         },
-        bluedark: {
+        bd: {
           1: '#09111D',
           2: '#0E1827',
           3: '#0B264C',

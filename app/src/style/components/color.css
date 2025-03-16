@@ -20,11 +20,11 @@
     }
 
     .background-accent {
-        @apply bg-bluedark-9;
+        @apply bg-bd-9;
     }
 
     .background-accent-alternate {
-        @apply bg-bluedark-10;
+        @apply bg-bd-10;
     }
 
     .background-success {
@@ -52,11 +52,11 @@
     }
 
     .foreground-accent {
-        @apply text-bluedark-9;
+        @apply text-bd-9;
     }
 
     .foreground-accent-alternate {
-        @apply text-bluedark-10;
+        @apply text-bd-10;
     }
 
     .foreground-success {
@@ -80,7 +80,7 @@
     }
 
     .icon-accent {
-        @apply bg-bluedark-9;
+        @apply bg-bd-9;
     }
 
     .icon-success {
@@ -108,7 +108,7 @@
     }
 
     .border-accent {
-        @apply border-bluedark-9;
+        @apply border-bd-9;
     }
 
     .border-success {

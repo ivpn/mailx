@@ -25,11 +25,11 @@
                         </button>
                         <div class="hs-dropdown-menu hs-dropdown-open:opacity-100 hidden" aria-labelledby="hs-dropdown-new-alias">
                             <button data-hs-overlay="#modal-create-alias-false">
-                                <span class="icon at bg-bluedark-9 text-sm"></span>
+                                <span class="icon at bg-bd-9 text-sm"></span>
                                 Alias
                             </button>
                             <button data-hs-overlay="#modal-create-alias-true">
-                                <span class="icon scan bg-bluedark-9 text-sm"></span>
+                                <span class="icon scan bg-bd-9 text-sm"></span>
                                 Catch-all Alias
                             </button>
                         </div>
@@ -50,7 +50,7 @@
                                         Alias
                                         <svg
                                         data-sort="name"
-                                        v-bind:class="{ 'text-bluedark-9': sortBy === 'name', 'rotate-180': sortOrder === 'ASC' && sortBy === 'name' }"
+                                        v-bind:class="{ 'text-bd-9': sortBy === 'name', 'rotate-180': sortOrder === 'ASC' && sortBy === 'name' }"
                                         class="ms-1 flex-shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round">
@@ -67,7 +67,7 @@
                                         Type
                                         <svg
                                         data-sort="catch_all"
-                                        v-bind:class="{ 'text-bluedark-9': sortBy === 'catch_all', 'rotate-180': sortOrder === 'ASC' && sortBy === 'catch_all' }"
+                                        v-bind:class="{ 'text-bd-9': sortBy === 'catch_all', 'rotate-180': sortOrder === 'ASC' && sortBy === 'catch_all' }"
                                         class="ms-1 flex-shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round">
@@ -84,7 +84,7 @@
                                         Created
                                         <svg
                                         data-sort="created_at"
-                                        v-bind:class="{ 'text-bluedark-9': sortBy === 'created_at', 'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
+                                        v-bind:class="{ 'text-bd-9': sortBy === 'created_at', 'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
                                         class="ms-1 flex-shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round">

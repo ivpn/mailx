@@ -1,10 +1,5 @@
 <template>
     <div>
-        <button
-            v-bind:disabled="!alias.recipients.length"
-            v-bind:data-hs-overlay="'#modal-send-alias' + alias.id">
-            Send
-        </button>
         <div v-bind:id="'modal-send-alias' + alias.id" class="hs-overlay hidden">
             <div>
                 <div>

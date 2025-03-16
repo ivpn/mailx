@@ -1,8 +1,5 @@
 <template>
     <div>
-        <button v-bind:data-hs-overlay="'#modal-alias-edit' + alias.id">
-            Edit
-        </button>
         <div v-bind:id="'modal-alias-edit' + alias.id" class="hs-overlay hidden">
             <div>
                 <div>

@@ -54,5 +54,17 @@
         &.block {
             mask-image: url("../../assets/icons/icon-block.svg");
         }
+
+        &.more {
+            mask-image: url("../../assets/icons/icon-more.svg");
+        }
+
+        &.edit {
+            mask-image: url("../../assets/icons/icon-edit.svg");
+        }
+
+        &.trash {
+            mask-image: url("../../assets/icons/icon-trash.svg");
+        }
     }
 }

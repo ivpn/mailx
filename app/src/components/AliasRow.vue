@@ -67,15 +67,34 @@
             </div>
         </td>
         <td>
-            <div class="flex gap-5 justify-end">
-                <AliasSend :alias="alias" />
-                <AliasEdit :alias="alias" :recipients="recipients" :key="rowKey" />
-                <button @click.stop="deleteAlias" class="delete">
-                    Delete
+            <div class="hs-dropdown [--offset:0]">
+                <button v-bind:id="'hs-dropdown-alias-edit-' + alias.id">
+                    <span class="icon more text-lg"></span>
                 </button>
+                <div
+                    class="hs-dropdown-menu hs-dropdown-open:opacity-100 hidden"
+                    v-bind:aria-labelledby="'hs-dropdown-alias-edit-' + alias.id"
+                >
+                    <button
+                        v-bind:disabled="!alias.recipients.length"
+                        v-bind:data-hs-overlay="'#modal-send-alias' + alias.id">
+                        <i class="icon send text-xs"></i>
+                        Send
+                    </button>
+                    <button v-bind:data-hs-overlay="'#modal-alias-edit' + alias.id">
+                        <i class="icon edit text-xs"></i>
+                        Edit
+                    </button>
+                    <button @click.stop="deleteAlias" class="delete">
+                        <i class="icon trash text-xs bg-red-500"></i>
+                        Delete
+                    </button>
+                </div>
             </div>
         </td>
     </tr>
+    <AliasSend :alias="alias" />
+    <AliasEdit :alias="alias" :recipients="recipients" :key="rowKey" />
 </template>
 
 <script setup lang="ts">
@@ -86,6 +105,7 @@ import AliasSend from './AliasSend.vue'
 import { aliasApi } from '../api/alias.ts'
 import events from '../events.ts'
 import { formatDistanceToNow } from 'date-fns'
+import dropdown from '@preline/dropdown'
 
 const props = defineProps(['alias', 'recipients', 'catchAll'])
 const alias = ref(props.alias)
@@ -123,5 +143,6 @@ const renderRow = () => {
 
 onMounted(() => {
     tooltip.autoInit()
+    dropdown.autoInit()
 })
 </script>

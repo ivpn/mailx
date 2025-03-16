@@ -1,7 +1,5 @@
 <template>
     <div>
-        <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=false :label="'New Alias'" />
-        <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=true :label="'New Catch-all Alias'" />
         <div v-if="!list.length && loaded" class="flex flex-col my-14">
             <div class="flex flex-col items-center text-center">
                 <h3>Create Aliases</h3>
@@ -107,6 +105,8 @@
             </div>
         </div>
     </div>
+    <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=false :label="'New Alias'" />
+    <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=true :label="'New Catch-all Alias'" />
 </template>
 
 <script setup lang="ts">

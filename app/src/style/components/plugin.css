@@ -42,7 +42,7 @@
         @apply relative [--placement:bottom-right];
 
         .hs-dropdown-menu {
-            @apply transition-[opacity,margin] opacity-0 background-primary border border-tertiary shadow-sm p-2 mt-2 drop-shadow-[4px_4px_0_rgba(82,82,91,100)];
+            @apply transition-[opacity,margin] opacity-0 background-primary border border-tertiary shadow-sm p-2 drop-shadow-[4px_4px_0_rgba(82,82,91,100)] z-10 min-w-36;
 
             button {
                 @apply w-full flex items-center gap-x-2 px-3 py-2 text-sm foreground-primary hover:background-secondary;

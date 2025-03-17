@@ -1,6 +1,6 @@
 @layer components {
     .page {
-        @apply min-h-screen;
+        @apply min-h-screen flex;
 
         &.center {
             @apply flex flex-col items-center justify-center;
@@ -8,7 +8,15 @@
     }
 
     .card-container {
-        @apply p-8 pt-6;
+        @apply flex flex-col min-h-screen p-8 pt-6;
+
+        header {
+            @apply flex justify-between;
+        }
+    }
+
+    .card-empty {
+        @apply flex flex-col py-5 px-8 border-secondary border items-center justify-center text-center grow;
     }
 
     .card-primary {

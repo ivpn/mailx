@@ -1,105 +1,103 @@
 <template>
-    <div>
-        <div v-if="!list.length && loaded" class="flex flex-col my-14">
-            <div class="flex flex-col items-center text-center">
-                <h3>Create Aliases</h3>
-                <p v-if="recipients.length && settings.id" class="my-2">
-                    To get started, create an alias.
-                </p>
-                <p v-if="!recipients.length && loaded" class="my-2">
-                    To get started, first add a recipient.
-                </p>
-                <div class="flex gap-4">
-                    <AliasCreateDropdown />
-                </div>
+    <div class="card-container">
+        <header>
+            <h2>Aliases</h2>
+            <div class="flex items-center justify-between mb-6">
+                <AliasCreateDropdown />
             </div>
+        </header>
+        <div v-if="!list.length && loaded" class="card-empty">
+            <span class="bg-secondary rounded flex items-center justify-center p-2 mb-5">
+                <i class="icon at icon-accent text-2xl"></i>
+            </span>
+            <h4>You did not create any aliases yet</h4>
+            <p v-if="recipients.length && settings.id" class="text-tertiary pb-6">
+                This area will light up with items once you start creating aliases.<br>
+                You can create both an alias or a catch-all alias.
+                <span v-if="!recipients.length && loaded">
+                    <br>To get started, first add a <router-link to="/recipients">recipient</router-link>.
+                </span>
+            </p>
+            <AliasCreateDropdown />
         </div>
-        <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="card-container">
-            <div class="flex flex-row justify-between">
-                <h2>Aliases</h2>
-                <div class="flex items-center justify-between mb-6">
-                    <AliasCreateDropdown />
-                </div>
+        <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="card-primary">
+            <div  class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>
+                                <button
+                                @click="sort"
+                                data-sort="name"
+                                class="sort">
+                                    Alias
+                                    <i
+                                        data-sort="name"
+                                        v-if="sortBy !== 'name'"
+                                        v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'name' }"
+                                        class="icon arrow-down text-xl icon-tertiary"
+                                    ></i>
+                                    <i
+                                        data-sort="name"
+                                        v-if="sortBy === 'name'"
+                                        v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'name' }"
+                                        class="icon arrow-down text-xl icon-accent"
+                                    ></i>
+                                </button>    
+                            </th>
+                            <th>Domain</th>
+                            <th>
+                                <button
+                                @click="sort"
+                                data-sort="catch_all"
+                                class="sort">
+                                    Type
+                                    <i
+                                        data-sort="catch_all"
+                                        v-if="sortBy !== 'catch_all'"
+                                        v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'catch_all' }"
+                                        class="icon arrow-down text-xl icon-tertiary"
+                                    ></i>
+                                    <i
+                                        data-sort="catch_all"
+                                        v-if="sortBy === 'catch_all'"
+                                        v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'catch_all' }"
+                                        class="icon arrow-down text-xl icon-accent"
+                                    ></i>
+                                </button>    
+                            </th>
+                            <th>Count</th>
+                            <th>
+                                <button
+                                @click="sort"
+                                data-sort="created_at"
+                                class="sort">
+                                    Created
+                                    <i
+                                        data-sort="created_at"
+                                        v-if="sortBy !== 'created_at'"
+                                        v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
+                                        class="icon arrow-down text-xl icon-tertiary"
+                                    ></i>
+                                    <i
+                                        data-sort="created_at"
+                                        v-if="sortBy === 'created_at'"
+                                        v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
+                                        class="icon arrow-down text-xl icon-accent"
+                                    ></i>
+                                </button>
+                            </th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <AliasRow v-for="alias in list" :alias="alias" :key="rowKey" :recipients.sync="recipients" :catchAll=false />
+                    </tbody>
+                </table>
             </div>
-            <div class="card-primary">
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Status</th>
-                                <th>
-                                    <button
-                                    @click="sort"
-                                    data-sort="name"
-                                    class="sort">
-                                        Alias
-                                        <i
-                                            data-sort="name"
-                                            v-if="sortBy !== 'name'"
-                                            v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'name' }"
-                                            class="icon arrow-down text-xl icon-tertiary"
-                                        ></i>
-                                        <i
-                                            data-sort="name"
-                                            v-if="sortBy === 'name'"
-                                            v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'name' }"
-                                            class="icon arrow-down text-xl icon-accent"
-                                        ></i>
-                                    </button>    
-                                </th>
-                                <th>Domain</th>
-                                <th>
-                                    <button
-                                    @click="sort"
-                                    data-sort="catch_all"
-                                    class="sort">
-                                        Type
-                                        <i
-                                            data-sort="catch_all"
-                                            v-if="sortBy !== 'catch_all'"
-                                            v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'catch_all' }"
-                                            class="icon arrow-down text-xl icon-tertiary"
-                                        ></i>
-                                        <i
-                                            data-sort="catch_all"
-                                            v-if="sortBy === 'catch_all'"
-                                            v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'catch_all' }"
-                                            class="icon arrow-down text-xl icon-accent"
-                                        ></i>
-                                    </button>    
-                                </th>
-                                <th>Count</th>
-                                <th>
-                                    <button
-                                    @click="sort"
-                                    data-sort="created_at"
-                                    class="sort">
-                                        Created
-                                        <i
-                                            data-sort="created_at"
-                                            v-if="sortBy !== 'created_at'"
-                                            v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
-                                            class="icon arrow-down text-xl icon-tertiary"
-                                        ></i>
-                                        <i
-                                            data-sort="created_at"
-                                            v-if="sortBy === 'created_at'"
-                                            v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
-                                            class="icon arrow-down text-xl icon-accent"
-                                        ></i>
-                                    </button>
-                                </th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <AliasRow v-for="alias in list" :alias="alias" :key="rowKey" :recipients.sync="recipients" :catchAll=false />
-                        </tbody>
-                    </table>
-                </div>
-                <p v-if="error" class="error">Error: {{ error }}</p>
-                <Pagination v-if="list.length" :list.sync="list" :limit="limit" :page="page" :total="total" :key="rowKey" @onUpdatePage="onUpdatePage" />
-            </div>
+            <p v-if="error" class="error">Error: {{ error }}</p>
+            <Pagination v-if="list.length" :list.sync="list" :limit="limit" :page="page" :total="total" :key="rowKey" @onUpdatePage="onUpdatePage" />
         </div>
     </div>
     <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=false :label="'New Alias'" />
@@ -118,6 +116,7 @@ import Pagination from './Pagination.vue'
 import AliasCreateDropdown from './AliasCreateDropdown.vue'
 import events from '../events.ts'
 import dropdown from '@preline/dropdown'
+import { RouterLink } from 'vue-router'
 
 const alias = {
     id: '',

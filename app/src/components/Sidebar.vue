@@ -33,31 +33,10 @@
                 </a>
             </div>
         </nav>
-        <!-- <div class="hs-dropdown">
-            <button id="hs-dropdown-default">
-                {{ email }}
-                <svg class="ms-1 flex-shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="m6 9 6 6 6-6" />
-                </svg>
-            </button>
-            <div class="hs-dropdown-menu hs-dropdown-open:opacity-100 hidden" aria-labelledby="hs-dropdown-default">
-                <button @click="$router.push('/account')">
-                    Account
-                </button>
-                <button @click.stop="logout" class="delete">
-                    Log out
-                </button>
-            </div>
-            <ThemeSwitch />
-        </div> -->
     </header>
 </template>
 
 <script setup lang="ts">
-// import ThemeSwitch from './ThemeSwitch.vue'
-// import dropdown from '@preline/dropdown'
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { userApi } from '../api/user.ts'

@@ -10,7 +10,7 @@
             }
 
             &.cancel {
-                @apply text-primary bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-600 dark:hover:bg-zinc-700;
+                @apply text-primary bg-quaternary hover:bg-quaternary-alt;
             }
 
             &.lg {
@@ -27,7 +27,7 @@
         }
 
         &.close {
-            @apply flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent text-primary hover:bg-zinc-100 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:pointer-events-none;
+            @apply flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent text-primary hover:bg-tertiary disabled:opacity-50 disabled:pointer-events-none;
         }
 
         &.sort {

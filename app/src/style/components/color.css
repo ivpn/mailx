@@ -15,6 +15,10 @@
         @apply bg-nl-10 dark:bg-nd-10;
     }
 
+    .bg-quaternary-alt {
+        @apply bg-nl-9 dark:bg-nd-9;
+    }
+
     .bg-accent {
         @apply bg-bd-9;
     }

@@ -1,6 +1,6 @@
 @layer components {
     .badge {
-        @apply inline-flex items-center py-1.5 px-2 rounded text-xs font-medium bg-zinc-100 text-zinc-500 dark:bg-zinc-500 dark:text-zinc-100 font-secondary;
+        @apply inline-flex items-center py-1.5 px-2 rounded text-xs font-medium font-secondary bg-tertiary text-secondary;
 
         &.success {
             @apply bg-success text-primary font-semibold;

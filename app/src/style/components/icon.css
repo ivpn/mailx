@@ -68,7 +68,7 @@
         }
 
         &.arrow-down {
-            mask-image: url("../../assets/icons/icon-arrow-down.svg");
+            mask-image: url("../../assets/icons/icon-arrow-down-dark.svg");
         }
     }
 }

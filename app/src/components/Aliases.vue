@@ -33,14 +33,18 @@
                                     data-sort="name"
                                     class="sort">
                                         Alias
-                                        <svg
-                                        data-sort="name"
-                                        v-bind:class="{ 'text-bd-9': sortBy === 'name', 'rotate-180': sortOrder === 'ASC' && sortBy === 'name' }"
-                                        class="ms-1 flex-shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="m6 9 6 6 6-6" />
-                                        </svg>
+                                        <i
+                                            data-sort="name"
+                                            v-if="sortBy !== 'name'"
+                                            v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'name' }"
+                                            class="icon arrow-down text-xl dark:bg-nd-11"
+                                        ></i>
+                                        <i
+                                            data-sort="name"
+                                            v-if="sortBy === 'name'"
+                                            v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'name' }"
+                                            class="icon arrow-down text-xl bg-bd-9"
+                                        ></i>
                                     </button>    
                                 </th>
                                 <th>Domain</th>
@@ -50,14 +54,18 @@
                                     data-sort="catch_all"
                                     class="sort">
                                         Type
-                                        <svg
-                                        data-sort="catch_all"
-                                        v-bind:class="{ 'text-bd-9': sortBy === 'catch_all', 'rotate-180': sortOrder === 'ASC' && sortBy === 'catch_all' }"
-                                        class="ms-1 flex-shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="m6 9 6 6 6-6" />
-                                        </svg>
+                                        <i
+                                            data-sort="catch_all"
+                                            v-if="sortBy !== 'catch_all'"
+                                            v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'catch_all' }"
+                                            class="icon arrow-down text-xl dark:bg-nd-11"
+                                        ></i>
+                                        <i
+                                            data-sort="catch_all"
+                                            v-if="sortBy === 'catch_all'"
+                                            v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'catch_all' }"
+                                            class="icon arrow-down text-xl bg-bd-9"
+                                        ></i>
                                     </button>    
                                 </th>
                                 <th>Count</th>
@@ -67,14 +75,18 @@
                                     data-sort="created_at"
                                     class="sort">
                                         Created
-                                        <svg
-                                        data-sort="created_at"
-                                        v-bind:class="{ 'text-bd-9': sortBy === 'created_at', 'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
-                                        class="ms-1 flex-shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="m6 9 6 6 6-6" />
-                                        </svg>
+                                        <i
+                                            data-sort="created_at"
+                                            v-if="sortBy !== 'created_at'"
+                                            v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
+                                            class="icon arrow-down text-xl dark:bg-nd-11"
+                                        ></i>
+                                        <i
+                                            data-sort="created_at"
+                                            v-if="sortBy === 'created_at'"
+                                            v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
+                                            class="icon arrow-down text-xl bg-bd-9"
+                                        ></i>
                                     </button>
                                 </th>
                                 <th>Actions</th>

@@ -10,7 +10,7 @@
                     To get started, first add a recipient.
                 </p>
                 <div class="flex gap-4">
-                    <!-- New Alias dropdown -->
+                    <AliasCreateDropdown />
                 </div>
             </div>
         </div>
@@ -18,22 +18,7 @@
             <div class="flex flex-row justify-between">
                 <h2>Aliases</h2>
                 <div class="flex items-center justify-between mb-6">
-                    <div class="hs-dropdown">
-                        <button id="hs-dropdown-new-alias" class="cta">
-                            New Alias
-                            <span class="icon arrow-down-fill"></span>
-                        </button>
-                        <div class="hs-dropdown-menu hs-dropdown-open:opacity-100 hidden" aria-labelledby="hs-dropdown-new-alias">
-                            <button data-hs-overlay="#modal-create-alias-false">
-                                <span class="icon at bg-bd-9 text-sm"></span>
-                                Alias
-                            </button>
-                            <button data-hs-overlay="#modal-create-alias-true">
-                                <span class="icon scan bg-bd-9 text-sm"></span>
-                                Catch-all Alias
-                            </button>
-                        </div>
-                    </div>
+                    <AliasCreateDropdown />
                 </div>
             </div>
             <div class="card-primary">
@@ -118,6 +103,7 @@ import { settingsApi } from '../api/settings.ts'
 import AliasRow from './AliasRow.vue'
 import AliasCreate from './AliasCreate.vue'
 import Pagination from './Pagination.vue'
+import AliasCreateDropdown from './AliasCreateDropdown.vue'
 import events from '../events.ts'
 import dropdown from '@preline/dropdown'
 

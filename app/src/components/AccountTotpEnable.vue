@@ -53,9 +53,9 @@
                             <p>
                                 Please record the following backup codes which you will be able to use instead of TOTP in case you lost access to your device.
                             </p>
-                            <p class="py-4 px-5 background-primary">
+                            <p class="py-4 px-5 bg-primary">
                                 Backup codes:
-                                <span class="foreground-primary">
+                                <span class="text-primary">
                                     {{ resConfirm.backup }}
                                 </span>
                             </p>

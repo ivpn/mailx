@@ -10,17 +10,17 @@
         </div>
         <nav class="flex items-center gap-x-2">
             <div class="flex items-center gap-x-3">
-                <span class="min-h-[38px] min-w-[38px] inline-flex justify-center items-center border border-secondary foreground-secondary text-sm">{{ page }}</span>
-                <span class="min-h-[38px] min-w-[38px] inline-flex justify-center items-center foreground-secondary text-sm">of {{ pages }}</span>
+                <span class="min-h-[38px] min-w-[38px] inline-flex justify-center items-center border border-secondary text-secondary text-sm">{{ page }}</span>
+                <span class="min-h-[38px] min-w-[38px] inline-flex justify-center items-center text-secondary text-sm">of {{ pages }}</span>
             </div>
             <button
                 @click="prev"
-                class="h-[38px] w-[38px] inline-flex justify-center items-center hover:background-secondary">
+                class="h-[38px] w-[38px] inline-flex justify-center items-center hover:bg-secondary">
                 <i class="icon arrow-down rotate-90 text-xl icon-secondary"></i>
             </button>
             <button
                 @click="next"
-                class="h-[38px] w-[38px] inline-flex justify-center items-center hover:background-secondary">
+                class="h-[38px] w-[38px] inline-flex justify-center items-center hover:bg-secondary">
                 <i class="icon arrow-down -rotate-90 text-xl icon-secondary"></i>
             </button>
         </nav>

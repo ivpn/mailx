@@ -24,7 +24,7 @@
                     </span>
                 </p>
             </div>
-            <p class="foreground-tertiary">{{ alias.description }}</p>
+            <p class="text-tertiary">{{ alias.description }}</p>
         </td>
         <td>
             <p class="py-3">@{{ alias.name.split('@')[1] }}</p>

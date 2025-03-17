@@ -2,7 +2,7 @@
     input[type=email],
     input[type=text],
     input[type=password] {
-        @apply background-secondary foreground-secondary border-primary appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-accent mb-2;
+        @apply bg-secondary text-secondary border-primary appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-accent mb-2;
 
         &.error {
             @apply border-error;
@@ -22,13 +22,13 @@
     }
 
     select {
-        @apply background-secondary foreground-secondary border-primary form-select py-2.5 px-4 pe-9 block w-full border focus:border-accent disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent cursor-pointer;
+        @apply bg-secondary text-secondary border-primary form-select py-2.5 px-4 pe-9 block w-full border focus:border-accent disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent cursor-pointer;
 
         background-image: url("../../assets/icons/icon-arrow-down-dark.svg");
     }
 
     textarea {
-        @apply background-secondary foreground-secondary border-primary appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-accent mb-2 h-[350px];
+        @apply bg-secondary text-secondary border-primary appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-accent mb-2 h-[350px];
 
         &.error {
             @apply border-red-600 dark:border-red-600;
@@ -36,13 +36,13 @@
     }
 
     label {
-        @apply foreground-secondary block mb-3;
+        @apply text-secondary block mb-3;
     }
     
     .hs-select {
 
         button {
-            @apply foreground-secondary font-normal text-base;
+            @apply text-secondary font-normal text-base;
         }
     }
 }

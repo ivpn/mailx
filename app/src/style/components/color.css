@@ -1,69 +1,69 @@
 @layer components {
-    .background-primary {
+    .bg-primary {
         @apply bg-nl-1 dark:bg-nd-1;
     }
 
-    .background-secondary {
+    .bg-secondary {
         @apply bg-nl-7 dark:bg-nd-3;
     }
 
-    .background-tertiary {
+    .bg-tertiary {
         @apply bg-nl-8 dark:bg-nd-5;
     }
 
-    .background-quaternary {
+    .bg-quaternary {
         @apply bg-nl-10 dark:bg-nd-10;
     }
 
-    .background-accent {
+    .bg-accent {
         @apply bg-bd-9;
     }
 
-    .background-accent-alternate {
+    .bg-accent-alt {
         @apply bg-bd-10;
     }
 
-    .background-success {
+    .bg-success {
         @apply bg-emerald-500 dark:bg-emerald-600;
     }
 
-    .background-error {
+    .bg-error {
         @apply bg-red-600;
     }
 
-    .background-error-alternate {
+    .bg-error-alt {
         @apply bg-red-700;
     }
 
-    .foreground-primary {
+    .text-primary {
         @apply text-nl-12 dark:text-nd-12;
     }
 
-    .foreground-secondary {
+    .text-secondary {
         @apply text-nl-11 dark:text-nd-11;
     }
 
-    .foreground-tertiary {
+    .text-tertiary {
         @apply text-nl-10 dark:text-nd-10;
     }
 
-    .foreground-accent {
+    .text-accent {
         @apply text-bd-9;
     }
 
-    .foreground-accent-alternate {
+    .text-accent-alt {
         @apply text-bd-10;
     }
 
-    .foreground-success {
+    .text-success {
         @apply text-emerald-600 dark:text-emerald-500;
     }
 
-    .foreground-error {
+    .text-error {
         @apply text-red-500;
     }
 
-    .foreground-error-alternate {
+    .text-error-alt {
         @apply text-red-600;
     }
 

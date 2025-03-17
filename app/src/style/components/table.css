@@ -5,7 +5,7 @@
         thead {
 
             th {
-                @apply px-5 py-3 text-start text-sm font-normal foreground-tertiary;
+                @apply px-5 py-3 text-start text-sm font-normal text-tertiary;
 
                 &:first-child {
                     @apply text-start px-0 pr-5;
@@ -20,7 +20,7 @@
         tbody {
 
             td {
-                @apply px-5 py-4 whitespace-nowrap text-start text-sm foreground-primary;
+                @apply px-5 py-4 whitespace-nowrap text-start text-sm text-primary;
 
                 &:first-child {
                     @apply text-start px-0 pr-5;

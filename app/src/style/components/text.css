@@ -1,39 +1,39 @@
 @layer components {
     h1 {
-        @apply text-3xl font-semibold foreground-primary mb-5;
+        @apply text-3xl font-semibold text-primary mb-5;
     }
 
     h2 {
-        @apply text-2xl font-semibold foreground-primary mb-5;
+        @apply text-2xl font-semibold text-primary mb-5;
     }
 
     h3 {
-        @apply text-xl font-semibold foreground-primary mb-5;
+        @apply text-xl font-semibold text-primary mb-5;
     }
 
     h4 {
-        @apply font-semibold foreground-primary mb-3;
+        @apply font-semibold text-primary mb-3;
     }
 
     p {
-        @apply foreground-secondary mb-5 font-primary;
+        @apply text-secondary mb-5 font-primary;
 
         &.error {
-            @apply foreground-error text-sm mb-3;
+            @apply text-error text-sm mb-3;
         }
     
         &.success {
-            @apply foreground-success text-sm mb-3;
+            @apply text-success text-sm mb-3;
         }
     }
 
     table td > p,
     table td > div > p {
-        @apply foreground-primary mb-0;
+        @apply text-primary mb-0;
     }
 
     a {
-        @apply foreground-accent hover:foreground-accent-alternate;
+        @apply text-accent hover:text-accent-alt;
     }
 
     hr {

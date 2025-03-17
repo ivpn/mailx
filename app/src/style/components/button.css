@@ -1,16 +1,16 @@
 @layer components {
     button {
-        @apply foreground-accent hover:foreground-accent-alternate text-sm focus:outline-none disabled:opacity-50 disabled:pointer-events-none py-2;
+        @apply text-accent hover:text-accent-alt text-sm focus:outline-none disabled:opacity-50 disabled:pointer-events-none py-2;
 
         &.cta {
-            @apply text-base foreground-primary background-accent hover:background-accent-alternate py-2 px-3 inline-flex items-center gap-x-2 rounded;
+            @apply text-base text-primary bg-accent hover:bg-accent-alt py-2 px-3 inline-flex items-center gap-x-2 rounded;
 
             &.delete {
-                @apply background-error hover:background-error-alternate foreground-primary hover:foreground-primary;
+                @apply bg-error hover:bg-error-alt text-primary hover:text-primary;
             }
 
             &.cancel {
-                @apply foreground-primary bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-600 dark:hover:bg-zinc-700;
+                @apply text-primary bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-600 dark:hover:bg-zinc-700;
             }
 
             &.lg {
@@ -27,15 +27,15 @@
         }
 
         &.close {
-            @apply flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent foreground-primary hover:bg-zinc-100 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:pointer-events-none;
+            @apply flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent text-primary hover:bg-zinc-100 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:pointer-events-none;
         }
 
         &.sort {
-            @apply inline-flex justify-center items-center text-sm foreground-tertiary;
+            @apply inline-flex justify-center items-center text-sm text-tertiary;
         }
 
         &.plain {
-            @apply font-normal foreground-primary hover:foreground-primary;
+            @apply font-normal text-primary hover:text-primary;
         }
     }
 }

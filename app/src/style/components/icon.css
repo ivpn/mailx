@@ -66,5 +66,9 @@
         &.trash {
             mask-image: url("../../assets/icons/icon-trash.svg");
         }
+
+        &.arrow-down {
+            mask-image: url("../../assets/icons/icon-arrow-down.svg");
+        }
     }
 }

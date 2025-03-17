@@ -1,11 +1,12 @@
 <template>
     <div class="flex flex-row justify-between pt-5 pb-3">
-        <div>
-            <select v-model="limit" @change="updateLimit">
+        <div class="flex items-center gap-x-3">
+            <select v-model="limit" @change="updateLimit" class="py-2">
                 <option>25</option>
                 <option>50</option>
                 <option>75</option>
             </select>
+            <p class="text-nowrap m-0">Items per page</p>
         </div>
         <nav class="flex items-center gap-x-1">
             <button

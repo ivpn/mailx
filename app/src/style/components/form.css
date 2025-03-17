@@ -2,10 +2,14 @@
     input[type=email],
     input[type=text],
     input[type=password] {
-        @apply text-zinc-600 border-zinc-500 appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-bd-9 mb-2 bg-white dark:bg-neutral-800 dark:border-neutral-500 dark:text-zinc-400;
+        @apply background-secondary foreground-secondary border-tertiary appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-accent mb-2;
 
         &.error {
-            @apply border-red-600 dark:border-red-600;
+            @apply border-error;
+        }
+
+        :disabled {
+            @apply opacity-70 pointer-events-none;
         }
     }
 
@@ -18,11 +22,13 @@
     }
 
     select {
-        @apply form-select py-2.5 px-4 pe-9 block w-full border border-zinc-500 text-zinc-600 bg-white dark:text-zinc-400 dark:bg-neutral-800 dark:border-neutral-500 focus:border-bd-9 disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent cursor-pointer;
+        @apply background-secondary foreground-secondary border-tertiary form-select py-2.5 px-4 pe-9 block w-full border focus:border-accent disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent cursor-pointer;
+
+        background-image: url("../../assets/icons/icon-arrow-down-dark.svg");
     }
 
     textarea {
-        @apply border-zinc-500 dark:border-neutral-500 appearance-none outline-none border w-full py-3 px-4 text-zinc-600 bg-white dark:text-zinc-300 dark:bg-neutral-800 leading-tight focus:border-bd-9 mb-2 h-[350px];
+        @apply background-secondary foreground-secondary border-tertiary appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-accent mb-2 h-[350px];
 
         &.error {
             @apply border-red-600 dark:border-red-600;
@@ -30,13 +36,13 @@
     }
 
     label {
-        @apply block text-zinc-500 dark:text-zinc-400 mb-3;
+        @apply foreground-secondary block mb-3;
     }
     
     .hs-select {
 
         button {
-            @apply font-normal text-base text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-400;
+            @apply foreground-secondary font-normal text-base;
         }
     }
 }

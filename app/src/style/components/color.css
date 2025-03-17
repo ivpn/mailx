@@ -19,6 +19,10 @@
         @apply bg-nl-9 dark:bg-nd-9;
     }
 
+    .bg-quinary {
+        @apply bg-nl-11 dark:bg-nd-11;
+    }
+
     .bg-accent {
         @apply bg-bd-9;
     }

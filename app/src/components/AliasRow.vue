@@ -69,7 +69,7 @@
         <td>
             <div class="hs-dropdown [--offset:0]">
                 <button v-bind:id="'hs-dropdown-alias-edit-' + alias.id">
-                    <span class="icon more text-lg"></span>
+                    <i class="icon icon-primary more text-lg"></i>
                 </button>
                 <div
                     class="hs-dropdown-menu hs-dropdown-open:opacity-100 hidden"
@@ -78,15 +78,15 @@
                     <button
                         v-bind:disabled="!alias.recipients.length"
                         v-bind:data-hs-overlay="'#modal-send-alias' + alias.id">
-                        <i class="icon send text-xs"></i>
+                        <i class="icon icon-primary send text-xs"></i>
                         Send
                     </button>
                     <button v-bind:data-hs-overlay="'#modal-alias-edit' + alias.id">
-                        <i class="icon edit text-xs"></i>
+                        <i class="icon icon-primary edit text-xs"></i>
                         Edit
                     </button>
                     <button @click.stop="deleteAlias" class="delete">
-                        <i class="icon trash text-xs bg-red-500"></i>
+                        <i class="icon icon-error trash text-xs"></i>
                         Delete
                     </button>
                 </div>

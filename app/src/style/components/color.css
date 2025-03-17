@@ -12,11 +12,7 @@
     }
 
     .background-quaternary {
-        @apply bg-nl-9 dark:bg-nd-7;
-    }
-
-    .background-quinary {
-        @apply bg-nl-10 dark:bg-nd-8;
+        @apply bg-nl-10 dark:bg-nd-10;
     }
 
     .background-accent {
@@ -76,6 +72,10 @@
     }
 
     .icon-secondary {
+        @apply bg-nl-11 dark:bg-nd-11;
+    }
+
+    .icon-tertiary {
         @apply bg-nl-10 dark:bg-nd-10;
     }
 
@@ -92,22 +92,14 @@
     }
 
     .border-primary {
-        @apply border-nl-12 dark:border-nd-12;
-    }
-
-    .border-secondary {
-        @apply border-nl-11 dark:border-nd-10;
-    }
-
-    .border-tertiary {
         @apply border-nl-9 dark:border-nd-8;
     }
 
-    .border-quaternary {
+    .border-secondary {
         @apply border-nl-7 dark:border-nd-7;
     }
 
-    .divide-quaternary {
+    .divide-primary {
         @apply divide-nl-7 dark:divide-nd-7;
     }
 

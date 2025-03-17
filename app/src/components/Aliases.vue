@@ -37,13 +37,13 @@
                                             data-sort="name"
                                             v-if="sortBy !== 'name'"
                                             v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'name' }"
-                                            class="icon arrow-down text-xl dark:bg-nd-11"
+                                            class="icon arrow-down text-xl icon-tertiary"
                                         ></i>
                                         <i
                                             data-sort="name"
                                             v-if="sortBy === 'name'"
                                             v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'name' }"
-                                            class="icon arrow-down text-xl bg-bd-9"
+                                            class="icon arrow-down text-xl icon-accent"
                                         ></i>
                                     </button>    
                                 </th>
@@ -58,13 +58,13 @@
                                             data-sort="catch_all"
                                             v-if="sortBy !== 'catch_all'"
                                             v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'catch_all' }"
-                                            class="icon arrow-down text-xl dark:bg-nd-11"
+                                            class="icon arrow-down text-xl icon-tertiary"
                                         ></i>
                                         <i
                                             data-sort="catch_all"
                                             v-if="sortBy === 'catch_all'"
                                             v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'catch_all' }"
-                                            class="icon arrow-down text-xl bg-bd-9"
+                                            class="icon arrow-down text-xl icon-accent"
                                         ></i>
                                     </button>    
                                 </th>
@@ -79,13 +79,13 @@
                                             data-sort="created_at"
                                             v-if="sortBy !== 'created_at'"
                                             v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
-                                            class="icon arrow-down text-xl dark:bg-nd-11"
+                                            class="icon arrow-down text-xl icon-tertiary"
                                         ></i>
                                         <i
                                             data-sort="created_at"
                                             v-if="sortBy === 'created_at'"
                                             v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
-                                            class="icon arrow-down text-xl bg-bd-9"
+                                            class="icon arrow-down text-xl icon-accent"
                                         ></i>
                                     </button>
                                 </th>

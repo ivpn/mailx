@@ -12,7 +12,7 @@
     }
 
     .card-primary {
-        @apply flex flex-col py-5 px-8 border-quaternary border;
+        @apply flex flex-col py-5 px-8 border-secondary border;
     }
 
     .card-secondary {

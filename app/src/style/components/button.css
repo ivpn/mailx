@@ -10,7 +10,7 @@
             }
 
             &.cancel {
-                @apply foreground-tertiary bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-600 dark:hover:bg-zinc-700;
+                @apply foreground-primary bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-600 dark:hover:bg-zinc-700;
             }
 
             &.lg {
@@ -31,7 +31,7 @@
         }
 
         &.sort {
-            @apply inline-flex justify-center items-center text-sm foreground-secondary;
+            @apply inline-flex justify-center items-center text-sm foreground-tertiary;
         }
 
         &.plain {

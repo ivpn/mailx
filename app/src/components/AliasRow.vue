@@ -24,7 +24,7 @@
                     </span>
                 </p>
             </div>
-            <p class="foreground-secondary">{{ alias.description }}</p>
+            <p class="foreground-tertiary">{{ alias.description }}</p>
         </td>
         <td>
             <p class="py-3">@{{ alias.name.split('@')[1] }}</p>
@@ -39,24 +39,24 @@
             <div class="flex items-center gap-3 mb-1">
                 <p class="flex items-center gap-1 hs-tooltip">
                     {{ alias.stats.forwards }}
-                    <i class="icon forward text-xs bg-nl-10 dark:bg-nd-10"></i>
+                    <i class="icon forward text-xs icon-tertiary"></i>
                     <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">{{ alias.stats.forwards }} Forwards</span>
                 </p>
                 <p class="flex items-center gap-1 hs-tooltip">
                     {{ alias.stats.blocks }}
-                    <i class="icon block text-xs bg-nl-10 dark:bg-nd-10"></i>
+                    <i class="icon block text-xs icon-tertiary"></i>
                     <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">{{ alias.stats.blocks }} Blocks</span>
                 </p>
             </div>
             <div class="flex items-center gap-3 mt-1">
                 <p class="flex items-center gap-1 hs-tooltip">
                     {{ alias.stats.replies }}
-                    <i class="icon reply text-xs bg-nl-10 dark:bg-nd-10"></i>
+                    <i class="icon reply text-xs icon-tertiary"></i>
                     <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">{{ alias.stats.replies }} Replies</span>
                 </p>
                 <p class="flex items-center gap-1 hs-tooltip">
                     {{ alias.stats.sends }}
-                    <i class="icon send text-xs bg-nl-10 dark:bg-nd-10"></i>
+                    <i class="icon send text-xs icon-tertiary"></i>
                     <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">{{ alias.stats.sends }} Sends</span>
                 </p>
             </div>

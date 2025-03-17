@@ -1,6 +1,6 @@
 @layer components {
     .icon {
-        @apply icon-primary w-5 h-5 inline-block bg-no-repeat;
+        @apply w-5 h-5 inline-block bg-no-repeat;
 
         width: 1.35em;
         height: 1.35em;

@@ -1,11 +1,11 @@
 @layer components {
     table {
-        @apply table-auto w-full divide-y divide-quaternary;
+        @apply table-auto w-full divide-y divide-primary;
 
         thead {
 
             th {
-                @apply px-5 py-3 text-start text-sm font-normal foreground-secondary;
+                @apply px-5 py-3 text-start text-sm font-normal foreground-tertiary;
 
                 &:first-child {
                     @apply text-start px-0 pr-5;

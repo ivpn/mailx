@@ -4,23 +4,23 @@
             <h1 class="py-5 pl-8 m-0 mb-3 foreground-accent">MailX</h1>
             <div class="flex flex-col items-center">
                 <router-link v-bind:class="{ 'active': route == '/' }" to="/">
-                    <span class="icon at"></span>
+                    <i class="icon at icon-primary"></i>
                     Aliases
                 </router-link>
                 <router-link v-bind:class="{ 'active': route == '/recipients' }" to="/recipients">
-                    <span class="icon mailbox"></span>
+                    <i class="icon mailbox icon-primary"></i>
                     Recipients
                 </router-link>
                 <router-link v-bind:class="{ 'active': route == '/stats' }" to="/stats">
-                    <span class="icon chart"></span>
+                    <i class="icon chart icon-primary"></i>
                     Stats
                 </router-link>
                 <router-link v-bind:class="{ 'active': route == '/settings' }" to="/settings">
-                    <span class="icon settings"></span>
+                    <i class="icon settings icon-primary"></i>
                     Settings
                 </router-link>
                 <router-link v-bind:class="{ 'active': route == '/account' }" to="/account">
-                    <span class="icon user"></span>
+                    <i class="icon user icon-primary"></i>
                     Account
                 </router-link>
             </div>
@@ -28,7 +28,7 @@
         <nav>
             <div class="flex flex-col items-center py-5">
                 <a @click.stop="logout">
-                    <span class="icon logout"></span>
+                    <i class="icon logout icon-primary"></i>
                     Log out
                 </a>
             </div>

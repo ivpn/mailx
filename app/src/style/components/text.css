@@ -16,7 +16,7 @@
     }
 
     p {
-        @apply foreground-secondary mb-5 font-primary font-light;
+        @apply foreground-secondary mb-5 font-primary;
 
         &.error {
             @apply foreground-error text-sm mb-3;

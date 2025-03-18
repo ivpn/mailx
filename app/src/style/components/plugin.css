@@ -15,7 +15,7 @@
         }
 
         header {
-            @apply flex justify-between items-center px-5 py-5;
+            @apply flex gap-2 justify-start items-center px-5 py-5;
 
             h3, h4 {
                 @apply m-0;

@@ -4,6 +4,9 @@
             <div>
                 <div>
                     <header>
+                        <button @click="close" class="close">
+                            <i class="icon arrow-left-line icon-primary"></i>
+                        </button>
                         <h4>SEND FROM ALIAS</h4>
                     </header>
                     <article>

@@ -70,5 +70,9 @@
         &.arrow-down {
             mask-image: url("../../assets/icons/icon-arrow-down-dark.svg");
         }
+
+        &.arrow-left-line {
+            mask-image: url("../../assets/icons/icon-arrow-left-line.svg");
+        }
     }
 }

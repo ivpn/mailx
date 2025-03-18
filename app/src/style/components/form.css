@@ -36,7 +36,11 @@
     }
 
     label {
-        @apply text-secondary block mb-3;
+        @apply text-secondary text-sm font-bold mb-3 flex items-center;
+
+        &.required::after {
+            @apply content-['•'] text-accent text-2xl;
+        }
     }
     
     .hs-select {

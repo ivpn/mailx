@@ -4,21 +4,123 @@
             <div>
                 <div>
                     <header>
-                        <h3>
-                            {{ props.label }}
-                        </h3>
                         <button @click="close" class="close">
-                            <span class="sr-only">Close</span>
-                            <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M18 6 6 18"></path>
-                                <path d="m6 6 12 12"></path>
-                            </svg>
+                            <i class="icon arrow-left-line icon-primary"></i>
                         </button>
+                        <h4 class="uppercase">{{ props.label }}</h4>
+                        <span>{{ step }}/2</span>
                     </header>
                     <article>
-                        <div v-if="!props.catchAll" class="grid space-y-3 mb-5">
+                        <div v-if="step == 1">
+                            <h5>Format</h5>
+                            <div class="select">
+                                <button
+                                    data-format="words"
+                                    v-bind:class="{ 'active': alias.format === 'words' }"
+                                    @click.stop="selectFormat">
+                                    <strong>Words</strong>
+                                    <span>e.g.: <i>quiet.haze16@{{ alias.domain }}</i></span>
+                                    <i class="icon arrow-left-line icon-primary" @click.stop="next"></i>
+                                </button>
+                                <button
+                                    data-format="random"
+                                    v-bind:class="{ 'active': alias.format === 'random' }"
+                                    @click.stop="selectFormat">
+                                    <strong>Random</strong>
+                                    <span>e.g.: <i>uf1h0hxi@{{ alias.domain }}</i></span>
+                                    <i class="icon arrow-left-line icon-primary" @click.stop="next"></i>
+                                </button>
+                                <button
+                                    data-format="uuid"
+                                    v-bind:class="{ 'active': alias.format === 'uuid' }"
+                                    @click.stop="selectFormat">
+                                    <strong>UUID</strong>
+                                    <span>e.g.: <i>550e8400-e29b-41d4-a716-446655440000@{{ alias.domain }}</i></span>
+                                    <i class="icon arrow-left-line icon-primary" @click.stop="next"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div v-if="props.catchAll">
+                            <div class="mb-5">
+                                <label for="alias_catch_all_suffix">
+                                    Alias sufix (6-12 alphanumeric characters):
+                                </label>
+                                <input 
+                                    v-model="alias.catch_all_suffix"
+                                    v-bind:class="{ 'error': errorCatchAllSuffix }"
+                                    id="alias_catch_all_suffix"
+                                    type="text"
+                                >
+                                <p v-if="errorCatchAllSuffix" class="error">Catch-all suffix must be between 6 and 12 characters</p>
+                                <p class="text-white dark:text-zinc-100 mb-1">
+                                    *+{{ alias.catch_all_suffix }}@{{ alias.domain }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div v-if="step == 2">
+                            <div class="mb-5">
+                                <label for="alias_description">
+                                    Description
+                                </label>
+                                <input
+                                    v-model="alias.description"
+                                    id="alias_description"
+                                    type="text"
+                                >
+                            </div>
+                            <div class="mb-5">
+                                <label for="alias_from_name">
+                                    From name
+                                </label>
+                                <input
+                                    v-model="alias.from_name"
+                                    id="alias_from_name"
+                                    type="text"
+                                >
+                            </div>
+                            <div class="mb-6">
+                                <label for="create-alias-recipient" class="required">
+                                    Recipients
+                                </label>
+                                <select
+                                    id="create-alias-recipient"
+                                    v-model="selectRecipients"
+                                    :disabled="!recipients.length"
+                                    :multiple="true"
+                                    data-hs-select='{
+                                    "placeholder": "Select recipient",
+                                    "toggleTag": "<button type=\"button\" aria-expanded=\"false\"></button>",
+                                    "toggleClasses": "hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 relative py-2.5 ps-4 pe-9 flex gap-x-2 text-nowrap w-full cursor-pointer border border-zinc-500 text-zinc-500 bg-white dark:text-zinc-300 dark:bg-neutral-800 dark:border-neutral-500 leading-tight focus:border-bluish-500",
+                                    "dropdownClasses": "mt-2 z-50 w-full max-h-72 p-1 space-y-0.5 bg-white border border-zinc-200 overflow-hidden overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-zinc-100 [&::-webkit-scrollbar-thumb]:bg-zinc-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 dark:bg-neutral-900 dark:border-neutral-700",
+                                    "optionClasses": "py-2 px-4 w-full text-zinc-800 cursor-pointer hover:bg-zinc-100 focus:outline-none focus:bg-zinc-100 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:text-neutral-200 dark:focus:bg-neutral-800",
+                                    "optionTemplate": "<div class=\"flex justify-between items-center w-full\"><span data-title></span><span class=\"hidden hs-selected:block\"><svg class=\"shrink-0 size-3.5 text-bluish-600 dark:text-bluish-500 \" xmlns=\"http:.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"20 6 9 17 4 12\"/></svg></span></div>",
+                                    "extraMarkup": "<div class=\"absolute top-1/2 end-3 -translate-y-1/2\"><svg class=\"shrink-0 size-3.5 text-zinc-500 dark:text-neutral-500 \" xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m7 15 5 5 5-5\"/><path d=\"m7 9 5-5 5 5\"/></svg></div>"
+                                    }' class="hidden">
+                                    <option v-for="(recipient, _) in recipients"
+                                        v-bind:value=recipient
+                                        :selected="recipient == settings.recipient"
+                                        :key="recipient">
+                                        {{ recipient }}
+                                    </option>
+                                </select>
+                                <p v-if="errorRecipients" class="error pt-3">{{ errorRecipients }}</p>
+                            </div>
+                            <div class="mb-6">
+                                <label for="alias_domain" class="required">
+                                    Domain
+                                </label>
+                                <select id="alias_domain" :disabled="!domains.length">
+                                    <option v-for="(domain, index) in domains" v-bind:domain
+                                        :selected="domain == alias.domain || index === 0" :key="domain">
+                                        {{ domain }}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- <div v-if="!props.catchAll" class="grid space-y-3 mb-5">
                             <p class="mb-1">
                                 Alias format:
                             </p>
@@ -73,94 +175,20 @@
                                         550e8400-e29b-41d4-a716-446655440000@{{ alias.domain }}</span>
                                 </label>
                             </div>
-                        </div>
-                        <div v-if="props.catchAll">
-                            <div class="mb-5">
-                                <label for="alias_catch_all_suffix">
-                                    Alias sufix (6-12 alphanumeric characters):
-                                </label>
-                                <input 
-                                    v-model="alias.catch_all_suffix"
-                                    v-bind:class="{ 'error': errorCatchAllSuffix }"
-                                    id="alias_catch_all_suffix"
-                                    type="text"
-                                >
-                                <p v-if="errorCatchAllSuffix" class="error">Catch-all suffix must be between 6 and 12 characters</p>
-                                <p class="text-white dark:text-zinc-100 mb-1">
-                                    *+{{ alias.catch_all_suffix }}@{{ alias.domain }}
-                                </p>
-                            </div>
-                        </div>
-                        <div class="mb-5">
-                            <label for="alias_description">
-                                Description:
-                            </label>
-                            <input
-                                v-model="alias.description"
-                                id="alias_description"
-                                type="text"
-                            >
-                        </div>
-                        <div class="mb-5">
-                            <label for="alias_from_name">
-                                From name:
-                            </label>
-                            <input
-                                v-model="alias.from_name"
-                                id="alias_from_name"
-                                type="text"
-                            >
-                        </div>
-                        <div class="mb-6">
-                            <label for="create-alias-recipient">
-                                Recipients:
-                            </label>
-                            <select
-                                id="create-alias-recipient"
-                                v-model="selectRecipients"
-                                :disabled="!recipients.length"
-                                :multiple="true"
-                                data-hs-select='{
-                                "placeholder": "Select recipient",
-                                "toggleTag": "<button type=\"button\" aria-expanded=\"false\"></button>",
-                                "toggleClasses": "hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 relative py-2.5 ps-4 pe-9 flex gap-x-2 text-nowrap w-full cursor-pointer border border-zinc-500 text-zinc-500 bg-white dark:text-zinc-300 dark:bg-neutral-800 dark:border-neutral-500 leading-tight focus:border-bluish-500",
-                                "dropdownClasses": "mt-2 z-50 w-full max-h-72 p-1 space-y-0.5 bg-white border border-zinc-200 overflow-hidden overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-zinc-100 [&::-webkit-scrollbar-thumb]:bg-zinc-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 dark:bg-neutral-900 dark:border-neutral-700",
-                                "optionClasses": "py-2 px-4 w-full text-zinc-800 cursor-pointer hover:bg-zinc-100 focus:outline-none focus:bg-zinc-100 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:text-neutral-200 dark:focus:bg-neutral-800",
-                                "optionTemplate": "<div class=\"flex justify-between items-center w-full\"><span data-title></span><span class=\"hidden hs-selected:block\"><svg class=\"shrink-0 size-3.5 text-bluish-600 dark:text-bluish-500 \" xmlns=\"http:.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"20 6 9 17 4 12\"/></svg></span></div>",
-                                "extraMarkup": "<div class=\"absolute top-1/2 end-3 -translate-y-1/2\"><svg class=\"shrink-0 size-3.5 text-zinc-500 dark:text-neutral-500 \" xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m7 15 5 5 5-5\"/><path d=\"m7 9 5-5 5 5\"/></svg></div>"
-                                }' class="hidden">
-                                <option v-for="(recipient, _) in recipients"
-                                    v-bind:value=recipient
-                                    :selected="recipient == settings.recipient"
-                                    :key="recipient">
-                                    {{ recipient }}
-                                </option>
-                            </select>
-                            <p v-if="errorRecipients" class="error pt-3">{{ errorRecipients }}</p>
-                        </div>
+                        </div> -->
 
-                        <div class="mb-6">
-                            <label for="alias_domain">
-                                Domain:
-                            </label>
-                            <select id="alias_domain" :disabled="!domains.length">
-                                <option v-for="(domain, index) in domains" v-bind:domain
-                                    :selected="domain == alias.domain || index === 0" :key="domain">
-                                    {{ domain }}
-                                </option>
-                            </select>
-                        </div>
                     </article>
                     <footer>
                         <nav>
+                            <button @click="close" class="cancel">
+                                Cancel
+                            </button>
                             <button
+                                v-if="step == 2"
                                 v-bind:disabled="errorRecipients.length > 0"
                                 @click="postAlias"
                                 class="cta">
-                                Create Alias
-                            </button>
-                            <button @click="close" class="cta cancel">
-                                Cancel
+                                Create and copy to clipboard
                             </button>
                         </nav>
                         <p v-if="error" class="error px-5">Error: {{ error }}</p>
@@ -198,6 +226,7 @@ const domains = ref(envDomains)
 const error = ref('')
 const errorRecipients = ref('')
 const errorCatchAllSuffix = ref(false)
+const step = ref(1)
 
 const postAlias = async () => {
     if (!validate()) return
@@ -268,10 +297,19 @@ const resetAlias = () => {
     }
 }
 
+const selectFormat = (e: any) => {
+    const format = e.target.dataset.format
+    alias.value.format = format
+}
+
+const next = () => {
+    step.value = 2
+}
+
 onMounted(() => {
     overlay.autoInit()
     select.autoInit()
-    addEvents()
-    resetAlias()
+    // addEvents()
+    // resetAlias()
 })
 </script>

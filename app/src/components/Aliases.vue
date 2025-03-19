@@ -1,8 +1,8 @@
 <template>
     <div class="card-container">
-        <header>
+        <header class="head">
             <h2>Aliases</h2>
-            <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center justify-between">
                 <AliasCreateDropdown />
             </div>
         </header>

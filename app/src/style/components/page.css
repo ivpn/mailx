@@ -12,7 +12,7 @@
     }
 
     .card-container {
-        @apply flex flex-col min-h-screen p-8 pt-6;
+        @apply flex flex-col min-h-screen p-8 pt-0;
 
         header {
             @apply flex justify-between;
@@ -32,6 +32,14 @@
 
         &.center {
             @apply w-full max-w-sm px-8 pt-6 pb-8 mb-4;
+        }
+    }
+
+    .head {
+        @apply min-h-[100px] flex items-center;
+
+        h1, h2, h3, h4, h5, h6 {
+            @apply m-0;
         }
     }
 }

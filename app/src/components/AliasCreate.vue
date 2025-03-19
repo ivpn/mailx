@@ -11,10 +11,10 @@
                             {{ props.label }}
                             <span v-if="step == 2">| {{ alias.format }}</span>
                         </h4>
-                        <span>{{ step }}/2</span>
+                        <span v-if="!props.catchAll">{{ step }}/2</span>
                     </header>
                     <article>
-                        <div v-bind:class="{ 'hidden': step !== 1 }">
+                        <div v-if="!props.catchAll" v-bind:class="{ 'hidden': step !== 1 }">
                             <h5>Format</h5>
                             <div class="select">
                                 <button
@@ -65,7 +65,7 @@
                             </div>
                         </div>
 
-                        <div v-bind:class="{ 'hidden': step !== 2 }">
+                        <div v-bind:class="{ 'hidden': step !== 2 && !props.catchAll }">
                             <div class="mb-5">
                                 <label for="alias_description">
                                     Description
@@ -190,7 +190,7 @@
                                 Cancel
                             </button>
                             <button
-                                v-if="step == 2"
+                                v-if="step == 2 || props.catchAll"
                                 v-bind:disabled="errorRecipients.length > 0"
                                 @click="postAlias"
                                 class="cta">

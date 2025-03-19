@@ -246,7 +246,8 @@ const postAlias = async () => {
     }
 
     try {
-        await aliasApi.create(alias.value)
+        const res = await aliasApi.create(alias.value)
+        copyAlias(res.data.name)
         events.emit('alias.create', {})
         error.value = ''
         close()
@@ -319,6 +320,10 @@ const prev = () => {
     }
 
     close()
+}
+
+const copyAlias = (alias: string) => {
+    navigator.clipboard.writeText(alias)
 }
 
 onMounted(() => {

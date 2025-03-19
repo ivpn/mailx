@@ -27,7 +27,7 @@ type AliasStore interface {
 	GetAliasCount(context.Context, string, string) (int, error)
 	GetAliasDailyCount(context.Context, string) (int, error)
 	GetAliasByName(string) (model.Alias, error)
-	PostAlias(context.Context, model.Alias) error
+	PostAlias(context.Context, model.Alias) (model.Alias, error)
 	UpdateAlias(context.Context, model.Alias) error
 	DeleteAlias(context.Context, string, string) error
 	DeleteAliasByUserID(context.Context, string) error
@@ -77,15 +77,15 @@ func (s *Service) GetAliasByName(name string) (model.Alias, error) {
 	return alias, nil
 }
 
-func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format string, domain string, sufix string) error {
+func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format string, domain string, sufix string) (model.Alias, error) {
 	count, err := s.Store.GetAliasDailyCount(ctx, alias.UserID)
 	if err != nil {
 		log.Printf("error creating alias: %s", err.Error())
-		return ErrPostAlias
+		return model.Alias{}, ErrPostAlias
 	}
 
 	if count >= s.Cfg.Service.MaxDailyAliases {
-		return ErrPostAliasLimit
+		return model.Alias{}, ErrPostAliasLimit
 	}
 
 	// Catch-all alias
@@ -93,43 +93,43 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 		userAliases, err := s.Store.GetAliases(ctx, alias.UserID, 0, 0, "", "", "true")
 		if err != nil {
 			log.Printf("error fetching user aliases: %s", err.Error())
-			return ErrPostAlias
+			return model.Alias{}, ErrPostAlias
 		}
 
 		for _, userAlias := range userAliases {
 			if strings.Contains(userAlias.Name, domain) {
-				return model.ErrDuplicateAliasDomain
+				return model.Alias{}, model.ErrDuplicateAliasDomain
 			}
 		}
 
 		alias.Name = model.GenerateAlias(format, sufix) + "@" + domain
 		alias.CatchAll = true
-		err = s.Store.PostAlias(ctx, alias)
+		alias, err = s.Store.PostAlias(ctx, alias)
 		if err != nil {
 			log.Printf("error creating catch-all alias: %s", err.Error())
-			return ErrPostAlias
+			return model.Alias{}, ErrPostAlias
 		}
 
-		return nil
+		return alias, nil
 	}
 
 	// Standard alias
 	for range 5 {
 		alias.Name = model.GenerateAlias(format, "") + "@" + domain
-		err := s.Store.PostAlias(ctx, alias)
+		alias, err = s.Store.PostAlias(ctx, alias)
 		if err != nil {
 			log.Printf("error creating standard alias: %s", err.Error())
 			var mysqlErr *mysql.MySQLError
 			if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
 				continue
 			} else {
-				return ErrPostAlias
+				return model.Alias{}, ErrPostAlias
 			}
 		}
 		break
 	}
 
-	return nil
+	return alias, nil
 }
 
 func (s *Service) UpdateAlias(ctx context.Context, alias model.Alias) error {

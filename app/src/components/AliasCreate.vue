@@ -125,64 +125,6 @@
                                 </select>
                             </div>
                         </div>
-
-                        <!-- <div v-if="!props.catchAll" class="grid space-y-3 mb-5">
-                            <p class="mb-1">
-                                Alias format:
-                            </p>
-                            <div class="relative flex items-start">
-                                <div class="flex items-center h-5 mt-1">
-                                    <input
-                                        v-model="alias.format"
-                                        value="words"
-                                        id="hs-radio-words"
-                                        name="hs-radio-with-description"
-                                        aria-describedby="hs-radio-words-description"
-                                        type="radio"
-                                    >
-                                </div>
-                                <label for="hs-radio-words" class="ms-3">
-                                    <span class="block text-sm font-semibold text-primary">Words</span>
-                                    <span id="hs-radio-words-description" class="block text-sm text-zinc-500 dark:text-zinc-400">e.g.
-                                        quiet.haze16@{{ alias.domain }}</span>
-                                </label>
-                            </div>                            
-                            <div class="relative flex items-start">
-                                <div class="flex items-center h-5 mt-1">
-                                    <input 
-                                        v-model="alias.format"
-                                        value="random"
-                                        id="hs-radio-random"
-                                        name="hs-radio-with-description"
-                                        aria-describedby="hs-radio-random-description"
-                                        type="radio"
-                                    >
-                                </div>
-                                <label for="hs-radio-random" class="ms-3">
-                                    <span class="block text-sm font-semibold text-primary">Random</span>
-                                    <span id="hs-radio-random-description" class="block text-sm text-zinc-500 dark:text-zinc-400">e.g.
-                                        uf1h0hxi@{{ alias.domain }}</span>
-                                </label>
-                            </div>
-                            <div class="relative flex items-start">
-                                <div class="flex items-center h-5 mt-1">
-                                    <input
-                                        v-model="alias.format"
-                                        value="uuid"
-                                        id="hs-radio-uuid"
-                                        name="hs-radio-with-description"
-                                        aria-describedby="hs-radio-uuid-description"
-                                        type="radio"
-                                    >
-                                </div>
-                                <label for="hs-radio-uuid" class="ms-3">
-                                    <span class="block text-sm font-semibold text-primary">UUID</span>
-                                    <span id="hs-radio-uuid-description" class="block text-sm text-zinc-500 dark:text-zinc-400">e.g.
-                                        550e8400-e29b-41d4-a716-446655440000@{{ alias.domain }}</span>
-                                </label>
-                            </div>
-                        </div> -->
-
                     </article>
                     <footer>
                         <nav>

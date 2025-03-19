@@ -1,11 +1,9 @@
 @layer components {
     .icon {
-        @apply w-5 h-5 inline-block bg-no-repeat;
+        mask-size: 1.35em;
+        mask-size: 1.35em;
 
-        width: 1.35em;
-        height: 1.35em;
-        mask-size: 1.35em;
-        mask-size: 1.35em;
+        @apply w-[1.35em] h-[1.35em] inline-block bg-no-repeat;        
 
         &.at {
             mask-image: url("../../assets/icons/icon-at.svg");

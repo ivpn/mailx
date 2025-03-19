@@ -1,5 +1,5 @@
 <template>
-    <div class="page">
+    <div class="page page-bg">
         <div class="w-[224px] flex-shrink-0 fixed h-full">
             <Sidebar />
         </div>

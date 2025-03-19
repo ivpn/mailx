@@ -1,4 +1,8 @@
 @layer components {
+    .page-bg {
+        @apply bg-[url("../../assets/bg-dark.svg")] bg-no-repeat bg-fixed bg-right-bottom;
+    }
+
     .page {
         @apply min-h-screen flex;
 
@@ -16,11 +20,11 @@
     }
 
     .card-empty {
-        @apply flex flex-col py-5 px-8 border-secondary border items-center justify-center text-center grow;
+        @apply flex flex-col py-5 px-8 border-secondary border bg-primary items-center justify-center text-center grow;
     }
 
     .card-primary {
-        @apply flex flex-col py-5 px-8 border-secondary border;
+        @apply flex flex-col py-5 px-8 border-secondary border bg-primary;
     }
 
     .card-secondary {

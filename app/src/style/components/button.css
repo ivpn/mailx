@@ -31,7 +31,7 @@
         }
 
         &.close {
-            @apply flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent text-primary hover:bg-tertiary disabled:opacity-50 disabled:pointer-events-none;
+            @apply flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent text-primary disabled:opacity-50 disabled:pointer-events-none;
         }
 
         &.sort {

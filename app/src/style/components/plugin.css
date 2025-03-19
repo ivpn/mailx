@@ -7,18 +7,26 @@
         @apply size-full fixed top-0 start-0 z-[60] overflow-x-hidden overflow-y-auto pointer-events-none flex flex-col items-center justify-center;
 
         & > div {
-            @apply hs-overlay-open:opacity-100 hs-overlay-open:duration-500 opacity-0 transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto drop-shadow-[4px_4px_0_rgba(82,82,91,100)];
+            @apply hs-overlay-open:opacity-100 hs-overlay-open:duration-500 opacity-0 transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto drop-shadow-[8px_8px_0_rgba(82,82,91,100)] border border-primary;
         }
 
         & > div > div {
-            @apply flex flex-col bg-primary border border-primary pointer-events-auto;
+            @apply flex flex-col bg-primary pointer-events-auto;
         }
 
         header {
             @apply flex gap-2 justify-start items-center px-5 py-5;
 
             h3, h4 {
-                @apply m-0;
+                @apply m-0 grow;
+
+                span {
+                    @apply capitalize;
+                }
+            }
+
+            & > span {
+                @apply text-sm font-bold text-accent;
             }
         }
 

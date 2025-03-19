@@ -4,38 +4,44 @@
             <div>
                 <div>
                     <header>
-                        <button @click="close" class="close">
+                        <button @click="prev" class="close">
                             <i class="icon arrow-left-line icon-primary"></i>
                         </button>
-                        <h4 class="uppercase">{{ props.label }}</h4>
+                        <h4 class="uppercase">
+                            {{ props.label }}
+                            <span v-if="step == 2">| {{ alias.format }}</span>
+                        </h4>
                         <span>{{ step }}/2</span>
                     </header>
                     <article>
-                        <div v-if="step == 1">
+                        <div v-bind:class="{ 'hidden': step !== 1 }">
                             <h5>Format</h5>
                             <div class="select">
                                 <button
-                                    data-format="words"
                                     v-bind:class="{ 'active': alias.format === 'words' }"
-                                    @click.stop="selectFormat">
-                                    <strong>Words</strong>
-                                    <span>e.g.: <i>quiet.haze16@{{ alias.domain }}</i></span>
+                                    @click="selectFormat('words')">
+                                    <div>
+                                        <strong>Words</strong>
+                                        <span>e.g.: <i>quiet.haze16</i></span>
+                                    </div>
                                     <i class="icon arrow-left-line icon-primary" @click.stop="next"></i>
                                 </button>
                                 <button
-                                    data-format="random"
                                     v-bind:class="{ 'active': alias.format === 'random' }"
-                                    @click.stop="selectFormat">
-                                    <strong>Random</strong>
-                                    <span>e.g.: <i>uf1h0hxi@{{ alias.domain }}</i></span>
+                                    @click="selectFormat('random')">
+                                    <div>
+                                        <strong>Random</strong>
+                                        <span>e.g.: <i>uf1h0hxi</i></span>
+                                    </div>
                                     <i class="icon arrow-left-line icon-primary" @click.stop="next"></i>
                                 </button>
                                 <button
-                                    data-format="uuid"
                                     v-bind:class="{ 'active': alias.format === 'uuid' }"
-                                    @click.stop="selectFormat">
-                                    <strong>UUID</strong>
-                                    <span>e.g.: <i>550e8400-e29b-41d4-a716-446655440000@{{ alias.domain }}</i></span>
+                                    @click="selectFormat('uuid')">
+                                    <div>
+                                        <strong>UUID</strong>
+                                        <span>e.g.: <i>550e8400-e29b-41d4-a716-446655440000</i></span>
+                                    </div>
                                     <i class="icon arrow-left-line icon-primary" @click.stop="next"></i>
                                 </button>
                             </div>
@@ -59,7 +65,7 @@
                             </div>
                         </div>
 
-                        <div v-if="step == 2">
+                        <div v-bind:class="{ 'hidden': step !== 2 }">
                             <div class="mb-5">
                                 <label for="alias_description">
                                     Description
@@ -295,10 +301,10 @@ const resetAlias = () => {
         catch_all: props.catchAll ? 'true' : 'false',
         catch_all_suffix: ''
     }
+    step.value = 1
 }
 
-const selectFormat = (e: any) => {
-    const format = e.target.dataset.format
+const selectFormat = (format: string) => {
     alias.value.format = format
 }
 
@@ -306,10 +312,19 @@ const next = () => {
     step.value = 2
 }
 
+const prev = () => {
+    if (step.value === 2) {
+        step.value = 1
+        return
+    }
+
+    close()
+}
+
 onMounted(() => {
     overlay.autoInit()
     select.autoInit()
-    // addEvents()
-    // resetAlias()
+    addEvents()
+    resetAlias()
 })
 </script>

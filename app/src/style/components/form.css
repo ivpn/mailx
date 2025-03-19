@@ -49,4 +49,40 @@
             @apply text-secondary font-normal text-base;
         }
     }
+
+    .select {
+        @apply flex flex-col gap-3;
+
+        button {
+            @apply flex justify-between items-center gap-3 bg-secondary p-4 w-full text-left;
+
+            &.active {
+                @apply text-primary bg-bl-5 dark:bg-bd-4;
+
+                strong {
+                    @apply bg-accent;
+                }
+
+                .icon {
+                    @apply inline-block;
+                }
+            }
+
+            strong {
+                @apply text-white bg-bd-5 inline-block px-2;
+            }
+
+            span {
+                @apply text-secondary block mt-3;
+
+                i {
+                    @apply text-primary italic;
+                }
+            }
+
+            .icon {
+                @apply rotate-180 hidden;
+            }
+        }
+    }
 }

@@ -13,7 +13,7 @@
                         <path d="M5 12h14"></path>
                         <path d="M12 5v14"></path>
                     </svg>
-                    Add Passkey
+                    New Passkey
                 </button>
             </div>
             <p v-if="error" class="error mt-6 mb-4">Error: {{ error }}</p>

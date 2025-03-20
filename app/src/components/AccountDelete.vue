@@ -3,7 +3,7 @@
         <h2>Delete Account</h2>
         <button
             v-bind:data-hs-overlay="'#modal-delete-account'"
-            class="delete">
+            class="cta delete mb-4">
             Delete Account
         </button>
         <div v-bind:id="'modal-delete-account'" class="hs-overlay hidden">

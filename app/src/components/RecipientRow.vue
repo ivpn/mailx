@@ -45,7 +45,7 @@
                     class="hs-dropdown-menu hs-dropdown-open:opacity-100 hidden"
                     v-bind:aria-labelledby="'hs-dropdown-recipient-edit-' + recipient.id"
                     >
-                    <button v-if="!recipient.is_active" v-bind:data-hs-overlay="'#modal-verify-recipient' + recipient.id">
+                    <button v-bind:class="{ 'hide': recipient.is_active }"v-bind:data-hs-overlay="'#modal-verify-recipient' + recipient.id">
                         <i class="icon icon-primary check text-xs"></i>
                         Verify
                     </button>
@@ -53,7 +53,7 @@
                         <i class="icon icon-primary edit text-xs"></i>
                         Edit
                     </button>
-                    <button v-if="!recipient.pgp_key" v-bind:data-hs-overlay="'#modal-add-key-recipient' + recipient.id">
+                    <button v-bind:class="{ 'hide': recipient.pgp_key }" v-bind:data-hs-overlay="'#modal-add-key-recipient' + recipient.id">
                         <i class="icon icon-primary key text-xs"></i>
                         Add PGP Key
                     </button>

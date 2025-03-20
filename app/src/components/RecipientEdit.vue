@@ -7,16 +7,10 @@
             <div>
                 <div>
                     <header>
-                        <h3>Edit recipient</h3>
                         <button @click="close" class="close">
-                            <span class="sr-only">Close</span>
-                            <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M18 6 6 18"></path>
-                                <path d="m6 6 12 12"></path>
-                            </svg>
+                            <i class="icon arrow-left-line icon-primary"></i>
                         </button>
+                        <h4>EDIT RECIPIENT</h4>
                     </header>
                     <article>
                         <h3>{{ recipient.email }}</h3>
@@ -29,7 +23,7 @@
                                 Enable this option to use PGP/Inline instead of the default PGP/MIME encryption. Do not enable if you want to recieve encrypted emails with attachments or HTML content. Only forwarded emails are encrypted. 
                             </p>
                         </div>
-                        <div class="mb-5">
+                        <div class="pb-5">
                             <input
                                 @change="updateRecipient"
                                 v-bind:checked="pgp_inline"

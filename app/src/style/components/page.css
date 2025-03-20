@@ -24,7 +24,7 @@
     }
 
     .card-primary {
-        @apply flex flex-col py-5 px-8 border-secondary border bg-primary grow;
+        @apply flex flex-col py-4 px-7 border-secondary border bg-primary grow;
     }
 
     .card-secondary {

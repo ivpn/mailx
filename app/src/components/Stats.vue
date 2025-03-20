@@ -3,7 +3,7 @@
         <header class="head">
             <h2>Stats</h2>
         </header>
-        <div class="card-primary">
+        <div class="card-primary pt-7">
             <h3>Messages in last 7 days</h3>
             <div id="chart" class="mb-5"></div>
             <h3>Messages in last 90 days</h3>

@@ -137,7 +137,6 @@ const copyAlias = (alias: string) => {
 }
 
 const renderRow = () => {
-    rowKey.value++
     tooltip.autoInit()
 }
 

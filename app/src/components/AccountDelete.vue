@@ -115,6 +115,7 @@ const close = () => {
     req.value = {} as any
     otp.value = ''
     error.value = ''
+    otpError.value = false
     const modal = document.querySelector('#modal-delete-account') as any
     overlay.close(modal)
 }

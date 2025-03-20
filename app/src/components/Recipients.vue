@@ -53,8 +53,6 @@ const recipient = {
     is_active: false,
 }
 
-const props = defineProps(['dashboard'])
-const isDashboard = props.dashboard
 const list = ref([] as typeof recipient[])
 const error = ref('')
 const loaded = ref(false)
@@ -64,7 +62,6 @@ const getList = async () => {
     try {
         const response = await recipientApi.getList()
         list.value = response.data
-        if (isDashboard) list.value = list.value.slice(0, 5)
         loaded.value = true
         error.value = ''
         renderRow()
@@ -92,8 +89,7 @@ const onDeleteRecipient = (payload: { id: string }) => {
 }
 
 const reload = () => {
-    if (!isDashboard) getList()
-    if (isDashboard) location.reload()
+    getList()
 }
 
 const renderRow = () => {

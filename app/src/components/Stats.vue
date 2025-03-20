@@ -1,32 +1,36 @@
 <template>
-    <div class="card">
-        <h1>Messages</h1>
-        <h3>Last 7 days</h3>
-        <div id="chart" class="mb-5"></div>
-        <h3>Last 90 days</h3>
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-center mb-8">
-            <div class="p-4 border-r border-zinc-200 dark:border-zinc-600">
-                <h1 class="mb-2">{{ stats.forwards }}</h1>
-                <p class="m-0">Forwards</p>
+    <div class="card-container">
+        <header class="head">
+            <h2>Stats</h2>
+        </header>
+        <div class="card-primary">
+            <h3>Messages in last 7 days</h3>
+            <div id="chart" class="mb-5"></div>
+            <h3>Messages in last 90 days</h3>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-center mb-8">
+                <div class="p-4 border-r border-zinc-200 dark:border-zinc-600">
+                    <h1 class="mb-2">{{ stats.forwards }}</h1>
+                    <p class="m-0">Forwards</p>
+                </div>
+                <div class="p-4 border-r border-transparent md:border-zinc-200 dark:md:border-zinc-600">
+                    <h1 class="mb-2">{{ stats.blocks }}</h1>
+                    <p class="m-0">Blocks</p>
+                </div>
+                <div class="p-4 border-r border-zinc-200 dark:border-zinc-600">
+                    <h1 class="mb-2">{{ stats.replies }}</h1>
+                    <p class="m-0">Replies</p>
+                </div>
+                <div class="p-4 border-r border-transparent md:border-zinc-200 dark:md:border-zinc-600">
+                    <h1 class="mb-2">{{ stats.sends }}</h1>
+                    <p class="m-0">Sends</p>
+                </div>
+                <div class="p-4">
+                    <h1 class="mb-2">{{ getBandwidth(stats.bandwidth) }}</h1>
+                    <p class="m-0">Bandwidth</p>
+                </div>
             </div>
-            <div class="p-4 border-r border-transparent md:border-zinc-200 dark:md:border-zinc-600">
-                <h1 class="mb-2">{{ stats.blocks }}</h1>
-                <p class="m-0">Blocks</p>
-            </div>
-            <div class="p-4 border-r border-zinc-200 dark:border-zinc-600">
-                <h1 class="mb-2">{{ stats.replies }}</h1>
-                <p class="m-0">Replies</p>
-            </div>
-            <div class="p-4 border-r border-transparent md:border-zinc-200 dark:md:border-zinc-600">
-                <h1 class="mb-2">{{ stats.sends }}</h1>
-                <p class="m-0">Sends</p>
-            </div>
-            <div class="p-4">
-                <h1 class="mb-2">{{ getBandwidth(stats.bandwidth) }}</h1>
-                <p class="m-0">Bandwidth</p>
-            </div>
+            <p v-if="error" class="error">Error: {{ error }}</p>
         </div>
-        <p v-if="error" class="error">Error: {{ error }}</p>
     </div>
 </template>
 

@@ -7,16 +7,10 @@
             <div>
                 <div>
                     <header>
-                        <h3>Enable 2-Factor Authentication</h3>
                         <button @click="close" class="close">
-                            <span class="sr-only">Close</span>
-                            <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M18 6 6 18"></path>
-                                <path d="m6 6 12 12"></path>
-                            </svg>
+                            <i class="icon arrow-left-line icon-primary"></i>
                         </button>
+                        <h4>ENABLE 2-FACTOR AUTHENTICATION</h4>
                     </header>
                     <article>
                         <div v-if="!isEnabled">
@@ -53,7 +47,7 @@
                             <p>
                                 Please record the following backup codes which you will be able to use instead of TOTP in case you lost access to your device.
                             </p>
-                            <p class="py-4 px-5 bg-primary">
+                            <p class="py-4 px-5 bg-secondary">
                                 Backup codes:
                                 <span class="text-primary">
                                     {{ resConfirm.backup }}
@@ -66,15 +60,15 @@
                     </article>
                     <footer>
                         <nav v-if="!isEnabled">
-                            <button @click="totpEnableConfirm" class="cta">
-                                Enable
-                            </button>
-                            <button @click="close" class="cta cancel">
+                            <button @click="close" class="cancel">
                                 Cancel
+                            </button>
+                            <button @click="totpEnableConfirm" class="cta">
+                                Enable 2-Factor Authentication
                             </button>
                         </nav>
                         <nav v-if="isEnabled">
-                            <button @click="complete" class="cta cancel">
+                            <button @click="complete" class="cancel">
                                 Close
                             </button>
                         </nav>

@@ -8,7 +8,7 @@
     <div v-if="!res.is_active && !isDashboard" class="card">
         <h1>Verify Your Email</h1>
         <p>
-            We have sent a 6-digit OTP code to your email address. Please enter the code below to verify your account email. Accounts with unconfirmed email address may be deleted after 7 days.
+            We have sent a 6-digit OTP code to your email address. Please enter the code below to verify your account email. Accounts with unconfirmed email address will be deleted after 7 days.
         </p>
         <div v-if="!confirmSuccess" class="mb-4 max-w-xs">
             <div class="mb-4">

@@ -21,7 +21,7 @@
                     <article>
                         <div class="mb-5">
                             <p>
-                                Add a email address to receive forwarded emails. A 6 digit verification code will be sent to this email address. If expired, you can resend the verification code. Unverified recipients will not receive any forwarded emails and may be deleted after 7 days.
+                                Add a email address to receive forwarded emails. A 6 digit verification code will be sent to this email address. If expired, you can resend the verification code. Unverified recipients will not receive any forwarded emails and will be deleted after 7 days.
                             </p>
                         </div>
                         <div class="mb-3">

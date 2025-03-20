@@ -15,7 +15,7 @@
                     <article>
                         <div class="mb-5">
                             <p>
-                                We have sent a 6-digit OTP code to this recipient email address. Please enter the code below to verify the recipient email. Recipients with unconfirmed email address may be deleted after 7 days.
+                                We have sent a 6-digit OTP code to this recipient email address. Please enter the code below to verify the recipient email. Recipients with unconfirmed email address will be deleted after 7 days.
                             </p>
                         </div>
                         <div class="mb-3">

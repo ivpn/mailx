@@ -41,7 +41,8 @@
                             {{ cred.id }}
                         </td>
                         <td>
-                            <button @click.stop="deleteCred(cred.id)" class="delete">
+                            <button @click.stop="deleteCred(cred.id)" class="delete w-full flex items-center gap-x-2 py-2 place-content-end">
+                                <i class="icon icon-error trash text-xs"></i>
                                 Delete
                             </button>
                         </td>

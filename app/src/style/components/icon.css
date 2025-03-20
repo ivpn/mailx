@@ -72,5 +72,13 @@
         &.arrow-left-line {
             mask-image: url("../../assets/icons/icon-arrow-left-line.svg");
         }
+
+        &.check {
+            mask-image: url("../../assets/icons/icon-check.svg");
+        }
+
+        &.key {
+            mask-image: url("../../assets/icons/icon-key.svg");
+        }
     }
 }

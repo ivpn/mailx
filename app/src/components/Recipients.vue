@@ -1,19 +1,22 @@
 <template>
-    <div v-if="!list.length && loaded" class="flex flex-col my-14">
-        <div class="flex flex-col items-center text-center">
-            <h3>Add Recipients</h3>
-            <p>To get started, add a recipient.</p>
-            <div class="flex gap-4">
+    <div class="card-container">
+        <header class="head">
+            <h2>Recipients</h2>
+            <div class="flex items-center justify-between">
                 <RecipientCreate />
             </div>
+        </header>
+        <div v-if="!list.length && loaded" class="card-empty">
+            <span class="bg-secondary rounded flex items-center justify-center p-2 mb-5">
+                <i class="icon mailbox icon-accent text-2xl"></i>
+            </span>
+            <h4>You did not create any recipients yet</h4>
+            <p class="text-tertiary pb-6">
+                This area will light up with items once you start creating recipients.
+            </p>
+            <RecipientCreate />
         </div>
-    </div>
-    <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="card">
-        <h1>Recipients</h1>
-        <div>
-            <div class="flex items-center justify-between mb-6">
-                <RecipientCreate />
-            </div>
+        <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="card-primary">
             <div class="table-container">
                 <table>
                     <thead>
@@ -29,12 +32,9 @@
                         <RecipientRow v-for="recipient in list" :recipient="recipient" :key="rowKey" />
                     </tbody>
                 </table>
+                <p v-if="error" class="error">Error: {{ error }}</p>
             </div>
         </div>
-        <p v-if="isDashboard" class="text-sm my-4">
-            <router-link to="/recipients">All Recipients</router-link>
-        </p>
-        <p v-if="error" class="error">Error: {{ error }}</p>
     </div>
 </template>
 

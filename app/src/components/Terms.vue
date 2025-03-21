@@ -1,7 +1,10 @@
 <template>
     <div class="container mx-auto max-w-screen-lg p-10">
         <p class="py-5">
-            <router-link to="/login">Back to Log In</router-link>
+            <router-link to="/login" class="flex items-center gap-2">
+                <i class="icon arrow-left-line icon-accent"></i>
+                Back to Log In
+            </router-link>
         </p>
         <h1>Terms of Service</h1>
         <p class="text-sm">Last updated: 22 October 2024</p>

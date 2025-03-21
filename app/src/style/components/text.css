@@ -48,7 +48,7 @@
         @apply list-disc ml-5;
     
         li {
-            @apply mb-5 leading-7;
+            @apply mb-5 leading-7 font-primary text-secondary;
         }
     }
 }

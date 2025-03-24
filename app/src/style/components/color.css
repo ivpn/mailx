@@ -12,15 +12,15 @@
     }
 
     .bg-quaternary {
-        @apply bg-dark-neutral-10 dark:bg-dark-neutral-10;
+        @apply bg-light-neutral-10 dark:bg-dark-neutral-10;
     }
 
     .bg-quaternary-alt {
-        @apply bg-dark-neutral-9 dark:bg-dark-neutral-9;
+        @apply bg-light-neutral-9 dark:bg-dark-neutral-9;
     }
 
     .bg-quinary {
-        @apply bg-dark-neutral-11 dark:bg-dark-neutral-11;
+        @apply bg-light-neutral-11 dark:bg-dark-neutral-11;
     }
 
     .bg-accent {
@@ -52,11 +52,11 @@
     }
 
     .text-secondary {
-        @apply text-dark-neutral-11 dark:text-dark-neutral-11;
+        @apply text-light-neutral-10 dark:text-dark-neutral-11;
     }
 
     .text-tertiary {
-        @apply text-dark-neutral-10 dark:text-dark-neutral-10;
+        @apply text-light-neutral-9 dark:text-dark-neutral-10;
     }
 
     .text-accent {
@@ -84,11 +84,11 @@
     }
 
     .icon-secondary {
-        @apply bg-dark-neutral-11 dark:bg-dark-neutral-11;
+        @apply bg-light-neutral-11 dark:bg-dark-neutral-11;
     }
 
     .icon-tertiary {
-        @apply bg-dark-neutral-10 dark:bg-dark-neutral-10;
+        @apply bg-light-neutral-10 dark:bg-dark-neutral-10;
     }
 
     .icon-accent {
@@ -104,15 +104,15 @@
     }
 
     .border-primary {
-        @apply border-dark-neutral-9 dark:border-dark-neutral-8;
+        @apply border-light-gray-8 dark:border-dark-neutral-8;
     }
 
     .border-secondary {
-        @apply border-dark-neutral-7 dark:border-dark-neutral-7;
+        @apply border-light-gray-4 dark:border-dark-neutral-7;
     }
 
     .divide-primary {
-        @apply divide-dark-neutral-7 dark:divide-dark-neutral-7;
+        @apply divide-light-gray-4 dark:divide-dark-neutral-7;
     }
 
     .border-accent {

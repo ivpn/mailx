@@ -3,7 +3,7 @@
         @apply text-accent hover:text-accent-alt text-sm focus:outline-none disabled:opacity-50 disabled:pointer-events-none py-2;
 
         &.cta {
-            @apply text-base text-primary bg-accent hover:bg-accent-alt py-2 px-3 inline-flex items-center gap-x-2 rounded;
+            @apply text-base text-white bg-accent hover:bg-accent-alt py-2 px-3 inline-flex items-center gap-x-2 rounded;
 
             &.delete {
                 @apply bg-error hover:bg-error-alt text-primary hover:text-primary;

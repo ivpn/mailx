@@ -31,6 +31,10 @@
         @apply bg-bl-10;
     }
 
+    .bg-accent-secondary {
+        @apply bg-bl-5;
+    }
+
     .bg-success {
         @apply bg-emerald-500 dark:bg-emerald-600;
     }

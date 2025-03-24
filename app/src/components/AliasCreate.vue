@@ -59,7 +59,7 @@
                                     type="text"
                                 >
                                 <p v-if="errorCatchAllSuffix" class="error">Catch-all suffix must be between 6 and 12 characters</p>
-                                <p class="text-white dark:text-zinc-100 mb-1">
+                                <p class="text-primary mb-1">
                                     *+{{ alias.catch_all_suffix }}@{{ alias.domain }}
                                 </p>
                             </div>

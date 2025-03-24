@@ -41,7 +41,7 @@
     }
 
     hr {
-        @apply border-t border-neutral-400 dark:border-neutral-600 mb-8;
+        @apply border-t border-secondary mb-8;
     }
 
     ul {

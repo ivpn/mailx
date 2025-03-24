@@ -8,7 +8,35 @@ export default {
   theme: {
     extend: {
       colors: {
-        ne: {
+        "light-gray": {
+          1: '#fcfcfd',
+          2: '#f9f9fb',
+          3: '#eff0f3',
+          4: '#e7e8ec',
+          5: '#e0e1e6',
+          6: '#d8d9e0',
+          7: '#cdced7',
+          8: '#b9bbc6',
+          9: '#8b8d98',
+          10: '#80828d',
+          11: '#62636c',
+          12: '#281d1d',
+        },
+        "light-neutral": {
+          1: '#fcfcfc',
+          2: '#f9f9f9',
+          3: '#f1f1f1',
+          4: '#e8e8e8',
+          5: '#e0e0e0',
+          6: '#d8d8d8',
+          7: '#cecece',
+          8: '#bbbbbb',
+          9: '#8d8d8d',
+          10: '#838383',
+          11: '#646464',
+          12: '#202020',
+        },
+        "dark-neutral": {
           1: '#0f0f0f',
           2: '#191919',
           3: '#222222',
@@ -22,7 +50,7 @@ export default {
           11: '#b4b4b4',
           12: '#eeeeee',
         },
-        bl: {
+        "blue": {
           1: '#09111d',
           2: '#0e1827',
           3: '#0b264c',

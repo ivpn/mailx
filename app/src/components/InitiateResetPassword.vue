@@ -28,7 +28,7 @@
                 <p>If an account with the specified email address exists we will send an email with further instructions on how to reset your password.</p>
             </div>
         </form>
-        <p class="text-zinc-500 my-5">
+        <p class="my-5">
             <router-link to="/login">Back to Log In</router-link>
         </p>
     </div>

@@ -103,6 +103,10 @@
         @apply bg-red-500;
     }
 
+    .icon-white {
+        @apply bg-white;
+    }
+
     .border-primary {
         @apply border-light-gray-8 dark:border-dark-neutral-8;
     }

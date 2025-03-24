@@ -1,6 +1,6 @@
 @layer components {
     .page-bg {
-        @apply bg-[url("../../assets/bg-dark.svg")] bg-no-repeat bg-fixed bg-right-bottom;
+        @apply bg-[url("../../assets/bg-light.svg")] dark:bg-[url("../../assets/bg-dark.svg")] bg-no-repeat bg-fixed bg-right-bottom;
     }
 
     .page {

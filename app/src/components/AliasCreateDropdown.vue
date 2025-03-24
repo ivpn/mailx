@@ -2,7 +2,7 @@
     <div class="hs-dropdown">
         <button id="hs-dropdown-new-alias" class="cta">
             New Alias
-            <i class="icon arrow-down text-xl icon-primary"></i>
+            <i class="icon arrow-down text-xl icon-white"></i>
         </button>
         <div class="hs-dropdown-menu hs-dropdown-open:opacity-100 hidden" aria-labelledby="hs-dropdown-new-alias">
             <button data-hs-overlay="#modal-create-alias-false">

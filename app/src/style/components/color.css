@@ -152,7 +152,7 @@
     }
 
     .border-success {
-        @apply border-semantic-success-500;
+        @apply border-semantic-success-600 dark:border-semantic-success-500;
     }
 
     .border-error {

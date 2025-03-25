@@ -8,8 +8,8 @@
             @apply border-error;
         }
 
-        :disabled {
-            @apply opacity-70 pointer-events-none;
+        &:disabled {
+            @apply pointer-events-none text-tertiary;
         }
     }
 

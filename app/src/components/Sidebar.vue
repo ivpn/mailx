@@ -1,7 +1,9 @@
 <template>
     <header class="bg-secondary flex flex-col justify-between h-full">
         <nav>
-            <h1 class="pl-8 m-0 text-accent head">MailX</h1>
+            <h1 class="pl-8 pr-5 m-0 text-accent head flex items-center justify-between">
+                MailX
+            </h1>
             <div class="flex flex-col items-center">
                 <router-link v-bind:class="{ 'active': route == '/' }" to="/">
                     <i class="icon at icon-primary"></i>
@@ -26,11 +28,12 @@
             </div>
         </nav>
         <nav>
-            <div class="flex flex-col items-center py-5">
+            <div class="flex items-center py-5 pr-5">
                 <a @click.stop="logout">
                     <i class="icon logout icon-primary"></i>
                     Log out
                 </a>
+                <ThemeSwitch />
             </div>
         </nav>
     </header>
@@ -41,6 +44,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { userApi } from '../api/user.ts'
 import events from '../events.ts'
+import ThemeSwitch from './ThemeSwitch.vue'
 
 const route = ref('/')
 const currentRoute = useRoute()

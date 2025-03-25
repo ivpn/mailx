@@ -51,7 +51,7 @@
     }
 
     .select {
-        @apply flex flex-col gap-3;
+        @apply flex flex-col gap-3 pb-3;
 
         button {
             @apply flex justify-between items-center gap-3 bg-secondary p-4 w-full text-left;

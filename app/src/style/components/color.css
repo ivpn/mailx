@@ -44,15 +44,15 @@
     }
 
     .bg-success {
-        @apply bg-emerald-500 dark:bg-emerald-600;
+        @apply bg-semantic-success-500 dark:bg-semantic-success-600;
     }
 
     .bg-error {
-        @apply bg-red-600;
+        @apply bg-semantic-danger-500;
     }
 
     .bg-error-alt {
-        @apply bg-red-700;
+        @apply bg-semantic-danger-600;
     }
 
     .text-primary {
@@ -80,15 +80,15 @@
     }
 
     .text-success {
-        @apply text-emerald-600 dark:text-emerald-500;
+        @apply text-semantic-success-600 dark:text-semantic-success-500;
     }
 
     .text-error {
-        @apply text-red-500;
+        @apply text-semantic-danger-500;
     }
 
     .text-error-alt {
-        @apply text-red-600;
+        @apply text-semantic-danger-600;
     }
 
     .icon-primary {
@@ -112,11 +112,11 @@
     }
 
     .icon-success {
-        @apply bg-emerald-600 dark:bg-emerald-500;
+        @apply bg-semantic-success-600 dark:bg-semantic-success-500;
     }
 
     .icon-error {
-        @apply bg-red-500;
+        @apply bg-semantic-danger-500;
     }
 
     .icon-white {
@@ -144,10 +144,10 @@
     }
 
     .border-success {
-        @apply border-emerald-500;
+        @apply border-semantic-success-500;
     }
 
     .border-error {
-        @apply border-red-500;
+        @apply border-semantic-danger-500;
     }
 }

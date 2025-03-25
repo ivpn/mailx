@@ -4,11 +4,11 @@
     }
 
     .bg-secondary {
-        @apply bg-light-gray-3 dark:bg-dark-neutral-3;
+        @apply bg-light-neutral-3 dark:bg-dark-neutral-3;
     }
 
     .bg-tertiary {
-        @apply bg-light-neutral-5 dark:bg-dark-neutral-5;
+        @apply bg-light-neutral-7 dark:bg-dark-neutral-5;
     }
 
     .bg-quaternary {
@@ -24,15 +24,19 @@
     }
 
     .bg-accent {
-        @apply bg-blue-9;
+        @apply bg-light-blue-9 dark:bg-dark-blue-9;
     }
 
     .bg-accent-alt {
-        @apply bg-blue-10;
+        @apply bg-light-blue-10 dark:bg-dark-blue-10;
     }
 
     .bg-accent-secondary {
-        @apply bg-blue-5;
+        @apply bg-light-blue-4 dark:bg-dark-blue-5;
+    }
+
+    .bg-info {
+        @apply bg-semantic-information-400;
     }
 
     .bg-success {
@@ -60,11 +64,15 @@
     }
 
     .text-accent {
-        @apply text-blue-9;
+        @apply text-light-blue-9 dark:text-dark-blue-9;
     }
 
     .text-accent-alt {
-        @apply text-blue-10;
+        @apply text-light-blue-10 dark:text-dark-blue-10;
+    }
+
+    .text-info {
+        @apply text-semantic-information-400;
     }
 
     .text-success {
@@ -92,7 +100,7 @@
     }
 
     .icon-accent {
-        @apply bg-blue-9;
+        @apply bg-light-blue-9 dark:bg-dark-blue-9;
     }
 
     .icon-success {
@@ -115,12 +123,16 @@
         @apply border-light-gray-4 dark:border-dark-neutral-7;
     }
 
+    .border-info {
+        @apply border-semantic-information-400;
+    }
+
     .divide-primary {
         @apply divide-light-gray-4 dark:divide-dark-neutral-7;
     }
 
     .border-accent {
-        @apply border-blue-9;
+        @apply border-light-blue-9 dark:border-dark-blue-9;
     }
 
     .border-success {

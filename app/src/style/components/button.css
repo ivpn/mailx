@@ -6,7 +6,7 @@
             @apply text-base text-white bg-accent hover:bg-accent-alt py-2 px-3 inline-flex items-center gap-x-2 rounded;
 
             &.delete {
-                @apply bg-error hover:bg-error-alt text-primary hover:text-primary;
+                @apply text-white hover:text-white bg-error hover:bg-error-alt;
             }
 
             &.cancel {

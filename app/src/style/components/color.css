@@ -60,7 +60,7 @@
     }
 
     .text-secondary {
-        @apply text-light-neutral-10 dark:text-dark-neutral-11;
+        @apply text-light-neutral-11 dark:text-dark-neutral-11;
     }
 
     .text-tertiary {

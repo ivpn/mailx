@@ -27,7 +27,14 @@
         }
 
         &.delete {
-            @apply text-semantic-danger-600 hover:text-semantic-danger-700 dark:text-semantic-danger-500 dark:hover:text-semantic-danger-600;
+            @apply text-error hover:text-error-alt;
+
+            &:hover {
+
+                .icon {
+                    @apply icon-error-alt;
+                }
+            }
         }
 
         &.close {

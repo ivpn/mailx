@@ -119,6 +119,10 @@
         @apply bg-semantic-danger-500;
     }
 
+    .icon-error-alt {
+        @apply bg-semantic-danger-600;
+    }
+
     .icon-white {
         @apply bg-white;
     }

@@ -39,7 +39,7 @@
         <td>
             <div class="hs-dropdown [--offset:0]">
                 <button v-bind:id="'hs-dropdown-recipient-edit-' + recipient.id">
-                    <i class="icon icon-primary more text-lg"></i>
+                    <i class="icon icon-secondary more text-lg"></i>
                 </button>
                 <div
                     class="hs-dropdown-menu hs-dropdown-open:opacity-100 hidden"

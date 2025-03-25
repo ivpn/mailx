@@ -54,11 +54,11 @@
                     </article>
                     <footer>
                         <nav>
-                            <button @click="close" class="cancel">
-                                Close
-                            </button>
                             <button @click="showAddress" class="cta">
                                 Show address
+                            </button>
+                            <button @click="close" class="cancel">
+                                Close
                             </button>
                         </nav>
                     </footer>

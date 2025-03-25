@@ -128,15 +128,15 @@
                     </article>
                     <footer>
                         <nav>
-                            <button @click="close" class="cancel">
-                                Cancel
-                            </button>
                             <button
                                 v-if="step == 2 || props.catchAll"
                                 v-bind:disabled="errorRecipients.length > 0"
                                 @click="postAlias"
                                 class="cta">
                                 Create and copy to clipboard
+                            </button>
+                            <button @click="close" class="cancel">
+                                Cancel
                             </button>
                         </nav>
                         <p v-if="error" class="error px-5">Error: {{ error }}</p>

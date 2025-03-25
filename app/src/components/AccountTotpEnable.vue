@@ -60,11 +60,11 @@
                     </article>
                     <footer>
                         <nav v-if="!isEnabled">
-                            <button @click="close" class="cancel">
-                                Cancel
-                            </button>
                             <button @click="totpEnableConfirm" class="cta">
                                 Enable 2-Factor Authentication
+                            </button>
+                            <button @click="close" class="cancel">
+                                Cancel
                             </button>
                         </nav>
                         <nav v-if="isEnabled">

@@ -35,11 +35,11 @@
                     </article>
                     <footer>
                         <nav>
-                            <button @click="close" class="cancel">
-                                Cancel
-                            </button>
                             <button @click="disableTotp" class="cta">
                                 Disable 2-Factor Authentication
+                            </button>
+                            <button @click="close" class="cancel">
+                                Cancel
                             </button>
                         </nav>
                         <p v-if="error" class="error px-5">Error: {{ error }}</p>

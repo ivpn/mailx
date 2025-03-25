@@ -43,11 +43,11 @@
                     </article>
                     <footer>
                         <nav>
-                            <button @click="close" class="cancel">
-                                Cancel
-                            </button>
                             <button @click.stop="promptDeleteAccount" class="cta delete">
                                 Delete Account
+                            </button>
+                            <button @click="close" class="cancel">
+                                Cancel
                             </button>
                         </nav>
                         <p v-if="error" class="error px-5">Error: {{ error }}</p>

@@ -24,11 +24,11 @@
                     </article>
                     <footer>
                         <nav>
-                            <button @click="close" class="cancel">
-                                Cancel
-                            </button>
                             <button @click="addKey" class="cta">
                                 Add PGP Public Key
+                            </button>
+                            <button @click="close" class="cancel">
+                                Cancel
                             </button>
                         </nav>
                         <p v-if="error" class="error px-5">Error: {{ error }}</p>

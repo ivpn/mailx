@@ -31,14 +31,14 @@
                     </article>
                     <footer>
                         <nav>
-                            <button @click="close" class="cancel">
-                                Cancel
+                            <button @click="verifyRecipient" class="cta">
+                                Verify Recipient
                             </button>
                             <button @click="sendOtp" class="cancel">
                                 Resend OTP
                             </button>
-                            <button @click="verifyRecipient" class="cta">
-                                Verify Recipient
+                            <button @click="close" class="cancel">
+                                Cancel
                             </button>
                         </nav>
                         <p v-if="error" class="error px-5">Error: {{ error }}</p>

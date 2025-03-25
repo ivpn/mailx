@@ -61,15 +61,15 @@
                     </article>
                     <footer>
                         <nav>
-                            <button @click="close" class="cancel">
-                                Cancel
-                            </button>
                             <button
                                 v-if="!success"
                                 @click="updateAlias"
                                 v-bind:disabled="errorRecipients.length > 0"
                                 class="cta">
                                 Save
+                            </button>
+                            <button @click="close" class="cancel">
+                                Cancel
                             </button>
                         </nav>
                         <p v-if="error" class="error px-5">Error: {{ error }}</p>

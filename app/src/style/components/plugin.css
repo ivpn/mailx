@@ -37,7 +37,11 @@
         footer {
 
             nav {
-                @apply flex justify-end items-center gap-x-3 px-5 py-5 pb-7;
+                @apply flex flex-col gap-y-3 px-5 py-5 pb-6;
+
+                button {
+                    @apply w-full justify-center;
+                }
             }
 
             p {

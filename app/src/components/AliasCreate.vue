@@ -24,7 +24,7 @@
                                         <strong>Words</strong>
                                         <span>e.g.: <i>quiet.haze16</i></span>
                                     </div>
-                                    <i class="icon arrow-left-line icon-primary" @click.stop="next"></i>
+                                    <i class="icon arrow-left-line icon-quaternary text-lg" @click.stop="next"></i>
                                 </button>
                                 <button
                                     v-bind:class="{ 'active': alias.format === 'random' }"
@@ -33,7 +33,7 @@
                                         <strong>Random</strong>
                                         <span>e.g.: <i>uf1h0hxi</i></span>
                                     </div>
-                                    <i class="icon arrow-left-line icon-primary" @click.stop="next"></i>
+                                    <i class="icon arrow-left-line icon-quaternary text-lg" @click.stop="next"></i>
                                 </button>
                                 <button
                                     v-bind:class="{ 'active': alias.format === 'uuid' }"
@@ -42,7 +42,7 @@
                                         <strong>UUID</strong>
                                         <span>e.g.: <i>550e8400-e29b-41d4-a716-446655440000</i></span>
                                     </div>
-                                    <i class="icon arrow-left-line icon-primary" @click.stop="next"></i>
+                                    <i class="icon arrow-left-line icon-quaternary text-lg" @click.stop="next"></i>
                                 </button>
                             </div>
                         </div>

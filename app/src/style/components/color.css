@@ -35,6 +35,10 @@
         @apply bg-light-blue-4 dark:bg-dark-blue-5;
     }
 
+    .bg-accent-tertiary {
+        @apply bg-light-blue-alpha-3 dark:bg-dark-blue-5;
+    }
+
     .bg-info {
         @apply bg-semantic-information-400;
     }
@@ -97,6 +101,10 @@
 
     .icon-tertiary {
         @apply bg-light-neutral-10 dark:bg-dark-neutral-10;
+    }
+
+    .icon-quaternary {
+        @apply bg-light-blue-9 dark:bg-dark-neutral-12;
     }
 
     .icon-accent {

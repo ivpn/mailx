@@ -128,7 +128,7 @@
     }
 
     .border-primary {
-        @apply border-light-gray-8 dark:border-dark-neutral-8;
+        @apply border-light-neutral-7 dark:border-dark-neutral-8;
     }
 
     .border-secondary {

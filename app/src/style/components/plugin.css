@@ -7,7 +7,7 @@
         @apply size-full fixed top-0 start-0 z-[60] overflow-x-hidden overflow-y-auto pointer-events-none flex flex-col items-center justify-center;
 
         & > div {
-            @apply hs-overlay-open:opacity-100 hs-overlay-open:duration-500 opacity-0 transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto drop-shadow-[8px_8px_0_rgba(81,81,81,100)] dark:drop-shadow-[8px_8px_0_rgba(82,82,91,100)] border border-primary;
+            @apply hs-overlay-open:opacity-100 hs-overlay-open:duration-500 opacity-0 transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto drop-shadow-[8px_8px_0_rgba(81,81,81,100)] dark:drop-shadow-[8px_8px_0_rgba(82,82,91,100)] border border-tertiary;
         }
 
         & > div > div {
@@ -58,7 +58,7 @@
         @apply relative [--placement:bottom-right];
 
         .hs-dropdown-menu {
-            @apply transition-[opacity,margin] opacity-0 bg-primary border border-primary shadow-sm p-2 drop-shadow-[4px_4px_0_rgba(81,81,81,100)] dark:drop-shadow-[4px_4px_0_rgba(82,82,91,100)] z-10 min-w-36;
+            @apply transition-[opacity,margin] opacity-0 bg-primary border border-tertiary shadow-sm p-2 drop-shadow-[4px_4px_0_rgba(81,81,81,100)] dark:drop-shadow-[4px_4px_0_rgba(82,82,91,100)] z-10 min-w-36;
 
             button {
                 @apply w-full flex items-center gap-x-2 px-3 py-2 text-sm text-primary hover:bg-secondary;

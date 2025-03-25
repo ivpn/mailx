@@ -1,26 +1,26 @@
 @layer components {
     .bg-primary {
-        @apply bg-white dark:bg-dark-neutral-1;
+        @apply bg-white dark:bg-dark-gray-1;
     }
 
     .bg-secondary {
-        @apply bg-light-gray-3 dark:bg-dark-neutral-3;
+        @apply bg-light-gray-3 dark:bg-dark-gray-3;
     }
 
     .bg-tertiary {
-        @apply bg-light-gray-7 dark:bg-dark-neutral-5;
+        @apply bg-light-gray-7 dark:bg-dark-gray-5;
     }
 
     .bg-quaternary {
-        @apply bg-light-gray-10 dark:bg-dark-neutral-10;
+        @apply bg-light-gray-10 dark:bg-dark-gray-10;
     }
 
     .bg-quaternary-alt {
-        @apply bg-light-gray-9 dark:bg-dark-neutral-9;
+        @apply bg-light-gray-9 dark:bg-dark-gray-9;
     }
 
     .bg-quinary {
-        @apply bg-light-gray-11 dark:bg-dark-neutral-11;
+        @apply bg-light-gray-11 dark:bg-dark-gray-11;
     }
 
     .bg-accent {
@@ -128,11 +128,11 @@
     }
 
     .border-primary {
-        @apply border-light-gray-3 dark:border-dark-neutral-3;
+        @apply border-light-gray-3 dark:border-dark-gray-3;
     }
 
     .border-secondary {
-        @apply border-light-gray-4 dark:border-dark-neutral-4;
+        @apply border-light-gray-4 dark:border-dark-gray-4;
     }
 
     .border-tertiary {

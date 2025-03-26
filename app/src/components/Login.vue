@@ -49,6 +49,9 @@
                                 placeholder="Password"
                             >
                             <p v-if="passwordError" class="error mb-2">Required</p>
+                            <p class="text-right">
+                                <router-link to="/reset/password/initiate">Forgot password?</router-link>
+                            </p>
                         </div>
                         <div v-if="otpRequired" class="mb-6">
                             <label for="password">
@@ -93,9 +96,6 @@
                 </router-link>
             </div>
         </form>
-        <p>
-            <router-link to="/reset/password/initiate">Forgot password?</router-link>
-        </p>
         <Footer />
     </div>
 </template>

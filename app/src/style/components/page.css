@@ -35,7 +35,7 @@
         @apply flex flex-col py-5 p-8 border-accent border bg-light-gray-3 dark:bg-dark-gray-2;
 
         &.center {
-            @apply w-full max-w-md p-12 pb-8 mb-5;
+            @apply w-full max-w-md px-12 py-10 mb-5;
         }
     }
 

@@ -48,5 +48,9 @@
         &.plain {
             @apply font-normal text-primary hover:text-primary;
         }
+
+        &.plain-alt {
+            @apply font-normal text-tertiary hover:text-secondary;
+        }
     }
 }

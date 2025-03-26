@@ -1,8 +1,10 @@
 <template>
     <div class="page center pt-10">
-        <form class="card-tertiary center" @submit.prevent="">
+        <form class="card-tertiary center" @submit.prevent="" autocomplete="off">
             <div>
                 <div v-if="passkeySupported" id="tabs-with-underline-1" role="tabpanel" aria-labelledby="tabs-with-underline-item-1">
+                    <h1 class="text-center text-accent mb-6">MailX</h1>
+                    <h4 class="text-center mb-8">Log in with Passkey</h4>
                     <div v-if="!isLoggedIn()">
                         <div class="mb-5">
                             <input
@@ -10,8 +12,9 @@
                                 v-bind:class="{ 'error': emailAuthnError }"
                                 id="email_authn"
                                 type="email"
-                                autocomplete="email_authn"
                                 placeholder="Email Address"
+                                class="email"
+                                autocomplete="false"
                             >
                             <p v-if="emailAuthnError" class="error">Required</p>
                         </div>
@@ -26,7 +29,7 @@
                 <div id="tabs-with-underline-2" v-bind:class="{ 'hidden': passkeySupported }" role="tabpanel"
                     aria-labelledby="tabs-with-underline-item-2">
                     <div v-if="!isLoggedIn()">
-                        <h1 class="text-center text-accent">MailX</h1>
+                        <h1 class="text-center text-accent mb-6">MailX</h1>
                         <h4 class="text-center mb-8">Log in with email and password</h4>
                         <div class="mb-3">
                             <input
@@ -36,6 +39,7 @@
                                 type="email"
                                 autocomplete="email"
                                 placeholder="Email address"
+                                class="email"
                             >
                             <p v-if="emailError" class="error">Required</p>
                         </div>
@@ -47,10 +51,13 @@
                                 type="password"
                                 autocomplete="current-password"
                                 placeholder="Password"
+                                class="password"
                             >
                             <p v-if="passwordError" class="error mb-2">Required</p>
                             <p class="text-right">
-                                <router-link to="/reset/password/initiate">Forgot password?</router-link>
+                                <router-link to="/reset/password/initiate">
+                                    <button class="plain-alt">Forgot password?</button>
+                                </router-link>
                             </p>
                         </div>
                         <div v-if="otpRequired" class="mb-6">

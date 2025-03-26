@@ -32,10 +32,10 @@
     }
 
     .card-tertiary {
-        @apply flex flex-col py-5 p-8 border-accent border bg-light-gray-3 dark:bg-dark-gray-2;
+        @apply flex flex-col py-5 p-8 border-accent border bg-light-gray-3 dark:bg-dark-gray-2 dark:border-none;
 
         &.center {
-            @apply w-full max-w-md px-12 py-10 mb-5;
+            @apply w-full max-w-md px-12 py-10 pb-8 mb-5;
         }
     }
 

@@ -15,6 +15,14 @@
         &::placeholder {
             @apply text-tertiary;
         }
+
+        &.email {
+            @apply bg-[url("../../assets/icons/icon-email-light.svg")] dark:bg-[url("../../assets/icons/icon-email-dark.svg")] bg-no-repeat bg-[center_left_0.5rem] pl-10;
+        }
+
+        &.password {
+            @apply bg-[url("../../assets/icons/icon-password-light.svg")] dark:bg-[url("../../assets/icons/icon-password-dark.svg")] bg-no-repeat bg-[center_left_0.5rem] pl-10;
+        }
     }
 
     input[type=checkbox] {

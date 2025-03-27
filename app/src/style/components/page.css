@@ -76,7 +76,7 @@
             @apply my-0;
 
             a {
-                @apply text-secondary hover:text-primary;
+                @apply text-primary hover:text-secondary;
             }
         }
     }

@@ -1,12 +1,15 @@
 <template>
     <div class="page center">
         <div></div>
-        <div class="text-center">
-            <h1 class="text-5xl">404</h1>
-            <p>Page not found</p>
-            <router-link to="/" tag="button" class="cta full">
-                Go to Dashboard
-            </router-link>
+        <div class="card-tertiary center text-center">
+            <article>
+                <h1 class="text-5xl">404</h1>
+                <p>Page not found</p>
+                <router-link to="/" tag="button" class="cta full mb-5">
+                    Go to Dashboard
+                </router-link>
+            </article>
+            
         </div>
         <Footer />
     </div>

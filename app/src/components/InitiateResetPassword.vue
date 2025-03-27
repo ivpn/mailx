@@ -1,5 +1,5 @@
 <template>
-    <div class="page center pt-10">
+    <div class="page center">
         <div></div>
         <form class="card-tertiary center" @submit.prevent="initiatePasswordReset">
             <article>

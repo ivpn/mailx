@@ -26,7 +26,7 @@
         @apply flex pt-5;
 
         button {
-            @apply text-accent hs-tab-active:border-accent pt-2 pb-4 px-1 text-center basis-0 grow inline-flex justify-center items-center gap-x-2 border-b-2 border-transparent whitespace-nowrap focus:outline-none text-secondary;
+            @apply text-accent hs-tab-active:border-accent pt-0 pb-4 px-1 text-center basis-0 grow inline-flex justify-center items-center gap-x-2 border-b-2 border-transparent whitespace-nowrap focus:outline-none text-secondary text-sm;
 
             &.active {
                 @apply hidden;

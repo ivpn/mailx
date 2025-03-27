@@ -7,7 +7,7 @@
         @apply min-h-screen flex;
 
         &.center {
-            @apply flex flex-col items-center justify-between;
+            @apply p-5 flex flex-col items-center justify-between;
         }
     }
 
@@ -38,11 +38,15 @@
         }
 
         article {
-            @apply px-12 py-11 pb-7 flex flex-col border-accent border bg-light-gray-3 dark:bg-dark-gray-2 dark:border-none;
+            @apply px-12 py-11 pb-7 flex flex-col border-accent border bg-light-gray-2 dark:bg-dark-gray-2 dark:border-none;
         }
 
         footer {
-            @apply flex gap-2 p-4 mt-4 dark:bg-dark-blue-2;
+            @apply flex gap-2 p-4 mt-4 bg-light-blue-3 dark:bg-dark-blue-2;
+
+            .icon {
+                @apply icon-accent dark:icon-primary;
+            }
 
             h4 {
                 @apply font-primary text-primary font-normal text-sm mb-1;
@@ -69,7 +73,7 @@
     .footer-nav {
         
         p {
-            @apply my-6;
+            @apply my-0;
 
             a {
                 @apply text-secondary hover:text-primary;

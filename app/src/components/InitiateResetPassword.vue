@@ -6,7 +6,7 @@
                 <h1 class="text-center text-accent mb-8">MailX</h1>
                 <h4 class="text-center mb-8">Reset password</h4>
                 <div v-if="!apiSuccess">
-                    <div class="mb-5">
+                    <div class="mb-3">
                         <input
                             v-model="email"
                             v-bind:class="{ 'error': emailError }"
@@ -18,6 +18,9 @@
                         >
                         <p v-if="emailError" class="error">Required</p>
                     </div>
+                    <p class="text-sm mb-5">
+                        Please enter your registered email address. You will be sent instructions on how to reset your password.
+                    </p>
                     <div class="flex items-center justify-between">
                         <button :disabled="isLoading" class="cta full">
                             Send reset instructions
@@ -34,14 +37,6 @@
                     </router-link>
                 </nav>
             </article>
-            <footer>
-                <div>
-                    <i class="icon info icon-primary"></i>
-                </div>
-                <div>
-                    <p>Please enter your registered email address. You will be sent instructions on how to reset your password.</p>
-                </div>
-            </footer>
         </form>
         <Footer />
     </div>

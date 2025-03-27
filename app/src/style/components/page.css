@@ -38,10 +38,10 @@
         }
 
         article {
-            @apply px-12 py-11 pb-9 flex flex-col border-accent border bg-light-gray-3 dark:bg-dark-gray-2 dark:border-none;
+            @apply px-12 py-11 pb-7 flex flex-col border-accent border bg-light-gray-3 dark:bg-dark-gray-2 dark:border-none;
         }
 
-        .footer {
+        footer {
             @apply flex gap-2 p-4 mt-4 dark:bg-dark-blue-2;
 
             h4 {

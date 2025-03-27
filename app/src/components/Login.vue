@@ -105,7 +105,7 @@
                     </router-link>
                 </div>
             </article>
-            <div class="footer">
+            <footer>
                 <div>
                     <i class="icon info icon-primary"></i>
                 </div>
@@ -113,7 +113,7 @@
                     <h4>Here to try MailX? You need an active IVPN account.</h4>
                     <p>Sign up or log in on <a href="https://www.ivpn.net/account/">ivpn.net</a> and look for "Email Beta" in your account settings.</p>
                 </div>
-            </div>
+            </footer>
         </form>
         <Footer />
     </div>

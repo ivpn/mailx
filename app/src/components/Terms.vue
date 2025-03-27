@@ -7,7 +7,7 @@
             </router-link>
         </p>
         <h1>Terms of Service</h1>
-        <p class="text-sm">Last updated: 22 October 2024</p>
+        <p class="text-sm">Last updated: 27 March 2025</p>
 
         <h2>1. Introduction</h2>
         <p>These Terms and Conditions ("Terms") govern your use of MailX, an email forwarding service operated by IVPN Limited ("we," "us," or "our"). By subscribing to or using our service, you ("you" or "user") agree to abide by these Terms.</p>

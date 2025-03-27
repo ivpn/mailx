@@ -12,10 +12,6 @@
             &.cancel {
                 @apply text-primary bg-quaternary hover:bg-quaternary-alt;
             }
-
-            &.lg {
-                @apply py-3 px-4;
-            }
         }
 
         &.cancel {

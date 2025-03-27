@@ -6,7 +6,7 @@
                 <h1 class="text-center text-accent mb-8">MailX</h1>
                 <h4 class="text-center mb-8">Set new password</h4>
                 <div v-if="!apiSuccess">
-                    <div class="mb-6">
+                    <div class="mb-5">
                         <input
                             v-model="password"
                             v-bind:class="{ 'error': passwordError }"
@@ -16,7 +16,7 @@
                             class="password"
                         >
                     </div>
-                    <div class="mb-4">
+                    <div class="mb-3">
                         <input
                             v-model="passwordConfirm"
                             v-bind:class="{ 'error': passwordError }"
@@ -26,7 +26,7 @@
                             class="password"
                         >
                     </div>
-                    <p class="text-sm mb-6">
+                    <p class="text-sm mb-5">
                         Must be 12+ characters and contain uppercase, lowercase, number, and special character (e.g. !@#$%^&*(),;.?":{}|<>)
                     </p>
                     <div class="flex items-center justify-between">
@@ -34,11 +34,11 @@
                             Update password
                         </button>
                     </div>
-                    <p v-if="passwordError" class="error mt-6">Error: {{ passwordError }}</p>
-                    <p v-if="apiError" class="error mt-6">Error: {{ apiError }}</p>
+                    <p v-if="passwordError" class="error mt-5">Error: {{ passwordError }}</p>
+                    <p v-if="apiError" class="error mt-5">Error: {{ apiError }}</p>
                 </div>
                 <div v-if="apiSuccess">
-                    <p class="success mb-6">{{ apiSuccess }}</p>
+                    <p class="success mb-5">{{ apiSuccess }}</p>
                 </div>
                 <nav role="tablist" class="tabs-router">
                     <router-link to="/login" custom v-slot="{ navigate }">

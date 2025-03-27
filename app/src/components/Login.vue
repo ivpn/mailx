@@ -21,7 +21,7 @@
                                 <p v-if="emailAuthnError" class="error">Required</p>
                             </div>
                             <div class="flex items-center w-full">
-                                <button :disabled="isLoading" @click="loginWithPasskey" class="cta lg full">
+                                <button :disabled="isLoading" @click="loginWithPasskey" class="cta full">
                                     Log in with Passkey
                                 </button>
                             </div>
@@ -33,7 +33,7 @@
                         <div v-if="!isLoggedIn()">
                             <h1 class="text-center text-accent mb-8">MailX</h1>
                             <h4 class="text-center mb-8">Log in with email and password</h4>
-                            <div class="mb-3">
+                            <div class="mb-5">
                                 <input
                                     v-model="email"
                                     v-bind:class="{ 'error': emailError }"
@@ -62,7 +62,7 @@
                                     </router-link>
                                 </p>
                             </div>
-                            <div v-if="otpRequired" class="mb-6">
+                            <div v-if="otpRequired" class="mb-5">
                                 <label for="password">
                                     Two-factor authentication token:
                                 </label>
@@ -75,11 +75,11 @@
                                 <p v-if="otpError" class="error">Required</p>
                             </div>
                             <div class="flex items-center w-full">
-                                <button :disabled="isLoading" @click="login" class="cta lg full">
+                                <button :disabled="isLoading" @click="login" class="cta full">
                                     Log in
                                 </button>
                             </div>
-                            <p v-if="error" class="error mt-6">Error: {{ error }}</p>
+                            <p v-if="error" class="error mt-5">Error: {{ error }}</p>
                         </div>
                     </div>
                 </div>
@@ -100,7 +100,7 @@
                 </nav>
                 <div v-if="isLoggedIn()" class="pb-2">
                     <p>You are logged in</p>
-                    <router-link to="/" tag="button" class="cta lg full">
+                    <router-link to="/" tag="button" class="cta full">
                         Go to Dashboard
                     </router-link>
                 </div>

@@ -8,7 +8,7 @@
                         <h1 class="text-center text-accent mb-8">MailX</h1>
                         <h4 class="text-center mb-8">Sign up with Passkey</h4>
                         <div v-if="!apiSuccess">
-                            <div class="mb-4">
+                            <div class="mb-5">
                                 <input
                                     v-model="emailAuthn"
                                     v-bind:class="{ 'error': emailAuthnError }"
@@ -20,7 +20,7 @@
                                 <p v-if="emailAuthnError" class="error">Required</p>
                             </div>
                             <div class="flex items-center w-full">
-                                <button @click="registerWithPasskey" :disabled="isLoading" class="cta lg full">
+                                <button @click="registerWithPasskey" :disabled="isLoading" class="cta full">
                                     Sign Up with Passkey
                                 </button>
                             </div>
@@ -35,7 +35,7 @@
                         <h1 class="text-center text-accent mb-8">MailX</h1>
                         <h4 class="text-center mb-8">Sign up with email and password</h4>
                         <div v-if="!apiSuccess">
-                            <div class="mb-4">
+                            <div class="mb-5">
                                 <input
                                     v-model="email"
                                     v-bind:class="{ 'error': emailError }"
@@ -46,7 +46,7 @@
                                 >
                                 <p v-if="emailError" class="error">Required</p>
                             </div>
-                            <div class="mb-6">
+                            <div class="mb-3">
                                 <input
                                     v-model="password"
                                     v-bind:class="{ 'error': passwordError }"
@@ -56,14 +56,14 @@
                                     class="password"
                                 >
                                 <p v-if="passwordError" class="error">Required</p>
-                                <p class="text-sm mb-2">Must be 12+ characters and contain uppercase, lowercase, number, and special character (e.g. !@#$%^&*(),;.?":{}|<>)</p>
                             </div>
+                            <p class="text-sm mb-5">Must be 12+ characters and contain uppercase, lowercase, number, and special character (e.g. !@#$%^&*(),;.?":{}|<>)</p>
                             <div class="flex items-center w-full">
-                                <button @click="register" :disabled="isLoading" class="cta lg full">
+                                <button @click="register" :disabled="isLoading" class="cta full">
                                     Sign Up
                                 </button>
                             </div>
-                            <p v-if="apiError" class="error mt-6">Error: {{ apiError }}</p>
+                            <p v-if="apiError" class="error mt-5">Error: {{ apiError }}</p>
                         </div>
                     </div>
                 </div>
@@ -82,7 +82,7 @@
                 </nav>
                 <div v-if="apiSuccess">
                     <p class="success mb-6">{{ apiSuccess }}</p>
-                    <router-link to="/login" tag="button" class="cta lg full">
+                    <router-link to="/login" tag="button" class="cta full">
                         Proceed to Log In
                     </router-link>
                 </div>

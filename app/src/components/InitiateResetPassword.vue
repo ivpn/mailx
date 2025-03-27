@@ -6,7 +6,7 @@
                 <h1 class="text-center text-accent mb-8">MailX</h1>
                 <h4 class="text-center mb-8">Reset password</h4>
                 <div v-if="!apiSuccess">
-                    <div class="mb-4">
+                    <div class="mb-5">
                         <input
                             v-model="email"
                             v-bind:class="{ 'error': emailError }"

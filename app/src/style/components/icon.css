@@ -3,7 +3,7 @@
         mask-size: 1.35em;
         mask-size: 1.35em;
 
-        @apply w-[1.35em] h-[1.35em] inline-block bg-no-repeat;        
+        @apply w-[1.35em] h-[1.35em] inline-block bg-no-repeat;
 
         &.at {
             mask-image: url("../../assets/icons/icon-at.svg");
@@ -79,6 +79,10 @@
 
         &.key {
             mask-image: url("../../assets/icons/icon-key.svg");
+        }
+
+        &.info {
+            mask-image: url("../../assets/icons/icon-info.svg");
         }
     }
 }

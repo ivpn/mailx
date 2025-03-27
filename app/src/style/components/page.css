@@ -7,7 +7,7 @@
         @apply min-h-screen flex;
 
         &.center {
-            @apply flex flex-col items-center justify-center;
+            @apply flex flex-col items-center justify-between;
         }
     }
 
@@ -32,10 +32,29 @@
     }
 
     .card-tertiary {
-        @apply flex flex-col py-5 p-8 border-accent border bg-light-gray-3 dark:bg-dark-gray-2 dark:border-none;
 
         &.center {
-            @apply w-full max-w-md px-12 py-10 pb-8 mb-5;
+            @apply w-full max-w-md;
+        }
+
+        article {
+            @apply px-12 py-11 pb-9 flex flex-col border-accent border bg-light-gray-3 dark:bg-dark-gray-2 dark:border-none;
+        }
+
+        .footer {
+            @apply flex gap-2 p-4 mt-4 dark:bg-dark-blue-2;
+
+            h4 {
+                @apply font-primary text-primary font-normal text-sm mb-1;
+            }
+
+            p {
+                @apply text-secondary text-sm m-0;
+
+                a {
+                    @apply underline text-secondary hover:text-primary;
+                }
+            }
         }
     }
 
@@ -44,6 +63,17 @@
 
         h1, h2, h3, h4, h5, h6 {
             @apply m-0;
+        }
+    }
+
+    .footer-nav {
+        
+        p {
+            @apply my-6;
+
+            a {
+                @apply text-secondary hover:text-primary;
+            }
         }
     }
 }

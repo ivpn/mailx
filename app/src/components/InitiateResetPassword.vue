@@ -1,36 +1,49 @@
 <template>
     <div class="page center pt-10">
-        <h1>Reset Password</h1>
-        <form class="card center" @submit.prevent="initiatePasswordReset">
-            <div v-if="!apiSuccess">
-                <p>Please enter your registered email address. You will be sent instructions on how to reset your password.</p>
-                <div class="mb-4">
-                    <label for="email">
-                        Email Address
-                    </label>
-                    <input
-                        v-model="email"
-                        v-bind:class="{ 'error': emailError }"
-                        id="email"
-                        type="email"
-                        autocomplete="email"
-                    >
-                    <p v-if="emailError" class="error">Required</p>
+        <div></div>
+        <form class="card-tertiary center" @submit.prevent="initiatePasswordReset">
+            <article>
+                <div v-if="!apiSuccess">
+                    <h1 class="text-center text-accent mb-8">MailX</h1>
+                    <h4 class="text-center mb-8">Reset password</h4>
+                    <div class="mb-4">
+                        <input
+                            v-model="email"
+                            v-bind:class="{ 'error': emailError }"
+                            id="email"
+                            type="email"
+                            autocomplete="email"
+                            placeholder="Email Address"
+                            class="email"
+                        >
+                        <p v-if="emailError" class="error">Required</p>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <button :disabled="isLoading" class="cta full">
+                            Send reset instructions
+                        </button>
+                    </div>
+                    <p v-if="apiError" class="error mt-6">Error: {{ apiError }}</p>
                 </div>
-                <div class="flex items-center justify-between">
-                    <button :disabled="isLoading" class="cta full">
-                        Send Reset Instructions
-                    </button>
+                <div v-if="apiSuccess">
+                    <p>If an account with the specified email address exists we will send an email with further instructions on how to reset your password.</p>
                 </div>
-                <p v-if="apiError" class="error mt-6">Error: {{ apiError }}</p>
-            </div>
-            <div v-if="apiSuccess">
-                <p>If an account with the specified email address exists we will send an email with further instructions on how to reset your password.</p>
-            </div>
+                <nav role="tablist" class="tabs-router">
+                    <router-link to="/login" custom v-slot="{ navigate }">
+                        <button @click="navigate">Back to Log In</button>
+                    </router-link>
+                </nav>
+            </article>
+            <footer>
+                <div>
+                    <i class="icon info icon-primary"></i>
+                </div>
+                <div>
+                    <p>Please enter your registered email address. You will be sent instructions on how to reset your password.</p>
+                </div>
+            </footer>
         </form>
-        <p class="my-5">
-            <router-link to="/login">Back to Log In</router-link>
-        </p>
+        <Footer />
     </div>
 </template>
 
@@ -38,6 +51,7 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import { userApi } from '../api/user.ts'
+import Footer from './Footer.vue'
 
 const email = ref('')
 const emailError = ref(false)

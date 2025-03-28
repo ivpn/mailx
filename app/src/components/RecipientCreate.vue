@@ -97,6 +97,7 @@ const postRecipient = async () => {
 const close = () => {
     recipient.value = {} as any
     error.value = ''
+    emailError.value = false
     const modal = document.querySelector('#modal-create-recipient') as any
     overlay.close(modal)
 }

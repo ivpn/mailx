@@ -1,123 +1,107 @@
 <template>
-
-    <!-- Standard Aliases -->
-    <div>
-        <div v-if="!list.length && loaded" class="flex flex-col my-14">
-            <div class="flex flex-col items-center text-center">
-                <h3>Create Aliases</h3>
-                <p v-if="recipients.length && settings.id" class="my-2">
-                    To get started, create an alias.
-                </p>
-                <p v-if="!recipients.length && loaded" class="my-2">
-                    To get started, first add a recipient.
-                </p>
-                <div class="flex gap-4">
-                    <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=false />
-                </div>
+    <div class="card-container">
+        <header class="head">
+            <h2>Aliases</h2>
+            <div class="flex items-center justify-between">
+                <AliasCreateDropdown />
             </div>
-        </div>
-        <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="card">
-            <h1>Aliases</h1>
-            <div>
-                <div class="flex items-center justify-between mb-6">
-                    <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=false />
-                </div>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th v-if="!isDashboard">
-                                    <button
-                                    @click="sort"
-                                    data-sort="created_at"
-                                    class="sort">
-                                        CREATED
-                                        <svg
-                                        data-sort="created_at"
-                                        v-bind:class="{ 'text-bluish-500': sortBy === 'created_at', 'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
-                                        class="ms-1 flex-shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="m6 9 6 6 6-6" />
-                                        </svg>
-                                    </button>
-                                </th>
-                                <th v-if="!isDashboard">
-                                    <button
-                                    @click="sort"
-                                    data-sort="name"
-                                    class="sort">
-                                        ALIAS
-                                        <svg
-                                        data-sort="name"
-                                        v-bind:class="{ 'text-bluish-500': sortBy === 'name', 'rotate-180': sortOrder === 'ASC' && sortBy === 'name' }"
-                                        class="ms-1 flex-shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="m6 9 6 6 6-6" />
-                                        </svg>
-                                    </button>    
-                                </th>
-                                <th v-if="isDashboard">CREATED</th>
-                                <th v-if="isDashboard">ALIAS</th>
-                                <th>COUNT</th>
-                                <th>ACTIVE</th>
-                                <th>ACTIONS</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <AliasRow v-for="alias in list" :alias="alias" :key="rowKey" :recipients.sync="recipients" :catchAll=false />
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <p v-if="isDashboard" class="text-sm my-4">
-                <router-link to="/aliases">All Aliases</router-link>
+        </header>
+        <div v-if="!list.length && loaded" class="card-empty">
+            <span class="bg-secondary rounded flex items-center justify-center p-2 mb-5">
+                <i class="icon at icon-accent text-2xl"></i>
+            </span>
+            <h4>You did not create any aliases yet</h4>
+            <p v-if="recipients.length && settings.id" class="text-tertiary pb-6">
+                This area will light up with items once you start creating aliases.<br>
+                You can create both an alias or a catch-all alias.
+                <span v-if="!recipients.length && loaded">
+                    <br>To get started, first add a <router-link to="/recipients">recipient</router-link>.
+                </span>
             </p>
+            <AliasCreateDropdown />
+        </div>
+        <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="card-primary">
+            <div  class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>
+                                <button
+                                @click="sort"
+                                data-sort="name"
+                                class="sort">
+                                    Alias
+                                    <i
+                                        data-sort="name"
+                                        v-if="sortBy !== 'name'"
+                                        v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'name' }"
+                                        class="icon arrow-down text-xl icon-tertiary"
+                                    ></i>
+                                    <i
+                                        data-sort="name"
+                                        v-if="sortBy === 'name'"
+                                        v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'name' }"
+                                        class="icon arrow-down text-xl icon-accent"
+                                    ></i>
+                                </button>    
+                            </th>
+                            <th>Domain</th>
+                            <th>
+                                <button
+                                @click="sort"
+                                data-sort="catch_all"
+                                class="sort">
+                                    Type
+                                    <i
+                                        data-sort="catch_all"
+                                        v-if="sortBy !== 'catch_all'"
+                                        v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'catch_all' }"
+                                        class="icon arrow-down text-xl icon-tertiary"
+                                    ></i>
+                                    <i
+                                        data-sort="catch_all"
+                                        v-if="sortBy === 'catch_all'"
+                                        v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'catch_all' }"
+                                        class="icon arrow-down text-xl icon-accent"
+                                    ></i>
+                                </button>    
+                            </th>
+                            <th>Count</th>
+                            <th>
+                                <button
+                                @click="sort"
+                                data-sort="created_at"
+                                class="sort">
+                                    Created
+                                    <i
+                                        data-sort="created_at"
+                                        v-if="sortBy !== 'created_at'"
+                                        v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
+                                        class="icon arrow-down text-xl icon-tertiary"
+                                    ></i>
+                                    <i
+                                        data-sort="created_at"
+                                        v-if="sortBy === 'created_at'"
+                                        v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
+                                        class="icon arrow-down text-xl icon-accent"
+                                    ></i>
+                                </button>
+                            </th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <AliasRow v-for="alias in list" :alias="alias" :key="rowKey" :recipients.sync="recipients" :catchAll=false />
+                    </tbody>
+                </table>
+            </div>
             <p v-if="error" class="error">Error: {{ error }}</p>
-            <Pagination v-if="list.length && !isDashboard" :list.sync="list" :limit="limit" :page="page" :total="total" :key="rowKey" @onUpdatePage="onUpdatePage" />
+            <Pagination v-if="list.length" :list.sync="list" :limit="limit" :page="page" :total="total" :key="rowKey" @onUpdatePage="onUpdatePage" />
         </div>
     </div>
-
-    <!-- Catch-all Aliases -->
-    <div v-if="!isDashboard">
-        <div v-if="!listCatchAll.length && loadedCatchAll" class="flex flex-col my-14">
-            <div class="flex flex-col items-center text-center">
-                <h3>Create Catch-all Aliases</h3>
-                <p v-if="!recipients.length && loadedCatchAll" class="my-2">
-                    To get started, first add a recipient.
-                </p>
-                <div class="flex gap-4">
-                    <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=true />
-                </div>
-            </div>
-        </div>
-        <div v-bind:class="{ 'hidden': !listCatchAll.length || !loadedCatchAll }" class="card">
-            <h1>Catch-all Aliases</h1>
-            <div>
-                <div class="flex items-center justify-between mb-6">
-                    <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=true />
-                </div>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>CREATED</th>
-                                <th>ALIAS</th>
-                                <th>COUNT</th>
-                                <th>ACTIVE</th>
-                                <th>ACTIONS</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <AliasRow v-for="alias in listCatchAll" :alias="alias" :key="rowKey" :recipients.sync="recipients" :catchAll=true />
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=false :label="'New Alias'" />
+    <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=true :label="'New Catch-all Alias'" />
 </template>
 
 <script setup lang="ts">
@@ -129,7 +113,10 @@ import { settingsApi } from '../api/settings.ts'
 import AliasRow from './AliasRow.vue'
 import AliasCreate from './AliasCreate.vue'
 import Pagination from './Pagination.vue'
+import AliasCreateDropdown from './AliasCreateDropdown.vue'
 import events from '../events.ts'
+import dropdown from '@preline/dropdown'
+import { RouterLink } from 'vue-router'
 
 const alias = {
     id: '',
@@ -147,10 +134,7 @@ const alias = {
     }
 }
 
-const props = defineProps(['dashboard'])
-const isDashboard = props.dashboard
 const list = ref([] as typeof alias[])
-const listCatchAll = ref([] as typeof alias[])
 const recipients = ref([])
 const settings = ref({
     id: '',
@@ -160,7 +144,6 @@ const settings = ref({
 })
 const error = ref('')
 const loaded = ref(false)
-const loadedCatchAll = ref(false)
 const rowKey = ref(0)
 const limit = ref(25)
 const page = ref(1)
@@ -174,34 +157,13 @@ const getList = async () => {
             limit: limit.value,
             page: page.value,
             sort_by: sortBy.value,
-            sort_order: sortOrder.value,
-            catch_all: "false"
+            sort_order: sortOrder.value
         })
         list.value = res.data.aliases
         total.value = res.data.total
-        if (isDashboard) list.value = list.value.slice(0, 5)
         loaded.value = true
         error.value = ''
         renderRow()
-    } catch (err) {
-        if (axios.isAxiosError(err)) {
-            error.value = err.message
-        }
-    }
-}
-
-const getListCatchAll = async () => {
-    try {
-        const res = await aliasApi.getList({
-            limit: limit.value,
-            page: page.value,
-            sort_by: sortBy.value,
-            sort_order: sortOrder.value,
-            catch_all: "true"
-        })
-        listCatchAll.value = res.data.aliases
-        loadedCatchAll.value = true
-        error.value = ''
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.message
@@ -274,10 +236,10 @@ const sort = (e: any) => {
 
 const fetch = () => {
     getList()
-    getListCatchAll()
 }
 
 onMounted(async () => {
+    dropdown.autoInit()
     await getRecipients()
     await getSettings()
     fetch()
@@ -285,5 +247,4 @@ onMounted(async () => {
     events.on('alias.update', fetch)
     events.on('alias.delete', onDeleteAlias)
 })
-
 </script>

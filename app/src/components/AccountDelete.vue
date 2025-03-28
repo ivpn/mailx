@@ -3,31 +3,23 @@
         <h2>Delete Account</h2>
         <button
             v-bind:data-hs-overlay="'#modal-delete-account'"
-            class="delete">
+            class="cta delete mb-4">
             Delete Account
         </button>
         <div v-bind:id="'modal-delete-account'" class="hs-overlay hidden">
             <div>
                 <div>
                     <header>
-                        <h3>Delete Account</h3>
-                        <button
-                            @click="close"
-                            class="close">
-                            <span class="sr-only">Close</span>
-                            <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M18 6 6 18"></path>
-                                <path d="m6 6 12 12"></path>
-                            </svg>
+                        <button @click="close" class="close">
+                            <i class="icon arrow-left-line icon-primary"></i>
                         </button>
+                        <h4>DELETE ACCOUNT</h4>
                     </header>
                     <article>
                         <div>
                             <div class="mb-5">
                                 <p>
-                                    <strong>Warning:</strong> this operation cannot be undone. Deleting your account will permanently remove data from our systems.
+                                    <strong>WARNING:</strong> this operation cannot be undone. Deleting your account will permanently remove data from our systems.
                                 </p>
                             </div>
                             <div class="mb-5">
@@ -51,14 +43,10 @@
                     </article>
                     <footer>
                         <nav>
-                            <button
-                                @click.stop="promptDeleteAccount"
-                                class="cta delete">
+                            <button @click.stop="promptDeleteAccount" class="cta delete">
                                 Delete Account
                             </button>
-                            <button
-                                @click="close"
-                                class="cta cancel">
+                            <button @click="close" class="cancel">
                                 Cancel
                             </button>
                         </nav>
@@ -127,6 +115,7 @@ const close = () => {
     req.value = {} as any
     otp.value = ''
     error.value = ''
+    otpError.value = false
     const modal = document.querySelector('#modal-delete-account') as any
     overlay.close(modal)
 }

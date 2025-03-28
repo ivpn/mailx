@@ -1,49 +1,6 @@
 <template>
     <tr>
         <td>
-            <div class="mt-1 flex items-center gap-2">
-                <div v-if="alias.enabled" class="hs-tooltip flex-none rounded-full bg-emerald-500/20 p-1">
-                    <div class="h-1.5 w-1.5 rounded-full bg-emerald-400"></div>
-                    <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
-                        Active
-                    </span>
-                </div>
-                <div v-if="!alias.enabled" class="hs-tooltip flex-none rounded-full bg-gray-500/20 p-1">
-                    <div class="h-1.5 w-1.5 rounded-full bg-gray-400 dark:bg-neutral-500"></div>
-                    <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
-                        Inactive
-                    </span>
-                </div>
-                <p>{{ new Date(alias.created_at).toDateString() }}</p>
-            </div>
-        </td>
-        <td>
-            <div class="hs-tooltip inline-block">
-                <span class="hs-tooltip-toggle">
-                    <button class="plain truncate max-w-[320px]" @click="copyAlias(alias.name)">
-                        {{ alias.name }}
-                    </button>
-                    <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
-                        {{ copyText }}: {{ alias.name }}
-                    </span>
-                </span>
-            </div>
-            <p>{{ alias.description }}</p>
-        </td>
-        <td>
-            <div class="hs-tooltip inline-block">
-                <span class="hs-tooltip-toggle dark:text-gray-100">
-                    {{ alias.stats.forwards }}/{{ alias.stats.blocks }}/{{ alias.stats.replies }}/{{ alias.stats.sends }}
-                    <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
-                        {{ alias.stats.forwards }} Forwards<br>
-                        {{ alias.stats.blocks }} Blocks<br>
-                        {{ alias.stats.replies }} Replies<br>
-                        {{ alias.stats.sends }} Sends
-                    </span>
-                </span>
-            </div>
-        </td>
-        <td>
             <div class="flex items-center hs-tooltip">
                 <input
                     @change="updateAlias"
@@ -57,15 +14,87 @@
             </div>
         </td>
         <td>
-            <div class="flex gap-5 justify-end">
-                <AliasSend :alias="alias" />
-                <AliasEdit :alias="alias" :recipients="recipients" :key="rowKey" />
-                <button @click.stop="deleteAlias" class="delete">
-                    Delete
+            <div class="hs-tooltip inline-block">
+                <p class="hs-tooltip-toggle">
+                    <button class="plain truncate max-w-[320px] text-base p-0" @click="copyAlias(alias.name)">
+                        {{ alias.name.split('@')[0] }}
+                    </button>
+                    <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
+                        {{ copyText }}: {{ alias.name }}
+                    </span>
+                </p>
+            </div>
+            <p class="text-tertiary">{{ alias.description }}</p>
+        </td>
+        <td>
+            <p class="py-3">@{{ alias.name.split('@')[1] }}</p>
+        </td>
+        <td>
+            <p class="py-3">
+                <span v-if="!alias.catch_all">Alias</span>
+                <span v-if="alias.catch_all">Catch-all</span>
+            </p>
+        </td>
+        <td>
+            <div class="flex items-center gap-3 mb-1">
+                <p class="flex items-center gap-1 hs-tooltip">
+                    {{ alias.stats.forwards }}
+                    <i class="icon forward text-xs icon-tertiary"></i>
+                    <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">{{ alias.stats.forwards }} Forwards</span>
+                </p>
+                <p class="flex items-center gap-1 hs-tooltip">
+                    {{ alias.stats.blocks }}
+                    <i class="icon block text-xs icon-tertiary"></i>
+                    <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">{{ alias.stats.blocks }} Blocks</span>
+                </p>
+            </div>
+            <div class="flex items-center gap-3 mt-1">
+                <p class="flex items-center gap-1 hs-tooltip">
+                    {{ alias.stats.replies }}
+                    <i class="icon reply text-xs icon-tertiary"></i>
+                    <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">{{ alias.stats.replies }} Replies</span>
+                </p>
+                <p class="flex items-center gap-1 hs-tooltip">
+                    {{ alias.stats.sends }}
+                    <i class="icon send text-xs icon-tertiary"></i>
+                    <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">{{ alias.stats.sends }} Sends</span>
+                </p>
+            </div>
+        </td>
+        <td>
+            <div class="mt-1 flex items-center gap-2">
+                <p>{{ formatDistanceToNow(new Date(alias.created_at)) }}</p>
+            </div>
+        </td>
+        <td>
+            <div class="hs-dropdown [--offset:0]">
+                <button v-bind:id="'hs-dropdown-alias-edit-' + alias.id">
+                    <i class="icon icon-secondary more text-lg"></i>
                 </button>
+                <div
+                    class="hs-dropdown-menu hs-dropdown-open:opacity-100 hidden"
+                    v-bind:aria-labelledby="'hs-dropdown-alias-edit-' + alias.id"
+                >
+                    <button
+                        v-bind:disabled="!alias.recipients.length"
+                        v-bind:data-hs-overlay="'#modal-send-alias' + alias.id">
+                        <i class="icon icon-primary send text-xs"></i>
+                        Send
+                    </button>
+                    <button v-bind:data-hs-overlay="'#modal-alias-edit' + alias.id">
+                        <i class="icon icon-primary edit text-xs"></i>
+                        Edit
+                    </button>
+                    <button @click.stop="deleteAlias" class="delete">
+                        <i class="icon icon-error trash text-xs"></i>
+                        Delete
+                    </button>
+                </div>
             </div>
         </td>
     </tr>
+    <AliasSend :alias="alias" />
+    <AliasEdit :alias="alias" :recipients="recipients" :key="rowKey" />
 </template>
 
 <script setup lang="ts">
@@ -75,6 +104,8 @@ import AliasEdit from './AliasEdit.vue'
 import AliasSend from './AliasSend.vue'
 import { aliasApi } from '../api/alias.ts'
 import events from '../events.ts'
+import { formatDistanceToNow } from 'date-fns'
+import dropdown from '@preline/dropdown'
 
 const props = defineProps(['alias', 'recipients', 'catchAll'])
 const alias = ref(props.alias)
@@ -106,11 +137,11 @@ const copyAlias = (alias: string) => {
 }
 
 const renderRow = () => {
-    rowKey.value++
     tooltip.autoInit()
 }
 
 onMounted(() => {
     tooltip.autoInit()
+    dropdown.autoInit()
 })
 </script>

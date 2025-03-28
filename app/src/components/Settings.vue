@@ -1,83 +1,87 @@
 <template>
-    <div class="card">
-        <h1>Settings</h1>
-        <h4>Default Domain</h4>
-        <p>
-            The default alias domain is the domain to be selected by default in the drop down options when generating a
-            new alias.
-        </p>
-        <div class="max-w-xs mb-6">
-            <label for="domain">
-                Select default domain:
-            </label>
-            <select id="domain">
-                <option
-                    v-for="(domain, index) in domains"
-                    v-bind:domain
-                    :selected="domain == req.domain || index === 0"
-                    :key="domain">
-                    {{ domain }}
-                </option>
-            </select>
+    <div class="card-container">
+        <header class="head">
+            <h2>Settings</h2>
+        </header>
+        <div class="card-primary">
+            <h4>Default Domain</h4>
+            <p>
+                The default alias domain is the domain to be selected by default in the drop down options when generating a
+                new alias.
+            </p>
+            <div class="max-w-xs mb-6">
+                <label for="domain">
+                    Select default domain:
+                </label>
+                <select id="domain">
+                    <option
+                        v-for="(domain, index) in domains"
+                        v-bind:domain
+                        :selected="domain == req.domain || index === 0"
+                        :key="domain">
+                        {{ domain }}
+                    </option>
+                </select>
+            </div>
+            <h4>Default Recipient</h4>
+            <p>
+                The default recipient to be selected by default in the drop down options when creating a new recipient. You can add recipients <router-link to="/recipients">here</router-link>.
+            </p>
+            <div class="max-w-xs mb-6">
+                <label for="recipient">
+                    Select default recipient:
+                </label>
+                <select id="recipient" :disabled="!recipients.length">
+                    <option
+                        v-for="recipient in recipients"
+                        v-bind:value=recipient
+                        :selected="recipient == req.recipient"
+                        :key="recipient">
+                        {{ recipient }}
+                    </option>
+                </select>
+            </div>
+            <h4>Default Alias Format</h4>
+            <p>
+                The default alias format to be selected by default when creating a new alias. You can add aliases <router-link to="/">here</router-link>.
+            </p>
+            <div class="max-w-xs mb-6">
+                <label for="format">
+                    Select default alias format:
+                </label>
+                <select id="format" :disabled="!aliasFormats.length">
+                    <option
+                        v-for="format in aliasFormats"
+                        v-bind:value=format.toLowerCase()
+                        :selected="format.toLowerCase() == req.alias_format"
+                        :key="format">
+                        {{ format }}
+                    </option>
+                </select>
+            </div>
+            <h4>From Name</h4>
+            <p>
+                The 'From Name' is shown when you send an email from an alias or reply anonymously to a forwarded email. If
+                left blank, then the email alias will be used as the 'From Name'.
+            </p>
+            <div class="max-w-xs mb-5">
+                <label for="from-name">
+                    From name:
+                </label>
+                <input
+                    v-model="req.from_name"
+                    id="from-name"
+                    type="text"
+                >
+            </div>
+            <div class="mb-3">
+                <button @click="saveSettings" class="cta">
+                    Save Settings
+                </button>
+            </div>
+            <p v-if="error" class="error">Error: {{ error }}</p>
+            <p v-if="success" class="success">{{ success }}</p>
         </div>
-        <h4>Default Recipient</h4>
-        <p>
-            The default recipient to be selected by default in the drop down options when creating a new recipient. You can add recipients <router-link to="/recipients">here</router-link>.
-        </p>
-        <div class="max-w-xs mb-6">
-            <label for="recipient">
-                Select default recipient:
-            </label>
-            <select id="recipient" :disabled="!recipients.length">
-                <option
-                    v-for="recipient in recipients"
-                    v-bind:value=recipient
-                    :selected="recipient == req.recipient"
-                    :key="recipient">
-                    {{ recipient }}
-                </option>
-            </select>
-        </div>
-        <h4>Default Alias Format</h4>
-        <p>
-            The default alias format to be selected by default when creating a new alias. You can add aliases <router-link to="/aliases">here</router-link>.
-        </p>
-        <div class="max-w-xs mb-6">
-            <label for="format">
-                Select default alias format:
-            </label>
-            <select id="format" :disabled="!aliasFormats.length">
-                <option
-                    v-for="format in aliasFormats"
-                    v-bind:value=format.toLowerCase()
-                    :selected="format.toLowerCase() == req.alias_format"
-                    :key="format">
-                    {{ format }}
-                </option>
-            </select>
-        </div>
-        <h4>From Name</h4>
-        <p>
-            The 'From Name' is shown when you send an email from an alias or reply anonymously to a forwarded email. If
-            left blank, then the email alias will be used as the 'From Name'.
-        </p>
-        <div class="max-w-xs mb-5">
-            <label for="from-name">
-                From name:
-            </label>
-            <input
-                v-model="req.from_name"
-                id="from-name"
-                type="text"
-            >
-        </div>
-        <div class="mb-3">
-            <button @click="saveSettings" class="cta">
-                Save Settings
-            </button>
-        </div>
-        <p v-if="error" class="error">Error: {{ error }}</p>
-        <p v-if="success" class="success">{{ success }}</p>
     </div>
 </template>
 

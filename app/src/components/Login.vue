@@ -1,111 +1,120 @@
 <template>
-    <div class="page center pt-10">
-        <h1>MailX</h1>
-        <h2 class="mb-10">
-            Email forwarding service operated by
-            <a href="https://www.ivpn.net/">IVPN</a>
-        </h2>
-        <h3>Log In</h3>
-        <form class="card center" @submit.prevent="">
-            <nav v-if="passkeySupported" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
-                <button
-                    @click="onTabChange"
-                    class="active"
-                    id="tabs-with-underline-item-1" aria-selected="true" data-hs-tab="#tabs-with-underline-1"
-                    aria-controls="tabs-with-underline-1" role="tab">
-                    Passkey
-                </button>
-                <button
-                    @click="onTabChange"
-                    id="tabs-with-underline-item-2" aria-selected="false" data-hs-tab="#tabs-with-underline-2"
-                    aria-controls="tabs-with-underline-2" role="tab">
-                    Email & Password
-                </button>
-            </nav>
-            <div v-bind:class="{ 'mt-6': passkeySupported }">
-                <div v-if="passkeySupported" id="tabs-with-underline-1" role="tabpanel" aria-labelledby="tabs-with-underline-item-1">
-                    <div v-if="!isLoggedIn()">
-                        <div class="mb-4">
-                            <label for="email_authn">
-                                Email Address
-                            </label>
-                            <input
-                                v-model="emailAuthn"
-                                v-bind:class="{ 'error': emailAuthnError }"
-                                id="email_authn"
-                                type="email"
-                                autocomplete="email_authn"
-                            >
-                            <p v-if="emailAuthnError" class="error">Required</p>
+    <div class="page center">
+        <div></div>
+        <form class="card-tertiary center" @submit.prevent="" autocomplete="off">
+            <article>
+                <div>
+                    <div v-if="passkeySupported" id="tabs-with-underline-1" role="tabpanel" aria-labelledby="tabs-with-underline-item-1">
+                        <h1 class="text-center text-accent mb-8">MailX</h1>
+                        <h4 class="text-center mb-8">Log in with Passkey</h4>
+                        <div v-if="!isLoggedIn()">
+                            <div class="mb-5">
+                                <input
+                                    v-model="emailAuthn"
+                                    v-bind:class="{ 'error': emailAuthnError }"
+                                    id="email_authn"
+                                    type="email"
+                                    placeholder="Email Address"
+                                    class="email"
+                                    autocomplete="false"
+                                >
+                                <p v-if="emailAuthnError" class="error">Required</p>
+                            </div>
+                            <div class="flex items-center w-full">
+                                <button :disabled="isLoading" @click="loginWithPasskey" class="cta full">
+                                    Log in with Passkey
+                                </button>
+                            </div>
+                            <p v-if="error" class="error mt-6">Error: {{ error }}</p>
                         </div>
-                        <div class="flex items-center w-full">
-                            <button :disabled="isLoading" @click="loginWithPasskey" class="cta full">
-                                Log In with Passkey
-                            </button>
+                    </div>
+                    <div id="tabs-with-underline-2" v-bind:class="{ 'hidden': passkeySupported }" role="tabpanel"
+                        aria-labelledby="tabs-with-underline-item-2">
+                        <div v-if="!isLoggedIn()">
+                            <h1 class="text-center text-accent mb-8">MailX</h1>
+                            <h4 class="text-center mb-8">Log in with email and password</h4>
+                            <div class="mb-5">
+                                <input
+                                    v-model="email"
+                                    v-bind:class="{ 'error': emailError }"
+                                    id="email"
+                                    type="email"
+                                    autocomplete="email"
+                                    placeholder="Email address"
+                                    class="email"
+                                >
+                                <p v-if="emailError" class="error">Required</p>
+                            </div>
+                            <div class="mb-5">
+                                <input
+                                    v-model="password"
+                                    v-bind:class="{ 'error': passwordError }"
+                                    id="password"
+                                    type="password"
+                                    autocomplete="current-password"
+                                    placeholder="Password"
+                                    class="password"
+                                >
+                                <p v-if="passwordError" class="error mb-2">Required</p>
+                                <p class="text-right">
+                                    <router-link to="/reset/password/initiate">
+                                        <button class="plain-alt">Forgot password?</button>
+                                    </router-link>
+                                </p>
+                            </div>
+                            <div v-if="otpRequired" class="mb-5">
+                                <label for="password">
+                                    Two-factor authentication token:
+                                </label>
+                                <input
+                                    v-model="otp"
+                                    v-bind:class="{ 'error': otpError }"
+                                    id="otp"
+                                    type="text"
+                                >
+                                <p v-if="otpError" class="error">Required</p>
+                            </div>
+                            <div class="flex items-center w-full">
+                                <button :disabled="isLoading" @click="login" class="cta full">
+                                    Log in
+                                </button>
+                            </div>
+                            <p v-if="error" class="error mt-5">Error: {{ error }}</p>
                         </div>
-                        <p v-if="error" class="error mt-6">Error: {{ error }}</p>
                     </div>
                 </div>
-                <div id="tabs-with-underline-2" v-bind:class="{ 'hidden': passkeySupported }" role="tabpanel"
-                    aria-labelledby="tabs-with-underline-item-2">
-                    <div v-if="!isLoggedIn()">
-                        <div class="mb-4">
-                            <label for="email">
-                                Email Address
-                            </label>
-                            <input
-                                v-model="email"
-                                v-bind:class="{ 'error': emailError }"
-                                id="email"
-                                type="email"
-                                autocomplete="email"
-                            >
-                            <p v-if="emailError" class="error">Required</p>
-                        </div>
-                        <div class="mb-6">
-                            <label for="password">
-                                Password
-                            </label>
-                            <input
-                                v-model="password"
-                                v-bind:class="{ 'error': passwordError }"
-                                id="password"
-                                type="password"
-                                autocomplete="current-password"
-                            >
-                            <p v-if="passwordError" class="error mb-2">Required</p>
-                        </div>
-                        <div v-if="otpRequired" class="mb-6">
-                            <label for="password">
-                                Two-factor authentication token:
-                            </label>
-                            <input
-                                v-model="otp"
-                                v-bind:class="{ 'error': otpError }"
-                                id="otp"
-                                type="text"
-                            >
-                            <p v-if="otpError" class="error">Required</p>
-                        </div>
-                        <div class="flex items-center w-full">
-                            <button :disabled="isLoading" @click="login" class="cta full">
-                                Log In
-                            </button>
-                        </div>
-                        <p v-if="error" class="error mt-6">Error: {{ error }}</p>
-                    </div>
+                <nav v-if="passkeySupported" aria-label="Tabs" role="tablist" aria-orientation="horizontal" class="tabs-router">
+                    <button
+                        @click="onTabChange"
+                        class="active"
+                        id="tabs-with-underline-item-1" aria-selected="true" data-hs-tab="#tabs-with-underline-1"
+                        aria-controls="tabs-with-underline-1" role="tab">
+                        Or use Passkey
+                    </button>
+                    <button
+                        @click="onTabChange"
+                        id="tabs-with-underline-item-2" aria-selected="false" data-hs-tab="#tabs-with-underline-2"
+                        aria-controls="tabs-with-underline-2" role="tab">
+                        Or use password
+                    </button>
+                </nav>
+                <div v-if="isLoggedIn()" class="pb-2">
+                    <p>You are logged in</p>
+                    <router-link to="/" tag="button" class="cta full">
+                        Go to Dashboard
+                    </router-link>
                 </div>
-            </div>
-            <div v-if="isLoggedIn()" class="pb-2">
-                <p>You are logged in</p>
-                <router-link to="/" tag="button" class="cta full">
-                    Go to Dashboard
-                </router-link>
-            </div>
+            </article>
+            <footer>
+                <div>
+                    <i class="icon info icon-primary"></i>
+                </div>
+                <div>
+                    <h4>Here to try MailX? You need an active IVPN account.</h4>
+                    <p>Sign up or log in on <a href="https://www.ivpn.net/account/">ivpn.net</a> and look for "Email Beta" in your account settings.</p>
+                </div>
+            </footer>
         </form>
-        <p>
-            <router-link to="/reset/password/initiate">Forgot Your Password?</router-link>
-        </p>
         <Footer />
     </div>
 </template>

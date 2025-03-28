@@ -1,27 +1,18 @@
 <template>
     <div>
-        <button v-bind:data-hs-overlay="'#modal-verify-recipient' + recipient.id">
-            Verify
-        </button>
         <div v-bind:id="'modal-verify-recipient' + recipient.id" class="hs-overlay hidden">
             <div>
                 <div>
                     <header>
-                        <h3>Verify recipient</h3>
                         <button @click="close" class="close">
-                            <span class="sr-only">Close</span>
-                            <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M18 6 6 18"></path>
-                                <path d="m6 6 12 12"></path>
-                            </svg>
+                            <i class="icon arrow-left-line icon-primary"></i>
                         </button>
+                        <h4>VERIFY RECIPIENT</h4>
                     </header>
                     <article>
                         <div class="mb-5">
                             <p>
-                                We have sent a 6-digit OTP code to this recipient email address. Please enter the code below to verify the recipient email. Recipients with unconfirmed email address may be deleted after 7 days.
+                                We have sent a 6-digit OTP code to this recipient email address. Please enter the code below to verify the recipient email. Recipients with unconfirmed email address will be deleted after 7 days.
                             </p>
                         </div>
                         <div class="mb-3">
@@ -40,13 +31,13 @@
                     </article>
                     <footer>
                         <nav>
-                            <button @click="verifyRecipient" class="pcta">
-                                Verify
+                            <button @click="verifyRecipient" class="cta">
+                                Verify Recipient
                             </button>
-                            <button @click="sendOtp" class="cta cancel">
+                            <button @click="sendOtp" class="cancel">
                                 Resend OTP
                             </button>
-                            <button @click="close" class="cta cancel">
+                            <button @click="close" class="cancel">
                                 Cancel
                             </button>
                         </nav>

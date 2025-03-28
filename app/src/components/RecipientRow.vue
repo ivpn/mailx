@@ -5,14 +5,14 @@
         </td>
         <td>
             <div class="hs-tooltip inline-block">
-                <span class="hs-tooltip-toggle">
+                <p class="hs-tooltip-toggle">
                     <button class="plain truncate max-w-[320px]" @click="copyAlias(recipient.email)">
                         {{ recipient.email }}
                     </button>
                     <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                         {{ copyText }}: {{ recipient.email }}
                     </span>
-                </span>
+                </p>
             </div>
         </td>
         <td>
@@ -22,30 +22,56 @@
             </p>
         </td>
         <td>
-            <RecipientAddPGPKey v-if="!recipient.pgp_key" :recipient="recipient" />
-            <div v-if="recipient.pgp_key">
+            <div class="hs-tooltip inline-block">
                 <input
                     @change="updateRecipient"
                     v-bind:checked="recipient.pgp_enabled"
                     v-bind:disabled="!recipient.pgp_key"
                     type="checkbox"
-                    class="mr-5"
+                    class="mr-4"
                 >
-                <button @click.stop="deletePgpKey" class="delete">
-                    Delete Key
-                </button>
+                <span v-if="!recipient.pgp_key" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
+                    Add PGP key to enable encryption
+                </span>
             </div>
+            
         </td>
         <td>
-            <div class="flex gap-5 justify-end">
-                <RecipientVerify v-if="!recipient.is_active" :recipient="recipient" />
-                <RecipientEdit :recipient="recipient" />
-                <button @click.stop="deleteRecipient" class="delete">
-                    Delete
+            <div class="hs-dropdown [--offset:0]">
+                <button v-bind:id="'hs-dropdown-recipient-edit-' + recipient.id">
+                    <i class="icon icon-secondary more text-lg"></i>
                 </button>
+                <div
+                    class="hs-dropdown-menu hs-dropdown-open:opacity-100 hidden"
+                    v-bind:aria-labelledby="'hs-dropdown-recipient-edit-' + recipient.id"
+                    >
+                    <button v-bind:class="{ 'hide': recipient.is_active }"v-bind:data-hs-overlay="'#modal-verify-recipient' + recipient.id">
+                        <i class="icon icon-primary check text-xs"></i>
+                        Verify
+                    </button>
+                    <button v-bind:data-hs-overlay="'#modal-edit-recipient' + recipient.id">
+                        <i class="icon icon-primary edit text-xs"></i>
+                        Edit
+                    </button>
+                    <button v-bind:class="{ 'hide': recipient.pgp_key }" v-bind:data-hs-overlay="'#modal-add-key-recipient' + recipient.id">
+                        <i class="icon icon-primary key text-xs"></i>
+                        Add PGP Key
+                    </button>
+                    <button v-if="recipient.pgp_key" @click.stop="deletePgpKey" class="delete">
+                        <i class="icon icon-error trash text-xs"></i>
+                        Remove PGP Key
+                    </button>
+                    <button @click.stop="deleteRecipient" class="delete">
+                        <i class="icon icon-error trash text-xs"></i>
+                        Delete
+                    </button>
+                </div>
             </div>
         </td>
     </tr>
+    <RecipientAddPGPKey :recipient="recipient" />
+    <RecipientVerify :recipient="recipient" />
+    <RecipientEdit :recipient="recipient" />
 </template>
 
 <script setup lang="ts">
@@ -56,6 +82,7 @@ import RecipientEdit from './RecipientEdit.vue'
 import RecipientAddPGPKey from './RecipientAddPGPKey.vue'
 import { recipientApi } from '../api/recipient.ts'
 import events from '../events.ts'
+import dropdown from '@preline/dropdown'
 
 const props = defineProps(['recipient'])
 const recipient = ref(props.recipient)
@@ -83,7 +110,7 @@ const updateRecipient = async () => {
 }
 
 const deletePgpKey = async () => {
-    if (!confirm('Are you sure you want to delete PGP public key?')) return
+    if (!confirm('Are you sure you want to remove PGP public key?')) return
 
     const payload = {
         id: recipient.value.id,
@@ -107,5 +134,6 @@ const copyAlias = (alias: string) => {
 
 onMounted(() => {
     tooltip.autoInit()
+    dropdown.autoInit()
 })
 </script>

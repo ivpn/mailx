@@ -1,45 +1,29 @@
 <template>
-    <div>
-        <hr>
-        <div class="flex flex-row justify-between pb-3">
-            <div>
-                <select v-model="limit" @change="updateLimit">
-                    <option>25</option>
-                    <option>50</option>
-                    <option>75</option>
-                </select>
-            </div>
-            <nav class="flex items-center gap-x-1">
-                <button
-                    @click="prev"
-                    class="min-h-[38px] min-w-[38px] py-2 px-2.5 inline-flex justify-center items-center gap-x-2 text-sm text-gray-800 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-700 focus:outline-none disabled:opacity-50 disabled:pointer-events-none">
-                    <svg class="flex-shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <path d="m15 18-6-6 6-6"></path>
-                    </svg>
-                    <span aria-hidden="true" class="sr-only">Previous</span>
-                </button>
-                <div class="flex items-center gap-x-1">
-                    <span
-                        class="min-h-[38px] min-w-[38px] flex justify-center items-center border border-gray-500 dark:border-neutral-500 text-gray-800 dark:text-gray-400 py-2 px-3 text-sm focus:outline-none disabled:opacity-50 disabled:pointer-events-none">{{ page }}</span>
-                    <span
-                        class="min-h-[38px] flex justify-center items-center text-gray-500 dark:text-gray-400 py-2 px-1.5 text-sm">of</span>
-                    <span
-                        class="min-h-[38px] flex justify-center items-center text-gray-500 dark:text-gray-400 py-2 px-1.5 text-sm">{{ pages }}</span>
-                </div>
-                <button
-                    @click="next"
-                    class="min-h-[38px] min-w-[38px] py-2 px-2.5 inline-flex justify-center items-center gap-x-2 text-sm text-gray-800 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-700 focus:outline-none disabled:opacity-50 disabled:pointer-events-none">
-                    <span aria-hidden="true" class="sr-only">Next</span>
-                    <svg class="flex-shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <path d="m9 18 6-6-6-6"></path>
-                    </svg>
-                </button>
-            </nav>
+    <div class="flex flex-row justify-between pt-5 pb-3">
+        <div class="flex items-center gap-x-3">
+            <select v-model="limit" @change="updateLimit" class="py-2">
+                <option>25</option>
+                <option>50</option>
+                <option>75</option>
+            </select>
+            <p class="text-nowrap m-0">Items per page</p>
         </div>
+        <nav class="flex items-center gap-x-2">
+            <div class="flex items-center gap-x-3">
+                <span class="min-h-[38px] min-w-[38px] inline-flex justify-center items-center border border-secondary text-secondary text-sm">{{ page }}</span>
+                <span class="min-h-[38px] min-w-[38px] inline-flex justify-center items-center text-secondary text-sm">of {{ pages }}</span>
+            </div>
+            <button
+                @click="prev"
+                class="h-[38px] w-[38px] inline-flex justify-center items-center hover:bg-secondary">
+                <i class="icon arrow-down rotate-90 text-xl icon-secondary"></i>
+            </button>
+            <button
+                @click="next"
+                class="h-[38px] w-[38px] inline-flex justify-center items-center hover:bg-secondary">
+                <i class="icon arrow-down -rotate-90 text-xl icon-secondary"></i>
+            </button>
+        </nav>
     </div>
 </template>
 

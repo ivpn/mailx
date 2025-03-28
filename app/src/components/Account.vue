@@ -1,18 +1,22 @@
 <template>
-    <AccountVerify />
-    <div class="card">
-        <h1>Account Settings</h1>
-        <AccountSubscription />
-        <hr>
-        <AccountChangeEmail />
-        <hr>
-        <AccountChangePassword />
-        <hr>
-        <AccountTotp />
-        <hr>
-        <AccountPasskeys />
-        <hr>
-        <AccountDelete />
+    <div class="card-container">
+        <header class="head">
+            <h2>Account Settings</h2>
+        </header>
+        <div class="card-primary">
+            <AccountVerify />
+            <AccountSubscription />
+            <hr>
+            <AccountChangeEmail />
+            <hr>
+            <AccountChangePassword />
+            <hr>
+            <AccountTotp />
+            <hr>
+            <AccountPasskeys />
+            <hr>
+            <AccountDelete />
+        </div>
     </div>
 </template>
 

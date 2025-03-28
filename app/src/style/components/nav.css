@@ -1,0 +1,36 @@
+@layer components {
+    nav {
+
+        a {
+            @apply text-primary hover:text-primary py-4 font-medium text-sm w-full cursor-pointer px-8 flex flex-row items-center gap-x-2;
+
+            &.active {
+                @apply border-accent border-r-2 bg-tertiary;
+            }
+        }
+    }
+
+    nav[role=tablist] {
+        @apply flex gap-x-1;
+
+        button {
+            @apply text-base hs-tab-active:border-accent pt-2 pb-4 px-1 text-center basis-0 grow inline-flex justify-center items-center gap-x-2 border-b-2 border-transparent whitespace-nowrap focus:outline-none text-secondary;
+
+            &.active {
+                @apply border-accent border-b-2;
+            }
+        }
+    }
+
+    nav[role=tablist].tabs-router {
+        @apply flex pt-5;
+
+        button {
+            @apply text-accent hs-tab-active:border-accent pt-0 pb-4 px-1 text-center basis-0 grow inline-flex justify-center items-center gap-x-2 border-b-2 border-transparent whitespace-nowrap focus:outline-none text-secondary text-sm;
+
+            &.active {
+                @apply hidden;
+            }
+        }
+    }
+}

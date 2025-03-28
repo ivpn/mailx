@@ -13,7 +13,7 @@
                         <path d="M5 12h14"></path>
                         <path d="M12 5v14"></path>
                     </svg>
-                    Add Passkey
+                    New Passkey
                 </button>
             </div>
             <p v-if="error" class="error mt-6 mb-4">Error: {{ error }}</p>
@@ -27,9 +27,9 @@
             <table>
                 <thead>
                     <tr>
-                        <th>CREATED</th>
+                        <th>Created</th>
                         <th>ID</th>
-                        <th>ACTIONS</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -41,7 +41,8 @@
                             {{ cred.id }}
                         </td>
                         <td>
-                            <button @click.stop="deleteCred(cred.id)" class="delete">
+                            <button @click.stop="deleteCred(cred.id)" class="delete w-full flex items-center gap-x-2 py-2 place-content-end">
+                                <i class="icon icon-error trash text-xs"></i>
                                 Delete
                             </button>
                         </td>

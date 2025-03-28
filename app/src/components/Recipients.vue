@@ -8,7 +8,7 @@
         </header>
         <div v-if="!list.length && loaded" class="card-empty">
             <span class="bg-secondary rounded flex items-center justify-center p-2 mb-5">
-                <i class="icon mailbox icon-accent text-2xl"></i>
+                <i class="icon inbox icon-accent text-2xl"></i>
             </span>
             <h4>You did not create any recipients yet</h4>
             <p class="text-tertiary pb-6">

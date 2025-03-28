@@ -17,8 +17,8 @@
             mask-image: url("../../assets/icons/icon-logout.svg");
         }
 
-        &.mailbox {
-            mask-image: url("../../assets/icons/icon-mailbox.svg");
+        &.inbox {
+            mask-image: url("../../assets/icons/icon-inbox.svg");
         }
 
         &.settings {

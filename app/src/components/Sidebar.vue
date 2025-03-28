@@ -10,7 +10,7 @@
                     Aliases
                 </router-link>
                 <router-link v-bind:class="{ 'active': route == '/recipients' }" to="/recipients">
-                    <i class="icon mailbox icon-primary"></i>
+                    <i class="icon inbox icon-primary"></i>
                     Recipients
                 </router-link>
                 <router-link v-bind:class="{ 'active': route == '/stats' }" to="/stats">

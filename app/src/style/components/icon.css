@@ -14,7 +14,7 @@
         }
 
         &.logout {
-            mask-image: url("../../assets/icons/icon-logout.svg");
+            mask-image: url("../../assets/icons/icon-log-out.svg");
         }
 
         &.inbox {

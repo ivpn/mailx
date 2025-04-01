@@ -25,6 +25,12 @@ func (d *Database) GetSession(ctx context.Context, token string) (model.Session,
 	return session, true, q.Error
 }
 
+func (d *Database) GetSessionCount(ctx context.Context, userID string) (int, error) {
+	var count int64
+	err := d.Client.Model(&model.Session{}).Where("user_id = ?", userID).Count(&count).Error
+	return int(count), err
+}
+
 func (d *Database) SaveSession(ctx context.Context, sessionData webauthn.SessionData, token string, userID string) error {
 	data, err := json.Marshal(sessionData)
 	if err != nil {

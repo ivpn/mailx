@@ -62,6 +62,7 @@ type ServiceConfig struct {
 	MaxRecipients     int
 	MaxDailyAliases   int
 	MaxDailySendReply int
+	MaxSessions       int
 }
 
 type Config struct {
@@ -101,6 +102,11 @@ func New() (Config, error) {
 	}
 
 	maxDailySendReply, err := strconv.Atoi(os.Getenv("MAX_DAILY_SEND_REPLY"))
+	if err != nil {
+		return Config{}, err
+	}
+
+	maxSessions, err := strconv.Atoi(os.Getenv("MAX_SESSIONS"))
 	if err != nil {
 		return Config{}, err
 	}
@@ -161,6 +167,7 @@ func New() (Config, error) {
 			MaxRecipients:     maxRecipients,
 			MaxDailyAliases:   maxDailyAliases,
 			MaxDailySendReply: maxDailySendReply,
+			MaxSessions:       maxSessions,
 		},
 	}, nil
 }

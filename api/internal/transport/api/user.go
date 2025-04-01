@@ -28,6 +28,7 @@ var (
 	TotpRequired                 = "2FA is required"
 	ErrInvalidTotpCode           = "Invalid 2FA code"
 	ErrGetUser                   = "Could not get user"
+	ErrTooManySessions           = "Too many sessions"
 )
 
 type UserService interface {
@@ -51,6 +52,7 @@ type UserService interface {
 	TotpEnableConfirm(context.Context, string, string) (model.TOTPBackup, error)
 	TotpDisable(context.Context, string, string) error
 	VerifyTotp(context.Context, string, string) (bool, error)
+	CheckSessionCount(context.Context, string) (bool, error)
 }
 
 // @Summary Register user
@@ -200,6 +202,15 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 		log.Printf("error login: %s", err.Error())
 		return c.Status(401).JSON(fiber.Map{
 			"error": ErrInvalidCredentials,
+		})
+	}
+
+	// Check max sessions limit
+	ok, err := h.Service.CheckSessionCount(c.Context(), user.ID)
+	if !ok || err != nil {
+		log.Printf("error login: %s", err.Error())
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrTooManySessions,
 		})
 	}
 

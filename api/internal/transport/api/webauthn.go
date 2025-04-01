@@ -304,6 +304,14 @@ func (h *Handler) BeginLogin(c *fiber.Ctx) error {
 		})
 	}
 
+	// Check max sessions limit
+	ok, err := h.Service.CheckSessionCount(c.Context(), user.ID)
+	if !ok || err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrTooManySessions,
+		})
+	}
+
 	// Begin login
 	options, sessionData, err := h.WebAuthn.BeginLogin(user)
 	if err != nil {

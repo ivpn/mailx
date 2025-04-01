@@ -40,6 +40,19 @@ func (s *Service) GetSessionCount(ctx context.Context, userID string) (int, erro
 	return count, nil
 }
 
+func (s *Service) CheckSessionCount(ctx context.Context, userID string) (bool, error) {
+	count, err := s.Store.GetSessionCount(ctx, userID)
+	if err != nil {
+		return false, err
+	}
+
+	if count >= s.Cfg.Service.MaxSessions {
+		return false, nil
+	}
+
+	return true, nil
+}
+
 func (s *Service) SaveSession(ctx context.Context, session webauthn.SessionData, token string, userID string) error {
 	err := s.Store.SaveSession(ctx, session, token, userID)
 	if err != nil {

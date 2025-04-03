@@ -3,7 +3,7 @@
         <header class="head">
             <h2>Aliases</h2>
             <div class="flex items-center justify-between">
-                <AliasCreateDropdown />
+                <AliasCreateDropdown v-if="recipients.length && loaded" />
             </div>
         </header>
         <div v-if="!list.length && loaded" class="card-empty">
@@ -11,14 +11,14 @@
                 <i class="icon at icon-accent text-2xl"></i>
             </span>
             <h4>You did not create any aliases yet</h4>
-            <p v-if="recipients.length && settings.id" class="text-tertiary pb-6">
-                This area will light up with items once you start creating aliases.<br>
+            <p class="text-tertiary">
+                This area will light up with items once you start adding new aliases.<br>
                 You can create both an alias or a catch-all alias.
-                <span v-if="!recipients.length && loaded">
-                    <br>To get started, first add a <router-link to="/recipients">recipient</router-link>.
-                </span>
             </p>
-            <AliasCreateDropdown />
+            <p v-if="!recipients.length && loaded" class="text-tertiary mb-6">
+                To get started, first <router-link to="/recipients">add a recipient</router-link> or <router-link to="/account">verify account email</router-link>.
+            </p>
+            <AliasCreateDropdown v-if="recipients.length && loaded" />
         </div>
         <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="card-primary">
             <div  class="table-container">
@@ -100,8 +100,8 @@
             <Pagination v-if="list.length" :list.sync="list" :limit="limit" :page="page" :total="total" :key="rowKey" @onUpdatePage="onUpdatePage" />
         </div>
     </div>
-    <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=false :label="'New Alias'" />
-    <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=true :label="'New Catch-all Alias'" />
+    <AliasCreate v-if="recipients.length && settings.id && loaded" :recipients.sync="recipients" :settings.sync="settings" :catchAll=false :label="'New Alias'" />
+    <AliasCreate v-if="recipients.length && settings.id && loaded" :recipients.sync="recipients" :settings.sync="settings" :catchAll=true :label="'New Catch-all Alias'" />
 </template>
 
 <script setup lang="ts">
@@ -115,7 +115,6 @@ import AliasCreate from './AliasCreate.vue'
 import Pagination from './Pagination.vue'
 import AliasCreateDropdown from './AliasCreateDropdown.vue'
 import events from '../events.ts'
-import dropdown from '@preline/dropdown'
 import { RouterLink } from 'vue-router'
 
 const alias = {
@@ -239,7 +238,6 @@ const fetch = () => {
 }
 
 onMounted(async () => {
-    dropdown.autoInit()
     await getRecipients()
     await getSettings()
     fetch()

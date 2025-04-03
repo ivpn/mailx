@@ -11,8 +11,8 @@
                 <i class="icon inbox icon-accent text-2xl"></i>
             </span>
             <h4>You did not create any recipients yet</h4>
-            <p class="text-tertiary pb-6">
-                This area will light up with items once you start creating recipients.
+            <p class="text-tertiary mb-6">
+                This area will light up with items once you start adding new recipients.
             </p>
             <RecipientCreate />
         </div>

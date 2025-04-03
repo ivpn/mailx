@@ -16,3 +16,14 @@
         </div>
     </div>
 </template>
+
+<script setup lang="ts">
+import { onMounted } from 'vue'
+import dropdown from '@preline/dropdown'
+import overlay from '@preline/overlay'
+
+onMounted(async () => {
+    dropdown.autoInit()
+    overlay.autoInit()
+})
+</script>

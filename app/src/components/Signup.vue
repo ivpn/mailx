@@ -155,8 +155,10 @@ const register = async () => {
 
     try {
         const res = await userApi.register(data)
-        apiSuccess.value = res.data.message
         apiError.value = ''
+        if (res.status === 200) {
+            window.location.href = '/signup-complete'
+        }
     } catch (err) {
         apiSuccess.value = ''
         if (axios.isAxiosError(err)) {
@@ -185,10 +187,8 @@ const registerWithPasskey = async () => {
         var res = await userApi.registerBegin(data)
         const creds = await startRegistration({ optionsJSON: res.data['publicKey'] })
         res = await userApi.registerFinish(creds)
-        apiSuccess.value = res.data.message
         apiError.value = ''
         if (res.status === 200) {
-            // Redirect to the dashboard
             localStorage.setItem('email', data.email)
             window.location.href = '/'
         }

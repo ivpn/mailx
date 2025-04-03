@@ -104,6 +104,7 @@
                         Go to Dashboard
                     </router-link>
                 </div>
+                <p v-if="success" class="success text-center">{{ success }}</p>
             </article>
             <footer>
                 <div>
@@ -121,6 +122,7 @@
 
 <script setup lang="ts">
 import { onMounted, onUpdated, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import axios from 'axios'
 import { userApi } from '../api/user.ts'
 import { startAuthentication, browserSupportsWebAuthn } from '@simplewebauthn/browser'
@@ -139,6 +141,7 @@ const otpRequired = ref(false)
 const error = ref('')
 const isLoading = ref(false)
 const passkeySupported = ref(false)
+const success = ref('')
 
 const validateEmail = () => {
     emailError.value = !email.value
@@ -269,6 +272,11 @@ onMounted(() => {
 
     passkeySupported.value = browserSupportsWebAuthn()
     tabs.autoInit()
+
+    const route = useRoute()
+    if (route.path.includes('signup-complete')) {
+        success.value = 'Account created successfully. Please log in.'
+    }
 })
 
 onUpdated(() => {

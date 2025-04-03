@@ -65,6 +65,11 @@ const routes = [
         component: Login
     },
     {
+        path: '/signup-complete',
+        name: AppName + ' - Signup Complete',
+        component: Login
+    },
+    {
         path: '/reset/password/initiate',
         name: AppName + ' - Reset Password',
         component: InitiateResetPassword

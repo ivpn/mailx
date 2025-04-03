@@ -20,6 +20,7 @@ func (http Http) PostSubscription(sub model.Subscription) error {
 	req := fiber.Post("https://api.example.net/subscription")
 	req.Set("Content-Type", "application/json")
 	req.Set("Authorization:", "Bearer "+http.Cfg.PSK)
+	req.Body([]byte(`{"id": "` + sub.ID + `"}`))
 
 	_, _, err := req.Bytes()
 	if err != nil {

@@ -49,6 +49,11 @@
 
                         <div v-if="props.catchAll">
                             <div class="mb-5">
+                                <p>
+                                    You can create 1 catch-all alias per domain.
+                                </p>
+                            </div>
+                            <div class="mb-5">
                                 <label for="alias_catch_all_suffix">
                                     Alias sufix (6-12 alphanumeric characters):
                                 </label>
@@ -88,7 +93,7 @@
                             </div>
                             <div class="mb-6">
                                 <label for="create-alias-recipient" class="required">
-                                    Recipients
+                                    Recipient(s)
                                 </label>
                                 <select
                                     id="create-alias-recipient"
@@ -96,7 +101,7 @@
                                     :disabled="!recipients.length"
                                     :multiple="true"
                                     data-hs-select='{
-                                    "placeholder": "Select recipient",
+                                    "placeholder": "Select recipient(s)",
                                     "toggleTag": "<button type=\"button\" aria-expanded=\"false\"></button>",
                                     "toggleClasses": "hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 relative py-2.5 ps-4 pe-9 flex gap-x-2 text-nowrap w-full cursor-pointer border border-primary text-secondary bg-secondary leading-tight focus:border-accent",
                                     "dropdownClasses": "mt-2 z-50 w-full max-h-72 p-1 space-y-0.5 bg-primary border border-tertiary overflow-hidden overflow-y-auto",

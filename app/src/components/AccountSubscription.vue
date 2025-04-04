@@ -1,12 +1,18 @@
 <template>
     <div class="mb-5">
-        <h2>Subscription</h2>
+        <h2>Account</h2>
         <p v-if="res.id" class="text-sm">
             <span v-if="isActive()" class="badge success">Active</span>
             <span v-if="!isActive()" class="badge">Inactive</span>
         </p>
+        <div class="mb-3">
+            <h4>Account email:</h4>
+            <p class="mb-3">
+                {{ email }}
+            </p>
+        </div>
         <div v-if="isActive()" class="mb-3">
-            <h4>Active until:</h4>
+            <h4>Subscription active until:</h4>
             <p class="mb-3">
                 {{ activeUntilDate() }}
             </p>
@@ -33,6 +39,7 @@ import { onMounted, ref } from 'vue'
 import tooltip from '@preline/tooltip'
 import axios from 'axios'
 import { subscriptionApi } from '../api/subscription.ts'
+import events from '../events.ts'
 
 const res = ref({
     id: '',
@@ -40,6 +47,7 @@ const res = ref({
 })
 const error = ref('')
 const copyText = ref('Click to copy')
+const email = ref(localStorage.getItem('email'))
 
 const getSubscription = async () => {
     try {
@@ -68,8 +76,13 @@ const copyAlias = (alias: string) => {
     }, 2000)
 }
 
+const onUpdateEmail = (event: any) => {
+    email.value = event.email
+}
+
 onMounted(() => {
     getSubscription()
     tooltip.autoInit()
+    events.on('user.update', onUpdateEmail)
 })
 </script>

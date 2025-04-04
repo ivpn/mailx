@@ -39,7 +39,7 @@
                         </div>
                         <div v-bind:class="{ 'hidden': generatedEmail == '' }" class="mb-5">
                             <p>Send message to this email:</p>
-                            <div class="hs-tooltip mb-3">
+                            <div class="hs-tooltip [--strategy:absolute] mb-3">
                                 <span class="hs-tooltip-toggle">
                                     <button @click="copy(generatedEmail)" class="plain">
                                         {{ generatedEmail }}

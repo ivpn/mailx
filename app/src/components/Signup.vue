@@ -87,15 +87,6 @@
                     </router-link>
                 </div>
             </article>
-            <footer>
-                <div>
-                    <i class="icon info icon-primary"></i>
-                </div>
-                <div>
-                    <h4>Here to try MailX? You need an active IVPN account.</h4>
-                    <p>Sign up or log in on <a href="https://www.ivpn.net/account/">ivpn.net</a> and look for "Email Beta" in your account settings. Already have an account? <router-link to="/login">Log In</router-link></p>
-                </div>
-            </footer>
         </form>
         <Footer />
     </div>
@@ -155,8 +146,10 @@ const register = async () => {
 
     try {
         const res = await userApi.register(data)
-        apiSuccess.value = res.data.message
         apiError.value = ''
+        if (res.status === 200) {
+            window.location.href = '/signup-complete'
+        }
     } catch (err) {
         apiSuccess.value = ''
         if (axios.isAxiosError(err)) {
@@ -185,10 +178,8 @@ const registerWithPasskey = async () => {
         var res = await userApi.registerBegin(data)
         const creds = await startRegistration({ optionsJSON: res.data['publicKey'] })
         res = await userApi.registerFinish(creds)
-        apiSuccess.value = res.data.message
         apiError.value = ''
         if (res.status === 200) {
-            // Redirect to the dashboard
             localStorage.setItem('email', data.email)
             window.location.href = '/'
         }

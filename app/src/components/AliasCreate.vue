@@ -49,6 +49,11 @@
 
                         <div v-if="props.catchAll">
                             <div class="mb-5">
+                                <p>
+                                    You can create 1 catch-all alias per domain.
+                                </p>
+                            </div>
+                            <div class="mb-5">
                                 <label for="alias_catch_all_suffix">
                                     Alias sufix (6-12 alphanumeric characters):
                                 </label>

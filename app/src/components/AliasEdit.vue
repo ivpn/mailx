@@ -33,7 +33,7 @@
                         </div>
                         <div class="mb-6">
                             <label v-bind:for="'recipient_' + alias.id">
-                                Recipients:
+                                Recipient(s):
                             </label>
                             <select
                                 v-model="selectRecipients"

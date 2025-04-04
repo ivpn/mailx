@@ -88,7 +88,7 @@
                             </div>
                             <div class="mb-6">
                                 <label for="create-alias-recipient" class="required">
-                                    Recipients
+                                    Recipient(s)
                                 </label>
                                 <select
                                     id="create-alias-recipient"

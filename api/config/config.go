@@ -56,13 +56,14 @@ type SMTPClientConfig struct {
 }
 
 type ServiceConfig struct {
-	OTPExpiration     time.Duration
-	SubscriptionType  string
-	MaxCredentials    int
-	MaxRecipients     int
-	MaxDailyAliases   int
-	MaxDailySendReply int
-	MaxSessions       int
+	OTPExpiration          time.Duration
+	SubscriptionType       string
+	MaxCredentials         int
+	MaxRecipients          int
+	MaxDailyAliases        int
+	MaxDailySendReply      int
+	MaxSessions            int
+	ForwardGracePeriodDays int
 }
 
 type Config struct {
@@ -107,6 +108,11 @@ func New() (Config, error) {
 	}
 
 	maxSessions, err := strconv.Atoi(os.Getenv("MAX_SESSIONS"))
+	if err != nil {
+		return Config{}, err
+	}
+
+	forwardGracePeriodDays, err := strconv.Atoi(os.Getenv("FORWARD_GRACE_PERIOD_DAYS"))
 	if err != nil {
 		return Config{}, err
 	}
@@ -161,13 +167,14 @@ func New() (Config, error) {
 		},
 
 		Service: ServiceConfig{
-			OTPExpiration:     otpExp,
-			SubscriptionType:  os.Getenv("SUBSCRIPTION_TYPE"),
-			MaxCredentials:    maxCredentials,
-			MaxRecipients:     maxRecipients,
-			MaxDailyAliases:   maxDailyAliases,
-			MaxDailySendReply: maxDailySendReply,
-			MaxSessions:       maxSessions,
+			OTPExpiration:          otpExp,
+			SubscriptionType:       os.Getenv("SUBSCRIPTION_TYPE"),
+			MaxCredentials:         maxCredentials,
+			MaxRecipients:          maxRecipients,
+			MaxDailyAliases:        maxDailyAliases,
+			MaxDailySendReply:      maxDailySendReply,
+			MaxSessions:            maxSessions,
+			ForwardGracePeriodDays: forwardGracePeriodDays,
 		},
 	}, nil
 }

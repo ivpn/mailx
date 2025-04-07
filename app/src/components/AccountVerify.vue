@@ -34,10 +34,11 @@
             </div>
             <p v-if="error" class="error my-5">Error: {{ error }}</p>
             <p v-if="resendSuccess && !error && !confirmSuccess" class="success my-5">{{ resendSuccess }}</p>
-            <p v-if="confirmSuccess" class="text-sm my-5">
-                <span class="badge success">{{ confirmSuccess }}</span>
-            </p>
+            
         </div>
+        <p v-if="confirmSuccess" class="text-sm mb-9">
+            <span class="badge success">{{ confirmSuccess }}</span>
+        </p>
     </div>
     <hr v-if="!res.is_active && !isDashboard">
 </template>

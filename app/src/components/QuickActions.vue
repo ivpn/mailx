@@ -1,9 +1,11 @@
 <template>
-    <AccountConfirm :dashboard="true" />
-    <Aliases :dashboard="false" />
+    <AccountVerify :dashboard="true" />
+    <SubscriptionStatus :dashboard="true" />
+    <Aliases />
 </template>
 
 <script setup lang="ts">
-import AccountConfirm from './AccountVerify.vue'
+import AccountVerify from './AccountVerify.vue'
+import SubscriptionStatus from './AccountSubscriptionStatus.vue'
 import Aliases from './Aliases.vue'
 </script>

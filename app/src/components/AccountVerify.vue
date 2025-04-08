@@ -1,9 +1,6 @@
 <template>
     <div v-if="!res.is_active && isDashboard" class="card-secondary m-8 mb-0">
-        <h4>Verify Your Email</h4>
-        <p class="m-0">
-            Please <router-link to="/account">verify</router-link> your account email address.
-        </p>
+        <p class="m-0">Please <router-link to="/account">verify</router-link> your account email address</p>
     </div>
     <div v-if="!res.is_active && !isDashboard">
         <h2>Verify Your Email</h2>

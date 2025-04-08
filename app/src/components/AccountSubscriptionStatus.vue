@@ -1,7 +1,8 @@
 <template>
-    <div v-if="!isActive && !isAccountRoute()" class="card">
-        <p class="mb-2">Account subscription is inactive</p>
-        <router-link to="/account">View Details</router-link>
+    <div v-if="!isActive && isDashboard" class="card-secondary m-8 mb-0">
+        <p class="m-0">
+            Your <router-link to="/account">subscription</router-link> is inactive
+        </p>
     </div>
 </template>
 
@@ -18,6 +19,8 @@ const res = ref({
 const route = ref('/')
 const currentRoute = useRoute()
 const isActive = ref(true)
+const props = defineProps(['dashboard'])
+const isDashboard = props.dashboard
 
 const getSubscription = async () => {
     try {
@@ -26,10 +29,6 @@ const getSubscription = async () => {
         isActive.value = res.value.active_until > new Date().toISOString()
     } catch (err) {
     }
-}
-
-const isAccountRoute = () => {
-    return route.value === '/account'
 }
 
 onMounted(() => {

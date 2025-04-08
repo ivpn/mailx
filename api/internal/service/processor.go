@@ -5,7 +5,6 @@ import (
 	"errors"
 	"log"
 	"strings"
-	"time"
 
 	"ivpn.net/email/api/internal/client/mailer"
 	"ivpn.net/email/api/internal/model"
@@ -124,7 +123,7 @@ func (s *Service) findRecipients(from string, email string, msgType model.Messag
 		return []model.Recipient{}, model.Alias{}, 0, err
 	}
 
-	if sub.ActiveUntil.Before(time.Now()) {
+	if !sub.IsActive() {
 		return []model.Recipient{}, model.Alias{}, 0, ErrInactiveSubscription
 	}
 

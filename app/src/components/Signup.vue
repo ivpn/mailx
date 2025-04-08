@@ -147,7 +147,6 @@ const register = async () => {
     try {
         await userApi.register(data)
         apiError.value = ''
-        localStorage.setItem('email', data.email)
         window.location.href = '/signup-complete'
     } catch (err) {
         apiSuccess.value = ''

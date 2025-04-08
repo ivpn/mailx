@@ -48,12 +48,7 @@
                         </div>
 
                         <div v-if="props.catchAll">
-                            <div class="mb-5">
-                                <p>
-                                    You can create 1 catch-all alias per domain.
-                                </p>
-                            </div>
-                            <div class="mb-5">
+                            <div class="mb-3">
                                 <label for="alias_catch_all_suffix">
                                     Alias sufix (6-12 alphanumeric characters):
                                 </label>
@@ -71,7 +66,7 @@
                         </div>
 
                         <div v-bind:class="{ 'hidden': step !== 2 && !props.catchAll }">
-                            <div class="mb-5">
+                            <div class="mb-3">
                                 <label for="alias_description">
                                     Description
                                 </label>
@@ -81,7 +76,7 @@
                                     type="text"
                                 >
                             </div>
-                            <div class="mb-5">
+                            <div class="mb-3">
                                 <label for="alias_from_name">
                                     From name
                                 </label>
@@ -91,7 +86,7 @@
                                     type="text"
                                 >
                             </div>
-                            <div class="mb-6">
+                            <div class="mb-3">
                                 <label for="create-alias-recipient" class="required">
                                     Recipient(s)
                                 </label>
@@ -118,7 +113,7 @@
                                 </select>
                                 <p v-if="errorRecipients" class="error pt-3">{{ errorRecipients }}</p>
                             </div>
-                            <div class="mb-6">
+                            <div class="mb-3">
                                 <label for="alias_domain" class="required">
                                     Domain
                                 </label>

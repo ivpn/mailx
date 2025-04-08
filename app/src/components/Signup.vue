@@ -147,7 +147,7 @@ const register = async () => {
     try {
         const res = await userApi.register(data)
         apiError.value = ''
-        if (res.status === 200) {
+        if (res.status === 200 || res.status === 201) {
             window.location.href = '/signup-complete'
         }
     } catch (err) {
@@ -179,7 +179,7 @@ const registerWithPasskey = async () => {
         const creds = await startRegistration({ optionsJSON: res.data['publicKey'] })
         res = await userApi.registerFinish(creds)
         apiError.value = ''
-        if (res.status === 200) {
+        if (res.status === 200 || res.status === 201) {
             localStorage.setItem('email', data.email)
             window.location.href = '/'
         }

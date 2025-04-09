@@ -78,6 +78,17 @@ func (s *Service) GetVerifiedRecipients(ctx context.Context, recipientEmails str
 }
 
 func (s *Service) PostRecipient(ctx context.Context, recipient model.Recipient) error {
+	sub, err := s.GetSubscription(context.Background(), recipient.UserID)
+	if err != nil {
+		log.Printf("error fetching subscription: %s", err.Error())
+		return ErrPostRecipient
+	}
+
+	if !sub.IsActive() {
+		log.Println("error creating recipient: subscription is not active")
+		return ErrPostRecipient
+	}
+
 	count, err := s.Store.GetRecipientsCount(ctx, recipient.UserID)
 	if err != nil {
 		log.Printf("error creating recipient: %s", err.Error())
@@ -165,9 +176,20 @@ func (s *Service) SendRecipientOTP(ctx context.Context, ID string, userID string
 }
 
 func (s *Service) UpdateRecipient(ctx context.Context, recipient model.Recipient) error {
-	err := s.Store.UpdateRecipient(ctx, recipient)
+	sub, err := s.GetSubscription(context.Background(), recipient.UserID)
 	if err != nil {
-		log.Printf("an error occurred updating the recipient: %s", err.Error())
+		log.Printf("error fetching subscription: %s", err.Error())
+		return ErrUpdateRecipient
+	}
+
+	if !sub.IsActive() {
+		log.Println("error updating recipient: subscription is not active")
+		return ErrUpdateRecipient
+	}
+
+	err = s.Store.UpdateRecipient(ctx, recipient)
+	if err != nil {
+		log.Printf("error updating recipient: %s", err.Error())
 		return ErrUpdateRecipient
 	}
 

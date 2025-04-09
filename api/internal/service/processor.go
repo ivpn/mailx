@@ -32,6 +32,24 @@ func (s *Service) ProcessMessage(data []byte) error {
 			continue
 		}
 
+		sub, err := s.GetSubscription(context.Background(), alias.UserID)
+		if err != nil {
+			log.Println("error getting subscription", err)
+			continue
+		}
+
+		// Forward
+		if relayType == model.Forward && !sub.IsActiveWithGracePeriod(s.Cfg.Service.ForwardGracePeriodDays) {
+			log.Println("inactive subscription for forward")
+			continue
+		}
+
+		// Reply | Send
+		if relayType != model.Forward && !sub.IsActive() {
+			log.Println("inactive subscription for reply/send")
+			continue
+		}
+
 		settings, err := s.GetSettings(context.Background(), alias.UserID)
 		if err != nil {
 			log.Println("error getting settings", err)
@@ -116,15 +134,6 @@ func (s *Service) findRecipients(from string, email string, msgType model.Messag
 		// Block
 		s.saveMessage(alias, model.Block, []byte{})
 		return []model.Recipient{}, model.Alias{}, 0, ErrDisabledAlias
-	}
-
-	sub, err := s.GetSubscription(context.Background(), alias.UserID)
-	if err != nil {
-		return []model.Recipient{}, model.Alias{}, 0, err
-	}
-
-	if !sub.IsActive() {
-		return []model.Recipient{}, model.Alias{}, 0, ErrInactiveSubscription
 	}
 
 	err = utils.ValidateEmail(replyTo)

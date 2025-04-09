@@ -11,6 +11,10 @@
                             {{ props.label }}
                             <span v-if="step == 2">| {{ alias.format }}</span>
                         </h4>
+                        <div v-if="props.catchAll" class="hs-tooltip [--strategy:absolute]">
+                            <i class="icon info icon-primary hs-tooltip-toggle"></i>
+                            <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">You can create 1 catch-all alias per domain.</span>
+                        </div>
                         <span v-if="!props.catchAll">{{ step }}/2</span>
                     </header>
                     <article>
@@ -154,6 +158,7 @@ import select from '@preline/select'
 import axios from 'axios'
 import { aliasApi } from '../api/alias.ts'
 import events from '../events.ts'
+import tooltip from '@preline/tooltip'
 
 const envDomains = import.meta.env.VITE_DOMAINS.split(',')
 const props = defineProps(['recipients', 'settings', 'catchAll', 'label'])
@@ -271,6 +276,7 @@ const copyAlias = (alias: string) => {
 onMounted(() => {
     overlay.autoInit()
     select.autoInit()
+    tooltip.autoInit()
     addEvents()
     resetAlias()
 })

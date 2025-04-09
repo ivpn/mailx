@@ -78,6 +78,17 @@ func (s *Service) GetAliasByName(name string) (model.Alias, error) {
 }
 
 func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format string, domain string, sufix string) (model.Alias, error) {
+	sub, err := s.GetSubscription(context.Background(), alias.UserID)
+	if err != nil {
+		log.Printf("error fetching subscription: %s", err.Error())
+		return model.Alias{}, ErrPostAlias
+	}
+
+	if !sub.IsActive() {
+		log.Println("error creating alias: subscription is not active")
+		return model.Alias{}, ErrPostAlias
+	}
+
 	count, err := s.Store.GetAliasDailyCount(ctx, alias.UserID)
 	if err != nil {
 		log.Printf("error creating alias: %s", err.Error())

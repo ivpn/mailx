@@ -1,9 +1,11 @@
 <template>
     <header class="bg-secondary flex flex-col justify-between h-full">
         <nav>
-            <h1 class="pl-8 pr-5 m-0 text-accent head flex items-center justify-between">
-                MailX
-            </h1>
+            <router-link to="/" class="p-0">
+                <h1 class="pl-8 pr-5 m-0 text-accent head flex items-center justify-between">
+                    MailX
+                </h1>
+            </router-link>
             <div class="flex flex-col items-center">
                 <router-link v-bind:class="{ 'active': route == '/' }" to="/">
                     <i class="icon at icon-primary"></i>

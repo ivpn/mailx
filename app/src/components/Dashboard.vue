@@ -4,7 +4,6 @@
             <Sidebar />
         </div>
         <div class="ml-[224px] grow overflow-x-hidden">
-            <SubscriptionStatus />
             <router-view></router-view>
         </div>
     </div>
@@ -12,5 +11,4 @@
 
 <script setup lang="ts">
 import Sidebar from './Sidebar.vue'
-import SubscriptionStatus from './AccountSubscriptionStatus.vue'
 </script>

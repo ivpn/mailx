@@ -5,8 +5,11 @@
             <article>
                 <h1 class="text-5xl">404</h1>
                 <p>Page not found</p>
-                <router-link to="/" tag="button" class="cta full mb-5">
-                    Go to Dashboard
+                <router-link v-if="isLoggedIn()" to="/" tag="button" class="cta full mb-5">
+                    Go to Aliases
+                </router-link>
+                <router-link v-if="!isLoggedIn()" to="/login" tag="button" class="cta full mb-5">
+                    Go to Login
                 </router-link>
             </article>
             
@@ -17,4 +20,8 @@
 
 <script setup lang="ts">
 import Footer from './Footer.vue'
+
+const isLoggedIn = () => {
+    return localStorage.getItem('email') != '' && localStorage.getItem('email') != null
+}
 </script>

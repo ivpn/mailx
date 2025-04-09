@@ -98,12 +98,6 @@
                         Or use password
                     </button>
                 </nav>
-                <div v-if="isLoggedIn()" class="pb-2">
-                    <p>You are logged in</p>
-                    <router-link to="/" tag="button" class="cta full">
-                        Go to Dashboard
-                    </router-link>
-                </div>
                 <p v-if="success" class="success text-center">{{ success }}</p>
             </article>
             <footer>

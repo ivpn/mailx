@@ -214,6 +214,9 @@ const close = () => {
     error.value = ''
     const modal = document.querySelector('#modal-create-alias-' + props.catchAll) as any
     overlay.close(modal)
+
+    const multiselect = select.getInstance('#create-alias-recipient' as any, true) as any
+    multiselect.element.setValue([settings.value.recipient ? settings.value.recipient : props.recipients[0]])
 }
 
 const addEvents = () => {

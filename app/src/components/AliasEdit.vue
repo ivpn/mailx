@@ -121,6 +121,9 @@ const close = () => {
     error.value = ''
     const modal = document.querySelector('#modal-alias-edit' + alias.value.id) as any
     overlay.close(modal)
+
+    const multiselect = select.getInstance('#recipient_' + alias.value.id as any, true) as any
+    multiselect.element.setValue(props.alias.recipients.split(','))
 }
 
 const addEvents = () => {

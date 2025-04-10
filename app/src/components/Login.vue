@@ -17,6 +17,7 @@
                                     placeholder="Email Address"
                                     class="email"
                                     autocomplete="false"
+                                    @keypress.enter.prevent
                                 >
                                 <p v-if="emailAuthnError" class="error">Required</p>
                             </div>
@@ -42,6 +43,7 @@
                                     autocomplete="email"
                                     placeholder="Email address"
                                     class="email"
+                                    @keypress.enter.prevent
                                 >
                                 <p v-if="emailError" class="error">Required</p>
                             </div>
@@ -54,6 +56,7 @@
                                     autocomplete="current-password"
                                     placeholder="Password"
                                     class="password"
+                                    @keypress.enter.prevent
                                 >
                                 <p v-if="passwordError" class="error mb-2">Required</p>
                                 <p class="text-right">

@@ -16,6 +16,7 @@
                                     id="email_authn"
                                     type="email"
                                     class="email"
+                                    @keypress.enter.prevent
                                 >
                                 <p v-if="emailAuthnError" class="error">Required</p>
                             </div>
@@ -43,6 +44,7 @@
                                     id="email"
                                     type="email"
                                     class="email"
+                                    @keypress.enter.prevent
                                 >
                                 <p v-if="emailError" class="error">Required</p>
                             </div>
@@ -54,6 +56,7 @@
                                     id="password"
                                     type="password"
                                     class="password"
+                                    @keypress.enter.prevent
                                 >
                                 <p v-if="passwordError" class="error">Required</p>
                             </div>

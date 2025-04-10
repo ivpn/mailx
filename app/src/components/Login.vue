@@ -4,10 +4,10 @@
         <form class="card-tertiary center" @submit.prevent="" autocomplete="off">
             <article>
                 <div>
-                    <div v-if="passkeySupported" id="tabs-with-underline-1" role="tabpanel" aria-labelledby="tabs-with-underline-item-1">
+                    <div v-if="passkeySupported" v-bind:class="{ 'hidden': signupSuccess }" id="tabs-with-underline-1" role="tabpanel" aria-labelledby="tabs-with-underline-item-1">
                         <h1 class="text-center text-accent mb-8">MailX</h1>
                         <h4 class="text-center mb-8">Log in with Passkey</h4>
-                        <div v-if="!isLoggedIn()">
+                        <div>
                             <div class="mb-5">
                                 <input
                                     v-model="emailAuthn"
@@ -17,6 +17,7 @@
                                     placeholder="Email Address"
                                     class="email"
                                     autocomplete="false"
+                                    @keypress.enter.prevent
                                 >
                                 <p v-if="emailAuthnError" class="error">Required</p>
                             </div>
@@ -28,9 +29,9 @@
                             <p v-if="error" class="error mt-6">Error: {{ error }}</p>
                         </div>
                     </div>
-                    <div id="tabs-with-underline-2" v-bind:class="{ 'hidden': passkeySupported }" role="tabpanel"
+                    <div id="tabs-with-underline-2" v-bind:class="{ 'hidden': passkeySupported && !signupSuccess }" role="tabpanel"
                         aria-labelledby="tabs-with-underline-item-2">
-                        <div v-if="!isLoggedIn()">
+                        <div>
                             <h1 class="text-center text-accent mb-8">MailX</h1>
                             <h4 class="text-center mb-8">Log in with email and password</h4>
                             <div class="mb-5">
@@ -42,6 +43,7 @@
                                     autocomplete="email"
                                     placeholder="Email address"
                                     class="email"
+                                    @keypress.enter.prevent
                                 >
                                 <p v-if="emailError" class="error">Required</p>
                             </div>
@@ -54,6 +56,7 @@
                                     autocomplete="current-password"
                                     placeholder="Password"
                                     class="password"
+                                    @keypress.enter.prevent
                                 >
                                 <p v-if="passwordError" class="error mb-2">Required</p>
                                 <p class="text-right">
@@ -74,7 +77,7 @@
                                 >
                                 <p v-if="otpError" class="error">Required</p>
                             </div>
-                            <div class="flex items-center w-full">
+                            <div class="flex items-center w-full" v-bind:class="{ 'mb-6': !passkeySupported }">
                                 <button :disabled="isLoading" @click="login" class="cta full">
                                     Log in
                                 </button>
@@ -86,19 +89,20 @@
                 <nav v-if="passkeySupported" aria-label="Tabs" role="tablist" aria-orientation="horizontal" class="tabs-router">
                     <button
                         @click="onTabChange"
-                        class="active"
+                        v-bind:class="{ 'active': !signupSuccess }"
                         id="tabs-with-underline-item-1" aria-selected="true" data-hs-tab="#tabs-with-underline-1"
                         aria-controls="tabs-with-underline-1" role="tab">
                         Or use Passkey
                     </button>
                     <button
                         @click="onTabChange"
+                        v-bind:class="{ 'active': signupSuccess }"
                         id="tabs-with-underline-item-2" aria-selected="false" data-hs-tab="#tabs-with-underline-2"
                         aria-controls="tabs-with-underline-2" role="tab">
                         Or use password
                     </button>
                 </nav>
-                <p v-if="success" class="success text-center">{{ success }}</p>
+                <p v-if="signupSuccess" class="success text-center">{{ signupSuccess }}</p>
             </article>
             <footer>
                 <div>
@@ -135,7 +139,7 @@ const otpRequired = ref(false)
 const error = ref('')
 const isLoading = ref(false)
 const passkeySupported = ref(false)
-const success = ref('')
+const signupSuccess = ref('')
 
 const validateEmail = () => {
     emailError.value = !email.value
@@ -269,7 +273,7 @@ onMounted(() => {
 
     const route = useRoute()
     if (route.path.includes('signup-complete')) {
-        success.value = 'Account created successfully. Please log in.'
+        signupSuccess.value = 'Account created successfully. Please log in.'
     }
 })
 

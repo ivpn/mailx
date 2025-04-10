@@ -41,7 +41,7 @@
                             <p>Send message to this email:</p>
                             <div class="hs-tooltip [--strategy:absolute] mb-3">
                                 <span class="hs-tooltip-toggle">
-                                    <button @click="copy(generatedEmail)" class="plain">
+                                    <button @click="copy(generatedEmail)" class="plain break-all">
                                         {{ generatedEmail }}
                                     </button>
                                     <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">

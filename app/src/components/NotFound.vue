@@ -12,9 +12,9 @@
                     Go to Login
                 </router-link>
             </article>
-            
         </div>
-        <Footer />
+        <div v-if="isLoggedIn()"></div>
+        <Footer v-if="!isLoggedIn()" />
     </div>
 </template>
 

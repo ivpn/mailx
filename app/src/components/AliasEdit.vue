@@ -117,6 +117,7 @@ const close = () => {
     alias.value.description = props.alias.description
     alias.value.from_name = props.alias.from_name
     alias.value.recipients = props.alias.recipients
+    selectRecipients.value = props.alias.recipients
     success.value = ''
     error.value = ''
     const modal = document.querySelector('#modal-alias-edit' + alias.value.id) as any

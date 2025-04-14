@@ -12,11 +12,11 @@ import (
 )
 
 var (
-	PostRecipientSuccess     = "New recipient is added"
-	ActivateRecipientSuccess = "Recipient is activated"
-	UpdateRecipientSuccess   = "Recipient is updated"
-	DeleteRecipientSuccess   = "Recipient is deleted"
-	DeleteRecipientErr       = "Cannot delete default recipient"
+	PostRecipientSuccess     = "Recipient added successfully."
+	ActivateRecipientSuccess = "Recipient activated successfully."
+	UpdateRecipientSuccess   = "Recipient updated successfully."
+	DeleteRecipientSuccess   = "Recipient deleted successfully."
+	DeleteRecipientErr       = "The default recipient cannot be deleted."
 )
 
 type RecipientService interface {

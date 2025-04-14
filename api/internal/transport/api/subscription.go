@@ -10,8 +10,8 @@ import (
 )
 
 var (
-	UpdateSubscriptionSuccess = "Subscription is updated"
-	AddSubscriptionSuccess    = "Subscription is added"
+	UpdateSubscriptionSuccess = "Subscription updated successfully."
+	AddSubscriptionSuccess    = "Subscription added successfully."
 )
 
 type SubscriptionService interface {

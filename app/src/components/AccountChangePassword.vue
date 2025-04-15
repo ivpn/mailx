@@ -84,7 +84,7 @@ const changePassword = async () => {
             error.value = err.response?.data.error || err.message
 
             if (err.response?.status === 429) {
-                error.value = 'Too many requests, please try again later'
+                error.value = 'Too many requests, please try again later.'
             }
         }
     }

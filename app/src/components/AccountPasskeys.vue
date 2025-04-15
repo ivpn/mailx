@@ -110,7 +110,7 @@ const addPasskey = async () => {
             error.value = err.response?.data.error || err.message
 
             if (err.response?.status === 429) {
-                error.value = 'Too many requests, please try again later'
+                error.value = 'Too many requests, please try again later.'
             }
         }
     }
@@ -127,10 +127,10 @@ const startAddPasskey = async (res: any) => {
             error.value = err.response?.data.error || err.message
 
             if (err.response?.status === 429) {
-                error.value = 'Too many requests, please try again later'
+                error.value = 'Too many requests, please try again later.'
             }
         } else {
-            error.value = 'The operation was aborted or failed'
+            error.value = 'The operation was aborted or failed.'
         }
     }
 }

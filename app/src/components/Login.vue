@@ -192,7 +192,7 @@ const login = async () => {
             error.value = err.response?.data.error || err.message
 
             if (err.response?.status === 429) {
-                error.value = 'Too many requests, please try again later'
+                error.value = 'Too many requests, please try again later.'
             }
 
             if (err.response?.data.code === 70001) {
@@ -222,7 +222,7 @@ const loginWithPasskey = async () => {
             error.value = err.response?.data.error || err.message
 
             if (err.response?.status === 429) {
-                error.value = 'Too many requests, please try again later'
+                error.value = 'Too many requests, please try again later.'
             }
         }
     } finally {
@@ -245,10 +245,10 @@ const startAuth = async (data: any, res: any) => {
             error.value = err.response?.data.error || err.message
 
             if (err.response?.status === 429) {
-                error.value = 'Too many requests, please try again later'
+                error.value = 'Too many requests, please try again later.'
             }
         } else {
-            error.value = 'The operation was aborted or failed'
+            error.value = 'The operation was aborted or failed.'
         }
     } finally {
         isLoading.value = false // End loading

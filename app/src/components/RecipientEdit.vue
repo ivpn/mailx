@@ -70,7 +70,7 @@ const updateRecipient = async () => {
         if (axios.isAxiosError(err)) {
             const errorMsg = err.response?.data.error || err.message
             error.value = err.response?.status === 429
-                ? 'Too many requests, please try again later'
+                ? 'Too many requests, please try again later.'
                 : errorMsg
         }
     }

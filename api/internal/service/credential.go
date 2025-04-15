@@ -10,11 +10,11 @@ import (
 )
 
 var (
-	ErrGetCredentials        = errors.New("could not get credentials")
-	ErrSaveCredential        = errors.New("could not save credential")
-	ErrUpdateCredential      = errors.New("could not update credential")
-	ErrDeleteCredential      = errors.New("could not delete credential")
-	ErrMaxExceededCredential = errors.New("maximum number of passkeys reached")
+	ErrGetCredentials        = errors.New("Unable to retrieve credentials.")
+	ErrSaveCredential        = errors.New("Unable to save credential. Please try again.")
+	ErrUpdateCredential      = errors.New("Unable to update credential. Please try again.")
+	ErrDeleteCredential      = errors.New("Unable to delete credential. Please try again.")
+	ErrMaxExceededCredential = errors.New("You have reached the maximum number of allowed passkeys.")
 )
 
 type CredentialStore interface {

@@ -13,14 +13,14 @@ import (
 )
 
 var (
-	ErrGetRecipient            = errors.New("could not get recipient by ID")
-	ErrGetRecipients           = errors.New("could not get recipients by user ID")
-	ErrPostRecipient           = errors.New("could not create recipient")
-	ErrMaxExceededRecipient    = errors.New("maximum number of recipients reached")
-	ErrUpdateRecipient         = errors.New("could not update recipient")
-	ErrDeleteRecipient         = errors.New("could not delete recipient")
-	ErrDeleteRecipientByUserID = errors.New("could not delete recipient by user ID")
-	ErrActivateRecipient       = errors.New("could not activate recipient")
+	ErrGetRecipient            = errors.New("Unable to retrieve recipient by ID.")
+	ErrGetRecipients           = errors.New("Unable to retrieve recipients by user ID.")
+	ErrPostRecipient           = errors.New("Unable to create recipient.")
+	ErrMaxExceededRecipient    = errors.New("Maximum number of allowed recipients reached.")
+	ErrUpdateRecipient         = errors.New("Unable to update recipient.")
+	ErrDeleteRecipient         = errors.New("Unable to delete recipient.")
+	ErrDeleteRecipientByUserID = errors.New("Unable to delete recipient for this user.")
+	ErrActivateRecipient       = errors.New("Unable to activate recipient.")
 )
 
 type RecipientsStore interface {

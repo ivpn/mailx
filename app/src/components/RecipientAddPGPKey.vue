@@ -65,7 +65,7 @@ const addKey = async () => {
     const payload = {
         id: recipient.value.id,
         pgp_enabled: true,
-        pgp_key: pgp_key.value
+        pgp_key: pgp_key.value.trim()
     }
 
     try {

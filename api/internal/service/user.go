@@ -247,6 +247,17 @@ func (s *Service) ActivateUser(ctx context.Context, ID string, otp string) error
 		return ErrActivateUser
 	}
 
+	sub, err := s.GetSubscription(context.Background(), ID)
+	if err != nil {
+		log.Printf("error fetching subscription: %s", err.Error())
+		return nil
+	}
+
+	if !sub.IsActive() {
+		log.Println("error creating recipient: subscription is not active")
+		return nil
+	}
+
 	recipient := model.Recipient{
 		UserID:   ID,
 		Email:    user.Email,

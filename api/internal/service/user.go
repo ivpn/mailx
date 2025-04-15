@@ -7,11 +7,12 @@ import (
 	"log"
 	"strings"
 
+	"slices"
+
 	"github.com/go-sql-driver/mysql"
 	"ivpn.net/email/api/internal/client/mailer"
 	"ivpn.net/email/api/internal/model"
 	"ivpn.net/email/api/internal/utils"
-	"slices"
 )
 
 var (
@@ -244,6 +245,17 @@ func (s *Service) ActivateUser(ctx context.Context, ID string, otp string) error
 	if err != nil {
 		log.Printf("error activating user: %s", err.Error())
 		return ErrActivateUser
+	}
+
+	sub, err := s.GetSubscription(context.Background(), ID)
+	if err != nil {
+		log.Printf("error fetching subscription: %s", err.Error())
+		return nil
+	}
+
+	if !sub.IsActive() {
+		log.Println("error creating recipient: subscription is not active")
+		return nil
 	}
 
 	recipient := model.Recipient{

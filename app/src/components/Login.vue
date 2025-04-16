@@ -255,8 +255,9 @@ const startAuth = async (data: any, res: any) => {
     }
 }
 
-const isLoggedIn = () => {
-    return localStorage.getItem('email') != '' && localStorage.getItem('email') != null
+const isLoggedIn = (): boolean => {
+    const email = localStorage.getItem('email')
+    return email !== null && email.trim() !== ''
 }
 
 const onTabChange = () => {

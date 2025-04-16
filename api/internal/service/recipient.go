@@ -200,14 +200,14 @@ func (s *Service) DeleteRecipient(ctx context.Context, ID string, userID string)
 	// Get recipient
 	recipient, err := s.Store.GetRecipient(ctx, ID, userID)
 	if err != nil {
-		log.Printf("error deleting recipient: %s", err.Error())
+		log.Printf("error deleting recipient, GetRecipient: %s", err.Error())
 		return ErrDeleteRecipient
 	}
 
 	// Get aliases
 	aliases, err := s.Store.GetAliases(ctx, userID, 0, 0, "", "", "")
 	if err != nil {
-		log.Printf("error deleting recipient: %s", err.Error())
+		log.Printf("error deleting recipient, GetAliases: %s", err.Error())
 		return ErrDeleteRecipient
 	}
 
@@ -225,7 +225,7 @@ func (s *Service) DeleteRecipient(ctx context.Context, ID string, userID string)
 			// Update alias
 			err = s.Store.UpdateAlias(ctx, alias)
 			if err != nil {
-				log.Printf("error deleting recipient: %s", err.Error())
+				log.Printf("error deleting recipient, UpdateAlias: %s", err.Error())
 				return ErrDeleteRecipient
 			}
 		}
@@ -233,7 +233,7 @@ func (s *Service) DeleteRecipient(ctx context.Context, ID string, userID string)
 
 	err = s.Store.DeleteRecipient(ctx, ID, userID)
 	if err != nil {
-		log.Printf("error deleting recipient: %s", err.Error())
+		log.Printf("error deleting recipient, DeleteRecipient: %s", err.Error())
 		return ErrDeleteRecipient
 	}
 

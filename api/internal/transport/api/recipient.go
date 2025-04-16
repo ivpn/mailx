@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"log"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -260,7 +259,6 @@ func (h *Handler) DeleteRecipient(c *fiber.Ctx) error {
 	ID := c.Params("id")
 	err := h.Service.DeleteRecipient(c.Context(), ID, userID)
 	if err != nil {
-		log.Println("error deleting recipient", err.Error())
 		return c.Status(400).JSON(fiber.Map{
 			"error": DeleteRecipientErr,
 		})

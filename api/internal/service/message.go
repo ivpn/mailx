@@ -9,10 +9,10 @@ import (
 )
 
 var (
-	ErrGetMessagesByUser     = errors.New("could not get messages by user ID")
-	ErrGetMessagesByAlias    = errors.New("could not get messages by alias ID")
-	ErrPostMessage           = errors.New("could not create message")
-	ErrDeleteMessageByUserID = errors.New("could not delete messages by user ID")
+	ErrGetMessagesByUser     = errors.New("Unable to retrieve messages for this user.")
+	ErrGetMessagesByAlias    = errors.New("Unable to retrieve messages for this alias.")
+	ErrPostMessage           = errors.New("Unable to create message.")
+	ErrDeleteMessageByUserID = errors.New("Unable to delete messages for this user.")
 )
 
 type MessageStore interface {

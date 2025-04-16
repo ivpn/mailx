@@ -8,10 +8,10 @@ import (
 )
 
 var (
-	ErrGetSettings    = errors.New("could not get settings by user ID")
-	ErrPostSettings   = errors.New("could not create settings")
-	ErrUpdateSettings = errors.New("could not update settings")
-	ErrDeleteSettings = errors.New("could not delete settings")
+	ErrGetSettings    = errors.New("Unable to retrieve settings by user ID.")
+	ErrPostSettings   = errors.New("Unable to create settings.")
+	ErrUpdateSettings = errors.New("Unable to update settings.")
+	ErrDeleteSettings = errors.New("Unable to delete settings.")
 )
 
 type SettingsStore interface {

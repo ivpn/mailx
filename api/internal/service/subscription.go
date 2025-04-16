@@ -11,11 +11,11 @@ import (
 )
 
 var (
-	ErrGetSubscription    = errors.New("could not get subscription by user ID")
-	ErrAddSubscription    = errors.New("could not add subscription")
-	ErrPostSubscription   = errors.New("could not create subscription")
-	ErrUpdateSubscription = errors.New("could not update subscription")
-	ErrDeleteSubscription = errors.New("could not delete subscription")
+	ErrGetSubscription    = errors.New("Unable to retrieve subscription by user ID.")
+	ErrAddSubscription    = errors.New("Unable to add subscription.")
+	ErrPostSubscription   = errors.New("Unable to create subscription.")
+	ErrUpdateSubscription = errors.New("Unable to update subscription.")
+	ErrDeleteSubscription = errors.New("Unable to delete subscription.")
 )
 
 type SubscriptionStore interface {

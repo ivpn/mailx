@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"log"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -11,10 +12,11 @@ import (
 )
 
 var (
-	PostRecipientSuccess     = "New recipient is added"
-	ActivateRecipientSuccess = "Recipient is activated"
-	UpdateRecipientSuccess   = "Recipient is updated"
-	DeleteRecipientSuccess   = "Recipient is deleted"
+	PostRecipientSuccess     = "Recipient added successfully."
+	ActivateRecipientSuccess = "Recipient activated successfully."
+	UpdateRecipientSuccess   = "Recipient updated successfully."
+	DeleteRecipientSuccess   = "Recipient deleted successfully."
+	DeleteRecipientErr       = "The default recipient cannot be deleted."
 )
 
 type RecipientService interface {
@@ -258,8 +260,9 @@ func (h *Handler) DeleteRecipient(c *fiber.Ctx) error {
 	ID := c.Params("id")
 	err := h.Service.DeleteRecipient(c.Context(), ID, userID)
 	if err != nil {
+		log.Println("error deleting recipient", err.Error())
 		return c.Status(400).JSON(fiber.Map{
-			"error": err.Error(),
+			"error": DeleteRecipientErr,
 		})
 	}
 

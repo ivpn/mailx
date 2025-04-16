@@ -12,19 +12,19 @@ import (
 )
 
 var (
-	BeginRegistrationSuccess  = "Registration started"
-	FinishRegistrationSuccess = "Registration finished"
-	BeginLoginSuccess         = "Login started"
-	FinishLoginSuccess        = "Login finished"
-	ErrBeginRegistration      = "could not begin registration"
-	ErrFinishRegistration     = "could not finish registration"
-	ErrBeginLogin             = "could not begin login"
-	ErrFinishLogin            = "could not finish login"
-	ErrGetSession             = "could not get session"
-	ErrSaveSession            = "could not save session"
-	ErrDeleteSession          = "could not delete session"
-	ErrDeleteCredential       = "could not delete credential"
-	DeleteCredentialSuccess   = "Credential deleted"
+	BeginRegistrationSuccess  = "Registration process started successfully."
+	FinishRegistrationSuccess = "Registration completed successfully."
+	BeginLoginSuccess         = "Login process started successfully."
+	FinishLoginSuccess        = "Login completed successfully."
+	ErrBeginRegistration      = "Unable to start registration. Please try again."
+	ErrFinishRegistration     = "Unable to complete registration. Please try again."
+	ErrBeginLogin             = "Unable to start login. Please try again."
+	ErrFinishLogin            = "Unable to complete login. Please try again."
+	ErrGetSession             = "Unable to retrieve session. Please try again."
+	ErrSaveSession            = "Unable to save session. Please try again."
+	ErrDeleteSession          = "Unable to delete session. Please try again."
+	ErrDeleteCredential       = "Unable to delete credential. Please try again."
+	DeleteCredentialSuccess   = "Credential deleted successfully."
 )
 
 type SessionService interface {

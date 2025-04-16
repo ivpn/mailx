@@ -12,10 +12,10 @@ import (
 )
 
 var (
-	ErrInactiveSubscription = errors.New("inactive subscription")
-	ErrDisabledAlias        = errors.New("disabled alias")
-	ErrNoRecipients         = errors.New("no verified recipients")
-	ErrInactiveRecipient    = errors.New("inactive recipient")
+	ErrInactiveSubscription = errors.New("Subscription is inactive.")
+	ErrDisabledAlias        = errors.New("This alias is disabled.")
+	ErrNoRecipients         = errors.New("No verified recipients available.")
+	ErrInactiveRecipient    = errors.New("The recipient is inactive.")
 )
 
 func (s *Service) ProcessMessage(data []byte) error {

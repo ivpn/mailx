@@ -9,9 +9,9 @@ import (
 )
 
 var (
-	ErrGetSession    = errors.New("could not get session by token")
-	ErrSaveSession   = errors.New("could not save session")
-	ErrDeleteSession = errors.New("could not delete session")
+	ErrGetSession    = errors.New("Unable to retrieve session by token.")
+	ErrSaveSession   = errors.New("Unable to save session. Please try again.")
+	ErrDeleteSession = errors.New("Unable to delete session. Please try again.")
 )
 
 type SessionStore interface {

@@ -15,7 +15,6 @@ var (
 	ActivateRecipientSuccess = "Recipient activated successfully."
 	UpdateRecipientSuccess   = "Recipient updated successfully."
 	DeleteRecipientSuccess   = "Recipient deleted successfully."
-	DeleteRecipientErr       = "The default recipient cannot be deleted."
 )
 
 type RecipientService interface {
@@ -260,7 +259,7 @@ func (h *Handler) DeleteRecipient(c *fiber.Ctx) error {
 	err := h.Service.DeleteRecipient(c.Context(), ID, userID)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
-			"error": DeleteRecipientErr,
+			"error": err.Error(),
 		})
 	}
 

@@ -12,6 +12,8 @@ type Events = {
     'recipient.update': {}
     'recipient.verify': {}
     'recipient.delete': { id: string }
+    'recipient.delete.error': { error: string }
+    'recipient.reload': {}
 }
 
 export default mitt<Events>()

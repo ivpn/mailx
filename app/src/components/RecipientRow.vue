@@ -83,15 +83,24 @@ import RecipientAddPGPKey from './RecipientAddPGPKey.vue'
 import { recipientApi } from '../api/recipient.ts'
 import events from '../events.ts'
 import dropdown from '@preline/dropdown'
+import axios from 'axios'
 
 const props = defineProps(['recipient'])
 const recipient = ref(props.recipient)
 const copyText = ref('Click to copy')
 
-const deleteRecipient = () => {
+const deleteRecipient = async () => {
     if (!confirm('Are you sure you want to delete recipient? Note that aliases with this recipient will be disabled.')) return
-    
-    events.emit('recipient.delete', { id: recipient.value.id })
+
+    try {
+        await recipientApi.delete(recipient.value.id)
+        events.emit('recipient.reload', {})
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            const error = err.response?.data.error || err.message
+            events.emit('recipient.delete.error', { error: error })
+        }
+    }
 }
 
 const updateRecipient = async () => {

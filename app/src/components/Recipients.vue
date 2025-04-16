@@ -67,25 +67,13 @@ const getList = async () => {
         renderRow()
     } catch (err) {
         if (axios.isAxiosError(err)) {
-            error.value = err.message
+            error.value = err.response?.data.error || err.message
         }
     }
 }
 
-const deleteRecipient = async (id: string) => {
-    try {
-        await recipientApi.delete(id)
-        error.value = ''
-        reload()
-    } catch (err) {
-        if (axios.isAxiosError(err)) {
-            error.value = err.message
-        }
-    }
-}
-
-const onDeleteRecipient = (payload: { id: string }) => {
-    deleteRecipient(payload.id)
+const onDeleteRecipientError = (payload: { error: string }) => {
+    error.value = payload.error
 }
 
 const reload = () => {
@@ -101,6 +89,7 @@ onMounted(() => {
     events.on('recipient.create', getList)
     events.on('recipient.update', reload)
     events.on('recipient.verify', reload)
-    events.on('recipient.delete', onDeleteRecipient)
+    events.on('recipient.delete.error', onDeleteRecipientError)
+    events.on('recipient.reload', reload)
 })
 </script>

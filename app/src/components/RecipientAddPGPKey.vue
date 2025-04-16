@@ -87,6 +87,7 @@ const addKey = async () => {
 const close = () => {
     error.value = ''
     pgpError.value = false
+    pgp_key.value = ''
     const modal = document.querySelector('#modal-add-key-recipient' + recipient.value.id) as any
     overlay.close(modal)
 }

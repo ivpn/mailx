@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import Dashboard from './components/Dashboard.vue'
 import QuickActions from './components/QuickActions.vue'
 import Recipients from './components/Recipients.vue'
@@ -21,68 +21,75 @@ declare global {
 
 const AppName = import.meta.env.VITE_APP_NAME
 
-const routes = [
+// Protected routes that require authentication
+const PROTECTED_ROUTES = ['/', '/recipients', '/stats', '/settings', '/account']
+
+// Dashboard child routes
+const dashboardChildren: RouteRecordRaw[] = [
+    {
+        path: '',
+        name: AppName,
+        component: QuickActions,
+    },
+    {
+        path: 'recipients',
+        name: `${AppName} - Recipients`,
+        component: Recipients,
+    },
+    {
+        path: 'stats',
+        name: `${AppName} - Stats`,
+        component: Stats,
+    },
+    {
+        path: 'settings',
+        name: `${AppName} - Settings`,
+        component: Settings,
+    },
+    {
+        path: 'account',
+        name: `${AppName} - Account`,
+        component: Account,
+    },
+]
+
+// Public routes
+const routes: RouteRecordRaw[] = [
     {
         path: '/',
         name: AppName,
         component: Dashboard,
-        children: [
-            {
-                path: '',
-                name: AppName,
-                component: QuickActions,
-            },
-            {
-                path: 'recipients',
-                name: AppName + ' - Recipients',
-                component: Recipients,
-            },
-            {
-                path: 'stats',
-                name: AppName + ' - Stats',
-                component: Stats,
-            },
-            {
-                path: 'settings',
-                name: AppName + ' - Settings',
-                component: Settings,
-            },
-            {
-                path: 'account',
-                name: AppName + ' - Account',
-                component: Account,
-            },
-        ]
+        children: dashboardChildren
     },
     {
         path: '/signup/:subid',
-        name: AppName + ' - Sign Up',
+        name: `${AppName} - Sign Up`,
         component: Signup
     },
     {
         path: '/login',
-        name: AppName + ' - Log In',
+        name: `${AppName} - Log In`,
         component: Login
     },
     {
         path: '/signup-complete',
-        name: AppName + ' - Signup Complete',
+        name: `${AppName} - Signup Complete`,
         component: Login
     },
     {
         path: '/reset/password/initiate',
-        name: AppName + ' - Reset Password',
+        name: `${AppName} - Reset Password`,
         component: InitiateResetPassword
     },
     {
         path: '/reset/password/:otp',
-        name: AppName + ' - Set New Password',
+        name: `${AppName} - Set New Password`,
         component: ResetPassword,
-        params: true
+        props: true // Better approach than accessing params directly
     },
     {
         path: '/tos',
-        name: AppName + ' - Terms',
+        name: `${AppName} - Terms`,
         component: Terms
     },
     {
@@ -97,29 +104,28 @@ const router = createRouter({
     routes
 })
 
+// Check if user is logged in
+const isLoggedIn = (): boolean => {
+    const email = localStorage.getItem('email')
+    return email !== null && email.trim() !== ''
+}
+
+// Authentication guard
 router.beforeEach((to, _) => {
     document.title = to.name as string
 
-    const protectedRoutes = ['/', '/recipients', '/stats', '/settings', '/account']
-    
-    if (protectedRoutes.includes(to.path) && !isLoggedIn()) {
-        return { name: AppName + ' - Log In' }
+    if (PROTECTED_ROUTES.includes(to.path) && !isLoggedIn()) {
+        return { name: `${AppName} - Log In` }
     }
 })
 
+// Reinitialize Preline plugins after route changes
 router.afterEach((failure) => {
-    // Reinitialize Preline plugins
-    // https://preline.co/docs/preline-javascript.html
     if (!failure) {
         setTimeout(() => {
             window.HSStaticMethods.autoInit();
         }, 100)
     }
 })
-
-const isLoggedIn = (): boolean => {
-    const email = localStorage.getItem('email')
-    return email !== null && email.trim() !== ''
-}
 
 export default router

@@ -11,11 +11,11 @@ import (
 )
 
 var (
-	PostAliasSuccess   = "New alias created"
-	UpdateAliasSuccess = "Alias is updated"
-	DeleteAliasSuccess = "Alias is deleted"
-	ErrInvalidDomain   = "Invalid domain"
-	ErrUnverifiedRcp   = "Recipient not verified"
+	PostAliasSuccess   = "Alias created successfully."
+	UpdateAliasSuccess = "Alias updated successfully."
+	DeleteAliasSuccess = "Alias deleted successfully."
+	ErrInvalidDomain   = "Selected domain is invalid."
+	ErrUnverifiedRcp   = "The recipient address has not been verified."
 )
 
 type AliasService interface {

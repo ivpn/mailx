@@ -11,10 +11,10 @@ import (
 )
 
 var (
-	PostRecipientSuccess     = "New recipient is added"
-	ActivateRecipientSuccess = "Recipient is activated"
-	UpdateRecipientSuccess   = "Recipient is updated"
-	DeleteRecipientSuccess   = "Recipient is deleted"
+	PostRecipientSuccess     = "Recipient added successfully."
+	ActivateRecipientSuccess = "Recipient activated successfully."
+	UpdateRecipientSuccess   = "Recipient updated successfully."
+	DeleteRecipientSuccess   = "Recipient deleted successfully."
 )
 
 type RecipientService interface {

@@ -99,6 +99,12 @@ const router = createRouter({
 
 router.beforeEach((to, _) => {
     document.title = to.name as string
+
+    const protectedRoutes = ['/', '/recipients', '/stats', '/settings', '/account']
+    
+    if (protectedRoutes.includes(to.path) && !isLoggedIn()) {
+        return { name: AppName + ' - Log In' }
+    }
 })
 
 router.afterEach((failure) => {
@@ -110,5 +116,10 @@ router.afterEach((failure) => {
         }, 100)
     }
 })
+
+const isLoggedIn = (): boolean => {
+    const email = localStorage.getItem('email')
+    return email !== null && email.trim() !== ''
+}
 
 export default router

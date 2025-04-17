@@ -21,7 +21,8 @@
 <script setup lang="ts">
 import Footer from './Footer.vue'
 
-const isLoggedIn = () => {
-    return localStorage.getItem('email') != '' && localStorage.getItem('email') != null
+const isLoggedIn = (): boolean => {
+    const email = localStorage.getItem('email')
+    return email !== null && email.trim() !== ''
 }
 </script>

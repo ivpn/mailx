@@ -13,14 +13,14 @@ import (
 )
 
 var (
-	ErrGetRecipient            = errors.New("could not get recipient by ID")
-	ErrGetRecipients           = errors.New("could not get recipients by user ID")
-	ErrPostRecipient           = errors.New("could not create recipient")
-	ErrMaxExceededRecipient    = errors.New("maximum number of recipients reached")
-	ErrUpdateRecipient         = errors.New("could not update recipient")
-	ErrDeleteRecipient         = errors.New("could not delete recipient")
-	ErrDeleteRecipientByUserID = errors.New("could not delete recipient by user ID")
-	ErrActivateRecipient       = errors.New("could not activate recipient")
+	ErrGetRecipient            = errors.New("Unable to retrieve recipient by ID.")
+	ErrGetRecipients           = errors.New("Unable to retrieve recipients by user ID.")
+	ErrPostRecipient           = errors.New("Unable to create recipient.")
+	ErrMaxExceededRecipient    = errors.New("Maximum number of allowed recipients reached.")
+	ErrUpdateRecipient         = errors.New("Unable to update recipient.")
+	ErrDeleteRecipient         = errors.New("Unable to delete recipient.")
+	ErrDeleteRecipientByUserID = errors.New("Unable to delete recipient for this user.")
+	ErrActivateRecipient       = errors.New("Unable to activate recipient.")
 )
 
 type RecipientsStore interface {
@@ -200,13 +200,15 @@ func (s *Service) DeleteRecipient(ctx context.Context, ID string, userID string)
 	// Get recipient
 	recipient, err := s.Store.GetRecipient(ctx, ID, userID)
 	if err != nil {
-		return err
+		log.Printf("error deleting recipient, GetRecipient: %s", err.Error())
+		return ErrDeleteRecipient
 	}
 
 	// Get aliases
 	aliases, err := s.Store.GetAliases(ctx, userID, 0, 0, "", "", "")
 	if err != nil {
-		return err
+		log.Printf("error deleting recipient, GetAliases: %s", err.Error())
+		return ErrDeleteRecipient
 	}
 
 	// Delete recipient from each alias
@@ -223,14 +225,15 @@ func (s *Service) DeleteRecipient(ctx context.Context, ID string, userID string)
 			// Update alias
 			err = s.Store.UpdateAlias(ctx, alias)
 			if err != nil {
-				return err
+				log.Printf("error deleting recipient, UpdateAlias: %s", err.Error())
+				return ErrDeleteRecipient
 			}
 		}
 	}
 
 	err = s.Store.DeleteRecipient(ctx, ID, userID)
 	if err != nil {
-		log.Printf("an error occurred deleting the recipient: %s", err.Error())
+		log.Printf("error deleting recipient, DeleteRecipient: %s", err.Error())
 		return ErrDeleteRecipient
 	}
 

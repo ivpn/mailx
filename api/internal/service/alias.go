@@ -11,14 +11,14 @@ import (
 )
 
 var (
-	ErrGetAlias            = errors.New("could not get alias by ID")
-	ErrGetAliases          = errors.New("could not get aliass by recipient ID")
-	ErrGetAliasByName      = errors.New("could not get alias by name")
-	ErrPostAlias           = errors.New("could not create alias, try again")
-	ErrPostAliasLimit      = errors.New("maximum number of aliases reached")
-	ErrUpdateAlias         = errors.New("could not update alias")
-	ErrDeleteAlias         = errors.New("could not delete alias")
-	ErrDeleteAliasByUserID = errors.New("could not delete alias by user ID")
+	ErrGetAlias            = errors.New("Unable to retrieve alias by ID.")
+	ErrGetAliases          = errors.New("Unable to retrieve aliases by recipient ID.")
+	ErrGetAliasByName      = errors.New("Unable to retrieve alias by name.")
+	ErrPostAlias           = errors.New("Unable to create alias. Please try again.")
+	ErrPostAliasLimit      = errors.New("You’ve reached the maximum number of allowed aliases.")
+	ErrUpdateAlias         = errors.New("Unable to update alias. Please try again.")
+	ErrDeleteAlias         = errors.New("Unable to delete alias. Please try again.")
+	ErrDeleteAliasByUserID = errors.New("Unable to delete aliases for this user.")
 )
 
 type AliasStore interface {

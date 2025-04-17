@@ -65,7 +65,7 @@ const addKey = async () => {
     const payload = {
         id: recipient.value.id,
         pgp_enabled: true,
-        pgp_key: pgp_key.value
+        pgp_key: pgp_key.value.trim()
     }
 
     try {
@@ -78,7 +78,7 @@ const addKey = async () => {
             error.value = err.response?.data.error || err.message
 
             if (err.response?.status === 429) {
-                error.value = 'Too many requests, please try again later'
+                error.value = 'Too many requests, please try again later.'
             }
         }
     }
@@ -87,6 +87,7 @@ const addKey = async () => {
 const close = () => {
     error.value = ''
     pgpError.value = false
+    pgp_key.value = ''
     const modal = document.querySelector('#modal-add-key-recipient' + recipient.value.id) as any
     overlay.close(modal)
 }

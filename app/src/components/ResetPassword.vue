@@ -101,7 +101,7 @@ const resetPassword = async () => {
             apiError.value = err.response?.data.error || err.message
 
             if (err.response?.status === 429) {
-                apiError.value = 'Too many requests, please try again later'
+                apiError.value = 'Too many requests, please try again later.'
             }
         }
     } finally {

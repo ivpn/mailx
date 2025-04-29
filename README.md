@@ -81,7 +81,11 @@ cd mailserver
 
 #### Run
 ```bash
+# localhost
 docker compose up -d
+
+# Staging|Production
+docker compose -f compose.deploy.yml up -d
 ```
 
 #### Setup Postfix

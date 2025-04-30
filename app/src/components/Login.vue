@@ -5,7 +5,9 @@
             <article>
                 <div>
                     <div v-if="passkeySupported" v-bind:class="{ 'hidden': signupSuccess }" id="tabs-with-underline-1" role="tabpanel" aria-labelledby="tabs-with-underline-item-1">
-                        <h1 class="text-center text-accent mb-8">MailX</h1>
+                        <h1 class="flex justify-center text-accent mb-8">
+                            <span class="logo"></span>
+                        </h1>
                         <h4 class="text-center mb-8">Log in with Passkey</h4>
                         <div>
                             <div class="mb-5">
@@ -32,7 +34,9 @@
                     <div id="tabs-with-underline-2" v-bind:class="{ 'hidden': passkeySupported && !signupSuccess }" role="tabpanel"
                         aria-labelledby="tabs-with-underline-item-2">
                         <div>
-                            <h1 class="text-center text-accent mb-8">MailX</h1>
+                            <h1 class="flex justify-center text-accent mb-8">
+                                <span class="logo"></span>
+                            </h1>
                             <h4 class="text-center mb-8">Log in with email and password</h4>
                             <div class="mb-5">
                                 <input

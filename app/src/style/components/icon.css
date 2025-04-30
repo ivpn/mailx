@@ -85,4 +85,8 @@
             mask-image: url("../../assets/icons/icon-info.svg");
         }
     }
+
+    .logo {
+        @apply block bg-[url("../../assets/mailX-5.svg")] dark:bg-[url("../../assets/mailX-3.svg")] bg-no-repeat w-28 h-9 bg-[center] bg-contain;
+    }
 }

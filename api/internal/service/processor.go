@@ -115,7 +115,6 @@ func (s *Service) saveMessage(alias model.Alias, msgType model.MessageType, data
 		AliasID: alias.ID,
 		UserID:  alias.UserID,
 		Type:    msgType,
-		Size:    len(data),
 	})
 	if err != nil {
 		log.Println("error saving message", err)

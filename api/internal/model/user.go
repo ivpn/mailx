@@ -27,13 +27,12 @@ type User struct {
 }
 
 type UserStats struct {
-	Forwards  int   `json:"forwards"`
-	Blocks    int   `json:"blocks"`
-	Replies   int   `json:"replies"`
-	Sends     int   `json:"sends"`
-	Bandwidth int   `json:"bandwidth"`
-	Aliases   int64 `json:"aliases"`
-	Messages  []any `json:"messages" gorm:"type:text"`
+	Forwards int   `json:"forwards"`
+	Blocks   int   `json:"blocks"`
+	Replies  int   `json:"replies"`
+	Sends    int   `json:"sends"`
+	Aliases  int64 `json:"aliases"`
+	Messages []any `json:"messages" gorm:"type:text"`
 }
 
 func (u *User) SetPassword(passwordPlain string) error {

@@ -1925,9 +1925,6 @@
         "model.AliasStats": {
             "type": "object",
             "properties": {
-                "bandwidth": {
-                    "type": "integer"
-                },
                 "blocks": {
                     "type": "integer"
                 },
@@ -2079,9 +2076,6 @@
             "type": "object",
             "properties": {
                 "aliases": {
-                    "type": "integer"
-                },
-                "bandwidth": {
                     "type": "integer"
                 },
                 "blocks": {

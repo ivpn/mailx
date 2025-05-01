@@ -1936,9 +1936,6 @@ const docTemplate = `{
         "model.AliasStats": {
             "type": "object",
             "properties": {
-                "bandwidth": {
-                    "type": "integer"
-                },
                 "blocks": {
                     "type": "integer"
                 },
@@ -2090,9 +2087,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "aliases": {
-                    "type": "integer"
-                },
-                "bandwidth": {
                     "type": "integer"
                 },
                 "blocks": {

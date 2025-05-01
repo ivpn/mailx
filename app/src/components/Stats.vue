@@ -7,7 +7,7 @@
             <h3>Messages in last 7 days</h3>
             <div id="chart" class="mb-5"></div>
             <h3>Messages in last 90 days</h3>
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-center mb-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center mb-8">
                 <div class="p-4 border-r border-secondary">
                     <h1 class="mb-2">{{ stats.forwards }}</h1>
                     <p class="m-0">Forwards</p>
@@ -20,13 +20,9 @@
                     <h1 class="mb-2">{{ stats.replies }}</h1>
                     <p class="m-0">Replies</p>
                 </div>
-                <div class="p-4 border-r border-transparent md:border-secondary">
+                <div class="p-4 border-r border-transparent">
                     <h1 class="mb-2">{{ stats.sends }}</h1>
                     <p class="m-0">Sends</p>
-                </div>
-                <div class="p-4">
-                    <h1 class="mb-2">{{ getBandwidth(stats.bandwidth) }}</h1>
-                    <p class="m-0">Bandwidth</p>
                 </div>
             </div>
             <p v-if="error" class="error">Error: {{ error }}</p>
@@ -55,7 +51,6 @@ const stats = ref({
     blocks: 0,
     replies: 0,
     sends: 0,
-    bandwidth: 0,
     aliases: 0,
     messages: [],
 })
@@ -75,16 +70,6 @@ const getStats = async () => {
             error.value = err.response?.data.error || err.message
         }
     }
-}
-
-const getBandwidth = (bytes: number): string => {
-    if (bytes === 0) return '0 B'
-
-    const k = 1024
-    const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
 }
 
 const initChart = () => {

@@ -20,8 +20,7 @@ func (d *Database) GetAlias(ctx context.Context, ID string, userID string) (mode
 		Select("SUM(CASE WHEN type = ? THEN 1 ELSE 0 END) as forwards, "+
 			"SUM(CASE WHEN type = ? THEN 1 ELSE 0 END) as blocks, "+
 			"SUM(CASE WHEN type = ? THEN 1 ELSE 0 END) as replies, "+
-			"SUM(CASE WHEN type = ? THEN 1 ELSE 0 END) as sends, "+
-			"SUM(size) as bandwidth",
+			"SUM(CASE WHEN type = ? THEN 1 ELSE 0 END) as sends",
 			model.Forward, model.Block, model.Reply, model.Send).
 		Where("alias_id = ?", ID).
 		Scan(&aliasStats).Error
@@ -58,8 +57,7 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 			COALESCE(SUM(CASE WHEN m.type = ? THEN 1 ELSE 0 END), 0) AS forwards,
 			COALESCE(SUM(CASE WHEN m.type = ? THEN 1 ELSE 0 END), 0) AS blocks,
 			COALESCE(SUM(CASE WHEN m.type = ? THEN 1 ELSE 0 END), 0) AS replies,
-			COALESCE(SUM(CASE WHEN m.type = ? THEN 1 ELSE 0 END), 0) AS sends,
-			COALESCE(SUM(m.size), 0) AS bandwidth
+			COALESCE(SUM(CASE WHEN m.type = ? THEN 1 ELSE 0 END), 0) AS sends
 		FROM aliases a
 		LEFT JOIN messages m
 		ON a.id = m.alias_id
@@ -83,16 +81,15 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 
 	for rows.Next() {
 		var alias model.Alias
-		var forwards, blocks, replies, sends, bandwidth int
-		if err := rows.Scan(&alias.ID, &alias.CreatedAt, &alias.UpdatedAt, &alias.DeletedAt, &alias.Name, &alias.UserID, &alias.Enabled, &alias.Description, &alias.Recipients, &alias.FromName, &alias.CatchAll, &forwards, &blocks, &replies, &sends, &bandwidth); err != nil {
+		var forwards, blocks, replies, sends int
+		if err := rows.Scan(&alias.ID, &alias.CreatedAt, &alias.UpdatedAt, &alias.DeletedAt, &alias.Name, &alias.UserID, &alias.Enabled, &alias.Description, &alias.Recipients, &alias.FromName, &alias.CatchAll, &forwards, &blocks, &replies, &sends); err != nil {
 			return nil, err
 		}
 		alias.Stats = model.AliasStats{
-			Forwards:  forwards,
-			Blocks:    blocks,
-			Replies:   replies,
-			Sends:     sends,
-			Bandwidth: bandwidth,
+			Forwards: forwards,
+			Blocks:   blocks,
+			Replies:  replies,
+			Sends:    sends,
 		}
 		aliases = append(aliases, alias)
 	}

@@ -25,11 +25,10 @@ type Alias struct {
 }
 
 type AliasStats struct {
-	Forwards  int `json:"forwards"`
-	Blocks    int `json:"blocks"`
-	Replies   int `json:"replies"`
-	Sends     int `json:"sends"`
-	Bandwidth int `json:"bandwidth"`
+	Forwards int `json:"forwards"`
+	Blocks   int `json:"blocks"`
+	Replies  int `json:"replies"`
+	Sends    int `json:"sends"`
 }
 
 type AliasList struct {

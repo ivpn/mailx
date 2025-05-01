@@ -95,8 +95,7 @@ func (d *Database) GetUserStats(ctx context.Context, ID string) (model.UserStats
 		Select("SUM(CASE WHEN type = ? THEN 1 ELSE 0 END) as forwards, "+
 			"SUM(CASE WHEN type = ? THEN 1 ELSE 0 END) as blocks, "+
 			"SUM(CASE WHEN type = ? THEN 1 ELSE 0 END) as replies, "+
-			"SUM(CASE WHEN type = ? THEN 1 ELSE 0 END) as sends, "+
-			"SUM(size) as bandwidth",
+			"SUM(CASE WHEN type = ? THEN 1 ELSE 0 END) as sends",
 			model.Forward, model.Block, model.Reply, model.Send).
 		Where("user_id = ?", ID).
 		Where("created_at > NOW() - INTERVAL 90 DAY").

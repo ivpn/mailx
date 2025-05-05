@@ -180,8 +180,6 @@ definitions:
     type: object
   model.AliasStats:
     properties:
-      bandwidth:
-        type: integer
       blocks:
         type: integer
       forwards:
@@ -281,8 +279,6 @@ definitions:
   model.UserStats:
     properties:
       aliases:
-        type: integer
-      bandwidth:
         type: integer
       blocks:
         type: integer

@@ -3,7 +3,7 @@
         <nav>
             <router-link to="/" class="p-0">
                 <h1 class="pl-8 pr-5 m-0 text-accent head flex items-center justify-between">
-                    MailX
+                    <span class="logo"></span>
                 </h1>
             </router-link>
             <div class="flex flex-col items-center">

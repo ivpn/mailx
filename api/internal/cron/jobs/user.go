@@ -72,17 +72,17 @@ func deleteUsers(db *gorm.DB, users []model.User) {
 			return
 		}
 
-		// Delete subscriptions of the user
-		err = db.Where("user_id = ?", ID).Delete(&model.Subscription{}).Error
-		if err != nil {
-			log.Println("Error deleting subscriptions of user:", err)
-			return
-		}
-
 		// Delete settings of the user
 		err = db.Where("user_id = ?", ID).Delete(&model.Settings{}).Error
 		if err != nil {
 			log.Println("Error deleting settings of user:", err)
+			return
+		}
+
+		// Delete subscriptions of the user
+		err = db.Where("user_id = ?", ID).Delete(&model.Subscription{}).Error
+		if err != nil {
+			log.Println("Error deleting subscriptions of user:", err)
 			return
 		}
 

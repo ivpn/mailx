@@ -21,7 +21,6 @@ type Message struct {
 	UserID    string      `json:"-"`
 	AliasID   string      `json:"-"`
 	Type      MessageType `json:"type"`
-	Size      int         `json:"-"`
 }
 
 func ParseReplyTo(email string) (string, string) {

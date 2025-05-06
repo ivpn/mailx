@@ -64,7 +64,7 @@
                                 >
                                 <p v-if="passwordError" class="error">Required</p>
                             </div>
-                            <p class="text-sm mb-5">Must be 12+ characters and contain uppercase, lowercase, number, and special character (e.g. !@#$%^&*(),;.?":{}|<>-_+=~)</p>
+                            <p class="text-sm mb-5">Must be 12+ characters and contain uppercase, lowercase, number, and special character (e.g. -_+=~!@#$%^&*(),;.?":{}|<>)</p>
                             <div class="flex items-center w-full">
                                 <button @click="register" :disabled="isLoading" class="cta full">
                                     Sign Up

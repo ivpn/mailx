@@ -24,7 +24,7 @@
             >
         </div>
         <p class="text-sm">
-            Must be 12+ characters and contain uppercase, lowercase, number, and special character (e.g. !@#$%^&*(),;.?":{}|<>-_+=~)
+            Must be 12+ characters and contain uppercase, lowercase, number, and special character (e.g. -_+=~!@#$%^&*(),;.?":{}|<>)
         </p>
         <div class="mb-3 max-w-xs">
             <button

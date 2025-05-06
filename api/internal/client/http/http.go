@@ -5,7 +5,6 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"ivpn.net/email/api/config"
-	"ivpn.net/email/api/internal/model"
 )
 
 type Http struct {
@@ -18,11 +17,11 @@ func New(cfg config.APIConfig) *Http {
 	}
 }
 
-func (http Http) SignupWebhook(sub model.Subscription) error {
+func (http Http) SignupWebhook(subID string) error {
 	req := fiber.Post(http.Cfg.SignupWebhookURL)
 	req.Set("Content-Type", "application/json")
 	req.Set("Authorization:", "Bearer "+http.Cfg.SignupWebhookPSK)
-	req.Body([]byte(`{"uuid": "` + sub.ID + `"}`))
+	req.Body([]byte(`{"uuid": "` + subID + `"}`))
 
 	_, _, err := req.Bytes()
 	if err != nil {

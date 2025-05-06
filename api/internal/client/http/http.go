@@ -64,8 +64,6 @@ func (h Http) SignupWebhook(subID string) error {
 		return errors.New("Error calling signup webhook")
 	}
 
-	log.Println("Signup webhook request:", req)
-
 	if status != http.StatusOK {
 		log.Println("Error calling signup webhook, status:", status)
 		return errors.New("Error calling signup webhook")

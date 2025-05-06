@@ -43,7 +43,7 @@ func passwordValidation(fl validator.FieldLevel) bool {
 	var uppercase = regexp.MustCompile(`[A-Z]`).MatchString
 	var lowercase = regexp.MustCompile(`[a-z]`).MatchString
 	var number = regexp.MustCompile(`[0-9]`).MatchString
-	var specialChar = regexp.MustCompile(`[!@#$%^&*(),;.?":{}|<>]`).MatchString
+	var specialChar = regexp.MustCompile(`[-_+=~!@#$%^&*(),;.?":{}|<>]`).MatchString
 
 	if !uppercase(password) {
 		return false

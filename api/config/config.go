@@ -20,6 +20,8 @@ type APIConfig struct {
 	LogFile           string
 	BasicAuthUser     string
 	BasicAuthPassword string
+	SignupWebhookURL  string
+	SignupWebhookPSK  string
 }
 
 type DBConfig struct {
@@ -140,6 +142,8 @@ func New() (Config, error) {
 			LogFile:           os.Getenv("LOG_FILE"),
 			BasicAuthUser:     os.Getenv("BASIC_AUTH_USER"),
 			BasicAuthPassword: os.Getenv("BASIC_AUTH_PASSWORD"),
+			SignupWebhookURL:  os.Getenv("SIGNUP_WEBHOOK_URL"),
+			SignupWebhookPSK:  os.Getenv("SIGNUP_WEBHOOK_PSK"),
 		},
 		DB: DBConfig{
 			Host:     os.Getenv("DB_HOST"),

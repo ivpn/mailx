@@ -20,7 +20,7 @@ func New(cfg config.APIConfig) *Http {
 	}
 }
 
-func (h Http) SignupWebhook(subID string) error {
+func (h Http) SignupWebhookNet(subID string) error {
 	data := map[string]string{
 		"uuid": subID,
 	}
@@ -51,10 +51,10 @@ func (h Http) SignupWebhook(subID string) error {
 	return nil
 }
 
-func (h Http) SignupWebhookFiber(subID string) error {
+func (h Http) SignupWebhook(subID string) error {
 	req := fiber.Post(h.Cfg.SignupWebhookURL)
 	req.Set("Content-Type", "application/json")
-	req.Set("Authorization:", "Bearer "+h.Cfg.SignupWebhookPSK)
+	req.Set("Authorization", "Bearer "+h.Cfg.SignupWebhookPSK)
 	req.Body([]byte(`{"uuid": "` + subID + `"}`))
 
 	_, _, err := req.Bytes()

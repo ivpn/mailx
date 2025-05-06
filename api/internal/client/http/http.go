@@ -3,6 +3,7 @@ package http
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 
@@ -57,11 +58,18 @@ func (h Http) SignupWebhook(subID string) error {
 	req.Set("Authorization", "Bearer "+h.Cfg.SignupWebhookPSK)
 	req.Body([]byte(`{"uuid": "` + subID + `"}`))
 
-	_, _, err := req.Bytes()
+	statusCode, body, err := req.Bytes()
 	if err != nil {
 		log.Println("Error calling signup webhook:", err)
-		return err[0]
+		return errors.New("Error calling signup webhook")
 	}
+
+	if statusCode != http.StatusOK {
+		log.Println("Error calling signup webhook, statusCode:", statusCode)
+		return errors.New("Error calling signup webhook")
+	}
+
+	log.Println("Signup webhook response body:", string(body))
 
 	return nil
 }

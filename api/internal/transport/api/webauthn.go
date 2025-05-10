@@ -118,69 +118,6 @@ func (h *Handler) BeginRegistration(c *fiber.Ctx) error {
 	return c.Status(200).JSON(options)
 }
 
-// @Summary Add Passkey
-// @Description Begin Add Passkey process
-// @Tags webauthn
-// @Accept json
-// @Produce json
-// @Param email body EmailReq true "Email"
-// @Success 201 {object} SuccessRes
-// @Failure 400 {object} ErrorRes
-// @Router /register/add [post]
-func (h *Handler) AddPasskey(c *fiber.Ctx) error {
-	// Parse the request
-	req := EmailReq{}
-	err := c.BodyParser(&req)
-	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"error": ErrInvalidRequest,
-		})
-	}
-
-	// Validate the request
-	err = h.Validator.Struct(req)
-	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"error": ErrInvalidRequest,
-		})
-	}
-
-	// Get user
-	user, err := h.Service.GetUserByEmail(c.Context(), req.Email)
-	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"error": err.Error(),
-		})
-	}
-
-	// Begin registration
-	options, sessionData, err := h.WebAuthn.BeginRegistration(user)
-	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"error": err.Error(),
-		})
-	}
-
-	// Save the session
-	token, err := model.GenSessionToken()
-	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"error": ErrSaveSession,
-		})
-	}
-	err = h.Service.SaveSession(c.Context(), *sessionData, token, user.ID)
-	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"error": ErrSaveSession,
-		})
-	}
-
-	// Set token in cookie
-	c.Cookie(auth.NewCookieTempAuthn(token, c.Path(), h.Cfg))
-
-	return c.Status(200).JSON(options)
-}
-
 // @Summary Finish registration
 // @Description Finish registration process
 // @Tags webauthn
@@ -267,6 +204,69 @@ func (h *Handler) FinishRegistration(c *fiber.Ctx) error {
 	return c.Status(200).JSON(fiber.Map{
 		"message": FinishRegistrationSuccess,
 	})
+}
+
+// @Summary Add Passkey
+// @Description Begin Add Passkey process
+// @Tags webauthn
+// @Accept json
+// @Produce json
+// @Param email body EmailReq true "Email"
+// @Success 201 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /register/add [post]
+func (h *Handler) AddPasskey(c *fiber.Ctx) error {
+	// Parse the request
+	req := EmailReq{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	// Validate the request
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	// Get user
+	user, err := h.Service.GetUserByEmail(c.Context(), req.Email)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	// Begin registration
+	options, sessionData, err := h.WebAuthn.BeginRegistration(user)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	// Save the session
+	token, err := model.GenSessionToken()
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrSaveSession,
+		})
+	}
+	err = h.Service.SaveSession(c.Context(), *sessionData, token, user.ID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrSaveSession,
+		})
+	}
+
+	// Set token in cookie
+	c.Cookie(auth.NewCookieTempAuthn(token, c.Path(), h.Cfg))
+
+	return c.Status(200).JSON(options)
 }
 
 // @Summary Begin login

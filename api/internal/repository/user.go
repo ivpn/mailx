@@ -64,6 +64,26 @@ func (d *Database) GetUserByEmail(ctx context.Context, email string) (model.User
 	return user, nil
 }
 
+func (d *Database) GetUserByEmailUnfinishedSignup(ctx context.Context, email string) (model.User, error) {
+	var user model.User
+	err := d.Client.Where("email = ? AND password_hash IS NULL", email).First(&user).Error
+	if err != nil {
+		return model.User{}, err
+	}
+
+	var creds []model.Credential
+	err = d.Client.Where("user_id = ?", user.ID).Find(&creds).Error
+	if err != nil {
+		return model.User{}, err
+	}
+
+	if len(creds) > 0 {
+		return model.User{}, err
+	}
+
+	return user, nil
+}
+
 func (d *Database) PostUser(ctx context.Context, user model.User) (model.User, error) {
 	err := d.Client.Create(&user).Error
 	return user, err

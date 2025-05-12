@@ -90,8 +90,13 @@ func (s *Service) GetUserByEmail(ctx context.Context, email string) (model.User,
 }
 
 func (s *Service) GetUnfinishedSignupOrPostUser(ctx context.Context, user model.User, subID string) (model.User, error) {
-	user, err := s.Store.GetUserByEmailUnfinishedSignup(ctx, user.Email)
+	email := user.Email
+	user, err := s.Store.GetUserByEmailUnfinishedSignup(ctx, email)
 	if err != nil {
+		user := model.User{
+			Email:    email,
+			IsActive: false,
+		}
 		err = s.PostUser(ctx, user, subID)
 		if err != nil {
 			log.Printf("error creating user: %s", err.Error())

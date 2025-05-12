@@ -66,7 +66,7 @@ func (d *Database) GetUserByEmail(ctx context.Context, email string) (model.User
 
 func (d *Database) GetUserByEmailUnfinishedSignup(ctx context.Context, email string) (model.User, error) {
 	var user model.User
-	err := d.Client.Where("email = ? AND password_hash IS NULL", email).First(&user).Error
+	err := d.Client.Where("email = ? AND password_hash = ''", email).First(&user).Error
 	if err != nil {
 		return model.User{}, err
 	}

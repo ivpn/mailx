@@ -45,6 +45,7 @@ var (
 type UserStore interface {
 	GetUser(context.Context, string) (model.User, error)
 	GetUserByEmail(context.Context, string) (model.User, error)
+	GetUserByEmailUnfinishedSignup(context.Context, string) (model.User, error)
 	PostUser(context.Context, model.User) (model.User, error)
 	ActivateUser(context.Context, string) error
 	SaveUser(context.Context, model.User) error
@@ -83,6 +84,19 @@ func (s *Service) GetUserByEmail(ctx context.Context, email string) (model.User,
 	user, err := s.Store.GetUserByEmail(ctx, email)
 	if err != nil {
 		return model.User{}, ErrIncorrectEmail
+	}
+
+	return user, nil
+}
+
+func (s *Service) GetUnfinishedSignupOrPostUser(ctx context.Context, user model.User, subID string) (model.User, error) {
+	user, err := s.Store.GetUserByEmailUnfinishedSignup(ctx, user.Email)
+	if err != nil {
+		err = s.PostUser(ctx, user, subID)
+		if err != nil {
+			log.Printf("error creating user: %s", err.Error())
+			return model.User{}, ErrPostUser
+		}
 	}
 
 	return user, nil

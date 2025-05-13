@@ -38,6 +38,7 @@ type UserService interface {
 	GetUserByCredentials(context.Context, string, string) (model.User, error)
 	GetUserByPassword(context.Context, string, string) (model.User, error)
 	GetUserByEmail(context.Context, string) (model.User, error)
+	GetUnfinishedSignupOrPostUser(context.Context, model.User, string) (model.User, error)
 	SaveUser(context.Context, model.User) error
 	DeleteUserRequest(context.Context, string) (string, error)
 	DeleteUser(context.Context, string, string) error

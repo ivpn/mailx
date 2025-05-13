@@ -207,7 +207,16 @@ const parseSubid = () => {
     }
 }
 
+const isLoggedIn = (): boolean => {
+    const email = localStorage.getItem('email')
+    return email !== null && email.trim() !== ''
+}
+
 onMounted(() => {
+    if (isLoggedIn()) {
+        window.location.href = '/'
+    }
+    
     parseSubid()
     passkeySupported.value = browserSupportsWebAuthn()
     tabs.autoInit()

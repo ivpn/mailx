@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"ivpn.net/email/api/config"
+	"ivpn.net/email/api/internal/client/http"
 )
 
 type Store interface {
@@ -28,6 +29,7 @@ type Service struct {
 	Cfg   config.Config
 	Store Store
 	Cache Cache
+	Http  http.Http
 }
 
 func New(cfg config.Config, store Store, cache Cache) *Service {
@@ -35,5 +37,8 @@ func New(cfg config.Config, store Store, cache Cache) *Service {
 		Cfg:   cfg,
 		Store: store,
 		Cache: cache,
+		Http: http.Http{
+			Cfg: cfg.API,
+		},
 	}
 }

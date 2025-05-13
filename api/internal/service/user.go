@@ -176,12 +176,6 @@ func (s *Service) PostUser(ctx context.Context, user model.User, subID string) e
 		return ErrPostUser
 	}
 
-	otp, err := utils.CreateOTP()
-	if err != nil {
-		log.Printf("error creating user: %s", err.Error())
-		return ErrCreateOTP
-	}
-
 	err = s.Http.SignupWebhook(subID)
 	if err != nil {
 		log.Printf("error creating user: %s", err.Error())

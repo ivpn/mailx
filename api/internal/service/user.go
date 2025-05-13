@@ -182,26 +182,6 @@ func (s *Service) PostUser(ctx context.Context, user model.User, subID string) e
 		return ErrCreateOTP
 	}
 
-	err = s.Cache.Set(ctx, "activation_"+user.ID, otp.Hash, s.Cfg.Service.OTPExpiration)
-	if err != nil {
-		log.Printf("error creating user: %s", err.Error())
-		return ErrSaveOTP
-	}
-
-	utils.Background(func() {
-		data := map[string]any{
-			"otp":  otp.Secret,
-			"from": s.Cfg.SMTPClient.SenderName,
-		}
-		mailer := mailer.New(s.Cfg.SMTPClient)
-		mailer.Sender = s.Cfg.SMTPClient.Sender
-		mailer.SenderName = s.Cfg.SMTPClient.SenderName
-		err = mailer.SendTemplate(user.Email, "["+mailer.SenderName+"] Verify Account Notification", "otp_account.tmpl", data)
-		if err != nil {
-			log.Printf("error creating user: %s", err.Error())
-		}
-	})
-
 	err = s.Http.SignupWebhook(subID)
 	if err != nil {
 		log.Printf("error creating user: %s", err.Error())

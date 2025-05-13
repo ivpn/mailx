@@ -98,8 +98,24 @@ func (h *Handler) Register(c *fiber.Ctx) error {
 		})
 	}
 
+	// Get user
+	user, err = h.Service.GetUserByEmail(c.Context(), req.Email)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
 	// Set password
 	err = h.Service.ChangePassword(c.Context(), user.ID, req.Password)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	// Send OTP
+	err = h.Service.SendUserOTP(c.Context(), user.ID)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),

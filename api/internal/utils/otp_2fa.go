@@ -3,7 +3,6 @@ package utils
 import (
 	"crypto/hmac"
 	"crypto/sha256"
-	"crypto/subtle"
 	"encoding/base32"
 	"encoding/binary"
 	"errors"
@@ -94,8 +93,7 @@ func CheckWithConfig(secret string, code int, config *OTPConfig) (bool, error) {
 		if err != nil {
 			return false, err
 		}
-		// Use constant-time comparison to prevent timing attacks
-		if subtle.ConstantTimeEq(int32(c), int32(code)) == 1 {
+		if c == code {
 			return true, nil
 		}
 	}

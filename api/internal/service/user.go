@@ -510,11 +510,17 @@ func (s *Service) ResetPassword(ctx context.Context, otp string, password string
 }
 
 func (s *Service) TotpEnable(ctx context.Context, userID string) (model.TOTPNew, error) {
+	random, err := utils.RandomString(10, utils.AlphaNumericUserFriendlyUppercase)
+	if err != nil {
+		log.Printf("error enabling TOTP: %s", err.Error())
+		return model.TOTPNew{}, ErrCreateOTP
+	}
+
 	totpSecret := base32.StdEncoding.EncodeToString(
-		[]byte(utils.RandomString(10, utils.AlphaNumericUserFriendlyUppercase)),
+		[]byte(random),
 	)
 
-	err := s.Cache.Set(ctx, "totp_"+userID, totpSecret, s.Cfg.Service.OTPExpiration)
+	err = s.Cache.Set(ctx, "totp_"+userID, totpSecret, s.Cfg.Service.OTPExpiration)
 	if err != nil {
 		log.Printf("error enabling TOTP: %s", err.Error())
 		return model.TOTPNew{}, ErrSaveOTP
@@ -554,9 +560,17 @@ func (s *Service) TotpEnableConfirm(ctx context.Context, userID string, otp stri
 	}
 
 	backupCodes := []string{}
+
 	for range 8 {
-		backupCodes = append(backupCodes, utils.RandomString(8, utils.AlphaNumericUserFriendly))
+		random, err := utils.RandomString(8, utils.AlphaNumericUserFriendly)
+		if err != nil {
+			log.Printf("error enabling TOTP: %s", err.Error())
+			return model.TOTPBackup{}, ErrCreateOTP
+		}
+
+		backupCodes = append(backupCodes, random)
 	}
+
 	totpBackup := strings.Join(backupCodes, " ")
 
 	err = s.Store.TotpEnable(ctx, userID, secret, totpBackup)

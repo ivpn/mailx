@@ -19,10 +19,10 @@ jobs:
       - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
-          ref: 'main'
+          ref: ${{ github.ref }}
 
       - name: Pull changes from branch
-        run: git pull origin main
+        run: git pull origin ${{ github.ref }}
 
       - name: create app/.env file
         run: |

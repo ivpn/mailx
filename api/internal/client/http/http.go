@@ -26,14 +26,14 @@ func (h Http) SignupWebhook(subID string) error {
 	req.Set("Authorization", "Bearer "+h.Cfg.SignupWebhookPSK)
 	req.Body([]byte(`{"uuid": "` + subID + `"}`))
 
-	status, body, err := req.Bytes()
+	status, _, err := req.Bytes()
 	if err != nil {
 		log.Printf("Error calling signup webhook: %v", err)
 		return errors.New("error calling signup webhook")
 	}
 
 	if status != http.StatusOK {
-		log.Printf("Error calling signup webhook, status: %d, body: %s", status, string(body))
+		log.Printf("Error calling signup webhook, status: %d", status)
 		return errors.New("error response from signup webhook")
 	}
 

@@ -35,7 +35,7 @@ func RandomString(n int, charset string) (string, error) {
 
 	maxIdx := big.NewInt(int64(len(charset)))
 
-	for i := 0; i < n; i++ {
+	for range n {
 		idx, err := rand.Int(rand.Reader, maxIdx)
 		if err != nil {
 			if err == io.EOF {

@@ -20,6 +20,7 @@ var (
 	ErrGetUserStats        = errors.New("Unable to retrieve user statistics.")
 	ErrSaveUser            = errors.New("Unable to save user.")
 	ErrPostUser            = errors.New("Unable to create user.")
+	ErrSignupWebhook       = errors.New("Unable to call signup webhook.")
 	ErrActivateUser        = errors.New("Unable to activate user.")
 	ErrDeleteUser          = errors.New("Unable to delete user.")
 	ErrCreateOTP           = errors.New("Unable to generate OTP.")
@@ -198,6 +199,12 @@ func (s *Service) PostUser(ctx context.Context, user model.User, subID string) e
 			log.Printf("error creating user: %s", err.Error())
 		}
 	})
+
+	err = s.Http.SignupWebhook(subID)
+	if err != nil {
+		log.Printf("error creating user: %s", err.Error())
+		return ErrSignupWebhook
+	}
 
 	return nil
 }

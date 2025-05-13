@@ -92,11 +92,13 @@ func (s *Service) GetUserByEmail(ctx context.Context, email string) (model.User,
 
 func (s *Service) GetUnfinishedSignupOrPostUser(ctx context.Context, user model.User, subID string) (model.User, error) {
 	email := user.Email
+	pass := user.PasswordPlain
 	user, err := s.Store.GetUserByEmailUnfinishedSignup(ctx, email)
 	if err != nil {
 		user := model.User{
-			Email:    email,
-			IsActive: false,
+			Email:         email,
+			PasswordPlain: pass,
+			IsActive:      false,
 		}
 		err = s.PostUser(ctx, user, subID)
 		if err != nil {

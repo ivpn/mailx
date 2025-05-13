@@ -90,8 +90,16 @@ func (h *Handler) Register(c *fiber.Ctx) error {
 		IsActive:      false,
 	}
 
-	// Save the user
-	err = h.Service.PostUser(c.Context(), user, req.SubID)
+	// Get unfinished signup user or create new user
+	user, err = h.Service.GetUnfinishedSignupOrPostUser(c.Context(), user, req.SubID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	// Set password
+	err = h.Service.ChangePassword(c.Context(), user.ID, req.Password)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),

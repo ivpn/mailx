@@ -76,6 +76,7 @@
                     v-bind:aria-labelledby="'hs-dropdown-alias-edit-' + alias.id"
                 >
                     <button
+                        v-if="!alias.catch_all"
                         v-bind:disabled="!alias.recipients.length"
                         v-bind:data-hs-overlay="'#modal-send-alias' + alias.id">
                         <i class="icon icon-primary send text-xs"></i>

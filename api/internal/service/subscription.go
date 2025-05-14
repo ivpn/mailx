@@ -59,6 +59,12 @@ func (s *Service) PostSubscription(ctx context.Context, userID string, subID str
 		}
 	}
 
+	err = s.Cache.Del(ctx, "sub_"+subID)
+	if err != nil {
+		log.Printf("error deleting subscription: %s", err.Error())
+		return ErrPostSubscription
+	}
+
 	return nil
 }
 

@@ -21,7 +21,7 @@
                     <article>
                         <div class="mb-5">
                             <p>
-                                Add a email address to receive forwarded emails. A 6 digit verification code will be sent to this email address. If expired, you can resend the verification code. Unverified recipients will not receive any forwarded emails and will be deleted after 7 days. You can add up to 10 recipients.
+                                Add a new email address to receive forwarded emails. New addresses need a one-time verification before use.
                             </p>
                         </div>
                         <div class="mb-3">
@@ -37,6 +37,9 @@
                             >
                             <p v-if="emailError" class="error">Required</p>
                         </div>
+                        <p>
+                            Note: Unverified recipient email addresses are automatically deleted 7 days after creation. You can add up to 10 recipients.
+                        </p>
                     </article>
                     <footer>
                         <nav>

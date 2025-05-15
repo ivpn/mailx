@@ -3,7 +3,7 @@
         <h2>Passkeys</h2>
         <div v-if="passkeySupported">
             <p>
-                Add or remove Passkeys.<br>
+                Add or remove Passkeys associated with your account.<br>
             </p>
             <div class="flex justify-start items-center gap-x-3 mb-3">
                 <button @click="addPasskey" class="cta">

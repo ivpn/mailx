@@ -1,22 +1,20 @@
 {{define "body"}}
-Here is the OTP to verify your recipient email address:
+One-time code to verify your MailX recipient email address:
 {{.otp}}
 
 Note:
-Unverified recipients will not receive any forwarded emails and may be deleted after 7 days.
+Unverified recipients will not receive any forwarded emails and are automatically deleted after 7 days.
 
-Regards,
-{{.from}}
+Sent by {{.from}}
 {{end}}
 
 {{define "bodyHtml"}}
 <div style="font-family: Arial, Helvetica, sans-serif;font-size: 15px;">
-Here is the OTP to verify your recipient email address:<br>
+One-time code to verify your MailX recipient email address:<br>
 {{.otp}}<br><br>
 Note:<br>
-Unverified recipients will not receive any forwarded emails and may be deleted after 7 days.
+Unverified recipients will not receive any forwarded emails and are automatically deleted after 7 days.
 <br><br>
-Regards,<br>
-{{.from}}
+Sent by {{.from}}
 </div>
 {{end}}

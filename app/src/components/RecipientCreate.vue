@@ -37,9 +37,6 @@
                             >
                             <p v-if="emailError" class="error">Required</p>
                         </div>
-                        <p>
-                            Note: Unverified recipient email addresses are automatically deleted 7 days after creation. You can add up to 10 recipients.
-                        </p>
                     </article>
                     <footer>
                         <nav>
@@ -51,6 +48,9 @@
                             </button>
                         </nav>
                         <p v-if="error" class="error px-5">Error: {{ error }}</p>
+                        <p class="px-5">
+                            Note: Unverified recipient email addresses are automatically deleted 7 days after creation. You can add up to 10 recipients.
+                        </p>
                     </footer>
                 </div>
             </div>

@@ -182,11 +182,11 @@ const errorCatchAllSuffix = ref(false)
 const step = ref(1)
 
 const postAlias = async () => {
-    if (!validate()) return
-
     alias.value.domain = (document.getElementById('alias_domain') as HTMLInputElement).value
     alias.value.recipients = selectRecipients.value.join(',')
     alias.value.enabled = true
+
+    if (!validate(alias.value.recipients)) return
 
     if (props.catchAll) {
         alias.value.format = 'catch_all'
@@ -231,7 +231,12 @@ const addEvents = () => {
     })
 }
 
-const validate = () => {
+const validate = (rcps: string) => {
+    if (rcps.length === 0) {
+        error.value = 'Select one or more recipients'
+        return false
+    }
+
     if (props.catchAll) {
         errorCatchAllSuffix.value = alias.value.catch_all_suffix.length < 6 || alias.value.catch_all_suffix.length > 12
     } else {

@@ -99,6 +99,8 @@ const errorRecipients = ref('')
 const updateAlias = async () => {
     alias.value.recipients = selectRecipients.value.toString()
 
+    if (!validate(alias.value.recipients)) return
+
     try {
         const res = await aliasApi.update(alias.value.id, alias.value)
         success.value = res.data.message
@@ -111,6 +113,15 @@ const updateAlias = async () => {
             error.value = err.message
         }
     }
+}
+
+const validate = (rcps: string) => {
+    if (rcps.length === 0) {
+        error.value = 'Select one or more recipients'
+        return false
+    }
+
+    return true
 }
 
 const close = () => {

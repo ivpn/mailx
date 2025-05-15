@@ -10,7 +10,7 @@
             <span class="bg-secondary rounded flex items-center justify-center p-2 mb-5">
                 <i class="icon at icon-accent text-2xl"></i>
             </span>
-            <h4>You have no aliases yet</h4>
+            <h4 class="mb-6">You have no aliases yet</h4>
             <p v-if="!recipients.length && loaded" class="text-tertiary mb-6">
                 To get started, first <router-link to="/account">verify</router-link> your primary email address.
             </p>

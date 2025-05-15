@@ -16,10 +16,12 @@
                         <div v-if="!isEnabled">
                             <div class="mb-5">
                                 <p>
-                                    To enable two-factor authentication, please scan the code with a TOTP app (for example: Google Authenticator) and enter the code in the field below.
+                                    To enable 2FA, please scan the QR code in a TOTP app (such as Ente or Aegis), and enter the output code in the field below.
                                 </p>
                                 <p>
-                                    If you cannot scan QR code, you can enter the following information manually. Secret: {{ resEnable.secret }}, Account: {{ resEnable.account }}
+                                    You can also add the following information for manual setup:<br>
+                                    - Secret: {{ resEnable.secret }}<br>
+                                    - Account: {{ resEnable.account }}
                                 </p>
                             </div>
                             <div class="mb-5 container">
@@ -42,10 +44,10 @@
                         </div>
                         <div v-if="isEnabled">
                             <p>
-                                Two-factor authentication was set up successfully.
+                                Two-factor authentication is active.
                             </p>
                             <p>
-                                Please record the following backup codes which you will be able to use instead of TOTP in case you lost access to your device.
+                                Save the following backup codes. You will need them if you lose access to your TOTP authenticator.
                             </p>
                             <p class="py-4 px-5 bg-secondary">
                                 Backup codes:
@@ -54,7 +56,7 @@
                                 </span>
                             </p>
                             <p>
-                                Each of these codes can be used only once.
+                                Each code can be used once.
                             </p>
                         </div>
                     </article>

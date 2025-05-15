@@ -1,10 +1,10 @@
 <template>
     <div class="mb-5">
-        <h2>Change Email</h2>
+        <h2>Change Primary Email</h2>
         <div v-if="!success">
             <div class="mb-4 max-w-xs">
                 <label for="new-email">
-                    New email:
+                    Set a new primary email address:
                 </label>
                 <input
                     v-model="email"

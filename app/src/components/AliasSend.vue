@@ -12,7 +12,7 @@
                     <article>
                         <div class="mb-5">
                             <p>
-                                Generate the proper email address to send a message from this alias. Note that to send emails using an alias, you need to do so from a verified recipient.
+                                To send an email using an alias, you need a specific forwarding address generated after providing the target email address. Only emails originating from your verified recipient email addresses are forwarded.
                             </p>
                         </div>
                         <div class="mb-5">

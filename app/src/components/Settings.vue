@@ -6,8 +6,7 @@
         <div class="card-primary">
             <h4>Default Domain</h4>
             <p>
-                The default alias domain is the domain to be selected by default in the drop down options when generating a
-                new alias.
+                Set the default alias domain for new aliases created.
             </p>
             <div class="max-w-xs mb-6">
                 <label for="domain">
@@ -25,7 +24,7 @@
             </div>
             <h4>Default Recipient</h4>
             <p>
-                The default recipient to be selected by default in the drop down options when creating a new recipient. You can add recipients <router-link to="/recipients">here</router-link>.
+                Set the default recipient for new aliases created.
             </p>
             <div class="max-w-xs mb-6">
                 <label for="recipient">
@@ -43,7 +42,7 @@
             </div>
             <h4>Default Alias Format</h4>
             <p>
-                The default alias format to be selected by default when creating a new alias. You can add aliases <router-link to="/">here</router-link>.
+                Set the default alias naming format for new aliases created. Options: 1. Words ('quiet.haze16') 2. Random ('uf1h0xi') 3. UUID ('550e8400-e29b-41d4-a716-446655440000')
             </p>
             <div class="max-w-xs mb-6">
                 <label for="format">
@@ -61,8 +60,7 @@
             </div>
             <h4>From Name</h4>
             <p>
-                The 'From Name' is shown when you send an email from an alias or reply anonymously to a forwarded email. If
-                left blank, then the email alias will be used as the 'From Name'.
+                Set the 'From name' used for replies and emails sent using an alias. Leave it blank to use the alias email address.
             </p>
             <div class="max-w-xs mb-5">
                 <label for="from-name">

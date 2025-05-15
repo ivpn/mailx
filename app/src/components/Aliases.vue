@@ -10,13 +10,9 @@
             <span class="bg-secondary rounded flex items-center justify-center p-2 mb-5">
                 <i class="icon at icon-accent text-2xl"></i>
             </span>
-            <h4>You did not create any aliases yet</h4>
-            <p class="text-tertiary">
-                This area will light up with items once you start adding new aliases.<br>
-                You can create both an alias or a catch-all alias.
-            </p>
+            <h4 class="mb-6">You have no aliases yet</h4>
             <p v-if="!recipients.length && loaded" class="text-tertiary mb-6">
-                To get started, first <router-link to="/recipients">add a recipient</router-link> or <router-link to="/account">verify account email</router-link>.
+                To get started, first <router-link to="/account">verify</router-link> your primary email address.
             </p>
             <AliasCreateDropdown v-if="recipients.length && loaded" />
         </div>

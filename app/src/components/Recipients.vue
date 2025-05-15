@@ -10,9 +10,9 @@
             <span class="bg-secondary rounded flex items-center justify-center p-2 mb-5">
                 <i class="icon inbox icon-accent text-2xl"></i>
             </span>
-            <h4>You did not create any recipients yet</h4>
+            <h4 class="mb-6">You have no recipients yet</h4>
             <p class="text-tertiary mb-6">
-                This area will light up with items once you start adding new recipients.
+                <router-link to="/account">Verify</router-link> your primary email address or add a new recipient address.
             </p>
             <RecipientCreate />
         </div>

@@ -13,7 +13,7 @@
                         </h4>
                         <div v-if="props.catchAll" class="hs-tooltip [--strategy:absolute]">
                             <i class="icon info icon-primary hs-tooltip-toggle"></i>
-                            <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">You can create 1 catch-all alias per domain.</span>
+                            <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">Limited to 1 catch-all alias per domain</span>
                         </div>
                         <span v-if="!props.catchAll">{{ step }}/2</span>
                     </header>
@@ -54,7 +54,7 @@
                         <div v-if="props.catchAll">
                             <div class="mb-3">
                                 <label for="alias_catch_all_suffix">
-                                    Alias sufix (6-12 alphanumeric characters):
+                                    Alias suffix (6-12 alphanumeric chars.):
                                 </label>
                                 <input 
                                     v-model="alias.catch_all_suffix"

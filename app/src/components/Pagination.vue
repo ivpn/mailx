@@ -6,7 +6,7 @@
                 <option>50</option>
                 <option>75</option>
             </select>
-            <p class="text-nowrap m-0">Items per page</p>
+            <p class="text-nowrap m-0">per page</p>
         </div>
         <nav class="flex items-center gap-x-2">
             <div class="flex items-center gap-x-3">

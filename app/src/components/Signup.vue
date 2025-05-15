@@ -79,12 +79,12 @@
                         class="active"
                         id="tabs-with-underline-item-1" aria-selected="true" data-hs-tab="#tabs-with-underline-1"
                         aria-controls="tabs-with-underline-1" role="tab">
-                        Or use Passkey
+                        Use Passkey instead
                     </button>
                     <button
                         id="tabs-with-underline-item-2" aria-selected="false" data-hs-tab="#tabs-with-underline-2"
                         aria-controls="tabs-with-underline-2" role="tab">
-                        Or use password
+                        Use Password instead
                     </button>
                 </nav>
                 <div v-if="apiSuccess">

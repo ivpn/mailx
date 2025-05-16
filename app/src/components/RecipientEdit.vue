@@ -55,6 +55,8 @@ const updateRecipient = async () => {
     // Toggle pgp_inline option
     pgp_inline.value = !pgp_inline.value
 
+    const temp_pgp_inline = recipient.value.pgp_inline
+
     const payload = {
         id: recipient.value.id,
         pgp_key: recipient.value.pgp_key,
@@ -73,6 +75,8 @@ const updateRecipient = async () => {
                 ? 'Too many requests, please try again later.'
                 : errorMsg
         }
+
+        pgp_inline.value = temp_pgp_inline
     }
 }
 

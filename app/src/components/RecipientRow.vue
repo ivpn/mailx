@@ -105,6 +105,7 @@ const deleteRecipient = async () => {
 
 const updateRecipient = async () => {
     // Toggle pgp_enabled option
+    const temp_pgp_enabled = recipient.value.pgp_enabled
     recipient.value.pgp_enabled = !recipient.value.pgp_enabled
 
     const payload = {
@@ -115,7 +116,19 @@ const updateRecipient = async () => {
 
     try {
         await recipientApi.update(payload)
-    } catch {}
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            var errMsg = err.response?.data.error || err.message
+
+            if (err.response?.status === 429) {
+                errMsg = 'Too many requests, please try again later.'
+            }
+
+            recipient.value.pgp_enabled = temp_pgp_enabled // revert the change
+
+            alert(errMsg)
+        }
+    }
 }
 
 const deletePgpKey = async () => {
@@ -130,7 +143,17 @@ const deletePgpKey = async () => {
     try {
         await recipientApi.update(payload)
         events.emit('recipient.update', {})
-    } catch {}
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            var errMsg = err.response?.data.error || err.message
+
+            if (err.response?.status === 429) {
+                errMsg = 'Too many requests, please try again later.'
+            }
+
+            alert(errMsg)
+        }
+    }
 }
 
 const copyAlias = (alias: string) => {

@@ -119,7 +119,7 @@ const addPasskey = async () => {
 const startAddPasskey = async (res: any) => {
     try {
         const creds = await startRegistration({ optionsJSON: res.data['publicKey'] })
-        res = await userApi.registerFinish(creds)
+        res = await userApi.registerAddFinish(creds)
         error.value = ''
         getList()
     } catch (err: any) {

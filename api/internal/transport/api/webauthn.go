@@ -170,13 +170,11 @@ func (h *Handler) FinishRegistration(c *fiber.Ctx) error {
 	}
 
 	// Send OTP
-	if !user.IsActive {
-		err = h.Service.SendUserOTP(c.Context(), user.ID)
-		if err != nil {
-			return c.Status(400).JSON(fiber.Map{
-				"error": err.Error(),
-			})
-		}
+	err = h.Service.SendUserOTP(c.Context(), user.ID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
 	}
 
 	// Delete session
@@ -277,6 +275,94 @@ func (h *Handler) AddPasskey(c *fiber.Ctx) error {
 	c.Cookie(auth.NewCookieTempAuthn(token, c.Path(), h.Cfg))
 
 	return c.Status(200).JSON(options)
+}
+
+// @Summary Finish add Passkey
+// @Description Finish add Passkey process
+// @Tags webauthn
+// @Accept json
+// @Produce json
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /register/add/finish [post]
+func (h *Handler) FinishAddPasskey(c *fiber.Ctx) error {
+	// Get cookie token
+	token := c.Cookies(auth.AUTHN_TEMP_COOKIE)
+
+	// Get session
+	session, ok, err := h.Service.GetSession(c.Context(), token)
+	if err != nil || !ok {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrGetSession,
+		})
+	}
+
+	// Get user
+	user, err := h.Service.GetUser(c.Context(), session.UserID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	// Finish registration
+	r, err := adaptor.ConvertRequest(c, true)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrFinishRegistration,
+		})
+	}
+
+	credential, err := h.WebAuthn.FinishRegistration(user, session.SessionData, r)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	// Add credential to user
+	err = h.Service.SaveCredential(c.Context(), *credential, user.ID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	// Delete session
+	err = h.Service.DeleteSession(c.Context(), token)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrDeleteSession,
+		})
+	}
+
+	// Clear cookie
+	c.ClearCookie(auth.AUTHN_TEMP_COOKIE)
+
+	// Save the session
+	sessionData := webauthn.SessionData{
+		UserID:  user.WebAuthnID(),
+		Expires: time.Now().Add(h.Cfg.TokenExpiration),
+	}
+	token, err = model.GenSessionToken()
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrSaveSession,
+		})
+	}
+	err = h.Service.SaveSession(c.Context(), sessionData, token, user.ID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrSaveSession,
+		})
+	}
+
+	// Set token in cookie
+	c.Cookie(auth.NewCookieAuthn(token, "/", h.Cfg))
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": FinishRegistrationSuccess,
+	})
 }
 
 // @Summary Begin login

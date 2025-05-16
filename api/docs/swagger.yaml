@@ -791,6 +791,25 @@ paths:
       summary: Add Passkey
       tags:
       - webauthn
+  /register/add/finish:
+    post:
+      consumes:
+      - application/json
+      description: Finish add Passkey process
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Finish add Passkey
+      tags:
+      - webauthn
   /register/begin:
     post:
       consumes:

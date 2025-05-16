@@ -795,6 +795,35 @@ const docTemplate = `{
                 }
             }
         },
+        "/register/add/finish": {
+            "post": {
+                "description": "Finish add Passkey process",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "webauthn"
+                ],
+                "summary": "Finish add Passkey",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
         "/register/begin": {
             "post": {
                 "description": "Begin registration process",

@@ -170,11 +170,13 @@ func (h *Handler) FinishRegistration(c *fiber.Ctx) error {
 	}
 
 	// Send OTP
-	err = h.Service.SendUserOTP(c.Context(), user.ID)
-	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"error": err.Error(),
-		})
+	if !user.IsActive {
+		err = h.Service.SendUserOTP(c.Context(), user.ID)
+		if err != nil {
+			return c.Status(400).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		}
 	}
 
 	// Delete session

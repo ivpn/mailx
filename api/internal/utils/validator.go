@@ -25,12 +25,17 @@ func NewValidator() Validator {
 		log.Println("error registering pgp key validation:", err)
 	}
 
+	err = v.RegisterValidation("emailx", sqlEmailValidation)
+	if err != nil {
+		log.Println("error registering sql email validation:", err)
+	}
+
 	return v
 }
 
 func ValidateEmail(email string) error {
 	validator := NewValidator()
-	return validator.Var(email, "required,email")
+	return validator.Var(email, "required,emailx")
 }
 
 func passwordValidation(fl validator.FieldLevel) bool {
@@ -62,6 +67,19 @@ func passwordValidation(fl validator.FieldLevel) bool {
 	}
 
 	return true
+}
+
+func sqlEmailValidation(fl validator.FieldLevel) bool {
+	email := fl.Field().String()
+
+	// “omitempty” double check
+	if email == "" {
+		return true
+	}
+
+	// Check if the email is valid
+	re := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
+	return re.MatchString(email)
 }
 
 func pgpKeyValidation(fl validator.FieldLevel) bool {

@@ -1,23 +1,23 @@
 package api
 
 type UserReq struct {
-	Email    string `json:"email" validate:"required,email"`
+	Email    string `json:"email" validate:"required,emailx"`
 	Password string `json:"password" validate:"password"`
 	OTP      string `json:"otp" validate:"min=0,max=8"`
 }
 
 type EmailReq struct {
-	Email string `json:"email" validate:"required,email"`
+	Email string `json:"email" validate:"required,emailx"`
 }
 
 type SignupUserReq struct {
-	Email    string `json:"email" validate:"required,email"`
+	Email    string `json:"email" validate:"required,emailx"`
 	Password string `json:"password" validate:"password"`
 	SubID    string `json:"subid" validate:"required,uuid"`
 }
 
 type SignupEmailReq struct {
-	Email string `json:"email" validate:"required,email"`
+	Email string `json:"email" validate:"required,emailx"`
 	SubID string `json:"subid" validate:"required,uuid"`
 }
 

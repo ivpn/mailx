@@ -19,10 +19,13 @@ func (d *Database) GetRecipientByEmail(ctx context.Context, email string, userID
 	return recipient, err
 }
 
-func (d *Database) GetRecipientsCountByEmail(ctx context.Context, email string) (int, error) {
+func (d *Database) CheckDuplicateRecipient(ctx context.Context, email string) (bool, error) {
 	var count int64
 	err := d.Client.Model(&model.Recipient{}).Where("email = ?", email).Count(&count).Error
-	return int(count), err
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
 }
 
 func (d *Database) GetRecipients(ctx context.Context, userID string) ([]model.Recipient, error) {

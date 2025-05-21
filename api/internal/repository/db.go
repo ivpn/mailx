@@ -76,6 +76,7 @@ func connect(cfg config.DBConfig) (*gorm.DB, error) {
 
 		if len(replicas) > 0 {
 			err = db.Use(dbresolver.Register(dbresolver.Config{
+				Sources:  replicas,
 				Replicas: replicas,
 				Policy:   dbresolver.RandomPolicy{},
 			}).

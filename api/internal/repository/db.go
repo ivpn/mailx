@@ -46,8 +46,8 @@ func connect(cfg config.DBConfig) (*gorm.DB, error) {
 		Logger: logger.Default.LogMode(logger.Silent),
 	}
 
-	host_main := cfg.Host
-
+	// Determine the main host (first in the Hosts array)
+	host_main := ""
 	if len(cfg.Hosts) > 0 && cfg.Hosts[0] != "" {
 		host_main = cfg.Hosts[0]
 	}
@@ -61,29 +61,32 @@ func connect(cfg config.DBConfig) (*gorm.DB, error) {
 
 	// DBResolver adds multiple databases support to GORM
 	// https://github.com/go-gorm/dbresolver
-	if len(cfg.Hosts) > 0 && cfg.Hosts[0] != "" {
-		hosts := make([]gorm.Dialector, 0)
-		for _, host := range cfg.Hosts {
-			// Skip the main host
-			if host == host_main {
+	if len(cfg.Hosts) > 1 { // Check if we have additional hosts besides the main one
+		replicas := make([]gorm.Dialector, 0)
+
+		// Start from index 1 since index 0 is already used as the primary
+		for i := 1; i < len(cfg.Hosts); i++ {
+			host := cfg.Hosts[i]
+			if host == "" {
 				continue
 			}
 
-			hosts = append(hosts, mysql.Open(cfg.User+":"+cfg.Password+"@tcp("+host+":"+cfg.Port+")/"+cfg.Name+"?charset=utf8mb4&parseTime=True&loc=Local"))
+			replicas = append(replicas, mysql.Open(cfg.User+":"+cfg.Password+"@tcp("+host+":"+cfg.Port+")/"+cfg.Name+"?charset=utf8mb4&parseTime=True&loc=Local"))
 		}
 
-		err = db.Use(dbresolver.Register(dbresolver.Config{
-			Sources:  hosts,
-			Replicas: hosts,
-			Policy:   dbresolver.RandomPolicy{},
-		}).
-			SetMaxIdleConns(100).
-			SetMaxOpenConns(200).
-			SetConnMaxIdleTime(time.Hour).
-			SetConnMaxLifetime(24 * time.Hour))
+		if len(replicas) > 0 {
+			err = db.Use(dbresolver.Register(dbresolver.Config{
+				Replicas: replicas,
+				Policy:   dbresolver.RandomPolicy{},
+			}).
+				SetMaxIdleConns(100).
+				SetMaxOpenConns(200).
+				SetConnMaxIdleTime(time.Hour).
+				SetConnMaxLifetime(24 * time.Hour))
 
-		if err != nil {
-			return nil, err
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 

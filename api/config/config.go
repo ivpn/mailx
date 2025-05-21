@@ -25,7 +25,6 @@ type APIConfig struct {
 }
 
 type DBConfig struct {
-	Host     string
 	Hosts    []string
 	Port     string
 	Name     string
@@ -146,7 +145,6 @@ func New() (Config, error) {
 			SignupWebhookPSK:  os.Getenv("SIGNUP_WEBHOOK_PSK"),
 		},
 		DB: DBConfig{
-			Host:     os.Getenv("DB_HOST"),
 			Hosts:    dbHosts,
 			Port:     os.Getenv("DB_PORT"),
 			Name:     os.Getenv("DB_NAME"),

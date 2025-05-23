@@ -613,7 +613,7 @@ func (s *Service) VerifyTotp(ctx context.Context, userID string, otp string) (bo
 		failedAttemptsInt++
 
 		// Store failed attempts in cache for rate limiting
-		err = s.Cache.Set(ctx, "totp_fails_"+userID, strconv.Itoa(failedAttemptsInt), time.Hour)
+		err = s.Cache.Set(ctx, "totp_fails_"+userID, strconv.Itoa(failedAttemptsInt), 60*time.Minute)
 		if err != nil {
 			log.Printf("error setting failed attempts: %s", err.Error())
 			return false, ErrSaveOTP

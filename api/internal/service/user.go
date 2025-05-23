@@ -5,7 +5,9 @@ import (
 	"encoding/base32"
 	"errors"
 	"log"
+	"strconv"
 	"strings"
+	"time"
 
 	"slices"
 
@@ -596,6 +598,38 @@ func (s *Service) VerifyTotp(ctx context.Context, userID string, otp string) (bo
 		if err != nil {
 			return false, ErrInvalidTOTPCode
 		}
+	}
+
+	if !isValid {
+		// Get current failed attempts from cache
+		failedAttempts, err := s.Cache.Get(ctx, "totp_fails_"+userID)
+		if err != nil {
+			failedAttempts = "0"
+		}
+		failedAttemptsInt, err := strconv.Atoi(failedAttempts)
+		if err != nil {
+			failedAttemptsInt = 0
+		}
+		failedAttemptsInt++
+
+		// Store failed attempts in cache for rate limiting
+		err = s.Cache.Set(ctx, "totp_fails_"+userID, strconv.Itoa(failedAttemptsInt), time.Hour)
+		if err != nil {
+			log.Printf("error setting failed attempts: %s", err.Error())
+			return false, ErrSaveOTP
+		}
+	}
+
+	failedAttempts, err := s.Cache.Get(ctx, "totp_fails_"+userID)
+	if err != nil {
+		failedAttempts = "0"
+	}
+	failedAttemptsInt, err := strconv.Atoi(failedAttempts)
+	if err != nil {
+		failedAttemptsInt = 0
+	}
+	if failedAttemptsInt >= 5 {
+		return false, ErrInvalidTOTPCode
 	}
 
 	return isValid, nil

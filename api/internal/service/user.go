@@ -615,7 +615,7 @@ func (s *Service) VerifyTotp(ctx context.Context, userID string, otp string) (bo
 	}
 
 	if !idLimiter.IsAllowed() {
-		log.Printf("error disabling TOTP: too many failed attempts")
+		log.Printf("error verifying TOTP: too many failed attempts")
 		return false, ErrInvalidTOTPCode
 	}
 

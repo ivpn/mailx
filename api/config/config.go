@@ -66,6 +66,8 @@ type ServiceConfig struct {
 	MaxSessions            int
 	ForwardGracePeriodDays int
 	AccountGracePeriodDays int
+	IdLimiterMax           int
+	IdLimiterExpiration    time.Duration
 }
 
 type Config struct {
@@ -85,6 +87,16 @@ func New() (Config, error) {
 
 	otpExpStr := os.Getenv("OTP_EXPIRATION")
 	otpExp, err := time.ParseDuration(otpExpStr)
+	if err != nil {
+		return Config{}, err
+	}
+
+	idLimiterMax, err := strconv.Atoi(os.Getenv("ID_LIMITER_MAX"))
+	if err != nil {
+		return Config{}, err
+	}
+	idLimiterExpirationStr := os.Getenv("ID_LIMITER_EXPIRATION")
+	idLimiterExpiration, err := time.ParseDuration(idLimiterExpirationStr)
 	if err != nil {
 		return Config{}, err
 	}
@@ -184,6 +196,8 @@ func New() (Config, error) {
 			MaxSessions:            maxSessions,
 			ForwardGracePeriodDays: forwardGracePeriodDays,
 			AccountGracePeriodDays: accountGracePeriodDays,
+			IdLimiterMax:           idLimiterMax,
+			IdLimiterExpiration:    idLimiterExpiration,
 		},
 	}, nil
 }

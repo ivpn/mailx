@@ -6,7 +6,6 @@ import (
 	"errors"
 	"log"
 	"strings"
-	"time"
 
 	"slices"
 
@@ -602,8 +601,8 @@ func (s *Service) VerifyTotp(ctx context.Context, userID string, otp string) (bo
 	idLimiter := utils.IDLimiter{
 		ID:    userID,
 		Label: "totp_fails",
-		Max:   5,
-		Exp:   60 * time.Minute,
+		Max:   s.Cfg.Service.IdLimiterMax,
+		Exp:   s.Cfg.Service.IdLimiterExpiration,
 		Cache: s.Cache,
 	}
 

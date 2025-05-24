@@ -24,7 +24,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	h.Server.Use(healthcheck.New())
 
 	h.Server.Post("/v1/register", limiter.New(), h.Register)
-	h.Server.Post("/v1/login", limiter.New(), h.Login)
+	h.Server.Post("/v1/login", limit.New(5, 10*time.Minute), h.Login)
 	h.Server.Post("/v1/initiatepasswordreset", limiter.New(), h.InitiatePasswordReset)
 	h.Server.Put("/v1/resetpassword", limiter.New(), h.ResetPassword)
 
@@ -68,7 +68,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Post("/recipient", limit.New(5, 10*time.Minute), h.PostRecipient)
 	v1.Put("/recipient", h.UpdateRecipient)
 	v1.Post("/recipient/sendotp/:id", limit.New(5, 10*time.Minute), h.SendRecipientOTP)
-	v1.Post("/recipient/activate/:id", limiter.New(), h.ActivateRecipient)
+	v1.Post("/recipient/activate/:id", limit.New(5, 10*time.Minute), h.ActivateRecipient)
 	v1.Delete("/recipient/:id", h.DeleteRecipient)
 
 	v1.Get("/alias/:id", h.GetAlias)

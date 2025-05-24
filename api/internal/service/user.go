@@ -5,7 +5,6 @@ import (
 	"encoding/base32"
 	"errors"
 	"log"
-	"strconv"
 	"strings"
 	"time"
 
@@ -600,35 +599,24 @@ func (s *Service) VerifyTotp(ctx context.Context, userID string, otp string) (bo
 		}
 	}
 
+	idLimiter := utils.IDLimiter{
+		ID:    userID,
+		Label: "totp_fails",
+		Max:   5,
+		Exp:   60 * time.Minute,
+		Cache: s.Cache,
+	}
+
 	if !isValid {
-		// Get current failed attempts from cache
-		failedAttempts, err := s.Cache.Get(ctx, "totp_fails_"+userID)
+		err = idLimiter.Tick()
 		if err != nil {
-			failedAttempts = "0"
-		}
-		failedAttemptsInt, err := strconv.Atoi(failedAttempts)
-		if err != nil {
-			failedAttemptsInt = 0
-		}
-		failedAttemptsInt++
-
-		// Store failed attempts in cache for rate limiting
-		err = s.Cache.Set(ctx, "totp_fails_"+userID, strconv.Itoa(failedAttemptsInt), 60*time.Minute)
-		if err != nil {
-			log.Printf("error setting failed attempts: %s", err.Error())
-			return false, ErrSaveOTP
+			log.Printf("error ticking ID limiter: %s", err.Error())
+			return false, ErrInvalidTOTPCode
 		}
 	}
 
-	failedAttempts, err := s.Cache.Get(ctx, "totp_fails_"+userID)
-	if err != nil {
-		failedAttempts = "0"
-	}
-	failedAttemptsInt, err := strconv.Atoi(failedAttempts)
-	if err != nil {
-		failedAttemptsInt = 0
-	}
-	if failedAttemptsInt >= 5 {
+	if !idLimiter.IsAllowed() {
+		log.Printf("error disabling TOTP: too many failed attempts")
 		return false, ErrInvalidTOTPCode
 	}
 

@@ -108,6 +108,51 @@ supervisorctl restart postfix
 setup debug show-mail-logs
 ```
 
+#### Setup DKIM Signing
+
+Update dkim_signing.conf:
+```bash
+docker exec -it mailserver sh
+nano /etc/rspamd/override.d/dkim_signing.conf
+```
+
+dkim_signing.conf:
+```conf
+# documentation: https://rspamd.com/doc/modules/dkim_signing.html
+
+enabled = true;
+
+sign_authenticated = true;
+sign_local = true;
+try_fallback = false;
+
+use_domain = "header";
+use_domain_sign_local = "header";
+use_redis = false; # don't change unless Redis also provides the DKIM keys
+use_esld = true;
+allow_username_mismatch = true;
+
+check_pubkey = false; # you want to use this in the beginning
+
+domain {
+    domain.com {
+        path = "/tmp/docker-mailserver/rspamd/dkim/rsa-2048-mail-domain.com.private.txt";
+        selector = "mail";
+    }
+}
+```
+
+Restart Postfix and Rspamd:
+```bash
+supervisorctl restart postfix
+supervisorctl restart rspamd
+```
+
+Test DKIM signing with https://dkimvalidator.com:
+```bash
+echo "Test email" | mail -s "Test email" wyygMXeSfnzl5l@dkimvalidator.com
+```
+
 #### Update Mailserver
 ```bash
 docker compose pull

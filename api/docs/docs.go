@@ -768,17 +768,6 @@ const docTemplate = `{
                     "webauthn"
                 ],
                 "summary": "Add Passkey",
-                "parameters": [
-                    {
-                        "description": "Email",
-                        "name": "email",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/api.EmailReq"
-                        }
-                    }
-                ],
                 "responses": {
                     "201": {
                         "description": "Created",

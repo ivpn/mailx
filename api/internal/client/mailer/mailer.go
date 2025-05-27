@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"strconv"
+	"strings"
 
 	"github.com/OfimaticSRL/parsemail"
 	"github.com/ProtonMail/gopenpgp/v3/crypto"
@@ -27,19 +28,39 @@ type Mailer struct {
 func New(cfg config.SMTPClientConfig) Mailer {
 	port, err := strconv.Atoi(cfg.Port)
 	if err != nil {
-		log.Println(err)
+		log.Println("Invalid SMTP port:", cfg.Port)
+		return Mailer{}
 	}
 
-	if cfg.User == "" || cfg.Password == "" {
-		return Mailer{
-			dialer: &gomail.Dialer{Host: cfg.Host, Port: port},
-			Sender: cfg.Sender,
+	hosts := strings.Split(cfg.Host, ",")
+
+	var dialer *gomail.Dialer
+	for _, host := range hosts {
+		host = strings.TrimSpace(host)
+		if cfg.User == "" || cfg.Password == "" {
+			dialer = &gomail.Dialer{Host: host, Port: port}
+		} else {
+			dialer = gomail.NewDialer(host, port, cfg.User, cfg.Password)
+		}
+
+		conn, err := dialer.Dial()
+		if err == nil {
+			conn.Close()
+			break
+		} else {
+			log.Printf("Failed to connect to SMTP host: %s, trying next host if available. Error: %v\n", host, err)
+			dialer = nil
 		}
 	}
 
+	if dialer == nil {
+		return Mailer{}
+	}
+
 	return Mailer{
-		dialer: gomail.NewDialer(cfg.Host, port, cfg.User, cfg.Password),
-		Sender: cfg.Sender,
+		dialer:     dialer,
+		Sender:     cfg.Sender,
+		SenderName: cfg.SenderName,
 	}
 }
 

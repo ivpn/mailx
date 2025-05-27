@@ -51,9 +51,7 @@ func New(cfg config.SMTPClientConfig) Mailer {
 		if err != nil {
 			log.Printf("Failed to connect to SMTP host: %s, trying next host if available. Error: %v\n", host, err)
 			dialer = nil
-		}
-
-		if err == nil {
+		} else {
 			conn.Close()
 			break
 		}

@@ -98,12 +98,8 @@ const deleteCred = async (id: string) => {
 }
 
 const addPasskey = async () => {
-    const data = {
-        email: localStorage.getItem('email')
-    }
-
     try {
-        var res = await userApi.registerAdd(data)
+        var res = await userApi.registerAdd()
         startAddPasskey(res)
     } catch (err) {
         if (axios.isAxiosError(err)) {

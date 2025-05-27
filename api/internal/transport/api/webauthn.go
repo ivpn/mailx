@@ -219,30 +219,14 @@ func (h *Handler) FinishRegistration(c *fiber.Ctx) error {
 // @Tags webauthn
 // @Accept json
 // @Produce json
-// @Param email body EmailReq true "Email"
 // @Success 201 {object} SuccessRes
 // @Failure 400 {object} ErrorRes
 // @Router /register/add [post]
 func (h *Handler) AddPasskey(c *fiber.Ctx) error {
-	// Parse the request
-	req := EmailReq{}
-	err := c.BodyParser(&req)
-	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"error": ErrInvalidRequest,
-		})
-	}
+	ID := auth.GetUserID(c)
 
-	// Validate the request
-	err = h.Validator.Struct(req)
-	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"error": ErrInvalidRequest,
-		})
-	}
-
-	// Get user
-	user, err := h.Service.GetUserByEmail(c.Context(), req.Email)
+	// Get User
+	user, err := h.Service.GetUser(c.Context(), ID)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),

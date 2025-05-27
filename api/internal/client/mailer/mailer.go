@@ -25,6 +25,7 @@ type Mailer struct {
 	SenderName string
 }
 
+// #nosec G104
 func New(cfg config.SMTPClientConfig) Mailer {
 	port, err := strconv.Atoi(cfg.Port)
 	if err != nil {

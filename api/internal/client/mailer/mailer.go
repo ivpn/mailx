@@ -29,7 +29,11 @@ func New(cfg config.SMTPClientConfig) Mailer {
 	port, err := strconv.Atoi(cfg.Port)
 	if err != nil {
 		log.Println("Invalid SMTP port:", cfg.Port)
-		return Mailer{}
+		return Mailer{
+			dialer:     nil,
+			Sender:     cfg.Sender,
+			SenderName: cfg.SenderName,
+		}
 	}
 
 	hosts := strings.Split(cfg.Host, ",")
@@ -54,7 +58,11 @@ func New(cfg config.SMTPClientConfig) Mailer {
 	}
 
 	if dialer == nil {
-		return Mailer{}
+		return Mailer{
+			dialer:     nil,
+			Sender:     cfg.Sender,
+			SenderName: cfg.SenderName,
+		}
 	}
 
 	return Mailer{

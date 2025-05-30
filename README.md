@@ -115,11 +115,6 @@ Update dkim_signing.conf:
 nano docker-data/dms/config/rspamd/override.d/dkim_signing.conf
 ```
 
-```bash
-docker exec -it mailserver sh
-nano /etc/rspamd/override.d/dkim_signing.conf
-```
-
 dkim_signing.conf:
 ```conf
 # documentation: https://rspamd.com/doc/modules/dkim_signing.html
@@ -146,10 +141,10 @@ domain {
 }
 ```
 
-Restart Postfix and Rspamd:
+Restart Mailserver:
 ```bash
-supervisorctl restart postfix
-supervisorctl restart rspamd
+docker compose down
+docker compose up -d
 ```
 
 Test DKIM signing with https://dkimvalidator.com:

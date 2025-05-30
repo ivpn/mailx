@@ -112,6 +112,10 @@ setup debug show-mail-logs
 
 Update dkim_signing.conf:
 ```bash
+nano docker-data/dms/config/rspamd/override.d/dkim_signing.conf
+```
+
+```bash
 docker exec -it mailserver sh
 nano /etc/rspamd/override.d/dkim_signing.conf
 ```

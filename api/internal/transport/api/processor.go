@@ -1,6 +1,8 @@
 package api
 
 import (
+	"log"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -19,7 +21,9 @@ type ProcessorService interface {
 func (h *Handler) HandleEmail(c *fiber.Ctx) error {
 	err := h.Service.ProcessMessage(c.Body())
 	if err != nil {
+		log.Println("Error processing message:", err)
 		return err
 	}
+
 	return c.SendString("OK")
 }

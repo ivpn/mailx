@@ -63,8 +63,8 @@
         <p>Privatus GmbH, operator of MailX reserves the right to change this privacy policy at any time. In such cases, we will take every reasonable step to ensure that these changes are brought to your attention by posting all changes prominently on the MailX website for a reasonable period of time, before the new policy becomes effective as well as emailing our existing customers.</p>
         <p>If you have any questions or concerns about our privacy practices, contact us at mailx@ivpn.net.</p>
 
-        <hr>
-
+        <br>
+        
         <Footer />
     </div>
 </template>

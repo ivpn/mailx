@@ -11,6 +11,7 @@ import InitiateResetPassword from './components/InitiateResetPassword.vue'
 import ResetPassword from './components/ResetPassword.vue'
 import Terms from './components/Terms.vue'
 import Privacy from './components/Privacy.vue'
+import Faq from './components/Faq.vue'
 import NotFound from './components/NotFound.vue'
 import { type IStaticMethods } from 'preline/preline'
 
@@ -97,6 +98,11 @@ const routes: RouteRecordRaw[] = [
         path: '/privacy',
         name: `${AppName} - Privacy Policy`,
         component: Privacy
+    },
+    {
+        path: '/faq',
+        name: `${AppName} - FAQ`,
+        component: Faq
     },
     {
         path: '/:pathMatch(.*)*',

@@ -10,6 +10,7 @@ import (
 type Cache interface {
 	Set(context.Context, string, any, time.Duration) error
 	Get(context.Context, string) (string, error)
+	Incr(context.Context, string, time.Duration) error
 }
 
 type IDLimiter struct {
@@ -21,17 +22,7 @@ type IDLimiter struct {
 }
 
 func (l *IDLimiter) Tick() error {
-	failedAttempts, err := l.Cache.Get(context.Background(), l.Label+"_"+l.ID)
-	if err != nil {
-		failedAttempts = "0"
-	}
-	failedAttemptsInt, err := strconv.Atoi(failedAttempts)
-	if err != nil {
-		failedAttemptsInt = 0
-	}
-	failedAttemptsInt++
-
-	err = l.Cache.Set(context.Background(), l.Label+"_"+l.ID, strconv.Itoa(failedAttemptsInt), l.Exp)
+	err := l.Cache.Incr(context.Background(), l.Label+"_"+l.ID, l.Exp)
 	if err != nil {
 		log.Printf("error setting failed attempts: %s", err.Error())
 		return err

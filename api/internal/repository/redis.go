@@ -104,3 +104,16 @@ func (r *Redis) Get(ctx context.Context, key string) (string, error) {
 func (r *Redis) Del(ctx context.Context, key string) error {
 	return r.Client.Del(ctx, key).Err()
 }
+
+func (c *Redis) Incr(ctx context.Context, key string, expiration time.Duration) error {
+	err := c.Client.Incr(ctx, key).Err()
+	if err != nil {
+		return err
+	}
+
+	if expiration > 0 {
+		return c.Client.Expire(ctx, key, expiration).Err()
+	}
+
+	return nil
+}

@@ -47,15 +47,15 @@ func VerifyEmailAuth(data []byte) (bool, error) {
 
 	// Check for domain mismatches when authentication method is present
 	if parsed.DKIM != "" && !relaxedMatch(fromDomain, parsed.DKIMDomain) {
-		return false, nil
+		return false, errors.New("DKIM domain mismatch, fromDomain: " + fromDomain + ", DKIM domain: " + parsed.DKIMDomain)
 	}
 
 	if parsed.SPF != "" && !relaxedMatch(fromDomain, parsed.SPFDomain) {
-		return false, nil
+		return false, errors.New("SPF domain mismatch, fromDomain: " + fromDomain + ", SPF domain: " + parsed.SPFDomain)
 	}
 
 	if parsed.DMARC != "" && !relaxedMatch(fromDomain, parsed.DMARCDomain) {
-		return false, nil
+		return false, errors.New("DMARC domain mismatch, fromDomain: " + fromDomain + ", DMARC domain: " + parsed.DMARCDomain)
 	}
 
 	// Continue with original verification checks
@@ -110,12 +110,26 @@ func extractValue(s string) string {
 }
 
 func extractDomain(email string) string {
+	// Trim whitespace
+	email = strings.TrimSpace(email)
+
+	// Trim surrounding quotes if present
+	if len(email) > 1 && email[0] == '"' && email[len(email)-1] == '"' {
+		email = email[1 : len(email)-1]
+	}
+
+	// Find the last '@' character and return the domain part
 	if at := strings.LastIndex(email, "@"); at != -1 {
 		return email[at+1:]
 	}
+
 	return email
 }
 
 func relaxedMatch(fromDomain, authDomain string) bool {
-	return strings.HasSuffix(fromDomain, authDomain)
+	if fromDomain == "" || authDomain == "" {
+		return false
+	}
+
+	return strings.HasSuffix(fromDomain, authDomain) || strings.HasSuffix(authDomain, fromDomain)
 }

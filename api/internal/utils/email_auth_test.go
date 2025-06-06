@@ -51,13 +51,13 @@ func TestRelaxedMatch(t *testing.T) {
 		{
 			fromDomain: "example.com",
 			authDomain: "",
-			expected:   true,
+			expected:   false,
 			name:       "empty auth domain",
 		},
 		{
 			fromDomain: "",
 			authDomain: "",
-			expected:   true,
+			expected:   false,
 			name:       "both empty",
 		},
 	}
@@ -384,7 +384,7 @@ Authentication-Results: mx.example.net; dmarc=pass header.from=different.org
 
 This is a test email.`,
 			want:    false,
-			wantErr: false,
+			wantErr: true,
 		},
 		{
 			name: "valid email with all auth passes",
@@ -408,7 +408,7 @@ Authentication-Results: mx.example.net; dkim=pass header.d=different.org
 
 This is a test email.`,
 			want:    false,
-			wantErr: false,
+			wantErr: true,
 		},
 		{
 			name: "valid email with SPF pass but domain mismatch",
@@ -420,7 +420,7 @@ Authentication-Results: mx.example.net; spf=pass smtp.mailfrom=different.org
 
 This is a test email.`,
 			want:    false,
-			wantErr: false,
+			wantErr: true,
 		},
 		{
 			name: "valid email with all auth fails",

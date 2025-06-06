@@ -37,11 +37,12 @@
 cp api/.env.sample api/.env
 cp app/.env.sample app/.env
 cp mailserver/.env.sample mailserver/.env
-mkdir -p mailserver/docker-data/dms/config
+mkdir -p mailserver/docker-data/dms/config/rspamd/override.d
 cp mailserver/config/postfix-main.cf.sample mailserver/docker-data/dms/config/postfix-main.cf
 cp mailserver/config/postfix-virtual.cf.sample mailserver/docker-data/dms/config/postfix-virtual.cf
 cp mailserver/config/postfix-aliases.cf.sample mailserver/docker-data/dms/config/postfix-aliases.cf
 cp mailserver/config/user-patches.sh.sample mailserver/docker-data/dms/config/user-patches.sh
+cp mailserver/config/rspamd/override.d/milter_headers.conf.sample mailserver/docker-data/dms/config/rspamd/override.d/milter_headers.conf
 ```
 
 > [!IMPORTANT]

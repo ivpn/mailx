@@ -545,36 +545,39 @@ This is a test email.`,
 To: recipient@example.net
 Subject: Test Email
 Date: Thu, 22 Aug 2023 12:00:00 -0700
-Authentication-Results: mx.example.net; iprev=pass; x-google-dkim=pass
+Authentication-Results: phl-mx-05.messagingengine.com; arc=none (no signatures found)
+ARC-Authentication-Results: mx.example.net; dkim=pass header.d=example.com
 
 This is a test email.`,
 			want:    true,
 			wantErr: false,
 		},
-		// 		{
-		// 			name: "email with Authentication-Results with some other methods but no fails",
-		// 			emailRaw: `From: sender@example.com
-		// To: recipient@example.net
-		// Subject: Test Email
-		// Date: Thu, 22 Aug 2023 12:00:00 -0700
-		// Authentication-Results: mx.example.net; iprev=pass; x-custom=neutral; auth=pass
+		{
+			name: "email with Authentication-Results with some other methods but no fails",
+			emailRaw: `From: sender@example.com
+To: recipient@example.net
+Subject: Test Email
+Date: Thu, 22 Aug 2023 12:00:00 -0700
+Authentication-Results: mx.example.net; iprev=pass; x-custom=neutral; auth=pass
+ARC-Authentication-Results: mx.example.net; dkim=pass header.d=example.com
 
-		// This is a test email.`,
-		// 			want:    true,
-		// 			wantErr: false,
-		// },
-		// 		{
-		// 			name: "email with Authentication-Results containing other passes and one fail",
-		// 			emailRaw: `From: sender@example.com
-		// To: recipient@example.net
-		// Subject: Test Email
-		// Date: Thu, 22 Aug 2023 12:00:00 -0700
-		// Authentication-Results: mx.example.net; iprev=pass; x-custom=pass; dkim=fail
+This is a test email.`,
+			want:    true,
+			wantErr: false,
+		},
+		{
+			name: "email with Authentication-Results containing other passes and one fail",
+			emailRaw: `From: sender@example.com
+To: recipient@example.net
+Subject: Test Email
+Date: Thu, 22 Aug 2023 12:00:00 -0700
+Authentication-Results: mx.example.net; iprev=pass; x-custom=pass; dkim=fail
+Authentication-Results: mx.example.net; dkim=pass header.d=example.com
 
-		// This is a test email.`,
-		// 			want:    false,
-		// 			wantErr: false,
-		// 		},
+This is a test email.`,
+			want:    false,
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {

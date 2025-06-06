@@ -45,12 +45,26 @@ func VerifyEmailAuth(data []byte) (bool, error) {
 	}
 	fromDomain := extractDomain(fromAddr.Address)
 
+	// Check for domain mismatches when authentication method is present
+	if parsed.DKIM != "" && !relaxedMatch(fromDomain, parsed.DKIMDomain) {
+		return false, nil
+	}
+
+	if parsed.SPF != "" && !relaxedMatch(fromDomain, parsed.SPFDomain) {
+		return false, nil
+	}
+
+	if parsed.DMARC != "" && !relaxedMatch(fromDomain, parsed.DMARCDomain) {
+		return false, nil
+	}
+
+	// Continue with original verification checks
 	switch {
 	case parsed.DMARC == "pass":
 		return true, nil
-	case parsed.DKIM == "pass" && relaxedMatch(fromDomain, parsed.DKIMDomain):
+	case parsed.DKIM == "pass":
 		return true, nil
-	case parsed.SPF == "pass" && relaxedMatch(fromDomain, parsed.SPFDomain):
+	case parsed.SPF == "pass":
 		return true, nil
 	default:
 		return false, nil

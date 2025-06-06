@@ -375,6 +375,18 @@ This is a test email.`,
 			wantErr: false,
 		},
 		{
+			name: "valid email with DMARC pass but domain mismatch",
+			emailRaw: `From: sender@example.com
+To: recipient@example.net
+Subject: Test Email
+Date: Thu, 22 Aug 2023 12:00:00 -0700
+Authentication-Results: mx.example.net; dmarc=pass header.from=different.org
+
+This is a test email.`,
+			want:    false,
+			wantErr: false,
+		},
+		{
 			name: "valid email with all auth passes",
 			emailRaw: `From: sender@example.com
 To: recipient@example.net

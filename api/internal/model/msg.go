@@ -2,8 +2,12 @@ package model
 
 import (
 	"bytes"
+	"errors"
+	"log"
 	"net/mail"
 	"strings"
+
+	"ivpn.net/email/api/internal/utils"
 )
 
 type Msg struct {
@@ -16,6 +20,14 @@ type Msg struct {
 }
 
 func ParseMsg(data []byte) (Msg, error) {
+	pass, err := utils.VerifyEmailAuth(data)
+	if err != nil {
+		log.Println("email authentication failed with error:", err)
+	}
+	if !pass {
+		return Msg{}, errors.New("email authentication failed")
+	}
+
 	msg, err := mail.ReadMessage(bytes.NewReader(data))
 	if err != nil {
 		return Msg{}, err

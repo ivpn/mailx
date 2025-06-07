@@ -7,7 +7,7 @@
             </router-link>
         </p>
         <h1>Privacy Policy</h1>
-        <p class="text-sm">Last updated: 03 June 2025</p>
+        <p class="text-sm">Last updated: 07 June 2025</p>
 
         <p>MailX is developed and operated by the team behind IVPN. All services we offer to customers are built for privacy. Internally, we know what exactly that means. If a choice needs to be made between one practice that deepens a user's privacy, and another that would diminish it but accelerate our growth, we'll always take the slower, more private option.</p>
 
@@ -39,7 +39,8 @@
 
         <p>Emails are processed through a self-hosted Postfix server.</p>
         <p>Delivered emails are immediately removed from the Postfix queues. Undelivered emails are stored in a deferred queue. After 5 days, Postfix stops attempting delivery and discards the emails from the deferred queue.</p>
-        <p>The Postfix server is configured with the <a href="https://docker-mailserver.github.io/docker-mailserver/latest/config/environment/#log_level" target="_blank">"info" log level</a>. Logs of email transactions are retained for 7 days for operational purposes.</p>
+
+        <p>The Postfix server is configured with the <a href="https://docker-mailserver.github.io/docker-mailserver/latest/config/environment/#log_level" target="_blank">"info" log level</a>, which means it records general information about email activity (such as when messages are sent or received). These logs are kept for 7 days to support system maintenance and troubleshooting.</p>
 
         <h2>I've signed up to the service through my IVPN subscription. Can you associate my MailX account with my IVPN Account ID?</h2>
 

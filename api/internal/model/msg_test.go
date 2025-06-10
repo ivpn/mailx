@@ -252,6 +252,52 @@ This is just a plain text email.`,
 			wantFilenames: []string{},
 			wantErr:       true,
 		},
+		{
+			name: "email with both asc and non-asc attachments",
+			data: `From: sender@example.com
+To: recipient@example.com
+Subject: Mixed Attachments
+Content-Type: multipart/mixed; boundary="boundary123"
+
+--boundary123
+Content-Type: text/plain
+
+Email with both .asc and non-.asc attachments.
+
+--boundary123
+Content-Type: application/pgp-signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: Example
+Comment: GPGTools - https://gpgtools.org
+
+iQEzBAEBCAAdFiEE+Y5JJsjFlnUSqMJJNnn76HnlCeEFAmVtZIUACgkQNnn76Hnl
+CeHk9Qf9Eq4shrink7GFh75J7qbgbPHgbRhVuTrCGLeVIKbgDCURDjB2YJx5dA==
+=s8One
+-----END PGP SIGNATURE-----
+--boundary123
+Content-Type: application/octet-stream
+Content-Disposition: attachment; filename="document.pdf"
+
+Sample PDF Content
+--boundary123
+Content-Type: application/pgp-signature 
+Content-Disposition: attachment; filename="other.txt"
+
+-----BEGIN PGP SIGNATURE-----
+Version: Example
+Comment: GPGTools - https://gpgtools.org
+
+iQEzBAEBCAAdFiEE+Y5JJsjFlnUSqMJJNnn76HnlCeEFAmVtZIUACgkQNnn76Hnl
+CeHk9Qf9Eq4shrink7GFh75J7qbgbPHgbRhVuTrCGLeVIKbgDCURDjB2YJx5dA==
+=s8One
+-----END PGP SIGNATURE-----
+--boundary123--`,
+			wantNum:       1,
+			wantFilenames: []string{"signature.asc"},
+			wantErr:       false,
+		},
 	}
 
 	for _, tt := range tests {

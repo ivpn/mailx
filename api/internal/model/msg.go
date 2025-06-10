@@ -127,6 +127,11 @@ func ExtractPGPSignatures(data []byte) ([]parsemail.Attachment, error) {
 				continue
 			}
 
+			// if filename does not end with .asc, skip it
+			if !strings.HasSuffix(filename, ".asc") {
+				continue
+			}
+
 			bodyBytes, err := io.ReadAll(p)
 			if err != nil {
 				return nil, err

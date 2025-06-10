@@ -110,6 +110,379 @@ func TestParseMessageError(t *testing.T) {
 	}
 }
 
+func TestExtractPGPSignatures(t *testing.T) {
+	tests := []struct {
+		name          string
+		data          string
+		wantNum       int
+		wantFilenames []string
+		wantErr       bool
+	}{
+		{
+			name: "email with pgp signature",
+			data: `From: sender@example.com
+To: recipient@example.com
+Subject: Signed Email
+Content-Type: multipart/mixed; boundary="boundary123"
+
+--boundary123
+Content-Type: text/plain
+
+This is a signed email.
+
+--boundary123
+Content-Type: application/pgp-signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: Example
+Comment: GPGTools - https://gpgtools.org
+
+iQEzBAEBCAAdFiEE+Y5JJsjFlnUSqMJJNnn76HnlCeEFAmVtZIUACgkQNnn76Hnl
+CeHk9Qf9Eq4shrink7GFh75J7qbgbPHgbRhVuTrCGLeVIKbgDCURDjB2YJx5dA==
+=s8One
+-----END PGP SIGNATURE-----
+--boundary123--`,
+			wantNum:       1,
+			wantFilenames: []string{"signature.asc"},
+			wantErr:       false,
+		},
+		{
+			name: "email with multiple pgp signatures",
+			data: `From: sender@example.com
+To: recipient@example.com
+Subject: Multiple Signatures
+Content-Type: multipart/mixed; boundary="boundary123"
+
+--boundary123
+Content-Type: text/plain
+
+This email has multiple signatures.
+
+--boundary123
+Content-Type: application/pgp-signature
+Content-Disposition: attachment; filename="sig1.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: Example
+Comment: GPGTools - https://gpgtools.org
+
+iQEzBAEBCAAdFiEE+Y5JJsjFlnUSqMJJNnn76HnlCeEFAmVtZIUACgkQNnn76Hnl
+CeHk9Qf9Eq4shrink7GFh75J7qbgbPHgbRhVuTrCGLeVIKbgDCURDjB2YJx5dA==
+=s8One
+-----END PGP SIGNATURE-----
+--boundary123
+Content-Type: application/pgp-signature
+Content-Disposition: attachment; filename="sig2.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: Example2
+Comment: GPGTools - https://gpgtools.org
+
+iQEzBAEBCAAdFiEE+Y5JJsjFlnUSqMJJNnn76HnlCeEFAmVtZIUACgkQNnn76Hnl
+CeHk9Qf9Eq4shrink7GFh75J7qbgbPHgbRhVuTrCGLeVIKbgDCURDjB2YJx5dA==
+=s8Two
+-----END PGP SIGNATURE-----
+--boundary123--`,
+			wantNum:       2,
+			wantFilenames: []string{"sig1.asc", "sig2.asc"},
+			wantErr:       false,
+		},
+		{
+			name: "email with signature but no filename",
+			data: `From: sender@example.com
+To: recipient@example.com
+Subject: Signed Email No Filename
+Content-Type: multipart/mixed; boundary="boundary123"
+
+--boundary123
+Content-Type: text/plain
+
+This is a signed email.
+
+--boundary123
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: Example
+Comment: GPGTools - https://gpgtools.org
+
+iQEzBAEBCAAdFiEE+Y5JJsjFlnUSqMJJNnn76HnlCeEFAmVtZIUACgkQNnn76Hnl
+CeHk9Qf9Eq4shrink7GFh75J7qbgbPHgbRhVuTrCGLeVIKbgDCURDjB2YJx5dA==
+=s8One
+-----END PGP SIGNATURE-----
+--boundary123--`,
+			wantNum:       1,
+			wantFilenames: []string{"signature.asc"},
+			wantErr:       false,
+		},
+		{
+			name: "email without pgp signature",
+			data: `From: sender@example.com
+To: recipient@example.com
+Subject: Regular Email
+Content-Type: multipart/mixed; boundary="boundary123"
+
+--boundary123
+Content-Type: text/plain
+
+This is a regular email without signature.
+--boundary123--`,
+			wantNum:       0,
+			wantFilenames: []string{},
+			wantErr:       false,
+		},
+		{
+			name: "non-multipart email",
+			data: `From: sender@example.com
+To: recipient@example.com
+Subject: Plain Email
+Content-Type: text/plain
+
+This is just a plain text email.`,
+			wantNum:       0,
+			wantFilenames: []string{},
+			wantErr:       false,
+		},
+		{
+			name:          "invalid email data",
+			data:          "Invalid email data",
+			wantNum:       0,
+			wantFilenames: []string{},
+			wantErr:       true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ExtractPGPSignatures([]byte(tt.data))
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ExtractPGPSignatures() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+
+			if !tt.wantErr {
+				if len(got) != tt.wantNum {
+					t.Errorf("ExtractPGPSignatures() returned %d signatures, want %d", len(got), tt.wantNum)
+					return
+				}
+
+				for i, attachment := range got {
+					if i < len(tt.wantFilenames) && attachment.Filename != tt.wantFilenames[i] {
+						t.Errorf("ExtractPGPSignatures() signature %d filename = %q, want %q",
+							i, attachment.Filename, tt.wantFilenames[i])
+					}
+					if !strings.HasPrefix(attachment.ContentType, "application/pgp-signature") {
+						t.Errorf("ExtractPGPSignatures() signature %d ContentType = %q, want prefix %q",
+							i, attachment.ContentType, "application/pgp-signature")
+					}
+					if len(attachment.Content) == 0 {
+						t.Errorf("ExtractPGPSignatures() signature %d has empty Content", i)
+					}
+				}
+			}
+		})
+	}
+}
+
+func TestExtractPGPKeys(t *testing.T) {
+	tests := []struct {
+		name          string
+		data          string
+		wantNum       int
+		wantFilenames []string
+		wantErr       bool
+	}{
+		{
+			name: "email with pgp key",
+			data: `From: sender@example.com
+To: recipient@example.com
+Subject: PGP Key
+Content-Type: multipart/mixed; boundary="boundary123"
+
+--boundary123
+Content-Type: text/plain
+
+Here is my public key.
+
+--boundary123
+Content-Type: application/pgp-keys
+Content-Disposition: attachment; filename="pubkey.asc"
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: Example
+Comment: GPGTools - https://gpgtools.org
+
+mQINBGVtZIUBEADJ9Xdx5LJSgLMY7rFUGQR3YjRFR8PNY9F5DQ+pq7bn2FvKThBu
+ExampleKeyContentExampleKeyContentExampleKeyContent
+-----END PGP PUBLIC KEY BLOCK-----
+--boundary123--`,
+			wantNum:       1,
+			wantFilenames: []string{"pubkey.asc"},
+			wantErr:       false,
+		},
+		{
+			name: "email with base64 encoded pgp key",
+			data: `From: sender@example.com
+To: recipient@example.com
+Subject: Base64 PGP Key
+Content-Type: multipart/mixed; boundary="boundary123"
+
+--boundary123
+Content-Type: text/plain
+
+Here is my base64 encoded public key.
+
+--boundary123
+Content-Type: application/pgp-keys
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="pubkey.asc"
+
+LS0tLS1CRUdJTiBQR1AgUFVCTElDIEtFWSBCTE9DSy0tLS0tClZlcnNpb246IEV4YW1w
+bGUKQ29tbWVudDogR1BHVG9vbHMgLSBodHRwczovL2dwZ3Rvb2xzLm9yZwoKbVFJTkJH
+VnRaSVVCRUFESjlYZHg1TEpTZ0xNWTdyRlVHUVIzWWpSRlI4UE5ZOUY1RFErcXE3Ym4y
+RnZLVGhCdQpFeGFtcGxlS2V5Q29udGVudEV4YW1wbGVLZXlDb250ZW50RXhhbXBsZUtl
+eUNvbnRlbnQKLS0tLS1FTkQgUEdQIFBVQkxJQyBLRVkgQkxPQ0stLS0tLQ==
+--boundary123--`,
+			wantNum:       1,
+			wantFilenames: []string{"pubkey.asc"},
+			wantErr:       false,
+		},
+		{
+			name: "email with multiple pgp keys",
+			data: `From: sender@example.com
+To: recipient@example.com
+Subject: Multiple PGP Keys
+Content-Type: multipart/mixed; boundary="boundary123"
+
+--boundary123
+Content-Type: text/plain
+
+Here are my public keys.
+
+--boundary123
+Content-Type: application/pgp-keys
+Content-Disposition: attachment; filename="key1.asc"
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: Example1
+Comment: GPGTools - https://gpgtools.org
+
+mQINBGVtZIUBEADJ9Xdx5LJSgLMY7rFUGQR3YjRFR8PNY9F5DQ+pq7bn2FvKThBu
+Key1ContentKey1ContentKey1Content
+-----END PGP PUBLIC KEY BLOCK-----
+--boundary123
+Content-Type: application/pgp-keys
+Content-Disposition: attachment; filename="key2.asc"
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: Example2
+Comment: GPGTools - https://gpgtools.org
+
+mQINBGVtZIUBEADJ9Xdx5LJSgLMY7rFUGQR3YjRFR8PNY9F5DQ+pq7bn2FvKThBu
+Key2ContentKey2ContentKey2Content
+-----END PGP PUBLIC KEY BLOCK-----
+--boundary123--`,
+			wantNum:       2,
+			wantFilenames: []string{"key1.asc", "key2.asc"},
+			wantErr:       false,
+		},
+		{
+			name: "pgp key without filename",
+			data: `From: sender@example.com
+To: recipient@example.com
+Subject: PGP Key No Filename
+Content-Type: multipart/mixed; boundary="boundary123"
+
+--boundary123
+Content-Type: text/plain
+
+Here is my public key.
+
+--boundary123
+Content-Type: application/pgp-keys
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: Example
+Comment: GPGTools - https://gpgtools.org
+
+mQINBGVtZIUBEADJ9Xdx5LJSgLMY7rFUGQR3YjRFR8PNY9F5DQ+pq7bn2FvKThBu
+ExampleKeyContentExampleKeyContentExampleKeyContent
+-----END PGP PUBLIC KEY BLOCK-----
+--boundary123--`,
+			wantNum:       1,
+			wantFilenames: []string{"publickey.asc"},
+			wantErr:       false,
+		},
+		{
+			name: "email without pgp keys",
+			data: `From: sender@example.com
+To: recipient@example.com
+Subject: Regular Email
+Content-Type: multipart/mixed; boundary="boundary123"
+
+--boundary123
+Content-Type: text/plain
+
+This is a regular email without keys.
+--boundary123--`,
+			wantNum:       0,
+			wantFilenames: []string{},
+			wantErr:       false,
+		},
+		{
+			name: "non-multipart email",
+			data: `From: sender@example.com
+To: recipient@example.com
+Subject: Plain Email
+Content-Type: text/plain
+
+This is just a plain text email.`,
+			wantNum:       0,
+			wantFilenames: []string{},
+			wantErr:       false,
+		},
+		{
+			name:          "invalid email data",
+			data:          "Invalid email data",
+			wantNum:       0,
+			wantFilenames: []string{},
+			wantErr:       true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ExtractPGPKeys([]byte(tt.data))
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ExtractPGPKeys() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+
+			if !tt.wantErr {
+				if len(got) != tt.wantNum {
+					t.Errorf("ExtractPGPKeys() returned %d keys, want %d", len(got), tt.wantNum)
+					return
+				}
+
+				for i, attachment := range got {
+					if i < len(tt.wantFilenames) && attachment.Filename != tt.wantFilenames[i] {
+						t.Errorf("ExtractPGPKeys() key %d filename = %q, want %q",
+							i, attachment.Filename, tt.wantFilenames[i])
+					}
+					if !strings.HasPrefix(attachment.ContentType, "application/pgp-keys") {
+						t.Errorf("ExtractPGPKeys() key %d ContentType = %q, want prefix %q",
+							i, attachment.ContentType, "application/pgp-keys")
+					}
+					if len(attachment.Content) == 0 {
+						t.Errorf("ExtractPGPKeys() key %d has empty Content", i)
+					}
+				}
+			}
+		})
+	}
+}
+
 func compareMessages(a, b Msg) bool {
 	if a.From != b.From || a.FromName != b.FromName || a.Subject != b.Subject || a.Body != b.Body || a.Type != b.Type {
 		return false

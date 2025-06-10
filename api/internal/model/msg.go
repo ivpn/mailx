@@ -278,7 +278,7 @@ func decodePart(part *multipart.Part) ([]byte, error) {
 }
 
 // getFilename extracts the filename from Content-Disposition or Content-Type headers.
-func getFilename(header interface{}) string {
+func getFilename(header any) string {
 	var cd, ct string
 	switch h := header.(type) {
 	case mail.Header:

@@ -110,6 +110,102 @@ func TestParseMessageError(t *testing.T) {
 	}
 }
 
+func TestExtractPGPKeys(t *testing.T) {
+	tests := []struct {
+		name          string
+		data          string
+		wantFiles     []string
+		wantTypes     []string
+		wantErr       bool
+		wantAttachNum int
+	}{
+		{
+			name:          "invalid email format",
+			data:          "Invalid email data",
+			wantErr:       true,
+			wantAttachNum: 0,
+		},
+		{
+			name:          "no content type header",
+			data:          "From: sender@example.com\r\nTo: recipient@example.com\r\nSubject: Test Subject\r\n\r\n-----BEGIN PGP PUBLIC KEY BLOCK-----\r\nContent here\r\n-----END PGP PUBLIC KEY BLOCK-----",
+			wantFiles:     []string{"publickey.asc"},
+			wantTypes:     []string{"application/pgp-keys"},
+			wantAttachNum: 1,
+		},
+		{
+			name:          "non-multipart with pgp content",
+			data:          "From: sender@example.com\r\nTo: recipient@example.com\r\nSubject: Test Subject\r\nContent-Type: text/plain\r\n\r\n-----BEGIN PGP PUBLIC KEY BLOCK-----\r\nContent here\r\n-----END PGP PUBLIC KEY BLOCK-----",
+			wantFiles:     []string{"publickey.asc"},
+			wantTypes:     []string{"text/plain"},
+			wantAttachNum: 1,
+		},
+		{
+			name:          "multipart with pgp key part",
+			data:          "From: sender@example.com\r\nTo: recipient@example.com\r\nSubject: Test Subject\r\nContent-Type: multipart/mixed; boundary=boundary123\r\n\r\n--boundary123\r\nContent-Type: text/plain\r\n\r\nThis is the body text.\r\n--boundary123\r\nContent-Type: application/pgp-keys\r\nContent-Transfer-Encoding: base64\r\n\r\nLS0tLS1CRUdJTiBQR1AgUFVCTElDIEtFWSBCTE9DSy0tLS0tCkNvbnRlbnQgaGVyZQotLS0tLUVORCBQR1AgUFVCTElDIEtFWSBCTE9DSy0tLS0tCg==\r\n--boundary123--\r\n",
+			wantFiles:     []string{"publickey.asc"},
+			wantTypes:     []string{"application/pgp-keys"},
+			wantAttachNum: 1,
+		},
+		{
+			name:          "multipart with named pgp key part",
+			data:          "From: sender@example.com\r\nTo: recipient@example.com\r\nSubject: Test Subject\r\nContent-Type: multipart/mixed; boundary=boundary123\r\n\r\n--boundary123\r\nContent-Type: text/plain\r\n\r\nThis is the body text.\r\n--boundary123\r\nContent-Type: application/pgp-keys\r\nContent-Disposition: attachment; filename=mykey.asc\r\n\r\n-----BEGIN PGP PUBLIC KEY BLOCK-----\r\nContent here\r\n-----END PGP PUBLIC KEY BLOCK-----\r\n--boundary123--\r\n",
+			wantFiles:     []string{"mykey.asc"},
+			wantTypes:     []string{"application/pgp-keys"},
+			wantAttachNum: 1,
+		},
+		{
+			name:          "nested multipart with pgp key",
+			data:          "From: sender@example.com\r\nTo: recipient@example.com\r\nSubject: Test Subject\r\nContent-Type: multipart/mixed; boundary=outer\r\n\r\n--outer\r\nContent-Type: text/plain\r\n\r\nThis is the body text.\r\n--outer\r\nContent-Type: multipart/alternative; boundary=inner\r\n\r\n--inner\r\nContent-Type: text/plain\r\n\r\nPlain text\r\n--inner\r\nContent-Type: application/pgp-keys\r\nContent-Transfer-Encoding: quoted-printable\r\nContent-Disposition: attachment; filename=key.asc\r\n\r\n-----BEGIN PGP PUBLIC KEY BLOCK-----\r\nContent here\r\n-----END PGP PUBLIC KEY BLOCK-----\r\n--inner--\r\n--outer--\r\n",
+			wantFiles:     []string{"key.asc"},
+			wantTypes:     []string{"application/pgp-keys"},
+			wantAttachNum: 1,
+		},
+		{
+			name:          "multipart without pgp key parts",
+			data:          "From: sender@example.com\r\nTo: recipient@example.com\r\nSubject: Test Subject\r\nContent-Type: multipart/mixed; boundary=boundary123\r\n\r\n--boundary123\r\nContent-Type: text/plain\r\n\r\nThis is the body text.\r\n--boundary123\r\nContent-Type: application/pdf\r\nContent-Transfer-Encoding: base64\r\n\r\nJVBERi0xLjQKJcfsj6IKNSAwIG9iago8PC9MZW5ndGggNiAwIFIvRmlsdGVyIC9GbGF0ZURlY29kZT4+\r\n--boundary123--\r\n",
+			wantAttachNum: 0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ExtractPGPKeys([]byte(tt.data))
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ExtractPGPKeys() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if tt.wantErr {
+				return
+			}
+
+			if len(got) != tt.wantAttachNum {
+				t.Errorf("ExtractPGPKeys() got %d attachments, want %d", len(got), tt.wantAttachNum)
+				return
+			}
+
+			for i, attachment := range got {
+				if i >= len(tt.wantFiles) || i >= len(tt.wantTypes) {
+					t.Errorf("ExtractPGPKeys() unexpected attachment at index %d", i)
+					continue
+				}
+
+				if attachment.Filename != tt.wantFiles[i] {
+					t.Errorf("Attachment %d filename = %v, want %v", i, attachment.Filename, tt.wantFiles[i])
+				}
+
+				if attachment.ContentType != tt.wantTypes[i] {
+					t.Errorf("Attachment %d content type = %v, want %v", i, attachment.ContentType, tt.wantTypes[i])
+				}
+
+				// Verify the attachment has data
+				if attachment.Data == nil {
+					t.Errorf("Attachment %d has nil Data", i)
+				}
+			}
+		})
+	}
+}
+
 func compareMessages(a, b Msg) bool {
 	if a.From != b.From || a.FromName != b.FromName || a.Subject != b.Subject || a.Body != b.Body || a.Type != b.Type {
 		return false

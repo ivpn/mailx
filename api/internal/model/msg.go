@@ -306,4 +306,82 @@ func getFilename(header any) string {
 	}
 
 	return ""
+
+}
+
+// ExtractTextBody extracts the plain text body from an email.
+func ExtractTextBody(data []byte) (string, error) {
+	return extractBodyRecursive(data, "text/plain")
+}
+
+// ExtractHTMLBody extracts the HTML body from an email.
+func ExtractHTMLBody(data []byte) (string, error) {
+	return extractBodyRecursive(data, "text/html")
+}
+
+// extractBodyRecursive recursively walks MIME parts to find the first matching content type.
+func extractBodyRecursive(data []byte, contentType string) (string, error) {
+	msg, err := mail.ReadMessage(bytes.NewReader(data))
+	if err != nil {
+		return "", fmt.Errorf("failed to parse email: %w", err)
+	}
+
+	ctHeader := msg.Header.Get("Content-Type")
+	mediaType, params, err := mime.ParseMediaType(ctHeader)
+	if err != nil {
+		return "", fmt.Errorf("failed to parse Content-Type: %w", err)
+	}
+
+	body, err := io.ReadAll(msg.Body)
+	if err != nil {
+		return "", fmt.Errorf("failed to read message body: %w", err)
+	}
+
+	return walkMIMEParts(mediaType, params, body, contentType)
+}
+
+// walkMIMEParts recursively searches for a part of the desired content type.
+func walkMIMEParts(mediaType string, params map[string]string, body []byte, targetType string) (string, error) {
+	if strings.HasPrefix(mediaType, "multipart/") {
+		boundary := params["boundary"]
+		mr := multipart.NewReader(bytes.NewReader(body), boundary)
+		for {
+			p, err := mr.NextPart()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				return "", fmt.Errorf("error reading multipart: %w", err)
+			}
+
+			pMediaType, pParams, _ := mime.ParseMediaType(p.Header.Get("Content-Type"))
+			encoding := strings.ToLower(p.Header.Get("Content-Transfer-Encoding"))
+			decodedBody, err := decodeBody(p, encoding)
+			if err != nil {
+				return "", fmt.Errorf("error decoding part body: %w", err)
+			}
+
+			result, err := walkMIMEParts(pMediaType, pParams, decodedBody, targetType)
+			if err == nil && result != "" {
+				return result, nil
+			}
+		}
+	} else if mediaType == targetType {
+		return string(body), nil
+	}
+
+	return "", fmt.Errorf("%s not found", targetType)
+}
+
+func decodeBody(r io.Reader, encoding string) ([]byte, error) {
+	switch encoding {
+	case "base64":
+		return io.ReadAll(base64.NewDecoder(base64.StdEncoding, r))
+	case "quoted-printable":
+		return io.ReadAll(quotedprintable.NewReader(r))
+	case "", "7bit", "8bit", "binary":
+		return io.ReadAll(r)
+	default:
+		return nil, fmt.Errorf("unsupported encoding: %s", encoding)
+	}
 }

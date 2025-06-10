@@ -489,6 +489,256 @@ This is just a plain text email.`,
 	}
 }
 
+func TestExtractTextBody(t *testing.T) {
+	tests := []struct {
+		name    string
+		data    string
+		want    string
+		wantErr bool
+	}{
+		{
+			name: "simple plain text email",
+			data: `From: sender@example.com
+To: recipient@example.com
+Subject: Plain Text Email
+Content-Type: text/plain
+
+This is a plain text email body.`,
+			want:    "This is a plain text email body.",
+			wantErr: false,
+		},
+		{
+			name: "multipart email with plain text part",
+			data: `From: sender@example.com
+To: recipient@example.com
+Subject: Multipart Email
+Content-Type: multipart/mixed; boundary="boundary123"
+
+--boundary123
+Content-Type: text/plain
+
+This is the plain text part.
+--boundary123
+Content-Type: text/html
+
+<html><body>This is the HTML part.</body></html>
+--boundary123--`,
+			want:    "This is the plain text part.",
+			wantErr: false,
+		},
+		{
+			name: "multipart email with encoded plain text part",
+			data: `From: sender@example.com
+To: recipient@example.com
+Subject: Encoded Email
+Content-Type: multipart/mixed; boundary="boundary123"
+
+--boundary123
+Content-Type: text/plain
+Content-Transfer-Encoding: base64
+
+VGhpcyBpcyBiYXNlNjQgZW5jb2RlZCB0ZXh0Lg==
+--boundary123--`,
+			want:    "This is base64 encoded text.",
+			wantErr: false,
+		},
+		{
+			name: "multipart email with quoted-printable encoding",
+			data: `From: sender@example.com
+To: recipient@example.com
+Subject: Quoted Printable Email
+Content-Type: multipart/mixed; boundary="boundary123"
+
+--boundary123
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+
+This is quoted=3Dprintable text with special chars =C3=A4=C3=B6=C3=BC.
+--boundary123--`,
+			want:    "This is quoted=printable text with special chars äöü.",
+			wantErr: false,
+		},
+		{
+			name: "html only email",
+			data: `From: sender@example.com
+To: recipient@example.com
+Subject: HTML Only Email
+Content-Type: text/html
+
+<html><body>This is HTML content only.</body></html>`,
+			want:    "",
+			wantErr: true,
+		},
+		{
+			name: "nested multipart email with plain text",
+			data: `From: sender@example.com
+To: recipient@example.com
+Subject: Nested Multipart Email
+Content-Type: multipart/mixed; boundary="outer"
+
+--outer
+Content-Type: multipart/alternative; boundary="inner"
+
+--inner
+Content-Type: text/plain
+
+This is the nested plain text.
+--inner
+Content-Type: text/html
+
+<html><body>This is nested HTML.</body></html>
+--inner--
+--outer--`,
+			want:    "This is the nested plain text.",
+			wantErr: false,
+		},
+		{
+			name:    "invalid email data",
+			data:    "Invalid email data",
+			want:    "",
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ExtractTextBody([]byte(tt.data))
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ExtractTextBody() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !tt.wantErr && got != tt.want {
+				t.Errorf("ExtractTextBody() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestExtractHTMLBody(t *testing.T) {
+	tests := []struct {
+		name    string
+		data    string
+		want    string
+		wantErr bool
+	}{
+		{
+			name: "simple html email",
+			data: `From: sender@example.com
+To: recipient@example.com
+Subject: HTML Email
+Content-Type: text/html
+
+<html><body>This is an HTML email body.</body></html>`,
+			want:    "<html><body>This is an HTML email body.</body></html>",
+			wantErr: false,
+		},
+		{
+			name: "multipart email with html part",
+			data: `From: sender@example.com
+To: recipient@example.com
+Subject: Multipart Email
+Content-Type: multipart/mixed; boundary="boundary123"
+
+--boundary123
+Content-Type: text/plain
+
+This is the plain text part.
+--boundary123
+Content-Type: text/html
+
+<html><body>This is the HTML part.</body></html>
+--boundary123--`,
+			want:    "<html><body>This is the HTML part.</body></html>",
+			wantErr: false,
+		},
+		{
+			name: "multipart email with encoded html part",
+			data: `From: sender@example.com
+To: recipient@example.com
+Subject: Encoded Email
+Content-Type: multipart/mixed; boundary="boundary123"
+
+--boundary123
+Content-Type: text/html
+Content-Transfer-Encoding: base64
+
+PGh0bWw+PGJvZHk+VGhpcyBpcyBiYXNlNjQgZW5jb2RlZCBIVE1MLjwvYm9keT48L2h0bWw+
+--boundary123--`,
+			want:    "<html><body>This is base64 encoded HTML.</body></html>",
+			wantErr: false,
+		},
+		{
+			name: "multipart email with quoted-printable html encoding",
+			data: `From: sender@example.com
+To: recipient@example.com
+Subject: Quoted Printable Email
+Content-Type: multipart/mixed; boundary="boundary123"
+
+--boundary123
+Content-Type: text/html
+Content-Transfer-Encoding: quoted-printable
+
+<html><body>This is quoted=3Dprintable HTML with special chars =C3=A4=C3=B6=C3=BC.</body></html>
+--boundary123--`,
+			want:    "<html><body>This is quoted=printable HTML with special chars äöü.</body></html>",
+			wantErr: false,
+		},
+		{
+			name: "plain text only email",
+			data: `From: sender@example.com
+To: recipient@example.com
+Subject: Plain Text Only Email
+Content-Type: text/plain
+
+This is plain text content only.`,
+			want:    "",
+			wantErr: true,
+		},
+		{
+			name: "nested multipart email with html",
+			data: `From: sender@example.com
+To: recipient@example.com
+Subject: Nested Multipart Email
+Content-Type: multipart/mixed; boundary="outer"
+
+--outer
+Content-Type: multipart/alternative; boundary="inner"
+
+--inner
+Content-Type: text/plain
+
+This is the nested plain text.
+--inner
+Content-Type: text/html
+
+<html><body>This is nested HTML content.</body></html>
+--inner--
+--outer--`,
+			want:    "<html><body>This is nested HTML content.</body></html>",
+			wantErr: false,
+		},
+		{
+			name:    "invalid email data",
+			data:    "Invalid email data",
+			want:    "",
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ExtractHTMLBody([]byte(tt.data))
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ExtractHTMLBody() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !tt.wantErr && got != tt.want {
+				t.Errorf("ExtractHTMLBody() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
 func compareMessages(a, b Msg) bool {
 	if a.From != b.From || a.FromName != b.FromName || a.Subject != b.Subject || a.Body != b.Body || a.Type != b.Type {
 		return false

@@ -247,7 +247,25 @@ func (s *Service) ActivateRecipient(ctx context.Context, ID string, userID strin
 		return ErrExpiredOTP
 	}
 
+	idLimiter := utils.IDLimiter{
+		ID:    ID,
+		Label: "recipient_fails",
+		Max:   s.Cfg.Service.IdLimiterMax,
+		Exp:   s.Cfg.Service.IdLimiterExpiration,
+		Cache: s.Cache,
+	}
+
 	if !utils.MatchOTP(otp, hash) {
+		err = idLimiter.Tick()
+		if err != nil {
+			log.Printf("error activating recipient: %s", err.Error())
+		}
+
+		return ErrIncorrectOTP
+	}
+
+	if !idLimiter.IsAllowed() {
+		log.Printf("error activating recipient: too many failed attempts")
 		return ErrIncorrectOTP
 	}
 

@@ -599,6 +599,27 @@ func (s *Service) VerifyTotp(ctx context.Context, userID string, otp string) (bo
 		}
 	}
 
+	idLimiter := utils.IDLimiter{
+		ID:    userID,
+		Label: "totp_fails",
+		Max:   s.Cfg.Service.IdLimiterMax,
+		Exp:   s.Cfg.Service.IdLimiterExpiration,
+		Cache: s.Cache,
+	}
+
+	if !isValid {
+		err = idLimiter.Tick()
+		if err != nil {
+			log.Printf("error ticking ID limiter: %s", err.Error())
+			return false, ErrInvalidTOTPCode
+		}
+	}
+
+	if !idLimiter.IsAllowed() {
+		log.Printf("error verifying TOTP: too many failed attempts")
+		return false, ErrInvalidTOTPCode
+	}
+
 	return isValid, nil
 }
 

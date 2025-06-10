@@ -4,7 +4,6 @@ smtp_tls_protocols = !SSLv2, !SSLv3
 smtpd_tls_protocols = !SSLv2, !SSLv3
 
 always_add_missing_headers = yes
-notify_classes =
 
 milter_default_action = accept
 milter_protocol = 6

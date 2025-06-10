@@ -34,14 +34,7 @@ func (d *Database) GetAlias(ctx context.Context, ID string, userID string) (mode
 }
 
 func (d *Database) GetAliases(ctx context.Context, userID string, limit int, offset int, sortBy string, sortOrder string, catchAll string) ([]model.Alias, error) {
-	if sortBy == "" {
-		sortBy = "created_at"
-	}
 	sortBy = "a." + sortBy
-
-	if sortOrder == "" {
-		sortOrder = "DESC"
-	}
 
 	if catchAll == "true" {
 		catchAll = "AND a.catch_all = true"

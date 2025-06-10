@@ -75,6 +75,31 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 	sortOrder := strings.ToUpper(c.Query("sort_order"))
 	catchAll := c.Query("catch_all")
 
+	var allowSortBy = map[string]bool{
+		"created_at": true,
+		"updated_at": true,
+		"name":       true,
+	}
+	var allowSortOrder = map[string]bool{
+		"ASC":  true,
+		"DESC": true,
+	}
+	var allowCatchAll = map[string]bool{
+		"true":  true,
+		"false": true,
+		"":      true,
+	}
+
+	if _, ok := allowSortBy[sortBy]; !ok {
+		sortBy = "created_at"
+	}
+	if _, ok := allowSortOrder[sortOrder]; !ok {
+		sortOrder = "DESC"
+	}
+	if _, ok := allowCatchAll[catchAll]; !ok {
+		catchAll = ""
+	}
+
 	list, err := h.Service.GetAliases(c.Context(), userID, limit, page, sortBy, sortOrder, catchAll)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{

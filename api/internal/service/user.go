@@ -140,8 +140,9 @@ func (s *Service) PostUser(ctx context.Context, user model.User, subID string) e
 		return ErrInvalidSubscription
 	}
 
-	rcpCount, err := s.Store.GetRecipientsCountByEmail(ctx, user.Email)
-	if err != nil || rcpCount > 0 {
+	exists, err := s.Store.CheckDuplicateRecipient(ctx, user.Email)
+	if exists || err != nil {
+		log.Printf("error creating user: ErrDuplicateEmail")
 		return model.ErrDuplicateEmail
 	}
 

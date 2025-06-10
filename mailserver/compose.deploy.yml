@@ -39,6 +39,7 @@ services:
       - DOMAIN=${DOMAIN}
       - SMTP_USER=${SMTP_USER}
       - SMTP_PASS=${SMTP_PASS}
+      - PSK=${PSK}
       - ENABLE_MTA_STS=1
     restart: always
     stop_grace_period: 1m

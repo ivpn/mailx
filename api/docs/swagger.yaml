@@ -770,13 +770,6 @@ paths:
       consumes:
       - application/json
       description: Begin Add Passkey process
-      parameters:
-      - description: Email
-        in: body
-        name: email
-        required: true
-        schema:
-          $ref: '#/definitions/api.EmailReq'
       produces:
       - application/json
       responses:

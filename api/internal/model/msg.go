@@ -124,7 +124,7 @@ func ExtractPGPSignatures(data []byte) ([]parsemail.Attachment, error) {
 			ct := p.Header.Get("Content-Type")
 			filename := p.FileName()
 			if filename == "" {
-				filename = "unknown"
+				continue
 			}
 
 			bodyBytes, err := io.ReadAll(p)
@@ -187,22 +187,12 @@ func ExtractPGPKeys(data []byte) ([]parsemail.Attachment, error) {
 	mediaType, params, err := mime.ParseMediaType(ct)
 	if err != nil {
 		// No valid Content-Type header, treat whole body as one PGP key (unlikely)
-		body, _ := ioutil.ReadAll(msg.Body)
-		return []parsemail.Attachment{{
-			Filename:    "publickey.asc",
-			ContentType: "application/pgp-keys",
-			Data:        bytes.NewReader(body),
-		}}, nil
+		return []parsemail.Attachment{}, nil
 	}
 
 	if !strings.HasPrefix(mediaType, "multipart/") {
 		// Not multipart, treat whole body as one PGP key (maybe)
-		body, _ := ioutil.ReadAll(msg.Body)
-		return []parsemail.Attachment{{
-			Filename:    "publickey.asc",
-			ContentType: mediaType,
-			Data:        bytes.NewReader(body),
-		}}, nil
+		return []parsemail.Attachment{}, nil
 	}
 
 	// Multipart message: parse parts recursively

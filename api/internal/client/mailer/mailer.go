@@ -135,7 +135,8 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 		return err
 	}
 
-	log.Println("Email reply sent successfully")
+	log.Printf("Email reply sent successfully, %s", email.MessageID)
+
 	return nil
 }
 
@@ -290,7 +291,7 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 			return err
 		}
 
-		log.Println("PGP/MIME email forward sent successfully")
+		log.Printf("PGP/MIME email forward sent successfully, %s", email.MessageID)
 		return nil
 	}
 
@@ -299,7 +300,7 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 		return err
 	}
 
-	log.Println("Email forward sent successfully")
+	log.Printf("Email forward sent successfully, %s", email.MessageID)
 	return nil
 }
 

@@ -135,7 +135,8 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 		return err
 	}
 
-	log.Println("Email reply sent successfully")
+	log.Printf("Email reply sent successfully, %s", email.MessageID)
+
 	return nil
 }
 
@@ -163,6 +164,22 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 		return err
 	}
 
+	if email.TextBody == "" {
+		extractedTextBody, err := model.ExtractTextBody(data)
+		if err != nil {
+			log.Println("Error extracting text body:", err)
+		} else {
+			email.TextBody = extractedTextBody
+		}
+	}
+	if email.HTMLBody == "" {
+		extractedHTMLBody, err := model.ExtractHTMLBody(data)
+		if err != nil {
+			log.Println("Error extracting HTML body:", err)
+		} else {
+			email.HTMLBody = extractedHTMLBody
+		}
+	}
 	if email.HTMLBody == "" {
 		email.HTMLBody = model.PlainTextToHTML(email.TextBody)
 	}
@@ -185,6 +202,40 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 		m.SetBody("text/plain", email.TextBody)
 	} else {
 		m.AddAlternative("text/html", headerHtml.String()+email.HTMLBody)
+	}
+
+	// PGPSignatures
+	pgpSignatures, err := model.ExtractPGPSignatures(data)
+	if err != nil {
+		log.Println("Error extracting PGP signatures:", err)
+	} else {
+		for _, a := range pgpSignatures {
+			m.Attach(a.Filename, gomail.SetCopyFunc(func(w io.Writer) error {
+				data, err := io.ReadAll(a.Data)
+				if err != nil {
+					return err
+				}
+				_, err = w.Write(data)
+				return err
+			}))
+		}
+	}
+
+	// PGPKeys
+	pgpKeys, err := model.ExtractPGPKeys(data)
+	if err != nil {
+		log.Println("Error extracting PGP keys:", err)
+	} else {
+		for _, a := range pgpKeys {
+			m.Attach(a.Filename, gomail.SetCopyFunc(func(w io.Writer) error {
+				data, err := io.ReadAll(a.Data)
+				if err != nil {
+					return err
+				}
+				_, err = w.Write(data)
+				return err
+			}))
+		}
 	}
 
 	for _, a := range email.Attachments {
@@ -240,7 +291,7 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 			return err
 		}
 
-		log.Println("PGP/MIME email forward sent successfully")
+		log.Printf("PGP/MIME email forward sent successfully, %s", email.MessageID)
 		return nil
 	}
 
@@ -249,7 +300,7 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 		return err
 	}
 
-	log.Println("Email forward sent successfully")
+	log.Printf("Email forward sent successfully, %s", email.MessageID)
 	return nil
 }
 

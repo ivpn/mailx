@@ -1,0 +1,40 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: Go Build and Test
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - name: Set up sparse checkout
+        run: |
+          git sparse-checkout init --cone
+          git sparse-checkout set api
+      - name: Pull changes from PR branch
+        run: git pull origin ${{ github.event.pull_request.head.ref }}
+      - name: Move directory
+        run: |
+          mv api/* .
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+            go-version: '1.23'
+      - name: Build
+        run: go build -v ./...
+      - name: Test
+        run: go test -v ./...
+      - name: Vet
+        run: go vet ./...
+      - name: Modernize
+        run: go run golang.org/x/tools/gopls/internal/analysis/modernize/cmd/modernize@latest -test ./...

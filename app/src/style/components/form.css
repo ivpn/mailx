@@ -1,0 +1,105 @@
+@layer components {
+    input[type=email],
+    input[type=text],
+    input[type=password] {
+        @apply bg-secondary text-secondary border-primary appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-accent mb-2;
+
+        &.error {
+            @apply border-error;
+        }
+
+        &:disabled {
+            @apply pointer-events-none text-tertiary;
+        }
+
+        &::placeholder {
+            @apply text-tertiary;
+        }
+
+        &.email {
+            @apply bg-[url("../../assets/icons/icon-email-light.svg")] dark:bg-[url("../../assets/icons/icon-email-dark.svg")] bg-no-repeat bg-[center_left_0.5rem] pl-10;
+        }
+
+        &.password {
+            @apply bg-[url("../../assets/icons/icon-password-light.svg")] dark:bg-[url("../../assets/icons/icon-password-dark.svg")] bg-no-repeat bg-[center_left_0.5rem] pl-10;
+        }
+
+        &.search {
+            @apply py-[9px] px-8 m-0 rounded bg-[url("../../assets/icons/icon-search-light.svg")] dark:bg-[url("../../assets/icons/icon-search-dark.svg")] bg-no-repeat bg-[center_left_0.5rem] bg-auto lg:w-80;
+        }
+    }
+
+    input[type=checkbox] {
+        @apply form-checkbox relative w-11 h-6 p-px bg-tertiary border-transparent text-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:ring-transparent disabled:opacity-50 disabled:pointer-events-none checked:bg-none checked:text-info checked:border-info focus:ring-offset-transparent before:inline-block before:size-5 before:bg-white checked:before:bg-white before:translate-x-0 checked:before:translate-x-full before:rounded-full before:shadow before:transform before:transition before:ease-in-out before:duration-200;
+    }
+
+    input[type=radio] {
+        @apply form-radio border-secondary bg-secondary rounded-full text-accent focus:ring-transparent dark:checked:border-transparent dark:focus:ring-offset-transparent;
+    }
+
+    select {
+        @apply bg-secondary text-secondary border-primary form-select py-2.5 px-4 pe-9 block w-full border focus:border-accent disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent cursor-pointer mb-2;
+
+        background-image: url("../../assets/icons/icon-arrow-down-dark.svg");
+    }
+
+    textarea {
+        @apply bg-secondary text-secondary border-primary appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-accent mb-2 h-[350px];
+
+        &.error {
+            @apply border-error;
+        }
+    }
+
+    label {
+        @apply text-secondary text-sm font-bold mb-3 flex items-center;
+
+        &.required::after {
+            @apply content-['•'] text-accent text-2xl/4;
+        }
+    }
+    
+    .hs-select {
+        @apply mb-2;
+
+        button {
+            @apply text-secondary font-normal text-base;
+        }
+    }
+
+    .select {
+        @apply flex flex-col gap-3 pb-3;
+
+        button {
+            @apply flex justify-between items-center gap-3 bg-secondary p-4 w-full text-left;
+
+            &.active {
+                @apply text-primary bg-accent-secondary;
+
+                strong {
+                    @apply text-white bg-accent;
+                }
+
+                .icon {
+                    @apply inline-block;
+                }
+            }
+
+            strong {
+                @apply text-primary bg-accent-tertiary inline-block px-2;
+            }
+
+            span {
+                @apply text-secondary block mt-3;
+
+                i {
+                    @apply text-primary italic;
+                }
+            }
+
+            .icon {
+                @apply rotate-180 hidden;
+            }
+        }
+    }
+}

@@ -1,0 +1,21 @@
+{{define "header"}}
+This email was sent to {{.alias}} from {{.from}}
+
+{{end}}
+
+{{define "headerHtml"}}
+<table style="width: 100%;">
+    <tr>
+        <td>
+            <div style="padding: 15px;background: rgb(241 245 249);color: rgb(75 85 99);font-size: 13px;text-align: center;font-family: Arial, Helvetica, sans-serif;">
+                This email was sent to
+                <a style="color: rgb(59 130 246);text-decoration: none;" href="mailto:{{.alias}}">{{.alias}}</a>
+                from
+                <a style="color: rgb(59 130 246);text-decoration: none;" href="mailto:{{.from}}">{{.from}}</a>
+            </div>
+            <br>
+        </td>
+    </tr>
+</table>
+<br>
+{{end}}

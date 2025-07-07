@@ -1,0 +1,11 @@
+@import "roboto/roboto.css";
+
+@layer components {
+    .font-primary {
+        font-family: sans-serif;
+    }
+    
+    .font-secondary {
+        font-family: 'Roboto Mono', monospace;
+    }
+}

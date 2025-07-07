@@ -1,0 +1,13 @@
+@layer components {
+    .mobile {
+        @apply sm:hidden [@media(max-height:530px)]:block;
+    }
+
+    .tablet {
+        @apply md:hidden;
+    }
+
+    .desktop {
+        @apply max-md:hidden;
+    }
+}

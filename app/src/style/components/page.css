@@ -1,0 +1,83 @@
+@layer components {
+    .page-bg {
+        @apply md:bg-[url("../../assets/bg-light.svg")] md:dark:bg-[url("../../assets/bg-dark.svg")] bg-no-repeat bg-fixed bg-right-bottom;
+    }
+
+    .page {
+        @apply min-h-screen flex;
+
+        &.center {
+            @apply p-5 flex flex-col items-center justify-between;
+        }
+    }
+
+    .card-container {
+        @apply flex flex-col min-h-screen p-5 pt-0 md:p-8 md:pt-0;
+
+        header {
+            @apply flex justify-between;
+        }
+    }
+
+    .card-empty {
+        @apply flex flex-col py-5 px-8 border-secondary border bg-primary items-center justify-center text-center grow;
+    }
+
+    .card-primary {
+        @apply flex flex-col py-5 md:px-7 px-5 border-secondary border bg-primary grow;
+    }
+
+    .card-secondary {
+        @apply flex flex-col py-5 px-8 bg-secondary;
+    }
+
+    .card-tertiary {
+
+        &.center {
+            @apply w-full max-w-md;
+        }
+
+        article {
+            @apply px-4 sm:px-12 py-11 pb-7 flex flex-col border-accent border bg-light-gray-2 dark:bg-dark-gray-2 dark:border-none;
+        }
+
+        footer {
+            @apply flex gap-2 p-4 mt-4 bg-light-blue-3 dark:bg-dark-blue-2;
+
+            .icon {
+                @apply icon-accent dark:icon-primary;
+            }
+
+            h4 {
+                @apply font-primary text-primary font-normal text-sm mb-1;
+            }
+
+            p {
+                @apply text-secondary text-sm m-0;
+
+                a {
+                    @apply underline text-secondary hover:text-primary;
+                }
+            }
+        }
+    }
+
+    .head {
+        @apply min-h-[0px] [@media(max-height:530px)]:min-h-[0px] [@media(max-height:530px)]:mb-6 sm:min-h-[100px] mb-6 sm:mb-0 flex items-center gap-2;
+
+        h1, h2, h3, h4, h5, h6 {
+            @apply m-0;
+        }
+    }
+
+    .footer-nav {
+        
+        p {
+            @apply my-0;
+
+            a {
+                @apply text-primary hover:text-secondary;
+            }
+        }
+    }
+}

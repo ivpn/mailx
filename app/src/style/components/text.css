@@ -1,0 +1,54 @@
+@layer components {
+    h1 {
+        @apply sm:text-3xl text-2xl font-semibold text-primary mb-5;
+    }
+
+    h2 {
+        @apply sm:text-2xl text-xl font-semibold text-primary mb-5;
+    }
+
+    h3 {
+        @apply sm:text-xl text-lg font-semibold text-primary mb-5;
+    }
+
+    h4 {
+        @apply sm:text-lg text-base font-semibold text-primary mb-3;
+    }
+
+    h5 {
+        @apply font-semibold text-primary mb-3;
+    }
+
+    p {
+        @apply text-secondary mb-5 font-primary;
+
+        &.error {
+            @apply text-error text-sm mb-3;
+        }
+    
+        &.success {
+            @apply text-success text-sm mb-3;
+        }
+    }
+
+    table td > p,
+    table td > div > p {
+        @apply text-primary mb-0;
+    }
+
+    a {
+        @apply text-accent hover:text-accent-alt;
+    }
+
+    hr {
+        @apply border-t border-secondary mb-8;
+    }
+
+    ul {
+        @apply list-disc ml-5;
+    
+        li {
+            @apply mb-5 leading-7 font-primary text-secondary;
+        }
+    }
+}

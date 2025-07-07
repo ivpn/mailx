@@ -1,0 +1,96 @@
+@layer components {
+    .icon {
+        mask-size: 1.35em;
+        mask-size: 1.35em;
+
+        @apply w-[1.35em] h-[1.35em] inline-block bg-no-repeat;
+
+        &.at {
+            mask-image: url("../../assets/icons/icon-at.svg");
+        }
+
+        &.chart {
+            mask-image: url("../../assets/icons/icon-chart.svg");
+        }
+
+        &.logout {
+            mask-image: url("../../assets/icons/icon-log-out.svg");
+        }
+
+        &.inbox {
+            mask-image: url("../../assets/icons/icon-inbox.svg");
+        }
+
+        &.settings {
+            mask-image: url("../../assets/icons/icon-settings.svg");
+        }
+
+        &.user {
+            mask-image: url("../../assets/icons/icon-user.svg");
+        }
+
+        &.arrow-down-fill {
+            mask-image: url("../../assets/icons/icon-arrow-down-fill.svg");
+        }
+
+        &.scan {
+            mask-image: url("../../assets/icons/icon-scan.svg");
+        }
+
+        &.reply {
+            mask-image: url("../../assets/icons/icon-reply.svg");
+        }
+
+        &.forward {
+            mask-image: url("../../assets/icons/icon-forward.svg");
+        }
+
+        &.send {
+            mask-image: url("../../assets/icons/icon-send.svg");
+        }
+
+        &.block {
+            mask-image: url("../../assets/icons/icon-block.svg");
+        }
+
+        &.more {
+            mask-image: url("../../assets/icons/icon-more.svg");
+        }
+
+        &.edit {
+            mask-image: url("../../assets/icons/icon-edit.svg");
+        }
+
+        &.trash {
+            mask-image: url("../../assets/icons/icon-trash.svg");
+        }
+
+        &.arrow-down {
+            mask-image: url("../../assets/icons/icon-arrow-down-dark.svg");
+        }
+
+        &.arrow-left-line {
+            mask-image: url("../../assets/icons/icon-arrow-left-line.svg");
+        }
+
+        &.check {
+            mask-image: url("../../assets/icons/icon-check.svg");
+        }
+
+        &.key {
+            mask-image: url("../../assets/icons/icon-key.svg");
+        }
+
+        &.info {
+            mask-image: url("../../assets/icons/icon-info.svg");
+        }
+
+        &.close {
+            mask-image: url("../../assets/icons/icon-close.svg");
+        }
+    }
+
+    .logo {
+        @apply block bg-[url("../../assets/mailX-5.svg")] dark:bg-[url("../../assets/mailX-3.svg")] bg-no-repeat w-24 sm:w-28 h-9 bg-[center] bg-contain;
+    }
+}

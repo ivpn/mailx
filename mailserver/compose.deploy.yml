@@ -1,0 +1,63 @@
+services:
+  mailserver:
+    image: ghcr.io/docker-mailserver/docker-mailserver:latest
+    container_name: mailserver
+    hostname: ${DMS_HOSTNAME}
+    env_file: mailserver.env
+    # More information about the mail-server ports:
+    # https://docker-mailserver.github.io/docker-mailserver/latest/config/security/understanding-the-ports/
+    ports:
+      - "127.0.0.1:2025:25"  # SMTP  (explicit TLS => STARTTLS, Authentication is DISABLED => use port 465/587 instead)
+      - "127.0.0.1:465:465"  # ESMTP (implicit TLS)
+      - "127.0.0.1:587:587"  # ESMTP (explicit TLS => STARTTLS)
+    volumes:
+      - ./docker-data/certbot/certs/live/:/etc/letsencrypt
+      - /etc/letsencrypt/:/etc/letsencrypt/
+      - ./docker-data/dms/mail-data/:/var/mail/
+      - ./docker-data/dms/mail-logs/:/var/log/mail/
+      - ./docker-data/dms/config/:/tmp/docker-mailserver/
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - ENABLE_OPENDKIM=0
+      - ENABLE_OPENDMARC=0
+      - ENABLE_POLICYD_SPF=0
+      - ENABLE_POP3=0
+      - ENABLE_IMAP=0
+      - ENABLE_AMAVIS=0
+      - ENABLE_SPAMASSASSIN=0
+      - ENABLE_FETCHMAIL=0
+      - PERMIT_DOCKER=host
+      - SMTP_ONLY=1
+      - ENABLE_RSPAMD=${ENABLE_RSPAMD}
+      - ENABLE_FAIL2BAN=${ENABLE_FAIL2BAN}
+      - ENABLE_CLAMAV=${ENABLE_CLAMAV}
+      - SSL_TYPE=${SSL_TYPE}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - LOGROTATE_INTERVAL=${LOGROTATE_INTERVAL}
+      - LOGROTATE_COUNT=${LOGROTATE_COUNT}
+      - ENABLE_SASLAUTHD=1
+      - DOMAIN=${DOMAIN}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - PSK=${PSK}
+      - ENABLE_MTA_STS=1
+    restart: always
+    stop_grace_period: 1m
+    # Uncomment if using `ENABLE_FAIL2BAN=1`:
+    cap_add:
+      - NET_ADMIN
+    healthcheck:
+      test: "ss --listening --tcp | grep -P 'LISTEN.+:smtp' || exit 1"
+      timeout: 3s
+      retries: 3
+    networks:
+      net:
+        ipv4_address: ${DMS_IP}
+
+networks:
+  net:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: ${NET_SUBNET}
+         gateway: ${NET_GATEWAY}

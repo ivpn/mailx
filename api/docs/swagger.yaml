@@ -1,0 +1,1346 @@
+definitions:
+  api.ActivateReq:
+    properties:
+      otp:
+        type: string
+    required:
+    - otp
+    type: object
+  api.AliasReq:
+    properties:
+      catch_all_suffix:
+        maxLength: 12
+        minLength: 6
+        type: string
+      description:
+        type: string
+      domain:
+        type: string
+      enabled:
+        type: boolean
+      format:
+        type: string
+      from_name:
+        type: string
+      recipients:
+        type: string
+    required:
+    - domain
+    - recipients
+    type: object
+  api.ChangePasswordReq:
+    properties:
+      password:
+        type: string
+    type: object
+  api.DeleteUserReq:
+    properties:
+      otp:
+        type: string
+    required:
+    - otp
+    type: object
+  api.EmailReq:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
+  api.ErrorRes:
+    properties:
+      error:
+        type: string
+    type: object
+  api.RecipientReq:
+    properties:
+      id:
+        type: string
+      pgp_enabled:
+        type: boolean
+      pgp_inline:
+        type: boolean
+      pgp_key:
+        type: string
+    required:
+    - id
+    type: object
+  api.ResetPasswordReq:
+    properties:
+      otp:
+        type: string
+      password:
+        type: string
+    required:
+    - otp
+    type: object
+  api.SettingsReq:
+    properties:
+      alias_format:
+        type: string
+      domain:
+        type: string
+      from_name:
+        type: string
+      id:
+        type: string
+      recipient:
+        type: string
+    required:
+    - id
+    type: object
+  api.SignupEmailReq:
+    properties:
+      email:
+        type: string
+      subid:
+        type: string
+    required:
+    - email
+    - subid
+    type: object
+  api.SignupUserReq:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      subid:
+        type: string
+    required:
+    - email
+    - subid
+    type: object
+  api.SubscriptionReq:
+    properties:
+      active_until:
+        type: string
+      id:
+        type: string
+    required:
+    - active_until
+    - id
+    type: object
+  api.SuccessRes:
+    properties:
+      message:
+        type: string
+    type: object
+  api.TotpReq:
+    properties:
+      otp:
+        maxLength: 8
+        minLength: 6
+        type: string
+    required:
+    - otp
+    type: object
+  api.UserReq:
+    properties:
+      email:
+        type: string
+      otp:
+        maxLength: 8
+        minLength: 0
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    type: object
+  model.Alias:
+    properties:
+      catch_all:
+        type: boolean
+      created_at:
+        type: string
+      description:
+        type: string
+      enabled:
+        type: boolean
+      from_name:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      recipients:
+        type: string
+      stats:
+        $ref: '#/definitions/model.AliasStats'
+    type: object
+  model.AliasList:
+    properties:
+      aliases:
+        items:
+          $ref: '#/definitions/model.Alias'
+        type: array
+      total:
+        type: integer
+    type: object
+  model.AliasStats:
+    properties:
+      blocks:
+        type: integer
+      forwards:
+        type: integer
+      replies:
+        type: integer
+      sends:
+        type: integer
+    type: object
+  model.Credential:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      user_id:
+        type: string
+    type: object
+  model.Recipient:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      pgp_enabled:
+        type: boolean
+      pgp_inline:
+        type: boolean
+      pgp_key:
+        type: string
+    type: object
+  model.Settings:
+    properties:
+      alias_format:
+        type: string
+      created_at:
+        type: string
+      domain:
+        type: string
+      from_name:
+        type: string
+      id:
+        type: string
+      recipient:
+        type: string
+    type: object
+  model.Subscription:
+    properties:
+      active_until:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      type:
+        $ref: '#/definitions/model.SubscriptionType'
+    type: object
+  model.SubscriptionType:
+    enum:
+    - Free
+    - Managed
+    type: string
+    x-enum-varnames:
+    - Free
+    - Managed
+  model.TOTPBackup:
+    properties:
+      backup:
+        type: string
+    type: object
+  model.TOTPNew:
+    properties:
+      account:
+        type: string
+      secret:
+        type: string
+      uri:
+        type: string
+    type: object
+  model.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      totp_enabled:
+        type: boolean
+    type: object
+  model.UserStats:
+    properties:
+      aliases:
+        type: integer
+      blocks:
+        type: integer
+      forwards:
+        type: integer
+      messages:
+        items: {}
+        type: array
+      replies:
+        type: integer
+      sends:
+        type: integer
+    type: object
+info:
+  contact: {}
+paths:
+  /alias:
+    post:
+      consumes:
+      - application/json
+      description: Create alias
+      parameters:
+      - description: Alias request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.AliasReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Create alias
+      tags:
+      - alias
+  /alias/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete alias
+      parameters:
+      - description: Alias ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete alias
+      tags:
+      - alias
+    get:
+      consumes:
+      - application/json
+      description: Get alias by ID
+      parameters:
+      - description: Alias ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Alias'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get alias
+      tags:
+      - alias
+    put:
+      consumes:
+      - application/json
+      description: Update alias
+      parameters:
+      - description: Alias ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Alias request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.AliasReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update alias
+      tags:
+      - alias
+  /aliases:
+    get:
+      consumes:
+      - application/json
+      description: Get all aliases
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.AliasList'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get aliases
+      tags:
+      - alias
+  /email:
+    post:
+      consumes:
+      - application/json
+      description: Handle incoming email
+      parameters:
+      - description: Email body
+        in: body
+        name: email
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Email handler
+      tags:
+      - email
+  /initiatepasswordreset:
+    post:
+      consumes:
+      - application/json
+      description: Initiate password reset
+      parameters:
+      - description: Initiate password reset request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.EmailReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Initiate password reset
+      tags:
+      - user
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Login user
+      parameters:
+      - description: User request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.UserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Login user
+      tags:
+      - user
+  /login/begin:
+    post:
+      consumes:
+      - application/json
+      description: Begin login process
+      parameters:
+      - description: Email
+        in: body
+        name: email
+        required: true
+        schema:
+          $ref: '#/definitions/api.EmailReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Begin login
+      tags:
+      - webauthn
+  /login/finish:
+    post:
+      consumes:
+      - application/json
+      description: Finish login process
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Finish login
+      tags:
+      - webauthn
+  /recipient:
+    post:
+      consumes:
+      - application/json
+      description: Create recipient
+      parameters:
+      - description: Recipient request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.EmailReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Create recipient
+      tags:
+      - recipient
+    put:
+      consumes:
+      - application/json
+      description: Update recipient
+      parameters:
+      - description: Recipient request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.RecipientReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update recipient
+      tags:
+      - recipient
+  /recipient/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete recipient
+      parameters:
+      - description: Recipient ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete recipient
+      tags:
+      - recipient
+    get:
+      consumes:
+      - application/json
+      description: Get recipient by ID
+      parameters:
+      - description: Recipient ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Recipient'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get recipient
+      tags:
+      - recipient
+  /recipient/activate/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Activate recipient
+      parameters:
+      - description: Recipient ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Activate request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.ActivateReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Activate recipient
+      tags:
+      - recipient
+  /recipient/sendotp/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Send recipient OTP
+      parameters:
+      - description: Recipient ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Send recipient OTP
+      tags:
+      - recipient
+  /recipients:
+    get:
+      consumes:
+      - application/json
+      description: Get all recipients
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Recipient'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get recipients
+      tags:
+      - recipient
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Register user
+      parameters:
+      - description: User request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.SignupUserReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Register user
+      tags:
+      - user
+  /register/add:
+    post:
+      consumes:
+      - application/json
+      description: Begin Add Passkey process
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Add Passkey
+      tags:
+      - webauthn
+  /register/add/finish:
+    post:
+      consumes:
+      - application/json
+      description: Finish add Passkey process
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Finish add Passkey
+      tags:
+      - webauthn
+  /register/begin:
+    post:
+      consumes:
+      - application/json
+      description: Begin registration process
+      parameters:
+      - description: Email
+        in: body
+        name: email
+        required: true
+        schema:
+          $ref: '#/definitions/api.SignupEmailReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Begin registration
+      tags:
+      - webauthn
+  /register/finish:
+    post:
+      consumes:
+      - application/json
+      description: Finish registration process
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Finish registration
+      tags:
+      - webauthn
+  /resetpassword:
+    put:
+      consumes:
+      - application/json
+      description: Reset password
+      parameters:
+      - description: Password reset request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.ResetPasswordReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Reset password
+      tags:
+      - user
+  /settings:
+    get:
+      consumes:
+      - application/json
+      description: Get settings
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Settings'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get settings
+      tags:
+      - settings
+    put:
+      consumes:
+      - application/json
+      description: Update settings
+      parameters:
+      - description: Settings
+        in: body
+        name: settings
+        required: true
+        schema:
+          $ref: '#/definitions/api.SettingsReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update settings
+      tags:
+      - settings
+  /sub:
+    get:
+      consumes:
+      - application/json
+      description: Get subscription
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Subscription'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get subscription
+      tags:
+      - subscription
+  /subscription/add:
+    post:
+      consumes:
+      - application/json
+      description: Add subscription
+      parameters:
+      - description: Subscription request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.SubscriptionReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Add subscription
+      tags:
+      - subscription
+  /subscription/update:
+    put:
+      consumes:
+      - application/json
+      description: Update subscription
+      parameters:
+      - description: Subscription request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.SubscriptionReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update subscription
+      tags:
+      - subscription
+  /user:
+    get:
+      consumes:
+      - application/json
+      description: Get user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get user
+      tags:
+      - user
+  /user/activate:
+    post:
+      consumes:
+      - application/json
+      description: Activate user
+      parameters:
+      - description: Activate request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.ActivateReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Activate user
+      tags:
+      - user
+  /user/changeemail:
+    put:
+      consumes:
+      - application/json
+      description: Change email
+      parameters:
+      - description: Change email request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.EmailReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Change email
+      tags:
+      - user
+  /user/changepassword:
+    put:
+      consumes:
+      - application/json
+      description: Change password
+      parameters:
+      - description: Change password request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.ChangePasswordReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Change password
+      tags:
+      - user
+  /user/credential/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete credential by ID
+      parameters:
+      - description: Credential ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete credential
+      tags:
+      - webauthn
+  /user/credentials:
+    get:
+      consumes:
+      - application/json
+      description: Get user credentials
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Credential'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get credentials
+      tags:
+      - webauthn
+  /user/delete:
+    post:
+      consumes:
+      - application/json
+      description: Delete user
+      parameters:
+      - description: Delete user request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.DeleteUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete user
+      tags:
+      - user
+  /user/delete/request:
+    post:
+      consumes:
+      - application/json
+      description: Delete user request
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete user request
+      tags:
+      - user
+  /user/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Logout user
+      tags:
+      - user
+  /user/sendotp:
+    post:
+      consumes:
+      - application/json
+      description: Send user OTP
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Send user OTP
+      tags:
+      - user
+  /user/stats:
+    get:
+      consumes:
+      - application/json
+      description: Get user stats
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.UserStats'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get user stats
+      tags:
+      - user
+  /user/totp/disable:
+    put:
+      consumes:
+      - application/json
+      description: Disable TOTP
+      parameters:
+      - description: TOTP confirm request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.TotpReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Disable TOTP
+      tags:
+      - user
+  /user/totp/enable:
+    put:
+      consumes:
+      - application/json
+      description: Enable TOTP
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.TOTPNew'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Enable TOTP
+      tags:
+      - user
+  /user/totp/enable/confirm:
+    put:
+      consumes:
+      - application/json
+      description: Enable TOTP confirm
+      parameters:
+      - description: TOTP confirm request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.TotpReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.TOTPBackup'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Enable TOTP confirm
+      tags:
+      - user
+swagger: "2.0"

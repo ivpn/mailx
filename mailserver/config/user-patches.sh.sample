@@ -1,0 +1,17 @@
+# SASL config
+echo "pwcheck_method: auxprop
+auxprop_plugin: sasldb
+mech_list: CRAM-MD5" > /etc/postfix/sasl/smtpd.conf
+
+echo $SMTP_PASS | saslpasswd2 -c -u "$DOMAIN" $SMTP_USER
+
+chown postfix:postfix /etc/sasldb2
+chmod 640 /etc/sasldb2
+
+# curl-email.sh script
+echo "curl --silent --data-binary @- -H  \"Authorization: Bearer $PSK\" -X POST http://email-api:3000/v1/email" > /usr/local/bin/curl-email.sh
+
+chmod +x /usr/local/bin/curl-email.sh
+
+# reload Postfix to apply changes
+postfix reload

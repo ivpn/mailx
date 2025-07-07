@@ -1,0 +1,46 @@
+name: CI Production
+
+on:
+  push:
+    tags:
+    - '*'
+
+env:
+  API_IMAGE: email/api
+  APP_IMAGE: email/app
+  TAG: latest
+  REGISTRY: ${{ secrets.REGISTRY_NAME }}
+
+jobs:
+  deploy_production:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Pull changes from branch
+        run: git pull origin ${{ github.ref }}
+
+      - name: create app/.env file
+        run: |
+          echo "VITE_API_URL=${{ secrets.PROD_VITE_API_URL }}" >> app/.env
+          echo "VITE_DOMAINS=${{ secrets.PROD_VITE_DOMAINS }}" >> app/.env
+          echo "VITE_APP_NAME=${{ secrets.PROD_VITE_APP_NAME }}" >> app/.env
+
+      - name: Build api image
+        run: docker build -t $REGISTRY/$API_IMAGE:$TAG api/.
+
+      - name: Build app image
+        run: docker build -t $REGISTRY/$APP_IMAGE:$TAG app/.
+
+      - name: Log in to registry
+        run: echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login ${{ secrets.REGISTRY_NAME }} -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
+
+      - name: Push api:${{ env.TAG }}
+        run: docker push $REGISTRY/$API_IMAGE:$TAG
+
+      - name: Push app:${{ env.TAG }}
+        run: docker push $REGISTRY/$APP_IMAGE:$TAG

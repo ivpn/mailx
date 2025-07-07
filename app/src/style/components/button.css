@@ -1,0 +1,52 @@
+@layer components {
+    button {
+        @apply text-accent hover:text-accent-alt text-sm focus:outline-none disabled:opacity-50 disabled:pointer-events-none py-2;
+
+        &.cta {
+            @apply sm:text-base text-sm text-white bg-accent hover:bg-accent-alt py-2 px-3 inline-flex items-center gap-x-2 rounded;
+
+            &.delete {
+                @apply text-white hover:text-white bg-error hover:bg-error-alt;
+            }
+
+            &.cancel {
+                @apply text-primary bg-quaternary hover:bg-quaternary-alt;
+            }
+        }
+
+        &.cancel {
+            @apply py-2 px-3 inline-flex text-secondary hover:text-tertiary font-semibold;
+        }
+
+        &.full {
+            @apply w-full text-center block;
+        }
+
+        &.delete {
+            @apply text-error hover:text-error-alt;
+
+            &:hover {
+
+                .icon {
+                    @apply icon-error-alt;
+                }
+            }
+        }
+
+        &.close {
+            @apply flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent text-primary disabled:opacity-50 disabled:pointer-events-none;
+        }
+
+        &.sort {
+            @apply inline-flex justify-center items-center text-sm text-tertiary;
+        }
+
+        &.plain {
+            @apply font-normal text-primary hover:text-primary;
+        }
+
+        &.plain-alt {
+            @apply font-normal text-tertiary hover:text-secondary;
+        }
+    }
+}

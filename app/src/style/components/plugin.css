@@ -1,0 +1,83 @@
+@layer components {
+    .hs-tooltip-content {
+        @apply opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-secondary text-xs font-medium text-primary rounded shadow-sm;
+    }
+
+    .hs-overlay {
+        @apply size-full fixed top-0 start-0 z-[60] overflow-x-hidden overflow-y-auto place-content-end sm:place-content-center;
+
+        & > div {
+            @apply hs-overlay-open:opacity-100 hs-overlay-open:duration-500 opacity-0 transition-all sm:max-w-lg sm:w-full sm:m-3 sm:mx-auto sm:shadow-[8px_8px_0_rgba(81,81,81,100)] sm:dark:shadow-[8px_8px_0_rgba(82,82,91,100)] sm:border border-tertiary;
+        }
+
+        & > div > div {
+            @apply flex flex-col bg-primary pointer-events-auto;
+        }
+
+        header {
+            @apply flex gap-2 justify-start items-center px-5 py-5;
+
+            h3, h4 {
+                @apply m-0 grow text-left;
+
+                span {
+                    @apply capitalize;
+                }
+            }
+
+            & > span {
+                @apply text-sm font-bold text-accent;
+            }
+        }
+
+        article {
+            @apply whitespace-normal text-left text-base px-5 py-0;
+        }
+
+        footer {
+
+            nav {
+                @apply flex flex-col gap-y-3 px-5 py-5 pb-6;
+
+                button {
+                    @apply w-full justify-center;
+                }
+            }
+
+            p {
+                @apply text-left pb-3;
+            }
+        }
+    }
+
+    div[data-hs-overlay-backdrop-template] {
+        @apply bg-light-neutral-11 dark:bg-black bg-opacity-70 dark:bg-opacity-80;
+    }
+
+    .hs-dropdown {
+        @apply relative [--placement:bottom-right];
+
+        .hs-dropdown-menu {
+            @apply transition-[opacity,margin] opacity-0 bg-primary border border-tertiary p-2 shadow-[4px_4px_0_rgba(81,81,81,100)] dark:shadow-[4px_4px_0_rgba(82,82,91,100)] z-10 min-w-36;
+
+            button {
+                @apply w-full flex items-center gap-x-2 px-3 py-2 text-sm text-primary hover:bg-secondary;
+
+                &.delete {
+                    @apply text-error;
+
+                    &:hover {
+
+                        .icon {
+                            @apply icon-error;
+                        }
+                    }
+                }
+
+                &.hide {
+                    @apply hidden;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,42 @@
+{
+  "name": "email-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@preline/accordion": "^3.1.0",
+    "@preline/dropdown": "^2.1.0",
+    "@preline/overlay": "^2.1.0",
+    "@preline/select": "^2.5.2",
+    "@preline/tabs": "^2.5.0",
+    "@preline/theme-switch": "^2.4.1",
+    "@preline/tooltip": "^2.1.0",
+    "@simplewebauthn/browser": "13.1.0",
+    "@tailwindcss/forms": "^0.5.7",
+    "apexcharts": "^3.49.0",
+    "axios": "^1.8.2",
+    "date-fns": "^4.1.0",
+    "jwt-decode": "^4.0.0",
+    "mitt": "^3.0.1",
+    "postcss-import": "^16.1.0",
+    "preline": "^2.1.0",
+    "qrious": "^4.0.2",
+    "typescript-cookie": "^1.0.6",
+    "vue": "^3.4.21",
+    "vue-router": "4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.3",
+    "typescript": "5.6.3",
+    "vite": "^5.4.19",
+    "vue-tsc": "2.1.10"
+  }
+}

@@ -1,0 +1,54 @@
+@layer components {
+    table {
+        @apply table-auto w-full md:divide-y divide-primary;
+
+        thead {
+
+            th {
+                @apply px-5 py-3 text-start text-sm font-normal text-tertiary;
+
+                &:first-child {
+                    @apply text-start px-0 pr-5;
+                }
+
+                &:last-child {
+                    @apply text-end px-0 pl-5;
+                }
+            }
+        }
+
+        tbody {
+
+            td {
+                @apply px-5 py-4 whitespace-nowrap text-start text-sm text-primary;
+
+                &:first-child {
+                    @apply text-start px-0 pr-5;
+                }
+
+                &:last-child {
+                    @apply text-end px-0 pl-5;
+                }
+            }
+
+            .tablet {
+
+                td {
+                    @apply p-0;
+
+                    &:last-child {
+                        @apply text-end px-0 pl-0;
+                    }
+                }
+
+                hr {
+                    @apply my-5;
+                }
+            }
+        }
+    }
+
+    .table-container {
+        @apply flex flex-col overflow-x-auto;
+    }
+}

@@ -1,0 +1,91 @@
+name: email
+
+services:
+  api:
+    build: .
+    container_name: email-api
+    image: email-api
+    env_file: .env
+    restart: unless-stopped
+    ports:
+      - ${API_PORT}:${API_PORT}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - api:/var/log
+    networks:
+      net:
+  
+  app:
+    build: ../app
+    container_name: email-app
+    image: email-app
+    restart: unless-stopped
+    ports:
+      - ${APP_PORT}:${APP_PORT}
+    networks:
+      net:
+
+  db:
+    image: mariadb
+    container_name: email-db
+    restart: unless-stopped
+    healthcheck:
+      test: "/usr/bin/mariadb --user=${DB_USER} --password=${DB_PASSWORD} --execute \"SHOW DATABASES;\""
+      interval: 2s
+      timeout: 10s
+      retries: 5
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db:/var/lib/mysql
+    labels:
+      - docker-volume-backup.stop-during-backup=db
+    networks:
+      net:
+  
+  redis:
+    image: redis
+    container_name: email-redis
+    restart: unless-stopped
+    volumes:
+      - redis:/data
+    networks:
+      net:
+  
+  backup:
+    image: offen/docker-volume-backup:v2
+    container_name: backup
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      BACKUP_FILENAME: "${BACKUP_FILENAME}-%Y-%m-%dT%H-%M.tar.gz"
+      BACKUP_LATEST_SYMLINK: backup-latest.tar.gz.gpg
+      BACKUP_CRON_EXPRESSION: ${BACKUP_CRON_EXPRESSION}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS}
+      GPG_PASSPHRASE: ${GPG_PASSPHRASE}
+      AWS_S3_BUCKET_NAME: ${AWS_S3_BUCKET_NAME}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      BACKUP_STOP_DURING_BACKUP_LABEL: db
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - db:/backup/db:ro
+      - ${HOME}/backups:/archive
+    networks:
+      net:
+
+volumes:
+  api:
+  db:
+  redis:
+
+networks:
+  net:
+    driver: bridge

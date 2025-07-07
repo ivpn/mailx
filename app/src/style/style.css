@@ -1,0 +1,22 @@
+@import "fonts/fonts.css";
+@import "components/color.css";
+@import "components/page.css";
+@import "components/button.css";
+@import "components/form.css";
+@import "components/nav.css";
+@import "components/text.css";
+@import "components/plugin.css";
+@import "components/table.css";
+@import "components/badge.css";
+@import "components/icon.css";
+@import "components/responsive.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    html {
+        font-family: 'Roboto Mono', monospace;
+    }
+}

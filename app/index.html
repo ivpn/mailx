@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) { document.head.insertAdjacentHTML('beforeend', '<meta name="color-scheme" content="dark">');document.documentElement.classList.add('dark'); } else {
+      document.documentElement.classList.remove('dark') }
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>App</title>
+    <link rel="icon" type="image/png" href="/src/assets/favicon-light.png" media="(prefers-color-scheme: light)" />
+    <link rel="icon" type="image/png" href="/src/assets/favicon-dark.png" media="(prefers-color-scheme: dark)" />
+  </head>
+  <body class="bg-primary text-primary">
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

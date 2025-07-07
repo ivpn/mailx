@@ -1,0 +1,34 @@
+smtpd_tls_security_level = may
+smtp_tls_security_level = may
+smtp_tls_protocols = !SSLv2, !SSLv3
+smtpd_tls_protocols = !SSLv2, !SSLv3
+
+always_add_missing_headers = yes
+
+milter_default_action = accept
+milter_protocol = 6
+smtpd_milters = $rspamd_milter
+non_smtpd_milters = $rspamd_milter
+
+smtpd_sender_restrictions =
+    permit_mynetworks,
+    permit_sasl_authenticated,
+    reject_sender_login_mismatch,
+    reject_non_fqdn_sender,
+    reject_unlisted_sender,
+    reject_unauth_destination,
+    reject_invalid_hostname,
+    reject_unknown_sender_domain,
+    reject_unauth_pipelining
+
+smtpd_relay_restrictions =
+    permit_mynetworks, 
+    permit_sasl_authenticated,
+    reject_unauth_destination
+
+smtpd_helo_restrictions =
+    permit_mynetworks
+    permit_sasl_authenticated
+    reject_invalid_helo_hostname
+    reject_non_fqdn_helo_hostname
+    reject_unknown_helo_hostname

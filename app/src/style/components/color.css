@@ -1,0 +1,161 @@
+@layer components {
+    .bg-primary {
+        @apply bg-white dark:bg-dark-gray-1;
+    }
+
+    .bg-secondary {
+        @apply bg-light-gray-3 dark:bg-dark-gray-3;
+    }
+
+    .bg-tertiary {
+        @apply bg-light-gray-7 dark:bg-dark-gray-5;
+    }
+
+    .bg-quaternary {
+        @apply bg-light-gray-10 dark:bg-dark-gray-10;
+    }
+
+    .bg-quaternary-alt {
+        @apply bg-light-gray-9 dark:bg-dark-gray-9;
+    }
+
+    .bg-quinary {
+        @apply bg-light-gray-11 dark:bg-dark-gray-11;
+    }
+
+    .bg-accent {
+        @apply bg-light-blue-9 dark:bg-dark-blue-9;
+    }
+
+    .bg-accent-alt {
+        @apply bg-light-blue-10 dark:bg-dark-blue-10;
+    }
+
+    .bg-accent-secondary {
+        @apply bg-light-blue-4 dark:bg-dark-blue-5;
+    }
+
+    .bg-accent-tertiary {
+        @apply bg-light-blue-alpha-3 dark:bg-dark-blue-5;
+    }
+
+    .bg-info {
+        @apply bg-semantic-information-400;
+    }
+
+    .bg-success {
+        @apply bg-semantic-success-500 dark:bg-semantic-success-600;
+    }
+
+    .bg-error {
+        @apply bg-semantic-danger-500;
+    }
+
+    .bg-error-alt {
+        @apply bg-semantic-danger-600;
+    }
+
+    .text-primary {
+        @apply text-black dark:text-dark-neutral-12;
+    }
+
+    .text-secondary {
+        @apply text-light-neutral-11 dark:text-dark-neutral-11;
+    }
+
+    .text-tertiary {
+        @apply text-light-neutral-9 dark:text-dark-neutral-10;
+    }
+
+    .text-accent {
+        @apply text-light-blue-9 dark:text-dark-blue-9;
+    }
+
+    .text-accent-alt {
+        @apply text-light-blue-10 dark:text-dark-blue-10;
+    }
+
+    .text-info {
+        @apply text-semantic-information-400;
+    }
+
+    .text-success {
+        @apply text-semantic-success-600 dark:text-semantic-success-500;
+    }
+
+    .text-error {
+        @apply text-semantic-danger-500;
+    }
+
+    .text-error-alt {
+        @apply text-semantic-danger-600;
+    }
+
+    .icon-primary {
+        @apply bg-black dark:bg-dark-neutral-12;
+    }
+
+    .icon-secondary {
+        @apply bg-light-neutral-11 dark:bg-dark-neutral-11;
+    }
+
+    .icon-tertiary {
+        @apply bg-light-neutral-10 dark:bg-dark-neutral-10;
+    }
+
+    .icon-quaternary {
+        @apply bg-light-blue-9 dark:bg-dark-neutral-12;
+    }
+
+    .icon-accent {
+        @apply bg-light-blue-9 dark:bg-dark-blue-9;
+    }
+
+    .icon-success {
+        @apply bg-semantic-success-600 dark:bg-semantic-success-500;
+    }
+
+    .icon-error {
+        @apply bg-semantic-danger-500;
+    }
+
+    .icon-error-alt {
+        @apply bg-semantic-danger-600;
+    }
+
+    .icon-white {
+        @apply bg-white;
+    }
+
+    .border-primary {
+        @apply border-light-gray-3 dark:border-dark-gray-3;
+    }
+
+    .border-secondary {
+        @apply border-light-gray-4 dark:border-dark-gray-4;
+    }
+
+    .border-tertiary {
+        @apply border-light-gray-7 dark:border-dark-gray-7;
+    }
+
+    .border-info {
+        @apply border-semantic-information-400;
+    }
+
+    .divide-primary {
+        @apply divide-light-gray-7 dark:divide-dark-gray-7;
+    }
+
+    .border-accent {
+        @apply border-light-blue-9 dark:border-dark-blue-9;
+    }
+
+    .border-success {
+        @apply border-semantic-success-600 dark:border-semantic-success-500;
+    }
+
+    .border-error {
+        @apply border-semantic-danger-500;
+    }
+}

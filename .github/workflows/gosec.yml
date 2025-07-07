@@ -1,0 +1,31 @@
+name: Gosec
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GO111MODULE: on
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - name: Set up sparse checkout
+        run: |
+          git sparse-checkout init --cone
+          git sparse-checkout set api
+      - name: Pull changes from PR branch
+        run: git pull origin ${{ github.event.pull_request.head.ref }}
+      - name: Move directory
+        run: |
+          mv api/* .
+      - name: Run Gosec Security Scanner
+        uses: securego/gosec@master
+        with:
+          args: '-exclude=G101,G402,G505 ./...'

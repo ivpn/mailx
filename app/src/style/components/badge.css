@@ -1,0 +1,9 @@
+@layer components {
+    .badge {
+        @apply inline-flex items-center py-1.5 px-2 rounded text-xs font-medium font-secondary bg-tertiary text-secondary;
+
+        &.success {
+            @apply bg-success text-white font-semibold;
+        }
+    }
+}

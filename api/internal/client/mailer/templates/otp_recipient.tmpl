@@ -1,0 +1,24 @@
+{{define "body"}}
+Hi,
+
+To confirm your recipient address, please use the verification code below:
+
+{{.otp}}
+
+This code will expire in 15 minutes. If it expires, you can request a new one on https://mailx.net.
+
+Please verify your recipient email within 7 days or it will be automatically deleted. Unverified recipients will not receive any forwarded emails.
+
+Sent by {{.from}}
+{{end}}
+
+{{define "bodyHtml"}}
+<div style="font-family: Arial, Helvetica, sans-serif;font-size: 15px;">
+Hi,<br><br>
+To confirm your recipient address, please use the verification code below:<br><br>
+{{.otp}}<br><br>
+This code will expire in 15 minutes. If it expires, you can request a new one on <a href="https://mailx.net">mailx.net</a>.<br><br>
+Please verify your recipient email within 7 days or it will be automatically deleted. Unverified recipients will not receive any forwarded emails.<br><br>
+Sent by {{.from}}
+</div>
+{{end}}

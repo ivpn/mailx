@@ -1,0 +1,55 @@
+@layer components {
+    nav {
+
+        a {
+            @apply text-primary hover:text-primary py-4 font-medium text-sm w-full cursor-pointer px-8 flex flex-row items-center gap-x-2;
+
+            &.active {
+                @apply border-accent border-r-2 bg-tertiary;
+            }
+        }
+    }
+
+    nav.mobile {
+
+            div {
+                @apply justify-between flex flex-row items-center px-5 md:px-8 py-3;
+            }
+
+        a {
+            @apply p-0 text-primary hover:text-primary font-medium text-base cursor-pointer flex flex-row items-center justify-center rounded-md w-10 h-10;
+
+            &.active {
+                @apply border-none bg-tertiary;
+
+                i {
+                    @apply icon-accent;
+                }
+            }
+        }
+    }
+
+    nav[role=tablist] {
+        @apply flex gap-x-1;
+
+        button {
+            @apply text-base hs-tab-active:border-accent pt-2 pb-4 px-1 text-center basis-0 grow inline-flex justify-center items-center gap-x-2 border-b-2 border-transparent whitespace-nowrap focus:outline-none text-secondary;
+
+            &.active {
+                @apply border-accent border-b-2;
+            }
+        }
+    }
+
+    nav[role=tablist].tabs-router {
+        @apply flex pt-5;
+
+        button {
+            @apply text-accent pt-0 pb-4 px-1 text-center basis-0 grow inline-flex justify-center items-center gap-x-2 border-b-2 border-transparent whitespace-nowrap focus:outline-none text-secondary text-sm;
+
+            &.active {
+                @apply hidden;
+            }
+        }
+    }
+}

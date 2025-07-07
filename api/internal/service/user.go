@@ -177,12 +177,11 @@ func (s *Service) PostUser(ctx context.Context, user model.User, subID string) e
 		return ErrPostUser
 	}
 
-	// TODO: Enable SignupWebhook call for beta
-	// err = s.Http.SignupWebhook(subID)
-	// if err != nil {
-	// 	log.Printf("error creating user: %s", err.Error())
-	// 	return ErrSignupWebhook
-	// }
+	err = s.Http.SignupWebhook(subID)
+	if err != nil {
+		log.Printf("error creating user: %s", err.Error())
+		return ErrSignupWebhook
+	}
 
 	return nil
 }

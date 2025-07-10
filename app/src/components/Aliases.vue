@@ -37,7 +37,7 @@
             <p v-if="!recipients.length" class="text-tertiary mb-6">
                 To get started, first <router-link to="/account">verify</router-link> your primary email address.
             </p>
-             <button v-if="!searchQuery && !loading && recipients.length" class="cta" data-hs-overlay="#modal-create-alias-false">
+            <button v-if="!searchQuery && !loading && recipients.length" class="cta" data-hs-overlay="#modal-create-alias-false">
                 New Alias
             </button>
         </div>
@@ -101,7 +101,7 @@
             <Pagination v-if="list.length" :list.sync="list" :limit="limit" :page="page" :total="total" :key="rowKey" @onUpdatePage="onUpdatePage" />
         </div>
     </div>
-    <AliasCreate v-if="recipients.length && settings.id" :recipients.sync="recipients" :settings.sync="settings" :catchAll=false :label="'New Alias'" />
+    <AliasCreate v-if="recipients.length && settings.id && loaded" :recipients.sync="recipients" :settings.sync="settings" :catchAll=false :label="'New Alias'" />
 </template>
 
 <script setup lang="ts">

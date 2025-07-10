@@ -49,9 +49,10 @@ func VerifyEmailAuth(data []byte) (bool, error) {
 	fromDomain := extractDomain(fromAddr.Address)
 
 	// Check for domain mismatches when authentication method is present
-	if parsed.DKIM != "" && !relaxedMatch(fromDomain, parsed.DKIMDomain) {
-		return false, errors.New("DKIM domain mismatch, fromDomain: " + fromDomain + ", DKIM domain: " + parsed.DKIMDomain)
-	}
+	// TODO: Re-enable DKIM domain check if needed, this check prevents real case scenarios when 3rd party services sending email on behalf of some domain
+	// if parsed.DKIM != "" && !relaxedMatch(fromDomain, parsed.DKIMDomain) {
+	// 	return false, errors.New("DKIM domain mismatch, fromDomain: " + fromDomain + ", DKIM domain: " + parsed.DKIMDomain)
+	// }
 
 	if parsed.SPF != "" && !relaxedMatch(fromDomain, parsed.SPFDomain) {
 		return false, errors.New("SPF domain mismatch, fromDomain: " + fromDomain + ", SPF domain: " + parsed.SPFDomain)

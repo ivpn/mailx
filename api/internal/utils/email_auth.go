@@ -42,11 +42,11 @@ func VerifyEmailAuth(data []byte) (bool, error) {
 
 	parsed := parseAuthResults(authResults)
 
-	fromAddr, err := mail.ParseAddress(headers.Get("From"))
-	if err != nil {
-		return false, err
-	}
-	fromDomain := extractDomain(fromAddr.Address)
+	// fromAddr, err := mail.ParseAddress(headers.Get("From"))
+	// if err != nil {
+	// 	return false, err
+	// }
+	// fromDomain := extractDomain(fromAddr.Address)
 
 	// Check for domain mismatches when authentication method is present
 	// TODO: Re-enable DKIM domain check if needed, this check prevents real case scenarios when 3rd party services sending email on behalf of some domain
@@ -54,13 +54,13 @@ func VerifyEmailAuth(data []byte) (bool, error) {
 	// 	return false, errors.New("DKIM domain mismatch, fromDomain: " + fromDomain + ", DKIM domain: " + parsed.DKIMDomain)
 	// }
 
-	if parsed.SPF != "" && !relaxedMatch(fromDomain, parsed.SPFDomain) {
-		return false, errors.New("SPF domain mismatch, fromDomain: " + fromDomain + ", SPF domain: " + parsed.SPFDomain)
-	}
+	// if parsed.SPF != "" && !relaxedMatch(fromDomain, parsed.SPFDomain) {
+	// 	return false, errors.New("SPF domain mismatch, fromDomain: " + fromDomain + ", SPF domain: " + parsed.SPFDomain)
+	// }
 
-	if parsed.DMARC != "" && !relaxedMatch(fromDomain, parsed.DMARCDomain) {
-		return false, errors.New("DMARC domain mismatch, fromDomain: " + fromDomain + ", DMARC domain: " + parsed.DMARCDomain)
-	}
+	// if parsed.DMARC != "" && !relaxedMatch(fromDomain, parsed.DMARCDomain) {
+	// 	return false, errors.New("DMARC domain mismatch, fromDomain: " + fromDomain + ", DMARC domain: " + parsed.DMARCDomain)
+	// }
 
 	// Continue with original verification checks
 	switch {

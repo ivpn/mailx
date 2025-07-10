@@ -10,7 +10,7 @@
             <router-link to="/faq">FAQ</router-link>
         </p>
         <p class="text-sm">
-            <a href="https://www.ivpn.net/">IVPN Limited</a>
+            <a href="https://www.ivpn.net/">IVPN</a>
         </p>
     </div>
 </template>

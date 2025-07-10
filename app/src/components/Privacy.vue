@@ -49,7 +49,7 @@
 
         <h2>Are there any ways to verify your claims regarding privacy?</h2>
 
-        <p>The entire project is open source with repositories available on GitHub for customers to verify our privacy practices.</p>
+        <p>The entire project is open source with repositories available on <a href="https://github.com/ivpn/mailx">GitHub</a> for customers to verify our privacy practices.</p>
 
         <h2>User Rights</h2>
 

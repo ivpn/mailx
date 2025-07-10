@@ -1,7 +1,7 @@
 @layer components {
-    .page-bg {
+    /* .page-bg {
         @apply md:bg-[url("../../assets/bg-light.svg")] md:dark:bg-[url("../../assets/bg-dark.svg")] bg-no-repeat bg-fixed bg-right-bottom;
-    }
+    } */
 
     .page {
         @apply min-h-screen flex;

@@ -6,7 +6,7 @@
                 Back
             </router-link>
         </p>
-        <h1>MailX FAQ</h1>
+        <h1>Mailx FAQ</h1>
         <p class="text-sm">Last updated: 20 June 2025</p>
 
         <h2>Aliases: How do I add an email alias?</h2>
@@ -51,17 +51,17 @@
         <h2>Recipients: How do I add a new recipient email address?</h2>
         <p>Click the 'Recipients' tab on the left side of the page.</p>
         <p>Click the 'New Recipient' button on the top-right of the page, then choose an option.</p>
-        <p>MailX supports 10 recipient addresses, and each address needs to be verified.  Unverified recipients will not receive any forwarded emails, and will be deleted after seven days.</p>
+        <p>Mailx supports 10 recipient addresses, and each address needs to be verified.  Unverified recipients will not receive any forwarded emails, and will be deleted after seven days.</p>
 
         <h2>Recipients: How does the PGP option work?</h2>
-        <p>Adding a PGP public key to a Recipient mail address enables PGP encryption between the MailX forwarding server and your real email inbox.  This increases the level of privacy for forwarded messages against the access level of your mail provider.  A mail provider has full access to all email messages, and the value of PGP-encrypted content is significantly less than plain text content.</p>
+        <p>Adding a PGP public key to a Recipient mail address enables PGP encryption between the Mailx forwarding server and your real email inbox.  This increases the level of privacy for forwarded messages against the access level of your mail provider.  A mail provider has full access to all email messages, and the value of PGP-encrypted content is significantly less than plain text content.</p>
         <p>PGP encryption is not available for outgoing/Send messages, or replies.</p>
         <p>Note: This option does not provide end-to-end encryption (E2EE) for email messages from their source (i.e. original sender) to the destination (i.e. your real inbox).</p>
 
         <h2>Recipients: How do I enable the PGP option for forwarded messages?</h2>
         <p>Add a PGP key to a recipient address via the 'Recipients' tab.</p>
         <p>Click the ellipsis menu button under the 'Actions' column on the right side.  Click the 'Add PGP Key' option.  Paste the public key, and click the 'Add PGP Public Key' button to confirm.</p>
-        <p>Toggle the 'Encryption' switch ON or OFF to govern whether forwarded messages are encrypted or not between the MailX server and your inbox.</p>
+        <p>Toggle the 'Encryption' switch ON or OFF to govern whether forwarded messages are encrypted or not between the Mailx server and your inbox.</p>
 
         <h2>Recipients: How do I remove a PGP key?</h2>
         <p>Click the 'Recipients' tab on the left side of the page.</p>

@@ -10,7 +10,7 @@
         <p class="text-sm">Last updated: 07 July 2025</p>
 
         <h2>1. Introduction</h2>
-        <p>These Terms of Service ("Terms") govern your use of MailX, an email forwarding service operated by Privatus GmbH ("we," "us," or "our"). By subscribing to or using our service, you ("you" or "user") agree to abide by these Terms.</p>
+        <p>These Terms of Service ("Terms") govern your use of Mailx, an email forwarding service operated by Privatus GmbH ("we," "us," or "our"). By subscribing to or using our service, you ("you" or "user") agree to abide by these Terms.</p>
 
         <h2>2. Acceptance of Terms</h2>
         <p>By accessing or using our service, you agree to be bound by these Terms and our <a href="/privacy">Privacy Policy</a>. If you do not agree with any part of these Terms, do not use our service.</p>
@@ -33,7 +33,7 @@
         <p>Your account is for individual use only; sharing your account or login credentials is prohibited. You are responsible for all activities that occur under your account. Notify us immediately of any unauthorized use or security breaches.</p>
 
         <h2>5. Intellectual Property & Licence</h2>
-        <p>All interfaces, graphics, logos, trademarks, and all other intellectual-property rights in or relating to MailX (“Service IP”) are and shall remain the exclusive property of Privatus GmbH and its licensors. No rights are granted to you except as expressly set out in these Terms.<br>
+        <p>All interfaces, graphics, logos, trademarks, and all other intellectual-property rights in or relating to Mailx (“Service IP”) are and shall remain the exclusive property of Privatus GmbH and its licensors. No rights are granted to you except as expressly set out in these Terms.<br>
         We grant you a personal, non-exclusive, non-transferable, revocable licence to access and use the Service for your own lawful, non-commercial purposes, strictly in accordance with these Terms.<br>
         You must <strong>not</strong>:</p>
         <ul>
@@ -50,7 +50,7 @@
 
         <h2>7. Termination and Suspension</h2>
         <p>We may suspend or terminate your account immediately, without prior notice or liability, upon breach of these Terms. No refunds will be provided if your account is terminated due to a breach of these Terms.</p>
-        <p>Upon termination, your right to use the MailX service ceases immediately. Provisions that should survive termination will remain in effect, including ownership provisions, warranty disclaimers, indemnity, and limitations of liability.</p>
+        <p>Upon termination, your right to use the Mailx service ceases immediately. Provisions that should survive termination will remain in effect, including ownership provisions, warranty disclaimers, indemnity, and limitations of liability.</p>
 
         <h2>8. Changes to Terms</h2>
         <p>We reserve the right to modify or replace these Terms at any time. Significant changes will be communicated by posting the new Terms on our website and updating the "Effective Date." By continuing to use our service after revisions become effective, you agree to be bound by the revised Terms.</p>
@@ -74,7 +74,7 @@
 
         <h2>Contact Us</h2>
         <p>If you have any questions about these Terms, please contact us at <a href="mailto:mailx@ivpn.net">mailx@ivpn.net</a>.</p>
-        <p>This document constitutes the entire Terms and Conditions for your use of the MailX email forwarding service operated by Privatus GmbH.</p>
+        <p>This document constitutes the entire Terms and Conditions for your use of the Mailx email forwarding service operated by Privatus GmbH.</p>
         <p>Privatus GmbH<br>
         Baarerstrasse 82<br>
         6300 Zug<br>

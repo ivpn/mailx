@@ -7,7 +7,7 @@
             </router-link>
         </p>
         <h1>Privacy Policy</h1>
-        <p class="text-sm">Last updated: 15 June 2025</p>
+        <p class="text-sm">Last updated: 10 July 2025</p>
 
         <p>MailX is developed and operated by the team behind IVPN. All services we offer to customers are built for privacy. Internally, we know what exactly that means. If a choice needs to be made between one practice that deepens a user’s privacy, and another that would diminish it but accelerate our growth, we’ll always take the slower, more private option.</p>
         <p>We are committed to being transparent about how we collect, use, and protect your data after you sign up to the MailX service. Below we offer a concise and human-readable summary of our policies.</p>

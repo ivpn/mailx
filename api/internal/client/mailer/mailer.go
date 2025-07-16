@@ -97,6 +97,22 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 		return err
 	}
 
+	if email.TextBody == "" {
+		extractedTextBody, err := model.ExtractTextBody(data)
+		if err != nil {
+			log.Println("Error extracting text body:", err)
+		} else {
+			email.TextBody = extractedTextBody
+		}
+	}
+	if email.HTMLBody == "" {
+		extractedHTMLBody, err := model.ExtractHTMLBody(data)
+		if err != nil {
+			log.Println("Error extracting HTML body:", err)
+		} else {
+			email.HTMLBody = extractedHTMLBody
+		}
+	}
 	if email.HTMLBody == "" {
 		email.HTMLBody = model.PlainTextToHTML(email.TextBody)
 	}

@@ -212,9 +212,9 @@ mail.domain.com. 3600 IN TXT "v=spf1 ip4:MAIL_SERVER_IPV4 -all"
 #### DMARC (TXT record):
 ```
 _dmarc.mail.domain.com. 3600 IN TXT v=DMARC1; p=quarantine
-````
+```
 
-DKIM (TXT record):
+#### DKIM (TXT record):
 ```
 mail._domainkey.domain.com. 3600 IN TXT v=DKIM1;k=rsa;p=DKIM_PUBLIC_KEY
 ```

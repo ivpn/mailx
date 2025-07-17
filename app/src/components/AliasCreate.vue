@@ -275,7 +275,7 @@ const resetAlias = () => {
         format: props.settings.alias_format || 'words',
         from_name: '',
         recipients: '',
-        domain: envDomains[0],
+        domain: props.settings.domain || envDomains[0],
         catch_all: props.catchAll ? 'true' : 'false',
         catch_all_suffix: ''
     }

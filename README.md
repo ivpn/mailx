@@ -160,6 +160,88 @@ docker compose down
 docker compose up -d
 ```
 
+
+## Add New Domain
+
+### Mailserver
+
+#### Update postfix-virtual.cf:
+```bash
+nano docker-data/dms/config/postfix-virtual.cf
+@domain.com curl_email
+```
+
+#### Setup Postfix:
+```bash
+docker exec -it mailserver sh
+postmap /etc/postfix/virtual
+newaliases
+setup config dkim selector mail domain domain.com
+supervisorctl restart postfix
+```
+
+#### Update dkim_signing.conf:
+```bash
+nano docker-data/dms/config/rspamd/override.d/dkim_signing.conf
+domain.com {
+    path = "/tmp/docker-mailserver/rspamd/dkim/rsa-2048-mail-domain.com.private.txt";
+    selector = "mail";
+}
+```
+
+#### Restart mailserver:
+```bash
+docker compose down
+docker compose -f compose.deploy.yml up -d
+```
+
+### DNS Records
+
+#### MX Records:
+```
+domain.com. . 14400 IN MX 10 mail.domain.com.
+mail.domain.com. . 14400 IN MX 10 MAIL_SERVER_IPV4
+```
+
+#### SPF Records:
+```
+domain.com. 3600 IN TXT "v=spf1 ip4:MAIL_SERVER_IPV4 -all"
+mail.domain.com. 3600 IN TXT "v=spf1 ip4:MAIL_SERVER_IPV4 -all"
+```
+
+#### DMARC (TXT record):
+```
+_dmarc.mail.domain.com. 3600 IN TXT v=DMARC1; p=quarantine
+````
+
+DKIM (TXT record):
+```
+mail._domainkey.domain.com. 3600 IN TXT v=DKIM1;k=rsa;p=DKIM_PUBLIC_KEY
+```
+
+### API
+
+#### Update .env:
+```bash
+nano .env
+DOMAINS=domain1.com,domain2.com
+```
+
+#### Restart api:
+```bash
+docker compose down
+docker compose up -d
+```
+
+### App
+
+#### Update GitHub Actions env variables:
+```bash
+STAGING_VITE_DOMAINS=domain1.com,domain2.com
+PROD_VITE_DOMAINS=domain1.com,domain2.com
+```
+
+
 ## Restore DB from backup
 
 DB backup is stored locally on the host machine in the `${HOME}/backups` directory.

@@ -104,6 +104,13 @@ func (h *Handler) PostRecipient(c *fiber.Ctx) error {
 		})
 	}
 
+	domain := strings.Split(req.Email, "@")
+	if strings.Contains(h.Cfg.Domains, domain[1]) {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidDomain,
+		})
+	}
+
 	recipient := model.Recipient{
 		UserID:   auth.GetUserID(c),
 		Email:    req.Email,

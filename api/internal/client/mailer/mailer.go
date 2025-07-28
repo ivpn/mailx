@@ -14,6 +14,7 @@ import (
 	"gopkg.in/gomail.v2"
 	"ivpn.net/email/api/config"
 	"ivpn.net/email/api/internal/model"
+	"ivpn.net/email/api/internal/utils"
 )
 
 //go:embed templates/*
@@ -121,8 +122,8 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 	m.SetAddressHeader("From", from, name)
 	m.SetHeader("To", rcp.Email)
 	m.SetHeader("Subject", email.Subject)
-	m.SetBody("text/plain", email.TextBody)
-	m.AddAlternative("text/html", email.HTMLBody)
+	m.SetBody("text/plain", utils.RemoveHeader(email.TextBody))
+	m.AddAlternative("text/html", utils.RemoveHtmlHeader(email.HTMLBody))
 
 	for _, a := range email.Attachments {
 		m.Attach(a.Filename, gomail.SetCopyFunc(func(w io.Writer) error {

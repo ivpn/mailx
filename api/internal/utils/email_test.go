@@ -65,14 +65,14 @@ func TestRemoveHtmlHeader(t *testing.T) {
 	}{
 		{
 			name: "removes HTML header",
-			input: `<table><tr><td><div>This email was sent to <a href="mailto:user@example.com">user@example.com</a> from <a href="mailto:sender@example.com">sender@example.com</a></div><br></td></tr></table><br>
+			input: `<table style="width: 100%;"><tr><td><div>This email was sent to <a href="mailto:user@example.com">user@example.com</a> from <a href="mailto:sender@example.com">sender@example.com</a></div><br></td></tr></table><br>
 <p>Actual email content here</p>`,
 			expected: `<p>Actual email content here</p>`,
 		},
 		{
 			name: "removes HTML header with extra whitespace",
-			input: `<table class="header">  <tr>  <td>  <div style="color:gray;">  This email was sent to  <a href="mailto:test@domain.com">test@domain.com</a>  from  <a href="mailto:noreply@service.com">noreply@service.com</a>  </div>  <br>  </td>  </tr>  </table>  <br>  
-<div>Content</div>`,
+			input: `<table class="header">  <tr>  <td>  <div style="color:gray;">  This email was sent to  <a href="mailto:test@domain.com">test@domain.com</a>  from  <a href="mailto:noreply@service.com">noreply@service.com</a>  </div>  <br>  </td>  </tr>  </table>  <br>
+		<div>Content</div>`,
 			expected: `<div>Content</div>`,
 		},
 		{
@@ -87,13 +87,13 @@ func TestRemoveHtmlHeader(t *testing.T) {
 		},
 		{
 			name:     "HTML header without content after",
-			input:    `<table><tr><td><div>This email was sent to <a href="mailto:user@example.com">user@example.com</a> from <a href="mailto:sender@example.com">sender@example.com</a></div><br></td></tr></table><br>`,
+			input:    `<table style="width: 100%;"><tr><td><div>This email was sent to <a href="mailto:user@example.com">user@example.com</a> from <a href="mailto:sender@example.com">sender@example.com</a></div><br></td></tr></table><br>`,
 			expected: ``,
 		},
 		{
 			name: "multiple HTML headers",
-			input: `<table><tr><td><div>This email was sent to <a href="mailto:user1@example.com">user1@example.com</a> from <a href="mailto:sender@example.com">sender@example.com</a></div><br></td></tr></table><br>
-<table><tr><td><div>This email was sent to <a href="mailto:user2@example.com">user2@example.com</a> from <a href="mailto:sender@example.com">sender@example.com</a></div><br></td></tr></table><br>
+			input: `<table style="width: 100%;"><tr><td><div>This email was sent to <a href="mailto:user1@example.com">user1@example.com</a> from <a href="mailto:sender@example.com">sender@example.com</a></div><br></td></tr></table><br>
+<table style="width: 100%;"><tr><td><div>This email was sent to <a href="mailto:user2@example.com">user2@example.com</a> from <a href="mailto:sender@example.com">sender@example.com</a></div><br></td></tr></table><br>
 <p>Content</p>`,
 			expected: `<p>Content</p>`,
 		},
@@ -112,11 +112,14 @@ func TestRemoveHtmlHeader(t *testing.T) {
             <br>
         </td>
     </tr>
-</table>
-<br>
-<p>More content</p>`,
+</table>`,
 			expected: `<p>Some content</p>
-<p>More content</p>`,
+`,
+		},
+		{
+			name:     "HTML header in middle of content",
+			input:    `<div dir="auto">Looks good.</div><div dir="auto"><br></div><div dir="auto">-- <br></div><div dir="auto"> Secured with Tuta Mail: <br></div><div dir="auto"> <a href="https://tuta.com/free-email" rel="noopener noreferrer" target="_blank">https://tuta.com/free-email</a><br></div><div dir="auto"><br></div><div dir="auto"><br></div><div dir="auto">28 Jul 2025 at 12:49 by tepid.closet03+hilje.juraj=proton.me@irelay.work:<br></div><blockquote class="tutanota_quote" style="border-left: 1px solid #93A3B8; padding-left: 10px; margin-left: 5px;"><table style="width: 100%;"><tbody><tr><td><div style="padding: 15px; background: no-repeat rgb(241, 245, 249); color: rgb(75, 85, 99); font-size: 13px; text-align: center; font-family: Arial, Helvetica, sans-serif;">This email was sent to <a style="color: rgb(59 130 246);text-decoration: none;" href="mailto:tepid.closet03@irelay.work" rel="noopener noreferrer" target="_blank">tepid.closet03@irelay.work</a> from <a style="color: rgb(59 130 246);text-decoration: none;" href="mailto:hilje.juraj@proton.me" rel="noopener noreferrer" target="_blank">hilje.juraj@proton.me</a><br></div><div dir="auto"><br></div></td></tr></tbody></table><div dir="auto"><br></div><div style="font-family: Arial, sans-serif; font-size: 14px;">Hello<br></div><div style="font-family: Arial, sans-serif; font-size: 14px;"><br></div><div style="font-family: Arial, sans-serif; font-size: 14px;"><p style="margin:0.0px 0.0px 0.0px 0.0px;font:13.0px 'Helvetica Neue'">您好<br></p><p style="margin:0.0px 0.0px 0.0px 0.0px;font:13.0px 'Helvetica Neue'">这是一次测试。<br></p><p style="margin:0.0px 0.0px 0.0px 0.0px;font:13.0px 'PingFang SC'">此致。<br></p></div><div style="font-family: Arial, sans-serif; font-size: 14px;"><br></div><div style="font-family: Arial, sans-serif; font-size: 14px;" class=""><div class=""><br></div><div class="">Sent with <a href="https://proton.me/mail/home" target="_blank" rel="noopener noreferrer">Proton Mail</a> secure email.<br></div></div></blockquote>`,
+			expected: `<div dir="auto">Looks good.</div><div dir="auto">--</div><div dir="auto"> Secured with Tuta Mail:</div><div dir="auto"> <a href="https://tuta.com/free-email" rel="noopener noreferrer" target="_blank">https://tuta.com/free-email</a></div><div dir="auto">28 Jul 2025 at 12:49 by tepid.closet03+hilje.juraj=proton.me@irelay.work:</div><blockquote class="tutanota_quote" style="border-left: 1px solid #93A3B8; padding-left: 10px; margin-left: 5px;"><div style="font-family: Arial, sans-serif; font-size: 14px;">Hello</div><div style="font-family: Arial, sans-serif; font-size: 14px;"><p style="margin:0.0px 0.0px 0.0px 0.0px;font:13.0px 'Helvetica Neue'">您好</p><p style="margin:0.0px 0.0px 0.0px 0.0px;font:13.0px 'Helvetica Neue'">这是一次测试。</p><p style="margin:0.0px 0.0px 0.0px 0.0px;font:13.0px 'PingFang SC'">此致。</p></div><div style="font-family: Arial, sans-serif; font-size: 14px;" class=""><div class="">Sent with <a href="https://proton.me/mail/home" target="_blank" rel="noopener noreferrer">Proton Mail</a> secure email.</div></div></blockquote>`,
 		},
 	}
 

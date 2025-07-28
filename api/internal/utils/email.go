@@ -8,6 +8,12 @@ func RemoveHeader(text string) string {
 }
 
 func RemoveHtmlHeader(html string) string {
-	re := regexp.MustCompile(`(?s)<table[^>]*>\s*<tr>\s*<td>\s*<div[^>]*>\s*This email was sent to\s*<a[^>]*mailto:[^"]+">[^<]+</a>\s*from\s*<a[^>]*mailto:[^"]+">[^<]+</a>\s*</div>\s*<br>\s*</td>\s*</tr>\s*</table>\s*<br>\s*`)
-	return re.ReplaceAllString(html, "")
+	// Relaxed regex: match any <table> containing "This email was sent to" and ending at </table>
+	re := regexp.MustCompile(`(?is)<table[^>]*>.*?This email was sent to.*?</table>`)
+	cleaned := re.ReplaceAllString(html, "")
+
+	// Optionally clean up one or more immediate trailing <br> tags or empty <div><br></div>
+	cleaned = regexp.MustCompile(`(?i)(\s*<br\s*/?>\s*|<div[^>]*>\s*(<br\s*/?>)?\s*</div>)+`).ReplaceAllString(cleaned, "")
+
+	return cleaned
 }

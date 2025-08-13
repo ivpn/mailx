@@ -184,7 +184,7 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 	}
 
 	for _, f := range email.InlineFiles {
-		m.Embed(f.ContentDisposition.Params["filename"], gomail.SetCopyFunc(func(w io.Writer) error {
+		m.Embed(f.ContentID, gomail.SetCopyFunc(func(w io.Writer) error {
 			_, err = w.Write(f.Data)
 			return err
 		}))
@@ -454,7 +454,7 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 	}
 
 	for _, f := range email.InlineFiles {
-		m.Embed(f.ContentType.Params["name"], gomail.SetCopyFunc(func(w io.Writer) error {
+		m.Embed(f.ContentID, gomail.SetCopyFunc(func(w io.Writer) error {
 			_, err = w.Write(f.Data)
 			return err
 		}))

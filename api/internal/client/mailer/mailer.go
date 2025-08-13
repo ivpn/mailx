@@ -200,7 +200,7 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 	return nil
 }
 
-func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data []byte, templateFile string, templateData any) error {
+func (mailer Mailer) ForwardLegacy(from string, name string, rcp model.Recipient, data []byte, templateFile string, templateData any) error {
 	var reader = bytes.NewReader(data)
 	email, err := parsemail.Parse(reader)
 	if err != nil {
@@ -361,6 +361,144 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 	}
 
 	log.Printf("Email forward sent successfully, %s", email.MessageID)
+	return nil
+}
+
+func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data []byte, templateFile string, templateData any) error {
+	reader := bytes.NewReader(data)
+	email, err := letters.ParseEmail(reader)
+	if err != nil {
+		return err
+	}
+
+	tmpl, err := template.New("email").ParseFS(templateFS, "templates/"+templateFile)
+	if err != nil {
+		return err
+	}
+
+	header := new(bytes.Buffer)
+	err = tmpl.ExecuteTemplate(header, "header", templateData)
+	if err != nil {
+		return err
+	}
+
+	headerHtml := new(bytes.Buffer)
+	err = tmpl.ExecuteTemplate(headerHtml, "headerHtml", templateData)
+	if err != nil {
+		return err
+	}
+
+	if email.HTML == "" {
+		email.HTML = model.PlainTextToHTML(email.Text)
+	}
+
+	m := gomail.NewMessage()
+	m.SetAddressHeader("From", from, name)
+	m.SetHeader("To", rcp.Email)
+	m.SetHeader("Subject", email.Headers.Subject)
+	m.SetBody("text/plain", header.String()+email.Text)
+
+	// PGP/Inline encryption
+	if rcp.PGPEnabled && rcp.PGPKey != "" && rcp.PGPInline {
+		pgp := crypto.PGP()
+		publicKey, _ := crypto.NewKeyFromArmored(rcp.PGPKey)
+		encHandle, _ := pgp.Encryption().Recipient(publicKey).New()
+		pgpMessage, _ := encHandle.Encrypt([]byte(email.Text))
+		armored, _ := pgpMessage.ArmorBytes()
+		email.Text = string(armored)
+		m.SetHeader("Content-Type", "text/plain")
+		m.SetBody("text/plain", email.Text)
+	} else {
+		m.AddAlternative("text/html", headerHtml.String()+email.HTML)
+	}
+
+	// PGPSignatures
+	pgpSignatures, err := model.ExtractPGPSignatures(data)
+	if err != nil {
+		log.Println("Error extracting PGP signatures:", err)
+	} else {
+		for _, a := range pgpSignatures {
+			m.Attach(a.Filename, gomail.SetCopyFunc(func(w io.Writer) error {
+				data, err := io.ReadAll(a.Data)
+				if err != nil {
+					return err
+				}
+				_, err = w.Write(data)
+				return err
+			}))
+		}
+	}
+
+	// PGPKeys
+	pgpKeys, err := model.ExtractPGPKeys(data)
+	if err != nil {
+		log.Println("Error extracting PGP keys:", err)
+	} else {
+		for _, a := range pgpKeys {
+			m.Attach(a.Filename, gomail.SetCopyFunc(func(w io.Writer) error {
+				data, err := io.ReadAll(a.Data)
+				if err != nil {
+					return err
+				}
+				_, err = w.Write(data)
+				return err
+			}))
+		}
+	}
+
+	for _, a := range email.AttachedFiles {
+		m.Attach(a.ContentDisposition.Params["filename"], gomail.SetCopyFunc(func(w io.Writer) error {
+			_, err = w.Write(a.Data)
+			return err
+		}))
+	}
+
+	for _, f := range email.InlineFiles {
+		m.Embed(f.ContentDisposition.Params["filename"], gomail.SetCopyFunc(func(w io.Writer) error {
+			_, err = w.Write(f.Data)
+			return err
+		}))
+	}
+
+	// PGP/MIME encryption
+	if rcp.PGPEnabled && rcp.PGPKey != "" && !rcp.PGPInline {
+		var buf bytes.Buffer
+		_, err = m.WriteTo(&buf)
+		if err != nil {
+			return err
+		}
+
+		pgp := crypto.PGP()
+		publicKey, _ := crypto.NewKeyFromArmored(rcp.PGPKey)
+		encHandle, _ := pgp.Encryption().Recipient(publicKey).New()
+		pgpMessage, _ := encHandle.Encrypt(buf.Bytes())
+		armored, _ := pgpMessage.ArmorBytes()
+
+		msg := gomail.NewMessage()
+		msg.SetAddressHeader("From", from, name)
+		msg.SetHeader("To", rcp.Email)
+		msg.SetHeader("Subject", email.Headers.Subject)
+		msg.SetHeader("Content-Type", "multipart/encrypted; protocol=\"application/pgp-encrypted\"")
+		msg.SetHeader("Content-Description", "OpenPGP encrypted message")
+		msg.SetHeader("Content-Disposition", "inline; filename=\"encrypted.asc\"")
+		msg.SetBody("application/pgp-encrypted", "Version: 1")
+		msg.AddAlternative("application/octet-stream; name=\"encrypted.asc\"\r\n", string(armored))
+
+		err = mailer.dialer.DialAndSend(msg)
+		if err != nil {
+			return err
+		}
+
+		log.Printf("PGP/MIME email forward sent successfully, %s", email.Headers.MessageID)
+		return nil
+	}
+
+	err = mailer.dialer.DialAndSend(m)
+	if err != nil {
+		return err
+	}
+
+	log.Printf("Email forward sent successfully, %s", email.Headers.MessageID)
 	return nil
 }
 

@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/ProtonMail/gopenpgp/v3/crypto"
+	"github.com/mnako/letters"
 	"github.com/yeo/parsemail"
 	"gopkg.in/gomail.v2"
 	"ivpn.net/email/api/config"
@@ -91,7 +92,7 @@ func (mailer Mailer) Send(to string, subject string, body string) error {
 	return nil
 }
 
-func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data []byte) error {
+func (mailer Mailer) ReplyLegacy(from string, name string, rcp model.Recipient, data []byte) error {
 	var reader = bytes.NewReader(data)
 	email, err := parsemail.Parse(reader)
 	if err != nil {
@@ -153,6 +154,48 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 	}
 
 	log.Printf("Email reply sent successfully, %s", email.MessageID)
+
+	return nil
+}
+
+func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data []byte) error {
+	reader := bytes.NewReader(data)
+	email, err := letters.ParseEmail(reader)
+	if err != nil {
+		return err
+	}
+
+	if email.HTML == "" {
+		email.HTML = model.PlainTextToHTML(email.Text)
+	}
+
+	m := gomail.NewMessage()
+	m.SetAddressHeader("From", from, name)
+	m.SetHeader("To", rcp.Email)
+	m.SetHeader("Subject", email.Headers.Subject)
+	m.SetBody("text/plain", utils.RemoveHeader(email.Text))
+	m.AddAlternative("text/html", utils.RemoveHtmlHeader(email.HTML))
+
+	for _, a := range email.AttachedFiles {
+		m.Attach(a.ContentDisposition.Params["filename"], gomail.SetCopyFunc(func(w io.Writer) error {
+			_, err = w.Write(a.Data)
+			return err
+		}))
+	}
+
+	for _, f := range email.InlineFiles {
+		m.Embed(f.ContentDisposition.Params["filename"], gomail.SetCopyFunc(func(w io.Writer) error {
+			_, err = w.Write(f.Data)
+			return err
+		}))
+	}
+
+	err = mailer.dialer.DialAndSend(m)
+	if err != nil {
+		return err
+	}
+
+	log.Printf("Email reply sent successfully, %s", email.Headers.MessageID)
 
 	return nil
 }

@@ -184,10 +184,18 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 	}
 
 	for _, f := range email.InlineFiles {
-		m.Embed(f.ContentID, gomail.SetCopyFunc(func(w io.Writer) error {
-			_, err = w.Write(f.Data)
-			return err
-		}))
+		m.Embed(
+			f.ContentID,
+			gomail.SetHeader(map[string][]string{
+				"Content-ID":          {f.ContentID},
+				"Content-Type":        {f.ContentType.ContentType},
+				"Content-Disposition": {f.ContentDisposition.Params["type"] + "; filename=\"" + f.ContentDisposition.Params["filename"] + "\""},
+			}),
+			gomail.SetCopyFunc(func(w io.Writer) error {
+				_, err = w.Write(f.Data)
+				return err
+			}),
+		)
 	}
 
 	err = mailer.dialer.DialAndSend(m)

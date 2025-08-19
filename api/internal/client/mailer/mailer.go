@@ -98,6 +98,9 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 		return err
 	}
 
+	email.Text = utils.RemoveHeader(email.Text)
+	email.HTML = utils.RemoveHtmlHeader(email.HTML)
+
 	if email.HTML == "" {
 		email.HTML = model.PlainTextToHTML(email.Text)
 	}
@@ -106,8 +109,8 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 	m.SetAddressHeader("From", from, name)
 	m.SetHeader("To", rcp.Email)
 	m.SetHeader("Subject", email.Headers.Subject)
-	m.SetBody("text/plain", utils.RemoveHeader(email.Text))
-	m.AddAlternative("text/html", utils.RemoveHtmlHeader(email.HTML))
+	m.SetBody("text/plain", email.Text)
+	m.AddAlternative("text/html", email.HTML)
 
 	for _, a := range email.AttachedFiles {
 		m.Attach(a.ContentDisposition.Params["filename"], gomail.SetCopyFunc(func(w io.Writer) error {

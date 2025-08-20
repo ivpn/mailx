@@ -250,27 +250,32 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 
 	// PGP/MIME encryption
 	if rcp.PGPEnabled && rcp.PGPKey != "" && !rcp.PGPInline {
-		var buf bytes.Buffer
-		_, err = m.WriteTo(&buf)
+		// var buf bytes.Buffer
+		// _, err = m.WriteTo(&buf)
+		// if err != nil {
+		// 	return err
+		// }
+
+		// pgp := crypto.PGP()
+		// publicKey, _ := crypto.NewKeyFromArmored(rcp.PGPKey)
+		// encHandle, _ := pgp.Encryption().Recipient(publicKey).New()
+		// pgpMessage, _ := encHandle.Encrypt(buf.Bytes())
+		// armored, _ := pgpMessage.ArmorBytes()
+
+		// msg := gomail.NewMessage()
+		// msg.SetAddressHeader("From", from, name)
+		// msg.SetHeader("To", rcp.Email)
+		// msg.SetHeader("Subject", email.Headers.Subject)
+		// msg.SetHeader("Content-Type", "multipart/encrypted; protocol=\"application/pgp-encrypted\"")
+		// msg.SetHeader("Content-Description", "OpenPGP encrypted message")
+		// msg.SetHeader("Content-Disposition", "inline; filename=\"encrypted.asc\"")
+		// msg.SetBody("application/pgp-encrypted", "Version: 1")
+		// msg.AddAlternative("application/octet-stream; name=\"encrypted.asc\"\r\n", string(armored))
+
+		msg, err := utils.EncryptWithPGPMIME(data, from, name, email.Headers.Subject, rcp.Email, rcp.PGPKey)
 		if err != nil {
 			return err
 		}
-
-		pgp := crypto.PGP()
-		publicKey, _ := crypto.NewKeyFromArmored(rcp.PGPKey)
-		encHandle, _ := pgp.Encryption().Recipient(publicKey).New()
-		pgpMessage, _ := encHandle.Encrypt(buf.Bytes())
-		armored, _ := pgpMessage.ArmorBytes()
-
-		msg := gomail.NewMessage()
-		msg.SetAddressHeader("From", from, name)
-		msg.SetHeader("To", rcp.Email)
-		msg.SetHeader("Subject", email.Headers.Subject)
-		msg.SetHeader("Content-Type", "multipart/encrypted; protocol=\"application/pgp-encrypted\"")
-		msg.SetHeader("Content-Description", "OpenPGP encrypted message")
-		msg.SetHeader("Content-Disposition", "inline; filename=\"encrypted.asc\"")
-		msg.SetBody("application/pgp-encrypted", "Version: 1")
-		msg.AddAlternative("application/octet-stream; name=\"encrypted.asc\"\r\n", string(armored))
 
 		err = mailer.dialer.DialAndSend(msg)
 		if err != nil {

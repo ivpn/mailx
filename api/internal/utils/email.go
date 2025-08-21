@@ -90,6 +90,9 @@ func EncryptWithPGPMIME(data []byte, fromAddr, fromName, subject, recipientEmail
 		return nil, fmt.Errorf("armor ciphertext: %w", err)
 	}
 
+	// Normalize line endings to CRLF
+	armored = strings.ReplaceAll(armored, "\n", "\r\n")
+
 	// --- 4) Build PGP/MIME multipart body ---
 	boundary := "pgp-boundary-" + randomChars(16) // Generate a random boundary string
 	var body bytes.Buffer
@@ -106,10 +109,10 @@ func EncryptWithPGPMIME(data []byte, fromAddr, fromName, subject, recipientEmail
 	body.WriteString("Content-Disposition: attachment; filename=\"encrypted.asc\"\r\n")
 	body.WriteString("Content-Transfer-Encoding: base64\r\n\r\n")
 	body.WriteString(armored)
-	if !strings.HasSuffix(armored, "\n") {
+	if !strings.HasSuffix(armored, "\r\n") {
 		body.WriteString("\r\n")
 	}
-	body.WriteString(fmt.Sprintf("\r\n--%s--\r\n", boundary))
+	body.WriteString(fmt.Sprintf("--%s--\r\n", boundary))
 
 	// --- 5) Build final gomail.Message ---
 	em := gomail.NewRawMessage()
@@ -117,9 +120,11 @@ func EncryptWithPGPMIME(data []byte, fromAddr, fromName, subject, recipientEmail
 	em.SetHeader("To", recipientEmail)
 	em.SetHeader("Subject", subject)
 	em.SetHeader("MIME-Version", "1.0")
-	em.SetHeader("Content-Type", fmt.Sprintf("multipart/encrypted; protocol=\"application/pgp-encrypted\" boundary=\"%s\"", boundary))
+	em.SetHeader("Content-Type", fmt.Sprintf(
+		"multipart/encrypted; protocol=\"application/pgp-encrypted\" boundary=\"%s\"", boundary))
 
 	// --- 6) Attach our prebuilt multipart/encrypted body ---
+	// Use your custom SetRawBody to avoid gomail re-encoding
 	em.SetRawBody("text/plain", body.String())
 
 	// --- 7) Print the final email message as raw string

@@ -11,10 +11,10 @@ import (
 
 	"github.com/ProtonMail/gopenpgp/v3/crypto"
 	"github.com/mnako/letters"
-	"gopkg.in/gomail.v2"
 	"ivpn.net/email/api/config"
 	"ivpn.net/email/api/internal/model"
 	"ivpn.net/email/api/internal/utils"
+	"ivpn.net/email/api/internal/utils/gomail.v2"
 )
 
 //go:embed templates/*

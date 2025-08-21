@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/ProtonMail/gopenpgp/v3/crypto"
-	"gopkg.in/gomail.v2"
+	"ivpn.net/email/api/internal/utils/gomail.v2"
 )
 
 func RemoveHeader(text string) string {
@@ -122,19 +122,24 @@ func EncryptWithPGPMIME(data []byte, fromAddr, fromName, subject, recipientEmail
 	body.WriteString(fmt.Sprintf("\r\n--%s--\r\n", boundary))
 
 	// --- 5) Build final gomail.Message ---
-	em := gomail.NewMessage()
+	em := gomail.NewRawMessage()
 	em.SetAddressHeader("From", fromAddr, fromName)
 	em.SetHeader("To", recipientEmail)
 	em.SetHeader("Subject", subject)
-	em.SetHeader("Date", time.Now().Format(time.RFC1123Z))
 	em.SetHeader("MIME-Version", "1.0")
-	em.SetHeader(
-		"Content-Type",
-		fmt.Sprintf("multipart/encrypted; protocol=\"application/pgp-encrypted\"; boundary=\"%s\"", boundary),
-	)
+	em.SetHeader("Content-Type", fmt.Sprintf("multipart/encrypted; protocol=\"application/pgp-encrypted\" boundary=\"%s\"", boundary))
 
 	// --- 6) Attach our prebuilt multipart/encrypted body ---
-	em.SetBody("text/plain", armored)
+	em.SetRawBody("text/plain", body.String())
+
+	// --- 7) Print the final email message as raw string
+	buf := new(bytes.Buffer)
+	_, err = em.WriteTo(buf)
+	if err != nil {
+		return nil, fmt.Errorf("write email to buffer: %w", err)
+	}
+	fmt.Println("PGP/MIME email message:")
+	fmt.Println(buf.String())
 
 	return em, nil
 }

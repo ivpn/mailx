@@ -3,8 +3,8 @@ package mailer
 import (
 	"testing"
 
-	"gopkg.in/gomail.v2"
 	"ivpn.net/email/api/config"
+	"ivpn.net/email/api/internal/utils/gomail.v2"
 )
 
 func TestSend(t *testing.T) {

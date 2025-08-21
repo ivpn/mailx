@@ -93,9 +93,6 @@ func EncryptWithPGPMIME(data []byte, fromAddr, fromName, subject, recipientEmail
 		return nil, fmt.Errorf("armor ciphertext: %w", err)
 	}
 
-	// Normalize line endings to CRLF
-	armored = strings.ReplaceAll(armored, "\n", "\r\n")
-
 	// --- 5) Build PGP/MIME multipart body ---
 	boundary := "boundary-" + randomChars(16)
 	var body bytes.Buffer

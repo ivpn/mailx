@@ -54,7 +54,7 @@ func NewRawMessage(settings ...MessageSetting) *Message {
 	m := &Message{
 		header:   make(header),
 		charset:  "",
-		encoding: Base64,
+		encoding: Unencoded,
 	}
 
 	m.applySettings(settings)
@@ -251,7 +251,8 @@ func (m *Message) newPart(contentType string, f func(io.Writer) error, settings 
 
 func (m *Message) newRawPart(f func(io.Writer) error, settings []PartSetting) *part {
 	p := &part{
-		copier: f,
+		copier:   f,
+		encoding: Unencoded,
 	}
 
 	for _, s := range settings {

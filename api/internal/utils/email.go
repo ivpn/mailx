@@ -102,8 +102,9 @@ func EncryptWithPGPMIME(data []byte, fromAddr, fromName, subject, recipientEmail
 
 	// Part 1: version
 	body.WriteString(fmt.Sprintf("--%s\r\n", boundary))
-	body.WriteString("Content-Type: application/pgp-encrypted\r\n\r\n")
+	body.WriteString("Content-Type: application/pgp-encrypted\r\n")
 	body.WriteString("Content-Description: PGP/MIME version identification\r\n")
+	body.WriteString("Content-Transfer-Encoding: 7bit\r\n\r\n")
 	body.WriteString("Version: 1\r\n\r\n")
 
 	// Part 2: encrypted content
@@ -111,6 +112,7 @@ func EncryptWithPGPMIME(data []byte, fromAddr, fromName, subject, recipientEmail
 	body.WriteString("Content-Type: application/octet-stream; name=\"encrypted.asc\"\r\n")
 	body.WriteString("Content-Description: OpenPGP encrypted message\r\n")
 	body.WriteString("Content-Disposition: inline; filename=\"encrypted.asc\"\r\n")
+	body.WriteString("Content-Transfer-Encoding: 7bit\r\n\r\n")
 	body.WriteString(armored)
 	if !strings.HasSuffix(armored, "\r\n") {
 		body.WriteString("\r\n")
@@ -124,13 +126,21 @@ func EncryptWithPGPMIME(data []byte, fromAddr, fromName, subject, recipientEmail
 	em.SetAddressHeader("From", fromAddr, fromName)
 	em.SetHeader("To", recipientEmail)
 	em.SetHeader("Subject", subject)
-	em.SetHeader("Date", time.Now().Format(time.RFC1123))
-	em.SetHeader("MIME-Version", "1.0")
+	em.SetHeader("Date", time.Now().UTC().Format(time.RFC1123Z))
 	em.SetHeader("Content-Type", fmt.Sprintf("multipart/encrypted; protocol=\"application/pgp-encrypted\"; boundary=\"%s\"", boundary))
 
 	// --- 7) Attach fully prebuilt multipart body ---
 	// Passing empty string type disables any re-encoding of body
 	em.SetRawBody(body.String())
+
+	// --- 8) Print the final email message as raw string
+	buf := new(bytes.Buffer)
+	_, err = em.WriteTo(buf)
+	if err != nil {
+		return nil, fmt.Errorf("write email to buffer: %w", err)
+	}
+	fmt.Println("PGP/MIME email message:")
+	fmt.Println(buf.String())
 
 	return em, nil
 }

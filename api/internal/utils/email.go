@@ -96,14 +96,15 @@ func EncryptWithPGPMIME(data []byte, fromAddr, fromName, subject, recipientEmail
 
 	// Part 1: version info
 	body.WriteString(fmt.Sprintf("--%s\r\n", boundary))
-	body.WriteString("Content-Type: application/pgp-encrypted\r\n\r\n")
+	body.WriteString("Content-Type: application/pgp-encrypted\r\n")
+	body.WriteString("Content-Transfer-Encoding: 7bit\r\n\r\n")
 	body.WriteString("Version: 1\r\n\r\n")
 
 	// Part 2: ciphertext
 	body.WriteString(fmt.Sprintf("--%s\r\n", boundary))
 	body.WriteString("Content-Type: application/octet-stream; name=\"encrypted.asc\"\r\n")
 	body.WriteString("Content-Disposition: attachment; filename=\"encrypted.asc\"\r\n")
-	body.WriteString("Content-Transfer-Encoding: 7bit\r\n\r\n")
+	body.WriteString("Content-Transfer-Encoding: base64\r\n\r\n")
 	body.WriteString(armored)
 	if !strings.HasSuffix(armored, "\n") {
 		body.WriteString("\r\n")

@@ -88,13 +88,15 @@ func EncryptWithPGPMIME(data []byte, fromAddr, fromName, subject, recipientEmail
 		return nil, fmt.Errorf("encrypt payload: %w", err)
 	}
 
-	armored, err := pgpMessage.Armor()
+	armored, err := pgpMessage.ArmorBytes()
 	if err != nil {
 		return nil, fmt.Errorf("armor ciphertext: %w", err)
 	}
 
+	print("armored:", string(armored))
+
 	// Normalize line endings to CRLF
-	armored = strings.ReplaceAll(armored, "\n", "\r\n")
+	armoredStr := strings.ReplaceAll(string(armored), "\n", "\r\n")
 
 	// --- 5) Build PGP/MIME multipart body ---
 	boundary := "boundary-" + randomChars(16)
@@ -113,8 +115,8 @@ func EncryptWithPGPMIME(data []byte, fromAddr, fromName, subject, recipientEmail
 	body.WriteString("Content-Description: OpenPGP encrypted message\r\n")
 	body.WriteString("Content-Disposition: inline; filename=\"encrypted.asc\"\r\n")
 	body.WriteString("Content-Transfer-Encoding: 7bit\r\n\r\n")
-	body.WriteString(armored)
-	if !strings.HasSuffix(armored, "\r\n") {
+	body.WriteString(armoredStr)
+	if !strings.HasSuffix(armoredStr, "\r\n") {
 		body.WriteString("\r\n")
 	}
 

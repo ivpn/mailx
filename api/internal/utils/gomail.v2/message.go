@@ -251,8 +251,7 @@ func (m *Message) newPart(contentType string, f func(io.Writer) error, settings 
 
 func (m *Message) newRawPart(contentType string, f func(io.Writer) error, settings []PartSetting) *part {
 	p := &part{
-		copier:   f,
-		encoding: Unencoded,
+		copier: f,
 	}
 
 	for _, s := range settings {

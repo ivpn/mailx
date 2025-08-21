@@ -102,7 +102,7 @@ func EncryptWithPGPMIME(data []byte, fromAddr, fromName, subject, recipientEmail
 	// Part 2: ciphertext
 	body.WriteString(fmt.Sprintf("--%s\r\n", boundary))
 	body.WriteString("Content-Type: application/octet-stream; name=\"encrypted.asc\"\r\n")
-	body.WriteString("Content-Disposition: inline; filename=\"encrypted.asc\"\r\n\r\n")
+	body.WriteString("Content-Disposition: attachment; filename=\"encrypted.asc\"\r\n\r\n")
 	body.WriteString(armored)
 	if !strings.HasSuffix(armored, "\n") {
 		body.WriteString("\r\n")

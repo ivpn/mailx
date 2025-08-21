@@ -110,10 +110,6 @@ func (w *messageWriter) writePart(p *part, charset string) {
 			"Content-Type":              {p.contentType + "; charset=" + charset},
 			"Content-Transfer-Encoding": {string(p.encoding)},
 		})
-	} else {
-		w.writeHeaders(map[string][]string{
-			"Content-Transfer-Encoding": {string(p.encoding)},
-		})
 	}
 	w.writeBody(p.copier, p.encoding)
 }

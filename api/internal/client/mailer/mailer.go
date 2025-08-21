@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ProtonMail/gopenpgp/v3/crypto"
 	"github.com/mnako/letters"
 	"ivpn.net/email/api/config"
 	"ivpn.net/email/api/internal/model"
@@ -180,14 +179,12 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 
 	// PGP/Inline encryption
 	if rcp.PGPEnabled && rcp.PGPKey != "" && rcp.PGPInline {
-		pgp := crypto.PGP()
-		publicKey, _ := crypto.NewKeyFromArmored(rcp.PGPKey)
-		encHandle, _ := pgp.Encryption().Recipient(publicKey).New()
-		pgpMessage, _ := encHandle.Encrypt([]byte(email.Text))
-		armored, _ := pgpMessage.ArmorBytes()
-		email.Text = string(armored)
+		armored, err := utils.EncryptWithPGPInline(email.Text, rcp.PGPKey)
+		if err != nil {
+			return err
+		}
 		m.SetHeader("Content-Type", "text/plain")
-		m.SetBody("text/plain", email.Text)
+		m.SetBody("text/plain", armored)
 	} else {
 		m.AddAlternative("text/html", headerHtml.String()+email.HTML)
 	}

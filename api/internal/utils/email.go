@@ -9,7 +9,6 @@ import (
 	"net/mail"
 	"regexp"
 	"strings"
-	"time"
 
 	"github.com/ProtonMail/gopenpgp/v3/crypto"
 	"ivpn.net/email/api/internal/utils/gomail.v2"
@@ -31,40 +30,29 @@ func RemoveHtmlHeader(html string) string {
 	return cleaned
 }
 
-func EncryptWithPGPInline(plainText, fromAddr, fromName, subject, recipientEmail, recipientKey string) (*gomail.Message, error) {
-	// 1) Parse recipient public key
+func EncryptWithPGPInline(plainText string, recipientKey string) (string, error) {
 	publicKey, err := crypto.NewKeyFromArmored(recipientKey)
 	if err != nil {
-		return nil, fmt.Errorf("parse public key: %w", err)
+		return "", fmt.Errorf("parse public key: %w", err)
 	}
 
-	// 2) Encrypt plain text
 	pgp := crypto.PGP()
 	encHandle, err := pgp.Encryption().Recipient(publicKey).New()
 	if err != nil {
-		return nil, fmt.Errorf("create encryption handle: %w", err)
+		return "", fmt.Errorf("create encryption handle: %w", err)
 	}
 
 	pgpMessage, err := encHandle.Encrypt([]byte(plainText))
 	if err != nil {
-		return nil, fmt.Errorf("encrypt text: %w", err)
+		return "", fmt.Errorf("encrypt text: %w", err)
 	}
 
-	armored, err := pgpMessage.Armor()
+	armored, err := pgpMessage.ArmorBytes()
 	if err != nil {
-		return nil, fmt.Errorf("armor ciphertext: %w", err)
+		return "", fmt.Errorf("armor ciphertext: %w", err)
 	}
 
-	// 3) Build final gomail.Message
-	msg := gomail.NewMessage()
-	msg.SetAddressHeader("From", fromAddr, fromName)
-	msg.SetHeader("To", recipientEmail)
-	msg.SetHeader("Subject", subject)
-	msg.SetHeader("Date", time.Now().Format(time.RFC1123Z))
-	msg.SetHeader("MIME-Version", "1.0")
-	msg.SetBody("text/plain", armored)
-
-	return msg, nil
+	return string(armored), nil
 }
 
 func EncryptWithPGPMIME(data []byte, fromAddr, fromName, subject, recipientEmail, recipientKey string) (*gomail.Message, error) {

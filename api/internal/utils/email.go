@@ -93,6 +93,9 @@ func EncryptWithPGPMIME(data []byte, fromAddr, fromName, subject, recipientEmail
 		return nil, fmt.Errorf("armor ciphertext: %w", err)
 	}
 
+	// Normalize line endings to CRLF
+	armored = strings.ReplaceAll(armored, "\n", "\r\n")
+
 	// --- 5) Build PGP/MIME multipart body ---
 	boundary := "boundary-" + randomChars(16)
 	var body bytes.Buffer
@@ -100,6 +103,7 @@ func EncryptWithPGPMIME(data []byte, fromAddr, fromName, subject, recipientEmail
 	// Part 1: version
 	body.WriteString(fmt.Sprintf("--%s\r\n", boundary))
 	body.WriteString("Content-Type: application/pgp-encrypted\r\n\r\n")
+	body.WriteString("Content-Description: PGP/MIME version identification\r\n")
 	body.WriteString("Version: 1\r\n\r\n")
 
 	// Part 2: encrypted content
@@ -132,7 +136,7 @@ func EncryptWithPGPMIME(data []byte, fromAddr, fromName, subject, recipientEmail
 }
 
 func randomChars(n int) string {
-	var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+	var letterRunes = []rune("abcdefghijklmnopqrstuvwxyz0123456789")
 	b := make([]rune, n)
 	for i := range b {
 		index, err := cryptoRandInt(len(letterRunes))

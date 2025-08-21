@@ -122,24 +122,21 @@ func EncryptWithPGPMIME(data []byte, fromAddr, fromName, subject, recipientEmail
 	body.WriteString(fmt.Sprintf("\r\n--%s--\r\n", boundary))
 
 	// --- 5) Build final gomail.Message ---
-	encMsg := gomail.NewMessage()
-	encMsg.SetAddressHeader("From", fromAddr, fromName)
-	encMsg.SetHeader("To", recipientEmail)
-	encMsg.SetHeader("Subject", subject)
-	encMsg.SetHeader("Date", time.Now().Format(time.RFC1123Z))
-	encMsg.SetHeader("MIME-Version", "1.0")
-	encMsg.SetHeader(
+	em := gomail.NewMessage()
+	em.SetAddressHeader("From", fromAddr, fromName)
+	em.SetHeader("To", recipientEmail)
+	em.SetHeader("Subject", subject)
+	em.SetHeader("Date", time.Now().Format(time.RFC1123Z))
+	em.SetHeader("MIME-Version", "1.0")
+	em.SetHeader(
 		"Content-Type",
 		fmt.Sprintf("multipart/encrypted; protocol=\"application/pgp-encrypted\"; boundary=\"%s\"", boundary),
 	)
 
 	// --- 6) Attach our prebuilt multipart/encrypted body ---
-	encMsg.AddAlternativeWriter("multipart/encrypted", func(w io.Writer) error {
-		_, err := w.Write(body.Bytes())
-		return err
-	})
+	em.SetBody("text/plain", armored)
 
-	return encMsg, nil
+	return em, nil
 }
 
 func randomChars(n int) string {

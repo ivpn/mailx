@@ -123,17 +123,7 @@ func EncryptWithPGPMIME(orig *gomail.Message, fromAddr, fromName, subject, recip
 	em.SetHeader("Content-Type", fmt.Sprintf("multipart/encrypted; protocol=\"application/pgp-encrypted\"; boundary=\"%s\"", boundary))
 
 	// --- 6) Attach fully prebuilt multipart body ---
-	// Passing empty string type disables any re-encoding of body
 	em.SetRawBody(body.String())
-
-	// --- 7) Print the final email message as raw string
-	out := new(bytes.Buffer)
-	_, err = em.WriteTo(out)
-	if err != nil {
-		return nil, fmt.Errorf("write email to buffer: %w", err)
-	}
-	fmt.Println("PGP/MIME email message:")
-	fmt.Println(out.String())
 
 	return em, nil
 }

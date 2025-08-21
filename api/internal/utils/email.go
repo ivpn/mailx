@@ -56,7 +56,8 @@ func EncryptWithPGPInline(plainText string, recipientKey string) (string, error)
 }
 
 func EncryptWithPGPMIME(data []byte, fromAddr, fromName, subject, recipientEmail, recipientKey string) (*gomail.Message, error) {
-	// --- 1) Serialize the original cleartext email ---
+
+	// --- 1) Parse original email ---
 	raw, err := mail.ReadMessage(bytes.NewReader(data))
 	if err != nil {
 		return nil, fmt.Errorf("read original email: %w", err)
@@ -68,12 +69,13 @@ func EncryptWithPGPMIME(data []byte, fromAddr, fromName, subject, recipientEmail
 		return nil, fmt.Errorf("parse public key: %w", err)
 	}
 
-	// --- 3) Read body and encrypt serialized message ---
+	// --- 3) Read email body ---
 	bodyBytes, err := io.ReadAll(raw.Body)
 	if err != nil {
 		return nil, fmt.Errorf("read message body: %w", err)
 	}
 
+	// --- 4) Encrypt body ---
 	pgp := crypto.PGP()
 	encHandle, err := pgp.Encryption().Recipient(publicKey).New()
 	if err != nil {
@@ -93,55 +95,45 @@ func EncryptWithPGPMIME(data []byte, fromAddr, fromName, subject, recipientEmail
 	// Normalize line endings to CRLF
 	armored = strings.ReplaceAll(armored, "\n", "\r\n")
 
-	// --- 4) Build PGP/MIME multipart body ---
-	boundary := "pgp-boundary-" + randomChars(16) // Generate a random boundary string
+	// --- 5) Build PGP/MIME multipart body ---
+	boundary := "pgp-boundary-" + randomChars(16)
 	var body bytes.Buffer
 
-	// Part 1: version info
+	// Part 1: version
 	body.WriteString(fmt.Sprintf("--%s\r\n", boundary))
 	body.WriteString("Content-Type: application/pgp-encrypted\r\n")
 	body.WriteString("Content-Transfer-Encoding: 7bit\r\n\r\n")
 	body.WriteString("Version: 1\r\n\r\n")
 
-	// Part 2: ciphertext
+	// Part 2: encrypted content
 	body.WriteString(fmt.Sprintf("--%s\r\n", boundary))
 	body.WriteString("Content-Type: application/octet-stream; name=\"encrypted.asc\"\r\n")
 	body.WriteString("Content-Disposition: attachment; filename=\"encrypted.asc\"\r\n")
 	body.WriteString("Content-Transfer-Encoding: base64\r\n\r\n")
-
 	body.WriteString(armored)
 	if !strings.HasSuffix(armored, "\r\n") {
 		body.WriteString("\r\n")
 	}
+
+	// End boundary
 	body.WriteString(fmt.Sprintf("--%s--\r\n", boundary))
 
-	// --- 5) Build final gomail.Message ---
+	// --- 6) Build final raw email ---
 	em := gomail.NewRawMessage()
 	em.SetAddressHeader("From", fromAddr, fromName)
 	em.SetHeader("To", recipientEmail)
 	em.SetHeader("Subject", subject)
 	em.SetHeader("MIME-Version", "1.0")
-	em.SetHeader("Content-Type", fmt.Sprintf(
-		"multipart/encrypted; protocol=\"application/pgp-encrypted\" boundary=\"%s\"", boundary))
 
-	// --- 6) Attach our prebuilt multipart/encrypted body ---
-	// Use your custom SetRawBody to avoid gomail re-encoding
+	// --- 7) Attach fully prebuilt multipart body ---
+	// Passing empty string type disables any re-encoding of body
 	em.SetRawBody(body.String())
-
-	// --- 7) Print the final email message as raw string
-	buf := new(bytes.Buffer)
-	_, err = em.WriteTo(buf)
-	if err != nil {
-		return nil, fmt.Errorf("write email to buffer: %w", err)
-	}
-	fmt.Println("PGP/MIME email message:")
-	fmt.Println(buf.String())
 
 	return em, nil
 }
 
 func randomChars(n int) string {
-	var letterRunes = []rune("abcdefghijklmnopqrstuvwxyz0123456789")
+	var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 	b := make([]rune, n)
 	for i := range b {
 		index, err := cryptoRandInt(len(letterRunes))

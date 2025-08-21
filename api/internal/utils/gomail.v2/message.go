@@ -54,7 +54,7 @@ func NewRawMessage(settings ...MessageSetting) *Message {
 	m := &Message{
 		header:   make(header),
 		charset:  "",
-		encoding: Unencoded,
+		encoding: Base64,
 	}
 
 	m.applySettings(settings)
@@ -208,8 +208,8 @@ func (m *Message) SetBody(contentType, body string, settings ...PartSetting) {
 	m.parts = []*part{m.newPart(contentType, newCopier(body), settings)}
 }
 
-func (m *Message) SetRawBody(contentType, body string, settings ...PartSetting) {
-	m.parts = []*part{m.newRawPart(contentType, newCopier(body), settings)}
+func (m *Message) SetRawBody(body string, settings ...PartSetting) {
+	m.parts = []*part{m.newRawPart(newCopier(body), settings)}
 }
 
 // AddAlternative adds an alternative part to the message.
@@ -249,7 +249,7 @@ func (m *Message) newPart(contentType string, f func(io.Writer) error, settings 
 	return p
 }
 
-func (m *Message) newRawPart(contentType string, f func(io.Writer) error, settings []PartSetting) *part {
+func (m *Message) newRawPart(f func(io.Writer) error, settings []PartSetting) *part {
 	p := &part{
 		copier: f,
 	}

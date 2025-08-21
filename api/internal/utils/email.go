@@ -108,6 +108,7 @@ func EncryptWithPGPMIME(data []byte, fromAddr, fromName, subject, recipientEmail
 	body.WriteString("Content-Type: application/octet-stream; name=\"encrypted.asc\"\r\n")
 	body.WriteString("Content-Disposition: attachment; filename=\"encrypted.asc\"\r\n")
 	body.WriteString("Content-Transfer-Encoding: base64\r\n\r\n")
+
 	body.WriteString(armored)
 	if !strings.HasSuffix(armored, "\r\n") {
 		body.WriteString("\r\n")
@@ -125,7 +126,7 @@ func EncryptWithPGPMIME(data []byte, fromAddr, fromName, subject, recipientEmail
 
 	// --- 6) Attach our prebuilt multipart/encrypted body ---
 	// Use your custom SetRawBody to avoid gomail re-encoding
-	em.SetRawBody("text/plain", body.String())
+	em.SetRawBody(body.String())
 
 	// --- 7) Print the final email message as raw string
 	buf := new(bytes.Buffer)

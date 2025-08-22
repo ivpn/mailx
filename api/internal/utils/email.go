@@ -84,8 +84,6 @@ func EncryptWithPGPMIME(orig *gomail.Message, fromAddr, fromName, subject, recip
 		return nil, fmt.Errorf("armor ciphertext: %w", err)
 	}
 
-	print("armored:", string(armored))
-
 	// Normalize line endings to CRLF
 	armoredStr := strings.ReplaceAll(string(armored), "\n", "\r\n")
 

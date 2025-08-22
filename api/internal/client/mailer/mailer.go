@@ -9,12 +9,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ProtonMail/gopenpgp/v3/crypto"
-	"github.com/yeo/parsemail"
-	"gopkg.in/gomail.v2"
+	"github.com/mnako/letters"
 	"ivpn.net/email/api/config"
 	"ivpn.net/email/api/internal/model"
 	"ivpn.net/email/api/internal/utils"
+	"ivpn.net/email/api/internal/utils/gomail.v2"
 )
 
 //go:embed templates/*
@@ -92,59 +91,46 @@ func (mailer Mailer) Send(to string, subject string, body string) error {
 }
 
 func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data []byte) error {
-	var reader = bytes.NewReader(data)
-	email, err := parsemail.Parse(reader)
+	reader := bytes.NewReader(data)
+	email, err := letters.ParseEmail(reader)
 	if err != nil {
 		return err
 	}
 
-	if email.TextBody == "" {
-		extractedTextBody, err := model.ExtractTextBody(data)
-		if err != nil {
-			log.Println("Error extracting text body:", err)
-		} else {
-			email.TextBody = extractedTextBody
-		}
-	}
-	if email.HTMLBody == "" {
-		extractedHTMLBody, err := model.ExtractHTMLBody(data)
-		if err != nil {
-			log.Println("Error extracting HTML body:", err)
-		} else {
-			email.HTMLBody = extractedHTMLBody
-		}
-	}
-	if email.HTMLBody == "" {
-		email.HTMLBody = model.PlainTextToHTML(email.TextBody)
+	email.Text = utils.RemoveHeader(email.Text)
+	email.HTML = utils.RemoveHtmlHeader(email.HTML)
+
+	if email.HTML == "" {
+		email.HTML = model.PlainTextToHTML(email.Text)
 	}
 
 	m := gomail.NewMessage()
 	m.SetAddressHeader("From", from, name)
 	m.SetHeader("To", rcp.Email)
-	m.SetHeader("Subject", email.Subject)
-	m.SetBody("text/plain", utils.RemoveHeader(email.TextBody))
-	m.AddAlternative("text/html", utils.RemoveHtmlHeader(email.HTMLBody))
+	m.SetHeader("Subject", email.Headers.Subject)
+	m.SetBody("text/plain", email.Text)
+	m.AddAlternative("text/html", email.HTML)
 
-	for _, a := range email.Attachments {
-		m.Attach(a.Filename, gomail.SetCopyFunc(func(w io.Writer) error {
-			data, err := io.ReadAll(a.Data)
-			if err != nil {
-				return err
-			}
-			_, err = w.Write(data)
+	for _, a := range email.AttachedFiles {
+		m.Attach(a.ContentDisposition.Params["filename"], gomail.SetCopyFunc(func(w io.Writer) error {
+			_, err = w.Write(a.Data)
 			return err
 		}))
 	}
 
-	for _, f := range email.EmbeddedFiles {
-		m.Embed(f.CID, gomail.SetCopyFunc(func(w io.Writer) error {
-			data, err := io.ReadAll(f.Data)
-			if err != nil {
+	for _, f := range email.InlineFiles {
+		m.Embed(
+			f.ContentID,
+			gomail.SetHeader(map[string][]string{
+				"Content-ID":          {f.ContentID},
+				"Content-Type":        {f.ContentType.ContentType},
+				"Content-Disposition": {f.ContentDisposition.Params["type"] + "; filename=\"" + f.ContentDisposition.Params["filename"] + "\""},
+			}),
+			gomail.SetCopyFunc(func(w io.Writer) error {
+				_, err = w.Write(f.Data)
 				return err
-			}
-			_, err = w.Write(data)
-			return err
-		}))
+			}),
+		)
 	}
 
 	err = mailer.dialer.DialAndSend(m)
@@ -152,14 +138,14 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 		return err
 	}
 
-	log.Printf("Email reply sent successfully, %s", email.MessageID)
+	log.Printf("Email reply sent successfully, %s", email.Headers.MessageID)
 
 	return nil
 }
 
 func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data []byte, templateFile string, templateData any) error {
-	var reader = bytes.NewReader(data)
-	email, err := parsemail.Parse(reader)
+	reader := bytes.NewReader(data)
+	email, err := letters.ParseEmail(reader)
 	if err != nil {
 		return err
 	}
@@ -181,44 +167,26 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 		return err
 	}
 
-	if email.TextBody == "" {
-		extractedTextBody, err := model.ExtractTextBody(data)
-		if err != nil {
-			log.Println("Error extracting text body:", err)
-		} else {
-			email.TextBody = extractedTextBody
-		}
-	}
-	if email.HTMLBody == "" {
-		extractedHTMLBody, err := model.ExtractHTMLBody(data)
-		if err != nil {
-			log.Println("Error extracting HTML body:", err)
-		} else {
-			email.HTMLBody = extractedHTMLBody
-		}
-	}
-	if email.HTMLBody == "" {
-		email.HTMLBody = model.PlainTextToHTML(email.TextBody)
+	if email.HTML == "" {
+		email.HTML = model.PlainTextToHTML(email.Text)
 	}
 
 	m := gomail.NewMessage()
 	m.SetAddressHeader("From", from, name)
 	m.SetHeader("To", rcp.Email)
-	m.SetHeader("Subject", email.Subject)
-	m.SetBody("text/plain", header.String()+email.TextBody)
+	m.SetHeader("Subject", email.Headers.Subject)
+	m.SetBody("text/plain", header.String()+email.Text)
 
 	// PGP/Inline encryption
 	if rcp.PGPEnabled && rcp.PGPKey != "" && rcp.PGPInline {
-		pgp := crypto.PGP()
-		publicKey, _ := crypto.NewKeyFromArmored(rcp.PGPKey)
-		encHandle, _ := pgp.Encryption().Recipient(publicKey).New()
-		pgpMessage, _ := encHandle.Encrypt([]byte(email.TextBody))
-		armored, _ := pgpMessage.ArmorBytes()
-		email.TextBody = string(armored)
+		armored, err := utils.EncryptWithPGPInline(email.Text, rcp.PGPKey)
+		if err != nil {
+			return err
+		}
 		m.SetHeader("Content-Type", "text/plain")
-		m.SetBody("text/plain", email.TextBody)
+		m.SetBody("text/plain", armored)
 	} else {
-		m.AddAlternative("text/html", headerHtml.String()+email.HTMLBody)
+		m.AddAlternative("text/html", headerHtml.String()+email.HTML)
 	}
 
 	// PGPSignatures
@@ -255,60 +223,41 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 		}
 	}
 
-	for _, a := range email.Attachments {
-		m.Attach(a.Filename, gomail.SetCopyFunc(func(w io.Writer) error {
-			data, err := io.ReadAll(a.Data)
-			if err != nil {
-				return err
-			}
-
-			_, err = w.Write(data)
+	for _, a := range email.AttachedFiles {
+		m.Attach(a.ContentDisposition.Params["filename"], gomail.SetCopyFunc(func(w io.Writer) error {
+			_, err = w.Write(a.Data)
 			return err
 		}))
 	}
 
-	for _, f := range email.EmbeddedFiles {
-		m.Embed(f.CID, gomail.SetCopyFunc(func(w io.Writer) error {
-			data, err := io.ReadAll(f.Data)
-			if err != nil {
+	for _, f := range email.InlineFiles {
+		m.Embed(
+			f.ContentID,
+			gomail.SetHeader(map[string][]string{
+				"Content-ID":          {f.ContentID},
+				"Content-Type":        {f.ContentType.ContentType},
+				"Content-Disposition": {f.ContentDisposition.Params["type"] + "; filename=\"" + f.ContentDisposition.Params["filename"] + "\""},
+			}),
+			gomail.SetCopyFunc(func(w io.Writer) error {
+				_, err = w.Write(f.Data)
 				return err
-			}
-
-			_, err = w.Write(data)
-			return err
-		}))
+			}),
+		)
 	}
 
 	// PGP/MIME encryption
 	if rcp.PGPEnabled && rcp.PGPKey != "" && !rcp.PGPInline {
-		var buf bytes.Buffer
-		_, err = m.WriteTo(&buf)
+		em, err := utils.EncryptWithPGPMIME(m, from, name, email.Headers.Subject, rcp.Email, rcp.PGPKey)
 		if err != nil {
 			return err
 		}
 
-		pgp := crypto.PGP()
-		publicKey, _ := crypto.NewKeyFromArmored(rcp.PGPKey)
-		encHandle, _ := pgp.Encryption().Recipient(publicKey).New()
-		pgpMessage, _ := encHandle.Encrypt(buf.Bytes())
-		armored, _ := pgpMessage.ArmorBytes()
-
-		msg := gomail.NewMessage()
-		msg.SetAddressHeader("From", from, name)
-		msg.SetHeader("To", rcp.Email)
-		msg.SetHeader("Subject", email.Subject)
-		msg.SetHeader("Content-Type", "multipart/encrypted; protocol=\"application/pgp-encrypted\"")
-		msg.SetHeader("Content-Description", "OpenPGP encrypted message")
-		msg.SetHeader("Content-Disposition", "inline; filename=\"encrypted.asc\"")
-		msg.SetBody("application/pgp-encrypted", "Version: 1")
-		msg.AddAlternative("application/octet-stream; name=\"encrypted.asc\"\r\n", string(armored))
-
-		err = mailer.dialer.DialAndSend(msg)
+		err = mailer.dialer.DialAndSend(em)
 		if err != nil {
 			return err
 		}
 
-		log.Printf("PGP/MIME email forward sent successfully, %s", email.MessageID)
+		log.Printf("PGP/MIME email forward sent successfully, %s", email.Headers.MessageID)
 		return nil
 	}
 
@@ -317,7 +266,7 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 		return err
 	}
 
-	log.Printf("Email forward sent successfully, %s", email.MessageID)
+	log.Printf("Email forward sent successfully, %s", email.Headers.MessageID)
 	return nil
 }
 

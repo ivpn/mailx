@@ -1,6 +1,17 @@
 package utils
 
-import "regexp"
+import (
+	"bytes"
+	"crypto/rand"
+	"fmt"
+	"math/big"
+	"regexp"
+	"strings"
+	"time"
+
+	"github.com/ProtonMail/gopenpgp/v3/crypto"
+	"ivpn.net/email/api/internal/utils/gomail.v2"
+)
 
 func RemoveHeader(text string) string {
 	re := regexp.MustCompile(`(?m)^This email was sent to .+? from .+\n?`)
@@ -16,4 +27,125 @@ func RemoveHtmlHeader(html string) string {
 	cleaned = regexp.MustCompile(`(?i)(\s*<br\s*/?>\s*|<div[^>]*>\s*(<br\s*/?>)?\s*</div>)+`).ReplaceAllString(cleaned, "")
 
 	return cleaned
+}
+
+func EncryptWithPGPInline(plainText string, recipientKey string) (string, error) {
+	publicKey, err := crypto.NewKeyFromArmored(recipientKey)
+	if err != nil {
+		return "", fmt.Errorf("parse public key: %w", err)
+	}
+
+	pgp := crypto.PGP()
+	encHandle, err := pgp.Encryption().Recipient(publicKey).New()
+	if err != nil {
+		return "", fmt.Errorf("create encryption handle: %w", err)
+	}
+
+	pgpMessage, err := encHandle.Encrypt([]byte(plainText))
+	if err != nil {
+		return "", fmt.Errorf("encrypt text: %w", err)
+	}
+
+	armored, err := pgpMessage.ArmorBytes()
+	if err != nil {
+		return "", fmt.Errorf("armor ciphertext: %w", err)
+	}
+
+	return string(armored), nil
+}
+
+func EncryptWithPGPMIME(orig *gomail.Message, fromAddr, fromName, subject, recipientEmail, recipientKey string) (*gomail.Message, error) {
+	// --- 1) Serialize the original email ---
+	var buf bytes.Buffer
+	if _, err := orig.WriteTo(&buf); err != nil {
+		return nil, fmt.Errorf("serialize original email: %w", err)
+	}
+
+	// --- 2) Parse recipient public key ---
+	publicKey, err := crypto.NewKeyFromArmored(recipientKey)
+	if err != nil {
+		return nil, fmt.Errorf("parse public key: %w", err)
+	}
+
+	// --- 3) Encrypt body ---
+	pgp := crypto.PGP()
+	encHandle, err := pgp.Encryption().Recipient(publicKey).New()
+	if err != nil {
+		return nil, fmt.Errorf("create encryption handle: %w", err)
+	}
+
+	pgpMessage, err := encHandle.Encrypt(buf.Bytes())
+	if err != nil {
+		return nil, fmt.Errorf("encrypt payload: %w", err)
+	}
+
+	armored, err := pgpMessage.ArmorBytes()
+	if err != nil {
+		return nil, fmt.Errorf("armor ciphertext: %w", err)
+	}
+
+	print("armored:", string(armored))
+
+	// Normalize line endings to CRLF
+	armoredStr := strings.ReplaceAll(string(armored), "\n", "\r\n")
+
+	// --- 4) Build PGP/MIME multipart body ---
+	boundary := "boundary-" + randomChars(16)
+	var body bytes.Buffer
+
+	// Part 1: version
+	body.WriteString(fmt.Sprintf("--%s\r\n", boundary))
+	body.WriteString("Content-Type: application/pgp-encrypted\r\n")
+	body.WriteString("Content-Description: PGP/MIME version identification\r\n")
+	body.WriteString("Content-Transfer-Encoding: 7bit\r\n\r\n")
+	body.WriteString("Version: 1\r\n\r\n")
+
+	// Part 2: encrypted content
+	body.WriteString(fmt.Sprintf("--%s\r\n", boundary))
+	body.WriteString("Content-Type: application/octet-stream; name=\"encrypted.asc\"\r\n")
+	body.WriteString("Content-Description: OpenPGP encrypted message\r\n")
+	body.WriteString("Content-Disposition: inline; filename=\"encrypted.asc\"\r\n")
+	body.WriteString("Content-Transfer-Encoding: 7bit\r\n\r\n")
+	body.WriteString(armoredStr)
+	if !strings.HasSuffix(armoredStr, "\r\n") {
+		body.WriteString("\r\n")
+	}
+
+	// End boundary
+	body.WriteString(fmt.Sprintf("\r\n--%s--\r\n", boundary))
+
+	// --- 5) Build final raw email ---
+	em := gomail.NewRawMessage()
+	em.SetAddressHeader("From", fromAddr, fromName)
+	em.SetHeader("To", recipientEmail)
+	em.SetHeader("Subject", subject)
+	em.SetHeader("Date", time.Now().UTC().Format(time.RFC1123Z))
+	em.SetHeader("Content-Type", fmt.Sprintf("multipart/encrypted; protocol=\"application/pgp-encrypted\"; boundary=\"%s\"", boundary))
+
+	// --- 6) Attach fully prebuilt multipart body ---
+	em.SetRawBody(body.String())
+
+	return em, nil
+}
+
+func randomChars(n int) string {
+	var letterRunes = []rune("abcdefghijklmnopqrstuvwxyz0123456789")
+	b := make([]rune, n)
+	for i := range b {
+		index, err := cryptoRandInt(len(letterRunes))
+		if err != nil {
+			// Handle error, return empty string or fallback
+			return ""
+		}
+		b[i] = letterRunes[index]
+	}
+	return string(b)
+}
+
+func cryptoRandInt(max int) (int, error) {
+	nBig, err := rand.Int(rand.Reader, big.NewInt(int64(max)))
+	if err != nil {
+		return 0, err
+	}
+	return int(nBig.Int64()), nil
 }

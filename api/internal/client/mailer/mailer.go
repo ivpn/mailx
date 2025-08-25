@@ -189,40 +189,6 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 		m.AddAlternative("text/html", headerHtml.String()+email.HTML)
 	}
 
-	// PGPSignatures
-	pgpSignatures, err := model.ExtractPGPSignatures(data)
-	if err != nil {
-		log.Println("Error extracting PGP signatures:", err)
-	} else {
-		for _, a := range pgpSignatures {
-			m.Attach(a.Filename, gomail.SetCopyFunc(func(w io.Writer) error {
-				data, err := io.ReadAll(a.Data)
-				if err != nil {
-					return err
-				}
-				_, err = w.Write(data)
-				return err
-			}))
-		}
-	}
-
-	// PGPKeys
-	pgpKeys, err := model.ExtractPGPKeys(data)
-	if err != nil {
-		log.Println("Error extracting PGP keys:", err)
-	} else {
-		for _, a := range pgpKeys {
-			m.Attach(a.Filename, gomail.SetCopyFunc(func(w io.Writer) error {
-				data, err := io.ReadAll(a.Data)
-				if err != nil {
-					return err
-				}
-				_, err = w.Write(data)
-				return err
-			}))
-		}
-	}
-
 	for _, a := range email.AttachedFiles {
 		m.Attach(a.ContentDisposition.Params["filename"], gomail.SetCopyFunc(func(w io.Writer) error {
 			_, err = w.Write(a.Data)

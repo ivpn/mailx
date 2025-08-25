@@ -3,7 +3,6 @@ module ivpn.net/email/api
 go 1.23.1
 
 require (
-	github.com/OfimaticSRL/parsemail v0.0.0-20230321032643-37a2f96e6589
 	github.com/ProtonMail/gopenpgp/v3 v3.1.2
 	github.com/alexedwards/argon2id v1.0.0
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de

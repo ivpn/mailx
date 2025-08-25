@@ -1,7 +1,5 @@
 github.com/KyleBanks/depth v1.2.1 h1:5h8fQADFrWtarTdtDudMmGsC7GPbOAu6RVB3ffsVFHc=
 github.com/KyleBanks/depth v1.2.1/go.mod h1:jzSb9d0L43HxTQfT+oSA1EEp2q+ne2uh6XgeJcm8brE=
-github.com/OfimaticSRL/parsemail v0.0.0-20230321032643-37a2f96e6589 h1:eX/Kz/VwetbRXZ7Q4fuVLSol/uTuGEmofFpyCs9jpSE=
-github.com/OfimaticSRL/parsemail v0.0.0-20230321032643-37a2f96e6589/go.mod h1:MeyUFKQUXa5bD0bfy+wf3eMotz8NdY/VxXYOQkUuHFg=
 github.com/ProtonMail/go-crypto v1.1.5 h1:eoAQfK2dwL+tFSFpr7TbOaPNUbPiJj4fLYwwGE1FQO4=
 github.com/ProtonMail/go-crypto v1.1.5/go.mod h1:rA3QumHc/FZ8pAHreoekgiAbzpNsfQAosU5td4SnOrE=
 github.com/ProtonMail/gopenpgp/v3 v3.1.2 h1:boYaqDF2e47xf5Dc4DmI+67Y9SLtKmMF68thfRgpJcc=

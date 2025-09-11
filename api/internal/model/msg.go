@@ -63,6 +63,10 @@ func ParseMsg(data []byte) (Msg, error) {
 		msgType = Reply
 	}
 
+	if isBounce(msg) {
+		msgType = Bounce
+	}
+
 	return Msg{
 		From:     from.Address,
 		FromName: from.Name,

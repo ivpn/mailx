@@ -37,7 +37,7 @@ type UserService interface {
 	GetUserByCredentials(context.Context, string, string) (model.User, error)
 	GetUserByPassword(context.Context, string, string) (model.User, error)
 	GetUserByEmail(context.Context, string) (model.User, error)
-	GetUnfinishedSignupOrPostUser(context.Context, model.User, string, string, string) (model.User, error)
+	GetUnfinishedSignupOrPostUser(context.Context, model.User, string, string, string, string) (model.User, error)
 	SaveUser(context.Context, model.User) error
 	DeleteUserRequest(context.Context, string) (string, error)
 	DeleteUser(context.Context, string, string) error
@@ -90,7 +90,7 @@ func (h *Handler) Register(c *fiber.Ctx) error {
 	}
 
 	// Get unfinished signup user or create new user
-	user, err = h.Service.GetUnfinishedSignupOrPostUser(c.Context(), user, req.SubID, req.PreauthID, req.PreauthTokenHash)
+	user, err = h.Service.GetUnfinishedSignupOrPostUser(c.Context(), user, req.SubID, req.PreauthID, req.PreauthTokenHash, req.ServiceName)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),

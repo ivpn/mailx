@@ -91,7 +91,7 @@ func (s *Service) GetUserByEmail(ctx context.Context, email string) (model.User,
 	return user, nil
 }
 
-func (s *Service) GetUnfinishedSignupOrPostUser(ctx context.Context, user model.User, subID string, preauthID string, preauthTokenHash string) (model.User, error) {
+func (s *Service) GetUnfinishedSignupOrPostUser(ctx context.Context, user model.User, subID string, preauthID string, preauthTokenHash string, serviceName string) (model.User, error) {
 	email := user.Email
 	pass := user.PasswordPlain
 	user, err := s.Store.GetUserByEmailUnfinishedSignup(ctx, email)
@@ -101,7 +101,7 @@ func (s *Service) GetUnfinishedSignupOrPostUser(ctx context.Context, user model.
 			PasswordPlain: pass,
 			IsActive:      false,
 		}
-		err = s.PostUser(ctx, user, subID, preauthID, preauthTokenHash)
+		err = s.PostUser(ctx, user, subID, preauthID, preauthTokenHash, serviceName)
 		if err != nil {
 			log.Printf("error creating user: %s", err.Error())
 			return model.User{}, ErrPostUser
@@ -135,7 +135,7 @@ func (s *Service) SaveUser(ctx context.Context, user model.User) error {
 	return nil
 }
 
-func (s *Service) PostUser(ctx context.Context, user model.User, subID string, preauthID string, preauthTokenHash string) error {
+func (s *Service) PostUser(ctx context.Context, user model.User, subID string, preauthID string, preauthTokenHash string, serviceName string) error {
 	preauth, err := s.Http.GetPreauth(preauthID)
 	if err != nil {
 		log.Printf("error creating user: %s", err.Error())
@@ -184,7 +184,7 @@ func (s *Service) PostUser(ctx context.Context, user model.User, subID string, p
 		return ErrPostUser
 	}
 
-	err = s.Http.SignupWebhook(subID)
+	err = s.Http.SignupWebhook(subID, serviceName)
 	if err != nil {
 		log.Printf("error creating user: %s", err.Error())
 		return ErrSignupWebhook

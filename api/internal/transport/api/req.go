@@ -16,6 +16,7 @@ type SignupUserReq struct {
 	SubID            string `json:"subid" validate:"required,uuid"`
 	PreauthID        string `json:"preauthid" validate:"required,uuid"`
 	PreauthTokenHash string `json:"preauthtokenhash" validate:"required,sha256"`
+	ServiceName      string `json:"service" validate:"required"`
 }
 
 type SignupEmailReq struct {
@@ -23,6 +24,7 @@ type SignupEmailReq struct {
 	SubID            string `json:"subid" validate:"required,uuid"`
 	PreauthID        string `json:"preauthid" validate:"required,uuid"`
 	PreauthTokenHash string `json:"preauthtokenhash" validate:"required,sha256"`
+	ServiceName      string `json:"service" validate:"required"`
 }
 
 type SubscriptionReq struct {

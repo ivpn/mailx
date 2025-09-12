@@ -21,12 +21,12 @@ func New(cfg config.APIConfig) *Http {
 	}
 }
 
-func (h Http) SignupWebhook(subID string) error {
+func (h Http) SignupWebhook(subID string, serviceName string) error {
 	req := fiber.Post(h.Cfg.SignupWebhookURL)
 	req.Set("Content-Type", "application/json")
 	req.Set("Accept", "application/json")
 	req.Set("Authorization", "Bearer "+h.Cfg.SignupWebhookPSK)
-	req.Body([]byte(`{"uuid": "` + subID + `"}`))
+	req.Body([]byte(`{"uuid": "` + subID + `", "service": "` + serviceName + `"}`))
 
 	status, _, err := req.Bytes()
 	if err != nil {

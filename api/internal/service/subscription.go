@@ -5,8 +5,8 @@ import (
 	"errors"
 	"log"
 
-	"github.com/araddon/dateparse"
 	"github.com/go-sql-driver/mysql"
+	"github.com/google/uuid"
 	"ivpn.net/email/api/internal/model"
 )
 
@@ -34,20 +34,17 @@ func (s *Service) GetSubscription(ctx context.Context, userID string) (model.Sub
 	return subscription, nil
 }
 
-func (s *Service) PostSubscription(ctx context.Context, userID string, subID string, activeUntil string) error {
-	activeUntilTime, err := dateparse.ParseAny(activeUntil)
-	if err != nil {
-		log.Printf("error posting subscription: %s", err.Error())
-		return ErrPostSubscription
-	}
-
+func (s *Service) PostSubscription(ctx context.Context, userID string, preauth model.Preauth) error {
 	sub := model.Subscription{
 		UserID:      userID,
-		ActiveUntil: activeUntilTime,
+		ActiveUntil: preauth.ActiveUntil,
+		IsActive:    preauth.IsActive,
+		Tier:        preauth.Tier,
+		TokenHash:   preauth.TokenHash,
 	}
-	sub.ID = subID
+	sub.ID = uuid.New().String()
 
-	err = s.Store.PostSubscription(ctx, sub)
+	err := s.Store.PostSubscription(ctx, sub)
 	if err != nil {
 		log.Printf("error posting subscription: %s", err.Error())
 		var mysqlErr *mysql.MySQLError
@@ -56,12 +53,6 @@ func (s *Service) PostSubscription(ctx context.Context, userID string, subID str
 		} else {
 			return ErrPostSubscription
 		}
-	}
-
-	err = s.Cache.Del(ctx, "sub_"+subID)
-	if err != nil {
-		log.Printf("error deleting subscription: %s", err.Error())
-		return ErrPostSubscription
 	}
 
 	return nil

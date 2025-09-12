@@ -11,14 +11,18 @@ type EmailReq struct {
 }
 
 type SignupUserReq struct {
-	Email    string `json:"email" validate:"required,emailx"`
-	Password string `json:"password" validate:"password"`
-	SubID    string `json:"subid" validate:"required,uuid"`
+	Email            string `json:"email" validate:"required,emailx"`
+	Password         string `json:"password" validate:"password"`
+	SubID            string `json:"subid" validate:"required,uuid"`
+	PreauthID        string `json:"preauthid" validate:"required,uuid"`
+	PreauthTokenHash string `json:"preauthtokenhash" validate:"required,sha256"`
 }
 
 type SignupEmailReq struct {
-	Email string `json:"email" validate:"required,emailx"`
-	SubID string `json:"subid" validate:"required,uuid"`
+	Email            string `json:"email" validate:"required,emailx"`
+	SubID            string `json:"subid" validate:"required,uuid"`
+	PreauthID        string `json:"preauthid" validate:"required,uuid"`
+	PreauthTokenHash string `json:"preauthtokenhash" validate:"required,sha256"`
 }
 
 type SubscriptionReq struct {

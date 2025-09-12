@@ -75,7 +75,7 @@ func (h *Handler) BeginRegistration(c *fiber.Ctx) error {
 	}
 
 	// Get unfinished signup user or create new user
-	user, err = h.Service.GetUnfinishedSignupOrPostUser(c.Context(), user, req.SubID)
+	user, err = h.Service.GetUnfinishedSignupOrPostUser(c.Context(), user, req.SubID, req.PreauthID, req.PreauthTokenHash)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),

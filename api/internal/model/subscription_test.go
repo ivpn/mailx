@@ -33,7 +33,7 @@ func TestSubscription_IsActive(t *testing.T) {
 			s := &Subscription{
 				ActiveUntil: tt.activeUntil,
 			}
-			if got := s.IsActive(); got != tt.want {
+			if got := s.IsActiveCheck(); got != tt.want {
 				t.Errorf("Subscription.IsActive() = %v, want %v", got, tt.want)
 			}
 		})

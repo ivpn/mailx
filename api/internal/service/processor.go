@@ -45,7 +45,7 @@ func (s *Service) ProcessMessage(data []byte) error {
 		}
 
 		// Reply | Send
-		if relayType != model.Forward && !sub.IsActive() {
+		if relayType != model.Forward && !sub.IsActiveCheck() {
 			log.Println("inactive subscription for reply/send")
 			continue
 		}

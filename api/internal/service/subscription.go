@@ -42,7 +42,6 @@ func (s *Service) PostSubscription(ctx context.Context, userID string, subID str
 	}
 
 	sub := model.Subscription{
-		Type:        model.Managed,
 		UserID:      userID,
 		ActiveUntil: activeUntilTime,
 	}
@@ -79,7 +78,6 @@ func (s *Service) AddSubscription(ctx context.Context, subscription model.Subscr
 }
 
 func (s *Service) UpdateSubscription(ctx context.Context, subscription model.Subscription) error {
-	subscription.Type = model.Managed
 	err := s.Store.UpdateSubscription(ctx, subscription)
 	if err != nil {
 		log.Printf("error updating subscription: %s", err.Error())

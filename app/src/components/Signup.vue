@@ -119,6 +119,9 @@ const apiError = ref('')
 const isLoading = ref(false)
 const passkeySupported = ref(false)
 const subid = ref('')
+const preauthid = ref('')
+const preauthtokenhash = ref('')
+const service = ref('')
 
 const validateEmail = () => {
     emailError.value = !email.value
@@ -148,7 +151,9 @@ const register = async () => {
     const data = {
         email: email.value,
         password: password.value,
-        subid: subid.value
+        subid: subid.value,
+        preauthid: preauthid.value,
+        preauthtokenhash: preauthtokenhash.value
     }
 
     try {
@@ -176,7 +181,9 @@ const registerWithPasskey = async () => {
 
     const data = {
         email: emailAuthn.value,
-        subid: subid.value
+        subid: subid.value,
+        preauthid: preauthid.value,
+        preauthtokenhash: preauthtokenhash.value
     }
 
     try {
@@ -199,10 +206,25 @@ const registerWithPasskey = async () => {
     }
 }
 
-const parseSubid = () => {
+const parseParams = () => {
     const route = useRoute()
     subid.value = route.params.subid as string
+    preauthid.value = route.params.preauthid as string
+    preauthtokenhash.value = route.params.preauthtokenhash as string
+    service.value = route.params.service as string
     if (!subid.value || !subid.value.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
+        window.location.href = '/login'
+    }
+
+    if (!preauthid.value || !preauthid.value.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
+        window.location.href = '/login'
+    }
+
+    if (!preauthtokenhash.value) {
+        window.location.href = '/login'
+    }
+
+    if (!service.value) {
         window.location.href = '/login'
     }
 }
@@ -217,7 +239,7 @@ onMounted(() => {
         window.location.href = '/'
     }
     
-    parseSubid()
+    parseParams()
     passkeySupported.value = browserSupportsWebAuthn()
     tabs.autoInit()
 })

@@ -22,6 +22,8 @@ type APIConfig struct {
 	BasicAuthPassword string
 	SignupWebhookURL  string
 	SignupWebhookPSK  string
+	PreauthURL        string
+	PreauthPSK        string
 }
 
 type DBConfig struct {
@@ -155,6 +157,8 @@ func New() (Config, error) {
 			BasicAuthPassword: os.Getenv("BASIC_AUTH_PASSWORD"),
 			SignupWebhookURL:  os.Getenv("SIGNUP_WEBHOOK_URL"),
 			SignupWebhookPSK:  os.Getenv("SIGNUP_WEBHOOK_PSK"),
+			PreauthURL:        os.Getenv("PREAUTH_URL"),
+			PreauthPSK:        os.Getenv("PREAUTH_PSK"),
 		},
 		DB: DBConfig{
 			Hosts:    dbHosts,

@@ -5,13 +5,6 @@ import (
 	"time"
 )
 
-type SubscriptionType string
-
-const (
-	Free    SubscriptionType = "Free"
-	Managed SubscriptionType = "Managed"
-)
-
 var (
 	ErrDuplicateSubscription = errors.New("subscription already exists")
 )
@@ -24,7 +17,7 @@ type Subscription struct {
 	ActiveUntil time.Time `json:"active_until"`
 	IsActive    bool      `json:"is_active"`
 	Tier        string    `json:"tier"`
-	TokenHash   string    `json:"-"`
+	TokenHash   string    `gorm:"unique" json:"-"`
 }
 
 func (s *Subscription) IsActiveCheck() bool {

@@ -208,24 +208,28 @@ const registerWithPasskey = async () => {
 
 const parseParams = () => {
     const route = useRoute()
-    subid.value = route.params.subid as string
-    preauthid.value = route.params.preauthid as string
-    preauthtokenhash.value = route.params.preauthtokenhash as string
-    service.value = route.params.service as string
+    const q = route.query
+    const first = (v: unknown) => typeof v === 'string' ? v : Array.isArray(v) ? v[0] : ''
+    subid.value = first(q.subid) || (route.params.subid as string) || ''
+    preauthid.value = first(q.preauthid) || (route.params.preauthid as string) || ''
+    preauthtokenhash.value = first(q.preauthtokenhash) || (route.params.preauthtokenhash as string) || ''
+    service.value = first(q.service) || (route.params.service as string) || ''
+    preauthtokenhash.value = preauthtokenhash.value.replace(/ /g, '+')
+
     if (!subid.value || !subid.value.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
-        window.location.href = '/login'
+        console.error('Invalid or missing subid')
     }
 
     if (!preauthid.value || !preauthid.value.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
-        window.location.href = '/login'
+        console.error('Invalid or missing preauthid')
     }
 
     if (!preauthtokenhash.value) {
-        window.location.href = '/login'
+        console.error('Invalid or missing preauthtokenhash')
     }
 
     if (!service.value) {
-        window.location.href = '/login'
+        console.error('Invalid or missing service')
     }
 }
 

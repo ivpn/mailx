@@ -153,7 +153,8 @@ const register = async () => {
         password: password.value,
         subid: subid.value,
         preauthid: preauthid.value,
-        preauthtokenhash: preauthtokenhash.value
+        preauthtokenhash: preauthtokenhash.value,
+        service: service.value
     }
 
     try {
@@ -183,7 +184,8 @@ const registerWithPasskey = async () => {
         email: emailAuthn.value,
         subid: subid.value,
         preauthid: preauthid.value,
-        preauthtokenhash: preauthtokenhash.value
+        preauthtokenhash: preauthtokenhash.value,
+        service: service.value
     }
 
     try {

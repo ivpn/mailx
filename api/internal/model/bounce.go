@@ -3,7 +3,7 @@ package model
 import "time"
 
 type Bounce struct {
-	ID             uint      `json:"-" gorm:"primaryKey"`
+	ID             string    `json:"id"`
 	CreatedAt      time.Time `json:"created_at"`
 	AttemptedAt    time.Time `json:"attempted_at"`
 	UserID         string    `json:"-"`

@@ -17,6 +17,7 @@ type Store interface {
 	SettingsStore
 	SessionStore
 	CredentialStore
+	BounceStore
 }
 
 type Cache interface {

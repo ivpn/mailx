@@ -9,11 +9,11 @@ import (
 type MessageType int
 
 const (
-	Forward MessageType = 0
-	Block   MessageType = 1
-	Reply   MessageType = 2
-	Send    MessageType = 3
-	Bounce  MessageType = 4
+	Forward    MessageType = 0
+	Block      MessageType = 1
+	Reply      MessageType = 2
+	Send       MessageType = 3
+	FailBounce MessageType = 4
 )
 
 type Message struct {

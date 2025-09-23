@@ -64,7 +64,7 @@ func ParseMsg(data []byte) (Msg, error) {
 	}
 
 	if isBounce(msg) {
-		msgType = Bounce
+		msgType = FailBounce
 	}
 
 	return Msg{

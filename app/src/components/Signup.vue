@@ -121,7 +121,6 @@ const passkeySupported = ref(false)
 const subid = ref('')
 const preauthid = ref('')
 const preauthtokenhash = ref('')
-const service = ref('')
 
 const validateEmail = () => {
     emailError.value = !email.value
@@ -153,8 +152,7 @@ const register = async () => {
         password: password.value,
         subid: subid.value,
         preauthid: preauthid.value,
-        preauthtokenhash: preauthtokenhash.value,
-        service: service.value
+        preauthtokenhash: preauthtokenhash.value
     }
 
     try {
@@ -184,8 +182,7 @@ const registerWithPasskey = async () => {
         email: emailAuthn.value,
         subid: subid.value,
         preauthid: preauthid.value,
-        preauthtokenhash: preauthtokenhash.value,
-        service: service.value
+        preauthtokenhash: preauthtokenhash.value
     }
 
     try {
@@ -215,7 +212,6 @@ const parseParams = () => {
     subid.value = first(q.subid) || (route.params.subid as string) || ''
     preauthid.value = first(q.preauthid) || (route.params.preauthid as string) || ''
     preauthtokenhash.value = first(q.preauthtokenhash) || (route.params.preauthtokenhash as string) || ''
-    service.value = first(q.service) || (route.params.service as string) || ''
     preauthtokenhash.value = preauthtokenhash.value.replace(/ /g, '+')
 
     if (!subid.value || !subid.value.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
@@ -228,10 +224,6 @@ const parseParams = () => {
 
     if (!preauthtokenhash.value) {
         console.error('Invalid or missing preauthtokenhash')
-    }
-
-    if (!service.value) {
-        console.error('Invalid or missing service')
     }
 }
 

@@ -26,12 +26,14 @@ type SubscriptionStore interface {
 }
 
 func (s *Service) GetSubscription(ctx context.Context, userID string) (model.Subscription, error) {
-	subscription, err := s.Store.GetSubscription(ctx, userID)
+	sub, err := s.Store.GetSubscription(ctx, userID)
 	if err != nil {
 		return model.Subscription{}, ErrGetSubscription
 	}
 
-	return subscription, nil
+	sub.IsGracePeriod = sub.IsGracePeriodCheck(s.Cfg.Service.ForwardGracePeriodDays)
+
+	return sub, nil
 }
 
 func (s *Service) PostSubscription(ctx context.Context, userID string, preauth model.Preauth) error {

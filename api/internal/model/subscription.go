@@ -10,14 +10,15 @@ var (
 )
 
 type Subscription struct {
-	ID          string    `gorm:"unique" json:"id"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"-"`
-	UserID      string    `json:"-"`
-	ActiveUntil time.Time `json:"active_until"`
-	IsActive    bool      `json:"is_active"`
-	Tier        string    `json:"tier"`
-	TokenHash   string    `gorm:"unique" json:"-"`
+	ID            string    `gorm:"unique" json:"id"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"-"`
+	UserID        string    `json:"-"`
+	ActiveUntil   time.Time `json:"active_until"`
+	IsActive      bool      `json:"is_active"`
+	Tier          string    `json:"tier"`
+	TokenHash     string    `gorm:"unique" json:"-"`
+	IsGracePeriod bool      `gorm:"-" json:"is_grace_period"`
 }
 
 func (s *Subscription) IsActiveCheck() bool {
@@ -26,4 +27,8 @@ func (s *Subscription) IsActiveCheck() bool {
 
 func (s *Subscription) IsActiveWithGracePeriod(days int) bool {
 	return s.ActiveUntil.AddDate(0, 0, days).After(time.Now())
+}
+
+func (s *Subscription) IsGracePeriodCheck(days int) bool {
+	return !s.IsActiveCheck() && s.IsActiveWithGracePeriod(days)
 }

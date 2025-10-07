@@ -37,7 +37,7 @@ func NotifyExpiringSubscriptionsJob(cfg config.Config, db *gorm.DB) {
 func UpdateActiveSubscriptions(db *gorm.DB) {
 	err := db.Model(&model.Subscription{}).
 		Where("active_until >= NOW()").
-		Update("notified", false).Error
+		UpdateColumn("notified", false).Error
 	if err != nil {
 		log.Println("Error resetting notified flag for active subscriptions:", err)
 	}
@@ -77,7 +77,7 @@ func MarkSubscriptionsNotified(db *gorm.DB, subs []model.Subscription) {
 
 	err := db.Model(&model.Subscription{}).
 		Where("id IN ?", ids).
-		Update("notified", true).Error
+		UpdateColumn("notified", true).Error
 	if err != nil {
 		log.Println("Error marking subscriptions as notified:", err)
 	}

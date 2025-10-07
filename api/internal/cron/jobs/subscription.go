@@ -10,7 +10,7 @@ import (
 	"ivpn.net/email/api/internal/utils"
 )
 
-func NotifyExpiringSubscriptionsJob(cfg *config.Config, db *gorm.DB) {
+func NotifyExpiringSubscriptionsJob(cfg config.Config, db *gorm.DB) {
 	// Reset `notified` for active subscriptions
 	UpdateActiveSubscriptions(db)
 
@@ -22,11 +22,11 @@ func NotifyExpiringSubscriptionsJob(cfg *config.Config, db *gorm.DB) {
 	}
 
 	if len(subs) == 0 {
-		log.Println("No expiring subscriptions found.")
 		return
 	}
 
 	// Send notifications
+	log.Printf("Notifying %d expiring subscriptions...", len(subs))
 	NotifyExpiringSubscriptions(cfg, db, subs)
 
 	// Mark as notified
@@ -36,7 +36,7 @@ func NotifyExpiringSubscriptionsJob(cfg *config.Config, db *gorm.DB) {
 // Set `notified` to false for all subscriptions that are active
 func UpdateActiveSubscriptions(db *gorm.DB) {
 	err := db.Model(&model.Subscription{}).
-		Where("notified = true AND active_until >= NOW()").
+		Where("active_until >= NOW()").
 		Update("notified", false).Error
 	if err != nil {
 		log.Println("Error resetting notified flag for active subscriptions:", err)
@@ -56,7 +56,7 @@ func GetExpiringSubscriptions(db *gorm.DB) ([]model.Subscription, error) {
 }
 
 // Send email notifications for expiring subscriptions
-func NotifyExpiringSubscriptions(cfg *config.Config, db *gorm.DB, subs []model.Subscription) {
+func NotifyExpiringSubscriptions(cfg config.Config, db *gorm.DB, subs []model.Subscription) {
 	for _, sub := range subs {
 		// Send email notification
 		err := sendSubscriptionExpiryEmail(cfg, db, sub)
@@ -84,7 +84,7 @@ func MarkSubscriptionsNotified(db *gorm.DB, subs []model.Subscription) {
 }
 
 // Send subscription expiry email
-func sendSubscriptionExpiryEmail(cfg *config.Config, db *gorm.DB, sub model.Subscription) error {
+func sendSubscriptionExpiryEmail(cfg config.Config, db *gorm.DB, sub model.Subscription) error {
 	user := model.User{}
 	err := db.Where("id = ?", sub.UserID).First(&user).Error
 	if err != nil {

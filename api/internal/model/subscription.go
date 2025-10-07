@@ -19,6 +19,7 @@ type Subscription struct {
 	Tier          string    `json:"tier"`
 	TokenHash     string    `gorm:"unique" json:"-"`
 	IsGracePeriod bool      `gorm:"-" json:"is_grace_period"`
+	Notified      bool      `json:"-"`
 }
 
 func (s *Subscription) IsActiveCheck() bool {

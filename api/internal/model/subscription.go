@@ -12,7 +12,7 @@ var (
 type Subscription struct {
 	ID            string    `gorm:"unique" json:"id"`
 	CreatedAt     time.Time `json:"created_at"`
-	UpdatedAt     time.Time `json:"-"`
+	UpdatedAt     time.Time `json:"updated_at"`
 	UserID        string    `json:"-"`
 	ActiveUntil   time.Time `json:"active_until"`
 	IsActive      bool      `json:"is_active"`

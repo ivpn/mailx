@@ -1,8 +1,29 @@
 <template>
-    <div v-if="!isActive && isDashboard" class="card-secondary m-8 mb-0">
-        <p class="m-0">
-            Your <router-link to="/account">subscription</router-link> is inactive
-        </p>
+    <div v-if="isLimited() && isDashboard" class="card-tertiary m-8 mb-0">
+        <footer>
+            <div>
+                <i class="icon info icon-primary"></i>
+            </div>
+            <div>
+                <h4>Limited Access Mode</h4>
+                <p>
+                    Your MailX account is in limited access mode. To regain full access add time to your <a href="https://www.ivpn.net/account/">IVPN account</a>.
+                </p>
+            </div>
+        </footer>
+    </div>
+    <div v-if="isPendingDelete() && isDashboard" class="card-tertiary m-8 mb-0">
+        <footer>
+            <div>
+                <i class="icon info icon-primary"></i>
+            </div>
+            <div>
+                <h4>Pending Deletion</h4>
+                <p>
+                    Your account is pending deletion. To reinstate access add time to your <a href="https://www.ivpn.net/account/">IVPN account</a>.
+                </p>
+            </div>
+        </footer>
     </div>
 </template>
 
@@ -11,24 +32,36 @@ import { onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { subscriptionApi } from '../api/subscription.ts'
 
-const res = ref({
+const sub = ref({
     id: '',
-    active_until: ''
+    active_until: '',
+    is_active: false,
+    is_grace_period: false,
 })
 
 const route = ref('/')
 const currentRoute = useRoute()
-const isActive = ref(true)
 const props = defineProps(['dashboard'])
 const isDashboard = props.dashboard
 
 const getSubscription = async () => {
     try {
-        const response = await subscriptionApi.get()
-        res.value = response.data
-        isActive.value = res.value.active_until > new Date().toISOString()
+        const res = await subscriptionApi.get()
+        sub.value = res.data
     } catch (err) {
     }
+}
+
+const isActive = () => {
+    return sub.value.active_until > new Date().toISOString()
+}
+
+const isLimited = () => {
+    return sub.value.is_grace_period && !isActive()
+}
+
+const isPendingDelete = () => {
+    return !sub.value.is_grace_period && !isActive()
 }
 
 onMounted(() => {

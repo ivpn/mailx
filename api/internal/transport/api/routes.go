@@ -54,7 +54,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Put("/user/totp/disable", limit.New(5, 10*time.Minute), h.TotpDisable)
 
 	v1.Get("/sub", h.GetSubscription)
-	v1.Post("/sub/update", limiter.New(), h.UpdateSubscription)
+	v1.Put("/sub/update", limiter.New(), h.UpdateSubscription)
 
 	v1.Get("/settings", h.GetSettings)
 	v1.Put("/settings", h.UpdateSettings)

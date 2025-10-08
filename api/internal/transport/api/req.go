@@ -26,8 +26,10 @@ type SignupEmailReq struct {
 }
 
 type SubscriptionReq struct {
-	ID          string `json:"id" validate:"required,uuid"`
-	ActiveUntil string `json:"active_until" validate:"required"`
+	ID               string `json:"id" validate:"required,uuid"`
+	SubID            string `json:"subid" validate:"required,uuid"`
+	PreauthID        string `json:"preauthid" validate:"required,uuid"`
+	PreauthTokenHash string `json:"preauthtokenhash" validate:"required"`
 }
 
 type AliasReq struct {

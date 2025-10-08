@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 
-	"github.com/araddon/dateparse"
 	"github.com/gofiber/fiber/v2"
 	"ivpn.net/email/api/internal/middleware/auth"
 	"ivpn.net/email/api/internal/model"
@@ -16,8 +15,7 @@ var (
 
 type SubscriptionService interface {
 	GetSubscription(context.Context, string) (model.Subscription, error)
-	AddSubscription(context.Context, model.Subscription, string) error
-	UpdateSubscription(context.Context, model.Subscription) error
+	UpdateSubscription(context.Context, model.Subscription, string, string, string) error
 }
 
 // @Summary Get subscription
@@ -40,47 +38,6 @@ func (h *Handler) GetSubscription(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(sub)
-}
-
-// @Summary Add subscription
-// @Description Add subscription
-// @Tags subscription
-// @Accept json
-// @Produce json
-// @Security ApiKeyAuth
-// @Param body body SubscriptionReq true "Subscription request"
-// @Success 200 {object} SuccessRes
-// @Failure 400 {object} ErrorRes
-// @Router /subscription/add [post]
-func (h *Handler) AddSubscription(c *fiber.Ctx) error {
-	req := SubscriptionReq{}
-	err := c.BodyParser(&req)
-	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"error": ErrInvalidRequest,
-		})
-	}
-
-	err = h.Validator.Struct(req)
-	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"error": ErrInvalidRequest,
-		})
-	}
-
-	sub := model.Subscription{}
-	sub.ID = req.ID
-
-	err = h.Service.AddSubscription(c.Context(), sub, req.ActiveUntil)
-	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"error": err.Error(),
-		})
-	}
-
-	return c.Status(200).JSON(fiber.Map{
-		"message": AddSubscriptionSuccess,
-	})
 }
 
 // @Summary Update subscription
@@ -109,18 +66,10 @@ func (h *Handler) UpdateSubscription(c *fiber.Ctx) error {
 		})
 	}
 
-	activeUntil, err := dateparse.ParseAny(req.ActiveUntil)
-	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"error": ErrInvalidRequest,
-		})
-	}
-
 	sub := model.Subscription{}
 	sub.ID = req.ID
-	sub.ActiveUntil = activeUntil
 
-	err = h.Service.UpdateSubscription(c.Context(), sub)
+	err = h.Service.UpdateSubscription(c.Context(), sub, req.SubID, req.PreauthID, req.PreauthTokenHash)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),

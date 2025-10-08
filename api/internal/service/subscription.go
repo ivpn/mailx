@@ -70,11 +70,38 @@ func (s *Service) AddSubscription(ctx context.Context, subscription model.Subscr
 	return nil
 }
 
-func (s *Service) UpdateSubscription(ctx context.Context, subscription model.Subscription) error {
-	err := s.Store.UpdateSubscription(ctx, subscription)
+func (s *Service) UpdateSubscription(ctx context.Context, sub model.Subscription, subID string, preauthID string, preauthTokenHash string) error {
+	preauth, err := s.Http.GetPreauth(preauthID)
+	if err != nil {
+		log.Printf("error creating user: %s", err.Error())
+		return ErrInvalidSubscription
+	}
+
+	if preauth.TokenHash != preauthTokenHash {
+		log.Printf("error creating user: Token hash does not match")
+		return ErrTokenHashMismatch
+	}
+
+	sub.ActiveUntil = preauth.ActiveUntil
+	sub.IsActive = preauth.IsActive
+	sub.Tier = preauth.Tier
+	sub.TokenHash = preauth.TokenHash
+
+	if sub.ID == "" {
+		log.Printf("error updating subscription: Subscription ID is required")
+		return ErrInvalidSubscription
+	}
+
+	err = s.Store.UpdateSubscription(ctx, sub)
 	if err != nil {
 		log.Printf("error updating subscription: %s", err.Error())
 		return ErrUpdateSubscription
+	}
+
+	err = s.Http.SignupWebhook(subID)
+	if err != nil {
+		log.Printf("error creating user: %s", err.Error())
+		return ErrSignupWebhook
 	}
 
 	return nil

@@ -5,5 +5,9 @@
         &.success {
             @apply bg-success text-white font-semibold;
         }
+
+        &.progress {
+            @apply bg-accent text-white font-semibold;
+        }
     }
 }

@@ -1,9 +1,12 @@
 <template>
     <div class="mb-5">
         <h2>Account</h2>
-        <p v-if="sub.id" class="text-sm">
+        <p v-if="sub.id && !syncing" class="text-sm">
             <span v-if="isActive()" class="badge success">Active</span>
             <span v-if="!isActive()" class="badge">Inactive</span>
+        </p>
+        <p v-if="syncing" class="text-sm">
+            <span v-if="isActive()" class="badge progress">Syncing...</span>
         </p>
         <div class="mb-3">
             <h4>Account email:</h4>
@@ -48,7 +51,8 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import tooltip from '@preline/tooltip'
 import axios from 'axios'
 import { subscriptionApi } from '../api/subscription.ts'
@@ -62,6 +66,11 @@ const sub = ref({
 })
 const error = ref('')
 const email = ref(localStorage.getItem('email'))
+const subid = ref('')
+const preauthid = ref('')
+const preauthtokenhash = ref('')
+const currentRoute = useRoute()
+const syncing = ref(false)
 
 const getSubscription = async () => {
     try {
@@ -71,6 +80,29 @@ const getSubscription = async () => {
         if (axios.isAxiosError(err)) {
             error.value = err.message
         }
+    }
+}
+
+const updateSubscription = async () => {
+    if (!subid.value || !preauthid.value || !preauthtokenhash.value) {
+        return
+    }
+
+    syncing.value = true
+    try {
+        await subscriptionApi.update({
+            id: sub.value.id,
+            subid: subid.value,
+            preauthid: preauthid.value,
+            preauthtokenhash: preauthtokenhash.value,
+        })
+        await getSubscription()
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.message
+        }
+    } finally {
+        syncing.value = false
     }
 }
 
@@ -94,9 +126,37 @@ const onUpdateEmail = (event: any) => {
     email.value = event.email
 }
 
+const parseParams = () => {
+    const route = useRoute()
+    const q = route.query
+    const first = (v: unknown) => typeof v === 'string' ? v : Array.isArray(v) ? v[0] : ''
+    subid.value = first(q.subid) || (route.params.subid as string) || ''
+    preauthid.value = first(q.preauthid) || (route.params.preauthid as string) || ''
+    preauthtokenhash.value = first(q.preauthtokenhash) || (route.params.preauthtokenhash as string) || ''
+    preauthtokenhash.value = preauthtokenhash.value.replace(/ /g, '+')
+
+    if (!subid.value || !subid.value.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
+        return
+    }
+
+    if (!preauthid.value || !preauthid.value.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
+        return
+    }
+
+    if (!preauthtokenhash.value) {
+        return
+    }
+
+    updateSubscription()
+}
+
 onMounted(() => {
     getSubscription()
     tooltip.autoInit()
     events.on('user.update', onUpdateEmail)
 })
+
+watch(currentRoute, () => {
+    parseParams()
+}, { immediate: true })
 </script>

@@ -93,10 +93,16 @@ definitions:
     properties:
       email:
         type: string
+      preauthid:
+        type: string
+      preauthtokenhash:
+        type: string
       subid:
         type: string
     required:
     - email
+    - preauthid
+    - preauthtokenhash
     - subid
     type: object
   api.SignupUserReq:
@@ -105,21 +111,33 @@ definitions:
         type: string
       password:
         type: string
+      preauthid:
+        type: string
+      preauthtokenhash:
+        type: string
       subid:
         type: string
     required:
     - email
+    - preauthid
+    - preauthtokenhash
     - subid
     type: object
   api.SubscriptionReq:
     properties:
-      active_until:
-        type: string
       id:
         type: string
+      preauthid:
+        type: string
+      preauthtokenhash:
+        type: string
+      subid:
+        type: string
     required:
-    - active_until
     - id
+    - preauthid
+    - preauthtokenhash
+    - subid
     type: object
   api.SuccessRes:
     properties:
@@ -238,17 +256,15 @@ definitions:
         type: string
       id:
         type: string
-      type:
-        $ref: '#/definitions/model.SubscriptionType'
+      is_active:
+        type: boolean
+      is_grace_period:
+        type: boolean
+      tier:
+        type: string
+      updated_at:
+        type: string
     type: object
-  model.SubscriptionType:
-    enum:
-    - Free
-    - Managed
-    type: string
-    x-enum-varnames:
-    - Free
-    - Managed
   model.TOTPBackup:
     properties:
       backup:
@@ -941,34 +957,6 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Get subscription
-      tags:
-      - subscription
-  /subscription/add:
-    post:
-      consumes:
-      - application/json
-      description: Add subscription
-      parameters:
-      - description: Subscription request
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/api.SubscriptionReq'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api.SuccessRes'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/api.ErrorRes'
-      security:
-      - ApiKeyAuth: []
-      summary: Add subscription
       tags:
       - subscription
   /subscription/update:

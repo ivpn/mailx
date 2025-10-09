@@ -1033,51 +1033,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/subscription/add": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Add subscription",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "subscription"
-                ],
-                "summary": "Add subscription",
-                "parameters": [
-                    {
-                        "description": "Subscription request",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/api.SubscriptionReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/api.SuccessRes"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/api.ErrorRes"
-                        }
-                    }
-                }
-            }
-        },
         "/subscription/update": {
             "put": {
                 "security": [
@@ -1821,10 +1776,18 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "email",
+                "preauthid",
+                "preauthtokenhash",
                 "subid"
             ],
             "properties": {
                 "email": {
+                    "type": "string"
+                },
+                "preauthid": {
+                    "type": "string"
+                },
+                "preauthtokenhash": {
                     "type": "string"
                 },
                 "subid": {
@@ -1836,6 +1799,8 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "email",
+                "preauthid",
+                "preauthtokenhash",
                 "subid"
             ],
             "properties": {
@@ -1843,6 +1808,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "password": {
+                    "type": "string"
+                },
+                "preauthid": {
+                    "type": "string"
+                },
+                "preauthtokenhash": {
                     "type": "string"
                 },
                 "subid": {
@@ -1853,14 +1824,22 @@ const docTemplate = `{
         "api.SubscriptionReq": {
             "type": "object",
             "required": [
-                "active_until",
-                "id"
+                "id",
+                "preauthid",
+                "preauthtokenhash",
+                "subid"
             ],
             "properties": {
-                "active_until": {
+                "id": {
                     "type": "string"
                 },
-                "id": {
+                "preauthid": {
+                    "type": "string"
+                },
+                "preauthtokenhash": {
+                    "type": "string"
+                },
+                "subid": {
                     "type": "string"
                 }
             }
@@ -2043,21 +2022,19 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "type": {
-                    "$ref": "#/definitions/model.SubscriptionType"
+                "is_active": {
+                    "type": "boolean"
+                },
+                "is_grace_period": {
+                    "type": "boolean"
+                },
+                "tier": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
                 }
             }
-        },
-        "model.SubscriptionType": {
-            "type": "string",
-            "enum": [
-                "Free",
-                "Managed"
-            ],
-            "x-enum-varnames": [
-                "Free",
-                "Managed"
-            ]
         },
         "model.TOTPBackup": {
             "type": "object",

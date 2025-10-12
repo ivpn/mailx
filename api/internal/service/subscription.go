@@ -32,6 +32,7 @@ func (s *Service) GetSubscription(ctx context.Context, userID string) (model.Sub
 	}
 
 	sub.Status = sub.GetStatus()
+	sub.Outage = sub.IsOutage()
 
 	return sub, nil
 }

@@ -31,7 +31,7 @@ func (s *Service) GetSubscription(ctx context.Context, userID string) (model.Sub
 		return model.Subscription{}, ErrGetSubscription
 	}
 
-	sub.IsGracePeriod = sub.IsGracePeriodCheck(s.Cfg.Service.ForwardGracePeriodDays)
+	sub.Status = sub.GetStatus()
 
 	return sub, nil
 }

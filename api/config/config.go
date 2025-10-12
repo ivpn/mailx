@@ -66,7 +66,6 @@ type ServiceConfig struct {
 	MaxDailyAliases        int
 	MaxDailySendReply      int
 	MaxSessions            int
-	ForwardGracePeriodDays int
 	AccountGracePeriodDays int
 	IdLimiterMax           int
 	IdLimiterExpiration    time.Duration
@@ -124,11 +123,6 @@ func New() (Config, error) {
 	}
 
 	maxSessions, err := strconv.Atoi(os.Getenv("MAX_SESSIONS"))
-	if err != nil {
-		return Config{}, err
-	}
-
-	forwardGracePeriodDays, err := strconv.Atoi(os.Getenv("FORWARD_GRACE_PERIOD_DAYS"))
 	if err != nil {
 		return Config{}, err
 	}
@@ -198,7 +192,6 @@ func New() (Config, error) {
 			MaxDailyAliases:        maxDailyAliases,
 			MaxDailySendReply:      maxDailySendReply,
 			MaxSessions:            maxSessions,
-			ForwardGracePeriodDays: forwardGracePeriodDays,
 			AccountGracePeriodDays: accountGracePeriodDays,
 			IdLimiterMax:           idLimiterMax,
 			IdLimiterExpiration:    idLimiterExpiration,

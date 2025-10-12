@@ -263,7 +263,7 @@ func (s *Service) ActivateUser(ctx context.Context, ID string, otp string) error
 		return nil
 	}
 
-	if !sub.IsActiveCheck() {
+	if !sub.ActiveStatus() {
 		log.Println("error creating recipient: subscription is not active")
 		return nil
 	}

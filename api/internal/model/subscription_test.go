@@ -31,7 +31,6 @@ func TestSubscriptionActive(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			s := &Subscription{ActiveUntil: tc.activeUntil}
 			got := s.Active()
@@ -90,7 +89,6 @@ func TestSubscriptionGracePeriod(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			s := &Subscription{
 				UpdatedAt:   tc.updatedAt,
@@ -145,7 +143,6 @@ func TestSubscriptionLimitedAccess(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			s := &Subscription{ActiveUntil: tc.activeUntil}
 			got := s.LimitedAccess()
@@ -197,7 +194,6 @@ func TestSubscriptionPendingDelete(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			s := &Subscription{ActiveUntil: tc.activeUntil}
 			got := s.PendingDelete()
@@ -244,7 +240,6 @@ func TestSubscriptionIsOutage(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			s := &Subscription{UpdatedAt: tc.updatedAt}
 			got := s.IsOutage()
@@ -327,7 +322,6 @@ func TestSubscriptionGracePeriodDays(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			s := &Subscription{ActiveUntil: tc.activeUntil}
 			got := s.GracePeriodDays(tc.days)

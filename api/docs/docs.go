@@ -2022,11 +2022,11 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "is_active": {
+                "outage": {
                     "type": "boolean"
                 },
-                "is_grace_period": {
-                    "type": "boolean"
+                "status": {
+                    "$ref": "#/definitions/model.SubscriptionStatus"
                 },
                 "tier": {
                     "type": "string"
@@ -2035,6 +2035,21 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "model.SubscriptionStatus": {
+            "type": "string",
+            "enum": [
+                "active",
+                "grace_period",
+                "limited_access",
+                "pending_delete"
+            ],
+            "x-enum-varnames": [
+                "Active",
+                "GracePeriod",
+                "LimitedAccess",
+                "PendingDelete"
+            ]
         },
         "model.TOTPBackup": {
             "type": "object",

@@ -256,15 +256,27 @@ definitions:
         type: string
       id:
         type: string
-      is_active:
+      outage:
         type: boolean
-      is_grace_period:
-        type: boolean
+      status:
+        $ref: '#/definitions/model.SubscriptionStatus'
       tier:
         type: string
       updated_at:
         type: string
     type: object
+  model.SubscriptionStatus:
+    enum:
+    - active
+    - grace_period
+    - limited_access
+    - pending_delete
+    type: string
+    x-enum-varnames:
+    - Active
+    - GracePeriod
+    - LimitedAccess
+    - PendingDelete
   model.TOTPBackup:
     properties:
       backup:

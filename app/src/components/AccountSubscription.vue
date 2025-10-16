@@ -54,7 +54,7 @@
                 <div>
                     <h4>Out of sync</h4>
                     <p>
-                        Your account status last update was at {{ updatedAtDate() }}. <a target="_blank" href="https://www.ivpn.net/account/">Sync with IVPN</a>
+                        Your last account status update was {{ updatedAtDate() }}. <a target="_blank" href="https://www.ivpn.net/account/">Sync with IVPN</a>
                     </p>
                 </div>
             </footer>

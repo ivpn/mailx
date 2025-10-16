@@ -7,7 +7,7 @@
             <div>
                 <h4>Limited Access Mode</h4>
                 <p>
-                    Your MailX account is in limited access mode. To regain full access add time to your <a href="https://www.ivpn.net/account/">IVPN account</a>.
+                    Your MailX account is in limited access mode. To regain full access add time to your <a target="_blank" href="https://www.ivpn.net/account/">IVPN account</a>.
                 </p>
             </div>
         </footer>
@@ -20,7 +20,7 @@
             <div>
                 <h4>Pending Deletion</h4>
                 <p>
-                    Your account is pending deletion. To reinstate access add time to your <a href="https://www.ivpn.net/account/">IVPN account</a>.
+                    Your account is pending deletion. To reinstate access add time to your <a target="_blank" href="https://www.ivpn.net/account/">IVPN account</a>.
                 </p>
             </div>
         </footer>

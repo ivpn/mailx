@@ -28,7 +28,7 @@
                 <div>
                     <h4>Limited Access Mode</h4>
                     <p>
-                        Your MailX account is in limited access mode. To regain full access add time to your <a href="https://www.ivpn.net/account/">IVPN account</a>.
+                        Your MailX account is in limited access mode. To regain full access add time to your <a target="_blank" href="https://www.ivpn.net/account/">IVPN account</a>.
                     </p>
                 </div>
             </footer>
@@ -41,7 +41,20 @@
                 <div>
                     <h4>Pending Deletion</h4>
                     <p>
-                        Your account is pending deletion. To reinstate access add time to your <a href="https://www.ivpn.net/account/">IVPN account</a>.
+                        Your account is pending deletion. To reinstate access add time to your <a target="_blank" href="https://www.ivpn.net/account/">IVPN account</a>.
+                    </p>
+                </div>
+            </footer>
+        </div>
+        <div v-if="isOutage()" class="card-tertiary">
+            <footer>
+                <div>
+                    <i class="icon info icon-primary"></i>
+                </div>
+                <div>
+                    <h4>Out of sync</h4>
+                    <p>
+                        Your account status last update was at {{ updatedAtDate() }}. <a target="_blank" href="https://www.ivpn.net/account/">Sync with IVPN</a>
                     </p>
                 </div>
             </footer>
@@ -62,7 +75,9 @@ const sub = ref({
     id: '',
     active_until: '',
     is_active: false,
+    updated_at: '',
     is_grace_period: false,
+    outage: false,
 })
 const error = ref('')
 const email = ref(localStorage.getItem('email'))
@@ -122,8 +137,16 @@ const activeUntilDate = () => {
     return new Date(sub.value.active_until).toDateString()
 }
 
+const updatedAtDate = () => {
+    return new Date(sub.value.updated_at).toLocaleString()
+}
+
 const onUpdateEmail = (event: any) => {
     email.value = event.email
+}
+
+const isOutage = () => {
+    return sub.value.outage
 }
 
 const parseParams = () => {

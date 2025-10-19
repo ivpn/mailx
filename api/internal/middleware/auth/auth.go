@@ -134,6 +134,17 @@ func NewCookieTempAuthn(token string, path string, cfg config.APIConfig) *fiber.
 	}
 }
 
+func NewCookiePASession(id string) *fiber.Cookie {
+	return &fiber.Cookie{
+		Name:     "pasession",
+		Value:    id,
+		HTTPOnly: true,
+		Secure:   true,
+		MaxAge:   900, // 15 minutes
+		Expires:  time.Now().Add(15 * time.Minute),
+	}
+}
+
 func NewWebAuthn(cfg config.APIConfig) *webauthn.WebAuthn {
 	var webAuthn *webauthn.WebAuthn
 	config := &webauthn.Config{

@@ -83,3 +83,7 @@ type PASessionReq struct {
 	PreAuthID string `json:"preauth_id" validate:"required,uuid"`
 	Token     string `json:"token" validate:"required"`
 }
+
+type RotatePASessionReq struct {
+	ID string `json:"id" validate:"required,uuid"`
+}

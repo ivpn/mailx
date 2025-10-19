@@ -152,3 +152,34 @@ func (s *Service) GetPASession(ctx context.Context, id string) (model.PASession,
 
 	return paSession, nil
 }
+
+func (s *Service) RotatePASessionId(ctx context.Context, id string) (string, error) {
+	paSession, err := s.GetPASession(ctx, id)
+	if err != nil {
+		log.Println("failed to get pre-auth session for rotation:", err)
+		return "", err
+	}
+
+	newID := uuid.New().String()
+	paSession.ID = newID
+
+	data, err := json.Marshal(paSession)
+	if err != nil {
+		log.Println("failed to marshal rotated pre-auth session to JSON:", err)
+		return "", err
+	}
+
+	err = s.Cache.Set(ctx, "pasession_"+newID, string(data), 15*time.Minute)
+	if err != nil {
+		log.Println("failed to set rotated pre-auth session in Redis:", err)
+		return "", err
+	}
+
+	err = s.Cache.Del(ctx, "pasession_"+id)
+	if err != nil {
+		log.Println("failed to delete old pre-auth session from Redis:", err)
+		return "", err
+	}
+
+	return newID, nil
+}

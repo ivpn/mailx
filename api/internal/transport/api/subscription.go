@@ -11,12 +11,14 @@ import (
 var (
 	UpdateSubscriptionSuccess = "Subscription updated successfully."
 	AddSubscriptionSuccess    = "Subscription added successfully."
+	InvalidPASessionId        = "Invalid pre-auth session ID."
 )
 
 type SubscriptionService interface {
 	GetSubscription(context.Context, string) (model.Subscription, error)
 	UpdateSubscription(context.Context, model.Subscription, string, string, string) error
 	AddPASession(context.Context, model.PASession) error
+	RotatePASessionId(context.Context, string) (string, error)
 }
 
 // @Summary Get subscription
@@ -122,4 +124,41 @@ func (h *Handler) AddPASession(c *fiber.Ctx) error {
 	}
 
 	return nil
+}
+
+// @Summary Rotate pre-auth session ID
+// @Description Rotate pre-auth session ID
+// @Tags subscription
+// @Accept json
+// @Produce json
+// @Param body body RotatePASessionReq true "Rotate pre-auth session request"
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /rotatepasession [put]
+func (h *Handler) RotatePASession(c *fiber.Ctx) error {
+	req := RotatePASessionReq{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": InvalidPASessionId,
+		})
+	}
+
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": InvalidPASessionId,
+		})
+	}
+
+	newID, err := h.Service.RotatePASessionId(c.Context(), req.ID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": InvalidPASessionId,
+		})
+	}
+
+	c.Cookie(auth.NewCookiePASession(newID))
+
+	return c.SendStatus(fiber.StatusOK)
 }

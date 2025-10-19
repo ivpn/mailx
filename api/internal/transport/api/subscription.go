@@ -16,6 +16,7 @@ var (
 type SubscriptionService interface {
 	GetSubscription(context.Context, string) (model.Subscription, error)
 	UpdateSubscription(context.Context, model.Subscription, string, string, string) error
+	AddPASession(context.Context, model.PASession) error
 }
 
 // @Summary Get subscription
@@ -79,4 +80,46 @@ func (h *Handler) UpdateSubscription(c *fiber.Ctx) error {
 	return c.Status(200).JSON(fiber.Map{
 		"message": UpdateSubscriptionSuccess,
 	})
+}
+
+// @Summary Add pre-auth session
+// @Description Add pre-auth session
+// @Tags subscription
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param body body PASessionReq true "Pre-auth session request"
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /sub/session [post]
+func (h *Handler) AddPASession(c *fiber.Ctx) error {
+	req := PASessionReq{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	paSession := model.PASession{
+		ID:        req.ID,
+		PreAuthID: req.PreAuthID,
+		Token:     req.Token,
+	}
+
+	err = h.Service.AddPASession(c.Context(), paSession)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return nil
 }

@@ -33,6 +33,10 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	h.Server.Post("/v1/login/begin", limiter.New(), h.BeginLogin)
 	h.Server.Post("/v1/login/finish", limiter.New(), h.FinishLogin)
 
+	session := h.Server.Group("/v1/sub/session")
+	session.Use(auth.NewPSK(cfg))
+	session.Post("", h.AddPASession)
+
 	v1 := h.Server.Group("/v1")
 	v1.Use(auth.New(cfg, h.Cache, h.Service))
 

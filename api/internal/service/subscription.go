@@ -2,8 +2,10 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"log"
+	"time"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
@@ -116,4 +118,37 @@ func (s *Service) DeleteSubscription(ctx context.Context, userID string) error {
 	}
 
 	return nil
+}
+
+func (s *Service) AddPASession(ctx context.Context, paSession model.PASession) error {
+	data, err := json.Marshal(paSession)
+	if err != nil {
+		log.Println("failed to marshal pre-auth session to JSON:", err)
+		return err
+	}
+
+	err = s.Cache.Set(ctx, "pasession_"+paSession.ID, string(data), 15*time.Minute)
+	if err != nil {
+		log.Println("failed to set pre-auth session in Redis:", err)
+		return err
+	}
+
+	return nil
+}
+
+func (s *Service) GetPASession(ctx context.Context, id string) (model.PASession, error) {
+	data, err := s.Cache.Get(ctx, "pasession_"+id)
+	if err != nil {
+		log.Println("failed to get pre-auth session from Redis:", err)
+		return model.PASession{}, err
+	}
+
+	var paSession model.PASession
+	err = json.Unmarshal([]byte(data), &paSession)
+	if err != nil {
+		log.Println("failed to unmarshal pre-auth session JSON:", err)
+		return model.PASession{}, err
+	}
+
+	return paSession, nil
 }

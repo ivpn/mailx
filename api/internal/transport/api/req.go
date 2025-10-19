@@ -77,3 +77,9 @@ type ActivateReq struct {
 type TotpReq struct {
 	OTP string `json:"otp" validate:"required,min=6,max=8"`
 }
+
+type PASessionReq struct {
+	ID        string `json:"id" validate:"required,uuid"`
+	PreAuthID string `json:"preauth_id" validate:"required,uuid"`
+	Token     string `json:"token" validate:"required"`
+}

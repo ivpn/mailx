@@ -104,6 +104,7 @@ import { ref, onMounted, onUpdated } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
 import { userApi } from '../api/user.ts'
+import { subscriptionApi } from '../api/subscription.ts'
 import { startRegistration, browserSupportsWebAuthn } from '@simplewebauthn/browser'
 import tabs from '@preline/tabs'
 import Footer from './Footer.vue'
@@ -119,8 +120,8 @@ const apiError = ref('')
 const isLoading = ref(false)
 const passkeySupported = ref(false)
 const subid = ref('')
-const preauthid = ref('')
-const preauthtokenhash = ref('')
+const sessionid = ref('')
+const syncing = ref(false)
 
 const validateEmail = () => {
     emailError.value = !email.value
@@ -129,7 +130,7 @@ const validateEmail = () => {
 
 const validateEmailAuthn = () => {
     emailAuthnError.value = !emailAuthn.value
-    return !emailAuthnError.value
+    return !emailAuthnError.value && syncing.value === false
 }
 
 const validatePassword = () => {
@@ -140,7 +141,7 @@ const validatePassword = () => {
 const validate = () => {
     const validEmail = validateEmail()
     const validPass = validatePassword()
-    return validEmail && validPass
+    return validEmail && validPass && syncing.value === false
 }
 
 const register = async () => {
@@ -151,8 +152,6 @@ const register = async () => {
         email: email.value,
         password: password.value,
         subid: subid.value,
-        preauthid: preauthid.value,
-        preauthtokenhash: preauthtokenhash.value
     }
 
     try {
@@ -181,8 +180,6 @@ const registerWithPasskey = async () => {
     const data = {
         email: emailAuthn.value,
         subid: subid.value,
-        preauthid: preauthid.value,
-        preauthtokenhash: preauthtokenhash.value
     }
 
     try {
@@ -205,26 +202,43 @@ const registerWithPasskey = async () => {
     }
 }
 
+const rotateSessionId = async () => {
+    if (!sessionid.value) {
+        return
+    }
+
+    syncing.value = true
+    try {
+        await subscriptionApi.rotateSessionId({
+            sessionid: sessionid.value,
+        })
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            apiError.value = err.message
+        }
+    } finally {
+        syncing.value = false
+    }
+}
+
 const parseParams = () => {
     const route = useRoute()
     const q = route.query
     const first = (v: unknown) => typeof v === 'string' ? v : Array.isArray(v) ? v[0] : ''
     subid.value = first(q.subid) || (route.params.subid as string) || ''
-    preauthid.value = first(q.preauthid) || (route.params.preauthid as string) || ''
-    preauthtokenhash.value = first(q.preauthtokenhash) || (route.params.preauthtokenhash as string) || ''
-    preauthtokenhash.value = preauthtokenhash.value.replace(/ /g, '+')
+    sessionid.value = first(q.sessionid) || (route.params.sessionid as string) || ''
 
     if (!subid.value || !subid.value.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
         console.error('Invalid or missing subid')
+        return
     }
 
-    if (!preauthid.value || !preauthid.value.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
-        console.error('Invalid or missing preauthid')
+    if (!sessionid.value || !sessionid.value.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
+        console.error('Invalid or missing sessionid')
+        return
     }
 
-    if (!preauthtokenhash.value) {
-        console.error('Invalid or missing preauthtokenhash')
-    }
+    rotateSessionId()
 }
 
 const isLoggedIn = (): boolean => {

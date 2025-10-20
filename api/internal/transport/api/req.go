@@ -85,5 +85,5 @@ type PASessionReq struct {
 }
 
 type RotatePASessionReq struct {
-	ID string `json:"id" validate:"required,uuid"`
+	ID string `json:"sessionid" validate:"required,uuid"`
 }

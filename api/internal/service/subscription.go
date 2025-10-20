@@ -84,12 +84,12 @@ func (s *Service) UpdateSubscription(ctx context.Context, sub model.Subscription
 		return ErrPASessionNotFound
 	}
 
-	preauthID := paSession.PreauthId
+	preauthId := paSession.PreauthId
 	token := paSession.Token
 	tokenHash := sha256.Sum256([]byte(token))
 	tokenHashStr := base64.StdEncoding.EncodeToString(tokenHash[:])
 
-	preauth, err := s.Http.GetPreauth(preauthID)
+	preauth, err := s.Http.GetPreauth(preauthId)
 	if err != nil {
 		log.Printf("error creating user: %s", err.Error())
 		return ErrPANotFound

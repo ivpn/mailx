@@ -922,6 +922,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/rotatepasession": {
+            "put": {
+                "description": "Rotate pre-auth session ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "subscription"
+                ],
+                "summary": "Rotate pre-auth session ID",
+                "parameters": [
+                    {
+                        "description": "Rotate pre-auth session request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.RotatePASessionReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
         "/settings": {
             "get": {
                 "security": [
@@ -1022,6 +1062,51 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/model.Subscription"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/sub/session": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Add pre-auth session",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "subscription"
+                ],
+                "summary": "Add pre-auth session",
+                "parameters": [
+                    {
+                        "description": "Pre-auth session request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.PASessionReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
                     "400": {
@@ -1715,6 +1800,25 @@ const docTemplate = `{
                 }
             }
         },
+        "api.PASessionReq": {
+            "type": "object",
+            "required": [
+                "id",
+                "preauth_id",
+                "token"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "preauth_id": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
         "api.RecipientReq": {
             "type": "object",
             "required": [
@@ -1749,6 +1853,17 @@ const docTemplate = `{
                 }
             }
         },
+        "api.RotatePASessionReq": {
+            "type": "object",
+            "required": [
+                "sessionid"
+            ],
+            "properties": {
+                "sessionid": {
+                    "type": "string"
+                }
+            }
+        },
         "api.SettingsReq": {
             "type": "object",
             "required": [
@@ -1776,18 +1891,10 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "email",
-                "preauthid",
-                "preauthtokenhash",
                 "subid"
             ],
             "properties": {
                 "email": {
-                    "type": "string"
-                },
-                "preauthid": {
-                    "type": "string"
-                },
-                "preauthtokenhash": {
                     "type": "string"
                 },
                 "subid": {
@@ -1799,8 +1906,6 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "email",
-                "preauthid",
-                "preauthtokenhash",
                 "subid"
             ],
             "properties": {
@@ -1808,12 +1913,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "password": {
-                    "type": "string"
-                },
-                "preauthid": {
-                    "type": "string"
-                },
-                "preauthtokenhash": {
                     "type": "string"
                 },
                 "subid": {
@@ -1825,18 +1924,10 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "id",
-                "preauthid",
-                "preauthtokenhash",
                 "subid"
             ],
             "properties": {
                 "id": {
-                    "type": "string"
-                },
-                "preauthid": {
-                    "type": "string"
-                },
-                "preauthtokenhash": {
                     "type": "string"
                 },
                 "subid": {

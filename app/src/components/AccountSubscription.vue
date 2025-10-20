@@ -128,6 +128,7 @@ const rotateSessionId = async () => {
         await subscriptionApi.rotateSessionId({
             sessionid: sessionid.value,
         })
+        await getSubscription()
         await updateSubscription()
     } catch (err) {
         if (axios.isAxiosError(err)) {

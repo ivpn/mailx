@@ -16,7 +16,7 @@ var (
 
 type SubscriptionService interface {
 	GetSubscription(context.Context, string) (model.Subscription, error)
-	UpdateSubscription(context.Context, model.Subscription, string, string, string) error
+	UpdateSubscription(context.Context, model.Subscription, string, string) error
 	AddPASession(context.Context, model.PASession) error
 	RotatePASessionId(context.Context, string) (string, error)
 }
@@ -54,6 +54,8 @@ func (h *Handler) GetSubscription(c *fiber.Ctx) error {
 // @Failure 400 {object} ErrorRes
 // @Router /subscription/update [put]
 func (h *Handler) UpdateSubscription(c *fiber.Ctx) error {
+	sessionId := c.Cookies(auth.PA_SESSION_COOKIE)
+
 	req := SubscriptionReq{}
 	err := c.BodyParser(&req)
 	if err != nil {
@@ -72,7 +74,7 @@ func (h *Handler) UpdateSubscription(c *fiber.Ctx) error {
 	sub := model.Subscription{}
 	sub.ID = req.ID
 
-	err = h.Service.UpdateSubscription(c.Context(), sub, req.SubID, req.PreauthID, req.PreauthTokenHash)
+	err = h.Service.UpdateSubscription(c.Context(), sub, req.SubID, sessionId)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
@@ -112,7 +114,7 @@ func (h *Handler) AddPASession(c *fiber.Ctx) error {
 
 	paSession := model.PASession{
 		ID:        req.ID,
-		PreAuthID: req.PreAuthID,
+		PreauthId: req.PreauthId,
 		Token:     req.Token,
 	}
 

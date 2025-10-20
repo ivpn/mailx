@@ -26,10 +26,8 @@ type SignupEmailReq struct {
 }
 
 type SubscriptionReq struct {
-	ID               string `json:"id" validate:"required,uuid"`
-	SubID            string `json:"subid" validate:"required,uuid"`
-	PreauthID        string `json:"preauthid" validate:"required,uuid"`
-	PreauthTokenHash string `json:"preauthtokenhash" validate:"required"`
+	ID    string `json:"id" validate:"required,uuid"`
+	SubID string `json:"subid" validate:"required,uuid"`
 }
 
 type AliasReq struct {
@@ -80,7 +78,7 @@ type TotpReq struct {
 
 type PASessionReq struct {
 	ID        string `json:"id" validate:"required,uuid"`
-	PreAuthID string `json:"preauth_id" validate:"required,uuid"`
+	PreauthId string `json:"preauth_id" validate:"required,uuid"`
 	Token     string `json:"token" validate:"required"`
 }
 

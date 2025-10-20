@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"log"
@@ -18,6 +20,8 @@ var (
 	ErrPostSubscription   = errors.New("Unable to create subscription.")
 	ErrUpdateSubscription = errors.New("Unable to update subscription.")
 	ErrDeleteSubscription = errors.New("Unable to delete subscription.")
+	ErrPANotFound         = errors.New("Pre-auth entry not found.")
+	ErrPASessionNotFound  = errors.New("Pre-auth session not found.")
 )
 
 type SubscriptionStore interface {
@@ -73,14 +77,25 @@ func (s *Service) AddSubscription(ctx context.Context, subscription model.Subscr
 	return nil
 }
 
-func (s *Service) UpdateSubscription(ctx context.Context, sub model.Subscription, subID string, preauthID string, preauthTokenHash string) error {
+func (s *Service) UpdateSubscription(ctx context.Context, sub model.Subscription, subID string, sessionId string) error {
+	paSession, err := s.GetPASession(ctx, sessionId)
+	if err != nil {
+		log.Printf("error creating user: %s", err.Error())
+		return ErrPASessionNotFound
+	}
+
+	preauthID := paSession.PreauthId
+	token := paSession.Token
+	tokenHash := sha256.Sum256([]byte(token))
+	tokenHashStr := base64.StdEncoding.EncodeToString(tokenHash[:])
+
 	preauth, err := s.Http.GetPreauth(preauthID)
 	if err != nil {
 		log.Printf("error creating user: %s", err.Error())
-		return ErrInvalidSubscription
+		return ErrPANotFound
 	}
 
-	if preauth.TokenHash != preauthTokenHash {
+	if preauth.TokenHash != tokenHashStr {
 		log.Printf("error creating user: Token hash does not match")
 		return ErrTokenHashMismatch
 	}

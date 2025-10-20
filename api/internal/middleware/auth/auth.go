@@ -24,6 +24,7 @@ const (
 	AUTH_COOKIE       = "auth"
 	AUTHN_COOKIE      = "authn"
 	AUTHN_TEMP_COOKIE = "authntemp"
+	PA_SESSION_COOKIE = "pasession"
 	USER_ID           = "user_id"
 )
 
@@ -136,7 +137,7 @@ func NewCookieTempAuthn(token string, path string, cfg config.APIConfig) *fiber.
 
 func NewCookiePASession(id string) *fiber.Cookie {
 	return &fiber.Cookie{
-		Name:     "pasession",
+		Name:     PA_SESSION_COOKIE,
 		Value:    id,
 		HTTPOnly: true,
 		Secure:   true,

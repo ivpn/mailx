@@ -1,5 +1,5 @@
 <template>
-    <div v-if="isLimited() && isDashboard" class="card-tertiary m-8 mb-0">
+    <div v-if="isLimited() && isDashboard && sub.id" class="card-tertiary m-8 mb-0">
         <footer>
             <div>
                 <i class="icon info icon-primary"></i>
@@ -12,7 +12,7 @@
             </div>
         </footer>
     </div>
-    <div v-if="isPendingDelete() && isDashboard" class="card-tertiary m-8 mb-0">
+    <div v-if="isPendingDelete() && isDashboard && sub.id" class="card-tertiary m-8 mb-0">
         <footer>
             <div>
                 <i class="icon info icon-primary"></i>

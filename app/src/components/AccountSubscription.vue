@@ -92,7 +92,7 @@ const getSubscription = async () => {
         sub.value = res.data
     } catch (err) {
         if (axios.isAxiosError(err)) {
-            error.value = err.message
+            error.value = err.response?.data.error || err.message
         }
     }
 }
@@ -111,7 +111,7 @@ const updateSubscription = async () => {
         await getSubscription()
     } catch (err) {
         if (axios.isAxiosError(err)) {
-            error.value = err.message
+            error.value = err.response?.data.error || err.message
         }
     } finally {
         syncing.value = false
@@ -132,7 +132,7 @@ const rotateSessionId = async () => {
         await updateSubscription()
     } catch (err) {
         if (axios.isAxiosError(err)) {
-            error.value = err.message
+            error.value = err.response?.data.error || err.message
         }
     } finally {
         syncing.value = false

@@ -55,6 +55,7 @@ func (h *Handler) GetSubscription(c *fiber.Ctx) error {
 // @Router /subscription/update [put]
 func (h *Handler) UpdateSubscription(c *fiber.Ctx) error {
 	sessionId := c.Cookies(auth.PA_SESSION_COOKIE)
+	userID := auth.GetUserID(c)
 
 	req := SubscriptionReq{}
 	err := c.BodyParser(&req)
@@ -73,6 +74,12 @@ func (h *Handler) UpdateSubscription(c *fiber.Ctx) error {
 
 	sub := model.Subscription{}
 	sub.ID = req.ID
+	sub, err = h.Service.GetSubscription(c.Context(), userID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
 
 	err = h.Service.UpdateSubscription(c.Context(), sub, req.SubID, sessionId)
 	if err != nil {

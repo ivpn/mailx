@@ -105,7 +105,7 @@ func (s *Service) UpdateSubscription(ctx context.Context, sub model.Subscription
 	sub.Tier = preauth.Tier
 	sub.TokenHash = preauth.TokenHash
 
-	if sub.ID == "" {
+	if sub.ID == "" || sub.UserID == "" {
 		log.Printf("error updating subscription: Subscription ID is required")
 		return ErrInvalidSubscription
 	}

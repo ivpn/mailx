@@ -34,9 +34,10 @@ import { subscriptionApi } from '../api/subscription.ts'
 
 const sub = ref({
     id: '',
+    updated_at: '',
     active_until: '',
-    is_active: false,
-    is_grace_period: false,
+    status: '',
+    outage: false,
 })
 
 const route = ref('/')
@@ -52,16 +53,12 @@ const getSubscription = async () => {
     }
 }
 
-const isActive = () => {
-    return sub.value.active_until > new Date().toISOString()
-}
-
 const isLimited = () => {
-    return sub.value.is_grace_period && !isActive()
+    return sub.value.status === 'limited_access'
 }
 
 const isPendingDelete = () => {
-    return !sub.value.is_grace_period && !isActive()
+    return sub.value.status === 'pending_delete'
 }
 
 onMounted(() => {

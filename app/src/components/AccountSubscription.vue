@@ -73,10 +73,9 @@ import events from '../events.ts'
 
 const sub = ref({
     id: '',
-    active_until: '',
-    is_active: false,
     updated_at: '',
-    is_grace_period: false,
+    active_until: '',
+    status: '',
     outage: false,
 })
 const error = ref('')
@@ -140,15 +139,15 @@ const rotateSessionId = async () => {
 }
 
 const isActive = () => {
-    return sub.value.active_until > new Date().toISOString()
+    return sub.value.status === 'active'
 }
 
 const isLimited = () => {
-    return sub.value.is_grace_period && !isActive()
+    return sub.value.status === 'limited_access'
 }
 
 const isPendingDelete = () => {
-    return !sub.value.is_grace_period && !isActive()
+    return sub.value.status === 'pending_delete'
 }
 
 const activeUntilDate = () => {

@@ -80,7 +80,7 @@ func (s *Service) AddSubscription(ctx context.Context, subscription model.Subscr
 func (s *Service) UpdateSubscription(ctx context.Context, sub model.Subscription, subID string, sessionId string) error {
 	paSession, err := s.GetPASession(ctx, sessionId)
 	if err != nil {
-		log.Printf("error creating user: %s", err.Error())
+		log.Printf("error updating subscription: %s", err.Error())
 		return ErrPASessionNotFound
 	}
 
@@ -91,12 +91,12 @@ func (s *Service) UpdateSubscription(ctx context.Context, sub model.Subscription
 
 	preauth, err := s.Http.GetPreauth(preauthId)
 	if err != nil {
-		log.Printf("error creating user: %s", err.Error())
+		log.Printf("error updating subscription: %s", err.Error())
 		return ErrPANotFound
 	}
 
 	if preauth.TokenHash != tokenHashStr {
-		log.Printf("error creating user: Token hash does not match")
+		log.Printf("error updating subscription: Token hash does not match")
 		return ErrTokenHashMismatch
 	}
 
@@ -118,7 +118,7 @@ func (s *Service) UpdateSubscription(ctx context.Context, sub model.Subscription
 
 	err = s.Http.SignupWebhook(subID)
 	if err != nil {
-		log.Printf("error creating user: %s", err.Error())
+		log.Printf("error updating subscription: %s", err.Error())
 		return ErrSignupWebhook
 	}
 

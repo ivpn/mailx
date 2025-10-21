@@ -11,8 +11,7 @@ services:
       - "127.0.0.1:465:465"  # ESMTP (implicit TLS)
       - "127.0.0.1:587:587"  # ESMTP (explicit TLS => STARTTLS)
     volumes:
-      - ./docker-data/certbot/certs/live/:/etc/letsencrypt
-      - /etc/letsencrypt/:/etc/letsencrypt/
+      - ./docker-data/certbot/certs/:/etc/letsencrypt
       - ./docker-data/dms/mail-data/:/var/mail/
       - ./docker-data/dms/mail-logs/:/var/log/mail/
       - ./docker-data/dms/config/:/tmp/docker-mailserver/

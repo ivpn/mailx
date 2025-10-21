@@ -39,13 +39,13 @@ func (s *Service) ProcessMessage(data []byte) error {
 		}
 
 		// Forward
-		if relayType == model.Forward && !sub.IsActiveWithGracePeriod(s.Cfg.Service.ForwardGracePeriodDays) {
+		if relayType == model.Forward && sub.PendingDelete() {
 			log.Println("inactive subscription for forward")
 			continue
 		}
 
 		// Reply | Send
-		if relayType != model.Forward && !sub.IsActiveCheck() {
+		if relayType != model.Forward && !sub.ActiveStatus() {
 			log.Println("inactive subscription for reply/send")
 			continue
 		}

@@ -52,6 +52,19 @@ definitions:
       error:
         type: string
     type: object
+  api.PASessionReq:
+    properties:
+      id:
+        type: string
+      preauth_id:
+        type: string
+      token:
+        type: string
+    required:
+    - id
+    - preauth_id
+    - token
+    type: object
   api.RecipientReq:
     properties:
       id:
@@ -73,6 +86,13 @@ definitions:
         type: string
     required:
     - otp
+    type: object
+  api.RotatePASessionReq:
+    properties:
+      sessionid:
+        type: string
+    required:
+    - sessionid
     type: object
   api.SettingsReq:
     properties:
@@ -113,13 +133,13 @@ definitions:
     type: object
   api.SubscriptionReq:
     properties:
-      active_until:
-        type: string
       id:
         type: string
+      subid:
+        type: string
     required:
-    - active_until
     - id
+    - subid
     type: object
   api.SuccessRes:
     properties:
@@ -238,17 +258,27 @@ definitions:
         type: string
       id:
         type: string
-      type:
-        $ref: '#/definitions/model.SubscriptionType'
+      outage:
+        type: boolean
+      status:
+        $ref: '#/definitions/model.SubscriptionStatus'
+      tier:
+        type: string
+      updated_at:
+        type: string
     type: object
-  model.SubscriptionType:
+  model.SubscriptionStatus:
     enum:
-    - Free
-    - Managed
+    - active
+    - grace_period
+    - limited_access
+    - pending_delete
     type: string
     x-enum-varnames:
-    - Free
-    - Managed
+    - Active
+    - GracePeriod
+    - LimitedAccess
+    - PendingDelete
   model.TOTPBackup:
     properties:
       backup:
@@ -874,6 +904,32 @@ paths:
       summary: Reset password
       tags:
       - user
+  /rotatepasession:
+    put:
+      consumes:
+      - application/json
+      description: Rotate pre-auth session ID
+      parameters:
+      - description: Rotate pre-auth session request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.RotatePASessionReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Rotate pre-auth session ID
+      tags:
+      - subscription
   /settings:
     get:
       consumes:
@@ -943,18 +999,18 @@ paths:
       summary: Get subscription
       tags:
       - subscription
-  /subscription/add:
+  /sub/session:
     post:
       consumes:
       - application/json
-      description: Add subscription
+      description: Add pre-auth session
       parameters:
-      - description: Subscription request
+      - description: Pre-auth session request
         in: body
         name: body
         required: true
         schema:
-          $ref: '#/definitions/api.SubscriptionReq'
+          $ref: '#/definitions/api.PASessionReq'
       produces:
       - application/json
       responses:
@@ -968,7 +1024,7 @@ paths:
             $ref: '#/definitions/api.ErrorRes'
       security:
       - ApiKeyAuth: []
-      summary: Add subscription
+      summary: Add pre-auth session
       tags:
       - subscription
   /subscription/update:

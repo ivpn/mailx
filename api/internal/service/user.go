@@ -2,7 +2,9 @@ package service
 
 import (
 	"context"
+	"crypto/sha256"
 	"encoding/base32"
+	"encoding/base64"
 	"errors"
 	"log"
 	"strings"
@@ -91,7 +93,7 @@ func (s *Service) GetUserByEmail(ctx context.Context, email string) (model.User,
 	return user, nil
 }
 
-func (s *Service) GetUnfinishedSignupOrPostUser(ctx context.Context, user model.User, subID string, preauthID string, preauthTokenHash string) (model.User, error) {
+func (s *Service) GetUnfinishedSignupOrPostUser(ctx context.Context, user model.User, subID string, sessionId string) (model.User, error) {
 	email := user.Email
 	pass := user.PasswordPlain
 	user, err := s.Store.GetUserByEmailUnfinishedSignup(ctx, email)
@@ -101,7 +103,7 @@ func (s *Service) GetUnfinishedSignupOrPostUser(ctx context.Context, user model.
 			PasswordPlain: pass,
 			IsActive:      false,
 		}
-		err = s.PostUser(ctx, user, subID, preauthID, preauthTokenHash)
+		err = s.PostUser(ctx, user, subID, sessionId)
 		if err != nil {
 			log.Printf("error creating user: %s", err.Error())
 			return model.User{}, ErrPostUser
@@ -135,14 +137,25 @@ func (s *Service) SaveUser(ctx context.Context, user model.User) error {
 	return nil
 }
 
-func (s *Service) PostUser(ctx context.Context, user model.User, subID string, preauthID string, preauthTokenHash string) error {
-	preauth, err := s.Http.GetPreauth(preauthID)
+func (s *Service) PostUser(ctx context.Context, user model.User, subID string, sessionId string) error {
+	paSession, err := s.GetPASession(ctx, sessionId)
+	if err != nil {
+		log.Printf("error creating user: %s", err.Error())
+		return ErrPASessionNotFound
+	}
+
+	preauthId := paSession.PreauthId
+	token := paSession.Token
+	tokenHash := sha256.Sum256([]byte(token))
+	tokenHashStr := base64.StdEncoding.EncodeToString(tokenHash[:])
+
+	preauth, err := s.Http.GetPreauth(preauthId)
 	if err != nil {
 		log.Printf("error creating user: %s", err.Error())
 		return ErrInvalidSubscription
 	}
 
-	if preauth.TokenHash != preauthTokenHash {
+	if preauth.TokenHash != tokenHashStr {
 		log.Printf("error creating user: Token hash does not match")
 		return ErrTokenHashMismatch
 	}
@@ -263,7 +276,7 @@ func (s *Service) ActivateUser(ctx context.Context, ID string, otp string) error
 		return nil
 	}
 
-	if !sub.IsActiveCheck() {
+	if !sub.ActiveStatus() {
 		log.Println("error creating recipient: subscription is not active")
 		return nil
 	}

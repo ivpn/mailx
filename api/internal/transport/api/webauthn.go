@@ -51,6 +51,9 @@ type CredentialService interface {
 // @Failure 400 {object} ErrorRes
 // @Router /register/begin [post]
 func (h *Handler) BeginRegistration(c *fiber.Ctx) error {
+	// Get session ID from cookie
+	sessionId := c.Cookies(auth.PA_SESSION_COOKIE)
+
 	// Parse the request
 	req := SignupEmailReq{}
 	err := c.BodyParser(&req)
@@ -75,7 +78,7 @@ func (h *Handler) BeginRegistration(c *fiber.Ctx) error {
 	}
 
 	// Get unfinished signup user or create new user
-	user, err = h.Service.GetUnfinishedSignupOrPostUser(c.Context(), user, req.SubID, req.PreauthID, req.PreauthTokenHash)
+	user, err = h.Service.GetUnfinishedSignupOrPostUser(c.Context(), user, req.SubID, sessionId)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),

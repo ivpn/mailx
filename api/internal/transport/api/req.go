@@ -11,23 +11,19 @@ type EmailReq struct {
 }
 
 type SignupUserReq struct {
-	Email            string `json:"email" validate:"required,emailx"`
-	Password         string `json:"password" validate:"password"`
-	SubID            string `json:"subid" validate:"required,uuid"`
-	PreauthID        string `json:"preauthid" validate:"required,uuid"`
-	PreauthTokenHash string `json:"preauthtokenhash" validate:"required"`
+	Email    string `json:"email" validate:"required,emailx"`
+	Password string `json:"password" validate:"password"`
+	SubID    string `json:"subid" validate:"required,uuid"`
 }
 
 type SignupEmailReq struct {
-	Email            string `json:"email" validate:"required,emailx"`
-	SubID            string `json:"subid" validate:"required,uuid"`
-	PreauthID        string `json:"preauthid" validate:"required,uuid"`
-	PreauthTokenHash string `json:"preauthtokenhash" validate:"required"`
+	Email string `json:"email" validate:"required,emailx"`
+	SubID string `json:"subid" validate:"required,uuid"`
 }
 
 type SubscriptionReq struct {
-	ID          string `json:"id" validate:"required,uuid"`
-	ActiveUntil string `json:"active_until" validate:"required"`
+	ID    string `json:"id" validate:"required,uuid"`
+	SubID string `json:"subid" validate:"required,uuid"`
 }
 
 type AliasReq struct {
@@ -74,4 +70,14 @@ type ActivateReq struct {
 
 type TotpReq struct {
 	OTP string `json:"otp" validate:"required,min=6,max=8"`
+}
+
+type PASessionReq struct {
+	ID        string `json:"id" validate:"required,uuid"`
+	PreauthId string `json:"preauth_id" validate:"required,uuid"`
+	Token     string `json:"token" validate:"required"`
+}
+
+type RotatePASessionReq struct {
+	ID string `json:"sessionid" validate:"required,uuid"`
 }

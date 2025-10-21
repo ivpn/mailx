@@ -16,8 +16,6 @@ func Run() error {
 		return err
 	}
 
-	// utils.NewLogger(cfg.API)
-
 	db, err := repository.NewDB(cfg.DB)
 	if err != nil {
 		return err

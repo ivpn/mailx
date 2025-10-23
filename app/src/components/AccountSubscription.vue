@@ -139,7 +139,7 @@ const rotateSessionId = async () => {
 }
 
 const isActive = () => {
-    return sub.value.status === 'active'
+    return sub.value.status === 'active' || sub.value.status === 'grace_period'
 }
 
 const isLimited = () => {

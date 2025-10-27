@@ -2,8 +2,11 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"log"
 	"os"
+	"path/filepath"
+	"regexp"
 
 	"ivpn.net/email/api/internal/model"
 )
@@ -39,12 +42,21 @@ func (d *Database) SaveBounceToFile(ctx context.Context, filename string, data [
 }
 
 func (d *Database) GetBounceFile(ctx context.Context, filename string) ([]byte, error) {
-	filePath := basePath + "/" + filename + ".eml"
-	data, err := os.ReadFile(filePath)
+	data, err := readBounceEmail(basePath, filename, ".eml")
 	if err != nil {
-		log.Println("error reading bounce file:", err)
 		return nil, err
 	}
 
 	return data, nil
+}
+
+func readBounceEmail(basePath, filename string, ext string) ([]byte, error) {
+	uuidPattern := regexp.MustCompile(`^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$`)
+	if !uuidPattern.MatchString(filename) {
+		return nil, errors.New("invalid filename format (must be UUID)")
+	}
+
+	filePath := filepath.Join(basePath, filename+ext)
+
+	return os.ReadFile(filePath)
 }

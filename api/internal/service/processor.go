@@ -25,17 +25,23 @@ func (s *Service) ProcessMessage(data []byte) error {
 		return err
 	}
 
+	// Bounce
+	if msg.Type == model.FailBounce {
+		alias, err := s.findAliasByEmail(msg.From)
+		if err != nil {
+			log.Println("error processing bounce", err)
+			return err
+		}
+
+		s.ProcessBounce(alias.UserID, alias.ID, data)
+		return nil
+	}
+
 	for _, to := range msg.To {
 		recipients, alias, relayType, err := s.findRecipients(msg.From, to, msg.Type)
 		if err != nil {
 			log.Println("error processing message", err)
 			continue
-		}
-
-		// Bounce
-		if msg.Type == model.FailBounce {
-			s.ProcessBounce(alias.UserID, alias.ID, data)
-			break
 		}
 
 		sub, err := s.GetSubscription(context.Background(), alias.UserID)
@@ -164,4 +170,14 @@ func (s *Service) findRecipients(from string, email string, msgType model.Messag
 	}
 
 	return recipients, alias, model.Forward, nil
+}
+
+func (s *Service) findAliasByEmail(email string) (model.Alias, error) {
+	name, _ := model.ParseReplyTo(email)
+	alias, err := s.GetAliasByName(name)
+	if err != nil {
+		return model.Alias{}, err
+	}
+
+	return alias, nil
 }

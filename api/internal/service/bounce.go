@@ -113,24 +113,24 @@ func (s *Service) ProcessBounce(userId string, aliasId string, data []byte) erro
 
 	var remoteMta string
 	for _, line := range bytes.Split(data, []byte{'\n'}) {
-		if bytes.HasPrefix(line, []byte("Remote-MTA: ")) {
-			remoteMta = string(bytes.TrimPrefix(line, []byte("Remote-MTA: ")))
+		if after, ok := bytes.CutPrefix(line, []byte("Remote-MTA: ")); ok {
+			remoteMta = string(after)
 			break
 		}
 	}
 
 	var status string
 	for _, line := range bytes.Split(data, []byte{'\n'}) {
-		if bytes.HasPrefix(line, []byte("Status: ")) {
-			status = string(bytes.TrimPrefix(line, []byte("Status: ")))
+		if after, ok := bytes.CutPrefix(line, []byte("Status: ")); ok {
+			status = string(after)
 			break
 		}
 	}
 
 	var diagnosticCode string
 	for _, line := range bytes.Split(data, []byte{'\n'}) {
-		if bytes.HasPrefix(line, []byte("Diagnostic-Code: ")) {
-			diagnosticCode = string(bytes.TrimPrefix(line, []byte("Diagnostic-Code: ")))
+		if after, ok := bytes.CutPrefix(line, []byte("Diagnostic-Code: ")); ok {
+			diagnosticCode = string(after)
 			break
 		}
 	}

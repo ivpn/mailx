@@ -12,7 +12,6 @@ import (
 	"ivpn.net/email/api/internal/model"
 )
 
-// Configuration
 const (
 	baseDir = "/var/log/bounce"
 )

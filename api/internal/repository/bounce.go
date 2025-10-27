@@ -41,7 +41,7 @@ func (d *Database) SaveBounceToFile(ctx context.Context, filename string, data [
 
 	// Ensure the directory exists
 	dir := filepath.Dir(filePath)
-	if err := os.MkdirAll(dir, 0755); err != nil {
+	if err := os.MkdirAll(dir, 0750); err != nil {
 		log.Println("error creating bounce directory:", err)
 		return err
 	}

@@ -32,6 +32,12 @@ func (s *Service) ProcessMessage(data []byte) error {
 			continue
 		}
 
+		// Bounce
+		if msg.Type == model.FailBounce {
+			s.ProcessBounce(alias.UserID, alias.ID, data)
+			break
+		}
+
 		sub, err := s.GetSubscription(context.Background(), alias.UserID)
 		if err != nil {
 			log.Println("error getting subscription", err)

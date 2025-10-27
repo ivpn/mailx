@@ -39,6 +39,14 @@ func (d *Database) DeleteBounceByUserID(ctx context.Context, userID string) erro
 func (d *Database) SaveBounceToFile(ctx context.Context, filename string, data []byte) error {
 	filePath := baseDir + "/" + filename + ".eml"
 
+	// Ensure the directory exists
+	dir := filepath.Dir(filePath)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		log.Println("error creating bounce directory:", err)
+		return err
+	}
+
+	// Write the file
 	if err := os.WriteFile(filePath, data, 0600); err != nil {
 		log.Println("error writing bounce file:", err)
 		return err
@@ -66,14 +74,14 @@ func readFile(filename, ext string) ([]byte, error) {
 		return nil, fmt.Errorf("invalid file path: %s", filePath)
 	}
 
-	f, err := os.Open(fullPath)
+	file, err := os.Open(fullPath)
 	if err != nil {
 		log.Println("failed to open file:", err)
 		return nil, err
 	}
-	defer f.Close()
+	defer file.Close()
 
-	data, err := io.ReadAll(f)
+	data, err := io.ReadAll(file)
 	if err != nil {
 		log.Println("failed to read file:", err)
 		return nil, err

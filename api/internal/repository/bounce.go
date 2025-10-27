@@ -22,6 +22,12 @@ func (d *Database) GetBouncesByUser(ctx context.Context, userID string) ([]model
 	return bounces, err
 }
 
+func (d *Database) GetBounce(ctx context.Context, bounceID string, userId string) (model.Bounce, error) {
+	var bounce model.Bounce
+	err := d.Client.Where("id = ? AND user_id = ?", bounceID, userId).First(&bounce).Error
+	return bounce, err
+}
+
 func (d *Database) PostBounce(ctx context.Context, bounce model.Bounce) error {
 	return d.Client.Create(&bounce).Error
 }

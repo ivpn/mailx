@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"fmt"
 	"log"
 
 	"github.com/google/uuid"
@@ -102,9 +101,9 @@ func (s *Service) ProcessBounce(userId string, aliasId string, data []byte) erro
 		return err
 	}
 
-	remoteMta := ""
-	if vals := email.Headers.ExtraHeaders["Received-From-MTA"]; len(vals) > 0 {
-		remoteMta = vals[0]
+	from := ""
+	if len(email.Headers.From) > 0 {
+		from = email.Headers.From[0].Address
 	}
 
 	to := ""
@@ -112,14 +111,28 @@ func (s *Service) ProcessBounce(userId string, aliasId string, data []byte) erro
 		to = email.Headers.To[0].Address
 	}
 
-	status := ""
-	if vals := email.Headers.ExtraHeaders["Status"]; len(vals) > 0 {
-		status = vals[0]
+	var remoteMta string
+	for _, line := range bytes.Split(data, []byte{'\n'}) {
+		if bytes.HasPrefix(line, []byte("Remote-MTA: ")) {
+			remoteMta = string(bytes.TrimPrefix(line, []byte("Remote-MTA: ")))
+			break
+		}
 	}
 
-	diagnosticCode := 0
-	if vals := email.Headers.ExtraHeaders["Diagnostic-Code"]; len(vals) > 0 {
-		fmt.Sscanf(vals[0], "%d", &diagnosticCode)
+	var status string
+	for _, line := range bytes.Split(data, []byte{'\n'}) {
+		if bytes.HasPrefix(line, []byte("Status: ")) {
+			status = string(bytes.TrimPrefix(line, []byte("Status: ")))
+			break
+		}
+	}
+
+	var diagnosticCode string
+	for _, line := range bytes.Split(data, []byte{'\n'}) {
+		if bytes.HasPrefix(line, []byte("Diagnostic-Code: ")) {
+			diagnosticCode = string(bytes.TrimPrefix(line, []byte("Diagnostic-Code: ")))
+			break
+		}
 	}
 
 	bounce := model.Bounce{
@@ -127,8 +140,9 @@ func (s *Service) ProcessBounce(userId string, aliasId string, data []byte) erro
 		AttemptedAt:    email.Headers.Date,
 		UserID:         userId,
 		AliasID:        aliasId,
-		RemoteMta:      remoteMta,
+		From:           from,
 		Destination:    to,
+		RemoteMta:      remoteMta,
 		Status:         status,
 		DiagnosticCode: diagnosticCode,
 	}

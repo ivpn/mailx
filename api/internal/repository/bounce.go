@@ -2,11 +2,10 @@ package repository
 
 import (
 	"context"
-	"errors"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
-	"regexp"
 
 	"ivpn.net/email/api/internal/model"
 )
@@ -42,7 +41,7 @@ func (d *Database) SaveBounceToFile(ctx context.Context, filename string, data [
 }
 
 func (d *Database) GetBounceFile(ctx context.Context, filename string) ([]byte, error) {
-	data, err := readBounceEmail(basePath, filename, ".eml")
+	data, err := readFile(basePath, filename, ".eml")
 	if err != nil {
 		return nil, err
 	}
@@ -50,13 +49,21 @@ func (d *Database) GetBounceFile(ctx context.Context, filename string) ([]byte, 
 	return data, nil
 }
 
-func readBounceEmail(basePath, filename string, ext string) ([]byte, error) {
-	uuidPattern := regexp.MustCompile(`^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$`)
-	if !uuidPattern.MatchString(filename) {
-		return nil, errors.New("invalid filename format (must be UUID)")
-	}
-
+func readFile(basePath, filename, ext string) ([]byte, error) {
 	filePath := filepath.Join(basePath, filename+ext)
 
-	return os.ReadFile(filePath)
+	f, err := os.Open(filePath)
+	if err != nil {
+		log.Println("failed to open file:", err)
+		return nil, err
+	}
+	defer f.Close()
+
+	data, err := io.ReadAll(f)
+	if err != nil {
+		log.Println("failed to read file:", err)
+		return nil, err
+	}
+
+	return data, nil
 }

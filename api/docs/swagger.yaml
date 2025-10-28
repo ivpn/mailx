@@ -189,6 +189,25 @@ definitions:
       sends:
         type: integer
     type: object
+  model.Bounce:
+    properties:
+      attempted_at:
+        type: string
+      created_at:
+        type: string
+      destination:
+        type: string
+      diagnostic_code:
+        type: string
+      from:
+        type: string
+      id:
+        type: string
+      remote_mta:
+        type: string
+      status:
+        type: string
+    type: object
   model.Credential:
     properties:
       created_at:
@@ -227,6 +246,8 @@ definitions:
         type: string
       id:
         type: string
+      log_bounce:
+        type: boolean
       recipient:
         type: string
     type: object
@@ -429,6 +450,56 @@ paths:
       summary: Get aliases
       tags:
       - alias
+  /bounce/file/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get bounce file by ID for the authenticated user
+      parameters:
+      - description: Bounce ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Bounce file content
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get bounce file
+      tags:
+      - bounce
+  /bounces:
+    get:
+      consumes:
+      - application/json
+      description: Get all bounces for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Bounce'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get bounces
+      tags:
+      - bounce
   /email:
     post:
       consumes:

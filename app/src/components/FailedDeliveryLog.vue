@@ -47,7 +47,6 @@ const error = ref('')
 
 const getLog = async () => {
     try {
-        console.log('Fetching log for bounce ID:', log.value.id)
         const res = await bounceApi.getFile(log.value.id)
         log_text.value = res.data
         error.value = ''

@@ -4,6 +4,7 @@ import QuickActions from './components/QuickActions.vue'
 import Recipients from './components/Recipients.vue'
 import Wildcards from './components/Wildcards.vue'
 import Stats from './components/Stats.vue'
+import FailedDeliveries from './components/FailedDeliveries.vue'
 import Settings from './components/Settings.vue'
 import Account from './components/Account.vue'
 import Signup from './components/Signup.vue'
@@ -48,6 +49,11 @@ const dashboardChildren: RouteRecordRaw[] = [
         path: 'stats',
         name: `${AppName} - Stats`,
         component: Stats,
+    },
+    {
+        path: 'failed-deliveries',
+        name: `${AppName} - Failed Deliveries`,
+        component: FailedDeliveries,
     },
     {
         path: 'settings',

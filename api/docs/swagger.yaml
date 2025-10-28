@@ -84,6 +84,8 @@ definitions:
         type: string
       id:
         type: string
+      log_bounce:
+        type: boolean
       recipient:
         type: string
     required:

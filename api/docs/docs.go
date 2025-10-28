@@ -1892,6 +1892,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "log_bounce": {
+                    "type": "boolean"
+                },
                 "recipient": {
                     "type": "string"
                 }

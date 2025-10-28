@@ -26,7 +26,7 @@ type BounceStore interface {
 	SaveBounceToFile(context.Context, string, []byte) error
 }
 
-func (s *Service) GetBouncesByUser(ctx context.Context, userID string) ([]model.Bounce, error) {
+func (s *Service) GetBounces(ctx context.Context, userID string) ([]model.Bounce, error) {
 	bounces, err := s.Store.GetBouncesByUser(ctx, userID)
 	if err != nil {
 		log.Printf("error getting bounces by user ID: %s", err.Error())
@@ -95,6 +95,15 @@ func (s *Service) DeleteBounceByUserID(ctx context.Context, userID string) error
 }
 
 func (s *Service) ProcessBounce(userId string, aliasId string, data []byte) error {
+	settings, err := s.GetSettings(context.Background(), userId)
+	if err != nil {
+		return err
+	}
+
+	if !settings.LogBounce {
+		return nil
+	}
+
 	reader := bytes.NewReader(data)
 	email, err := letters.ParseEmail(reader)
 	if err != nil {
@@ -135,6 +144,18 @@ func (s *Service) ProcessBounce(userId string, aliasId string, data []byte) erro
 		}
 	}
 
+	msgType := model.Send
+	for _, line := range bytes.Split(data, []byte{'\n'}) {
+		if _, ok := bytes.CutPrefix(line, []byte("In-Reply-To: ")); ok {
+			msgType = model.Reply
+			break
+		}
+		if _, ok := bytes.CutPrefix(line, []byte("References: ")); ok {
+			msgType = model.Reply
+			break
+		}
+	}
+
 	bounce := model.Bounce{
 		ID:             uuid.New().String(),
 		AttemptedAt:    email.Headers.Date,
@@ -153,6 +174,11 @@ func (s *Service) ProcessBounce(userId string, aliasId string, data []byte) erro
 	}
 
 	err = s.PostBounce(context.Background(), bounce)
+	if err != nil {
+		return err
+	}
+
+	err = s.RemoveLastMessage(context.Background(), userId, msgType)
 	if err != nil {
 		return err
 	}

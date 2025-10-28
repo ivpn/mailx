@@ -88,6 +88,10 @@
         &.close {
             mask-image: url("../../assets/icons/icon-close.svg");
         }
+
+        &.alert {
+            mask-image: url("../../assets/icons/icon-alert.svg");
+        }
     }
 
     .logo {

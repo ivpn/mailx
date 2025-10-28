@@ -2,7 +2,7 @@
     nav {
 
         a {
-            @apply text-primary hover:text-primary py-4 font-medium text-sm w-full cursor-pointer px-8 flex flex-row items-center gap-x-2;
+            @apply text-primary hover:text-primary py-4 font-medium text-sm w-full cursor-pointer px-6 flex flex-row items-center gap-x-2;
 
             &.active {
                 @apply border-accent border-r-2 bg-tertiary;

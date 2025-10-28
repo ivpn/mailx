@@ -14,6 +14,9 @@
                 <router-link v-bind:class="{ 'active': route == '/stats' }" to="/stats" title="Stats">
                     <i class="icon chart icon-primary"></i>
                 </router-link>
+                <router-link v-bind:class="{ 'active': route == '/failed-deliveries' }" to="/failed-deliveries" title="Failed Deliveries">
+                    <i class="icon alert icon-primary"></i>
+                </router-link>
                 <router-link v-bind:class="{ 'active': route == '/settings' }" to="/settings" title="Settings">
                     <i class="icon settings icon-primary"></i>
                 </router-link>

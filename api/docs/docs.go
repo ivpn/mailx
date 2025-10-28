@@ -228,6 +228,86 @@ const docTemplate = `{
                 }
             }
         },
+        "/bounce/file/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get bounce file by ID for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "bounce"
+                ],
+                "summary": "Get bounce file",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bounce ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Bounce file content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/bounces": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all bounces for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bounce"
+                ],
+                "summary": "Get bounces",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Bounce"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
         "/email": {
             "post": {
                 "description": "Handle incoming email",
@@ -1882,6 +1962,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "log_bounce": {
+                    "type": "boolean"
+                },
                 "recipient": {
                     "type": "string"
                 }
@@ -2038,6 +2121,35 @@ const docTemplate = `{
                 }
             }
         },
+        "model.Bounce": {
+            "type": "object",
+            "properties": {
+                "attempted_at": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "destination": {
+                    "type": "string"
+                },
+                "diagnostic_code": {
+                    "type": "string"
+                },
+                "from": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "remote_mta": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "model.Credential": {
             "type": "object",
             "properties": {
@@ -2095,6 +2207,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "string"
+                },
+                "log_bounce": {
+                    "type": "boolean"
                 },
                 "recipient": {
                     "type": "string"

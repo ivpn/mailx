@@ -78,6 +78,9 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Put("/alias/:id", h.UpdateAlias)
 	v1.Delete("/alias/:id", h.DeleteAlias)
 
+	v1.Get("/bounces", h.GetBounces)
+	v1.Get("/bounce/file/:id", h.GetBounceFile)
+
 	docs := h.Server.Group("/docs")
 	docs.Use(auth.NewBasicAuth(cfg))
 	docs.Get("/*", swagger.HandlerDefault)

@@ -341,6 +341,12 @@ func (s *Service) DeleteUser(ctx context.Context, userID string, OTP string) err
 		return ErrDeleteUser
 	}
 
+	err = s.Store.DeleteBounceByUserID(ctx, userID)
+	if err != nil {
+		log.Printf("error deleting user: %s", err.Error())
+		return ErrDeleteUser
+	}
+
 	err = s.Store.DeleteSubscription(ctx, userID)
 	if err != nil {
 		log.Printf("error deleting user: %s", err.Error())

@@ -72,6 +72,23 @@
                     type="text"
                 >
             </div>
+
+            <h4>Failed Deliveries</h4>
+            <p>
+                Enable or disable logging of failed email deliveries (bounces) for aliases. When enabled, failed delivery attempts will be recorded and kept for 14 days.
+            </p>
+            <div class="mb-8">
+                <label for="log-bounce">
+                    Log failed deliveries:
+                </label>
+                <input
+                    @change="saveSettings"
+                    v-bind:checked="req.log_bounce"
+                    v-model="req.log_bounce"
+                    id="log-bounce"
+                    type="checkbox"
+                >
+            </div>
             <div class="mb-3">
                 <button @click="saveSettings" class="cta">
                     Save Settings
@@ -94,7 +111,8 @@ const req = ref({
     domain: '',
     recipient: '',
     from_name: '',
-    alias_format: ''
+    alias_format: '',
+    log_bounce: false,
 })
 const envDomains = import.meta.env.VITE_DOMAINS.split(',')
 const domains = ref(envDomains)
@@ -119,6 +137,7 @@ const saveSettings = async () => {
     req.value.domain = (document.getElementById('domain') as HTMLSelectElement).value
     req.value.recipient = (document.getElementById('recipient') as HTMLSelectElement).value
     req.value.alias_format = (document.getElementById('format') as HTMLSelectElement).value
+    req.value.log_bounce = (document.getElementById('log-bounce') as HTMLInputElement).checked
 
     try {
         const res = await settingsApi.update(req.value)

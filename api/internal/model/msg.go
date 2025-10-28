@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"log"
+	"mime"
 	"net/mail"
 	"strings"
 
@@ -62,6 +63,10 @@ func ParseMsg(data []byte) (Msg, error) {
 		msgType = Reply
 	}
 
+	if isBounce(msg) {
+		msgType = FailBounce
+	}
+
 	return Msg{
 		From:     from.Address,
 		FromName: from.Name,
@@ -72,8 +77,33 @@ func ParseMsg(data []byte) (Msg, error) {
 	}, nil
 }
 
+// isReply checks whether the given email is a reply.
 func isReply(m *mail.Message) bool {
 	if m.Header.Get("In-Reply-To") != "" || m.Header.Get("References") != "" {
+		return true
+	}
+
+	return false
+}
+
+// isBounce checks whether the given email is a bounce (DSN).
+func isBounce(m *mail.Message) bool {
+	// 1. Check Return-Path header
+	if rp := m.Header.Get("Return-Path"); strings.TrimSpace(rp) == "<>" {
+		return true
+	}
+
+	// 2. Check Content-Type header
+	ct := m.Header.Get("Content-Type")
+	mediatype, params, err := mime.ParseMediaType(ct)
+	if err == nil && strings.EqualFold(mediatype, "multipart/report") {
+		if strings.EqualFold(params["report-type"], "delivery-status") {
+			return true
+		}
+	}
+
+	// 3. Optional: check Auto-Submitted
+	if strings.EqualFold(m.Header.Get("Auto-Submitted"), "auto-replied") {
 		return true
 	}
 

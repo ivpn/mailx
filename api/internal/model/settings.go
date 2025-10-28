@@ -7,4 +7,5 @@ type Settings struct {
 	Recipient   string `json:"recipient"`
 	FromName    string `json:"from_name"`
 	AliasFormat string `json:"alias_format"`
+	LogBounce   bool   `json:"log_bounce"`
 }

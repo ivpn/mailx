@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"strconv"
 
 	"ivpn.net/email/api/internal/model"
 )
@@ -20,6 +21,7 @@ type MessageStore interface {
 	GetMessagesByAlias(context.Context, string) ([]model.Message, error)
 	PostMessage(context.Context, model.Message) error
 	DeleteMessageByUserID(context.Context, string) error
+	DeleteMessage(context.Context, string, string) error
 	SendReplyDailyCount(context.Context, string) (int, error)
 }
 
@@ -72,6 +74,33 @@ func (s *Service) ValidateSendReplyDailyCount(ctx context.Context, userID string
 
 	if count >= s.Cfg.Service.MaxDailySendReply {
 		return errors.New("daily limit reached")
+	}
+
+	return nil
+}
+
+func (s *Service) RemoveLastMessage(ctx context.Context, userID string, typ model.MessageType) error {
+	messages, err := s.Store.GetMessagesByUser(ctx, userID)
+	if err != nil {
+		log.Printf("error getting messages by user ID: %s", err.Error())
+		return ErrGetMessagesByUser
+	}
+	var lastMessageID string
+	for i := len(messages) - 1; i >= 0; i-- {
+		if messages[i].Type == typ {
+			lastMessageID = strconv.FormatUint(uint64(messages[i].ID), 10)
+			break
+		}
+	}
+
+	if lastMessageID == "" {
+		return nil // No message of the specified type found
+	}
+
+	err = s.Store.DeleteMessage(ctx, lastMessageID, userID)
+	if err != nil {
+		log.Printf("error deleting message by ID: %s", err.Error())
+		return ErrDeleteMessageByUserID
 	}
 
 	return nil

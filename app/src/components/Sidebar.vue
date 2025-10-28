@@ -2,7 +2,7 @@
     <header class="bg-secondary flex flex-col justify-between h-full">
         <nav>
             <router-link to="/" class="p-0">
-                <h1 class="pl-8 pr-5 m-0 text-accent head flex items-center justify-between">
+                <h1 class="pl-6 pr-5 m-0 text-accent head flex items-center justify-between">
                     <span class="logo"></span>
                 </h1>
             </router-link>
@@ -22,6 +22,10 @@
                 <router-link v-bind:class="{ 'active': route == '/stats' }" to="/stats">
                     <i class="icon chart icon-primary"></i>
                     Stats
+                </router-link>
+                <router-link v-bind:class="{ 'active': route == '/failed-deliveries' }" to="/failed-deliveries">
+                    <i class="icon alert icon-primary"></i>
+                    Failed Deliveries
                 </router-link>
                 <router-link v-bind:class="{ 'active': route == '/settings' }" to="/settings">
                     <i class="icon settings icon-primary"></i>
@@ -43,7 +47,7 @@
                     <ThemeSwitch />
                 </div>
             </nav>
-            <p class="px-5 pl-8 text-sm">
+            <p class="px-5 pl-6 text-sm">
                 Support:
                 <a href="mailto:mailx@ivpn.net">Email</a> /
                 <a href="/faq">FAQ</a>

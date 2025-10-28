@@ -86,6 +86,13 @@ func deleteUsers(db *gorm.DB, users []model.User) {
 			return
 		}
 
+		// Delete bounces of the user
+		err = db.Where("user_id = ?", ID).Delete(&model.Bounce{}).Error
+		if err != nil {
+			log.Println("Error deleting bounces of user:", err)
+			return
+		}
+
 		// Delete the user
 		err = db.Where("id = ?", ID).Delete(&model.User{}).Error
 		if err != nil {

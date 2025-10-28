@@ -31,8 +31,9 @@
                             <span class="text-tertiary">Diagnostic Code</span>: {{ bounce.diagnostic_code }}<br>
                             <span class="text-tertiary">Created At</span>: {{ bounce.created_at }}<br>
                             <span class="text-tertiary">Attempted At</span>: {{ bounce.attempted_at }}<br>
-                            <button class="cta mt-3">Full log</button>
+                            <button v-bind:data-hs-overlay="'#modal-delivery-log' + bounce.id" class="cta mt-3">Full log</button>
                         </td>
+                        <FailedDeliveryLog :log="bounce" />
                     </tr>
                 </tbody>
                 </table>
@@ -46,6 +47,7 @@
 import { onMounted, ref } from 'vue'
 import axios from 'axios'
 import { bounceApi } from '../api/bounce.ts'
+import FailedDeliveryLog from './FailedDeliveryLog.vue'
 
 const bounce = {
     id: '',

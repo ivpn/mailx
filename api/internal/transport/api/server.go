@@ -20,6 +20,7 @@ type Service interface {
 	ProcessorService
 	SessionService
 	CredentialService
+	BounceService
 }
 
 type Handler struct {

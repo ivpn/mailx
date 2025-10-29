@@ -12,12 +12,13 @@ import (
 )
 
 type Msg struct {
-	From     string
-	FromName string
-	To       []string
-	Subject  string
-	Body     string
-	Type     MessageType
+	From       string
+	FromName   string
+	ReturnPath string
+	To         []string
+	Subject    string
+	Body       string
+	Type       MessageType
 }
 
 func ParseMsg(data []byte) (Msg, error) {
@@ -55,8 +56,17 @@ func ParseMsg(data []byte) (Msg, error) {
 		msgType = Reply
 	}
 
+	returnPath := ""
 	if isBounce(msg) {
 		msgType = FailBounce
+		returnPath = msg.Header.Get("Return-Path")
+		if returnPath != "" {
+			rpAddr, err := mail.ParseAddress(returnPath)
+			if err != nil {
+				return Msg{}, err
+			}
+			returnPath = rpAddr.Address
+		}
 	} else {
 		pass, err := utils.VerifyEmailAuth(data)
 		if err != nil {
@@ -68,12 +78,13 @@ func ParseMsg(data []byte) (Msg, error) {
 	}
 
 	return Msg{
-		From:     from.Address,
-		FromName: from.Name,
-		To:       to,
-		Subject:  subject,
-		Body:     body,
-		Type:     msgType,
+		From:       from.Address,
+		FromName:   from.Name,
+		ReturnPath: returnPath,
+		To:         to,
+		Subject:    subject,
+		Body:       body,
+		Type:       msgType,
 	}, nil
 }
 

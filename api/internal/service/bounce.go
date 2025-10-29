@@ -5,9 +5,10 @@ import (
 	"context"
 	"errors"
 	"log"
+	"time"
 
+	"github.com/araddon/dateparse"
 	"github.com/google/uuid"
-	"github.com/mnako/letters"
 	"ivpn.net/email/api/internal/model"
 )
 
@@ -94,7 +95,7 @@ func (s *Service) DeleteBounceByUserID(ctx context.Context, userID string) error
 	return nil
 }
 
-func (s *Service) ProcessBounce(userId string, aliasId string, data []byte) error {
+func (s *Service) ProcessBounce(userId string, aliasId string, data []byte, msg model.Msg) error {
 	settings, err := s.GetSettings(context.Background(), userId)
 	if err != nil {
 		return err
@@ -104,64 +105,45 @@ func (s *Service) ProcessBounce(userId string, aliasId string, data []byte) erro
 		return nil
 	}
 
-	reader := bytes.NewReader(data)
-	email, err := letters.ParseEmail(reader)
-	if err != nil {
-		return err
-	}
-
-	from := ""
-	if len(email.Headers.From) > 0 {
-		from = email.Headers.From[0].Address
-	}
-
-	to := ""
-	if len(email.Headers.To) > 0 {
-		to = email.Headers.To[0].Address
-	}
-
+	var to string
 	var remoteMta string
-	for _, line := range bytes.Split(data, []byte{'\n'}) {
-		if after, ok := bytes.CutPrefix(line, []byte("Remote-MTA: ")); ok {
-			remoteMta = string(after)
-			break
-		}
-	}
-
 	var status string
-	for _, line := range bytes.Split(data, []byte{'\n'}) {
-		if after, ok := bytes.CutPrefix(line, []byte("Status: ")); ok {
-			status = string(after)
-			break
-		}
-	}
-
 	var diagnosticCode string
-	for _, line := range bytes.Split(data, []byte{'\n'}) {
-		if after, ok := bytes.CutPrefix(line, []byte("Diagnostic-Code: ")); ok {
-			diagnosticCode = string(after)
-			break
-		}
-	}
-
+	var date time.Time
 	msgType := model.Send
 	for _, line := range bytes.Split(data, []byte{'\n'}) {
+		if after, ok := bytes.CutPrefix(line, []byte("Original-Recipient: rfc822;")); ok {
+			to = string(after)
+		}
+		if after, ok := bytes.CutPrefix(line, []byte("Remote-MTA: ")); ok {
+			remoteMta = string(after)
+		}
+		if after, ok := bytes.CutPrefix(line, []byte("Status: ")); ok {
+			status = string(after)
+		}
+		if after, ok := bytes.CutPrefix(line, []byte("Diagnostic-Code: ")); ok {
+			diagnosticCode = string(after)
+		}
 		if _, ok := bytes.CutPrefix(line, []byte("In-Reply-To: ")); ok {
 			msgType = model.Reply
-			break
 		}
 		if _, ok := bytes.CutPrefix(line, []byte("References: ")); ok {
 			msgType = model.Reply
-			break
+		}
+		if after, ok := bytes.CutPrefix(line, []byte("Date: ")); ok {
+			date, err = dateparse.ParseAny(string(after))
+			if err != nil {
+				return err
+			}
 		}
 	}
 
 	bounce := model.Bounce{
 		ID:             uuid.New().String(),
-		AttemptedAt:    email.Headers.Date,
+		AttemptedAt:    date,
 		UserID:         userId,
 		AliasID:        aliasId,
-		From:           from,
+		From:           msg.From,
 		Destination:    to,
 		RemoteMta:      remoteMta,
 		Status:         status,

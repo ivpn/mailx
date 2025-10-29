@@ -46,7 +46,6 @@ func ParseMsg(data []byte) (Msg, error) {
 		return Msg{}, err
 	}
 	fromAddress := from.Address
-	log.Println("Parsed email from:", fromAddress)
 
 	buf := new(bytes.Buffer)
 	_, err = buf.ReadFrom(msg.Body)
@@ -66,8 +65,6 @@ func ParseMsg(data []byte) (Msg, error) {
 		if err != nil {
 			return Msg{}, fmt.Errorf("extract original from bounce: %w", err)
 		}
-		log.Println("Parsed email from ORIGINAL:", fromAddress)
-
 	} else {
 		pass, err := utils.VerifyEmailAuth(data)
 		if err != nil {

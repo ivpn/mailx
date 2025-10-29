@@ -105,6 +105,7 @@ func (s *Service) ProcessBounce(userId string, aliasId string, data []byte, msg 
 		return nil
 	}
 
+	var messageId string
 	var to string
 	var remoteMta string
 	var status string
@@ -112,6 +113,14 @@ func (s *Service) ProcessBounce(userId string, aliasId string, data []byte, msg 
 	var date time.Time
 	msgType := model.Send
 	for _, line := range bytes.Split(data, []byte{'\n'}) {
+		if after, ok := bytes.CutPrefix(line, []byte("Message-Id: ")); ok {
+			messageId = string(after)
+			if start := bytes.IndexByte(after, '<'); start != -1 {
+				if end := bytes.IndexByte(after[start:], '@'); end != -1 {
+					messageId = string(after[start+1 : start+end])
+				}
+			}
+		}
 		if after, ok := bytes.CutPrefix(line, []byte("Original-Recipient: rfc822;")); ok {
 			to = string(after)
 		}
@@ -164,6 +173,8 @@ func (s *Service) ProcessBounce(userId string, aliasId string, data []byte, msg 
 	if err != nil {
 		return err
 	}
+
+	log.Printf("Bounce email processed successfully, %v", messageId)
 
 	return nil
 }

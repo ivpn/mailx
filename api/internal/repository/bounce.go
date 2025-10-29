@@ -18,7 +18,7 @@ const (
 
 func (d *Database) GetBouncesByUser(ctx context.Context, userID string) ([]model.Bounce, error) {
 	var bounces []model.Bounce
-	err := d.Client.Where("user_id = ?", userID).Find(&bounces).Error
+	err := d.Client.Where("user_id = ?", userID).Order("created_at desc").Find(&bounces).Error
 	return bounces, err
 }
 

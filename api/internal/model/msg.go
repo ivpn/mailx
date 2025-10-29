@@ -3,8 +3,11 @@ package model
 import (
 	"bytes"
 	"errors"
+	"fmt"
+	"io"
 	"log"
 	"mime"
+	"mime/multipart"
 	"net/mail"
 	"strings"
 
@@ -12,13 +15,12 @@ import (
 )
 
 type Msg struct {
-	From       string
-	FromName   string
-	ReturnPath string
-	To         []string
-	Subject    string
-	Body       string
-	Type       MessageType
+	From     string
+	FromName string
+	To       []string
+	Subject  string
+	Body     string
+	Type     MessageType
 }
 
 func ParseMsg(data []byte) (Msg, error) {
@@ -43,6 +45,8 @@ func ParseMsg(data []byte) (Msg, error) {
 	if err != nil {
 		return Msg{}, err
 	}
+	fromAddress := from.Address
+	log.Println("Parsed email from:", fromAddress)
 
 	buf := new(bytes.Buffer)
 	_, err = buf.ReadFrom(msg.Body)
@@ -56,17 +60,14 @@ func ParseMsg(data []byte) (Msg, error) {
 		msgType = Reply
 	}
 
-	returnPath := ""
 	if isBounce(msg) {
 		msgType = FailBounce
-		returnPath = msg.Header.Get("Return-Path")
-		if returnPath != "" {
-			rpAddr, err := mail.ParseAddress(returnPath)
-			if err != nil {
-				return Msg{}, err
-			}
-			returnPath = rpAddr.Address
+		fromAddress, err = ExtractOriginalFrom(data)
+		if err != nil {
+			return Msg{}, fmt.Errorf("extract original from bounce: %w", err)
 		}
+		log.Println("Parsed email from ORIGINAL:", fromAddress)
+
 	} else {
 		pass, err := utils.VerifyEmailAuth(data)
 		if err != nil {
@@ -78,13 +79,12 @@ func ParseMsg(data []byte) (Msg, error) {
 	}
 
 	return Msg{
-		From:       from.Address,
-		FromName:   from.Name,
-		ReturnPath: returnPath,
-		To:         to,
-		Subject:    subject,
-		Body:       body,
-		Type:       msgType,
+		From:     fromAddress,
+		FromName: from.Name,
+		To:       to,
+		Subject:  subject,
+		Body:     body,
+		Type:     msgType,
 	}, nil
 }
 
@@ -119,4 +119,64 @@ func isBounce(m *mail.Message) bool {
 	}
 
 	return false
+}
+
+// ExtractOriginalFrom parses a bounce/DSN email and returns the "From:"
+// address of the *original* message embedded as "message/rfc822".
+// Returns an empty string if not found.
+func ExtractOriginalFrom(data []byte) (string, error) {
+	msg, err := mail.ReadMessage(bytes.NewReader(data))
+	if err != nil {
+		return "", fmt.Errorf("read message: %w", err)
+	}
+
+	contentType := msg.Header.Get("Content-Type")
+	mediaType, params, err := mime.ParseMediaType(contentType)
+	if err != nil {
+		return "", fmt.Errorf("parse content-type: %w", err)
+	}
+
+	// Read entire body first to safely re-use it.
+	body, err := io.ReadAll(msg.Body)
+	if err != nil {
+		return "", fmt.Errorf("read body: %w", err)
+	}
+
+	// Must be multipart with a boundary.
+	if !strings.HasPrefix(mediaType, "multipart/") || params["boundary"] == "" {
+		return "", fmt.Errorf("not a multipart/report message")
+	}
+
+	mr := multipart.NewReader(bytes.NewReader(body), params["boundary"])
+	for {
+		part, err := mr.NextPart()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return "", fmt.Errorf("next part: %w", err)
+		}
+
+		pType := part.Header.Get("Content-Type")
+		if strings.HasPrefix(strings.ToLower(pType), "message/rfc822") {
+			// Found the original message part
+			innerData, err := io.ReadAll(part)
+			if err != nil {
+				return "", fmt.Errorf("read inner part: %w", err)
+			}
+
+			innerMsg, err := mail.ReadMessage(bytes.NewReader(innerData))
+			if err != nil {
+				return "", fmt.Errorf("read inner message: %w", err)
+			}
+
+			from := innerMsg.Header.Get("From")
+			if from == "" {
+				return "", fmt.Errorf("original From not found")
+			}
+			return from, nil
+		}
+	}
+
+	return "", fmt.Errorf("no message/rfc822 part found")
 }

@@ -51,7 +51,6 @@ func cleanupOldBounceFiles(maxAge time.Duration) error {
 	})
 
 	if err != nil {
-		log.Println("error cleaning up old files:", err)
 		return err
 	}
 

@@ -21,14 +21,6 @@ type Msg struct {
 }
 
 func ParseMsg(data []byte) (Msg, error) {
-	pass, err := utils.VerifyEmailAuth(data)
-	if err != nil {
-		log.Println("email authentication failed with error:", err)
-	}
-	if !pass {
-		return Msg{}, errors.New("email authentication failed")
-	}
-
 	msg, err := mail.ReadMessage(bytes.NewReader(data))
 	if err != nil {
 		return Msg{}, err
@@ -65,6 +57,14 @@ func ParseMsg(data []byte) (Msg, error) {
 
 	if isBounce(msg) {
 		msgType = FailBounce
+	} else {
+		pass, err := utils.VerifyEmailAuth(data)
+		if err != nil {
+			log.Println("email authentication failed with error:", err)
+		}
+		if !pass {
+			return Msg{}, errors.New("email authentication failed")
+		}
 	}
 
 	return Msg{

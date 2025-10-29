@@ -75,7 +75,7 @@
 
             <h4>Failed Deliveries</h4>
             <p>
-                Enable or disable logging of failed email deliveries (bounces) for aliases. When enabled, failed delivery attempts will be recorded and kept for 14 days.
+                Turn logging of failed email deliveries (bounces) from aliases on or off. When enabled, any failed delivery attempts are recorded and stored for 14 days.
             </p>
             <div class="mb-8">
                 <label for="log-bounce">

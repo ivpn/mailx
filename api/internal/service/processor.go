@@ -27,7 +27,7 @@ func (s *Service) ProcessMessage(data []byte) error {
 
 	// Bounce
 	if msg.Type == model.FailBounce {
-		alias, err := s.findAliasByEmail(msg.ReturnPath)
+		alias, err := s.findAliasByEmail(msg.From)
 		if err != nil {
 			log.Println("error processing bounce", err)
 			return err

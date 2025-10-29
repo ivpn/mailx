@@ -33,7 +33,7 @@ func (s *Service) ProcessMessage(data []byte) error {
 			return err
 		}
 
-		err = s.ProcessBounce(alias.UserID, alias.ID, data)
+		err = s.ProcessBounce(alias.UserID, alias.ID, data, msg)
 		if err != nil {
 			log.Println("error processing bounce", err)
 			return err

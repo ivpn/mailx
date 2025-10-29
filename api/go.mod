@@ -5,6 +5,7 @@ go 1.23.1
 require (
 	github.com/ProtonMail/gopenpgp/v3 v3.1.2
 	github.com/alexedwards/argon2id v1.0.0
+	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
 	github.com/go-playground/validator/v10 v10.20.0
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/go-webauthn/webauthn v0.11.2

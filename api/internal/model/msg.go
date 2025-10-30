@@ -167,11 +167,11 @@ func ExtractOriginalFrom(data []byte) (string, error) {
 				return "", fmt.Errorf("read inner message: %w", err)
 			}
 
-			from := innerMsg.Header.Get("From")
-			if from == "" {
-				return "", fmt.Errorf("original From not found")
+			from, err := mail.ParseAddress(innerMsg.Header.Get("From"))
+			if err != nil {
+				return "", fmt.Errorf("parse original From: %w", err)
 			}
-			return from, nil
+			return from.Address, nil
 		}
 	}
 

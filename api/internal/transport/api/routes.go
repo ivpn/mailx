@@ -27,11 +27,16 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	h.Server.Post("/v1/login", limit.New(5, 10*time.Minute), h.Login)
 	h.Server.Post("/v1/initiatepasswordreset", limiter.New(), h.InitiatePasswordReset)
 	h.Server.Put("/v1/resetpassword", limiter.New(), h.ResetPassword)
+	h.Server.Put("/v1/rotatepasession", limiter.New(), h.RotatePASession)
 
 	h.Server.Post("/v1/register/begin", limiter.New(), h.BeginRegistration)
 	h.Server.Post("/v1/register/finish", limiter.New(), h.FinishRegistration)
 	h.Server.Post("/v1/login/begin", limiter.New(), h.BeginLogin)
 	h.Server.Post("/v1/login/finish", limiter.New(), h.FinishLogin)
+
+	session := h.Server.Group("/v1/pasession")
+	session.Use(auth.NewPSK(cfg))
+	session.Post("/add", h.AddPASession)
 
 	v1 := h.Server.Group("/v1")
 	v1.Use(auth.New(cfg, h.Cache, h.Service))

@@ -73,17 +73,15 @@ import events from '../events.ts'
 
 const sub = ref({
     id: '',
-    active_until: '',
-    is_active: false,
     updated_at: '',
-    is_grace_period: false,
+    active_until: '',
+    status: '',
     outage: false,
 })
 const error = ref('')
 const email = ref(localStorage.getItem('email'))
 const subid = ref('')
-const preauthid = ref('')
-const preauthtokenhash = ref('')
+const sessionid = ref('')
 const currentRoute = useRoute()
 const syncing = ref(false)
 
@@ -93,13 +91,13 @@ const getSubscription = async () => {
         sub.value = res.data
     } catch (err) {
         if (axios.isAxiosError(err)) {
-            error.value = err.message
+            error.value = err.response?.data.error || err.message
         }
     }
 }
 
 const updateSubscription = async () => {
-    if (!subid.value || !preauthid.value || !preauthtokenhash.value) {
+    if (!subid.value) {
         return
     }
 
@@ -108,13 +106,32 @@ const updateSubscription = async () => {
         await subscriptionApi.update({
             id: sub.value.id,
             subid: subid.value,
-            preauthid: preauthid.value,
-            preauthtokenhash: preauthtokenhash.value,
         })
         await getSubscription()
     } catch (err) {
         if (axios.isAxiosError(err)) {
-            error.value = err.message
+            error.value = err.response?.data.error || err.message
+        }
+    } finally {
+        syncing.value = false
+    }
+}
+
+const rotateSessionId = async () => {
+    if (!sessionid.value) {
+        return
+    }
+
+    syncing.value = true
+    try {
+        await subscriptionApi.rotateSessionId({
+            sessionid: sessionid.value,
+        })
+        await getSubscription()
+        await updateSubscription()
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.response?.data.error || err.message
         }
     } finally {
         syncing.value = false
@@ -122,15 +139,15 @@ const updateSubscription = async () => {
 }
 
 const isActive = () => {
-    return sub.value.active_until > new Date().toISOString()
+    return sub.value.status === 'active' || sub.value.status === 'grace_period'
 }
 
 const isLimited = () => {
-    return sub.value.is_grace_period && !isActive()
+    return sub.value.status === 'limited_access'
 }
 
 const isPendingDelete = () => {
-    return !sub.value.is_grace_period && !isActive()
+    return sub.value.status === 'pending_delete'
 }
 
 const activeUntilDate = () => {
@@ -154,23 +171,17 @@ const parseParams = () => {
     const q = route.query
     const first = (v: unknown) => typeof v === 'string' ? v : Array.isArray(v) ? v[0] : ''
     subid.value = first(q.subid) || (route.params.subid as string) || ''
-    preauthid.value = first(q.preauthid) || (route.params.preauthid as string) || ''
-    preauthtokenhash.value = first(q.preauthtokenhash) || (route.params.preauthtokenhash as string) || ''
-    preauthtokenhash.value = preauthtokenhash.value.replace(/ /g, '+')
+    sessionid.value = first(q.sessionid) || (route.params.sessionid as string) || ''
 
     if (!subid.value || !subid.value.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
         return
     }
 
-    if (!preauthid.value || !preauthid.value.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
+    if (!sessionid.value || !sessionid.value.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
         return
     }
 
-    if (!preauthtokenhash.value) {
-        return
-    }
-
-    updateSubscription()
+    rotateSessionId()
 }
 
 onMounted(() => {

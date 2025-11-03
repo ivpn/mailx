@@ -186,6 +186,95 @@ func TestIsBounce(t *testing.T) {
 	}
 }
 
+func TestExtractOriginalFrom(t *testing.T) {
+	tests := []struct {
+		name    string
+		data    []byte
+		want    string
+		wantErr bool
+	}{
+		{
+			name:    "valid bounce with message/rfc822 part",
+			data:    []byte("Content-Type: multipart/report; boundary=\"boundary123\"\r\n\r\n--boundary123\r\nContent-Type: text/plain\r\n\r\nDelivery failed\r\n--boundary123\r\nContent-Type: message/rfc822\r\n\r\nFrom: original@example.com\r\nTo: recipient@example.com\r\nSubject: Original Subject\r\n\r\nOriginal body\r\n--boundary123--\r\n"),
+			want:    "original@example.com",
+			wantErr: false,
+		},
+		{
+			name:    "valid bounce with message/rfc822 (case insensitive)",
+			data:    []byte("Content-Type: multipart/report; boundary=\"boundary123\"\r\n\r\n--boundary123\r\nContent-Type: text/plain\r\n\r\nDelivery failed\r\n--boundary123\r\nContent-Type: MESSAGE/RFC822\r\n\r\nFrom: sender@example.com\r\nTo: recipient@example.com\r\nSubject: Test\r\n\r\nBody\r\n--boundary123--\r\n"),
+			want:    "sender@example.com",
+			wantErr: false,
+		},
+		{
+			name:    "valid bounce with From name and email",
+			data:    []byte("Content-Type: multipart/report; boundary=\"boundary123\"\r\n\r\n--boundary123\r\nContent-Type: message/rfc822\r\n\r\nFrom: John Doe <john@example.com>\r\nTo: recipient@example.com\r\nSubject: Test\r\n\r\nBody\r\n--boundary123--\r\n"),
+			want:    "john@example.com",
+			wantErr: false,
+		},
+		{
+			name:    "invalid message data",
+			data:    []byte("Invalid email data"),
+			want:    "",
+			wantErr: true,
+		},
+		{
+			name:    "not a multipart message",
+			data:    []byte("Content-Type: text/plain\r\n\r\nSimple text message"),
+			want:    "",
+			wantErr: true,
+		},
+		{
+			name:    "multipart without boundary",
+			data:    []byte("Content-Type: multipart/report\r\n\r\nNo boundary specified"),
+			want:    "",
+			wantErr: true,
+		},
+		{
+			name:    "no message/rfc822 part found",
+			data:    []byte("Content-Type: multipart/report; boundary=\"boundary123\"\r\n\r\n--boundary123\r\nContent-Type: text/plain\r\n\r\nDelivery failed\r\n--boundary123--\r\n"),
+			want:    "",
+			wantErr: true,
+		},
+		{
+			name:    "message/rfc822 part with invalid From header",
+			data:    []byte("Content-Type: multipart/report; boundary=\"boundary123\"\r\n\r\n--boundary123\r\nContent-Type: message/rfc822\r\n\r\nFrom: invalid-email\r\nTo: recipient@example.com\r\n\r\nBody\r\n--boundary123--\r\n"),
+			want:    "",
+			wantErr: true,
+		},
+		{
+			name:    "message/rfc822 part with missing From header",
+			data:    []byte("Content-Type: multipart/report; boundary=\"boundary123\"\r\n\r\n--boundary123\r\nContent-Type: message/rfc822\r\n\r\nTo: recipient@example.com\r\nSubject: Test\r\n\r\nBody\r\n--boundary123--\r\n"),
+			want:    "",
+			wantErr: true,
+		},
+		{
+			name:    "multiple parts with message/rfc822 as second part",
+			data:    []byte("Content-Type: multipart/report; boundary=\"boundary123\"\r\n\r\n--boundary123\r\nContent-Type: text/plain\r\n\r\nFirst part\r\n--boundary123\r\nContent-Type: message/delivery-status\r\n\r\nStatus info\r\n--boundary123\r\nContent-Type: message/rfc822\r\n\r\nFrom: test@example.com\r\nTo: recipient@example.com\r\n\r\nBody\r\n--boundary123--\r\n"),
+			want:    "test@example.com",
+			wantErr: false,
+		},
+		{
+			name:    "invalid content-type header",
+			data:    []byte("Content-Type: invalid/content/type/format\r\n\r\nBody"),
+			want:    "",
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ExtractOriginalFrom(tt.data)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ExtractOriginalFrom() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("ExtractOriginalFrom() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func compareMessages(a, b Msg) bool {
 	if a.From != b.From || a.FromName != b.FromName || a.Subject != b.Subject || a.Body != b.Body || a.Type != b.Type {
 		return false

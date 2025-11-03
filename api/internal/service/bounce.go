@@ -142,7 +142,7 @@ func (s *Service) ProcessBounce(userId string, aliasId string, data []byte, msg 
 		if after, ok := bytes.CutPrefix(line, []byte("Date: ")); ok {
 			date, err = dateparse.ParseAny(string(after))
 			if err != nil {
-				return err
+				log.Println("error parsing bounce date:", err.Error())
 			}
 		}
 	}

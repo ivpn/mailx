@@ -12,10 +12,10 @@ import (
 
 const (
 	baseDir = "/var/log/bounce"
-	expDays = 14
+	expDays = 7
 )
 
-// Delete bounces older than 14 days
+// Delete bounces older than 7 days
 func DeleteOldBounces(db *gorm.DB) {
 	err := cleanupOldBounceFiles(expDays * 24 * time.Hour)
 	if err != nil {

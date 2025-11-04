@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"log"
-	"strconv"
 
 	"ivpn.net/email/api/internal/model"
 )
@@ -21,7 +20,7 @@ type MessageStore interface {
 	GetMessagesByAlias(context.Context, string) ([]model.Message, error)
 	PostMessage(context.Context, model.Message) error
 	DeleteMessageByUserID(context.Context, string) error
-	DeleteMessage(context.Context, string, string) error
+	DeleteMessage(context.Context, uint, string) error
 	SendReplyDailyCount(context.Context, string) (int, error)
 }
 
@@ -85,15 +84,15 @@ func (s *Service) RemoveLastMessage(ctx context.Context, userID string, typ mode
 		log.Printf("error getting messages by user ID: %s", err.Error())
 		return ErrGetMessagesByUser
 	}
-	var lastMessageID string
+	var lastMessageID uint
 	for i := len(messages) - 1; i >= 0; i-- {
 		if messages[i].Type == typ {
-			lastMessageID = strconv.FormatUint(uint64(messages[i].ID), 10)
+			lastMessageID = messages[i].ID
 			break
 		}
 	}
 
-	if lastMessageID == "" {
+	if lastMessageID == 0 {
 		return nil // No message of the specified type found
 	}
 

@@ -8,7 +8,7 @@ import (
 
 func (d *Database) GetMessagesByUser(ctx context.Context, userID string) ([]model.Message, error) {
 	var messages []model.Message
-	err := d.Client.Where("user_id = ?", userID).Find(&messages).Error
+	err := d.Client.Where("user_id = ?", userID).Order("created_at asc").Find(&messages).Error
 	return messages, err
 }
 
@@ -26,7 +26,7 @@ func (d *Database) DeleteMessageByUserID(ctx context.Context, userID string) err
 	return d.Client.Where("user_id = ?", userID).Delete(&model.Message{}).Error
 }
 
-func (d *Database) DeleteMessage(ctx context.Context, messageID string, userID string) error {
+func (d *Database) DeleteMessage(ctx context.Context, messageID uint, userID string) error {
 	return d.Client.Where("id = ? AND user_id = ?", messageID, userID).Delete(&model.Message{}).Error
 }
 

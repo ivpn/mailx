@@ -14,7 +14,7 @@ func (d *Database) GetMessagesByUser(ctx context.Context, userID string) ([]mode
 
 func (d *Database) GetMessagesByAlias(ctx context.Context, aliasID string) ([]model.Message, error) {
 	var messages []model.Message
-	err := d.Client.Where("alias_id = ?", aliasID).Find(&messages).Error
+	err := d.Client.Where("alias_id = ?", aliasID).Order("created_at asc").Find(&messages).Error
 	return messages, err
 }
 

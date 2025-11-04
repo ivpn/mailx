@@ -78,11 +78,11 @@ func (s *Service) ValidateSendReplyDailyCount(ctx context.Context, userID string
 	return nil
 }
 
-func (s *Service) RemoveLastMessage(ctx context.Context, userID string, typ model.MessageType) error {
-	messages, err := s.Store.GetMessagesByUser(ctx, userID)
+func (s *Service) RemoveLastMessage(ctx context.Context, aliasId string, userId string, typ model.MessageType) error {
+	messages, err := s.Store.GetMessagesByAlias(ctx, aliasId)
 	if err != nil {
-		log.Printf("error getting messages by user ID: %s", err.Error())
-		return ErrGetMessagesByUser
+		log.Printf("error getting messages by alias ID: %s", err.Error())
+		return ErrGetMessagesByAlias
 	}
 	var lastMessageID uint
 	for i := len(messages) - 1; i >= 0; i-- {
@@ -96,7 +96,7 @@ func (s *Service) RemoveLastMessage(ctx context.Context, userID string, typ mode
 		return nil // No message of the specified type found
 	}
 
-	err = s.Store.DeleteMessage(ctx, lastMessageID, userID)
+	err = s.Store.DeleteMessage(ctx, lastMessageID, userId)
 	if err != nil {
 		log.Printf("error deleting message by ID: %s", err.Error())
 		return ErrDeleteMessageByUserID

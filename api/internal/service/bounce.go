@@ -169,7 +169,7 @@ func (s *Service) ProcessBounce(userId string, aliasId string, data []byte, msg 
 		return err
 	}
 
-	err = s.RemoveLastMessage(context.Background(), userId, msgType)
+	err = s.RemoveLastMessage(context.Background(), userId, userId, msgType)
 	if err != nil {
 		return err
 	}

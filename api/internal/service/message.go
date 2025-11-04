@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 
 	"ivpn.net/email/api/internal/model"
@@ -84,16 +85,23 @@ func (s *Service) RemoveLastMessage(ctx context.Context, aliasId string, userId 
 		log.Printf("error getting messages by alias ID: %s", err.Error())
 		return ErrGetMessagesByAlias
 	}
+
+	// print messages for debugging
+	for _, msg := range messages {
+		log.Printf("message found: %v", msg)
+	}
+
 	var lastMessageID uint
 	for i := len(messages) - 1; i >= 0; i-- {
+		// print message for debugging
+		log.Printf("evaluating message: %v", messages[i])
 		if messages[i].Type == typ {
 			lastMessageID = messages[i].ID
 			break
 		}
 	}
-
 	if lastMessageID == 0 {
-		return nil // No message of the specified type found
+		return fmt.Errorf("no message found to delete for type: %v", typ)
 	}
 
 	err = s.Store.DeleteMessage(ctx, lastMessageID, userId)

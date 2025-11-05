@@ -27,9 +27,7 @@
                             <span class="text-tertiary">From</span>: {{ bounce.from }}<br>
                             <span class="text-tertiary">To</span>: {{ bounce.destination }}<br>
                             <span class="text-tertiary">Status</span>: {{ bounce.status }}<br>
-                            <span class="text-tertiary">Remote MTA</span>: {{ bounce.remote_mta }}<br>
                             <span class="text-tertiary">Diagnostic Code</span>: {{ bounce.diagnostic_code }}<br>
-                            <span class="text-tertiary">Created At</span>: {{ formatDate(bounce.created_at) }}<br>
                             <span class="text-tertiary">Attempted At</span>: {{ formatDate(bounce.attempted_at) }}<br>
                             <button v-bind:data-hs-overlay="'#modal-delivery-log' + bounce.id" class="cta mt-3">Full log</button>
                         </td>

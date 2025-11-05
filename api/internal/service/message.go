@@ -86,15 +86,8 @@ func (s *Service) RemoveLastMessage(ctx context.Context, aliasId string, userId 
 		return ErrGetMessagesByAlias
 	}
 
-	// print messages for debugging
-	for _, msg := range messages {
-		log.Printf("message found: %v", msg)
-	}
-
 	var lastMessageID uint
 	for i := len(messages) - 1; i >= 0; i-- {
-		// print message for debugging
-		log.Printf("evaluating message: %v", messages[i])
 		if messages[i].Type == typ {
 			lastMessageID = messages[i].ID
 			break

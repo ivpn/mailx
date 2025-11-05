@@ -134,20 +134,20 @@ func (s *Service) ProcessBounce(userId string, aliasId string, data []byte, msg 
 		if after, ok := bytes.CutPrefix(line, []byte("Status:")); ok {
 			status = string(after)
 		}
-		// Capture Diagnostic-Code header and its folded continuation lines.
 		if after, ok := bytes.CutPrefix(line, []byte("Diagnostic-Code:")); ok {
-			diagnosticCode = strings.TrimSpace(string(after))
-			continue
+			diagnosticCode = string(after)
 		}
-		// RFC 5322 header folding: continuation lines start with space or tab.
-		if len(diagnosticCode) > 0 && len(line) > 0 && (line[0] == ' ' || line[0] == '\t') {
-			diagnosticCode += " " + strings.TrimSpace(string(line))
-		}
-		if _, ok := bytes.CutPrefix(line, []byte("In-Reply-To")); ok {
+		if _, ok := bytes.CutPrefix(line, []byte("In-Reply-To:")); ok {
 			msgType = model.Reply
 		}
-		if _, ok := bytes.CutPrefix(line, []byte("References")); ok {
+		if _, ok := bytes.CutPrefix(line, []byte("References:")); ok {
 			msgType = model.Reply
+		}
+		if after, ok := bytes.CutPrefix(line, []byte("Subject:")); ok {
+			subject := string(after)
+			if strings.Contains(subject, "Re:") || strings.Contains(subject, "RE:") {
+				msgType = model.Reply
+			}
 		}
 		if after, ok := bytes.CutPrefix(line, []byte("Date:")); ok {
 			date, err = dateparse.ParseAny(string(after))
@@ -184,6 +184,9 @@ func (s *Service) ProcessBounce(userId string, aliasId string, data []byte, msg 
 	if err != nil {
 		return err
 	}
+
+	log.Print("Bounce:", bounce)
+	log.Print("MsgType:", msgType)
 
 	log.Printf("Bounce email processed successfully, %v", messageId)
 

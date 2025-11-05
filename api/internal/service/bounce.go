@@ -150,7 +150,7 @@ func (s *Service) ProcessBounce(userId string, aliasId string, data []byte, msg 
 			}
 		}
 		if after, ok := bytes.CutPrefix(line, []byte("Date:")); ok {
-			date, err = dateparse.ParseAny(string(after))
+			date, err = dateparse.ParseAny(string(bytes.TrimSpace(after)))
 			if err != nil {
 				log.Println("error parsing bounce date:", err.Error())
 			}
@@ -180,7 +180,7 @@ func (s *Service) ProcessBounce(userId string, aliasId string, data []byte, msg 
 		return err
 	}
 
-	err = s.RemoveLastMessage(context.Background(), userId, userId, msgType)
+	err = s.RemoveLastMessage(context.Background(), aliasId, userId, msgType)
 	if err != nil {
 		return err
 	}

@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/araddon/dateparse"
@@ -105,6 +106,9 @@ func (s *Service) ProcessBounce(userId string, aliasId string, data []byte, msg 
 		return nil
 	}
 
+	// log the entire data email for debugging
+	log.Printf("Bounce email raw data: %s", string(data))
+
 	var messageId string
 	var to string
 	var remoteMta string
@@ -124,22 +128,28 @@ func (s *Service) ProcessBounce(userId string, aliasId string, data []byte, msg 
 		if after, ok := bytes.CutPrefix(line, []byte("Original-Recipient: rfc822;")); ok {
 			to = string(after)
 		}
-		if after, ok := bytes.CutPrefix(line, []byte("Remote-MTA: ")); ok {
+		if after, ok := bytes.CutPrefix(line, []byte("Remote-MTA:")); ok {
 			remoteMta = string(after)
 		}
-		if after, ok := bytes.CutPrefix(line, []byte("Status: ")); ok {
+		if after, ok := bytes.CutPrefix(line, []byte("Status:")); ok {
 			status = string(after)
 		}
-		if after, ok := bytes.CutPrefix(line, []byte("Diagnostic-Code: ")); ok {
-			diagnosticCode = string(after)
+		// Capture Diagnostic-Code header and its folded continuation lines.
+		if after, ok := bytes.CutPrefix(line, []byte("Diagnostic-Code:")); ok {
+			diagnosticCode = strings.TrimSpace(string(after))
+			continue
 		}
-		if _, ok := bytes.CutPrefix(line, []byte("In-Reply-To: ")); ok {
+		// RFC 5322 header folding: continuation lines start with space or tab.
+		if len(diagnosticCode) > 0 && len(line) > 0 && (line[0] == ' ' || line[0] == '\t') {
+			diagnosticCode += " " + strings.TrimSpace(string(line))
+		}
+		if _, ok := bytes.CutPrefix(line, []byte("In-Reply-To")); ok {
 			msgType = model.Reply
 		}
-		if _, ok := bytes.CutPrefix(line, []byte("References: ")); ok {
+		if _, ok := bytes.CutPrefix(line, []byte("References")); ok {
 			msgType = model.Reply
 		}
-		if after, ok := bytes.CutPrefix(line, []byte("Date: ")); ok {
+		if after, ok := bytes.CutPrefix(line, []byte("Date:")); ok {
 			date, err = dateparse.ParseAny(string(after))
 			if err != nil {
 				log.Println("error parsing bounce date:", err.Error())
@@ -149,6 +159,7 @@ func (s *Service) ProcessBounce(userId string, aliasId string, data []byte, msg 
 
 	bounce := model.Bounce{
 		ID:             uuid.New().String(),
+		CreatedAt:      time.Now(),
 		AttemptedAt:    date,
 		UserID:         userId,
 		AliasID:        aliasId,

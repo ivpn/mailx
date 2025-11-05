@@ -115,6 +115,7 @@ func (s *Service) ProcessBounce(userId string, aliasId string, data []byte, msg 
 	var status string
 	var diagnosticCode string
 	var date time.Time
+	var inDiag = false
 	msgType := model.Send
 	for _, line := range bytes.Split(data, []byte{'\n'}) {
 		if after, ok := bytes.CutPrefix(line, []byte("Message-Id: ")); ok {
@@ -134,8 +135,21 @@ func (s *Service) ProcessBounce(userId string, aliasId string, data []byte, msg 
 		if after, ok := bytes.CutPrefix(line, []byte("Status:")); ok {
 			status = string(after)
 		}
+		// Collect all lines from Diagnostic-Code: until a line starting with "--"
+		if inDiag {
+			trim := bytes.TrimSpace(line)
+			if bytes.HasPrefix(trim, []byte("--")) || len(trim) == 0 {
+				inDiag = false
+			} else {
+				if diagnosticCode != "" {
+					diagnosticCode += " "
+				}
+				diagnosticCode += string(trim)
+			}
+		}
 		if after, ok := bytes.CutPrefix(line, []byte("Diagnostic-Code:")); ok {
-			diagnosticCode = string(after)
+			diagnosticCode = string(bytes.TrimSpace(after))
+			inDiag = true
 		}
 		if _, ok := bytes.CutPrefix(line, []byte("In-Reply-To:")); ok {
 			msgType = model.Reply

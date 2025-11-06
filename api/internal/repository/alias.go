@@ -94,6 +94,12 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 	return aliases, nil
 }
 
+func (d *Database) GetAllAliases(ctx context.Context, userID string) ([]model.Alias, error) {
+	aliases := []model.Alias{}
+	err := d.Client.Where("user_id = ?", userID).Order("created_at desc").Find(&aliases).Error
+	return aliases, err
+}
+
 func (d *Database) GetAliasCount(ctx context.Context, userID string, catchAll string, search string) (int, error) {
 	if catchAll == "true" {
 		catchAll = " AND catch_all = true"

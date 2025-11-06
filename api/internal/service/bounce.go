@@ -106,9 +106,6 @@ func (s *Service) ProcessBounce(userId string, aliasId string, data []byte, msg 
 		return nil
 	}
 
-	// log the entire data email for debugging
-	log.Printf("Bounce email raw data: %s", string(data))
-
 	var messageId string
 	var to string
 	var remoteMta string
@@ -198,9 +195,6 @@ func (s *Service) ProcessBounce(userId string, aliasId string, data []byte, msg 
 	if err != nil {
 		return err
 	}
-
-	log.Print("Bounce:", bounce)
-	log.Print("MsgType:", msgType)
 
 	log.Printf("Bounce email processed successfully, %v", messageId)
 

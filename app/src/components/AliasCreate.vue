@@ -229,6 +229,8 @@ const close = () => {
     error.value = ''
     errorCatchAllSuffix.value = false
 
+    document.removeEventListener('keydown', handleKeydown)
+
     const accordionInstance = accordion.getInstance('#alias-accordion-one', true);
     if (accordionInstance && 'element' in accordionInstance) {
         accordionInstance.element.hide()
@@ -246,11 +248,27 @@ const addEvents = () => {
     modal.element.on('close', () => {
         close()
     })
+    modal.element.on('open', () => {
+        document.addEventListener('keydown', handleKeydown)
+        focusFirstInput()
+    })
 
     const multiselect = select.getInstance('#create-alias-recipient' as any, true) as any
     multiselect.element.on('change', (val: any) => {
         errorRecipients.value = val.length === 0 ? 'Select one or more recipients' : ''
     })
+}
+
+const handleKeydown = (event: KeyboardEvent) => {
+    if (event.key === 'Enter') {
+        event.preventDefault()
+        postAlias()
+    }
+}
+
+const focusFirstInput = () => {
+    const input = props.catchAll ? document.getElementById('alias_description') : document.getElementById('alias_description')
+    input?.focus()
 }
 
 const validate = (rcps: string) => {

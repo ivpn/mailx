@@ -1,12 +1,6 @@
 <template>
-    <div class="mb-5">
-        <h2>Delete Recipient</h2>
-        <button
-            v-bind:data-hs-overlay="'#modal-delete-recipient'"
-            class="cta delete mb-4">
-            Delete Recipient
-        </button>
-        <div v-bind:id="'modal-delete-recipient'" class="hs-overlay hidden">
+    <div>
+        <div v-bind:id="'modal-delete-recipient' + recipient.id" class="hs-overlay hidden">
             <div>
                 <div>
                     <header>
@@ -19,7 +13,7 @@
                         <div>
                             <div class="mb-5">
                                 <p>
-                                    <strong>WARNING:</strong> this operation cannot be undone. Deleting your recipient will permanently remove it from all associated aliases.
+                                    <strong>WARNING:</strong> this operation cannot be undone. Deleting your recipient will permanently remove it from all associated aliases. Aliases without recipient(s) will be disabled.
                                 </p>
                             </div>
                         </div>
@@ -55,7 +49,7 @@ const req = ref({ recipients: '' })
 const error = ref('')
 
 const deleteRecipient = async () => {
-    if (!confirm('Are you sure you want to delete recipient? Note that aliases without recipient(s) will be disabled.')) return
+    if (!confirm('Are you sure you want to delete recipient? Aliases without recipient(s) will be disabled.')) return
 
     const data = { recipients: recipients.value }
 
@@ -93,12 +87,12 @@ const getRecipients = async () => {
 const close = () => {
     req.value = {} as any
     error.value = ''
-    const modal = document.querySelector('#modal-delete-recipient') as any
+    const modal = document.querySelector('#modal-delete-recipient' + recipient.value.id) as any
     overlay.close(modal)
 }
 
 const addEvents = () => {
-    const modal = overlay.getInstance('#modal-delete-recipient' as any, true) as any
+    const modal = overlay.getInstance('#modal-delete-recipient' + recipient.value.id as any, true) as any
     modal.element.on('close', () => {
         close()
     })

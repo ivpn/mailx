@@ -220,7 +220,7 @@ func (s *Service) DeleteRecipient(ctx context.Context, ID string, userID string,
 			r = strings.Replace(r, ","+recipient.Email, "", -1)
 			r = strings.Replace(r, recipient.Email, "", -1)
 			alias.Recipients = model.MergeCommaSeparatedEmails(r, newRecipients)
-			alias.Enabled = r != ""
+			alias.Enabled = alias.Recipients != ""
 
 			// Update alias
 			err = s.Store.UpdateAlias(ctx, alias)

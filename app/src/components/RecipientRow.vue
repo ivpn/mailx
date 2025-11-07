@@ -166,7 +166,7 @@ const deleteRecipient = async () => {
     if (!confirm('Are you sure you want to delete recipient? Note that aliases with this recipient will be disabled.')) return
 
     try {
-        await recipientApi.delete(recipient.value.id)
+        await recipientApi.delete(recipient.value.id, { recipients: [] })
         events.emit('recipient.reload', {})
     } catch (err) {
         if (axios.isAxiosError(err)) {

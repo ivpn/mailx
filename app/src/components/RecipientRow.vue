@@ -147,7 +147,7 @@
     <RecipientAddPGPKey :recipient="recipient" />
     <RecipientVerify :recipient="recipient" />
     <RecipientEdit :recipient="recipient" />
-    <RecipientDelete :recipient="recipient" />
+    <RecipientDelete :recipient="recipient" :recipients="recipients" />
 </template>
 
 <script setup lang="ts">
@@ -162,8 +162,9 @@ import events from '../events.ts'
 import dropdown from '@preline/dropdown'
 import axios from 'axios'
 
-const props = defineProps(['recipient'])
+const props = defineProps(['recipient', 'recipients'])
 const recipient = ref(props.recipient)
+const recipients = ref(props.recipients)
 const copyText = ref('Click to copy')
 
 const updateRecipient = async () => {

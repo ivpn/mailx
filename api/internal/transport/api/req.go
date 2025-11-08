@@ -43,6 +43,10 @@ type RecipientReq struct {
 	PGPInline  bool   `json:"pgp_inline"`
 }
 
+type DeleteRecipientReq struct {
+	Recipients string `json:"recipients"`
+}
+
 type SettingsReq struct {
 	ID          string `json:"id" validate:"required,uuid"`
 	Domain      string `json:"domain"`

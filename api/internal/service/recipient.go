@@ -196,7 +196,7 @@ func (s *Service) UpdateRecipient(ctx context.Context, recipient model.Recipient
 	return nil
 }
 
-func (s *Service) DeleteRecipient(ctx context.Context, ID string, userID string) error {
+func (s *Service) DeleteRecipient(ctx context.Context, ID string, userID string, newRecipients string) error {
 	// Get recipient
 	recipient, err := s.Store.GetRecipient(ctx, ID, userID)
 	if err != nil {
@@ -219,8 +219,8 @@ func (s *Service) DeleteRecipient(ctx context.Context, ID string, userID string)
 			r = strings.Replace(r, recipient.Email+",", "", -1)
 			r = strings.Replace(r, ","+recipient.Email, "", -1)
 			r = strings.Replace(r, recipient.Email, "", -1)
-			alias.Recipients = r
-			alias.Enabled = r != ""
+			alias.Recipients = model.MergeCommaSeparatedEmails(r, newRecipients)
+			alias.Enabled = alias.Recipients != ""
 
 			// Update alias
 			err = s.Store.UpdateAlias(ctx, alias)

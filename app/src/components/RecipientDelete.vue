@@ -13,12 +13,12 @@
                         <div>
                             <div class="mb-5">
                                 <p>
-                                    <strong>WARNING:</strong> This operation cannot be undone. Deleting your recipient will permanently remove it from all associated aliases. Aliases without recipient(s) will be disabled.
+                                    <strong>WARNING:</strong> This operation cannot be undone. Deleting this recipient will remove it from all associated aliases, and any alias without a recipient will be disabled.
                                 </p>
                             </div>
                             <div class="mb-5">
                                 <p>
-                                    Optionally, you can select new recipient for aliases that currently use this recipient:
+                                    You may choose a new recipient for the affected aliases:
                                 </p>
                                 <label v-bind:for="'recipient_' + recipient.id">
                                     Recipient(s):

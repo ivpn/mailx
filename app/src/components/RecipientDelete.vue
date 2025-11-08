@@ -82,7 +82,7 @@ const error = ref('')
 const deleteRecipient = async () => {
     if (!confirm('Are you sure you want to delete recipient? Aliases without recipient(s) will be disabled.')) return
 
-    const data = { recipients: newEmails.value }
+    const data = { recipients: newEmails.value.join(',') }
 
     try {
         await recipientApi.delete(recipient.value.id, data)

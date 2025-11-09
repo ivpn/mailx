@@ -81,7 +81,10 @@ func (s *Service) ProcessMessage(data []byte) error {
 					return
 				}
 
-				s.saveMessage(alias, relayType, data)
+				err = s.SaveMessage(context.Background(), alias, relayType)
+				if err != nil {
+					log.Println("error saving message", err)
+				}
 			})
 		}
 	}
@@ -127,31 +130,25 @@ func (s *Service) queueMessage(from string, fromName string, settingsFromName st
 	return nil
 }
 
-func (s *Service) saveMessage(alias model.Alias, msgType model.MessageType, data []byte) {
-	err := s.PostMessage(context.Background(), model.Message{
-		AliasID: alias.ID,
-		UserID:  alias.UserID,
-		Type:    msgType,
-	})
-	if err != nil {
-		log.Println("error saving message", err)
-	}
-}
-
-func (s *Service) findRecipients(from string, email string, msgType model.MessageType) ([]model.Recipient, model.Alias, model.MessageType, error) {
-	name, replyTo := model.ParseReplyTo(email)
-
+func (s *Service) findRecipients(from string, to string, msgType model.MessageType) ([]model.Recipient, model.Alias, model.MessageType, error) {
+	// Extract alias name from the "to" email
+	name, replyTo := model.ParseReplyTo(to)
 	alias, err := s.GetAliasByName(name)
 	if err != nil {
 		return []model.Recipient{}, model.Alias{}, 0, err
 	}
 
+	// Handle disabled alias
 	if !alias.Enabled {
-		// Block
-		s.saveMessage(alias, model.Block, []byte{})
+		err = s.SaveMessage(context.Background(), alias, model.Block)
+		if err != nil {
+			log.Println("error saving message", err)
+		}
+
 		return []model.Recipient{}, model.Alias{}, 0, ErrDisabledAlias
 	}
 
+	// Handle Reply | Send
 	err = utils.ValidateEmail(replyTo)
 	if err == nil {
 		rcps, err := s.GetVerifiedRecipients(context.Background(), from, alias.UserID)
@@ -162,6 +159,7 @@ func (s *Service) findRecipients(from string, email string, msgType model.Messag
 		return []model.Recipient{{Email: replyTo}}, alias, model.MessageType(msgType), nil
 	}
 
+	// Handle Forward
 	rcps, err := s.GetRecipients(context.Background(), alias.UserID)
 	if err != nil || len(rcps) == 0 {
 		return []model.Recipient{}, model.Alias{}, 0, ErrNoRecipients

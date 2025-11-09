@@ -72,20 +72,36 @@
                     type="text"
                 >
             </div>
-
-            <h4>Failed Deliveries</h4>
+            <h4>Logs</h4>
+            <h5>Failed Deliveries</h5>
             <p>
                 Turn logging of failed email deliveries (bounces) from aliases on or off. When enabled, any failed delivery attempts are recorded and stored for 7 days.
             </p>
             <div class="mb-8">
                 <label for="log-bounce">
-                    Log failed deliveries:
+                    Log Failed Deliveries:
                 </label>
                 <input
                     @change="saveSettings"
                     v-bind:checked="req.log_bounce"
                     v-model="req.log_bounce"
                     id="log-bounce"
+                    type="checkbox"
+                >
+            </div>
+            <h5>Discarded Emails</h5>
+            <p>
+                Turn logging of discarded emails on or off. When enabled, any discarded emails for your aliases are recorded and stored for 7 days.
+            </p>
+            <div class="mb-8">
+                <label for="log-discard">
+                    Log Discarded Emails:
+                </label>
+                <input
+                    @change="saveSettings"
+                    v-bind:checked="req.log_discard"
+                    v-model="req.log_discard"
+                    id="log-discard"
                     type="checkbox"
                 >
             </div>
@@ -113,6 +129,7 @@ const req = ref({
     from_name: '',
     alias_format: '',
     log_bounce: false,
+    log_discard: false,
 })
 const envDomains = import.meta.env.VITE_DOMAINS.split(',')
 const domains = ref(envDomains)
@@ -138,6 +155,7 @@ const saveSettings = async () => {
     req.value.recipient = (document.getElementById('recipient') as HTMLSelectElement).value
     req.value.alias_format = (document.getElementById('format') as HTMLSelectElement).value
     req.value.log_bounce = (document.getElementById('log-bounce') as HTMLInputElement).checked
+    req.value.log_discard = (document.getElementById('log-discard') as HTMLInputElement).checked
 
     try {
         const res = await settingsApi.update(req.value)

@@ -45,10 +45,15 @@ func (s *Service) GetMessagesByAlias(ctx context.Context, aliasID string) ([]mod
 	return messages, nil
 }
 
-func (s *Service) PostMessage(ctx context.Context, message model.Message) error {
+func (s *Service) SaveMessage(ctx context.Context, alias model.Alias, msgType model.MessageType) error {
+	message := model.Message{
+		AliasID: alias.ID,
+		UserID:  alias.UserID,
+		Type:    msgType,
+	}
+
 	err := s.Store.PostMessage(ctx, message)
 	if err != nil {
-		log.Printf("error posting message: %s", err.Error())
 		return ErrPostMessage
 	}
 

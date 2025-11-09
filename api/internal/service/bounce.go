@@ -14,25 +14,25 @@ import (
 )
 
 var (
-	ErrGetBouncesByUser     = errors.New("Unable to retrieve bounces for this user.")
-	ErrPostBounce           = errors.New("Unable to create bounce.")
-	ErrDeleteBounceByUserID = errors.New("Unable to delete bounces for this user.")
+	ErrGetBounces    = errors.New("Unable to retrieve bounces for this user.")
+	ErrPostBounce    = errors.New("Unable to create bounce.")
+	ErrDeleteBounces = errors.New("Unable to delete bounces for this user.")
 )
 
 type BounceStore interface {
-	GetBouncesByUser(context.Context, string) ([]model.Bounce, error)
+	GetBounces(context.Context, string) ([]model.Bounce, error)
 	GetBounce(context.Context, string, string) (model.Bounce, error)
 	GetBounceFile(context.Context, string) ([]byte, error)
 	PostBounce(context.Context, model.Bounce) error
-	DeleteBounceByUserID(context.Context, string) error
+	DeleteBounces(context.Context, string) error
 	SaveBounceToFile(context.Context, string, []byte) error
 }
 
 func (s *Service) GetBounces(ctx context.Context, userID string) ([]model.Bounce, error) {
-	bounces, err := s.Store.GetBouncesByUser(ctx, userID)
+	bounces, err := s.Store.GetBounces(ctx, userID)
 	if err != nil {
 		log.Printf("error getting bounces by user ID: %s", err.Error())
-		return nil, ErrGetBouncesByUser
+		return nil, ErrGetBounces
 	}
 
 	return bounces, nil
@@ -86,11 +86,11 @@ func (s *Service) SaveBounceToFile(ctx context.Context, filename string, data []
 	return nil
 }
 
-func (s *Service) DeleteBounceByUserID(ctx context.Context, userID string) error {
-	err := s.Store.DeleteBounceByUserID(ctx, userID)
+func (s *Service) DeleteBounces(ctx context.Context, userID string) error {
+	err := s.Store.DeleteBounces(ctx, userID)
 	if err != nil {
 		log.Printf("error deleting bounces by user ID: %s", err.Error())
-		return ErrDeleteBounceByUserID
+		return ErrDeleteBounces
 	}
 
 	return nil

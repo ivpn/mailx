@@ -21,6 +21,7 @@ type Service interface {
 	SessionService
 	CredentialService
 	BounceService
+	DiscardService
 }
 
 type Handler struct {

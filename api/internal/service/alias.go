@@ -177,3 +177,13 @@ func (s *Service) DeleteAliasByUserID(ctx context.Context, userID string) error 
 
 	return nil
 }
+
+func (s *Service) FindAlias(email string) (model.Alias, error) {
+	name, _ := model.ParseReplyTo(email)
+	alias, err := s.GetAliasByName(name)
+	if err != nil {
+		return model.Alias{}, err
+	}
+
+	return alias, nil
+}

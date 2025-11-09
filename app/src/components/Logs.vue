@@ -44,6 +44,7 @@
                                     <span class="text-tertiary">Diagnostic Code</span>: {{ bounce.diagnostic_code }}<br>
                                     <span class="text-tertiary">Attempted At</span>: {{ formatDate(bounce.attempted_at) }}<br>
                                     <button v-bind:data-hs-overlay="'#modal-delivery-log' + bounce.id" class="cta mt-3">Full log</button>
+                                    <hr v-if="bounce.id !== bounces[bounces.length - 1]?.id" class="mt-8 mb-0">
                                 </td>
                                 <FailedDeliveryLog :log="bounce" />
                             </tr>
@@ -78,8 +79,8 @@
                                     <span class="text-tertiary">From</span>: {{ discard.from }}<br>
                                     <span class="text-tertiary">To</span>: {{ discard.destination }}<br>
                                     <span class="text-tertiary">Reason</span>: {{ discard.message }}<br>
-                                    <span class="text-tertiary">Attempted At</span>: {{ formatDate(discard.created_at) }}<br>
-                                    <button v-bind:data-hs-overlay="'#modal-delivery-log' + discard.id" class="cta mt-3">Full log</button>
+                                    <span class="text-tertiary">Attempted At</span>: {{ formatDate(discard.created_at) }}
+                                    <hr v-if="discard.id !== discards[discards.length - 1]?.id" class="mt-8 mb-0">
                                 </td>
                             </tr>
                         </tbody>

@@ -1,7 +1,7 @@
 <template>
     <div class="card-container">
         <header class="head">
-            <h2>Failed Deliveries</h2>
+            <h2>Logs</h2>
         </header>
         <div v-if="!list.length && loaded" class="card-empty">
             <span class="bg-secondary rounded flex items-center justify-center p-2 mb-5">

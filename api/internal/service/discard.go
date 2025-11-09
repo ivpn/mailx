@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"log"
+	"time"
 
+	"github.com/google/uuid"
 	"ivpn.net/email/api/internal/model"
 )
 
@@ -45,6 +47,26 @@ func (s *Service) DeleteDiscards(ctx context.Context, userID string) error {
 	if err != nil {
 		log.Printf("error deleting discards by user ID: %s", err.Error())
 		return ErrDeleteDiscards
+	}
+
+	return nil
+}
+
+func (s *Service) ProcessDiscard(alias model.Alias, from string, destination string, message string) error {
+	discard := model.Discard{
+		ID:          uuid.New().String(),
+		CreatedAt:   time.Now(),
+		UserID:      alias.UserID,
+		AliasID:     alias.ID,
+		From:        from,
+		Destination: destination,
+		Message:     message,
+	}
+
+	err := s.PostDiscard(context.Background(), discard)
+	if err != nil {
+		log.Printf("error processing discard: %s", err.Error())
+		return err
 	}
 
 	return nil

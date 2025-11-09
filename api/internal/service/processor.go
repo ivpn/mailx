@@ -14,7 +14,7 @@ var (
 	ErrInactiveSubscription = errors.New("Subscription is inactive.")
 	ErrDisabledAlias        = errors.New("This alias is disabled.")
 	ErrNoRecipients         = errors.New("No recipients found.")
-	ErrNoVerifiedRecipients = errors.New("No verified recipients found.")
+	ErrNoVerifiedRecipients = errors.New("No verified recipients found for sender address.")
 	ErrInactiveRecipient    = errors.New("The recipient is inactive.")
 )
 
@@ -47,9 +47,20 @@ func (s *Service) ProcessMessage(data []byte) error {
 		if err != nil {
 			log.Println("error processing message", err)
 
-			// Handle no verified recipients discard
+			// Handle ErrNoVerifiedRecipients
 			if errors.Is(err, ErrNoVerifiedRecipients) {
-				continue
+				settings, err := s.GetSettings(context.Background(), alias.UserID)
+				if err != nil {
+					log.Println("error getting settings", err)
+					continue
+				}
+
+				if settings.LogDiscard {
+					err := s.ProcessDiscard(alias, msg.From, to, ErrNoVerifiedRecipients.Error())
+					if err != nil {
+						log.Println("error processing discard", err)
+					}
+				}
 			}
 
 			continue

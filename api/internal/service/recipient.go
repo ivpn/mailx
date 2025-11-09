@@ -316,7 +316,7 @@ func (s *Service) FindRecipients(from string, to string, msgType model.MessageTy
 	if err == nil {
 		rcps, err := s.GetVerifiedRecipients(context.Background(), from, alias.UserID)
 		if err != nil || len(rcps) == 0 {
-			return []model.Recipient{}, model.Alias{}, 0, ErrNoVerifiedRecipients
+			return []model.Recipient{}, alias, 0, ErrNoVerifiedRecipients
 		}
 
 		return []model.Recipient{{Email: replyTo}}, alias, model.MessageType(msgType), nil

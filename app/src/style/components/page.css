@@ -23,6 +23,10 @@
         @apply flex flex-col py-5 px-8 border-secondary border bg-primary items-center justify-center text-center grow;
     }
 
+    .card-fill {
+        @apply flex flex-col grow;
+    }
+
     .card-primary {
         @apply flex flex-col py-5 md:px-7 px-5 border-secondary border bg-primary grow;
     }

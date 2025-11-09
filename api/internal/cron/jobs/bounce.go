@@ -11,18 +11,18 @@ import (
 )
 
 const (
-	baseDir = "/var/log/bounce"
-	expDays = 7
+	BounceBaseDir = "/var/log/bounce"
+	BounceExpDays = 7
 )
 
 // Delete bounces older than 7 days
 func DeleteOldBounces(db *gorm.DB) {
-	err := cleanupOldBounceFiles(expDays * 24 * time.Hour)
+	err := cleanupOldBounceFiles(BounceExpDays * 24 * time.Hour)
 	if err != nil {
 		log.Println("Error cleaning up old bounce files:", err)
 	}
 
-	err = db.Where("created_at < NOW() - INTERVAL ? DAY", expDays).Delete(&model.Bounce{}).Error
+	err = db.Where("created_at < NOW() - INTERVAL ? DAY", BounceExpDays).Delete(&model.Bounce{}).Error
 	if err != nil {
 		log.Println("Error deleting old bounces:", err)
 	}
@@ -31,7 +31,7 @@ func DeleteOldBounces(db *gorm.DB) {
 func cleanupOldBounceFiles(maxAge time.Duration) error {
 	cutoff := time.Now().Add(-maxAge)
 
-	err := filepath.Walk(baseDir, func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(BounceBaseDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}

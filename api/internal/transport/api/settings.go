@@ -68,13 +68,14 @@ func (h *Handler) UpdateSettings(c *fiber.Ctx) error {
 	}
 
 	settings := model.Settings{
-		UserID:      userID,
-		Domain:      req.Domain,
-		Recipient:   req.Recipient,
-		FromName:    req.FromName,
-		AliasFormat: req.AliasFormat,
-		LogBounce:   req.LogBounce,
-		LogDiscard:  req.LogDiscard,
+		UserID:       userID,
+		Domain:       req.Domain,
+		Recipient:    req.Recipient,
+		FromName:     req.FromName,
+		AliasFormat:  req.AliasFormat,
+		LogBounce:    req.LogBounce,
+		LogDiscard:   req.LogDiscard,
+		RemoveHeader: req.RemoveHeader,
 	}
 	settings.ID = req.ID
 

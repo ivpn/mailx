@@ -120,6 +120,14 @@ const addEvents = () => {
     modal.element.on('close', () => {
         close()
     })
+    modal.element.on('open', () => {
+        focusFirstInput()
+    })
+}
+
+const focusFirstInput = () => {
+    const input = document.getElementById('to_email_' + alias.value.id) as HTMLInputElement
+    input?.focus()
 }
 
 onMounted(() => {

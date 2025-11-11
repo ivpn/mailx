@@ -267,7 +267,7 @@ const handleKeydown = (event: KeyboardEvent) => {
 }
 
 const focusFirstInput = () => {
-    const input = props.catchAll ? document.getElementById('alias_description') : document.getElementById('alias_description')
+    const input = props.catchAll ? document.getElementById('alias_catch_all_suffix') : document.getElementById('alias_description')
     input?.focus()
 }
 

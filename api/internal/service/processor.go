@@ -92,7 +92,7 @@ func (s *Service) ProcessMessage(data []byte) error {
 
 		for _, recipient := range recipients {
 			utils.Background(func() {
-				err = s.QueueMessage(msg.From, msg.FromName, settings.FromName, recipient, data, alias, relayType)
+				err = s.QueueMessage(msg.From, msg.FromName, recipient, data, alias, relayType, settings)
 				if err != nil {
 					log.Println("error queueing message", err)
 					return
@@ -109,7 +109,7 @@ func (s *Service) ProcessMessage(data []byte) error {
 	return err
 }
 
-func (s *Service) QueueMessage(from string, fromName string, settingsFromName string, rcp model.Recipient, data []byte, alias model.Alias, msgType model.MessageType) error {
+func (s *Service) QueueMessage(from string, fromName string, rcp model.Recipient, data []byte, alias model.Alias, msgType model.MessageType, settings model.Settings) error {
 	mailer := mailer.New(s.Cfg.SMTPClient)
 
 	// Queue Forward
@@ -119,7 +119,7 @@ func (s *Service) QueueMessage(from string, fromName string, settingsFromName st
 			"from":  from,
 		}
 		generatedFrom := model.GenerateReplyTo(alias.Name, from)
-		err := mailer.Forward(generatedFrom, fromName, rcp, data, "header.tmpl", templateData)
+		err := mailer.Forward(generatedFrom, fromName, rcp, data, "header.tmpl", templateData, settings)
 		if err != nil {
 			log.Println("error forwarding message", err)
 			return err
@@ -134,7 +134,7 @@ func (s *Service) QueueMessage(from string, fromName string, settingsFromName st
 
 		name := alias.FromName
 		if name == "" {
-			name = settingsFromName
+			name = settings.FromName
 		}
 
 		err = mailer.Reply(alias.Name, name, rcp, data)

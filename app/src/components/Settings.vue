@@ -72,6 +72,22 @@
                     type="text"
                 >
             </div>
+            <h4>Mailx Header</h4>
+            <p>
+                Add Mailx header in forwarded messages - `Sent to &lt;alias&gt; from &lt;sender&gt;`.
+            </p>
+            <div class="mb-8">
+                <label for="remove-header">
+                    Add Mailx header:
+                </label>
+                <input
+                    @change="saveSettings"
+                    v-bind:checked="!req.remove_header"
+                    v-model="includeHeader"
+                    id="remove-header"
+                    type="checkbox"
+                >
+            </div>
             <h4>Logs</h4>
             <h5>Failed Deliveries</h5>
             <p>
@@ -130,6 +146,7 @@ const req = ref({
     alias_format: '',
     log_bounce: false,
     log_discard: false,
+    remove_header: false,
 })
 const envDomains = import.meta.env.VITE_DOMAINS.split(',')
 const domains = ref(envDomains)
@@ -137,6 +154,7 @@ const recipients = ref([])
 const success = ref('')
 const error = ref('')
 const aliasFormats = ref(['Words', 'Random', 'UUID'])
+const includeHeader = ref(true)
 
 const getSettings = async () => {
     try {
@@ -156,6 +174,7 @@ const saveSettings = async () => {
     req.value.alias_format = (document.getElementById('format') as HTMLSelectElement).value
     req.value.log_bounce = (document.getElementById('log-bounce') as HTMLInputElement).checked
     req.value.log_discard = (document.getElementById('log-discard') as HTMLInputElement).checked
+    req.value.remove_header = !includeHeader.value
 
     try {
         const res = await settingsApi.update(req.value)

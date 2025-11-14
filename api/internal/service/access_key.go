@@ -21,8 +21,8 @@ type AccessKeyStore interface {
 	DeleteAccessKeysByUserID(context.Context, string) error
 }
 
-func (s *Service) GetAccessKeys(ctx context.Context, userID string) ([]model.AccessKey, error) {
-	accessKeys, err := s.Store.GetAccessKeys(ctx, userID)
+func (s *Service) GetAccessKeys(ctx context.Context, userId string) ([]model.AccessKey, error) {
+	accessKeys, err := s.Store.GetAccessKeys(ctx, userId)
 	if err != nil {
 		log.Printf("error getting access keys: %s", err.Error())
 		return nil, ErrGetAccessKeys
@@ -31,7 +31,7 @@ func (s *Service) GetAccessKeys(ctx context.Context, userID string) ([]model.Acc
 	return accessKeys, nil
 }
 
-func (s *Service) PostAccessKey(ctx context.Context, accessKey model.AccessKey) error {
+func (s *Service) PostAccessKey(ctx context.Context, userId string, accessKey model.AccessKey) error {
 	if accessKey.TokenPlain == nil {
 		err := accessKey.SetToken(*accessKey.TokenPlain)
 		if err != nil {
@@ -43,8 +43,8 @@ func (s *Service) PostAccessKey(ctx context.Context, accessKey model.AccessKey) 
 	return s.Store.PostAccessKey(ctx, accessKey)
 }
 
-func (s *Service) DeleteAccessKey(ctx context.Context, accessKeyID string, userID string) error {
-	err := s.Store.DeleteAccessKey(ctx, accessKeyID, userID)
+func (s *Service) DeleteAccessKey(ctx context.Context, accessKeyId string, userId string) error {
+	err := s.Store.DeleteAccessKey(ctx, accessKeyId, userId)
 	if err != nil {
 		log.Printf("error deleting access key: %s", err.Error())
 		return ErrDeleteUserAccessKey
@@ -53,6 +53,6 @@ func (s *Service) DeleteAccessKey(ctx context.Context, accessKeyID string, userI
 	return nil
 }
 
-func (s *Service) DeleteAccessKeysByUserID(ctx context.Context, userID string) error {
-	return s.Store.DeleteAccessKeysByUserID(ctx, userID)
+func (s *Service) DeleteAccessKeysByUserID(ctx context.Context, userId string) error {
+	return s.Store.DeleteAccessKeysByUserID(ctx, userId)
 }

@@ -78,3 +78,8 @@ type ActivateReq struct {
 type TotpReq struct {
 	OTP string `json:"otp" validate:"required,min=6,max=8"`
 }
+
+type AccessKeyReq struct {
+	Name      string `json:"name" validate:"required"`
+	ExpiresAt string `json:"expires_at"`
+}

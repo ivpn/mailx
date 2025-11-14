@@ -13,25 +13,37 @@ var (
 
 type AccessKey struct {
 	BaseModel
-	UserID     string    `json:"user_id"`
-	TokenHash  string    `json:"-"`
-	TokenPlain *string   `gorm:"-" json:"-"`
-	Name       string    `json:"name"`
-	ExpiresAt  time.Time `json:"expires_at"`
+	UserID     string     `json:"user_id"`
+	TokenHash  string     `json:"-"`
+	TokenPlain *string    `gorm:"-" json:"-"`
+	Name       string     `json:"name"`
+	ExpiresAt  *time.Time `json:"expires_at"` // nullable
 }
 
-func (u *AccessKey) SetToken(tokenPlain string) error {
+func (a *AccessKey) SetToken(tokenPlain string) error {
 	hash, err := utils.HashPassword(tokenPlain)
 	if err != nil {
 		return ErrTokenHashFailed
 	}
 
-	u.TokenHash = hash
-	u.TokenPlain = nil
+	a.TokenHash = hash
+	a.TokenPlain = nil
 
 	return nil
 }
 
-func (u *AccessKey) Matches(tokenPlain string) bool {
-	return utils.HashMatchesPassword(tokenPlain, u.TokenHash)
+func (a *AccessKey) Matches(tokenPlain string) bool {
+	return utils.HashMatchesPassword(tokenPlain, a.TokenHash)
+}
+
+func NeverExpires() *time.Time {
+	return nil
+}
+
+func (a *AccessKey) IsExpired() bool {
+	if a.ExpiresAt == nil {
+		return false // never expires
+	}
+
+	return time.Now().After(*a.ExpiresAt)
 }

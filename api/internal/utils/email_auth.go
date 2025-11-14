@@ -3,7 +3,6 @@ package utils
 import (
 	"bytes"
 	"errors"
-	"log"
 	"net/mail"
 	"strings"
 )
@@ -35,7 +34,6 @@ func VerifyEmailAuth(data []byte) (bool, error) {
 	}
 
 	if len(authResults) == 0 {
-		log.Println(string(data))
 		msgID := headers.Get("Message-ID")
 		return false, errors.New("no Authentication-Results headers found, Message-ID: " + msgID)
 	}

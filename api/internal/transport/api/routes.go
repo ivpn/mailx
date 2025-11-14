@@ -80,6 +80,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 
 	v1.Get("/bounces", h.GetBounces)
 	v1.Get("/bounce/file/:id", h.GetBounceFile)
+	v1.Get("/discards", h.GetDiscards)
 
 	docs := h.Server.Group("/docs")
 	docs.Use(auth.NewBasicAuth(cfg))

@@ -8,4 +8,5 @@ type Settings struct {
 	FromName    string `json:"from_name"`
 	AliasFormat string `json:"alias_format"`
 	LogBounce   bool   `json:"log_bounce"`
+	LogDiscard  bool   `json:"log_discard"`
 }

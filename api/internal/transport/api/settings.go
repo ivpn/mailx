@@ -74,6 +74,7 @@ func (h *Handler) UpdateSettings(c *fiber.Ctx) error {
 		FromName:    req.FromName,
 		AliasFormat: req.AliasFormat,
 		LogBounce:   req.LogBounce,
+		LogDiscard:  req.LogDiscard,
 	}
 	settings.ID = req.ID
 

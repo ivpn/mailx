@@ -73,6 +73,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 
 	v1.Get("/alias/:id", h.GetAlias)
 	v1.Get("/aliases", h.GetAliases)
+	v1.Get("/aliases/export", h.ExportAliases)
 	v1.Post("/alias", limiter.New(), h.PostAlias)
 	v1.Put("/alias/:id", h.UpdateAlias)
 	v1.Delete("/alias/:id", h.DeleteAlias)

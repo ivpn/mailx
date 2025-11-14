@@ -72,12 +72,28 @@
                     type="text"
                 >
             </div>
+            <h4>Mailx Header</h4>
+            <p>
+                Add Mailx header in forwarded messages - `Sent to &lt;alias&gt; from &lt;sender&gt;`.
+            </p>
+            <div v-if="loaded" class="mb-8">
+                <label for="remove-header">
+                    Add Mailx header:
+                </label>
+                <input
+                    @change="saveSettings"
+                    v-bind:checked="!req.remove_header"
+                    v-model="includeHeader"
+                    id="remove-header"
+                    type="checkbox"
+                >
+            </div>
             <h4>Logs</h4>
             <h5>Failed Deliveries</h5>
             <p>
                 Turn logging of failed email deliveries (bounces) from aliases on or off. When enabled, any failed delivery attempts are recorded and stored for 7 days.
             </p>
-            <div class="mb-8">
+            <div v-if="loaded" class="mb-8">
                 <label for="log-bounce">
                     Log Failed Deliveries:
                 </label>
@@ -93,7 +109,7 @@
             <p>
                 Turn logging of discarded emails on or off. When enabled, any discarded emails for your aliases are recorded and stored for 7 days.
             </p>
-            <div class="mb-8">
+            <div v-if="loaded" class="mb-8">
                 <label for="log-discard">
                     Log Discarded Emails:
                 </label>
@@ -130,6 +146,7 @@ const req = ref({
     alias_format: '',
     log_bounce: false,
     log_discard: false,
+    remove_header: false,
 })
 const envDomains = import.meta.env.VITE_DOMAINS.split(',')
 const domains = ref(envDomains)
@@ -137,16 +154,21 @@ const recipients = ref([])
 const success = ref('')
 const error = ref('')
 const aliasFormats = ref(['Words', 'Random', 'UUID'])
+const includeHeader = ref(true)
+const loaded = ref(false)
 
 const getSettings = async () => {
     try {
         const response = await settingsApi.get()
         req.value = response.data
+        includeHeader.value = !req.value.remove_header
         error.value = ''
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.message
         }
+    } finally {
+        loaded.value = true
     }
 }
 
@@ -156,6 +178,7 @@ const saveSettings = async () => {
     req.value.alias_format = (document.getElementById('format') as HTMLSelectElement).value
     req.value.log_bounce = (document.getElementById('log-bounce') as HTMLInputElement).checked
     req.value.log_discard = (document.getElementById('log-discard') as HTMLInputElement).checked
+    req.value.remove_header = !includeHeader.value
 
     try {
         const res = await settingsApi.update(req.value)

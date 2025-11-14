@@ -82,6 +82,10 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Get("/bounce/file/:id", h.GetBounceFile)
 	v1.Get("/discards", h.GetDiscards)
 
+	v1.Get("/access_keys", h.GetAccessKeys)
+	v1.Post("/access_key", h.PostAccessKey)
+	v1.Delete("/access_key/:id", h.DeleteAccessKey)
+
 	docs := h.Server.Group("/docs")
 	docs.Use(auth.NewBasicAuth(cfg))
 	docs.Get("/*", swagger.HandlerDefault)

@@ -27,3 +27,25 @@ func GetEmails(rcps []Recipient) string {
 
 	return strings.Join(emails, ",")
 }
+
+func MergeCommaSeparatedEmails(a, b string) string {
+	set := make(map[string]bool)
+
+	for _, s := range strings.Split(a, ",") {
+		if s != "" {
+			set[s] = true
+		}
+	}
+	for _, s := range strings.Split(b, ",") {
+		if s != "" {
+			set[s] = true
+		}
+	}
+
+	result := make([]string, 0, len(set))
+	for key := range set {
+		result = append(result, key)
+	}
+
+	return strings.Join(result, ",")
+}

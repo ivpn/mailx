@@ -60,7 +60,8 @@
                         <i class="icon icon-error trash text-xs"></i>
                         Remove PGP Key
                     </button>
-                    <button @click.stop="deleteRecipient" class="delete">
+                    <button class="delete"
+                        v-bind:data-hs-overlay="'#modal-delete-recipient' + recipient.id">
                         <i class="icon icon-error trash text-xs"></i>
                         Delete
                     </button>
@@ -124,7 +125,8 @@
                                 <i class="icon icon-error trash text-xs"></i>
                                 Remove PGP Key
                             </button>
-                            <button @click.stop="deleteRecipient" class="delete">
+                            <button class="delete"
+                            v-bind:data-hs-overlay="'#modal-delete-recipient' + recipient.id">
                                 <i class="icon icon-error trash text-xs"></i>
                                 Delete
                             </button>
@@ -145,6 +147,7 @@
     <RecipientAddPGPKey :recipient="recipient" />
     <RecipientVerify :recipient="recipient" />
     <RecipientEdit :recipient="recipient" />
+    <RecipientDelete :recipient="recipient" :recipients="recipients" />
 </template>
 
 <script setup lang="ts">
@@ -153,28 +156,16 @@ import tooltip from '@preline/tooltip'
 import RecipientVerify from './RecipientVerify.vue'
 import RecipientEdit from './RecipientEdit.vue'
 import RecipientAddPGPKey from './RecipientAddPGPKey.vue'
+import RecipientDelete from './RecipientDelete.vue'
 import { recipientApi } from '../api/recipient.ts'
 import events from '../events.ts'
 import dropdown from '@preline/dropdown'
 import axios from 'axios'
 
-const props = defineProps(['recipient'])
+const props = defineProps(['recipient', 'recipients'])
 const recipient = ref(props.recipient)
+const recipients = ref(props.recipients)
 const copyText = ref('Click to copy')
-
-const deleteRecipient = async () => {
-    if (!confirm('Are you sure you want to delete recipient? Note that aliases with this recipient will be disabled.')) return
-
-    try {
-        await recipientApi.delete(recipient.value.id)
-        events.emit('recipient.reload', {})
-    } catch (err) {
-        if (axios.isAxiosError(err)) {
-            const error = err.response?.data.error || err.message
-            events.emit('recipient.delete.error', { error: error })
-        }
-    }
-}
 
 const updateRecipient = async () => {
     // Toggle pgp_enabled option

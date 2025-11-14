@@ -86,6 +86,7 @@ func (h *Handler) PostAccessKey(c *fiber.Ctx) error {
 	accessKey := model.AccessKey{
 		UserID:     userId,
 		TokenPlain: &token,
+		Name:       req.Name,
 		ExpiresAt:  model.NeverExpires(),
 	}
 

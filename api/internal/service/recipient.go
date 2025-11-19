@@ -308,7 +308,7 @@ func (s *Service) FindRecipients(from string, to string, msgType model.MessageTy
 			log.Println("error saving message", err)
 		}
 
-		return []model.Recipient{}, model.Alias{}, 0, ErrDisabledAlias
+		return []model.Recipient{}, alias, 0, ErrDisabledAlias
 	}
 
 	// Handle Reply | Send
@@ -325,7 +325,7 @@ func (s *Service) FindRecipients(from string, to string, msgType model.MessageTy
 	// Handle Forward
 	rcps, err := s.GetRecipients(context.Background(), alias.UserID)
 	if err != nil || len(rcps) == 0 {
-		return []model.Recipient{}, model.Alias{}, 0, ErrNoRecipients
+		return []model.Recipient{}, alias, 0, ErrNoRecipients
 	}
 
 	var recipients []model.Recipient

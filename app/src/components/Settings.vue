@@ -74,7 +74,7 @@
             </div>
             <h4>Log Issues</h4>
             <p>
-                Log email delivery (bounces) and forwarding issues.
+                Log email delivery (bounces) and forwarding issues. You can view logged issues in the <router-link to="/logs">Logs</router-link> section.
             </p>
             <div class="mb-8">
                 <label for="log-issues">

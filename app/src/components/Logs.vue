@@ -28,7 +28,7 @@
                             <span class="text-tertiary">From</span>: {{ log.from }}<br>
                             <span class="text-tertiary">To</span>: {{ log.destination }}<br>
                             <span class="text-tertiary">Type</span>: 
-                            <span class="badge small" v-bind="{class: log.log_type}">{{ log.log_type }}</span><br>
+                            <span class="badge small" v-bind="{class: log.log_type}">{{ formatLogType(log) }}</span><br>
                             <span class="text-tertiary">Reason</span>: {{ log.message }}<br></br>
                             <span v-if="log.status"><span class="text-tertiary">Status</span>: {{ log.status }}<br></span>
                             <span v-if="log.remote_mta"><span class="text-tertiary">Remote MTA</span>: {{ log.remote_mta }}<br></span>
@@ -117,6 +117,11 @@ const attemptedAt = (item: typeof log) => {
 const formatDate = (date: string) => {
     const d = new Date(date)
     return d.toLocaleString()
+}
+
+const formatLogType = (item: typeof log) => {
+    if (!item.log_type) return ''
+    return item.log_type.replace('_', ' ').charAt(0).toUpperCase() + item.log_type.replace('_', ' ').slice(1)
 }
 
 onMounted(async () => {

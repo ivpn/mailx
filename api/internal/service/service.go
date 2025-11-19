@@ -17,8 +17,6 @@ type Store interface {
 	SettingsStore
 	SessionStore
 	CredentialStore
-	BounceStore
-	DiscardStore
 	LogStore
 }
 

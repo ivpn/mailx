@@ -33,7 +33,7 @@ func (s *Service) ProcessMessage(data []byte) error {
 			return err
 		}
 
-		err = s.ProcessBounce(alias.UserID, alias.ID, data, msg)
+		err = s.ProcessBounceLog(alias.UserID, alias.ID, data, msg)
 		if err != nil {
 			log.Println("error processing bounce", err)
 			return err
@@ -56,7 +56,7 @@ func (s *Service) ProcessMessage(data []byte) error {
 				}
 
 				if settings.LogDiscard {
-					err := s.ProcessDiscard(alias, msg.From, to, ErrNoVerifiedRecipients.Error())
+					err := s.ProcessDiscardLog(alias, msg.From, to, ErrNoVerifiedRecipients.Error(), model.UnauthorisedSend)
 					if err != nil {
 						log.Println("error processing discard", err)
 					}

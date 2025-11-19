@@ -9,7 +9,8 @@
             </span>
             <h4 class="mb-6">You have no Logs</h4>
             <p class="text-tertiary mb-6">
-                To get started, first enable "Log Issues" in <router-link to="/settings">Settings</router-link>.
+                <span v-if="!settings.log_issues">To get started, first enable "Log Issues" in <router-link to="/settings">Settings</router-link>.<br></br></span>
+                <span v-if="settings.log_issues">Failed email deliveries and forwarding issues will be logged here.</span>
             </p>
         </div>
         <div v-bind:class="{ 'hidden': !logs.length || !loaded }" class="card-primary">
@@ -47,6 +48,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import axios from 'axios'
+import { settingsApi } from '../api/settings.ts'
 import { logApi } from '../api/log.ts'
 import FailedDeliveryLog from './FailedDeliveryLog.vue'
 
@@ -63,6 +65,11 @@ const log = {
     message: '',
     remote_mta: ''
 }
+
+const settings = ref({
+    id: '',
+    log_issues: false,
+})
 
 const logs = ref([] as typeof log[])
 const error = ref('')
@@ -82,12 +89,25 @@ const getLogs = async () => {
     }
 }
 
+const getSettings = async () => {
+    try {
+        const res = await settingsApi.get()
+        settings.value = res.data
+        error.value = ''
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.message
+        }
+    }
+}
+
 const formatDate = (date: string) => {
     const d = new Date(date)
     return d.toLocaleString()
 }
 
 onMounted(async () => {
+    await getSettings()
     getLogs()
 })
 </script>

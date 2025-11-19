@@ -72,7 +72,7 @@
                     type="text"
                 >
             </div>
-            <h4>Logs Issues</h4>
+            <h4>Log Issues</h4>
             <p>
                 Log email delivery (bounces) and forwarding issues.
             </p>

@@ -90,7 +90,7 @@
             </div>
             <h4>Log Issues</h4>
             <p>
-                Log your email delivery (bounce) and forwarding issues. When enabled, these logs are recorded and stored for 7 days. You can view logged issues in the <router-link to="/logs">Logs</router-link> section.
+                Log your failed email deliveries (bounces) and forwarding issues. When enabled, these logs are recorded and stored for 7 days. You can view logged issues in the <router-link to="/logs">Logs</router-link> section.
             </p>
             <div class="mb-8">
                 <label for="log-issues">

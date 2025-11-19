@@ -27,15 +27,16 @@
                             <span class="text-tertiary">ID</span>: {{ log.id }}<br>
                             <span class="text-tertiary">From</span>: {{ log.from }}<br>
                             <span class="text-tertiary">To</span>: {{ log.destination }}<br>
-                            <span class="text-tertiary">Type</span>: {{ log.type }}<br>
+                            <span class="text-tertiary">Type</span>: 
+                            <span class="badge small" v-bind="{class: log.log_type}">{{ log.log_type }}</span><br>
                             <span class="text-tertiary">Reason</span>: {{ log.message }}<br></br>
-                            <span class="text-tertiary">Status</span>: {{ log.status }}<br>
-                            <span class="text-tertiary">Remote MTA</span>: {{ log.remote_mta }}<br>
-                            <span class="text-tertiary">Attempted At</span>: {{ formatDate(log.attempted_at || log.created_at) }}<br>
-                            <button v-bind:data-hs-overlay="'#modal-delivery-log' + log.id" class="cta mt-3">Full log</button>
+                            <span v-if="log.status"><span class="text-tertiary">Status</span>: {{ log.status }}<br></span>
+                            <span v-if="log.remote_mta"><span class="text-tertiary">Remote MTA</span>: {{ log.remote_mta }}<br></span>
+                            <span class="text-tertiary">Attempted At</span>: {{ attemptedAt(log) }}<br>
+                            <button v-if="log.log_type === 'bounce'" v-bind:data-hs-overlay="'#modal-delivery-log' + log.id" class="cta mt-3">Full log</button>
                             <hr v-if="log.id !== logs[logs.length - 1]?.id" class="mt-8 mb-0">
                         </td>
-                        <FailedDeliveryLog :log="log" />
+                        <FailedDeliveryLog v-if="log.log_type === 'bounce'" :log="log" />
                     </tr>
                 </tbody>
                 </table>
@@ -56,7 +57,7 @@ const log = {
     id: '',
     created_at: '',
     attempted_at: '',
-    type: '',
+    log_type: '',
     user_id: '',
     alias_id: '',
     from: '',
@@ -76,6 +77,18 @@ const error = ref('')
 const loaded = ref(false)
 const rowKey = ref(0)
 
+const getSettings = async () => {
+    try {
+        const res = await settingsApi.get()
+        settings.value = res.data
+        error.value = ''
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.message
+        }
+    }
+}
+
 const getLogs = async () => {
     try {
         const res = await logApi.getList()
@@ -89,16 +102,16 @@ const getLogs = async () => {
     }
 }
 
-const getSettings = async () => {
-    try {
-        const res = await settingsApi.get()
-        settings.value = res.data
-        error.value = ''
-    } catch (err) {
-        if (axios.isAxiosError(err)) {
-            error.value = err.message
-        }
-    }
+// Treat "0001-01-01T00:00:00Z" (and variant with .000Z) as null/unset attempted_at
+const NULL_DATES = new Set([
+    '0001-01-01T00:00:00Z',
+    '0001-01-01T00:00:00.000Z'
+])
+
+const attemptedAt = (item: typeof log) => {
+    const a = item.attempted_at
+    const dateToUse = (a && !NULL_DATES.has(a)) ? a : item.created_at
+    return formatDate(dateToUse)
 }
 
 const formatDate = (date: string) => {

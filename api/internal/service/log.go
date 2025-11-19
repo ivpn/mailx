@@ -122,7 +122,7 @@ func (s *Service) ProcessBounceLog(userId string, aliasId string, data []byte, m
 		return err
 	}
 
-	if !settings.LogBounce {
+	if !settings.LogIssues {
 		return nil
 	}
 

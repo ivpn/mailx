@@ -55,7 +55,7 @@ func (s *Service) ProcessMessage(data []byte) error {
 					continue
 				}
 
-				if settings.LogDiscard {
+				if settings.LogIssues {
 					err := s.ProcessDiscardLog(alias, msg.From, to, ErrNoVerifiedRecipients.Error(), model.UnauthorisedSend)
 					if err != nil {
 						log.Println("error processing discard", err)

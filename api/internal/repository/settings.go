@@ -27,8 +27,7 @@ func (d *Database) UpdateSettings(ctx context.Context, settings model.Settings) 
 		"recipient":    settings.Recipient,
 		"from_name":    settings.FromName,
 		"alias_format": settings.AliasFormat,
-		"log_bounce":   settings.LogBounce,
-		"log_discard":  settings.LogDiscard,
+		"log_issues":   settings.LogIssues,
 	}).Error
 }
 

@@ -58,7 +58,23 @@ func (s *Service) ProcessMessage(data []byte) error {
 				if settings.LogIssues {
 					err := s.ProcessDiscardLog(alias, msg.From, to, ErrNoVerifiedRecipients.Error(), model.UnauthorisedSend)
 					if err != nil {
-						log.Println("error processing discard", err)
+						log.Println("error processing discard log", err)
+					}
+				}
+			}
+
+			// Handle ErrDisabledAlias
+			if errors.Is(err, ErrDisabledAlias) {
+				settings, err := s.GetSettings(context.Background(), alias.UserID)
+				if err != nil {
+					log.Println("error getting settings", err)
+					continue
+				}
+
+				if settings.LogIssues {
+					err := s.ProcessDiscardLog(alias, msg.From, to, ErrDisabledAlias.Error(), model.DisabledAlias)
+					if err != nil {
+						log.Println("error processing discard log", err)
 					}
 				}
 			}

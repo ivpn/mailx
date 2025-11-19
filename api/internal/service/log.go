@@ -109,7 +109,7 @@ func (s *Service) ProcessDiscardLog(alias model.Alias, from string, destination 
 
 	err := s.PostLog(context.Background(), lg)
 	if err != nil {
-		log.Printf("error processing discard: %s", err.Error())
+		log.Printf("error processing discard log: %s", err.Error())
 		return err
 	}
 

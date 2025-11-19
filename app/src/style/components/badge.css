@@ -9,5 +9,21 @@
         &.progress {
             @apply bg-accent text-white font-semibold;
         }
+        
+        &.bounce {
+            @apply bg-amber-500 dark:bg-amber-700 text-white font-semibold;
+        }
+
+        &.disabled_alias {
+            @apply bg-cyan-500 dark:bg-cyan-700 text-white font-semibold;
+        }
+
+        &.unauthorised_send {
+            @apply bg-violet-500 dark:bg-violet-700 text-white font-semibold;
+        }
+
+        &.small {
+            @apply py-0.5 px-1.5 text-xs;
+        }
     }
 }

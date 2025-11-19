@@ -38,7 +38,7 @@
 import { ref, onMounted } from 'vue'
 import overlay from '@preline/overlay'
 import axios from 'axios'
-import { bounceApi } from '../api/bounce.ts'
+import { logApi } from '../api/log.ts'
 
 const props = defineProps(['log'])
 const log = ref(props.log)
@@ -47,7 +47,7 @@ const error = ref('')
 
 const getLog = async () => {
     try {
-        const res = await bounceApi.getFile(log.value.id)
+        const res = await logApi.getFile(log.value.id)
         log_text.value = res.data
         error.value = ''
     } catch (err) {

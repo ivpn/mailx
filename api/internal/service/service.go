@@ -19,6 +19,7 @@ type Store interface {
 	CredentialStore
 	BounceStore
 	DiscardStore
+	LogStore
 }
 
 type Cache interface {

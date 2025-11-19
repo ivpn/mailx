@@ -2,12 +2,9 @@ package repository
 
 import (
 	"context"
-	"fmt"
-	"io"
 	"log"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"ivpn.net/email/api/internal/model"
 )
@@ -64,28 +61,28 @@ func (d *Database) GetBounceFile(ctx context.Context, filename string) ([]byte, 
 	return data, nil
 }
 
-func readFile(filename, ext string) ([]byte, error) {
-	filePath := filename + ext
-	cleanPath := filepath.Clean(filePath)
-	fullPath := filepath.Join(baseDir, cleanPath)
+// func readFile(filename, ext string) ([]byte, error) {
+// 	filePath := filename + ext
+// 	cleanPath := filepath.Clean(filePath)
+// 	fullPath := filepath.Join(baseDir, cleanPath)
 
-	// Ensure fullPath is still within baseDir
-	if !strings.HasPrefix(fullPath, baseDir+string(os.PathSeparator)) {
-		return nil, fmt.Errorf("invalid file path: %s", filePath)
-	}
+// 	// Ensure fullPath is still within baseDir
+// 	if !strings.HasPrefix(fullPath, baseDir+string(os.PathSeparator)) {
+// 		return nil, fmt.Errorf("invalid file path: %s", filePath)
+// 	}
 
-	file, err := os.Open(fullPath)
-	if err != nil {
-		log.Println("failed to open file:", err)
-		return nil, err
-	}
-	defer file.Close()
+// 	file, err := os.Open(fullPath)
+// 	if err != nil {
+// 		log.Println("failed to open file:", err)
+// 		return nil, err
+// 	}
+// 	defer file.Close()
 
-	data, err := io.ReadAll(file)
-	if err != nil {
-		log.Println("failed to read file:", err)
-		return nil, err
-	}
+// 	data, err := io.ReadAll(file)
+// 	if err != nil {
+// 		log.Println("failed to read file:", err)
+// 		return nil, err
+// 	}
 
-	return data, nil
-}
+// 	return data, nil
+// }

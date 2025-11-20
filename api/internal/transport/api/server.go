@@ -20,8 +20,7 @@ type Service interface {
 	ProcessorService
 	SessionService
 	CredentialService
-	BounceService
-	DiscardService
+	LogService
 	AccessKeyService
 }
 

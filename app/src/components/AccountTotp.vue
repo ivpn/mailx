@@ -6,7 +6,7 @@
             <span v-if="!res.totp_enabled" class="badge">Disabled</span>
         </p>
         <p>
-            When enabled, 2-factor authentication will be required when you log in.<br>
+            When enabled, 2-factor authentication will be required when you log in with your password.<br>
         </p>
         <div class="mb-3 max-w-xs">
             <AccountTotpEnable v-if="!res.totp_enabled" />

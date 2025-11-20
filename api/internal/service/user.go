@@ -321,7 +321,7 @@ func (s *Service) DeleteUser(ctx context.Context, userID string, OTP string) err
 		return ErrDeleteUser
 	}
 
-	err = s.Store.DeleteBounceByUserID(ctx, userID)
+	err = s.Store.DeleteLogs(ctx, userID)
 	if err != nil {
 		log.Printf("error deleting user: %s", err.Error())
 		return ErrDeleteUser

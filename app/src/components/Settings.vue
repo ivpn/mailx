@@ -72,20 +72,35 @@
                     type="text"
                 >
             </div>
-
-            <h4>Failed Deliveries</h4>
+            <h4>Mailx Header</h4>
             <p>
-                Turn logging of failed email deliveries (bounces) from aliases on or off. When enabled, any failed delivery attempts are recorded and stored for 7 days.
+                Add Mailx header in forwarded messages - `Sent to &lt;alias&gt; from &lt;sender&gt;`.
             </p>
-            <div class="mb-8">
-                <label for="log-bounce">
-                    Log failed deliveries:
+            <div v-if="loaded" class="mb-8">
+                <label for="remove-header">
+                    Add Mailx header:
                 </label>
                 <input
                     @change="saveSettings"
-                    v-bind:checked="req.log_bounce"
-                    v-model="req.log_bounce"
-                    id="log-bounce"
+                    v-bind:checked="!req.remove_header"
+                    v-model="includeHeader"
+                    id="remove-header"
+                    type="checkbox"
+                >
+            </div>
+            <h4>Log Issues</h4>
+            <p>
+                Log your failed email deliveries (bounces) and forwarding issues. When enabled, these logs are recorded and stored for 7 days. You can view logged issues in the <router-link to="/logs">Logs</router-link> section.
+            </p>
+            <div class="mb-8">
+                <label for="log-issues">
+                    Log Issues:
+                </label>
+                <input
+                    @change="saveSettings"
+                    v-bind:checked="req.log_issues"
+                    v-model="req.log_issues"
+                    id="log-issues"
                     type="checkbox"
                 >
             </div>
@@ -112,7 +127,8 @@ const req = ref({
     recipient: '',
     from_name: '',
     alias_format: '',
-    log_bounce: false,
+    log_issues: false,
+    remove_header: false,
 })
 const envDomains = import.meta.env.VITE_DOMAINS.split(',')
 const domains = ref(envDomains)
@@ -120,16 +136,21 @@ const recipients = ref([])
 const success = ref('')
 const error = ref('')
 const aliasFormats = ref(['Words', 'Random', 'UUID'])
+const includeHeader = ref(true)
+const loaded = ref(false)
 
 const getSettings = async () => {
     try {
         const response = await settingsApi.get()
         req.value = response.data
+        includeHeader.value = !req.value.remove_header
         error.value = ''
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.message
         }
+    } finally {
+        loaded.value = true
     }
 }
 
@@ -137,7 +158,8 @@ const saveSettings = async () => {
     req.value.domain = (document.getElementById('domain') as HTMLSelectElement).value
     req.value.recipient = (document.getElementById('recipient') as HTMLSelectElement).value
     req.value.alias_format = (document.getElementById('format') as HTMLSelectElement).value
-    req.value.log_bounce = (document.getElementById('log-bounce') as HTMLInputElement).checked
+    req.value.log_issues = (document.getElementById('log-issues') as HTMLInputElement).checked
+    req.value.remove_header = !includeHeader.value
 
     try {
         const res = await settingsApi.update(req.value)

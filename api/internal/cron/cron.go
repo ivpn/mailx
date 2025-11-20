@@ -52,7 +52,7 @@ func New(db *gorm.DB) {
 		return
 	}
 
-	err = gocron.Every(1).Hour().Do(jobs.DeleteOldBounces, db)
+	err = gocron.Every(1).Hour().Do(jobs.DeleteOldLogs, db)
 	if err != nil {
 		log.Println("Error scheduling job:", err)
 		return

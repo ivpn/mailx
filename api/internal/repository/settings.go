@@ -23,11 +23,12 @@ func (d *Database) PostSettings(ctx context.Context, settings model.Settings) er
 
 func (d *Database) UpdateSettings(ctx context.Context, settings model.Settings) error {
 	return d.Client.Model(&settings).Where("user_id = ?", settings.UserID).Updates(map[string]any{
-		"domain":       settings.Domain,
-		"recipient":    settings.Recipient,
-		"from_name":    settings.FromName,
-		"alias_format": settings.AliasFormat,
-		"log_bounce":   settings.LogBounce,
+		"domain":        settings.Domain,
+		"recipient":     settings.Recipient,
+		"from_name":     settings.FromName,
+		"alias_format":  settings.AliasFormat,
+		"log_issues":    settings.LogIssues,
+		"remove_header": settings.RemoveHeader,
 	}).Error
 }
 

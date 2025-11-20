@@ -106,7 +106,7 @@ func migrate(db *gorm.DB) error {
 		&model.Settings{},
 		&model.Session{},
 		&model.Credential{},
-		&model.Bounce{},
+		&model.Log{},
 	)
 	if err != nil {
 		return err

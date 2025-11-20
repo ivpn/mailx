@@ -22,23 +22,23 @@
                         </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="log in logs" :key="rowKey">
-                        <td class="start text-wrap leading-6">
-                            <span class="text-tertiary">Type</span>: 
-                            <span class="badge small" v-bind="{class: log.log_type}">{{ formatLogType(log) }}</span><br>
-                            <span class="text-tertiary">ID</span>: {{ log.id }}<br>
-                            <span class="text-tertiary">From</span>: {{ log.from }}<br>
-                            <span class="text-tertiary">To</span>: {{ log.destination }}<br>
-                            <span class="text-tertiary">Reason</span>: {{ log.message }}<br>
-                            <span v-if="log.status"><span class="text-tertiary">Status</span>: {{ log.status }}<br></span>
-                            <span v-if="log.remote_mta"><span class="text-tertiary">Remote MTA</span>: {{ log.remote_mta }}<br></span>
-                            <span class="text-tertiary">Attempted At</span>: {{ attemptedAt(log) }}<br>
-                            <button v-if="log.log_type === 'bounce'" v-bind:data-hs-overlay="'#modal-delivery-log' + log.id" class="cta mt-3">Full log</button>
-                            <hr v-if="log.id !== logs[logs.length - 1]?.id" class="mt-8 mb-0">
-                        </td>
-                        <FailedDeliveryLog v-if="log.log_type === 'bounce'" :log="log" />
-                    </tr>
-                </tbody>
+                        <tr v-for="log in logs" :key="rowKey">
+                            <td class="start text-wrap leading-6">
+                                <span class="text-tertiary">Type</span>: 
+                                <span class="badge small" v-bind="{class: log.log_type}">{{ formatLogType(log) }}</span><br>
+                                <span class="text-tertiary">ID</span>: {{ log.id }}<br>
+                                <span class="text-tertiary">From</span>: {{ log.from }}<br>
+                                <span class="text-tertiary">To</span>: {{ log.destination }}<br>
+                                <span class="text-tertiary">Reason</span>: {{ log.message }}<br>
+                                <span v-if="log.status"><span class="text-tertiary">Status</span>: {{ log.status }}<br></span>
+                                <span v-if="log.remote_mta"><span class="text-tertiary">Remote MTA</span>: {{ log.remote_mta }}<br></span>
+                                <span class="text-tertiary">Attempted At</span>: {{ attemptedAt(log) }}<br>
+                                <button v-if="log.log_type === 'bounce'" v-bind:data-hs-overlay="'#modal-delivery-log' + log.id" class="cta mt-3">Full log</button>
+                                <hr v-if="log.id !== logs[logs.length - 1]?.id" class="mt-8 mb-0">
+                            </td>
+                            <FailedDeliveryLog v-if="log.log_type === 'bounce'" :log="log" />
+                        </tr>
+                    </tbody>
                 </table>
             </div>
             <p v-if="error" class="error">Error: {{ error }}</p>

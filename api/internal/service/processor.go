@@ -14,7 +14,7 @@ var (
 	ErrInactiveSubscription = errors.New("Subscription is inactive.")
 	ErrDisabledAlias        = errors.New("This alias is disabled.")
 	ErrNoRecipients         = errors.New("No recipients found.")
-	ErrNoVerifiedRecipients = errors.New("No verified recipients found for sender address.")
+	ErrNoVerifiedRecipients = errors.New("Sender is not a verified address.")
 	ErrInactiveRecipient    = errors.New("The recipient is inactive.")
 )
 

@@ -1,161 +1,117 @@
 <template>
     <div class="card-container">
-
         <header class="head">
             <h2>Logs</h2>
         </header>
-
-        <nav class="flex gap-x-2" aria-label="Tabs" role="tablist">
-            <button type="button" class="plain active" id="unstyled-tabs-item-1" aria-selected="true" data-hs-tab="#unstyled-tabs-1" aria-controls="unstyled-tabs-1" role="tab">
-                Failed Deliveries
-            </button>
-            <button type="button" class="plain" id="unstyled-tabs-item-2" aria-selected="false" data-hs-tab="#unstyled-tabs-2" aria-controls="unstyled-tabs-2" role="tab">
-                Discarded Emails
-            </button>
-        </nav>
-
-        <div class="mt-6 card-fill">
-            <div id="unstyled-tabs-1" role="tabpanel" aria-labelledby="unstyled-tabs-item-1" class="card-fill">
-                <div v-if="!bounces.length && loaded" class="card-empty">
-                    <span class="bg-secondary rounded flex items-center justify-center p-2 mb-5">
-                        <i class="icon alert icon-accent text-2xl"></i>
-                    </span>
-                    <h4 class="mb-6">You have no Failed Deliveries yet</h4>
-                    <p class="text-tertiary mb-6">
-                        To get started, first enable Failed Deliveries in <router-link to="/settings">Settings</router-link>.
-                    </p>
-                </div>
-                <div v-bind:class="{ 'hidden': !bounces.length || !loaded }" class="card-primary">
-                    <div class="table-container">
-                        <table class="text-auto">
-                            <thead>
-                                <tr>
-                                    <th class="start">Log</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            <tr v-for="bounce in bounces" :key="rowKey">
-                                <td class="start text-wrap leading-6">
-                                    <span class="text-tertiary">ID</span>: {{ bounce.id }}<br>
-                                    <span class="text-tertiary">From</span>: {{ bounce.from }}<br>
-                                    <span class="text-tertiary">To</span>: {{ bounce.destination }}<br>
-                                    <span class="text-tertiary">Status</span>: {{ bounce.status }}<br>
-                                    <span class="text-tertiary">Remote MTA</span>: {{ bounce.remote_mta }}<br>
-                                    <span class="text-tertiary">Diagnostic Code</span>: {{ bounce.diagnostic_code }}<br>
-                                    <span class="text-tertiary">Attempted At</span>: {{ formatDate(bounce.attempted_at) }}<br>
-                                    <button v-bind:data-hs-overlay="'#modal-delivery-log' + bounce.id" class="cta mt-3">Full log</button>
-                                    <hr v-if="bounce.id !== bounces[bounces.length - 1]?.id" class="mt-8 mb-0">
-                                </td>
-                                <FailedDeliveryLog :log="bounce" />
-                            </tr>
-                        </tbody>
-                        </table>
-                    </div>
-                    <p v-if="errorBounces" class="error">Error: {{ errorBounces }}</p>
-                </div>
-            </div>
-            <div id="unstyled-tabs-2" class="card-fill hidden" role="tabpanel" aria-labelledby="unstyled-tabs-item-2">
-                <div v-if="!discards.length && loaded" class="card-empty">
-                    <span class="bg-secondary rounded flex items-center justify-center p-2 mb-5">
-                        <i class="icon alert icon-accent text-2xl"></i>
-                    </span>
-                    <h4 class="mb-6">You have no Discarded Emails yet</h4>
-                    <p class="text-tertiary mb-6">
-                        To get started, first enable Discarded Emails in <router-link to="/settings">Settings</router-link>.
-                    </p>
-                </div>
-                <div v-bind:class="{ 'hidden': !discards.length || !loaded }" class="card-primary">
-                    <div class="table-container">
-                        <table class="text-auto">
-                            <thead>
-                                <tr>
-                                    <th class="start">Log</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            <tr v-for="discard in discards" :key="rowKey">
-                                <td class="start text-wrap leading-6">
-                                    <span class="text-tertiary">ID</span>: {{ discard.id }}<br>
-                                    <span class="text-tertiary">From</span>: {{ discard.from }}<br>
-                                    <span class="text-tertiary">To</span>: {{ discard.destination }}<br>
-                                    <span class="text-tertiary">Reason</span>: {{ discard.message }}<br>
-                                    <span class="text-tertiary">Attempted At</span>: {{ formatDate(discard.created_at) }}
-                                    <hr v-if="discard.id !== discards[discards.length - 1]?.id" class="mt-8 mb-0">
-                                </td>
-                            </tr>
-                        </tbody>
-                        </table>
-                    </div>
-                    <p v-if="errorDiscards" class="error">Error: {{ errorDiscards }}</p>
-                </div>
-            </div>
+        <div v-if="!logs.length && loaded" class="card-empty">
+            <span class="bg-secondary rounded flex items-center justify-center p-2 mb-5">
+                <i class="icon alert icon-accent text-2xl"></i>
+            </span>
+            <h4 class="mb-6">You have no Logs</h4>
+            <p class="text-tertiary mb-6">
+                <span v-if="!settings.log_issues">To get started, first enable "Log Issues" in <router-link to="/settings">Settings</router-link>.<br></br></span>
+                <span v-if="settings.log_issues">Failed email deliveries and forwarding issues will be logged here.</span>
+            </p>
         </div>
-
+        <div v-bind:class="{ 'hidden': !logs.length || !loaded }" class="card-primary">
+            <div class="table-container">
+                <table class="text-auto">
+                    <thead>
+                        <tr>
+                            <th class="start">Log</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="log in logs" :key="rowKey">
+                        <td class="start text-wrap leading-6">
+                            <span class="text-tertiary">Type</span>: 
+                            <span class="badge small" v-bind="{class: log.log_type}">{{ formatLogType(log) }}</span><br>
+                            <span class="text-tertiary">ID</span>: {{ log.id }}<br>
+                            <span class="text-tertiary">From</span>: {{ log.from }}<br>
+                            <span class="text-tertiary">To</span>: {{ log.destination }}<br>
+                            <span class="text-tertiary">Reason</span>: {{ log.message }}<br>
+                            <span v-if="log.status"><span class="text-tertiary">Status</span>: {{ log.status }}<br></span>
+                            <span v-if="log.remote_mta"><span class="text-tertiary">Remote MTA</span>: {{ log.remote_mta }}<br></span>
+                            <span class="text-tertiary">Attempted At</span>: {{ attemptedAt(log) }}<br>
+                            <button v-if="log.log_type === 'bounce'" v-bind:data-hs-overlay="'#modal-delivery-log' + log.id" class="cta mt-3">Full log</button>
+                            <hr v-if="log.id !== logs[logs.length - 1]?.id" class="mt-8 mb-0">
+                        </td>
+                        <FailedDeliveryLog v-if="log.log_type === 'bounce'" :log="log" />
+                    </tr>
+                </tbody>
+                </table>
+            </div>
+            <p v-if="error" class="error">Error: {{ error }}</p>
+        </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import axios from 'axios'
-import { bounceApi } from '../api/bounce.ts'
-import { discardApi } from '../api/discard.ts'
+import { settingsApi } from '../api/settings.ts'
+import { logApi } from '../api/log.ts'
 import FailedDeliveryLog from './FailedDeliveryLog.vue'
-import tabs from '@preline/tabs'
 
-const bounce = {
+const log = {
     id: '',
     created_at: '',
     attempted_at: '',
+    log_type: '',
     user_id: '',
     alias_id: '',
     from: '',
     destination: '',
     status: '',
-    diagnostic_code: '',
+    message: '',
     remote_mta: ''
 }
 
-const discard = {
+const settings = ref({
     id: '',
-    created_at: '',
-    user_id: '',
-    alias_id: '',
-    from: '',
-    destination: '',
-    message: ''
-}
+    log_issues: false,
+})
 
-const bounces = ref([] as typeof bounce[])
-const discards = ref([] as typeof discard[])
-const errorBounces = ref('')
-const errorDiscards = ref('')
+const logs = ref([] as typeof log[])
+const error = ref('')
 const loaded = ref(false)
 const rowKey = ref(0)
 
-const getBounces = async () => {
+const getSettings = async () => {
     try {
-        const res = await bounceApi.getList()
-        bounces.value = res.data
-        loaded.value = true
-        errorBounces.value = ''
+        const res = await settingsApi.get()
+        settings.value = res.data
+        error.value = ''
     } catch (err) {
         if (axios.isAxiosError(err)) {
-            errorBounces.value = err.message
+            error.value = err.message
         }
     }
 }
 
-const getDiscards = async () => {
+const getLogs = async () => {
     try {
-        const res = await discardApi.getList()
-        discards.value = res.data
+        const res = await logApi.getList()
+        logs.value = res.data
         loaded.value = true
-        errorDiscards.value = ''
+        error.value = ''
     } catch (err) {
         if (axios.isAxiosError(err)) {
-            errorDiscards.value = err.message
+            error.value = err.message
         }
     }
+}
+
+// Treat "0001-01-01T00:00:00Z" (and variant with .000Z) as null/unset attempted_at
+const NULL_DATES = new Set([
+    '0001-01-01T00:00:00Z',
+    '0001-01-01T00:00:00.000Z'
+])
+
+const attemptedAt = (item: typeof log) => {
+    const a = item.attempted_at
+    const dateToUse = (a && !NULL_DATES.has(a)) ? a : item.created_at
+    return formatDate(dateToUse)
 }
 
 const formatDate = (date: string) => {
@@ -163,9 +119,13 @@ const formatDate = (date: string) => {
     return d.toLocaleString()
 }
 
+const formatLogType = (item: typeof log) => {
+    if (!item.log_type) return ''
+    return item.log_type.replace('_', ' ').charAt(0).toUpperCase() + item.log_type.replace('_', ' ').slice(1)
+}
+
 onMounted(async () => {
-    getBounces()
-    getDiscards()
-    tabs.autoInit()
+    await getSettings()
+    getLogs()
 })
 </script>

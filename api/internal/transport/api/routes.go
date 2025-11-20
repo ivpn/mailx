@@ -27,6 +27,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	h.Server.Post("/v1/login", limit.New(5, 10*time.Minute), h.Login)
 	h.Server.Post("/v1/initiatepasswordreset", limiter.New(), h.InitiatePasswordReset)
 	h.Server.Put("/v1/resetpassword", limiter.New(), h.ResetPassword)
+	h.Server.Post("/v1/api/authenticate", limit.New(5, 10*time.Minute), h.Login)
 
 	h.Server.Post("/v1/register/begin", limiter.New(), h.BeginRegistration)
 	h.Server.Post("/v1/register/finish", limiter.New(), h.FinishRegistration)

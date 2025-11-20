@@ -5,19 +5,22 @@ import (
 	"log"
 
 	"github.com/araddon/dateparse"
+	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/gofiber/fiber/v2"
 	"ivpn.net/email/api/internal/middleware/auth"
 	"ivpn.net/email/api/internal/model"
 )
 
 var (
-	ErrGetAccessKeys   = "Unable to retrieve access keys for this user."
-	ErrPostAccessKey   = "Unable to create access key. Please try again."
-	ErrDeleteAccessKey = "Unable to delete access key. Please try again."
+	ErrGetAccessKeys    = "Unable to retrieve access keys for this user."
+	ErrPostAccessKey    = "Unable to create access key. Please try again."
+	ErrDeleteAccessKey  = "Unable to delete access key. Please try again."
+	ErrInvalidAccessKey = "Invalid access key provided."
 )
 
 type AccessKeyService interface {
 	GetAccessKeys(context.Context, string) ([]model.AccessKey, error)
+	GetAccessKey(context.Context, string) (model.AccessKey, error)
 	PostAccessKey(context.Context, string, model.AccessKey) error
 	DeleteAccessKey(context.Context, string, string) error
 }
@@ -136,4 +139,75 @@ func (h *Handler) DeleteAccessKey(c *fiber.Ctx) error {
 	}
 
 	return nil
+}
+
+// @Summary Authenticate with access key
+// @Description Authenticate using an access key to obtain a session token
+// @Tags access_key
+// @Accept json
+// @Produce json
+// @Param auth_req body AuthReq true "Authentication Request"
+// @Success 200 {object} map[string]string "token"
+// @Failure 400 {object} ErrorRes
+// @Router /api/authenticate [post]
+func (h *Handler) Authenticate(c *fiber.Ctx) error {
+	// Parse the request
+	req := AuthReq{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		log.Printf("error authenticate: %s", err.Error())
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	// Validate the request
+	err = h.Validator.Struct(req)
+	if err != nil {
+		log.Printf("error authenticate: %s", err.Error())
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	// Get Access Key
+	accessKey, err := h.Service.GetAccessKey(c.Context(), req.AccessKey)
+	if err != nil {
+		log.Printf("error authenticate: %s", err.Error())
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidAccessKey,
+		})
+	}
+
+	// Get User
+	user, err := h.Service.GetUser(c.Context(), accessKey.UserID)
+	if err != nil {
+		log.Printf("error authenticate: %s", err.Error())
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidAccessKey,
+		})
+	}
+
+	// Save the session
+	sessionData := webauthn.SessionData{
+		UserID:  user.WebAuthnID(),
+		Expires: *accessKey.ExpiresAt,
+	}
+	token, err := model.GenSessionToken()
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrSaveSession,
+		})
+	}
+	err = h.Service.SaveSession(c.Context(), sessionData, token, user.ID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrSaveSession,
+		})
+	}
+
+	// Return token
+	return c.Status(200).JSON(fiber.Map{
+		"token": token,
+	})
 }

@@ -6,6 +6,10 @@ type UserReq struct {
 	OTP      string `json:"otp" validate:"min=0,max=8"`
 }
 
+type AuthReq struct {
+	AccessKey string `json:"access_key" validate:"required,min=32,max=32"`
+}
+
 type EmailReq struct {
 	Email string `json:"email" validate:"required,emailx"`
 }

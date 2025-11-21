@@ -2,7 +2,7 @@
     <div class="mb-5">
         <h2>Alias Export</h2>
         <p>
-            Export all aliases associated with your account. The exported data will be provided in a CSV format.
+            Download a complete list of your aliases in a CSV file. Includes status, recipients, and descriptions.
         </p>
         <button
             @click="exportAliases"

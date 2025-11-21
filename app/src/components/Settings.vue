@@ -116,7 +116,7 @@
                 <button @click="deleteAllLogs" class="cta sm delete">Delete All Logs</button>
             </div>
             <hr>
-            <div class="mb-3">
+            <div class="mb-6">
                 <button @click="saveSettings" class="cta">
                     Save Settings
                 </button>

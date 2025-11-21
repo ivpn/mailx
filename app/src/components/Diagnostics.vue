@@ -1,16 +1,16 @@
 <template>
     <div class="card-container">
         <header class="head">
-            <h2>Logs</h2>
+            <h2>Diagnostics</h2>
         </header>
         <div v-if="!logs.length && loaded" class="card-empty">
             <span class="bg-secondary rounded flex items-center justify-center p-2 mb-5">
                 <i class="icon alert icon-accent text-2xl"></i>
             </span>
-            <h4 class="mb-6">You have no Logs</h4>
+            <h4 class="mb-6">No Diagnostic logs</h4>
             <p class="text-tertiary mb-6">
-                <span v-if="!settings.log_issues">To get started, first enable "Log Issues" in <router-link to="/settings">Settings</router-link>.<br></br></span>
-                <span v-if="settings.log_issues">Failed email deliveries and forwarding issues will be logged here.</span>
+                <span v-if="!settings.log_issues">Enable email delivery diagnostics in <router-link to="/settings">Settings</router-link>.<br></br></span>
+                <span v-if="settings.log_issues">Email delivery diagnostics will be logged here.</span>
             </p>
         </div>
         <div v-bind:class="{ 'hidden': !logs.length || !loaded }" class="card-primary">

@@ -113,6 +113,7 @@ const close = () => {
     req.value.otp = ''
     resendSuccess.value = ''
     error.value = ''
+    otpError.value = false
     const modal = document.querySelector('#modal-verify-recipient' + recipient.value.id) as any
     overlay.close(modal)
 }

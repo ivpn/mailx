@@ -23,9 +23,9 @@
                     <i class="icon chart icon-primary"></i>
                     Stats
                 </router-link>
-                <router-link v-bind:class="{ 'active': route == '/logs' }" to="/logs">
+                <router-link v-bind:class="{ 'active': route == '/diagnostics' }" to="/diagnostics">
                     <i class="icon alert icon-primary"></i>
-                    Logs
+                    Diagnostics
                 </router-link>
                 <router-link v-bind:class="{ 'active': route == '/settings' }" to="/settings">
                     <i class="icon settings icon-primary"></i>

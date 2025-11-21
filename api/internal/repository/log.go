@@ -16,15 +16,15 @@ const (
 	logEmlBaseDir = "/var/log/eml"
 )
 
-func (d *Database) GetLogs(ctx context.Context, userID string) ([]model.Log, error) {
+func (d *Database) GetLogs(ctx context.Context, userId string) ([]model.Log, error) {
 	var logs []model.Log
-	err := d.Client.Where("user_id = ?", userID).Order("created_at desc").Find(&logs).Error
+	err := d.Client.Where("user_id = ?", userId).Order("created_at desc").Find(&logs).Error
 	return logs, err
 }
 
-func (d *Database) GetLog(ctx context.Context, logID string, userId string) (model.Log, error) {
+func (d *Database) GetLog(ctx context.Context, logId string, userId string) (model.Log, error) {
 	var log model.Log
-	err := d.Client.Where("id = ? AND user_id = ?", logID, userId).First(&log).Error
+	err := d.Client.Where("id = ? AND user_id = ?", logId, userId).First(&log).Error
 	return log, err
 }
 
@@ -32,8 +32,8 @@ func (d *Database) PostLog(ctx context.Context, log model.Log) error {
 	return d.Client.Create(&log).Error
 }
 
-func (d *Database) DeleteLogs(ctx context.Context, userID string) error {
-	return d.Client.Where("user_id = ?", userID).Delete(&model.Log{}).Error
+func (d *Database) DeleteLogs(ctx context.Context, userId string) error {
+	return d.Client.Where("user_id = ?", userId).Delete(&model.Log{}).Error
 }
 
 func (d *Database) SaveLogToFile(ctx context.Context, filename string, data []byte) error {

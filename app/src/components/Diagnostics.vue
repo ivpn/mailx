@@ -33,7 +33,7 @@
                                 <span v-if="log.status"><span class="text-tertiary">Status</span>: {{ log.status }}<br></span>
                                 <span v-if="log.remote_mta"><span class="text-tertiary">Remote MTA</span>: {{ log.remote_mta }}<br></span>
                                 <span class="text-tertiary">Attempted At</span>: {{ attemptedAt(log) }}<br>
-                                <button v-if="log.log_type === 'bounce'" v-bind:data-hs-overlay="'#modal-delivery-log' + log.id" class="cta mt-3">Full log</button>
+                                <button v-if="log.log_type === 'bounce'" v-bind:data-hs-overlay="'#modal-delivery-log' + log.id" class="cta sm mt-3">Full log</button>
                                 <hr v-if="log.id !== logs[logs.length - 1]?.id" class="mt-8 mb-0">
                             </td>
                             <FailedDeliveryLog v-if="log.log_type === 'bounce'" :log="log" />

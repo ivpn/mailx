@@ -22,6 +22,7 @@
                     </option>
                 </select>
             </div>
+            <hr>
             <h4>Default Recipient</h4>
             <p>
                 Set the default recipient for new aliases created.
@@ -40,6 +41,7 @@
                     </option>
                 </select>
             </div>
+            <hr>
             <h4>Default Alias Format</h4>
             <p>
                 Set the default alias naming format for new aliases created. Options: 1. Words ('quiet.haze16') 2. Random ('uf1h0xi') 3. UUID ('550e8400-e29b-41d4-a716-446655440000')
@@ -58,6 +60,7 @@
                     </option>
                 </select>
             </div>
+            <hr>
             <h4>From Name</h4>
             <p>
                 Set the 'From name' used for replies and emails sent using an alias. Leave it blank to use the alias email address.
@@ -72,6 +75,7 @@
                     type="text"
                 >
             </div>
+            <hr>
             <h4>Mailx Header</h4>
             <p>
                 Add Mailx header in forwarded messages - `Sent to &lt;alias&gt; from &lt;sender&gt;`.
@@ -88,11 +92,12 @@
                     type="checkbox"
                 >
             </div>
+            <hr>
             <h4>Diagnostic Logs</h4>
             <p>
                 Track your failed email deliveries (bounces) and forwarding issues in <router-link to="/diagnostics">Diagnostics</router-link>. When enabled, diagnostic logs are recorded and stored for 7 days.
             </p>
-            <div class="mb-8">
+            <div class="mb-6">
                 <label for="log-issues">
                     Enable Diagnostics:
                 </label>
@@ -104,6 +109,13 @@
                     type="checkbox"
                 >
             </div>
+            <div class="mb-8">
+                <label for="log-issues">
+                    Delete Diagnostic Logs:
+                </label>
+                <button @click="deleteAllLogs" class="cta sm delete">Delete All Logs</button>
+            </div>
+            <hr>
             <div class="mb-3">
                 <button @click="saveSettings" class="cta">
                     Save Settings
@@ -120,6 +132,7 @@ import { onMounted, ref } from 'vue'
 import axios from 'axios'
 import { settingsApi } from '../api/settings.ts'
 import { recipientApi } from '../api/recipient.ts'
+import { logApi } from '../api/log.ts'
 
 const req = ref({
     id: '',
@@ -182,6 +195,21 @@ const getRecipients = async () => {
         error.value = ''
     } catch (err) {
         if (axios.isAxiosError(err)) {
+            error.value = err.message
+        }
+    }
+}
+
+const deleteAllLogs = async () => {
+    if (!confirm('Are you sure you want to delete all diagnostic logs? This action cannot be undone.')) return
+
+    try {
+        const res = await logApi.deleteAll()
+        error.value = ''
+        success.value = res.data.message
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            success.value = ''
             error.value = err.message
         }
     }

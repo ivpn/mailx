@@ -12,6 +12,14 @@
             &.cancel {
                 @apply text-primary bg-quaternary hover:bg-quaternary-alt;
             }
+
+            &.sm {
+                @apply font-medium text-sm py-1.5 px-2;
+            }
+
+            &.xs {
+                @apply font-medium text-xs py-1.5 px-2;
+            }
         }
 
         &.cancel {

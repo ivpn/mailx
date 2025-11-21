@@ -12,7 +12,7 @@ var (
 	ErrGetLogs        = "Unable to retrieve logs for this user."
 	ErrGetLogFile     = "Unable to retrieve log file."
 	ErrDeleteLogs     = "Unable to delete logs for this user."
-	LogsDeleteSuccess = "Logs deleted successfully"
+	LogsDeleteSuccess = "All diagnostic logs have been deleted."
 )
 
 type LogService interface {

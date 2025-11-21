@@ -97,7 +97,7 @@
             <p>
                 Track your failed email deliveries (bounces) and forwarding issues in <router-link to="/diagnostics">Diagnostics</router-link>. When enabled, diagnostic logs are recorded and stored for 7 days.
             </p>
-            <div class="mb-6">
+            <div v-if="loaded" class="mb-6">
                 <label for="log-issues">
                     Enable Diagnostics:
                 </label>

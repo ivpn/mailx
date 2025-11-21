@@ -24,7 +24,7 @@
         <h2>Do you use cookies or third-party services?</h2>
 
         <p>We use cookies solely for the purpose of managing authenticated sessions.</p>
-        <p>For monitoring aggregate website usage we run our own [Umami](https://umami.is/docs) analytics instance. Umami is a privacy-focused, cookieless solution that tracks page views and user interactions without collecting personally identifiable information. All data remains on our self-hosted infrastructure.</p>
+        <p>For monitoring aggregate website usage we run our own <a href="https://umami.is/docs" target="_blank">Umami</a> analytics instance. Umami is a privacy-focused, cookieless solution that tracks page views and user interactions without collecting personally identifiable information. All data remains on our self-hosted infrastructure.</p>
 
         <h2>What information do you store about my account?</h2>
 

@@ -83,9 +83,9 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Delete("/logs", h.DeleteLogs)
 	v1.Get("/log/file/:id", h.GetLogFile)
 
-	v1.Get("/access_keys", h.GetAccessKeys)
-	v1.Post("/access_key", h.PostAccessKey)
-	v1.Delete("/access_key/:id", h.DeleteAccessKey)
+	v1.Get("/accesskeys", h.GetAccessKeys)
+	v1.Post("/accesskeys", h.PostAccessKey)
+	v1.Delete("/accesskeys/:id", h.DeleteAccessKey)
 
 	docs := h.Server.Group("/docs")
 	docs.Use(auth.NewBasicAuth(cfg))

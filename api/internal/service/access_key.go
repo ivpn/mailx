@@ -51,7 +51,7 @@ func (s *Service) GetAccessKey(ctx context.Context, tokenPlain string) (model.Ac
 }
 
 func (s *Service) PostAccessKey(ctx context.Context, userId string, accessKey model.AccessKey) error {
-	if accessKey.TokenPlain == nil {
+	if accessKey.TokenPlain != nil {
 		err := accessKey.SetToken(*accessKey.TokenPlain)
 		if err != nil {
 			log.Println("error setting access key token:", err.Error())

@@ -33,7 +33,7 @@ type AccessKeyService interface {
 // @Security ApiKeyAuth
 // @Success 200 {array} model.AccessKey
 // @Failure 400 {object} ErrorRes
-// @Router /access_keys [get]
+// @Router /accesskeys [get]
 func (h *Handler) GetAccessKeys(c *fiber.Ctx) error {
 	userID := auth.GetUserID(c)
 	accessKeys, err := h.Service.GetAccessKeys(c.Context(), userID)
@@ -53,9 +53,9 @@ func (h *Handler) GetAccessKeys(c *fiber.Ctx) error {
 // @Produce json
 // @Security ApiKeyAuth
 // @Param access_key body AccessKeyReq true "Access Key Request"
-// @Success 200 {object} map[string]string "access_key"
+// @Success 200 {object} map[string]string "token"
 // @Failure 400 {object} ErrorRes
-// @Router /access_key [post]
+// @Router /accesskeys [post]
 func (h *Handler) PostAccessKey(c *fiber.Ctx) error {
 	// Parse the request
 	userId := auth.GetUserID(c)
@@ -114,7 +114,7 @@ func (h *Handler) PostAccessKey(c *fiber.Ctx) error {
 
 	// Return the token
 	return c.Status(200).JSON(fiber.Map{
-		"access_key": token,
+		"token": token,
 	})
 }
 
@@ -127,7 +127,7 @@ func (h *Handler) PostAccessKey(c *fiber.Ctx) error {
 // @Param id path string true "Access Key ID"
 // @Success 200
 // @Failure 400 {object} ErrorRes
-// @Router /access_key/{id} [delete]
+// @Router /accesskeys/{id} [delete]
 func (h *Handler) DeleteAccessKey(c *fiber.Ctx) error {
 	userId := auth.GetUserID(c)
 	id := c.Params("id")

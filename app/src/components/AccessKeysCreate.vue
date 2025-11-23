@@ -48,7 +48,7 @@
                         <footer>
                             <nav>
                                 <button @click="postAccessKey" class="cta">
-                                    Add Access Key
+                                    Create Access Key
                                 </button>
                                 <button @click="close" class="cancel">
                                     Cancel
@@ -68,15 +68,15 @@
                                 <p>
                                     Please make sure to copy and store the Access Key securely as it will not be shown again:
                                 </p>
-                                <span class="text-black dark:text-white">
+                                <p class="py-4 px-5 bg-secondary text-primary break-all font-mono">
                                     {{ accessKey.token }}
-                                </span>
+                                </p>
                             </div>
                         </article>
                         <footer>
                             <nav>
                                 <button @click="copyAccessKey" class="cta">
-                                    Copy Access Key and Close
+                                    {{ copyText }}
                                 </button>
                                 <button @click="close" class="cancel">
                                     Close
@@ -105,6 +105,7 @@ const accessKey = ref({
 const error = ref('')
 const nameError = ref(false)
 const isCreated = ref(false)
+const copyText = ref('Copy To Clipboard')
 
 const validateName = () => {
     nameError.value = !accessKey.value.name
@@ -191,7 +192,10 @@ const handleKeydown = (event: KeyboardEvent) => {
 
 const copyAccessKey = () => {
     navigator.clipboard.writeText(accessKey.value.token)
-    close()
+    copyText.value = 'Copied'
+    setTimeout(() => {
+        copyText.value = 'Copy To Clipboard'
+    }, 2000)
 }
 
 onMounted(() => {

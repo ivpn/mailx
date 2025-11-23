@@ -27,7 +27,6 @@
                                     v-model="accessKey.name"
                                     v-bind:class="{ 'error': nameError }"
                                     id="accesskey_name"
-                                    placeholder="name@example.net"
                                     type="text"
                                 >
                                 <p v-if="nameError" class="error">Required</p>
@@ -79,7 +78,7 @@
                                 <button @click="copyAccessKey" class="cta">
                                     Copy Access Key and Close
                                 </button>
-                                <button @click="close" class="cta">
+                                <button @click="close" class="cancel">
                                     Close
                                 </button>
                             </nav>

@@ -78,7 +78,7 @@ func (h *Handler) PostAccessKey(c *fiber.Ctx) error {
 	}
 
 	// Create token
-	token, err := model.GenSessionToken()
+	token, err := model.GenAccessKeyToken()
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrPostAccessKey,

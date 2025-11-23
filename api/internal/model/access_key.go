@@ -1,6 +1,7 @@
 package model
 
 import (
+	"crypto/rand"
 	"errors"
 	"time"
 
@@ -46,4 +47,19 @@ func (a *AccessKey) IsExpired() bool {
 	}
 
 	return time.Now().After(*a.ExpiresAt)
+}
+
+func GenAccessKeyToken() (string, error) {
+	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	b := make([]byte, 64)
+	_, err := rand.Read(b)
+	if err != nil {
+		return "", err
+	}
+
+	for i := range 64 {
+		b[i] = charset[int(b[i])%len(charset)]
+	}
+
+	return string(b), nil
 }

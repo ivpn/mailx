@@ -6,9 +6,7 @@
                 Add or remove Access Keys associated with your account.<br>
             </p>
             <div class="flex justify-start items-center gap-x-3 mb-3">
-                <button @click="addAccessKey" class="cta">
-                    New Access Key
-                </button>
+                <AccessKeysCreate />
             </div>
             <p v-if="error" class="error mt-6 mb-4">Error: {{ error }}</p>
         </div>
@@ -67,6 +65,8 @@
 import { onMounted, ref } from 'vue'
 import axios from 'axios'
 import { userApi } from '../api/user.ts'
+import AccessKeysCreate from './AccessKeysCreate.vue'
+import events from '../events.ts'
 
 const credential = {
     id: '',
@@ -92,27 +92,6 @@ const getList = async () => {
     }
 }
 
-const addAccessKey = async () => {
-    try {
-        const req = {
-            Name: 'New Access Key',
-            ExpiresAt: '',
-        }
-        const res = await userApi.accessKeyCreate(req)
-        console.log(res.data)
-        error.value = ''
-        getList()
-    } catch (err) {
-        if (axios.isAxiosError(err)) {
-            error.value = err.response?.data.error || err.message
-
-            if (err.response?.status === 429) {
-                error.value = 'Too many requests, please try again later.'
-            }
-        }
-    }
-}
-
 const deleteAccessKey = async (id: string) => {
     if (!confirm('Are you sure you want to delete Access Key?')) return
 
@@ -134,5 +113,6 @@ const renderRow = () => {
 
 onMounted(() => {
     getList()
+    events.on('accesskey.create', getList)
 })
 </script>

@@ -25,7 +25,7 @@ type RecipientService interface {
 	SendRecipientOTP(context.Context, string, string) error
 	UpdateRecipient(context.Context, model.Recipient) error
 	ActivateRecipient(context.Context, string, string, string) error
-	DeleteRecipient(context.Context, string, string) error
+	DeleteRecipient(context.Context, string, string, string) error
 }
 
 // @Summary Get recipient
@@ -257,13 +257,29 @@ func (h *Handler) ActivateRecipient(c *fiber.Ctx) error {
 // @Produce json
 // @Security ApiKeyAuth
 // @Param id path string true "Recipient ID"
+// @Param body body DeleteRecipientReq true "Delete recipient request"
 // @Success 200 {object} SuccessRes
 // @Failure 400 {object} ErrorRes
 // @Router /recipient/{id} [delete]
 func (h *Handler) DeleteRecipient(c *fiber.Ctx) error {
 	userID := auth.GetUserID(c)
 	ID := c.Params("id")
-	err := h.Service.DeleteRecipient(c.Context(), ID, userID)
+	req := DeleteRecipientReq{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	rcps, err := h.Service.GetVerifiedRecipients(c.Context(), req.Recipients, userID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrUnverifiedRcp,
+		})
+	}
+
+	err = h.Service.DeleteRecipient(c.Context(), ID, userID, model.GetEmails(rcps))
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),

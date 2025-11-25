@@ -29,7 +29,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <RecipientRow v-for="recipient in list" :recipient="recipient" :key="rowKey" />
+                        <RecipientRow v-for="recipient in list" :recipient="recipient" :recipients="list" :key="rowKey" />
                     </tbody>
                 </table>
                 <p v-if="error" class="error">Error: {{ error }}</p>

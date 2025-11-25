@@ -100,6 +100,7 @@ const isEnabled = ref(false)
 const close = () => {
     req.value = {} as any
     error.value = ''
+    document.removeEventListener('keydown', handleKeydown)
     const modal = document.querySelector('#modal-totp-enable') as any
     overlay.close(modal)
 }
@@ -116,7 +117,21 @@ const addEvents = () => {
     })
     modal.element.on('open', () => {
         totpEnable()
+        focusFirstInput()
+        document.addEventListener('keydown', handleKeydown)
     })
+}
+
+const focusFirstInput = () => {
+    const input = document.getElementById('totp_enable_code')
+    input?.focus()
+}
+
+const handleKeydown = (event: KeyboardEvent) => {
+    if (event.key === 'Enter') {
+        event.preventDefault()
+        totpEnableConfirm()
+    }
 }
 
 const totpEnable = async () => {

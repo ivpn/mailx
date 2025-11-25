@@ -21,6 +21,7 @@ var (
 type AliasService interface {
 	GetAlias(context.Context, string, string) (model.Alias, error)
 	GetAliases(context.Context, string, int, int, string, string, string, string) (model.AliasList, error)
+	GetAllAliases(context.Context, string) ([]model.Alias, error)
 	PostAlias(context.Context, model.Alias, string, string, string) (model.Alias, error)
 	UpdateAlias(context.Context, model.Alias) error
 	DeleteAlias(context.Context, string, string) error
@@ -117,6 +118,39 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(list)
+}
+
+// @Summary Export aliases
+// @Description Export all aliases as CSV
+// @Tags alias
+// @Accept json
+// @Produce text/csv
+// @Security ApiKeyAuth
+// @Success 200 {string} string "CSV data"
+// @Failure 400 {object} ErrorRes
+// @Router /aliases/export [get]
+func (h *Handler) ExportAliases(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
+	aliases, err := h.Service.GetAllAliases(c.Context(), userID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	c.Set("Content-Type", "text/csv")
+	c.Set("Content-Disposition", "attachment; filename=\"aliases.csv\"")
+
+	var b strings.Builder
+	b.WriteString("alias,description,enabled,recipients\n")
+	for _, alias := range aliases {
+		b.WriteString(alias.Name + ",")
+		b.WriteString(alias.Description + ",")
+		b.WriteString(strconv.FormatBool(alias.Enabled) + ",")
+		b.WriteString(alias.Recipients + "\n")
+	}
+
+	return c.SendString(b.String())
 }
 
 // @Summary Create alias

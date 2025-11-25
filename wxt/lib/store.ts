@@ -3,7 +3,7 @@ export interface StoredData {
 }
 
 const STORAGE_KEYS = {
-    apiToken: "apiToken",
+    apiToken: 'apiToken',
 }
 
 export const store = {

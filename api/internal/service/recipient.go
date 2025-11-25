@@ -292,3 +292,48 @@ func (s *Service) DeleteRecipientByUserID(ctx context.Context, userID string) er
 
 	return nil
 }
+
+func (s *Service) FindRecipients(from string, to string, msgType model.MessageType) ([]model.Recipient, model.Alias, model.MessageType, error) {
+	// Extract alias name from the "to" email
+	name, replyTo := model.ParseReplyTo(to)
+	alias, err := s.GetAliasByName(name)
+	if err != nil {
+		return []model.Recipient{}, model.Alias{}, 0, err
+	}
+
+	// Handle disabled alias
+	if !alias.Enabled {
+		err = s.SaveMessage(context.Background(), alias, model.Block)
+		if err != nil {
+			log.Println("error saving message", err)
+		}
+
+		return []model.Recipient{}, alias, 0, ErrDisabledAlias
+	}
+
+	// Handle Reply | Send
+	err = utils.ValidateEmail(replyTo)
+	if err == nil {
+		rcps, err := s.GetVerifiedRecipients(context.Background(), from, alias.UserID)
+		if err != nil || len(rcps) == 0 {
+			return []model.Recipient{}, alias, 0, ErrNoVerifiedRecipients
+		}
+
+		return []model.Recipient{{Email: replyTo}}, alias, model.MessageType(msgType), nil
+	}
+
+	// Handle Forward
+	rcps, err := s.GetRecipients(context.Background(), alias.UserID)
+	if err != nil || len(rcps) == 0 {
+		return []model.Recipient{}, alias, 0, ErrNoRecipients
+	}
+
+	var recipients []model.Recipient
+	for _, rcp := range rcps {
+		if strings.Contains(alias.Recipients, rcp.Email) {
+			recipients = append(recipients, rcp)
+		}
+	}
+
+	return recipients, alias, model.Forward, nil
+}

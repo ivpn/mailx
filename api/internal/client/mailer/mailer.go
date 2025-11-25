@@ -143,7 +143,7 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 	return nil
 }
 
-func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data []byte, templateFile string, templateData any) error {
+func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data []byte, templateFile string, templateData any, settings model.Settings) error {
 	reader := bytes.NewReader(data)
 	email, err := letters.ParseEmail(reader)
 	if err != nil {
@@ -156,15 +156,19 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 	}
 
 	header := new(bytes.Buffer)
-	err = tmpl.ExecuteTemplate(header, "header", templateData)
-	if err != nil {
-		return err
+	if !settings.RemoveHeader {
+		err = tmpl.ExecuteTemplate(header, "header", templateData)
+		if err != nil {
+			return err
+		}
 	}
 
 	headerHtml := new(bytes.Buffer)
-	err = tmpl.ExecuteTemplate(headerHtml, "headerHtml", templateData)
-	if err != nil {
-		return err
+	if !settings.RemoveHeader {
+		err = tmpl.ExecuteTemplate(headerHtml, "headerHtml", templateData)
+		if err != nil {
+			return err
+		}
 	}
 
 	if email.HTML == "" {

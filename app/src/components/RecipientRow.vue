@@ -18,7 +18,7 @@
         <td>
             <p>
                 <span v-if="recipient.is_active" class="badge success">Verified</span>
-                <span v-if="!recipient.is_active" class="badge">Unverified</span>
+                <button v-if="!recipient.is_active" class="cta xs plain" v-bind:data-hs-overlay="'#modal-verify-recipient' + recipient.id">Unverified</button>
             </p>
         </td>
         <td>
@@ -44,7 +44,7 @@
                     class="hs-dropdown-menu hs-dropdown-open:opacity-100 hidden"
                     v-bind:aria-labelledby="'hs-dropdown-recipient-edit-' + recipient.id"
                     >
-                    <button v-bind:class="{ 'hide': recipient.is_active }"v-bind:data-hs-overlay="'#modal-verify-recipient' + recipient.id">
+                    <button v-bind:class="{ 'hide': recipient.is_active }" v-bind:data-hs-overlay="'#modal-verify-recipient' + recipient.id">
                         <i class="icon icon-primary check text-xs"></i>
                         Verify
                     </button>
@@ -135,7 +135,7 @@
                     <div>
                         <p class="my-3">
                             <span v-if="recipient.is_active" class="badge success">Verified</span>
-                            <span v-if="!recipient.is_active" class="badge">Unverified</span>
+                            <button v-if="!recipient.is_active" class="cta xs plain" v-bind:data-hs-overlay="'#modal-verify-recipient' + recipient.id">Unverified</button>
                         </p>
                     </div>
                 </div>

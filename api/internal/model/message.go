@@ -9,10 +9,11 @@ import (
 type MessageType int
 
 const (
-	Forward MessageType = 0
-	Block   MessageType = 1
-	Reply   MessageType = 2
-	Send    MessageType = 3
+	Forward    MessageType = 0
+	Block      MessageType = 1
+	Reply      MessageType = 2
+	Send       MessageType = 3
+	FailBounce MessageType = 4
 )
 
 type Message struct {
@@ -33,13 +34,12 @@ func ParseReplyTo(email string) (string, string) {
 	}
 
 	// Get respond to email between "+" and "@"
-	rcp := email[plusIndex+1 : strings.Index(email, "@")]
 	if plusIndex == -1 {
 		return alias, ""
 	}
 
 	// Get respond to email between "+" and "@"
-	rcp = email[plusIndex+1 : strings.Index(email, "@")]
+	rcp := email[plusIndex+1 : strings.Index(email, "@")]
 
 	// Check if respond to email is not empty and contains "=" and "+"
 	if rcp != "" && strings.Contains(rcp, "=") && strings.Contains(rcp, "+") {

@@ -48,11 +48,13 @@ type DeleteRecipientReq struct {
 }
 
 type SettingsReq struct {
-	ID          string `json:"id" validate:"required,uuid"`
-	Domain      string `json:"domain"`
-	Recipient   string `json:"recipient"`
-	FromName    string `json:"from_name"`
-	AliasFormat string `json:"alias_format"`
+	ID           string `json:"id" validate:"required,uuid"`
+	Domain       string `json:"domain"`
+	Recipient    string `json:"recipient"`
+	FromName     string `json:"from_name"`
+	AliasFormat  string `json:"alias_format"`
+	LogIssues    bool   `json:"log_issues"`
+	RemoveHeader bool   `json:"remove_header"`
 }
 
 type DeleteUserReq struct {

@@ -5,7 +5,7 @@
                 <h1 class="flex justify-center text-accent mb-8">
                     <span class="logo"></span>
                 </h1>
-                <h4 class="text-center mb-8">Log in with Access Key</h4>
+                <h4 class="text-center mb-8">Log in with Access Key from Mailx</h4>
                 <div>
                     <div class="mb-5">
                         <input
@@ -20,16 +20,13 @@
                     </div>
                     <div class="flex items-center w-full">
                         <button :disabled="isLoading" @click="loginWithAccessKey" class="cta full">
-                            Log in with Access Key
+                            Log In
                         </button>
                     </div>
                     <p v-if="error" class="error mt-6">Error: {{ error }}</p>
                 </div>
             </article>
             <footer>
-                <div>
-                    <i class="icon info icon-primary"></i>
-                </div>
                 <div>
                     <h4>Here to try Mailx? You need an active IVPN account.</h4>
                     <p>Sign up or log in on <a href="https://www.ivpn.net/account/">ivpn.net</a> and look for "Mailx

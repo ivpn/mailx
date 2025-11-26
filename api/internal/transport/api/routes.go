@@ -70,13 +70,18 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Put("/recipient", h.UpdateRecipient)
 	v1.Post("/recipient/sendotp/:id", limit.New(5, 10*time.Minute), h.SendRecipientOTP)
 	v1.Post("/recipient/activate/:id", limit.New(5, 10*time.Minute), h.ActivateRecipient)
-	v1.Delete("/recipient/:id", h.DeleteRecipient)
+	v1.Put("/recipient/delete/:id", h.DeleteRecipient)
 
 	v1.Get("/alias/:id", h.GetAlias)
 	v1.Get("/aliases", h.GetAliases)
+	v1.Get("/aliases/export", h.ExportAliases)
 	v1.Post("/alias", limiter.New(), h.PostAlias)
 	v1.Put("/alias/:id", h.UpdateAlias)
 	v1.Delete("/alias/:id", h.DeleteAlias)
+
+	v1.Get("/logs", h.GetLogs)
+	v1.Delete("/logs", h.DeleteLogs)
+	v1.Get("/log/file/:id", h.GetLogFile)
 
 	docs := h.Server.Group("/docs")
 	docs.Use(auth.NewBasicAuth(cfg))

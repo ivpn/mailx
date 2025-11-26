@@ -196,7 +196,7 @@ func (s *Service) UpdateRecipient(ctx context.Context, recipient model.Recipient
 	return nil
 }
 
-func (s *Service) DeleteRecipient(ctx context.Context, ID string, userID string) error {
+func (s *Service) DeleteRecipient(ctx context.Context, ID string, userID string, newRecipients string) error {
 	// Get recipient
 	recipient, err := s.Store.GetRecipient(ctx, ID, userID)
 	if err != nil {
@@ -219,8 +219,8 @@ func (s *Service) DeleteRecipient(ctx context.Context, ID string, userID string)
 			r = strings.Replace(r, recipient.Email+",", "", -1)
 			r = strings.Replace(r, ","+recipient.Email, "", -1)
 			r = strings.Replace(r, recipient.Email, "", -1)
-			alias.Recipients = r
-			alias.Enabled = r != ""
+			alias.Recipients = model.MergeCommaSeparatedEmails(r, newRecipients)
+			alias.Enabled = alias.Recipients != ""
 
 			// Update alias
 			err = s.Store.UpdateAlias(ctx, alias)
@@ -291,4 +291,49 @@ func (s *Service) DeleteRecipientByUserID(ctx context.Context, userID string) er
 	}
 
 	return nil
+}
+
+func (s *Service) FindRecipients(from string, to string, msgType model.MessageType) ([]model.Recipient, model.Alias, model.MessageType, error) {
+	// Extract alias name from the "to" email
+	name, replyTo := model.ParseReplyTo(to)
+	alias, err := s.GetAliasByName(name)
+	if err != nil {
+		return []model.Recipient{}, model.Alias{}, 0, err
+	}
+
+	// Handle disabled alias
+	if !alias.Enabled {
+		err = s.SaveMessage(context.Background(), alias, model.Block)
+		if err != nil {
+			log.Println("error saving message", err)
+		}
+
+		return []model.Recipient{}, alias, 0, ErrDisabledAlias
+	}
+
+	// Handle Reply | Send
+	err = utils.ValidateEmail(replyTo)
+	if err == nil {
+		rcps, err := s.GetVerifiedRecipients(context.Background(), from, alias.UserID)
+		if err != nil || len(rcps) == 0 {
+			return []model.Recipient{}, alias, 0, ErrNoVerifiedRecipients
+		}
+
+		return []model.Recipient{{Email: replyTo}}, alias, model.MessageType(msgType), nil
+	}
+
+	// Handle Forward
+	rcps, err := s.GetRecipients(context.Background(), alias.UserID)
+	if err != nil || len(rcps) == 0 {
+		return []model.Recipient{}, alias, 0, ErrNoRecipients
+	}
+
+	var recipients []model.Recipient
+	for _, rcp := range rcps {
+		if strings.Contains(alias.Recipients, rcp.Email) {
+			recipients = append(recipients, rcp)
+		}
+	}
+
+	return recipients, alias, model.Forward, nil
 }

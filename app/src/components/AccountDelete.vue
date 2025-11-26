@@ -19,7 +19,7 @@
                         <div>
                             <div class="mb-5">
                                 <p>
-                                    <strong>WARNING:</strong> this operation cannot be undone. Deleting your account will permanently remove data from our systems.
+                                    <strong>WARNING:</strong> This operation cannot be undone. Deleting your account will permanently remove data from our systems.
                                 </p>
                             </div>
                             <div class="mb-5">

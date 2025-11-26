@@ -24,6 +24,7 @@ var (
 type AliasStore interface {
 	GetAlias(context.Context, string, string) (model.Alias, error)
 	GetAliases(context.Context, string, int, int, string, string, string, string) ([]model.Alias, error)
+	GetAllAliases(context.Context, string) ([]model.Alias, error)
 	GetAliasCount(context.Context, string, string, string) (int, error)
 	GetAliasDailyCount(context.Context, string) (int, error)
 	GetAliasByName(string) (model.Alias, error)
@@ -65,6 +66,16 @@ func (s *Service) GetAliases(ctx context.Context, userID string, limit int, page
 		Aliases: aliases,
 		Total:   total,
 	}, nil
+}
+
+func (s *Service) GetAllAliases(ctx context.Context, userID string) ([]model.Alias, error) {
+	aliases, err := s.Store.GetAllAliases(ctx, userID)
+	if err != nil {
+		log.Printf("error fetching all aliases: %s", err.Error())
+		return nil, ErrGetAliases
+	}
+
+	return aliases, nil
 }
 
 func (s *Service) GetAliasByName(name string) (model.Alias, error) {
@@ -176,4 +187,14 @@ func (s *Service) DeleteAliasByUserID(ctx context.Context, userID string) error 
 	}
 
 	return nil
+}
+
+func (s *Service) FindAlias(email string) (model.Alias, error) {
+	name, _ := model.ParseReplyTo(email)
+	alias, err := s.GetAliasByName(name)
+	if err != nil {
+		return model.Alias{}, err
+	}
+
+	return alias, nil
 }

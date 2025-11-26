@@ -7,7 +7,7 @@
             </router-link>
         </p>
         <h1>Privacy Policy</h1>
-        <p class="text-sm">Last updated: 10 July 2025</p>
+        <p class="text-sm">Last updated: 21 Nov 2025</p>
 
         <p>Mailx is developed and operated by the team behind IVPN. All services we offer to customers are built for privacy. Internally, we know what exactly that means. If a choice needs to be made between one practice that deepens a user’s privacy, and another that would diminish it but accelerate our growth, we’ll always take the slower, more private option.</p>
         <p>We are committed to being transparent about how we collect, use, and protect your data after you sign up to the Mailx service. Below we offer a concise and human-readable summary of our policies.</p>
@@ -24,7 +24,7 @@
         <h2>Do you use cookies or third-party services?</h2>
 
         <p>We use cookies solely for the purpose of managing authenticated sessions.</p>
-        <p>No third-party cookies, trackers, or analytics are deployed when visiting our website or using the service.</p>
+        <p>For monitoring aggregate website usage we run our own <a href="https://umami.is/docs" target="_blank">Umami</a> analytics instance. Umami is a privacy-focused, cookieless solution that tracks page views and user interactions without collecting personally identifiable information. All data remains on our self-hosted infrastructure.</p>
 
         <h2>What information do you store about my account?</h2>
 

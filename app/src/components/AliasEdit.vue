@@ -143,11 +143,19 @@ const addEvents = () => {
     modal.element.on('close', () => {
         close()
     })
+    modal.element.on('open', () => {
+        focusFirstInput()
+    })
 
     const multiselect = select.getInstance('#recipient_' + alias.value.id as any, true) as any
     multiselect.element.on('change', (val: any) => {
         errorRecipients.value = val.length === 0 ? 'Select one or more recipients' : ''
     })
+}
+
+const focusFirstInput = () => {
+    const input = document.getElementById('description_' + alias.value.id) as HTMLInputElement
+    input?.focus()
 }
 
 onMounted(() => {

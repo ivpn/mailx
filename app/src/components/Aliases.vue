@@ -5,7 +5,7 @@
             <div class="flex gap-3 items-center justify-between">
                 <div class="max-md:hidden relative">
                     <form v-if="loaded" @submit.prevent="getList" autocomplete="off">
-                        <input class="search" type="text" v-model="search" placeholder="Search aliases...">
+                        <input class="search" type="text" v-model="search" placeholder="Search aliases..." id="input_search">
                     </form>
                     <button v-if="searchQuery" @click.prevent="clearSearch" class="absolute top-0 right-0 bottom-0 px-2 flex items-center justify-center">
                         <i class="icon close icon-tertiary text-base"></i>
@@ -105,7 +105,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import axios from 'axios'
 import { aliasApi } from '../api/alias'
 import { recipientApi } from '../api/recipient.ts'
@@ -254,6 +254,25 @@ const clearSearch = () => {
     getList()
 }
 
+const handleKeydown = (event: KeyboardEvent) => {
+    // Only trigger if not focused on an input or textarea
+    const activeElement = document.activeElement
+    if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA' || activeElement.getAttribute('contenteditable') === 'true')) {
+        return
+    }
+    
+    if (event.key === 's' || event.key === 'S') {
+        event.preventDefault()
+        const input = document.getElementById('input_search')
+        input?.focus()
+    }
+    if (event.key === 'n' || event.key === 'N') {
+        event.preventDefault()
+        const modalTrigger = document.querySelector('[data-hs-overlay="#modal-create-alias-false"]') as HTMLElement
+        modalTrigger?.click()
+    }
+}
+
 onMounted(async () => {
     await getRecipients()
     await getSettings()
@@ -261,5 +280,10 @@ onMounted(async () => {
     events.on('alias.create', fetch)
     events.on('alias.update', fetch)
     events.on('alias.delete', onDeleteAlias)
+    document.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+    document.removeEventListener('keydown', handleKeydown)
 })
 </script>

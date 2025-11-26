@@ -29,7 +29,7 @@ func TestGenAccessKeyTokenBasic(t *testing.T) {
 func TestGenAccessKeyTokenUniqueness(t *testing.T) {
 	const n = 500
 	seen := make(map[string]struct{}, n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		token, err := GenAccessKeyToken()
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -49,7 +49,7 @@ func TestGenAccessKeyTokenCharacterSet(t *testing.T) {
 	for _, r := range charset {
 		allowed[r] = struct{}{}
 	}
-	for i := 0; i < 50; i++ {
+	for range 50 {
 		token, err := GenAccessKeyToken()
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)

@@ -1,11 +1,11 @@
 <template>
-  <HelloWorld msg="Hello" />
+  <LoginScreen />
 </template>
 
 <script lang="ts" setup>
 import { onMounted } from 'vue'
 import { api } from '@/lib/api'
-import HelloWorld from '@/components/HelloWorld.vue'
+import LoginScreen from '@/components/popup/LoginScreen.vue'
 
 onMounted(async () => {
   try {

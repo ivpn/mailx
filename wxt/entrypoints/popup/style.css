@@ -1,3 +1,22 @@
+@import "../../../app/src/style/fonts/fonts.css";
+@import "../../../app/src/style/components/color.css";
+@import "../../../app/src/style/components/page.css";
+@import "../../../app/src/style/components/button.css";
+@import "../../../app/src/style/components/form.css";
+@import "../../../app/src/style/components/text.css";
+@import "../../../app/src/style/components/icon.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    html {
+        font-family: 'Roboto Mono', monospace;
+    }
+
+    .page {
+        min-height: 400px;
+        min-width: 400px;
+    }
+}

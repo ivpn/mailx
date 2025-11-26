@@ -135,7 +135,7 @@
                     <div>
                         <p class="my-3">
                             <span v-if="recipient.is_active" class="badge success">Verified</span>
-                            <span v-if="!recipient.is_active" class="badge">Unverified</span>
+                            <button v-if="!recipient.is_active" class="cta xs plain" v-bind:data-hs-overlay="'#modal-verify-recipient' + recipient.id">Unverified</button>
                         </p>
                     </div>
                 </div>

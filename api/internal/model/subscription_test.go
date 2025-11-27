@@ -213,23 +213,23 @@ func TestSubscriptionIsOutage(t *testing.T) {
 		want      bool
 	}{
 		{
-			name:      "updated 25h ago => outage",
-			updatedAt: now.Add(-25 * time.Hour),
+			name:      "updated 49h ago => outage",
+			updatedAt: now.Add(-49 * time.Hour),
 			want:      true,
 		},
 		{
-			name:      "updated 24h + 1s ago => outage",
-			updatedAt: now.Add(-24*time.Hour - 1*time.Second),
+			name:      "updated 48h + 1s ago => outage",
+			updatedAt: now.Add(-48*time.Hour - 1*time.Second),
 			want:      true,
 		},
 		{
-			name:      "updated 24h - 1s ago => not outage",
-			updatedAt: now.Add(-24*time.Hour + 1*time.Second),
+			name:      "updated 48h - 1s ago => not outage",
+			updatedAt: now.Add(-48*time.Hour + 1*time.Second),
 			want:      false,
 		},
 		{
-			name:      "updated 23h ago => not outage",
-			updatedAt: now.Add(-23 * time.Hour),
+			name:      "updated 47h ago => not outage",
+			updatedAt: now.Add(-47 * time.Hour),
 			want:      false,
 		},
 		{
@@ -244,7 +244,7 @@ func TestSubscriptionIsOutage(t *testing.T) {
 			s := &Subscription{UpdatedAt: tc.updatedAt}
 			got := s.IsOutage()
 			if got != tc.want {
-				t.Fatalf("IsOutage() = %v, want %v (updatedAt=%v now=%v threshold=%v)", got, tc.want, tc.updatedAt, time.Now(), tc.updatedAt.Add(24*time.Hour))
+				t.Fatalf("IsOutage() = %v, want %v (updatedAt=%v now=%v threshold=%v)", got, tc.want, tc.updatedAt, time.Now(), tc.updatedAt.Add(48*time.Hour))
 			}
 		})
 	}

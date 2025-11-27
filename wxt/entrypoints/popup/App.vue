@@ -5,6 +5,7 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
+import { api } from '@/lib/api'
 import { store } from '@/lib/store'
 import LoginScreen from '@/components/popup/LoginScreen.vue'
 import AliasesScreen from '@/components/popup/AliasesScreen.vue'
@@ -18,5 +19,12 @@ onMounted(async () => {
     console.log('API token changed:', newToken)
     apiToken.value = newToken
   })
+
+  try {
+    const res = await api.livez()
+    console.log('/livez response:', res)
+  } catch (err) {
+    console.error('Error calling /livez:', err)
+  }
 })
 </script>

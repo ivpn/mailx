@@ -47,7 +47,7 @@ const error = ref<string | null>(null)
 const accessKey = ref('')
 const accessKeyError = ref(false)
 
-const loginWithAccessKey = () => {
+const loginWithAccessKey = async () => {
     accessKeyError.value = false
     error.value = null
     if (!accessKey.value) {

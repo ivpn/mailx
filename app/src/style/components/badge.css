@@ -6,6 +6,10 @@
             @apply bg-success text-white font-semibold;
         }
 
+        &.progress {
+            @apply bg-accent text-white font-semibold;
+        }
+        
         &.bounce {
             @apply bg-amber-500 dark:bg-amber-700 text-white font-semibold;
         }

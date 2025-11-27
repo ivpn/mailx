@@ -6,6 +6,10 @@ const STORAGE_KEYS = {
     apiToken: 'apiToken',
 }
 
+type Listener<T> = (value: T) => void
+
+const apiTokenListeners = new Set<Listener<string | undefined>>()
+
 export const store = {
     async getApiToken(): Promise<string | undefined> {
         const { apiToken } = await browser.storage.local.get(STORAGE_KEYS.apiToken)
@@ -23,4 +27,9 @@ export const store = {
     async clearAll(): Promise<void> {
         await browser.storage.local.clear()
     },
+
+    onApiTokenChange(listener: Listener<string | undefined>): () => void {
+        apiTokenListeners.add(listener)
+        return () => apiTokenListeners.delete(listener)
+    }
 }

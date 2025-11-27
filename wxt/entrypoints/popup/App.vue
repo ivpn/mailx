@@ -4,16 +4,18 @@
 
 <script lang="ts" setup>
 import { onMounted } from 'vue'
-import { api } from '@/lib/api'
 import LoginScreen from '@/components/popup/LoginScreen.vue'
+import { ref } from 'vue'
+import { store } from '@/lib/store'
+
+const apiToken = ref<string | undefined>()
 
 onMounted(async () => {
-  try {
-    const res = await api.livez()
-    console.log('API response:', res)
-  } catch (error) {
-    console.error('Failed to check API status:', error)
-  }
+  apiToken.value = await store.getApiToken()
+
+  store.onApiTokenChange((newToken) => {
+    apiToken.value = newToken
+  })
 })
 </script>
 

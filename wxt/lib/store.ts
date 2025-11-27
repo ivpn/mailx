@@ -24,12 +24,12 @@ export const store = {
         await browser.storage.local.remove(STORAGE_KEYS.apiToken)
     },
 
-    async clearAll(): Promise<void> {
-        await browser.storage.local.clear()
-    },
-
     onApiTokenChange(listener: Listener<string | undefined>): () => void {
         apiTokenListeners.add(listener)
         return () => apiTokenListeners.delete(listener)
-    }
+    },
+
+    async clearAll(): Promise<void> {
+        await browser.storage.local.clear()
+    },
 }

@@ -16,9 +16,9 @@ func (d *Database) GetAccessKeys(ctx context.Context, userId string) ([]model.Ac
 	return accessKeys, nil
 }
 
-func (d *Database) GetAccessKeyByHash(ctx context.Context, tokenHash string) (model.AccessKey, error) {
+func (d *Database) GetAccessKey(ctx context.Context, id string) (model.AccessKey, error) {
 	var accessKey model.AccessKey
-	err := d.Client.Where("token_hash = ?", tokenHash).First(&accessKey).Error
+	err := d.Client.Where("id = ?", id).First(&accessKey).Error
 	if err != nil {
 		return model.AccessKey{}, err
 	}
@@ -26,8 +26,9 @@ func (d *Database) GetAccessKeyByHash(ctx context.Context, tokenHash string) (mo
 	return accessKey, nil
 }
 
-func (d *Database) PostAccessKey(ctx context.Context, accessKey model.AccessKey) error {
-	return d.Client.Create(&accessKey).Error
+func (d *Database) PostAccessKey(ctx context.Context, accessKey model.AccessKey) (model.AccessKey, error) {
+	err := d.Client.Create(&accessKey).Error
+	return accessKey, err
 }
 
 func (d *Database) DeleteAccessKey(ctx context.Context, accessKeyID string, userId string) error {

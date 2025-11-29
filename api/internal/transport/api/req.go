@@ -7,7 +7,7 @@ type UserReq struct {
 }
 
 type AuthReq struct {
-	AccessKey string `json:"access_key" validate:"required,min=32,max=32"`
+	AccessKey string `json:"access_key" validate:"required,min=85,max=85"`
 }
 
 type EmailReq struct {

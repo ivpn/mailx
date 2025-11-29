@@ -14,15 +14,16 @@ var (
 
 type AccessKey struct {
 	BaseModel
-	UserID     string     `json:"user_id"`
+	UserId     string     `json:"user_id"`
 	TokenHash  string     `json:"-"`
+	TokenId    string     `gorm:"-" json:"-"`
 	TokenPlain *string    `gorm:"-" json:"-"`
 	Name       string     `json:"name"`
 	ExpiresAt  *time.Time `json:"expires_at"` // nullable
 }
 
-func (a *AccessKey) SetToken(tokenPlain string) error {
-	hash, err := utils.HashPassword(tokenPlain)
+func (a *AccessKey) SetToken(token string) error {
+	hash, err := utils.HashPassword(token)
 	if err != nil {
 		return ErrTokenHashFailed
 	}
@@ -50,14 +51,23 @@ func (a *AccessKey) IsExpired() bool {
 }
 
 func GenAccessKeyToken() (string, error) {
+	token, err := GenToken(48)
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
+}
+
+func GenToken(length int) (string, error) {
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	b := make([]byte, 64)
+	b := make([]byte, length)
 	_, err := rand.Read(b)
 	if err != nil {
 		return "", err
 	}
 
-	for i := range 64 {
+	for i := range b {
 		b[i] = charset[int(b[i])%len(charset)]
 	}
 

@@ -5,63 +5,6 @@ import (
 	"time"
 )
 
-const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-
-func TestGenAccessKeyTokenBasic(t *testing.T) {
-	token, err := GenAccessKeyToken()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if len(token) != 64 {
-		t.Fatalf("expected length 64, got %d", len(token))
-	}
-	allowed := make(map[rune]struct{}, len(charset))
-	for _, r := range charset {
-		allowed[r] = struct{}{}
-	}
-	for i, r := range token {
-		if _, ok := allowed[r]; !ok {
-			t.Fatalf("invalid character at pos %d: %q", i, r)
-		}
-	}
-}
-
-func TestGenAccessKeyTokenUniqueness(t *testing.T) {
-	const n = 500
-	seen := make(map[string]struct{}, n)
-	for i := range n {
-		token, err := GenAccessKeyToken()
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		if len(token) != 64 {
-			t.Fatalf("expected length 64, got %d", len(token))
-		}
-		if _, exists := seen[token]; exists {
-			t.Fatalf("duplicate token found after %d iterations", i)
-		}
-		seen[token] = struct{}{}
-	}
-}
-
-func TestGenAccessKeyTokenCharacterSet(t *testing.T) {
-	allowed := make(map[rune]struct{}, len(charset))
-	for _, r := range charset {
-		allowed[r] = struct{}{}
-	}
-	for range 50 {
-		token, err := GenAccessKeyToken()
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		for _, r := range token {
-			if _, ok := allowed[r]; !ok {
-				t.Fatalf("token contains disallowed character: %q", r)
-			}
-		}
-	}
-}
-
 func TestAccessKeyIsExpired(t *testing.T) {
 	t.Run("never expires when ExpiresAt is nil", func(t *testing.T) {
 		accessKey := &AccessKey{
@@ -99,6 +42,68 @@ func TestAccessKeyIsExpired(t *testing.T) {
 		}
 		if !accessKey.IsExpired() {
 			t.Error("expected IsExpired to return true when ExpiresAt is in the past")
+		}
+	})
+}
+
+func TestGenToken(t *testing.T) {
+	t.Run("generates token of correct length", func(t *testing.T) {
+		lengths := []int{8, 16, 32, 64}
+		for _, length := range lengths {
+			token, err := GenToken(length)
+			if err != nil {
+				t.Errorf("GenToken(%d) returned error: %v", length, err)
+			}
+			if len(token) != length {
+				t.Errorf("GenToken(%d) returned token of length %d, expected %d", length, len(token), length)
+			}
+		}
+	})
+
+	t.Run("generates token with valid characters", func(t *testing.T) {
+		const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+		token, err := GenToken(100)
+		if err != nil {
+			t.Fatalf("GenToken(100) returned error: %v", err)
+		}
+
+		for _, char := range token {
+			valid := false
+			for _, validChar := range charset {
+				if char == validChar {
+					valid = true
+					break
+				}
+			}
+			if !valid {
+				t.Errorf("GenToken generated invalid character: %c", char)
+			}
+		}
+	})
+
+	t.Run("generates different tokens on subsequent calls", func(t *testing.T) {
+		token1, err := GenToken(32)
+		if err != nil {
+			t.Fatalf("GenToken(32) returned error: %v", err)
+		}
+
+		token2, err := GenToken(32)
+		if err != nil {
+			t.Fatalf("GenToken(32) returned error: %v", err)
+		}
+
+		if token1 == token2 {
+			t.Error("GenToken generated identical tokens on consecutive calls")
+		}
+	})
+
+	t.Run("generates empty string for zero length", func(t *testing.T) {
+		token, err := GenToken(0)
+		if err != nil {
+			t.Errorf("GenToken(0) returned error: %v", err)
+		}
+		if token != "" {
+			t.Errorf("GenToken(0) returned non-empty token: %s", token)
 		}
 	})
 }

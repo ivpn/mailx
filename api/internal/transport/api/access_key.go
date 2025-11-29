@@ -21,7 +21,7 @@ var (
 type AccessKeyService interface {
 	GetAccessKeys(context.Context, string) ([]model.AccessKey, error)
 	GetAccessKey(context.Context, string) (model.AccessKey, error)
-	PostAccessKey(context.Context, string, model.AccessKey) error
+	PostAccessKey(context.Context, string, model.AccessKey) (model.AccessKey, error)
 	DeleteAccessKey(context.Context, string, string) error
 }
 
@@ -87,7 +87,7 @@ func (h *Handler) PostAccessKey(c *fiber.Ctx) error {
 
 	// Prepare access key model
 	accessKey := model.AccessKey{
-		UserID:     userId,
+		UserId:     userId,
 		TokenPlain: &token,
 		Name:       req.Name,
 		ExpiresAt:  model.NeverExpires(),
@@ -105,7 +105,7 @@ func (h *Handler) PostAccessKey(c *fiber.Ctx) error {
 	}
 
 	// Store access key
-	err = h.Service.PostAccessKey(c.Context(), userId, accessKey)
+	accessKey, err = h.Service.PostAccessKey(c.Context(), userId, accessKey)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrPostAccessKey,
@@ -114,7 +114,7 @@ func (h *Handler) PostAccessKey(c *fiber.Ctx) error {
 
 	// Return the token
 	return c.Status(200).JSON(fiber.Map{
-		"token": token,
+		"token": accessKey.ID + "." + token,
 	})
 }
 
@@ -180,7 +180,7 @@ func (h *Handler) Authenticate(c *fiber.Ctx) error {
 	}
 
 	// Get User
-	user, err := h.Service.GetUser(c.Context(), accessKey.UserID)
+	user, err := h.Service.GetUser(c.Context(), accessKey.UserId)
 	if err != nil {
 		log.Printf("error authenticate: %s", err.Error())
 		return c.Status(400).JSON(fiber.Map{

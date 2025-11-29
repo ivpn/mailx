@@ -37,6 +37,10 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	sub.Use(auth.NewPSK(cfg))
 	sub.Post("/add", h.AddSubscription)
 
+	api := h.Server.Group("/v1/api")
+	api.Use(auth.NewAPIAuth(cfg, h.Service))
+	api.Get("/aliases", h.GetAliases)
+
 	v1 := h.Server.Group("/v1")
 	v1.Use(auth.New(cfg, h.Cache, h.Service))
 
@@ -84,10 +88,6 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Get("/accesskeys", h.GetAccessKeys)
 	v1.Post("/accesskeys", h.PostAccessKey)
 	v1.Delete("/accesskeys/:id", h.DeleteAccessKey)
-
-	api := h.Server.Group("/v1/api")
-	api.Use(auth.NewAPIAuth(cfg, h.Service))
-	api.Get("/aliases", h.GetAliases)
 
 	docs := h.Server.Group("/docs")
 	docs.Use(auth.NewBasicAuth(cfg))

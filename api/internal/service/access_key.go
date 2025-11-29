@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 	"strings"
+	"time"
 
 	"ivpn.net/email/api/internal/model"
 )
@@ -15,6 +16,7 @@ var (
 	ErrPostUserAccessKey   = errors.New("Unable to create access key. Please try again.")
 	ErrDeleteUserAccessKey = errors.New("Unable to delete access key. Please try again.")
 	ErrInvalidAccessKey    = errors.New("Invalid access key provided.")
+	ErrAccessKeyExpired    = errors.New("Access key has expired.")
 )
 
 type AccessKeyStore interface {
@@ -42,14 +44,16 @@ func (s *Service) GetAccessKey(ctx context.Context, key string) (model.AccessKey
 
 	accessKey, err := s.Store.GetAccessKey(ctx, id)
 	if err != nil {
-		log.Printf("error getting access key by hash: %s", err.Error())
 		return model.AccessKey{}, ErrGetAccessKey
 	}
 
 	matches := accessKey.Matches(token)
 	if !matches {
-		log.Printf("access key token does not match: %s", key)
 		return model.AccessKey{}, ErrInvalidAccessKey
+	}
+
+	if accessKey.ExpiresAt != nil && accessKey.ExpiresAt.Before(time.Now()) {
+		return model.AccessKey{}, ErrAccessKeyExpired
 	}
 
 	return accessKey, nil

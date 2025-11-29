@@ -58,12 +58,8 @@ const loginWithAccessKey = async () => {
     try {
         isLoading.value = true
         const res = await api.authenticate(accessKey.value)
-        if (res.success) {
-            store.setApiToken(res.token)
-            console.log('Login successful:', res)
-        } else {
-            error.value = res.error || 'Login failed'
-        }
+        store.setApiToken(res.token)
+        console.log('Login successful:', res)
     } catch (err) {
         error.value = 'An unexpected error occurred'
         console.error('Login error:', err)

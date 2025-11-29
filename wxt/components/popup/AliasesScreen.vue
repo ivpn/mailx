@@ -29,15 +29,11 @@ const fetchAliases = async () => {
     try {
         isLoading.value = true
         const res = await api.fetchAliases(props.apiToken)
-        if (res.success) {
-            list.value = res.aliases
-            console.log('Fetched aliases:', res.aliases)
-        } else {
-            error.value = res.error || 'Failed to fetch aliases'
-            console.error('Fetch aliases error:', res.error)
-        }
-    } catch (e) {
+        list.value = res.aliases
+        console.log('Fetched aliases:', res.aliases)
+    } catch (err) {
         error.value = 'An unexpected error occurred'
+        console.error('Fetch aliases error:', err)
     } finally {
         isLoading.value = false
     }

@@ -19,7 +19,7 @@ var (
 type AccessKeyStore interface {
 	GetAccessKeys(context.Context, string) ([]model.AccessKey, error)
 	GetAccessKeyByHash(context.Context, string) (model.AccessKey, error)
-	PostAccessKey(context.Context, model.AccessKey) error
+	PostAccessKey(context.Context, model.AccessKey) (model.AccessKey, error)
 	DeleteAccessKey(context.Context, string, string) error
 	DeleteAccessKeysByUserID(context.Context, string) error
 }
@@ -50,12 +50,12 @@ func (s *Service) GetAccessKey(ctx context.Context, tokenPlain string) (model.Ac
 	return accessKey, nil
 }
 
-func (s *Service) PostAccessKey(ctx context.Context, userId string, accessKey model.AccessKey) error {
+func (s *Service) PostAccessKey(ctx context.Context, userId string, accessKey model.AccessKey) (model.AccessKey, error) {
 	if accessKey.TokenPlain != nil {
 		err := accessKey.SetToken(*accessKey.TokenPlain)
 		if err != nil {
 			log.Println("error setting access key token:", err.Error())
-			return ErrPostUserAccessKey
+			return model.AccessKey{}, ErrPostUserAccessKey
 		}
 	}
 

@@ -16,9 +16,9 @@ func (d *Database) GetAccessKeys(ctx context.Context, userId string) ([]model.Ac
 	return accessKeys, nil
 }
 
-func (d *Database) GetAccessKeyByHash(ctx context.Context, tokenHash string) (model.AccessKey, error) {
+func (d *Database) GetAccessKey(ctx context.Context, id string) (model.AccessKey, error) {
 	var accessKey model.AccessKey
-	err := d.Client.Where("token_hash = ?", tokenHash).First(&accessKey).Error
+	err := d.Client.Where("id = ?", id).First(&accessKey).Error
 	if err != nil {
 		return model.AccessKey{}, err
 	}

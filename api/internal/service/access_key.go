@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"log"
+	"strings"
 
 	"ivpn.net/email/api/internal/model"
-	"ivpn.net/email/api/internal/utils"
 )
 
 var (
@@ -14,11 +14,12 @@ var (
 	ErrGetAccessKey        = errors.New("Unable to retrieve access key.")
 	ErrPostUserAccessKey   = errors.New("Unable to create access key. Please try again.")
 	ErrDeleteUserAccessKey = errors.New("Unable to delete access key. Please try again.")
+	ErrInvalidAccessKey    = errors.New("Invalid access key provided.")
 )
 
 type AccessKeyStore interface {
 	GetAccessKeys(context.Context, string) ([]model.AccessKey, error)
-	GetAccessKeyByHash(context.Context, string) (model.AccessKey, error)
+	GetAccessKey(context.Context, string) (model.AccessKey, error)
 	PostAccessKey(context.Context, model.AccessKey) (model.AccessKey, error)
 	DeleteAccessKey(context.Context, string, string) error
 	DeleteAccessKeysByUserID(context.Context, string) error
@@ -34,17 +35,21 @@ func (s *Service) GetAccessKeys(ctx context.Context, userId string) ([]model.Acc
 	return accessKeys, nil
 }
 
-func (s *Service) GetAccessKey(ctx context.Context, tokenPlain string) (model.AccessKey, error) {
-	tokenHash, err := utils.HashPassword(tokenPlain)
-	if err != nil {
-		log.Printf("error hashing access key token: %s", err.Error())
-		return model.AccessKey{}, ErrGetAccessKey
-	}
+func (s *Service) GetAccessKey(ctx context.Context, key string) (model.AccessKey, error) {
+	parts := strings.Split(key, ".")
+	id := parts[0]
+	token := parts[1]
 
-	accessKey, err := s.Store.GetAccessKeyByHash(ctx, tokenHash)
+	accessKey, err := s.Store.GetAccessKey(ctx, id)
 	if err != nil {
 		log.Printf("error getting access key by hash: %s", err.Error())
 		return model.AccessKey{}, ErrGetAccessKey
+	}
+
+	matches := accessKey.Matches(token)
+	if !matches {
+		log.Printf("access key token does not match: %s", key)
+		return model.AccessKey{}, ErrInvalidAccessKey
 	}
 
 	return accessKey, nil

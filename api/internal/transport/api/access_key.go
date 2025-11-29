@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/araddon/dateparse"
 	"github.com/go-webauthn/webauthn/webauthn"
@@ -175,7 +176,7 @@ func (h *Handler) Authenticate(c *fiber.Ctx) error {
 	if err != nil {
 		log.Printf("error authenticate: %s", err.Error())
 		return c.Status(400).JSON(fiber.Map{
-			"error": ErrInvalidAccessKey,
+			"error": err.Error(),
 		})
 	}
 
@@ -184,14 +185,14 @@ func (h *Handler) Authenticate(c *fiber.Ctx) error {
 	if err != nil {
 		log.Printf("error authenticate: %s", err.Error())
 		return c.Status(400).JSON(fiber.Map{
-			"error": ErrInvalidAccessKey,
+			"error": err.Error(),
 		})
 	}
 
 	// Save the session
 	sessionData := webauthn.SessionData{
 		UserID:  user.WebAuthnID(),
-		Expires: *accessKey.ExpiresAt,
+		Expires: time.Now().Add(h.Cfg.TokenExpiration),
 	}
 	token, err := model.GenSessionToken()
 	if err != nil {

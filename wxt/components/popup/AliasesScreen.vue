@@ -1,17 +1,29 @@
 <template>
-    <div class="page p-5">
-        <p v-if="isLoading">Loading...</p>
+    <div class="page p-4">
+        <p v-if="isLoading" class="text-secondary">Loading...</p>
         <p v-else-if="error" class="error">{{ error }}</p>
         <div v-else class="w-full">
+            <header class="pb-5">
+                <div class="flex gap-3 items-center justify-between">
+                    <div class="relative grow">
+                        <form @submit.prevent="" autocomplete="off">
+                            <input class="search w-full" type="text" placeholder="Search aliases..." id="input_search">
+                        </form>
+                        <button @click.prevent=""
+                            class="absolute top-0 right-0 bottom-0 px-2 flex items-center justify-center">
+                            <i class="icon close icon-tertiary text-base"></i>
+                        </button>
+                    </div>
+                    <button class="cta sm text-nowrap"
+                        data-hs-overlay="#modal-create-alias-false">
+                        New Alias
+                    </button>
+                </div>
+            </header>
             <hr class="m-0">
             <div v-for="alias in list" :key="alias.id" class="py-3 border-b border-secondary flex items-center gap-x-4">
                 <div class="flex items-center hs-tooltip">
-                    <input
-                        @change=""
-                        v-bind:checked="alias.enabled"
-                        type="checkbox"
-                        class="xs"
-                    >
+                    <input @change="" v-bind:checked="alias.enabled" type="checkbox" class="xs">
                 </div>
                 <div class="grow font-medium">{{ alias.name }}</div>
                 <button class="">

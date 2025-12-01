@@ -263,9 +263,10 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 	}
 
 	// Save the session
+	exp := time.Now().Add(h.Cfg.TokenExpiration)
 	sessionData := webauthn.SessionData{
 		UserID:  user.WebAuthnID(),
-		Expires: time.Now().Add(h.Cfg.TokenExpiration),
+		Expires: exp,
 	}
 	token, err := model.GenSessionToken()
 	if err != nil {
@@ -273,7 +274,7 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 			"error": ErrSaveSession,
 		})
 	}
-	err = h.Service.SaveSession(c.Context(), sessionData, token, user.ID)
+	err = h.Service.SaveSession(c.Context(), sessionData, token, user.ID, exp)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrSaveSession,

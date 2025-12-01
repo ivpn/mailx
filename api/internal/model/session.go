@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
+	"time"
 
 	"github.com/go-webauthn/webauthn/webauthn"
 )
@@ -14,6 +15,7 @@ type Session struct {
 	Token       string               `gorm:"unique" json:"token"`
 	Data        []byte               `gorm:"type:blob" json:"-"`
 	SessionData webauthn.SessionData `gorm:"-" json:"-"`
+	ExpiresAt   time.Time            `json:"expires_at"`
 }
 
 func GenSessionToken() (string, error) {

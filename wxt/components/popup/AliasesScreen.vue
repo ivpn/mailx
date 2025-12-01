@@ -1,14 +1,23 @@
 <template>
-    <div class="page center">
-        <h1>Aliases</h1>
+    <div class="page p-5">
         <p v-if="isLoading">Loading...</p>
         <p v-else-if="error" class="error">{{ error }}</p>
-        <div v-else>
-            <ul>
-                <li v-for="alias in list" :key="alias.id">
-                    {{ alias.name }}
-                </li>
-            </ul>
+        <div v-else class="w-full">
+            <hr class="m-0">
+            <div v-for="alias in list" :key="alias.id" class="py-3 border-b border-secondary flex items-center gap-x-4">
+                <div class="flex items-center hs-tooltip">
+                    <input
+                        @change=""
+                        v-bind:checked="alias.enabled"
+                        type="checkbox"
+                        class="xs"
+                    >
+                </div>
+                <div class="grow font-medium">{{ alias.name }}</div>
+                <button class="">
+                    <i class="icon icon-secondary trash text-xs"></i>
+                </button>
+            </div>
         </div>
     </div>
 </template>

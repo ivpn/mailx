@@ -29,7 +29,7 @@ var (
 
 type SessionService interface {
 	GetSession(context.Context, string) (model.Session, bool, error)
-	SaveSession(context.Context, webauthn.SessionData, string, string) error
+	SaveSession(context.Context, webauthn.SessionData, string, string, time.Time) error
 	DeleteSession(context.Context, string) error
 }
 
@@ -99,13 +99,14 @@ func (h *Handler) BeginRegistration(c *fiber.Ctx) error {
 	}
 
 	// Save the session
+	exp := time.Now().Add(h.Cfg.TokenExpiration)
 	token, err := model.GenSessionToken()
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrSaveSession,
 		})
 	}
-	err = h.Service.SaveSession(c.Context(), *sessionData, token, user.ID)
+	err = h.Service.SaveSession(c.Context(), *sessionData, token, user.ID, exp)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrSaveSession,
@@ -189,9 +190,10 @@ func (h *Handler) FinishRegistration(c *fiber.Ctx) error {
 	c.ClearCookie(auth.AUTHN_TEMP_COOKIE)
 
 	// Save the session
+	exp := time.Now().Add(h.Cfg.TokenExpiration)
 	sessionData := webauthn.SessionData{
 		UserID:  user.WebAuthnID(),
-		Expires: time.Now().Add(h.Cfg.TokenExpiration),
+		Expires: exp,
 	}
 	token, err = model.GenSessionToken()
 	if err != nil {
@@ -199,7 +201,7 @@ func (h *Handler) FinishRegistration(c *fiber.Ctx) error {
 			"error": ErrSaveSession,
 		})
 	}
-	err = h.Service.SaveSession(c.Context(), sessionData, token, user.ID)
+	err = h.Service.SaveSession(c.Context(), sessionData, token, user.ID, exp)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrSaveSession,
@@ -242,13 +244,14 @@ func (h *Handler) AddPasskey(c *fiber.Ctx) error {
 	}
 
 	// Save the session
+	exp := time.Now().Add(h.Cfg.TokenExpiration)
 	token, err := model.GenSessionToken()
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrSaveSession,
 		})
 	}
-	err = h.Service.SaveSession(c.Context(), *sessionData, token, user.ID)
+	err = h.Service.SaveSession(c.Context(), *sessionData, token, user.ID, exp)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrSaveSession,
@@ -324,9 +327,10 @@ func (h *Handler) FinishAddPasskey(c *fiber.Ctx) error {
 	c.ClearCookie(auth.AUTHN_TEMP_COOKIE)
 
 	// Save the session
+	exp := time.Now().Add(h.Cfg.TokenExpiration)
 	sessionData := webauthn.SessionData{
 		UserID:  user.WebAuthnID(),
-		Expires: time.Now().Add(h.Cfg.TokenExpiration),
+		Expires: exp,
 	}
 	token, err = model.GenSessionToken()
 	if err != nil {
@@ -334,7 +338,7 @@ func (h *Handler) FinishAddPasskey(c *fiber.Ctx) error {
 			"error": ErrSaveSession,
 		})
 	}
-	err = h.Service.SaveSession(c.Context(), sessionData, token, user.ID)
+	err = h.Service.SaveSession(c.Context(), sessionData, token, user.ID, exp)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrSaveSession,
@@ -402,14 +406,15 @@ func (h *Handler) BeginLogin(c *fiber.Ctx) error {
 	}
 
 	// Save the session
+	exp := time.Now().Add(h.Cfg.TokenExpiration)
 	token, err := model.GenSessionToken()
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrSaveSession,
 		})
 	}
-	sessionData.Expires = time.Now().Add(h.Cfg.TokenExpiration)
-	err = h.Service.SaveSession(c.Context(), *sessionData, token, user.ID)
+	sessionData.Expires = exp
+	err = h.Service.SaveSession(c.Context(), *sessionData, token, user.ID, exp)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrSaveSession,
@@ -491,9 +496,10 @@ func (h *Handler) FinishLogin(c *fiber.Ctx) error {
 	c.ClearCookie(auth.AUTHN_TEMP_COOKIE)
 
 	// Save the session
+	exp := time.Now().Add(h.Cfg.TokenExpiration)
 	sessionData := webauthn.SessionData{
 		UserID:  user.WebAuthnID(),
-		Expires: time.Now().Add(h.Cfg.TokenExpiration),
+		Expires: exp,
 	}
 	token, err = model.GenSessionToken()
 	if err != nil {
@@ -501,7 +507,7 @@ func (h *Handler) FinishLogin(c *fiber.Ctx) error {
 			"error": ErrSaveSession,
 		})
 	}
-	err = h.Service.SaveSession(c.Context(), sessionData, token, user.ID)
+	err = h.Service.SaveSession(c.Context(), sessionData, token, user.ID, exp)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrSaveSession,

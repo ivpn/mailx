@@ -40,6 +40,11 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	api := h.Server.Group("/v1/api")
 	api.Use(auth.NewAPIAuth(cfg, h.Service))
 	api.Get("/aliases", h.GetAliases)
+	api.Post("/alias", limiter.New(), h.PostAlias)
+	api.Put("/alias/:id", h.UpdateAlias)
+	api.Get("/recipients", h.GetRecipients)
+	api.Get("/settings", h.GetSettings)
+	api.Put("/settings", h.UpdateSettings)
 
 	v1 := h.Server.Group("/v1")
 	v1.Use(auth.New(cfg, h.Cache, h.Service))

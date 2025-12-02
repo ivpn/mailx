@@ -24,7 +24,7 @@ async function fetchAliases(apiToken: string) {
 }
 
 async function updateAlias(apiToken: string, aliasId: string, data: any) {
-    const res = await fetch(`${BASE_URL}/v1/api/aliases/${aliasId}`, {
+    const res = await fetch(`${BASE_URL}/v1/api/alias/${aliasId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -37,7 +37,7 @@ async function updateAlias(apiToken: string, aliasId: string, data: any) {
 }
 
 async function deleteAlias(apiToken: string, aliasId: string) {
-    const res = await fetch(`${BASE_URL}/v1/api/aliases/${aliasId}`, {
+    const res = await fetch(`${BASE_URL}/v1/api/alias/${aliasId}`, {
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${apiToken}`,

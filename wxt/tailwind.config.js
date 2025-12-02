@@ -4,6 +4,7 @@ export default {
     "./index.html",
     "./entrypoints/**/*.{js,ts,jsx,tsx,vue,html}", // include WXT entrypoints
     "./components/**/*.{js,ts,jsx,tsx,vue,html}", // if you have shared components
+    "./node_modules/preline/preline.js", // include preline.js for plugin
   ],
   theme: {
     extend: {
@@ -162,6 +163,7 @@ export default {
     },
   },
   plugins: [
+    require("preline/plugin"),
     require("@tailwindcss/forms")({
       strategy: 'class',
     }),

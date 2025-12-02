@@ -1,6 +1,6 @@
 {
-  "name": "wxt-vue-starter",
-  "description": "manifest.json description",
+  "name": "mailx",
+  "description": "Mailx Browser Extension",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -15,7 +15,10 @@
     "postinstall": "wxt prepare"
   },
   "dependencies": {
+    "@floating-ui/dom": "^1.7.4",
+    "@preline/tooltip": "^3.2.3",
     "@tailwindcss/forms": "^0.5.10",
+    "preline": "^2.1.0",
     "vue": "^3.5.21"
   },
   "devDependencies": {

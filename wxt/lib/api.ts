@@ -23,8 +23,34 @@ async function fetchAliases(apiToken: string) {
     return res.json()
 }
 
+async function updateAlias(apiToken: string, aliasId: string, data: any) {
+    const res = await fetch(`${BASE_URL}/v1/api/aliases/${aliasId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${apiToken}`,
+        },
+        body: JSON.stringify(data),
+    })
+
+    return res.json()
+}
+
+async function deleteAlias(apiToken: string, aliasId: string) {
+    const res = await fetch(`${BASE_URL}/v1/api/aliases/${aliasId}`, {
+        method: 'DELETE',
+        headers: {
+            Authorization: `Bearer ${apiToken}`,
+        },
+    })
+
+    return res.json()
+}
+
 export const api = {
     livez,
     authenticate,
     fetchAliases,
+    updateAlias,
+    deleteAlias,
 }

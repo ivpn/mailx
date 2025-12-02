@@ -23,10 +23,10 @@
             <hr class="m-0">
             <div v-for="alias in list" :key="alias.id" class="py-3 border-b border-secondary flex items-center gap-x-4">
                 <div class="flex items-center hs-tooltip">
-                    <input @change="" v-bind:checked="alias.enabled" type="checkbox" class="xs">
+                    <input @change="updateAlias(alias)" v-bind:checked="alias.enabled" type="checkbox" class="xs">
                 </div>
                 <div class="grow font-medium">{{ alias.name }}</div>
-                <button class="">
+                <button @click="deleteAlias(alias.id)">
                     <i class="icon icon-secondary trash text-xs"></i>
                 </button>
             </div>
@@ -57,6 +57,27 @@ const fetchAliases = async () => {
         console.error('Fetch aliases error:', err)
     } finally {
         isLoading.value = false
+    }
+}
+
+const updateAlias = async (alias: Alias) => {
+    try {
+        await api.updateAlias(props.apiToken, alias.id, { enabled: alias.enabled })
+        console.log('Updated alias:', alias)
+    } catch (err) {
+        console.error('Update alias error:', err)
+    }
+}
+
+const deleteAlias = async (aliasId: string) => {
+    if (!confirm('Are you sure you want to delete alias?')) return
+
+    try {
+        await api.deleteAlias(props.apiToken, aliasId)
+        list.value = list.value.filter(alias => alias.id !== aliasId)
+        console.log('Deleted alias with ID:', aliasId)
+    } catch (err) {
+        console.error('Delete alias error:', err)
     }
 }
 

@@ -16,7 +16,10 @@
     }
 
     .page {
-        min-height: 400px;
+        min-height: 500px;
+        max-height: 511px;
         min-width: 400px;
+        max-width: 500px;
+        overflow-y: auto;
     }
 }

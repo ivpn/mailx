@@ -19,8 +19,7 @@
             <p v-if="isLoading" class="text-secondary">Loading...</p>
             <p v-else-if="error" class="error">{{ error }}</p>
             <div v-else>
-                <hr class="m-0">
-                <div v-for="alias in list" :key="alias.id" class="py-3 border-b border-secondary flex items-center gap-x-4">
+                <div v-for="alias in list" :key="alias.id" class="py-3 border-t border-secondary flex items-center gap-x-4">
                     <div class="flex items-center">
                         <input @change="updateAlias(alias)" v-bind:checked="alias.enabled" type="checkbox" class="xs">
                     </div>

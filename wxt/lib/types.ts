@@ -5,3 +5,10 @@ export interface Alias {
   description: string
   recipients: string
 }
+
+export interface Defaults {
+  domain: string
+  recipient: string
+  alias_format: string
+  recipients: string
+}

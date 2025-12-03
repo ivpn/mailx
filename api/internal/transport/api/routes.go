@@ -46,6 +46,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	api.Get("/recipients", h.GetRecipients)
 	api.Get("/settings", h.GetSettings)
 	api.Put("/settings", h.UpdateSettings)
+	api.Get("/defaults", h.GetDefaults)
 
 	v1 := h.Server.Group("/v1")
 	v1.Use(auth.New(cfg, h.Cache, h.Service))

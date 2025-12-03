@@ -17,6 +17,7 @@ var (
 	ErrPostAccessKey    = "Unable to create access key. Please try again."
 	ErrDeleteAccessKey  = "Unable to delete access key. Please try again."
 	ErrInvalidAccessKey = "Invalid access key provided."
+	ErrGetDefaults      = "Unable to retrieve default settings."
 )
 
 type AccessKeyService interface {
@@ -24,6 +25,7 @@ type AccessKeyService interface {
 	GetAccessKey(context.Context, string) (model.AccessKey, error)
 	PostAccessKey(context.Context, string, model.AccessKey) (model.AccessKey, error)
 	DeleteAccessKey(context.Context, string, string) error
+	GetDefaults(context.Context, string) (model.Settings, string, error)
 }
 
 // @Summary Get access keys
@@ -189,6 +191,15 @@ func (h *Handler) Authenticate(c *fiber.Ctx) error {
 		})
 	}
 
+	// Get Defaults
+	settings, rcpsStr, err := h.Service.GetDefaults(c.Context(), user.ID)
+	if err != nil {
+		log.Printf("error authenticate: %s", err.Error())
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
 	// Save the session
 	exp := time.Now().Add(h.Cfg.ApiTokenExpiration)
 	sessionData := webauthn.SessionData{
@@ -210,6 +221,37 @@ func (h *Handler) Authenticate(c *fiber.Ctx) error {
 
 	// Return token
 	return c.Status(200).JSON(fiber.Map{
-		"token": token,
+		"token":        token,
+		"domain":       settings.Domain,
+		"recipient":    settings.Recipient,
+		"alias_format": settings.AliasFormat,
+		"recipients":   rcpsStr,
+	})
+}
+
+// @Summary Get default settings
+// @Description Get default settings and recipients for the authenticated user
+// @Tags access_key
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} ErrorRes
+// @Router /api/defaults [get]
+func (h *Handler) GetDefaults(c *fiber.Ctx) error {
+	userId := auth.GetUserID(c)
+	settings, rcpsStr, err := h.Service.GetDefaults(c.Context(), userId)
+	if err != nil {
+		log.Printf("error get defaults: %s", err.Error())
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrGetDefaults,
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"domain":       settings.Domain,
+		"recipient":    settings.Recipient,
+		"alias_format": settings.AliasFormat,
+		"recipients":   rcpsStr,
 	})
 }

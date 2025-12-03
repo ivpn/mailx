@@ -15,8 +15,8 @@ async function authenticate(apiKey: string) {
     return res.json()
 }
 
-async function fetchAliases(apiToken: string) {
-    const res = await fetch(`${BASE_URL}/v1/api/aliases`, {
+async function fetchAliases(apiToken: string, search = '') {
+    const res = await fetch(`${BASE_URL}/v1/api/aliases?search=${encodeURIComponent(search)}`, {
         headers: { Authorization: `Bearer ${apiToken}` },
     })
 

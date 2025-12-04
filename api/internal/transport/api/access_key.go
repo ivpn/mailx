@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/araddon/dateparse"
@@ -223,7 +224,7 @@ func (h *Handler) Authenticate(c *fiber.Ctx) error {
 	return c.Status(200).JSON(fiber.Map{
 		"token":        token,
 		"domain":       settings.Domain,
-		"domains":      h.Cfg.Domains,
+		"domains":      strings.Split(h.Cfg.Domains, ","),
 		"recipient":    settings.Recipient,
 		"recipients":   rcps,
 		"alias_format": settings.AliasFormat,
@@ -251,7 +252,7 @@ func (h *Handler) GetDefaults(c *fiber.Ctx) error {
 
 	return c.Status(200).JSON(fiber.Map{
 		"domain":       settings.Domain,
-		"domains":      h.Cfg.Domains,
+		"domains":      strings.Split(h.Cfg.Domains, ","),
 		"recipient":    settings.Recipient,
 		"recipients":   rcps,
 		"alias_format": settings.AliasFormat,

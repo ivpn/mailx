@@ -216,7 +216,7 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 
 	return c.Status(201).JSON(fiber.Map{
 		"message": PostAliasSuccess,
-		"name":    alias.Name,
+		"alias":   alias,
 	})
 }
 

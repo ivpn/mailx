@@ -6,6 +6,10 @@ type UserReq struct {
 	OTP      string `json:"otp" validate:"min=0,max=8"`
 }
 
+type AuthReq struct {
+	AccessKey string `json:"access_key" validate:"required,min=85,max=85"`
+}
+
 type EmailReq struct {
 	Email string `json:"email" validate:"required,emailx"`
 }
@@ -76,4 +80,9 @@ type ActivateReq struct {
 
 type TotpReq struct {
 	OTP string `json:"otp" validate:"required,min=6,max=8"`
+}
+
+type AccessKeyReq struct {
+	Name      string `json:"name" validate:"required"`
+	ExpiresAt string `json:"expires_at"`
 }

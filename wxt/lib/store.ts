@@ -12,6 +12,7 @@ const STORAGE_KEYS = {
 type Listener<T> = (value: T) => void
 
 const apiTokenListeners = new Set<Listener<string | undefined>>()
+const defaultsListeners = new Set<Listener<Defaults | undefined>>()
 
 export const store = {
     async getApiToken(): Promise<string | undefined> {
@@ -56,5 +57,10 @@ export const store = {
     onApiTokenChange(listener: Listener<string | undefined>): () => void {
         apiTokenListeners.add(listener)
         return () => apiTokenListeners.delete(listener)
+    },
+
+    onDefaultsChange(listener: Listener<Defaults | undefined>): () => void {
+        defaultsListeners.add(listener)
+        return () => defaultsListeners.delete(listener)
     },
 }

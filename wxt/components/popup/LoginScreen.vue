@@ -71,9 +71,10 @@ const loginWithAccessKey = async () => {
 const processResponse = (res: any) => {
     const defaults = {
         domain: res.domain,
+        domains: res.domains,
         recipient: res.recipient,
-        alias_format: res.alias_format,
         recipients: res.recipients,
+        alias_format: res.alias_format,
     }
     store.setDefaults(defaults)
     store.setApiToken(res.token)

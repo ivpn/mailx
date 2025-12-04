@@ -122,15 +122,16 @@
 import { ref, onMounted } from 'vue'
 import overlay from '@preline/overlay'
 import select from '@preline/select'
-import { store } from '@/lib/store'
 import { api } from '@/lib/api'
 import events from '@/lib/events'
 import tooltip from '@preline/tooltip'
 import accordion from '@preline/accordion'
 import { Defaults, Alias } from '@/lib/types'
 
-const props = defineProps<{ apiToken: string }>()
-const defaults = ref({} as Defaults)
+const props = defineProps<{
+    apiToken: string
+    defaults: Defaults
+}>()
 const alias = ref({} as Alias)
 const selectRecipients = ref([] as string[])
 const formats = ref([{
@@ -189,7 +190,7 @@ const close = () => {
     overlay.close(modal)
 
     const multiselect = select.getInstance('#create-alias-recipient' as any, true) as any
-    multiselect.element.setValue([defaults.value.recipient || defaults.value.recipients[0]])
+    multiselect.element.setValue([props.defaults.recipient || props.defaults.recipients[0]])
 }
 
 const addEvents = () => {
@@ -238,8 +239,7 @@ const copyAlias = (alias: string) => {
 }
 
 onMounted(async () => {
-    defaults.value = (await store.getDefaults()) ?? {} as Defaults
-    selectRecipients.value = [defaults.value.recipient || defaults.value.recipients[0]]
+    selectRecipients.value = [props.defaults.recipient || props.defaults.recipients[0]]
     overlay.autoInit()
     select.autoInit()
     tooltip.autoInit()

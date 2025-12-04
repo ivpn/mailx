@@ -43,17 +43,20 @@
             </div>
         </div>
     </div>
-    <AliasCreate :apiToken="props.apiToken" />
+    <AliasCreate :apiToken="props.apiToken" :defaults="props.defaults" />
 </template>
 
 <script lang="ts" setup>
 import { ref, onMounted, onUpdated } from 'vue'
 import { api } from '@/lib/api'
-import { Alias } from '@/lib/types'
+import { Defaults, Alias } from '@/lib/types'
 import tooltip from '@preline/tooltip'
 import AliasCreate from './AliasCreate.vue'
 
-const props = defineProps<{ apiToken: string }>()
+const props = defineProps<{
+    apiToken: string
+    defaults: Defaults
+}>()
 const list = ref([] as Alias[])
 const isLoading = ref(false)
 const error = ref<string | null>(null)

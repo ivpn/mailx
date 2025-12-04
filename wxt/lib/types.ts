@@ -11,7 +11,8 @@ export interface Alias {
 
 export interface Defaults {
   domain: string
-  recipient: string
+  domains: string[]
   alias_format: string
-  recipients: string
+  recipient: string
+  recipients: string[]
 }

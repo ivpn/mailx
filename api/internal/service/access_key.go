@@ -85,22 +85,21 @@ func (s *Service) DeleteAccessKeysByUserID(ctx context.Context, userId string) e
 	return s.Store.DeleteAccessKeysByUserID(ctx, userId)
 }
 
-func (s *Service) GetDefaults(ctx context.Context, userId string) (model.Settings, string, error) {
+func (s *Service) GetDefaults(ctx context.Context, userId string) (model.Settings, []string, error) {
 	settings, err := s.GetSettings(ctx, userId)
 	if err != nil {
-		return model.Settings{}, "", err
+		return model.Settings{}, nil, err
 	}
 
 	rcps, err := s.GetRecipients(ctx, userId)
 	if err != nil {
-		return model.Settings{}, "", err
+		return model.Settings{}, nil, err
 	}
 
 	emails := make([]string, 0, len(rcps))
 	for _, r := range rcps {
 		emails = append(emails, r.Email)
 	}
-	rcpsStr := strings.Join(emails, ",")
 
-	return settings, rcpsStr, nil
+	return settings, emails, nil
 }

@@ -76,7 +76,7 @@ const processResponse = (res: any) => {
         recipients: res.recipients,
         alias_format: res.alias_format,
     }
-    store.setDefaults(defaults)
     store.setApiToken(res.token)
+    store.setDefaults(defaults)
 }
 </script>

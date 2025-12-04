@@ -39,8 +39,11 @@ export const store = {
         return defaults
     },
 
-    async setDefaults(defaults: Defaults): Promise<void> {
+    async setDefaults(defaults: Defaults | undefined): Promise<void> {
         await browser.storage.local.set({ [STORAGE_KEYS.defaults]: defaults })
+        for (const listener of defaultsListeners) {
+            listener(defaults)
+        }
     },
 
     async removeDefaults(): Promise<void> {

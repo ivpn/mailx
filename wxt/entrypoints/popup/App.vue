@@ -1,6 +1,6 @@
 <template>
   <LoginScreen v-if="!apiToken" />
-  <AliasesScreen v-else-if="defaults" :apiToken="apiToken" :defaults="defaults" />
+  <AliasesScreen v-if="apiToken && defaults" :apiToken="apiToken" :defaults="defaults" />
 </template>
 
 <script lang="ts" setup>

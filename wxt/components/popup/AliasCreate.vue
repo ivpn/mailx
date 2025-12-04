@@ -75,16 +75,26 @@
                                         </div>
                                         <div class="pb-3">
                                             <label for="alias_domain">
-                                                Domain:
+                                                Domain
                                             </label>
-                                            {{ defaults.domain }}
+                                            <select id="alias_domain" :disabled="!defaults.domains.length">
+                                                <option v-for="(domain, index) in defaults.domains" v-bind:domain
+                                                    :selected="domain == alias.domain || index === 0" :key="domain">
+                                                    {{ domain }}
+                                                </option>
+                                            </select>
                                         </div>
                                         <div class="pb-3">
                                             <label for="alias_from_name" class="flex gap-2">
                                                 From name
                                                 <span class="hs-tooltip [--strategy:absolute] flex">
                                                     <i class="icon info icon-primary hs-tooltip-toggle"></i>
-                                                    <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">Leave blank to use alias email address or default From Name defined in Settings (if set)</span>
+                                                    <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible text-center" role="tooltip">
+                                                        Leave blank to use<br>
+                                                        alias email address or<br>
+                                                        default From Name defined<br>
+                                                        in Settings (if set)
+                                                    </span>
                                                 </span>
                                             </label>
                                             <input
@@ -231,7 +241,11 @@ const validate = (rcps: string) => {
 }
 
 const resetAlias = () => {
+    const multiselect = select.getInstance('#create-alias-recipient' as any, true) as any
+    multiselect.element.setValue([props.defaults.recipient])
+    selectRecipients.value = [props.defaults.recipient]
     alias.value = {} as Alias
+    alias.value.domain = props.defaults.domain
 }
 
 const copyAlias = (alias: string) => {
@@ -239,7 +253,6 @@ const copyAlias = (alias: string) => {
 }
 
 onMounted(async () => {
-    selectRecipients.value = [props.defaults.recipient || props.defaults.recipients[0]]
     overlay.autoInit()
     select.autoInit()
     tooltip.autoInit()

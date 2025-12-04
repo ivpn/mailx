@@ -176,7 +176,7 @@ const postAlias = async () => {
         loading.value = true
         const res = await api.createAlias(props.apiToken, alias.value)
         console.log('Created alias:', res)
-        copyAlias(res.data.name)
+        copyAlias(res.name)
         error.value = ''
         events.emit('alias.create', {})
         close()
@@ -203,7 +203,7 @@ const close = () => {
     overlay.close(modal)
 
     const multiselect = select.getInstance('#create-alias-recipient' as any, true) as any
-    multiselect.element.setValue([props.defaults.recipient || props.defaults.recipients[0]])
+    multiselect.element.setValue([props.defaults.recipient])
 }
 
 const addEvents = () => {

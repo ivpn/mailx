@@ -5,6 +5,7 @@
 @import "../../../app/src/style/components/form.css";
 @import "../../../app/src/style/components/text.css";
 @import "../../../app/src/style/components/icon.css";
+@import "../../../app/src/style/components/plugin.css";
 
 @tailwind base;
 @tailwind components;

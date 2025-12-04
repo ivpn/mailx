@@ -16,8 +16,12 @@
   },
   "dependencies": {
     "@floating-ui/dom": "^1.7.4",
+    "@preline/accordion": "^3.2.3",
+    "@preline/overlay": "^3.2.3",
+    "@preline/select": "^3.2.3",
     "@preline/tooltip": "^3.2.3",
     "@tailwindcss/forms": "^0.5.10",
+    "mitt": "^3.0.1",
     "preline": "^2.1.0",
     "vue": "^3.5.21"
   },

@@ -11,7 +11,7 @@
                             <i class="icon close icon-tertiary text-base"></i>
                         </button>
                     </div>
-                    <button class="cta sm text-nowrap" data-hs-overlay="#modal-create-alias-false">
+                    <button class="cta sm text-nowrap" data-hs-overlay="#modal-create-alias">
                         New Alias
                     </button>
                 </div>
@@ -43,6 +43,7 @@
             </div>
         </div>
     </div>
+    <AliasCreate :apiToken="props.apiToken" />
 </template>
 
 <script lang="ts" setup>
@@ -50,6 +51,7 @@ import { ref, onMounted, onUpdated } from 'vue'
 import { api } from '@/lib/api'
 import { Alias } from '@/lib/types'
 import tooltip from '@preline/tooltip'
+import AliasCreate from './AliasCreate.vue'
 
 const props = defineProps<{ apiToken: string }>()
 const list = ref([] as Alias[])

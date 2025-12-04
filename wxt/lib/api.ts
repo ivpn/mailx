@@ -23,6 +23,19 @@ async function fetchAliases(apiToken: string, search = '') {
     return res.json()
 }
 
+async function createAlias(apiToken: string, data: any) {
+    const res = await fetch(`${BASE_URL}/v1/api/alias`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${apiToken}`,
+        },
+        body: JSON.stringify(data),
+    })
+
+    return res.json()
+}
+
 async function updateAlias(apiToken: string, aliasId: string, data: any) {
     const res = await fetch(`${BASE_URL}/v1/api/alias/${aliasId}`, {
         method: 'PUT',
@@ -51,6 +64,7 @@ export const api = {
     livez,
     authenticate,
     fetchAliases,
+    createAlias,
     updateAlias,
     deleteAlias,
 }

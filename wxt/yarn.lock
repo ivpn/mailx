@@ -347,6 +347,21 @@
   resolved "https://registry.yarnpkg.com/@popperjs/core/-/core-2.11.8.tgz#6b79032e760a0899cd4204710beede972a3a185f"
   integrity sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==
 
+"@preline/accordion@^3.2.3":
+  version "3.2.3"
+  resolved "https://registry.yarnpkg.com/@preline/accordion/-/accordion-3.2.3.tgz#20e31cbf3a5328b19a4d89ace96bdab6e2465abd"
+  integrity sha512-bxD40aYgnsyuxPNmFN5+4EKAna9PCXpxpA/MrY3j5zpkTyBRxcEykucLE/aPTL0LrUd8/ifwoIERRSVcL7GTFA==
+
+"@preline/overlay@^3.2.3":
+  version "3.2.3"
+  resolved "https://registry.yarnpkg.com/@preline/overlay/-/overlay-3.2.3.tgz#e85f5c4c007cbc979cad52d4a5b6a3abf6bb9247"
+  integrity sha512-/MI5++XAezbVFReVw65KxLeiDJL62lWDywPxvWmH/EHMyOQ/N3d9SXC/VBQ/nyozQOwckv1ym2vw0wGbTfI+5w==
+
+"@preline/select@^3.2.3":
+  version "3.2.3"
+  resolved "https://registry.yarnpkg.com/@preline/select/-/select-3.2.3.tgz#b306ee6e3a532a6720d9393c7304febaac1d7d40"
+  integrity sha512-a9wk4khZJHJh1BYfhcvX2eaKtBwY/J8GSzQveogNrdMNIwEtQpsbzK6DvHoxsv3pwwREQmJt9Hoc5v6ZLf7pPQ==
+
 "@preline/tooltip@^3.2.3":
   version "3.2.3"
   resolved "https://registry.yarnpkg.com/@preline/tooltip/-/tooltip-3.2.3.tgz#4e492953c087d44324a15616bd5fa7516975f311"
@@ -2047,6 +2062,11 @@ minimist@^1.2.0, minimist@^1.2.8:
   version "7.1.2"
   resolved "https://registry.npmjs.org/minipass/-/minipass-7.1.2.tgz"
   integrity sha512-qOOzS1cBTWYF4BH8fVePDBOO9iptMnGUEZwNc/cMWnTV2nVLZ7VoNWEPHkYczZA0pdoA7dl6e7FL659nX9S2aw==
+
+mitt@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/mitt/-/mitt-3.0.1.tgz#ea36cf0cc30403601ae074c8f77b7092cdab36d1"
+  integrity sha512-vKivATfr97l2/QBCYAkXYDbrIWPM2IIKEl7YPhjCvKlG3kE2gm+uBo6nEXK3M5/Ffh/FLpKExzOQ3JJoJGFKBw==
 
 mlly@^1.7.4, mlly@^1.8.0:
   version "1.8.0"

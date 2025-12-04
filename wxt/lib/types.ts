@@ -4,6 +4,9 @@ export interface Alias {
   enabled: boolean
   description: string
   recipients: string
+  domain: string
+  format: string
+  from_name: string
 }
 
 export interface Defaults {

@@ -25,7 +25,7 @@ type AccessKeyService interface {
 	GetAccessKey(context.Context, string) (model.AccessKey, error)
 	PostAccessKey(context.Context, string, model.AccessKey) (model.AccessKey, error)
 	DeleteAccessKey(context.Context, string, string) error
-	GetDefaults(context.Context, string) (model.Settings, string, error)
+	GetDefaults(context.Context, string) (model.Settings, []string, error)
 }
 
 // @Summary Get access keys
@@ -192,7 +192,7 @@ func (h *Handler) Authenticate(c *fiber.Ctx) error {
 	}
 
 	// Get Defaults
-	settings, rcpsStr, err := h.Service.GetDefaults(c.Context(), user.ID)
+	settings, rcps, err := h.Service.GetDefaults(c.Context(), user.ID)
 	if err != nil {
 		log.Printf("error authenticate: %s", err.Error())
 		return c.Status(400).JSON(fiber.Map{
@@ -224,8 +224,8 @@ func (h *Handler) Authenticate(c *fiber.Ctx) error {
 		"token":        token,
 		"domain":       settings.Domain,
 		"recipient":    settings.Recipient,
+		"recipients":   rcps,
 		"alias_format": settings.AliasFormat,
-		"recipients":   rcpsStr,
 	})
 }
 

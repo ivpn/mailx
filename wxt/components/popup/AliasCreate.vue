@@ -175,12 +175,15 @@ const postAlias = async () => {
     try {
         loading.value = true
         const res = await api.createAlias(props.apiToken, alias.value)
+        console.log('Created alias:', res)
         copyAlias(res.data.name)
-        events.emit('alias.create', {})
         error.value = ''
-        loading.value = false
+        events.emit('alias.create', {})
         close()
     } catch (err) {
+        error.value = 'An unexpected error occurred'
+        console.error('Create alias error:', err)
+    } finally {
         loading.value = false
     }
 }

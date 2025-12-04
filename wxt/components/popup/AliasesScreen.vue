@@ -50,6 +50,7 @@
 import { ref, onMounted, onUpdated } from 'vue'
 import { api } from '@/lib/api'
 import { Defaults, Alias } from '@/lib/types'
+import events from '@/lib/events'
 import tooltip from '@preline/tooltip'
 import AliasCreate from './AliasCreate.vue'
 
@@ -119,6 +120,7 @@ const copyAlias = (alias: string) => {
 
 onMounted(() => {
     fetchAliases()
+    events.on('alias.create', fetchAliases)
 })
 
 onUpdated(() => {

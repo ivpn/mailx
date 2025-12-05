@@ -15,12 +15,17 @@
     html {
         font-family: 'Roboto Mono', monospace;
     }
+}
 
-    .page {
-        min-height: 500px;
-        max-height: 511px;
-        min-width: 400px;
-        max-width: 500px;
-        overflow-y: auto;
+@layer components {
+    nav {
+
+        a {
+            @apply text-secondary py-3 font-medium text-sm w-full cursor-pointer px-6 flex flex-row items-center gap-x-2 justify-center;
+
+            &.active {
+                @apply text-accent;
+            }
+        }
     }
 }

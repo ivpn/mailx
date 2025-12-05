@@ -1,7 +1,7 @@
 <template>
-    <div class="page p-5">
+    <div class="min-h-[550px] px-4 py-[50px]">
         <div class="w-full">
-            <header class="pb-5">
+            <header class="fixed top-0 left-0 right-0 bg-secondary z-10 px-4 py-2">
                 <div class="flex gap-3 items-center justify-between">
                     <div class="relative grow">
                         <form @submit.prevent="fetchAliases" autocomplete="off">
@@ -16,10 +16,10 @@
                     </button>
                 </div>
             </header>
-            <p v-if="isLoading" class="text-secondary">Loading...</p>
+            <p v-if="isLoading" class="text-secondary py-4">Loading...</p>
             <p v-else-if="error" class="error">{{ error }}</p>
             <div v-else>
-                <div v-for="alias in list" :key="alias.id" class="py-3 border-t border-secondary flex items-center gap-x-4">
+                <div v-for="(alias, index) in list" :key="alias.id" class="py-3 flex items-center gap-x-4" :class="{ 'border-t border-secondary': index > 0 }">
                     <div class="flex items-center">
                         <input @change="updateAlias(alias)" v-bind:checked="alias.enabled" type="checkbox" class="xs">
                     </div>

@@ -1,6 +1,20 @@
 <template>
-  <LoginScreen v-if="!apiToken" />
-  <AliasesScreen v-if="apiToken && defaults" :apiToken="apiToken" :defaults="defaults" />
+  <div class="max-w-[500px] min-w-[420px]">
+    <LoginScreen v-if="!apiToken" />
+    <AliasesScreen v-if="apiToken && defaults" :apiToken="apiToken" :defaults="defaults" />
+    <header v-if="apiToken && defaults" class="bg-secondary fixed bottom-0 left-0 right-0 z-10">
+      <nav>
+          <div class="flex flex-row items-center">
+              <a v-bind:class="{ 'active': true }" href="/">
+                  Aliases
+              </a>
+              <a v-bind:class="{ 'active': false }" href="/settings">
+                  Settings
+              </a>
+          </div>
+      </nav>
+    </header>
+  </div>
 </template>
 
 <script lang="ts" setup>

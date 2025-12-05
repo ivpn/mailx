@@ -118,9 +118,14 @@ const copyAlias = (alias: string) => {
     }, 2000)
 }
 
+const onCreateAlias = (event: { alias: Alias }) => {
+    console.log('Alias created event received:', event.alias)
+    list.value.unshift(event.alias)
+}
+
 onMounted(() => {
     fetchAliases()
-    events.on('alias.create', fetchAliases)
+    events.on('alias.create', onCreateAlias)
 })
 
 onUpdated(() => {

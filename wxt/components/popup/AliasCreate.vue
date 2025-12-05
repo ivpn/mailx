@@ -178,7 +178,7 @@ const postAlias = async () => {
         console.log('Created alias:', res)
         copyAlias(res.name)
         error.value = ''
-        events.emit('alias.create', {})
+        events.emit('alias.create', { alias: res.alias})
         close()
     } catch (err) {
         error.value = 'An unexpected error occurred'

@@ -19,12 +19,12 @@
             <p v-if="isLoading" class="text-secondary py-4">Loading...</p>
             <p v-else-if="error" class="error">{{ error }}</p>
             <div v-else>
-                <div v-for="(alias, index) in list" :key="alias.id" class="py-3 flex items-center gap-x-4" :class="{ 'border-t border-secondary': index > 0 }">
+                <div v-for="(alias, index) in list" :key="alias.id" class="min-h-[63.3px] flex items-center gap-x-4" :class="{ 'border-t border-secondary': index > 0 }">
                     <div class="flex items-center">
                         <input @change="updateAlias(alias)" v-bind:checked="alias.enabled" type="checkbox" class="xs">
                     </div>
-                    <div class="grow">
-                        <p class="m-0 text-primary font-medium text-base">{{ alias.name }}</p>
+                    <div class="grow min-w-24">
+                        <p class="m-0 min-width-0 text-primary font-medium text-base text-nowrap overflow-hidden text-ellipsis">{{ alias.name }}</p>
                         <p class="m-0">{{ alias.description }}</p>
                     </div>
                     <div class="hs-tooltip">

@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-[500px] min-w-[420px]">
+  <div class="max-w-[420px] min-w-[420px]">
     <LoginScreen v-if="!apiToken" />
     <AliasesScreen v-if="apiToken && defaults" :apiToken="apiToken" :defaults="defaults" />
     <header v-if="apiToken && defaults" class="bg-secondary fixed bottom-0 left-0 right-0 z-10">

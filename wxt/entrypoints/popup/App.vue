@@ -1,16 +1,17 @@
 <template>
   <div class="max-w-[420px] min-w-[420px]">
     <LoginScreen v-if="!apiToken" />
-    <AliasesScreen v-if="apiToken && defaults" :apiToken="apiToken" :defaults="defaults" />
+    <AliasesScreen v-if="apiToken && defaults && route === 'aliases'" :apiToken="apiToken" :defaults="defaults" />
+    <SettingsScreen v-if="apiToken && defaults && route === 'settings'" :apiToken="apiToken" :defaults="defaults" />
     <header v-if="apiToken && defaults" class="bg-secondary fixed bottom-0 left-0 right-0 z-10">
       <nav>
           <div class="flex flex-row items-center">
-              <a v-bind:class="{ 'active': true }" href="/">
+              <button @click="updateRoute('aliases')" v-bind:class="{ 'active': route === 'aliases' }">
                   Aliases
-              </a>
-              <a v-bind:class="{ 'active': false }" href="/settings">
+              </button>
+              <button @click="updateRoute('settings')" v-bind:class="{ 'active': route === 'settings' }">
                   Settings
-              </a>
+              </button>
           </div>
       </nav>
     </header>
@@ -24,9 +25,15 @@ import { store } from '@/lib/store'
 import { Defaults } from '@/lib/types'
 import LoginScreen from '@/components/popup/LoginScreen.vue'
 import AliasesScreen from '@/components/popup/AliasesScreen.vue'
+import SettingsScreen from '@/components/popup/SettingsScreen.vue'
 
 const apiToken = ref<string | undefined>()
 const defaults = ref<Defaults | undefined>()
+const route = ref<string>('aliases')
+
+const updateRoute = (newRoute: string) => {
+    route.value = newRoute
+}
 
 onMounted(async () => {
   apiToken.value = await store.getApiToken()

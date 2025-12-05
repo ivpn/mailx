@@ -20,7 +20,7 @@
 @layer components {
     nav {
 
-        a {
+        button {
             @apply text-secondary py-3 font-medium text-sm w-full cursor-pointer px-6 flex flex-row items-center gap-x-2 justify-center;
 
             &.active {

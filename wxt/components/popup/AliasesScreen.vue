@@ -119,6 +119,7 @@ const copyAlias = (alias: string) => {
 }
 
 const onCreateAlias = (event: { alias: Alias }) => {
+    if (!event.alias) return
     console.log('Alias created event received:', event.alias)
     list.value.unshift(event.alias)
 }

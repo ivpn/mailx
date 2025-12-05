@@ -207,7 +207,7 @@ const postAlias = async () => {
     try {
         loading.value = true
         const res = await aliasApi.create(alias.value)
-        copyAlias(res.data.name)
+        copyAlias(res.data.alias.name)
         events.emit('alias.create', {})
         error.value = ''
         loading.value = false

@@ -43,9 +43,6 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	api.Post("/alias", limiter.New(), h.PostAlias)
 	api.Put("/alias/:id", h.UpdateAlias)
 	api.Delete("/alias/:id", h.DeleteAlias)
-	api.Get("/recipients", h.GetRecipients)
-	api.Get("/settings", h.GetSettings)
-	api.Put("/settings", h.UpdateSettings)
 	api.Get("/defaults", h.GetDefaults)
 
 	v1 := h.Server.Group("/v1")

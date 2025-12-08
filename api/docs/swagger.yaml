@@ -1,4 +1,13 @@
 definitions:
+  api.AccessKeyReq:
+    properties:
+      expires_at:
+        type: string
+      name:
+        type: string
+    required:
+    - name
+    type: object
   api.ActivateReq:
     properties:
       otp:
@@ -28,9 +37,23 @@ definitions:
     - domain
     - recipients
     type: object
+  api.AuthReq:
+    properties:
+      access_key:
+        maxLength: 85
+        minLength: 85
+        type: string
+    required:
+    - access_key
+    type: object
   api.ChangePasswordReq:
     properties:
       password:
+        type: string
+    type: object
+  api.DeleteRecipientReq:
+    properties:
+      recipients:
         type: string
     type: object
   api.DeleteUserReq:
@@ -84,10 +107,12 @@ definitions:
         type: string
       id:
         type: string
-      log_bounce:
+      log_issues:
         type: boolean
       recipient:
         type: string
+      remove_header:
+        type: boolean
     required:
     - id
     type: object
@@ -150,6 +175,20 @@ definitions:
     required:
     - email
     type: object
+  model.AccessKey:
+    properties:
+      created_at:
+        type: string
+      expires_at:
+        description: nullable
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      user_id:
+        type: string
+    type: object
   model.Alias:
     properties:
       catch_all:
@@ -191,25 +230,6 @@ definitions:
       sends:
         type: integer
     type: object
-  model.Bounce:
-    properties:
-      attempted_at:
-        type: string
-      created_at:
-        type: string
-      destination:
-        type: string
-      diagnostic_code:
-        type: string
-      from:
-        type: string
-      id:
-        type: string
-      remote_mta:
-        type: string
-      status:
-        type: string
-    type: object
   model.Credential:
     properties:
       created_at:
@@ -219,6 +239,37 @@ definitions:
       user_id:
         type: string
     type: object
+  model.Log:
+    properties:
+      attempted_at:
+        type: string
+      created_at:
+        type: string
+      destination:
+        type: string
+      from:
+        type: string
+      id:
+        type: string
+      log_type:
+        $ref: '#/definitions/model.LogType'
+      message:
+        type: string
+      remote_mta:
+        type: string
+      status:
+        type: string
+    type: object
+  model.LogType:
+    enum:
+    - bounce
+    - disabled_alias
+    - unauthorised_send
+    type: string
+    x-enum-varnames:
+    - BounceMessage
+    - DisabledAlias
+    - UnauthorisedSend
   model.Recipient:
     properties:
       created_at:
@@ -248,10 +299,12 @@ definitions:
         type: string
       id:
         type: string
-      log_bounce:
+      log_issues:
         type: boolean
       recipient:
         type: string
+      remove_header:
+        type: boolean
     type: object
   model.Subscription:
     properties:
@@ -318,6 +371,83 @@ definitions:
 info:
   contact: {}
 paths:
+  /accesskeys:
+    get:
+      consumes:
+      - application/json
+      description: Get all access keys for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.AccessKey'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get access keys
+      tags:
+      - access_key
+    post:
+      consumes:
+      - application/json
+      description: Create a new access key for the authenticated user
+      parameters:
+      - description: Access Key Request
+        in: body
+        name: access_key
+        required: true
+        schema:
+          $ref: '#/definitions/api.AccessKeyReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Create access key
+      tags:
+      - access_key
+  /accesskeys/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete access key by ID
+      parameters:
+      - description: Access Key ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete access key
+      tags:
+      - access_key
   /alias:
     post:
       consumes:
@@ -452,22 +582,16 @@ paths:
       summary: Get aliases
       tags:
       - alias
-  /bounce/file/{id}:
+  /aliases/export:
     get:
       consumes:
       - application/json
-      description: Get bounce file by ID for the authenticated user
-      parameters:
-      - description: Bounce ID
-        in: path
-        name: id
-        required: true
-        type: string
+      description: Export all aliases as CSV
       produces:
-      - text/plain
+      - text/csv
       responses:
         "200":
-          description: Bounce file content
+          description: CSV data
           schema:
             type: string
         "400":
@@ -476,32 +600,167 @@ paths:
             $ref: '#/definitions/api.ErrorRes'
       security:
       - ApiKeyAuth: []
-      summary: Get bounce file
+      summary: Export aliases
       tags:
-      - bounce
-  /bounces:
-    get:
+      - alias
+  /api/alias:
+    post:
       consumes:
       - application/json
-      description: Get all bounces for the authenticated user
+      description: Create alias
+      parameters:
+      - description: Alias request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.AliasReq'
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
-            items:
-              $ref: '#/definitions/model.Bounce'
-            type: array
+            $ref: '#/definitions/api.SuccessRes'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/api.ErrorRes'
       security:
       - ApiKeyAuth: []
-      summary: Get bounces
+      summary: Create alias
       tags:
-      - bounce
+      - alias
+  /api/alias/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete alias
+      parameters:
+      - description: Alias ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete alias
+      tags:
+      - alias
+    put:
+      consumes:
+      - application/json
+      description: Update alias
+      parameters:
+      - description: Alias ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Alias request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.AliasReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update alias
+      tags:
+      - alias
+  /api/aliases:
+    get:
+      consumes:
+      - application/json
+      description: Get all aliases
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.AliasList'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get aliases
+      tags:
+      - alias
+  /api/authenticate:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate using an access key to obtain a session token
+      parameters:
+      - description: Authentication Request
+        in: body
+        name: auth_req
+        required: true
+        schema:
+          $ref: '#/definitions/api.AuthReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Authenticate with access key
+      tags:
+      - access_key
+  /api/defaults:
+    get:
+      consumes:
+      - application/json
+      description: Get default settings and recipients for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get default settings
+      tags:
+      - access_key
   /email:
     post:
       consumes:
@@ -550,6 +809,33 @@ paths:
       summary: Initiate password reset
       tags:
       - user
+  /log/file/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get log file by ID for the authenticated user
+      parameters:
+      - description: Log ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Log file content
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get log file
+      tags:
+      - log
   /login:
     post:
       consumes:
@@ -621,6 +907,49 @@ paths:
       summary: Finish login
       tags:
       - webauthn
+  /logs:
+    delete:
+      consumes:
+      - application/json
+      description: Delete all logs for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete logs
+      tags:
+      - log
+    get:
+      consumes:
+      - application/json
+      description: Get all logs for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Log'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get logs
+      tags:
+      - log
   /recipient:
     post:
       consumes:
@@ -687,6 +1016,12 @@ paths:
         name: id
         required: true
         type: string
+      - description: Delete recipient request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.DeleteRecipientReq'
       produces:
       - application/json
       responses:

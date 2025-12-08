@@ -1,18 +1,20 @@
 <template>
   <div class="max-w-[420px] min-w-[420px]">
     <Login v-if="!apiToken" />
-    <Aliases v-if="apiToken && defaults && route === 'aliases'" :apiToken="apiToken" :defaults="defaults" />
-    <Settings v-if="apiToken && defaults && route === 'settings'" :apiToken="apiToken" :defaults="defaults" />
+    <keep-alive>
+      <component v-if="apiToken && defaults" :is="activeComponent" :key="route" :apiToken="apiToken"
+        :defaults="defaults" />
+    </keep-alive>
     <header v-if="apiToken && defaults" class="bg-secondary fixed bottom-0 left-0 right-0 z-10">
       <nav>
-          <div class="flex flex-row items-center">
-              <button @click="updateRoute('aliases')" v-bind:class="{ 'active': route === 'aliases' }">
-                  Aliases
-              </button>
-              <button @click="updateRoute('settings')" v-bind:class="{ 'active': route === 'settings' }">
-                  Settings
-              </button>
-          </div>
+        <div class="flex flex-row items-center">
+          <button @click="updateRoute('aliases')" :class="{ active: route === 'aliases' }">
+            Aliases
+          </button>
+          <button @click="updateRoute('settings')" :class="{ active: route === 'settings' }">
+            Settings
+          </button>
+        </div>
       </nav>
     </header>
   </div>
@@ -29,11 +31,15 @@ import Settings from '@/components/popup/Settings.vue'
 
 const apiToken = ref<string | undefined>()
 const defaults = ref<Defaults | undefined>()
-const route = ref<string>('aliases')
+const route = ref('aliases')
 
-const updateRoute = (newRoute: string) => {
-    route.value = newRoute
+const updateRoute = (val: string) => {
+  route.value = val
 }
+
+const activeComponent = computed(() =>
+  route.value === 'aliases' ? Aliases : Settings
+)
 
 onMounted(async () => {
   apiToken.value = await store.getApiToken()

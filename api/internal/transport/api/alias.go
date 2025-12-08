@@ -59,6 +59,7 @@ func (h *Handler) GetAlias(c *fiber.Ctx) error {
 // @Success 200 {object} model.AliasList
 // @Failure 400 {object} ErrorRes
 // @Router /aliases [get]
+// @Router /api/aliases [get]
 func (h *Handler) GetAliases(c *fiber.Ctx) error {
 	userID := auth.GetUserID(c)
 
@@ -163,6 +164,7 @@ func (h *Handler) ExportAliases(c *fiber.Ctx) error {
 // @Success 201 {object} SuccessRes
 // @Failure 400 {object} ErrorRes
 // @Router /alias [post]
+// @Router /api/alias [post]
 func (h *Handler) PostAlias(c *fiber.Ctx) error {
 	userID := auth.GetUserID(c)
 	req := AliasReq{}
@@ -231,6 +233,7 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 // @Success 200 {object} SuccessRes
 // @Failure 400 {object} ErrorRes
 // @Router /alias/{id} [put]
+// @Router /api/alias/{id} [put]
 func (h *Handler) UpdateAlias(c *fiber.Ctx) error {
 	userID := auth.GetUserID(c)
 	req := AliasReq{}
@@ -279,6 +282,7 @@ func (h *Handler) UpdateAlias(c *fiber.Ctx) error {
 // @Success 200 {object} SuccessRes
 // @Failure 400 {object} ErrorRes
 // @Router /alias/{id} [delete]
+// @Router /api/alias/{id} [delete]
 func (h *Handler) DeleteAlias(c *fiber.Ctx) error {
 	userID := auth.GetUserID(c)
 	id := c.Params("id")

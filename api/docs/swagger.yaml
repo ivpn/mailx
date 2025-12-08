@@ -603,6 +603,114 @@ paths:
       summary: Export aliases
       tags:
       - alias
+  /api/alias:
+    post:
+      consumes:
+      - application/json
+      description: Create alias
+      parameters:
+      - description: Alias request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.AliasReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Create alias
+      tags:
+      - alias
+  /api/alias/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete alias
+      parameters:
+      - description: Alias ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete alias
+      tags:
+      - alias
+    put:
+      consumes:
+      - application/json
+      description: Update alias
+      parameters:
+      - description: Alias ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Alias request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.AliasReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update alias
+      tags:
+      - alias
+  /api/aliases:
+    get:
+      consumes:
+      - application/json
+      description: Get all aliases
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.AliasList'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get aliases
+      tags:
+      - alias
   /api/authenticate:
     post:
       consumes:

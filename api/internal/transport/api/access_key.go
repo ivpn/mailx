@@ -203,7 +203,7 @@ func (h *Handler) Authenticate(c *fiber.Ctx) error {
 
 	// Save the session
 	exp := time.Now().Add(h.Cfg.ApiTokenExpiration)
-	if exp.After(*accessKey.ExpiresAt) {
+	if accessKey.ExpiresAt != nil && exp.After(*accessKey.ExpiresAt) {
 		exp = *accessKey.ExpiresAt
 	}
 	sessionData := webauthn.SessionData{

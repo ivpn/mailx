@@ -21,6 +21,7 @@ type Service interface {
 	SessionService
 	CredentialService
 	LogService
+	AccessKeyService
 }
 
 type Handler struct {

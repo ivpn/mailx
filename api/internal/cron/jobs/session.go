@@ -10,8 +10,7 @@ import (
 
 // Delete expired sessions
 func DeleteExpiredSessions(db *gorm.DB, cfg config.APIConfig) {
-	exp := cfg.TokenExpiration.Hours()
-	err := db.Where("created_at < NOW() - INTERVAL ? HOUR", exp).Delete(&model.Session{}).Error
+	err := db.Where("expires_at < NOW()").Delete(&model.Session{}).Error
 	if err != nil {
 		log.Println("Error deleting expired sessions:", err)
 		return

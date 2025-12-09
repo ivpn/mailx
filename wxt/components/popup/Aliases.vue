@@ -1,5 +1,5 @@
 <template>
-    <div class="min-h-[600px] px-4 py-[50px]">
+    <div class="px-4 py-[50px]">
         <div class="w-full">
             <header class="fixed top-0 left-0 right-0 bg-secondary z-10 px-4 py-2">
                 <div class="flex gap-3 items-center justify-between">

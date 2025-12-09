@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-[420px] min-w-[420px]">
+  <div class="min-h-[600px] max-w-[420px] min-w-[420px]">
     <Login v-if="!apiToken" />
     <keep-alive>
       <component v-if="apiToken && defaults" :is="activeComponent" :key="route" :apiToken="apiToken"

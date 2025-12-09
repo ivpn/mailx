@@ -1,5 +1,5 @@
 <template>
-    <div class="min-h-[600px] p-4">
+    <div class="p-4">
         <h2 class="m-0">Settings</h2>
         <hr class="my-5">
         <p class="text-sm mb-3">Refresh recipients, domains and defaults:</p>
@@ -39,7 +39,7 @@ const refreshDefaults = async () => {
 
 const logout = async () => {
     if (!confirm('Do you want to proceed with the logout?')) return
-    
+
     try {
         await api.logout(props.apiToken)
         store.clearAll()

@@ -29,8 +29,7 @@
             <footer>
                 <div>
                     <h4>Here to try Mailx? You need an active IVPN account.</h4>
-                    <p>Sign up or log in on <a href="https://www.ivpn.net/account/">ivpn.net</a> and look for "Mailx
-                        Beta" in your account settings.</p>
+                    <p>Sign up or log in on <a href="https://www.ivpn.net/account/">ivpn.net</a> and look for "Mailx" in your account settings.</p>
                 </div>
             </footer>
         </form>

@@ -60,6 +60,25 @@ async function deleteAlias(apiToken: string, aliasId: string) {
     return res.json()
 }
 
+async function fetchDefaults(apiToken: string) {
+    const res = await fetch(`${BASE_URL}/v1/api/defaults`, {
+        headers: { Authorization: `Bearer ${apiToken}` },
+    })
+
+    return res.json()
+}
+
+async function logout(apiToken: string) {
+    const res = await fetch(`${BASE_URL}/v1/api/logout`, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${apiToken}`,
+        },
+    })
+
+    return res.json()
+}
+
 export const api = {
     livez,
     authenticate,
@@ -67,4 +86,6 @@ export const api = {
     createAlias,
     updateAlias,
     deleteAlias,
+    fetchDefaults,
+    logout,
 }

@@ -124,12 +124,36 @@ const onCreateAlias = (event: { alias: Alias }) => {
     list.value.unshift(event.alias)
 }
 
+const handleKeydown = (event: KeyboardEvent) => {
+    // Only trigger if not focused on an input or textarea
+    const activeElement = document.activeElement
+    if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA' || activeElement.getAttribute('contenteditable') === 'true')) {
+        return
+    }
+    
+    if (event.key === 's' || event.key === 'S') {
+        event.preventDefault()
+        const input = document.getElementById('input_search')
+        input?.focus()
+    }
+    if (event.key === 'n' || event.key === 'N') {
+        event.preventDefault()
+        const modalTrigger = document.querySelector('[data-hs-overlay="#modal-create-alias"]') as HTMLElement
+        modalTrigger?.click()
+    }
+}
+
 onMounted(() => {
     fetchAliases()
     events.on('alias.create', onCreateAlias)
+    document.addEventListener('keydown', handleKeydown)
 })
 
 onUpdated(() => {
     tooltip.autoInit()
+})
+
+onUnmounted(() => {
+    document.removeEventListener('keydown', handleKeydown)
 })
 </script>

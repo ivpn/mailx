@@ -3,10 +3,10 @@
         <h2 class="m-0">Settings</h2>
         <hr class="my-5">
         <p class="text-sm mb-3">Refresh recipients, domains and defaults:</p>
-        <button @click="refreshDefaults" class="cta sm plain">Refresh Defaults</button>
+        <button @click="refreshDefaults" class="cta sm">Refresh Defaults</button>
         <hr class="my-5">
         <p class="text-sm mb-3">Log out / delete session:</p>
-        <button @click="logout" class="cta sm plain">Log Out</button>
+        <button @click="logout" class="cta sm">Log Out</button>
         <p v-if="error" class="error my-5">Error: {{ error }}</p>
         <p v-if="success" class="success my-5">Success: {{ success }}</p>
     </div>

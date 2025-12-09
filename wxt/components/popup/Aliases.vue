@@ -17,7 +17,7 @@
                 </div>
             </header>
             <p v-if="isLoading" class="text-secondary py-4">Loading...</p>
-            <p v-else-if="error" class="error py-4">{{ error }}</p>
+            <p v-else-if="error" class="error py-4">Error: {{ error }}</p>
             <div v-else>
                 <div v-for="(alias, index) in list" :key="alias.id" class="min-h-[63.3px] flex items-center gap-x-4" :class="{ 'border-t border-secondary': index > 0 }">
                     <div class="flex items-center">

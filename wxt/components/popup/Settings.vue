@@ -8,7 +8,7 @@
         <p class="text-sm mb-3">Log out / delete session:</p>
         <button @click="logout" class="cta sm">Log Out</button>
         <p v-if="error" class="error my-5">Error: {{ error }}</p>
-        <p v-if="success" class="success my-5">Success: {{ success }}</p>
+        <p v-if="success" class="success my-5">{{ success }}</p>
     </div>
 </template>
 

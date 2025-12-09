@@ -42,8 +42,8 @@ const logout = async () => {
         await api.logout(props.apiToken)
         store.clearAll()
         console.log('Logged out successfully')
-        success.value = 'Logged out successfully'
         error.value = ''
+        alert('You have been logged out.')
     } catch (err) {
         console.error('Logout error:', err)
         success.value = ''

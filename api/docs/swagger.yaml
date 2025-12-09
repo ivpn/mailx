@@ -761,6 +761,30 @@ paths:
       summary: Get default settings
       tags:
       - access_key
+  /api/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout the authenticated API user by invalidating their session
+        token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Logout API user
+      tags:
+      - access_key
   /email:
     post:
       consumes:

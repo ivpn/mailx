@@ -45,6 +45,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	api.Put("/alias/:id", h.UpdateAlias)
 	api.Delete("/alias/:id", h.DeleteAlias)
 	api.Get("/defaults", h.GetDefaults)
+	api.Post("/logout", h.ApiLogout)
 
 	v1 := h.Server.Group("/v1")
 	v1.Use(auth.New(cfg, h.Cache, h.Service))

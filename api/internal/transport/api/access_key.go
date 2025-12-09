@@ -234,6 +234,29 @@ func (h *Handler) Authenticate(c *fiber.Ctx) error {
 	})
 }
 
+// @Summary Logout API user
+// @Description Logout the authenticated API user by invalidating their session token
+// @Tags access_key
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} map[string]string "message"
+// @Failure 400 {object} ErrorRes
+// @Router /api/logout [post]
+func (h *Handler) ApiLogout(c *fiber.Ctx) error {
+	token := auth.GetAuthToken(c)
+	err := h.Service.LogoutUser(c.Context(), token)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": LogoutSuccess,
+	})
+}
+
 // @Summary Get default settings
 // @Description Get default settings and recipients for the authenticated user
 // @Tags access_key

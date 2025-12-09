@@ -38,6 +38,8 @@ const refreshDefaults = async () => {
 }
 
 const logout = async () => {
+    if (!confirm('Do you want to proceed with the logout?')) return
+    
     try {
         await api.logout(props.apiToken)
         store.clearAll()

@@ -28,8 +28,7 @@
             </article>
             <footer>
                 <div>
-                    <h4>Here to try Mailx? You need an active IVPN account.</h4>
-                    <p>Sign up or log in on <a href="https://www.ivpn.net/account/">ivpn.net</a> and look for "Mailx" in your account settings.</p>
+                    <p>To create Mailx access key, go to <a href="https://app.mailx.net/account">mailx.net</a> and look for "Access Keys" section.</p>
                 </div>
             </footer>
         </form>

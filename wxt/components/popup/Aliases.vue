@@ -5,7 +5,7 @@
                 <div class="flex gap-3 items-center justify-between">
                     <div class="relative grow">
                         <form @submit.prevent="fetchAliases" autocomplete="off">
-                            <input v-model="search" class="search w-full" type="text" placeholder="Search aliases..." id="input_search">
+                            <input v-model="search" class="search w-full text-xs" type="text" placeholder="Search aliases..." id="input_search">
                         </form>
                         <button v-if="searchQuery" @click.prevent="clearSearch" class="absolute top-0 right-0 bottom-0 px-2 flex items-center justify-center">
                             <i class="icon close icon-tertiary text-base"></i>

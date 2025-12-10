@@ -11,12 +11,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-    html {
-        font-family: 'Roboto Mono', monospace;
-    }
-}
-
 @layer components {
     nav {
 

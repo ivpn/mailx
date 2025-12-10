@@ -22,7 +22,7 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
-import { api } from '@/lib/api'
+// import { api } from '@/lib/api'
 import { store } from '@/lib/store'
 import { Defaults } from '@/lib/types'
 import Login from '@/components/popup/Login.vue'
@@ -55,11 +55,11 @@ onMounted(async () => {
     defaults.value = newDefaults
   })
 
-  try {
-    const res = await api.livez()
-    console.log('/livez response:', res)
-  } catch (err) {
-    console.error('Error calling /livez:', err)
-  }
+  // try {
+  //   const res = await api.livez()
+  //   console.log('/livez response:', res)
+  // } catch (err) {
+  //   console.error('Error calling /livez:', err)
+  // }
 })
 </script>

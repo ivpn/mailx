@@ -25,6 +25,9 @@ export const userApi = {
     totpEnable: () => api.put('/user/totp/enable'),
     totpEnableConfirm: (data: any) => api.put('/user/totp/enable/confirm', data),
     totpDisable: (data: any) => api.put('/user/totp/disable', data),
+    accessKeyList: () => api.get('/accesskeys'),
+    accessKeyCreate: (data: any) => api.post('/accesskeys', data),
+    accessKeyDelete: (id: string) => api.delete('/accesskeys/' + id),
     clearSession: () => {
         localStorage.removeItem('email')
         window.location.href = '/login'

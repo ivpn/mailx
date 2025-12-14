@@ -15,6 +15,129 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/accesskeys": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all access keys for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "access_key"
+                ],
+                "summary": "Get access keys",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.AccessKey"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create a new access key for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "access_key"
+                ],
+                "summary": "Create access key",
+                "parameters": [
+                    {
+                        "description": "Access Key Request",
+                        "name": "access_key",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.AccessKeyReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "token",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/accesskeys/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete access key by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "access_key"
+                ],
+                "summary": "Delete access key",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Access Key ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
         "/alias": {
             "post": {
                 "security": [
@@ -228,36 +351,27 @@ const docTemplate = `{
                 }
             }
         },
-        "/bounce/file/{id}": {
+        "/aliases/export": {
             "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Get bounce file by ID for the authenticated user",
+                "description": "Export all aliases as CSV",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
-                    "text/plain"
+                    "text/csv"
                 ],
                 "tags": [
-                    "bounce"
+                    "alias"
                 ],
-                "summary": "Get bounce file",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bounce ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
+                "summary": "Export aliases",
                 "responses": {
                     "200": {
-                        "description": "Bounce file content",
+                        "description": "CSV data",
                         "schema": {
                             "type": "string"
                         }
@@ -271,14 +385,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/bounces": {
-            "get": {
+        "/api/alias": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Get all bounces for the authenticated user",
+                "description": "Create alias",
                 "consumes": [
                     "application/json"
                 ],
@@ -286,16 +400,266 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "bounce"
+                    "alias"
                 ],
-                "summary": "Get bounces",
+                "summary": "Create alias",
+                "parameters": [
+                    {
+                        "description": "Alias request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.AliasReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/alias/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update alias",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "alias"
+                ],
+                "summary": "Update alias",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Alias ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Alias request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.AliasReq"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/model.Bounce"
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete alias",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "alias"
+                ],
+                "summary": "Delete alias",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Alias ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/aliases": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all aliases",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "alias"
+                ],
+                "summary": "Get aliases",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.AliasList"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/authenticate": {
+            "post": {
+                "description": "Authenticate using an access key to obtain a session token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "access_key"
+                ],
+                "summary": "Authenticate with access key",
+                "parameters": [
+                    {
+                        "description": "Authentication Request",
+                        "name": "auth_req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.AuthReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "token",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/defaults": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get default settings and recipients for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "access_key"
+                ],
+                "summary": "Get default settings",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Logout the authenticated API user by invalidating their session token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "access_key"
+                ],
+                "summary": "Logout API user",
+                "responses": {
+                    "200": {
+                        "description": "message",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
                             }
                         }
                     },
@@ -371,6 +735,49 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/log/file/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get log file by ID for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "log"
+                ],
+                "summary": "Get log file",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Log ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Log file content",
+                        "schema": {
+                            "type": "string"
                         }
                     },
                     "400": {
@@ -475,6 +882,75 @@ const docTemplate = `{
                     "webauthn"
                 ],
                 "summary": "Finish login",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/logs": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all logs for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "log"
+                ],
+                "summary": "Get logs",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Log"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete all logs for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "log"
+                ],
+                "summary": "Delete logs",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -740,6 +1216,15 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "Delete recipient request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.DeleteRecipientReq"
+                        }
                     }
                 ],
                 "responses": {
@@ -1759,6 +2244,20 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "api.AccessKeyReq": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "expires_at": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "api.ActivateReq": {
             "type": "object",
             "required": [
@@ -1802,10 +2301,31 @@ const docTemplate = `{
                 }
             }
         },
+        "api.AuthReq": {
+            "type": "object",
+            "required": [
+                "access_key"
+            ],
+            "properties": {
+                "access_key": {
+                    "type": "string",
+                    "maxLength": 85,
+                    "minLength": 85
+                }
+            }
+        },
         "api.ChangePasswordReq": {
             "type": "object",
             "properties": {
                 "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.DeleteRecipientReq": {
+            "type": "object",
+            "properties": {
+                "recipients": {
                     "type": "string"
                 }
             }
@@ -1892,11 +2412,14 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "log_bounce": {
+                "log_issues": {
                     "type": "boolean"
                 },
                 "recipient": {
                     "type": "string"
+                },
+                "remove_header": {
+                    "type": "boolean"
                 }
             }
         },
@@ -1988,6 +2511,27 @@ const docTemplate = `{
                 }
             }
         },
+        "model.AccessKey": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "expires_at": {
+                    "description": "nullable",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
         "model.Alias": {
             "type": "object",
             "properties": {
@@ -2051,35 +2595,6 @@ const docTemplate = `{
                 }
             }
         },
-        "model.Bounce": {
-            "type": "object",
-            "properties": {
-                "attempted_at": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "destination": {
-                    "type": "string"
-                },
-                "diagnostic_code": {
-                    "type": "string"
-                },
-                "from": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "remote_mta": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                }
-            }
-        },
         "model.Credential": {
             "type": "object",
             "properties": {
@@ -2093,6 +2608,51 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "model.Log": {
+            "type": "object",
+            "properties": {
+                "attempted_at": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "destination": {
+                    "type": "string"
+                },
+                "from": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "log_type": {
+                    "$ref": "#/definitions/model.LogType"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "remote_mta": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.LogType": {
+            "type": "string",
+            "enum": [
+                "bounce",
+                "disabled_alias",
+                "unauthorised_send"
+            ],
+            "x-enum-varnames": [
+                "BounceMessage",
+                "DisabledAlias",
+                "UnauthorisedSend"
+            ]
         },
         "model.Recipient": {
             "type": "object",
@@ -2138,11 +2698,14 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "log_bounce": {
+                "log_issues": {
                     "type": "boolean"
                 },
                 "recipient": {
                     "type": "string"
+                },
+                "remove_header": {
+                    "type": "boolean"
                 }
             }
         },

@@ -15,7 +15,6 @@ import (
 
 func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	email := h.Server.Group("/v1/email")
-	email.Use(auth.NewPSKCORS(cfg))
 	email.Use(auth.NewPSK(cfg))
 	email.Post("", h.HandleEmail)
 
@@ -27,6 +26,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	h.Server.Post("/v1/login", limit.New(5, 10*time.Minute), h.Login)
 	h.Server.Post("/v1/initiatepasswordreset", limiter.New(), h.InitiatePasswordReset)
 	h.Server.Put("/v1/resetpassword", limiter.New(), h.ResetPassword)
+	h.Server.Post("/v1/api/authenticate", limit.New(5, 10*time.Minute), h.Authenticate)
 
 	h.Server.Post("/v1/register/begin", limiter.New(), h.BeginRegistration)
 	h.Server.Post("/v1/register/finish", limiter.New(), h.FinishRegistration)
@@ -34,9 +34,17 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	h.Server.Post("/v1/login/finish", limiter.New(), h.FinishLogin)
 
 	sub := h.Server.Group("/v1/subscription")
-	sub.Use(auth.NewPSKCORS(cfg))
 	sub.Use(auth.NewPSK(cfg))
 	sub.Post("/add", h.AddSubscription)
+
+	api := h.Server.Group("/v1/api")
+	api.Use(auth.NewAPIAuth(cfg, h.Service))
+	api.Get("/aliases", h.GetAliases)
+	api.Post("/alias", limiter.New(), h.PostAlias)
+	api.Put("/alias/:id", h.UpdateAlias)
+	api.Delete("/alias/:id", h.DeleteAlias)
+	api.Get("/defaults", h.GetDefaults)
+	api.Post("/logout", h.ApiLogout)
 
 	v1 := h.Server.Group("/v1")
 	v1.Use(auth.New(cfg, h.Cache, h.Service))
@@ -81,6 +89,10 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Get("/logs", h.GetLogs)
 	v1.Delete("/logs", h.DeleteLogs)
 	v1.Get("/log/file/:id", h.GetLogFile)
+
+	v1.Get("/accesskeys", h.GetAccessKeys)
+	v1.Post("/accesskeys", h.PostAccessKey)
+	v1.Delete("/accesskeys/:id", h.DeleteAccessKey)
 
 	docs := h.Server.Group("/docs")
 	docs.Use(auth.NewBasicAuth(cfg))

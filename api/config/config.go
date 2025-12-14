@@ -8,20 +8,21 @@ import (
 )
 
 type APIConfig struct {
-	FQDN              string
-	Name              string
-	Port              string
-	ApiAllowOrigin    string
-	TokenSecret       string
-	TokenExpiration   time.Duration
-	PSK               string
-	PSKAllowOrigin    string
-	Domains           string
-	LogFile           string
-	BasicAuthUser     string
-	BasicAuthPassword string
-	SignupWebhookURL  string
-	SignupWebhookPSK  string
+	FQDN               string
+	Name               string
+	Port               string
+	ApiAllowOrigin     string
+	TokenSecret        string
+	TokenExpiration    time.Duration
+	ApiTokenExpiration time.Duration
+	PSK                string
+	PSKAllowOrigin     string
+	Domains            string
+	LogFile            string
+	BasicAuthUser      string
+	BasicAuthPassword  string
+	SignupWebhookURL   string
+	SignupWebhookPSK   string
 }
 
 type DBConfig struct {
@@ -85,6 +86,12 @@ func New() (Config, error) {
 		return Config{}, err
 	}
 
+	apiTokenExpStr := os.Getenv("API_TOKEN_EXPIRATION")
+	apiTokenExp, err := time.ParseDuration(apiTokenExpStr)
+	if err != nil {
+		return Config{}, err
+	}
+
 	otpExpStr := os.Getenv("OTP_EXPIRATION")
 	otpExp, err := time.ParseDuration(otpExpStr)
 	if err != nil {
@@ -141,20 +148,21 @@ func New() (Config, error) {
 
 	return Config{
 		API: APIConfig{
-			FQDN:              os.Getenv("FQDN"),
-			Name:              os.Getenv("API_NAME"),
-			Port:              os.Getenv("API_PORT"),
-			ApiAllowOrigin:    os.Getenv("API_ALLOW_ORIGIN"),
-			TokenSecret:       os.Getenv("TOKEN_SECRET"),
-			TokenExpiration:   tokenExp,
-			PSK:               os.Getenv("PSK"),
-			PSKAllowOrigin:    os.Getenv("PSK_ALLOW_ORIGIN"),
-			Domains:           os.Getenv("DOMAINS"),
-			LogFile:           os.Getenv("LOG_FILE"),
-			BasicAuthUser:     os.Getenv("BASIC_AUTH_USER"),
-			BasicAuthPassword: os.Getenv("BASIC_AUTH_PASSWORD"),
-			SignupWebhookURL:  os.Getenv("SIGNUP_WEBHOOK_URL"),
-			SignupWebhookPSK:  os.Getenv("SIGNUP_WEBHOOK_PSK"),
+			FQDN:               os.Getenv("FQDN"),
+			Name:               os.Getenv("API_NAME"),
+			Port:               os.Getenv("API_PORT"),
+			ApiAllowOrigin:     os.Getenv("API_ALLOW_ORIGIN"),
+			TokenSecret:        os.Getenv("TOKEN_SECRET"),
+			TokenExpiration:    tokenExp,
+			ApiTokenExpiration: apiTokenExp,
+			PSK:                os.Getenv("PSK"),
+			PSKAllowOrigin:     os.Getenv("PSK_ALLOW_ORIGIN"),
+			Domains:            os.Getenv("DOMAINS"),
+			LogFile:            os.Getenv("LOG_FILE"),
+			BasicAuthUser:      os.Getenv("BASIC_AUTH_USER"),
+			BasicAuthPassword:  os.Getenv("BASIC_AUTH_PASSWORD"),
+			SignupWebhookURL:   os.Getenv("SIGNUP_WEBHOOK_URL"),
+			SignupWebhookPSK:   os.Getenv("SIGNUP_WEBHOOK_PSK"),
 		},
 		DB: DBConfig{
 			Hosts:    dbHosts,

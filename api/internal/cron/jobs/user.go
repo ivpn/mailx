@@ -93,6 +93,13 @@ func deleteUsers(db *gorm.DB, users []model.User) {
 			return
 		}
 
+		// Delete access keys of the user
+		err = db.Where("user_id = ?", ID).Delete(&model.AccessKey{}).Error
+		if err != nil {
+			log.Println("Error deleting access keys of user:", err)
+			return
+		}
+
 		// Delete the user
 		err = db.Where("id = ?", ID).Delete(&model.User{}).Error
 		if err != nil {

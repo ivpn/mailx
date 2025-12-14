@@ -80,22 +80,22 @@ func parseAuthResults(headers []string) AuthResults {
 
 		if strings.Contains(h, "dkim=pass") {
 			result.DKIM = "pass"
-			if idx := strings.Index(h, "header.d="); idx != -1 {
-				domain := extractValue(h[idx+len("header.d="):])
+			if _, after, ok := strings.Cut(h, "header.d="); ok {
+				domain := extractValue(after)
 				result.DKIMDomain = domain
 			}
 		}
 		if strings.Contains(h, "spf=pass") {
 			result.SPF = "pass"
-			if idx := strings.Index(h, "smtp.mailfrom="); idx != -1 {
-				domain := extractDomain(extractValue(h[idx+len("smtp.mailfrom="):]))
+			if _, after, ok := strings.Cut(h, "smtp.mailfrom="); ok {
+				domain := extractDomain(extractValue(after))
 				result.SPFDomain = domain
 			}
 		}
 		if strings.Contains(h, "dmarc=pass") {
 			result.DMARC = "pass"
-			if idx := strings.Index(h, "header.from="); idx != -1 {
-				domain := extractValue(h[idx+len("header.from="):])
+			if _, after, ok := strings.Cut(h, "header.from="); ok {
+				domain := extractValue(after)
 				result.DMARCDomain = domain
 			}
 		}

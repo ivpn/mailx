@@ -19,7 +19,9 @@ type ProcessorService interface {
 func (h *Handler) HandleEmail(c *fiber.Ctx) error {
 	err := h.Service.ProcessMessage(c.Body())
 	if err != nil {
-		return err
+		// TEMPORARY failure → Postfix should retry
+		return c.Status(fiber.StatusServiceUnavailable).SendString("temporary failure")
 	}
+
 	return c.SendString("OK")
 }

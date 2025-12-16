@@ -31,12 +31,12 @@ func GetEmails(rcps []Recipient) string {
 func MergeCommaSeparatedEmails(a, b string) string {
 	set := make(map[string]bool)
 
-	for _, s := range strings.Split(a, ",") {
+	for s := range strings.SplitSeq(a, ",") {
 		if s != "" {
 			set[s] = true
 		}
 	}
-	for _, s := range strings.Split(b, ",") {
+	for s := range strings.SplitSeq(b, ",") {
 		if s != "" {
 			set[s] = true
 		}

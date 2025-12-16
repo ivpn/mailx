@@ -32,7 +32,7 @@ func ParseMsg(data []byte) (Msg, error) {
 	subject := msg.Header.Get("Subject")
 
 	to := make([]string, 0)
-	for _, t := range strings.Split(msg.Header.Get("To"), ",") {
+	for t := range strings.SplitSeq(msg.Header.Get("To"), ",") {
 		address, err := mail.ParseAddress(t)
 		if err != nil {
 			return Msg{}, err

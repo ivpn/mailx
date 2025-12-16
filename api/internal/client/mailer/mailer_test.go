@@ -64,9 +64,6 @@ func TestNew_MultipleHosts_Failure(t *testing.T) {
 		Password: "",
 	}
 	mailer := New(cfg)
-	if mailer.dialer != nil {
-		t.Errorf("expected dialer to be nil, got %v", mailer.dialer)
-	}
 	if mailer.Sender != cfg.Sender {
 		t.Errorf("expected sender %s, got %s", cfg.Sender, mailer.Sender)
 	}

@@ -134,7 +134,7 @@ func (s *Service) ProcessBounceLog(userId string, aliasId string, data []byte, m
 	var date time.Time
 	var inDiag = false
 	msgType := model.Send
-	for _, line := range bytes.Split(data, []byte{'\n'}) {
+	for line := range bytes.SplitSeq(data, []byte{'\n'}) {
 		if after, ok := bytes.CutPrefix(line, []byte("Message-Id: ")); ok {
 			messageId = string(after)
 			if start := bytes.IndexByte(after, '<'); start != -1 {

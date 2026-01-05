@@ -5,9 +5,9 @@ import (
 	"errors"
 	"log"
 
+	"golang.org/x/sync/errgroup"
 	"ivpn.net/email/api/internal/client/mailer"
 	"ivpn.net/email/api/internal/model"
-	"ivpn.net/email/api/internal/utils"
 )
 
 var (
@@ -41,6 +41,8 @@ func (s *Service) ProcessMessage(data []byte) error {
 
 		return nil
 	}
+
+	var g errgroup.Group
 
 	for _, to := range msg.To {
 		recipients, alias, relayType, err := s.FindRecipients(msg.From, to, msg.Type)
@@ -107,22 +109,23 @@ func (s *Service) ProcessMessage(data []byte) error {
 		}
 
 		for _, recipient := range recipients {
-			utils.Background(func() {
+			g.Go(func() error {
 				err = s.QueueMessage(msg.From, msg.FromName, recipient, data, alias, relayType, settings)
 				if err != nil {
-					log.Println("error queueing message", err)
-					return
+					return err
 				}
 
-				err = s.SaveMessage(context.Background(), alias, relayType)
-				if err != nil {
+				if err := s.SaveMessage(context.Background(), alias, relayType); err != nil {
 					log.Println("error saving message", err)
 				}
+
+				return nil
 			})
 		}
 	}
 
-	return err
+	// Wait for all goroutines and return first error (if any)
+	return g.Wait()
 }
 
 func (s *Service) QueueMessage(from string, fromName string, rcp model.Recipient, data []byte, alias model.Alias, msgType model.MessageType, settings model.Settings) error {

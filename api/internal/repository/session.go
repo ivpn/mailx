@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/go-webauthn/webauthn/webauthn"
 	"ivpn.net/email/api/internal/model"
@@ -31,16 +32,17 @@ func (d *Database) GetSessionCount(ctx context.Context, userID string) (int, err
 	return int(count), err
 }
 
-func (d *Database) SaveSession(ctx context.Context, sessionData webauthn.SessionData, token string, userID string) error {
+func (d *Database) SaveSession(ctx context.Context, sessionData webauthn.SessionData, token string, userID string, exp time.Time) error {
 	data, err := json.Marshal(sessionData)
 	if err != nil {
 		return err
 	}
 
 	return d.Client.Create(&model.Session{
-		UserID: userID,
-		Token:  token,
-		Data:   data,
+		UserID:    userID,
+		Token:     token,
+		Data:      data,
+		ExpiresAt: exp,
 	}).Error
 }
 

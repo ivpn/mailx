@@ -9,7 +9,19 @@ chown postfix:postfix /etc/sasldb2
 chmod 640 /etc/sasldb2
 
 # curl-email.sh script
-echo "curl --silent --data-binary @- -H  \"Authorization: Bearer $PSK\" -X POST http://email-api:3000/v1/email" > /usr/local/bin/curl-email.sh
+echo "#!/bin/sh
+
+curl --silent --fail --data-binary @- -H  \"Authorization: Bearer $PSK\" -X POST http://email-api:3000/v1/email
+
+rc=\$?
+
+if [ \"\$rc\" -ne 0 ]; then
+    # Tell Postfix: temporary failure → defer message
+    exit 75
+fi
+
+# Success
+exit 0" >> /usr/local/bin/curl-email.sh
 
 chmod +x /usr/local/bin/curl-email.sh
 

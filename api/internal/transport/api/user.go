@@ -302,7 +302,7 @@ func (h *Handler) Logout(c *fiber.Ctx) error {
 	c.ClearCookie(auth.AUTHN_COOKIE)
 	c.ClearCookie(auth.AUTHN_TEMP_COOKIE)
 
-	authnToken := auth.GetAuthnToken(c)
+	authnToken := auth.GetAuthnCookie(c)
 
 	err := h.Service.LogoutUser(c.Context(), authnToken)
 	if err != nil {

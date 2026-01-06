@@ -58,7 +58,7 @@ func New(cfg config.APIConfig, cache Cache, service Service) fiber.Handler {
 func NewPSK(cfg config.APIConfig) fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
-		if GetToken(c) != cfg.PSK {
+		if GetAuthToken(c) != cfg.PSK {
 			return c.SendStatus(fiber.StatusUnauthorized)
 		}
 
@@ -83,34 +83,24 @@ func NewAPICORS(cfg config.APIConfig) fiber.Handler {
 	})
 }
 
-func NewPSKCORS(cfg config.APIConfig) fiber.Handler {
+func NewAPIAuth(cfg config.APIConfig, service Service) fiber.Handler {
 
-	return cors.New(cors.Config{
-		AllowOrigins:     cfg.PSKAllowOrigin,
-		AllowMethods:     fiber.MethodPut,
-		AllowCredentials: true,
-	})
-}
+	return func(c *fiber.Ctx) error {
+		token := GetAuthToken(c)
 
-func GetUserID(c *fiber.Ctx) string {
-	return c.Locals(USER_ID).(string)
-}
+		if token != "" {
+			session, ok, err := service.GetSession(c.Context(), token)
+			if err == nil && ok {
+				user, err := service.GetUser(c.Context(), session.UserID)
+				if err == nil {
+					c.Locals(USER_ID, user.ID)
+					return c.Next()
+				}
+			}
+		}
 
-func GetToken(c *fiber.Ctx) string {
-	var tokenString string
-	authorization := c.Get("Authorization")
-
-	if after, ok := strings.CutPrefix(authorization, "Bearer "); ok {
-		tokenString = after
-	} else if c.Cookies(AUTH_COOKIE) != "" {
-		tokenString = c.Cookies(AUTH_COOKIE)
+		return c.SendStatus(fiber.StatusUnauthorized)
 	}
-
-	return tokenString
-}
-
-func GetAuthnToken(c *fiber.Ctx) string {
-	return c.Cookies(AUTHN_COOKIE)
 }
 
 func NewCookieAuthn(token string, path string, cfg config.APIConfig) *fiber.Cookie {
@@ -160,4 +150,22 @@ func NewWebAuthn(cfg config.APIConfig) *webauthn.WebAuthn {
 	}
 
 	return webAuthn
+}
+
+func GetUserID(c *fiber.Ctx) string {
+	return c.Locals(USER_ID).(string)
+}
+
+func GetAuthnCookie(c *fiber.Ctx) string {
+	return c.Cookies(AUTHN_COOKIE)
+}
+
+func GetAuthToken(c *fiber.Ctx) string {
+	authorization := c.Get("Authorization")
+
+	if after, ok := strings.CutPrefix(authorization, "Bearer "); ok {
+		return after
+	}
+
+	return ""
 }

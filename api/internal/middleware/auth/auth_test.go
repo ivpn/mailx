@@ -7,55 +7,6 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-func TestGetToken(t *testing.T) {
-	tests := []struct {
-		name           string
-		authorization  string
-		cookie         string
-		expectedResult string
-	}{
-		{
-			name:           "Valid Bearer token in Authorization header",
-			authorization:  "Bearer validtoken",
-			cookie:         "",
-			expectedResult: "validtoken",
-		},
-		{
-			name:           "Valid token in cookie",
-			authorization:  "",
-			cookie:         "validtoken",
-			expectedResult: "validtoken",
-		},
-		{
-			name:           "No token in Authorization header or cookie",
-			authorization:  "",
-			cookie:         "",
-			expectedResult: "",
-		},
-		{
-			name:           "Invalid Authorization header format",
-			authorization:  "Invalid validtoken",
-			cookie:         "",
-			expectedResult: "",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			app := fiber.New()
-			req := &fasthttp.RequestCtx{}
-			c := app.AcquireCtx(req)
-			c.Request().Header.Set("Authorization", tt.authorization)
-			c.Request().Header.SetCookie(AUTH_COOKIE, tt.cookie)
-
-			result := GetToken(c)
-			if result != tt.expectedResult {
-				t.Errorf("expected %s, got %s", tt.expectedResult, result)
-			}
-		})
-	}
-}
-
 func TestGetUserID(t *testing.T) {
 	tests := []struct {
 		name           string
@@ -105,21 +56,50 @@ func TestGetUserID(t *testing.T) {
 		})
 	}
 }
-
-func TestGetAuthnToken(t *testing.T) {
+func TestGetAuthToken(t *testing.T) {
 	tests := []struct {
 		name           string
-		cookie         string
+		authorization  string
 		expectedResult string
 	}{
 		{
-			name:           "Valid authn token in cookie",
-			cookie:         "validauthtoken",
-			expectedResult: "validauthtoken",
+			name:           "Valid Bearer token",
+			authorization:  "Bearer abc123token",
+			expectedResult: "abc123token",
 		},
 		{
-			name:           "No authn token in cookie",
-			cookie:         "",
+			name:           "Valid Bearer token with spaces",
+			authorization:  "Bearer token with spaces",
+			expectedResult: "token with spaces",
+		},
+		{
+			name:           "Empty Bearer token",
+			authorization:  "Bearer ",
+			expectedResult: "",
+		},
+		{
+			name:           "No Bearer prefix",
+			authorization:  "abc123token",
+			expectedResult: "",
+		},
+		{
+			name:           "Different auth scheme",
+			authorization:  "Basic abc123",
+			expectedResult: "",
+		},
+		{
+			name:           "Empty authorization header",
+			authorization:  "",
+			expectedResult: "",
+		},
+		{
+			name:           "Bearer with lowercase",
+			authorization:  "bearer abc123token",
+			expectedResult: "",
+		},
+		{
+			name:           "Just Bearer",
+			authorization:  "Bearer",
 			expectedResult: "",
 		},
 	}
@@ -129,11 +109,59 @@ func TestGetAuthnToken(t *testing.T) {
 			app := fiber.New()
 			req := &fasthttp.RequestCtx{}
 			c := app.AcquireCtx(req)
-			c.Request().Header.SetCookie(AUTHN_COOKIE, tt.cookie)
 
-			result := GetAuthnToken(c)
+			if tt.authorization != "" {
+				c.Request().Header.Set("Authorization", tt.authorization)
+			}
+
+			result := GetAuthToken(c)
 			if result != tt.expectedResult {
-				t.Errorf("expected %s, got %s", tt.expectedResult, result)
+				t.Errorf("expected %q, got %q", tt.expectedResult, result)
+			}
+		})
+	}
+}
+func TestGetAuthnCookie(t *testing.T) {
+	tests := []struct {
+		name           string
+		cookieValue    string
+		expectedResult string
+	}{
+		{
+			name:           "Valid authn cookie",
+			cookieValue:    "session123token",
+			expectedResult: "session123token",
+		},
+		{
+			name:           "Empty authn cookie",
+			cookieValue:    "",
+			expectedResult: "",
+		},
+		{
+			name:           "Cookie with special characters",
+			cookieValue:    "token!@#$%^&*()",
+			expectedResult: "token!@#$%^&*()",
+		},
+		{
+			name:           "Long cookie value",
+			cookieValue:    "very_long_session_token_with_lots_of_characters_12345678901234567890",
+			expectedResult: "very_long_session_token_with_lots_of_characters_12345678901234567890",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			app := fiber.New()
+			req := &fasthttp.RequestCtx{}
+			c := app.AcquireCtx(req)
+
+			if tt.cookieValue != "" {
+				c.Request().Header.SetCookie(AUTHN_COOKIE, tt.cookieValue)
+			}
+
+			result := GetAuthnCookie(c)
+			if result != tt.expectedResult {
+				t.Errorf("expected %q, got %q", tt.expectedResult, result)
 			}
 		})
 	}

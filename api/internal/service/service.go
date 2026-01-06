@@ -18,6 +18,7 @@ type Store interface {
 	SessionStore
 	CredentialStore
 	LogStore
+	AccessKeyStore
 }
 
 type Cache interface {

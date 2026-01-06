@@ -15,6 +15,8 @@
             <hr>
             <AccountPasskeys />
             <hr>
+            <AccountAccessKeys />
+            <hr>
             <AccountAliasExport />
             <hr>
             <AccountDelete />
@@ -36,6 +38,7 @@ import AccountChangeEmail from './AccountChangeEmail.vue'
 import AccountChangePassword from './AccountChangePassword.vue'
 import AccountTotp from './AccountTotp.vue'
 import AccountPasskeys from './AccountPasskeys.vue'
+import AccountAccessKeys from './AccountAccessKeys.vue'
 import AccountAliasExport from './AccountAliasExport.vue'
 import AccountDelete from './AccountDelete.vue'
 </script>

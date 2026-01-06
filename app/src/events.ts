@@ -14,6 +14,7 @@ type Events = {
     'recipient.delete': { id: string }
     'recipient.delete.error': { error: string }
     'recipient.reload': {}
+    'accesskey.create': {}
 }
 
 export default mitt<Events>()

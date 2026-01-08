@@ -7,6 +7,12 @@ export default defineConfig({
     return {
       host_permissions: mode === 'development' ? ['http://0.0.0.0:3000/*'] : [],
       permissions: ['storage', 'webRequest', 'activeTab'],
+      web_accessible_resources: [
+        {
+          resources: ['mailx.svg'],
+          matches: ['<all_urls>'],
+        },
+      ],
     }
   },
 })

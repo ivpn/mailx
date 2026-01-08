@@ -1,8 +1,15 @@
+import { store } from '@/lib/store'
+import { Defaults } from '@/lib/types'
+
+let apiToken: string | undefined
+let defaults: Defaults | undefined
+
 export default defineContentScript({
   matches: ['<all_urls>'],
   runAt: 'document_idle',
-  main() {
-    // console.log('Hello content script', { id: browser.runtime.id })
+  async main() {
+    apiToken = await store.getApiToken()
+    defaults = await store.getDefaults()
     observeEmailInputs()
   },
 })
@@ -62,8 +69,9 @@ function injectButton(input: HTMLInputElement) {
   parent.appendChild(host)
 }
 
-function generateAliasFor(input: HTMLInputElement) {
-  const alias = generateAlias()
+async function generateAliasFor(input: HTMLInputElement) {
+  const alias = await postAlias()
+  if (!alias) return
   input.value = alias
 
   // Trigger input events so frameworks (React/Vue) notice
@@ -71,8 +79,50 @@ function generateAliasFor(input: HTMLInputElement) {
   input.dispatchEvent(new Event('change', { bubbles: true }))
 }
 
-function generateAlias() {
-  const site = location.hostname.replace('www.', '')
-  const random = Math.random().toString(36).slice(2, 8)
-  return `user+${site}-${random}@example.com`
+type CreateAliasResponse =
+  | { ok: true; result: { alias: { name: string } } }
+  | { ok: false; error: string }
+
+async function postAlias(): Promise<string | undefined> {
+  if (!defaults || !apiToken) {
+    console.warn('[CS] Missing defaults or apiToken')
+    return
+  }
+
+  const alias = {
+    domain: defaults.domain,
+    recipients: defaults.recipient,
+    format: defaults.alias_format,
+    enabled: true,
+  }
+
+  let res: CreateAliasResponse | undefined
+
+  try {
+    res = await browser.runtime.sendMessage({
+      type: 'CREATE_ALIAS',
+      payload: { apiToken, alias },
+    })
+  } catch (err) {
+    // This catches channel-level failures (SW died, extension reloaded, etc.)
+    console.error('[CS] Message send failed:', err)
+    return
+  }
+
+  if (!res) {
+    console.error('[CS] No response from background')
+    return
+  }
+
+  if (!res.ok) {
+    console.error('[CS] Create alias error:', res.error)
+    return
+  }
+
+  if (!res.result.alias.name) {
+    console.error('[CS] Invalid success response:', res)
+    return
+  }
+
+  return res.result.alias.name
 }

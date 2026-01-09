@@ -1,8 +1,9 @@
 import { store } from '@/lib/store'
-import { Defaults } from '@/lib/types'
+import { Defaults, Preferences } from '@/lib/types'
 
 let apiToken: string | undefined
 let defaults: Defaults | undefined
+let preferences: Preferences | undefined
 
 export default defineContentScript({
   matches: ['<all_urls>'],
@@ -10,7 +11,10 @@ export default defineContentScript({
   async main() {
     apiToken = await store.getApiToken()
     defaults = await store.getDefaults()
-    observeEmailInputs()
+    preferences = await store.getPreferences()
+    if (preferences.input_button) {
+      observeEmailInputs()
+    }
   },
 })
 
@@ -103,7 +107,7 @@ function injectButton(input: HTMLInputElement) {
   })
 
   button.addEventListener('mouseenter', () => {
-    button.style.transform = 'scale(1.2)';
+    button.style.transform = 'scale(1.1)';
   })
 
   button.addEventListener('mouseleave', () => {

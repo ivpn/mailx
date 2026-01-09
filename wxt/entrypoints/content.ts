@@ -31,27 +31,53 @@ function observeEmailInputs() {
 }
 
 function injectButton(input: HTMLInputElement) {
+  if (input.dataset.aliasInjected === 'true') return
   input.dataset.aliasInjected = 'true'
 
-  // Ensure parent is positioned
-  const parent = input.parentElement
+  // Measure BEFORE moving the input
+  const rect = input.getBoundingClientRect()
+  const height = rect.height
+  const width = rect.width
+
+  const parent = input.parentNode
   if (!parent) return
 
-  if (getComputedStyle(parent).position === 'static') {
-    parent.style.position = 'relative'
-  }
+  // Create wrapper
+  const wrapper = document.createElement('div')
+  Object.assign(wrapper.style, {
+    position: 'relative',
+    display: 'inline-block',
+    height: `${height}px`,
+    width: `${width}px`,
+  })
 
+  // Move input into wrapper
+  parent.insertBefore(wrapper, input)
+  wrapper.appendChild(input)
+
+  // Ensure input fills wrapper
+  Object.assign(input.style, {
+    height: '100%',
+    width: '100%',
+    boxSizing: 'border-box',
+  })
+
+  // Button host
   const host = document.createElement('div')
-  host.style.position = 'absolute'
-  host.style.right = '8px'
-  host.style.top = '50%'
-  host.style.transform = 'translateY(-50%)'
-  host.style.zIndex = '9999'
-  host.style.width = '24px'
-  host.style.height = '24px'
+  Object.assign(host.style, {
+    position: 'absolute',
+    top: '50%',
+    right: '8px',
+    transform: 'translateY(-50%)',
+    zIndex: '9999',
+    width: '24px',
+    height: '24px',
+    pointerEvents: 'auto',
+  })
 
   const icon = browser.runtime.getURL('/mailx.svg')
   const shadow = host.attachShadow({ mode: 'closed' })
+
   const button = document.createElement('button')
   button.title = 'Create Mailx alias'
 
@@ -76,7 +102,7 @@ function injectButton(input: HTMLInputElement) {
   })
 
   shadow.appendChild(button)
-  parent.appendChild(host)
+  wrapper.appendChild(host)
 }
 
 async function generateAliasFor(input: HTMLInputElement) {

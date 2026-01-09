@@ -2,6 +2,11 @@
     <div class="p-4">
         <h2 class="m-0">Settings</h2>
         <hr class="my-5">
+        <p class="text-sm mb-3">Show Mailx button on email input fields:</p>
+        <div class="flex items-center">
+            <input @change="toggleInputButton(($event.target as HTMLInputElement).checked)" v-bind:checked="preferences.input_button" type="checkbox">
+        </div>
+        <hr class="my-5">
         <p class="text-sm mb-3">Refresh recipients, domains and defaults:</p>
         <button @click="refreshDefaults" class="cta sm">Refresh Defaults</button>
         <hr class="my-5">
@@ -15,9 +20,12 @@
 <script lang="ts" setup>
 import { api } from '@/lib/api'
 import { store } from '@/lib/store'
+import { Defaults, Preferences } from '@/lib/types'
 
 const props = defineProps<{
     apiToken: string
+    defaults: Defaults
+    preferences: Preferences
 }>()
 
 const success = ref('')
@@ -62,5 +70,10 @@ const processResponse = (res: any) => {
         alias_format: res.alias_format,
     }
     store.setDefaults(defaults)
+}
+
+const toggleInputButton = async (enabled: boolean) => {
+    const newPreferences = { ...props.preferences, input_button: enabled }
+    store.setPreferences(newPreferences)
 }
 </script>

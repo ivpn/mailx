@@ -3,7 +3,7 @@
     <Login v-if="!apiToken" />
     <keep-alive>
       <component v-if="apiToken && defaults" :is="activeComponent" :key="route" :apiToken="apiToken"
-        :defaults="defaults" />
+        :defaults="defaults" :preferences="preferences" />
     </keep-alive>
     <header v-if="apiToken && defaults" class="bg-secondary fixed bottom-0 left-0 right-0 z-10">
       <nav>
@@ -24,13 +24,14 @@
 import { ref, onMounted } from 'vue'
 // import { api } from '@/lib/api'
 import { store } from '@/lib/store'
-import { Defaults } from '@/lib/types'
+import { Defaults, Preferences } from '@/lib/types'
 import Login from '@/components/popup/Login.vue'
 import Aliases from '@/components/popup/Aliases.vue'
 import Settings from '@/components/popup/Settings.vue'
 
 const apiToken = ref<string | undefined>()
 const defaults = ref<Defaults | undefined>()
+const preferences = ref<Preferences | undefined>()
 const route = ref('aliases')
 
 const updateRoute = (val: string) => {
@@ -44,6 +45,7 @@ const activeComponent = computed(() =>
 onMounted(async () => {
   apiToken.value = await store.getApiToken()
   defaults.value = await store.getDefaults()
+  preferences.value = await store.getPreferences()
 
   store.onApiTokenChange((newToken) => {
     console.log('API token changed:', newToken)

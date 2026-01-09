@@ -16,3 +16,7 @@ export interface Defaults {
   recipient: string
   recipients: string[]
 }
+
+export interface Preferences {
+  input_button: boolean
+}

@@ -1,4 +1,4 @@
-import { Defaults } from "./types"
+import { Defaults, Preferences } from "./types"
 
 export interface StoredData {
     apiToken?: string
@@ -7,12 +7,14 @@ export interface StoredData {
 const STORAGE_KEYS = {
     apiToken: 'apiToken',
     defaults: 'defaults',
+    preferences: 'preferences',
 }
 
 type Listener<T> = (value: T) => void
 
 const apiTokenListeners = new Set<Listener<string | undefined>>()
 const defaultsListeners = new Set<Listener<Defaults | undefined>>()
+const preferencesListeners = new Set<Listener<Preferences | { input_button: true }>>()
 
 export const store = {
     async getApiToken(): Promise<string | undefined> {
@@ -48,6 +50,22 @@ export const store = {
 
     async removeDefaults(): Promise<void> {
         await browser.storage.local.remove(STORAGE_KEYS.defaults)
+    },
+
+    async getPreferences(): Promise<Preferences> {
+        const { preferences } = await browser.storage.local.get(STORAGE_KEYS.preferences)
+        return preferences || { input_button: true }
+    },
+
+    async setPreferences(preferences: Preferences): Promise<void> {
+        await browser.storage.local.set({ [STORAGE_KEYS.preferences]: preferences })
+        for (const listener of preferencesListeners) {
+            listener(preferences)
+        }
+    },
+
+    async removePreferences(): Promise<void> {
+        await browser.storage.local.remove(STORAGE_KEYS.preferences)
     },
 
     async clearAll(): Promise<void> {

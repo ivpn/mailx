@@ -89,16 +89,25 @@ function injectButton(input: HTMLInputElement) {
     cursor: 'pointer',
     borderRadius: '50%',
     backgroundImage: `url(${icon})`,
-    backgroundSize: '18px',
+    backgroundSize: '16px',
     backgroundRepeat: 'no-repeat',
     backgroundPosition: 'center',
     backgroundColor: '#2c2c2c',
+    transition: 'transform 0.2s ease',
   })
 
   button.addEventListener('click', (e) => {
     e.preventDefault()
     e.stopPropagation()
     generateAliasFor(input)
+  })
+
+  button.addEventListener('mouseenter', () => {
+    button.style.transform = 'scale(1.2)';
+  })
+
+  button.addEventListener('mouseleave', () => {
+    button.style.transform = 'scale(1)';
   })
 
   shadow.appendChild(button)

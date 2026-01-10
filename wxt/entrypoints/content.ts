@@ -12,7 +12,7 @@ export default defineContentScript({
     apiToken = await store.getApiToken()
     defaults = await store.getDefaults()
     preferences = await store.getPreferences()
-    if (preferences.input_button) {
+    if (preferences.input_button && apiToken) {
       observeEmailInputs()
     }
   },

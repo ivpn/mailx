@@ -107,7 +107,7 @@ function injectButton(input: HTMLInputElement) {
   })
 
   button.addEventListener('mouseenter', () => {
-    button.style.transform = 'scale(1.1)';
+    button.style.transform = 'scale(1.15)';
   })
 
   button.addEventListener('mouseleave', () => {

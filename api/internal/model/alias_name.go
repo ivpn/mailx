@@ -87,11 +87,12 @@ func randomNumber() string {
 	if err != nil {
 		return fmt.Sprintf("%d0", num1)
 	}
-	num3, err := cryptoRandInt(10)
-	if err != nil {
-		return fmt.Sprintf("%d%d0", num1, num2)
-	}
-	return fmt.Sprintf("%d%d%d", num1, num2, num3)
+	return fmt.Sprintf("%d%d", num1, num2)
+	// num3, err := cryptoRandInt(10)
+	// if err != nil {
+	// 	return fmt.Sprintf("%d%d0", num1, num2)
+	// }
+	// return fmt.Sprintf("%d%d%d", num1, num2, num3)
 }
 
 // cryptoRandInt generates a random integer between 0 and max-1 using crypto/rand.

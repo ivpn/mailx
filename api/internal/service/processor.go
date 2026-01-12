@@ -8,6 +8,7 @@ import (
 	"golang.org/x/sync/errgroup"
 	"ivpn.net/email/api/internal/client/mailer"
 	"ivpn.net/email/api/internal/model"
+	"ivpn.net/email/api/internal/utils"
 )
 
 var (
@@ -39,6 +40,16 @@ func (s *Service) ProcessMessage(data []byte) error {
 			return err
 		}
 
+		return nil
+	}
+
+	// Verify Email Authentication
+	pass, err := utils.VerifyEmailAuth(data)
+	if err != nil {
+		log.Println("email authentication failed:", err)
+	}
+	if !pass {
+		// Fail silently so unauthenticated emails are not kept in postfix queue
 		return nil
 	}
 

@@ -2,16 +2,12 @@ package model
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
-	"log"
 	"mime"
 	"mime/multipart"
 	"net/mail"
 	"strings"
-
-	"ivpn.net/email/api/internal/utils"
 )
 
 type Msg struct {
@@ -64,14 +60,6 @@ func ParseMsg(data []byte) (Msg, error) {
 		fromAddress, err = ExtractOriginalFrom(data)
 		if err != nil {
 			return Msg{}, fmt.Errorf("extract original from bounce: %w", err)
-		}
-	} else {
-		pass, err := utils.VerifyEmailAuth(data)
-		if err != nil {
-			log.Println("email authentication failed with error:", err)
-		}
-		if !pass {
-			return Msg{}, errors.New("email authentication failed")
 		}
 	}
 

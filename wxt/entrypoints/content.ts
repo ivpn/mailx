@@ -73,7 +73,6 @@ function injectButton(input: HTMLInputElement) {
     top: '50%',
     right: '8px',
     transform: 'translateY(-50%)',
-    zIndex: '9999',
     width: '24px',
     height: '24px',
     pointerEvents: 'auto',

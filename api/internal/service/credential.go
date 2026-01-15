@@ -74,7 +74,21 @@ func (s *Service) DeleteCredential(ctx context.Context, credential webauthn.Cred
 }
 
 func (s *Service) DeleteCredentialByID(ctx context.Context, ID string, userID string) error {
-	err := s.Store.DeleteCredentialByID(ctx, ID, userID)
+	user, err := s.Store.GetUser(ctx, userID)
+	if err != nil {
+		return ErrDeleteCredential
+	}
+
+	credentials, err := s.Store.GetCredentials(ctx, userID)
+	if err != nil {
+		return ErrDeleteCredential
+	}
+
+	if user.PasswordHash == "" && len(credentials) <= 1 {
+		return ErrDeleteCredential
+	}
+
+	err = s.Store.DeleteCredentialByID(ctx, ID, userID)
 	if err != nil {
 		return ErrDeleteCredential
 	}

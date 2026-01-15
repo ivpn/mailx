@@ -53,7 +53,7 @@ func (s *Subscription) ActiveStatus() bool {
 }
 
 func (s *Subscription) IsOutage() bool {
-	return s.UpdatedAt.Add(time.Duration(24) * time.Hour).Before(time.Now())
+	return s.UpdatedAt.Add(time.Duration(48) * time.Hour).Before(time.Now())
 }
 
 func (s *Subscription) GracePeriodDays(days int) bool {

@@ -52,37 +52,37 @@ func TestSubscriptionGracePeriod(t *testing.T) {
 	}{
 		{
 			name:        "outage and within 3-day window => true",
-			updatedAt:   now.Add(-25 * time.Hour), // outage (older than 24h)
+			updatedAt:   now.Add(-49 * time.Hour), // outage (older than 48h)
 			activeUntil: now.Add(-48 * time.Hour), // 2 days ago (+3d => +1d > now)
 			want:        true,
 		},
 		{
 			name:        "not outage and within 3-day window => false",
-			updatedAt:   now.Add(-23 * time.Hour), // not outage
+			updatedAt:   now.Add(-47 * time.Hour), // not outage
 			activeUntil: now.Add(-24 * time.Hour), // 1 day ago (+3d => +2d > now)
 			want:        false,
 		},
 		{
 			name:        "outage but outside 3-day window => false",
-			updatedAt:   now.Add(-26 * time.Hour),     // outage
+			updatedAt:   now.Add(-50 * time.Hour),     // outage
 			activeUntil: now.Add(-5 * 24 * time.Hour), // 5 days ago (+3d => 2 days before now)
 			want:        false,
 		},
 		{
 			name:        "near outage boundary but not outage => false",
-			updatedAt:   now.Add(-24 * time.Hour).Add(1 * time.Second), // UpdatedAt +24h ~ now +1s => not outage
+			updatedAt:   now.Add(-48 * time.Hour).Add(1 * time.Second), // UpdatedAt +48h ~ now +1s => not outage
 			activeUntil: now.Add(-2 * 24 * time.Hour),                  // 2 days ago (+3d => +1d > now)
 			want:        false,
 		},
 		{
 			name:        "outage and just inside 3-day window boundary => true",
-			updatedAt:   now.Add(-25 * time.Hour),                   // outage
+			updatedAt:   now.Add(-49 * time.Hour),                   // outage
 			activeUntil: now.AddDate(0, 0, -3).Add(2 * time.Second), // ActiveUntil +3d ~ now +2s > now
 			want:        true,
 		},
 		{
 			name:        "outage and exactly outside 3-day window => false",
-			updatedAt:   now.Add(-25 * time.Hour),                    // outage
+			updatedAt:   now.Add(-49 * time.Hour),                    // outage
 			activeUntil: now.AddDate(0, 0, -3).Add(-2 * time.Second), // ActiveUntil +3d ~ now -2s < now
 			want:        false,
 		},
@@ -213,23 +213,23 @@ func TestSubscriptionIsOutage(t *testing.T) {
 		want      bool
 	}{
 		{
-			name:      "updated 25h ago => outage",
-			updatedAt: now.Add(-25 * time.Hour),
+			name:      "updated 49h ago => outage",
+			updatedAt: now.Add(-49 * time.Hour),
 			want:      true,
 		},
 		{
-			name:      "updated 24h + 1s ago => outage",
-			updatedAt: now.Add(-24*time.Hour - 1*time.Second),
+			name:      "updated 48h + 1s ago => outage",
+			updatedAt: now.Add(-48*time.Hour - 1*time.Second),
 			want:      true,
 		},
 		{
-			name:      "updated 24h - 1s ago => not outage",
-			updatedAt: now.Add(-24*time.Hour + 1*time.Second),
+			name:      "updated 48h - 1s ago => not outage",
+			updatedAt: now.Add(-48*time.Hour + 1*time.Second),
 			want:      false,
 		},
 		{
-			name:      "updated 23h ago => not outage",
-			updatedAt: now.Add(-23 * time.Hour),
+			name:      "updated 47h ago => not outage",
+			updatedAt: now.Add(-47 * time.Hour),
 			want:      false,
 		},
 		{
@@ -244,7 +244,7 @@ func TestSubscriptionIsOutage(t *testing.T) {
 			s := &Subscription{UpdatedAt: tc.updatedAt}
 			got := s.IsOutage()
 			if got != tc.want {
-				t.Fatalf("IsOutage() = %v, want %v (updatedAt=%v now=%v threshold=%v)", got, tc.want, tc.updatedAt, time.Now(), tc.updatedAt.Add(24*time.Hour))
+				t.Fatalf("IsOutage() = %v, want %v (updatedAt=%v now=%v threshold=%v)", got, tc.want, tc.updatedAt, time.Now(), tc.updatedAt.Add(48*time.Hour))
 			}
 		})
 	}

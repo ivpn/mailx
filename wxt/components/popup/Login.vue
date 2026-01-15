@@ -2,10 +2,10 @@
     <div class="page center">
         <form class="card-tertiary center" @submit.prevent="" autocomplete="off">
             <article>
-                <h1 class="flex justify-center text-accent mb-8">
+                <h1 class="flex justify-center text-accent mb-6">
                     <span class="logo"></span>
                 </h1>
-                <h4 class="text-center mb-8">Log in with Access Key from Mailx</h4>
+                <h4 class="text-center mb-6">Log in with Access Key from Mailx</h4>
                 <div>
                     <div class="mb-5">
                         <input

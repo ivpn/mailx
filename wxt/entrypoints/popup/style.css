@@ -22,4 +22,11 @@
             }
         }
     }
+
+    .card-tertiary {
+
+        article {
+            @apply pt-10;
+        }
+    }
 }

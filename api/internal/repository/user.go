@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"log"
 
 	"github.com/go-webauthn/webauthn/webauthn"
@@ -78,7 +79,7 @@ func (d *Database) GetUserByEmailUnfinishedSignup(ctx context.Context, email str
 	}
 
 	if len(creds) > 0 {
-		return model.User{}, err
+		return model.User{}, errors.New("user has already registered webauthn credentials")
 	}
 
 	return user, nil

@@ -21,7 +21,13 @@ export default defineContentScript({
 function observeEmailInputs() {
   const observer = new MutationObserver(() => {
     const inputs = document.querySelectorAll<HTMLInputElement>(
-      'input[type="email"]:not([data-alias-injected])'
+      `
+      input[type="email"]:not([data-alias-injected]),
+      input[type="text"][name*="email" i]:not([data-alias-injected]),
+      input[type="text"][id*="email" i]:not([data-alias-injected]),
+      input[type="email"][name*="email" i]:not([data-alias-injected]),
+      input[type="email"][id*="email" i]:not([data-alias-injected])
+      `
     )
 
     inputs.forEach(injectButton)
@@ -36,6 +42,7 @@ function observeEmailInputs() {
 
 function injectButton(input: HTMLInputElement) {
   if (input.dataset.aliasInjected === 'true') return
+  if (!isValidEmailInput(input)) return
   input.dataset.aliasInjected = 'true'
 
   // Measure BEFORE moving the input
@@ -115,6 +122,25 @@ function injectButton(input: HTMLInputElement) {
 
   shadow.appendChild(button)
   wrapper.appendChild(host)
+}
+
+function isValidEmailInput(element: HTMLInputElement): boolean {
+  const style = getComputedStyle(element);
+
+  return (
+    // visible & interactive
+    style.visibility !== "hidden" &&
+    style.display !== "none" &&
+    style.opacity !== "0" &&
+    style.pointerEvents !== "none" &&
+
+    // usable
+    !element.disabled &&
+    !element.readOnly &&
+
+    // avoid false positives (checkboxes, radios, etc.)
+    (element.type === "email" || element.type === "text")
+  )
 }
 
 async function generateAliasFor(input: HTMLInputElement) {

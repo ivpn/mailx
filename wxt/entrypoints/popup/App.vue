@@ -1,5 +1,5 @@
 <template>
-  <div class="h-[410px] w-[420px] overflow-scroll">
+  <div class="h-[474px] w-[420px] overflow-scroll">
     <Login v-if="!apiToken" />
     <keep-alive>
       <component v-if="apiToken && defaults" :is="activeComponent" :key="route" :apiToken="apiToken"

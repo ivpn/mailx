@@ -1,13 +1,15 @@
 <template>
     <div class="p-4">
         <h2 class="m-0">Settings</h2>
-        <hr class="my-4">
+        <hr class="my-5">
         <p class="text-sm my-4">Show Mailx button on email input fields:</p>
         <div class="flex items-center">
             <input @change="toggleInputButton(($event.target as HTMLInputElement).checked)" v-bind:checked="preferences.input_button" type="checkbox">
         </div>
+        <hr class="my-5">
         <p class="text-sm my-4">Refresh recipients, domains and defaults:</p>
         <button @click="refreshDefaults" class="cta sm">Refresh Defaults</button>
+        <hr class="my-5">
         <p class="text-sm my-4">Log out / delete session:</p>
         <button @click="logout" class="cta sm">Log Out</button>
         <p v-if="error" class="error my-4 mt-5">Error: {{ error }}</p>

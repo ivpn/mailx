@@ -27,7 +27,7 @@
                         <p class="m-0 min-width-0 text-primary font-medium text-base text-nowrap overflow-hidden text-ellipsis">{{ alias.name }}</p>
                         <p class="m-0">{{ alias.description }}</p>
                     </div>
-                    <div class="hs-tooltip">
+                    <div v-if="!alias.catch_all" class="hs-tooltip">
                         <button class="hs-tooltip-toggle plain" @click="copyAlias(alias.name)">
                             <i class="icon icon-secondary copy text-xs"></i>
                             <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0"

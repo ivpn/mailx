@@ -7,6 +7,7 @@ export interface Alias {
   domain: string
   format: string
   from_name: string
+  catch_all: boolean
 }
 
 export interface Defaults {

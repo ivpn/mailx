@@ -176,7 +176,7 @@ const postAlias = async () => {
         loading.value = true
         const res = await api.createAlias(props.apiToken, alias.value)
         console.log('Created alias:', res)
-        copyAlias(res.name)
+        copyAlias(res.alias.name)
         error.value = ''
         events.emit('alias.create', { alias: res.alias})
         close()

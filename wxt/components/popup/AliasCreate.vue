@@ -68,7 +68,7 @@
                                             </label>
                                             <select id="alias_format">
                                                 <option v-for="(format, index) in formats" v-bind:value="format.value"
-                                                    :selected="format.value == alias.format || index === 0" :key="format.value">
+                                                    :selected="format.value == defaults.alias_format || index === 0" :key="format.value">
                                                     {{ format.name }}
                                                 </option>
                                             </select>
@@ -79,7 +79,7 @@
                                             </label>
                                             <select id="alias_domain" :disabled="!defaults.domains.length">
                                                 <option v-for="(domain, index) in defaults.domains" v-bind:domain
-                                                    :selected="domain == alias.domain || index === 0" :key="domain">
+                                                    :selected="domain == defaults.domain || index === 0" :key="domain">
                                                     {{ domain }}
                                                 </option>
                                             </select>

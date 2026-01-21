@@ -11,7 +11,7 @@ import (
 var (
 	UpdateSubscriptionSuccess = "Subscription updated successfully."
 	AddSubscriptionSuccess    = "Subscription added successfully."
-	InvalidPASessionId        = "Invalid pre-auth session ID."
+	InvalidPASessionId        = "This signup link has expired."
 )
 
 type SubscriptionService interface {

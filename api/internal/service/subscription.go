@@ -142,7 +142,7 @@ func (s *Service) AddPASession(ctx context.Context, paSession model.PASession) e
 		return err
 	}
 
-	err = s.Cache.Set(ctx, "pasession_"+paSession.ID, string(data), 15*time.Minute)
+	err = s.Cache.Set(ctx, "pasession_"+paSession.ID, string(data), s.Cfg.API.PreauthTTL)
 	if err != nil {
 		log.Println("failed to set pre-auth session in Redis:", err)
 		return err

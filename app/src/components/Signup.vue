@@ -18,16 +18,18 @@
                                     id="email_authn"
                                     type="email"
                                     class="email"
+                                    :disabled="!!rotateSessionError"
                                     @keypress.enter.prevent
                                 >
                                 <p v-if="emailAuthnError" class="error">Required</p>
                             </div>
                             <div class="flex items-center w-full">
-                                <button @click="registerWithPasskey" :disabled="isLoading" class="cta full">
+                                <button @click="registerWithPasskey" :disabled="isLoading || !!rotateSessionError" class="cta full">
                                     Sign Up with Passkey
                                 </button>
                             </div>
                             <p v-if="apiError" class="error mt-6">Error: {{ apiError }}</p>
+                            <p v-if="rotateSessionError" class="error mt-5">Error: {{ rotateSessionError }}</p>
                         </div>
                     </div>
                     <div
@@ -48,6 +50,7 @@
                                     id="email"
                                     type="email"
                                     class="email"
+                                    :disabled="!!rotateSessionError"
                                     @keypress.enter.prevent
                                 >
                                 <p v-if="emailError" class="error">Required</p>
@@ -60,17 +63,19 @@
                                     id="password"
                                     type="password"
                                     class="password"
+                                    :disabled="!!rotateSessionError"
                                     @keypress.enter.prevent
                                 >
                                 <p v-if="passwordError" class="error">Required</p>
                             </div>
                             <p class="text-sm mb-5">Must be 12+ characters and contain uppercase, lowercase, number, and special character (e.g. -_+=~!@#$%^&*(),;.?":{}|<>)</p>
                             <div class="flex items-center w-full">
-                                <button @click="register" :disabled="isLoading" class="cta full">
+                                <button @click="register" :disabled="isLoading || !!rotateSessionError" class="cta full">
                                     Sign Up
                                 </button>
                             </div>
                             <p v-if="apiError" class="error mt-5">Error: {{ apiError }}</p>
+                            <p v-if="rotateSessionError" class="error mt-5">Error: {{ rotateSessionError }}</p>
                         </div>
                     </div>
                 </div>
@@ -117,6 +122,7 @@ const emailAuthnError = ref(false)
 const passwordError = ref(false)
 const apiSuccess = ref('')
 const apiError = ref('')
+const rotateSessionError = ref('')
 const isLoading = ref(false)
 const passkeySupported = ref(false)
 const subid = ref('')
@@ -212,12 +218,13 @@ const rotateSessionId = async () => {
         await subscriptionApi.rotateSessionId({
             sessionid: sessionid.value,
         })
+        rotateSessionError.value = ''
     } catch (err) {
         if (axios.isAxiosError(err)) {
-            apiError.value = err.response?.data.error || err.message
+            rotateSessionError.value = err.response?.data.error || err.message
 
             if (err.response?.status === 429) {
-                apiError.value = 'Too many requests, please try again later.'
+                rotateSessionError.value = 'Too many requests, please try again later.'
             }
         }
     } finally {

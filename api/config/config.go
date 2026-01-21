@@ -25,6 +25,7 @@ type APIConfig struct {
 	SignupWebhookPSK   string
 	PreauthURL         string
 	PreauthPSK         string
+	PreauthTTL         time.Duration
 }
 
 type DBConfig struct {
@@ -142,6 +143,12 @@ func New() (Config, error) {
 	dbHosts := strings.Split(os.Getenv("DB_HOSTS"), ",")
 	redisAddrs := strings.Split(os.Getenv("REDIS_ADDRESSES"), ",")
 
+	preauthTTLStr := os.Getenv("PREAUTH_TTL")
+	preauthTTL, err := time.ParseDuration(preauthTTLStr)
+	if err != nil {
+		return Config{}, err
+	}
+
 	return Config{
 		API: APIConfig{
 			FQDN:               os.Getenv("FQDN"),
@@ -161,6 +168,7 @@ func New() (Config, error) {
 			SignupWebhookPSK:   os.Getenv("SIGNUP_WEBHOOK_PSK"),
 			PreauthURL:         os.Getenv("PREAUTH_URL"),
 			PreauthPSK:         os.Getenv("PREAUTH_PSK"),
+			PreauthTTL:         preauthTTL,
 		},
 		DB: DBConfig{
 			Hosts:    dbHosts,

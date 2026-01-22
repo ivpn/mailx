@@ -26,6 +26,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	h.Server.Post("/v1/login", limit.New(5, 10*time.Minute), h.Login)
 	h.Server.Post("/v1/initiatepasswordreset", limiter.New(), h.InitiatePasswordReset)
 	h.Server.Put("/v1/resetpassword", limiter.New(), h.ResetPassword)
+	h.Server.Put("/v1/rotatepasession", limiter.New(), h.RotatePASession)
 	h.Server.Post("/v1/api/authenticate", limit.New(5, 10*time.Minute), h.Authenticate)
 
 	h.Server.Post("/v1/register/begin", limiter.New(), h.BeginRegistration)
@@ -33,9 +34,9 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	h.Server.Post("/v1/login/begin", limiter.New(), h.BeginLogin)
 	h.Server.Post("/v1/login/finish", limiter.New(), h.FinishLogin)
 
-	sub := h.Server.Group("/v1/subscription")
-	sub.Use(auth.NewPSK(cfg))
-	sub.Post("/add", h.AddSubscription)
+	session := h.Server.Group("/v1/pasession")
+	session.Use(auth.NewPSK(cfg))
+	session.Post("/add", h.AddPASession)
 
 	api := h.Server.Group("/v1/api")
 	api.Use(auth.NewAPIAuth(cfg, h.Service))
@@ -67,6 +68,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Put("/user/totp/disable", limit.New(5, 10*time.Minute), h.TotpDisable)
 
 	v1.Get("/sub", h.GetSubscription)
+	v1.Put("/sub/update", limiter.New(), h.UpdateSubscription)
 
 	v1.Get("/settings", h.GetSettings)
 	v1.Put("/settings", h.UpdateSettings)

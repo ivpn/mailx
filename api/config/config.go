@@ -23,6 +23,9 @@ type APIConfig struct {
 	BasicAuthPassword  string
 	SignupWebhookURL   string
 	SignupWebhookPSK   string
+	PreauthURL         string
+	PreauthPSK         string
+	PreauthTTL         time.Duration
 }
 
 type DBConfig struct {
@@ -65,7 +68,6 @@ type ServiceConfig struct {
 	MaxDailyAliases        int
 	MaxDailySendReply      int
 	MaxSessions            int
-	ForwardGracePeriodDays int
 	AccountGracePeriodDays int
 	IdLimiterMax           int
 	IdLimiterExpiration    time.Duration
@@ -133,11 +135,6 @@ func New() (Config, error) {
 		return Config{}, err
 	}
 
-	forwardGracePeriodDays, err := strconv.Atoi(os.Getenv("FORWARD_GRACE_PERIOD_DAYS"))
-	if err != nil {
-		return Config{}, err
-	}
-
 	accountGracePeriodDays, err := strconv.Atoi(os.Getenv("ACCOUNT_GRACE_PERIOD_DAYS"))
 	if err != nil {
 		return Config{}, err
@@ -145,6 +142,12 @@ func New() (Config, error) {
 
 	dbHosts := strings.Split(os.Getenv("DB_HOSTS"), ",")
 	redisAddrs := strings.Split(os.Getenv("REDIS_ADDRESSES"), ",")
+
+	preauthTTLStr := os.Getenv("PREAUTH_TTL")
+	preauthTTL, err := time.ParseDuration(preauthTTLStr)
+	if err != nil {
+		return Config{}, err
+	}
 
 	return Config{
 		API: APIConfig{
@@ -163,6 +166,9 @@ func New() (Config, error) {
 			BasicAuthPassword:  os.Getenv("BASIC_AUTH_PASSWORD"),
 			SignupWebhookURL:   os.Getenv("SIGNUP_WEBHOOK_URL"),
 			SignupWebhookPSK:   os.Getenv("SIGNUP_WEBHOOK_PSK"),
+			PreauthURL:         os.Getenv("PREAUTH_URL"),
+			PreauthPSK:         os.Getenv("PREAUTH_PSK"),
+			PreauthTTL:         preauthTTL,
 		},
 		DB: DBConfig{
 			Hosts:    dbHosts,
@@ -202,7 +208,6 @@ func New() (Config, error) {
 			MaxDailyAliases:        maxDailyAliases,
 			MaxDailySendReply:      maxDailySendReply,
 			MaxSessions:            maxSessions,
-			ForwardGracePeriodDays: forwardGracePeriodDays,
 			AccountGracePeriodDays: accountGracePeriodDays,
 			IdLimiterMax:           idLimiterMax,
 			IdLimiterExpiration:    idLimiterExpiration,

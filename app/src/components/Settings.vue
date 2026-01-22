@@ -65,7 +65,7 @@
             <p>
                 Set the 'From name' used for replies and emails sent using an alias. Leave it blank to use the alias email address.
             </p>
-            <div class="max-w-xs mb-5">
+            <div class="max-w-xs mb-7">
                 <label for="from-name">
                     From name:
                 </label>

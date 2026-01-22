@@ -8,7 +8,7 @@
             Enter the 6-digit OTP code we have sent via email to verify your primary address. You have 7 days to complete this step after signing up to prevent account deletion.
         </p>
         <div v-if="!confirmSuccess" class="mb-9 max-w-xs">
-            <div class="mb-4">
+            <div class="mb-5">
                 <label for="account-otp">
                     6-digit OTP code:
                 </label>

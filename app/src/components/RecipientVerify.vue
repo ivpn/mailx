@@ -15,7 +15,7 @@
                                 We have sent a 6-digit OTP code to your new recipient email address. Enter the code below to complete the verification.
                             </p>
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-5">
                             <label for="otp">
                                 6-digit OTP code:
                             </label>

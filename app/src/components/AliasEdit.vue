@@ -11,7 +11,7 @@
                     </header>
                     <article>
                         <h3>{{ alias.name }}</h3>
-                        <div class="mb-5">
+                        <div class="mb-7">
                             <label v-bind:for="'description_' + alias.id">
                                 Description:
                             </label>
@@ -21,7 +21,7 @@
                                 type="text"
                             >
                         </div>
-                        <div class="mb-5">
+                        <div class="mb-7">
                             <label v-bind:for="'from_' + alias.id">
                                 From name:
                             </label>

@@ -34,7 +34,7 @@
                             </div>
                         </div>
                         <div>
-                            <div class="pb-3">
+                            <div class="pb-5">
                                 <label for="alias_description">
                                     Description (optional)
                                 </label>
@@ -106,7 +106,7 @@
                                                 </option>
                                             </select>
                                         </div>
-                                        <div class="pb-3">
+                                        <div class="pb-5">
                                             <label for="alias_from_name" class="flex gap-2">
                                                 From name
                                                 <span class="hs-tooltip [--strategy:absolute] flex">

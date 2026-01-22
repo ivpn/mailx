@@ -22,7 +22,7 @@
             <AccountDelete />
             <hr>
             <h2>Support</h2>
-            <p>
+            <p class="mt-0">
                 Support:
                 <a href="mailto:mailx@ivpn.net">Email</a> /
                 <a href="/faq">FAQ</a>

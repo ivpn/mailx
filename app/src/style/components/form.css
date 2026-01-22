@@ -2,7 +2,7 @@
     input[type=email],
     input[type=text],
     input[type=password] {
-        @apply bg-secondary text-secondary border-primary appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-accent mb-2;
+        @apply bg-secondary text-secondary border-primary appearance-none outline-none border w-full py-3 px-4 leading-tight focus:border-accent;
 
         &.error {
             @apply border-error;

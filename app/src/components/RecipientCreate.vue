@@ -18,7 +18,7 @@
                                 Add a new email address to receive forwarded emails. New addresses need a one-time verification before use.
                             </p>
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-5">
                             <label for="recipient_email">
                                 Email:
                             </label>

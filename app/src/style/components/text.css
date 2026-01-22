@@ -20,7 +20,7 @@
     }
 
     p {
-        @apply text-secondary mb-5 font-primary;
+        @apply text-secondary mt-2 mb-5 font-primary;
 
         &.error {
             @apply text-error text-sm mb-3;

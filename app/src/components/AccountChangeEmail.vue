@@ -2,7 +2,7 @@
     <div class="mb-5">
         <h2>Change Primary Email</h2>
         <div v-if="!success">
-            <div class="mb-4 max-w-xs">
+            <div class="mb-6 max-w-xs">
                 <label for="new-email">
                     Set a new primary email address:
                 </label>

@@ -10,7 +10,7 @@
                         </h1>
                         <h4 class="text-center mb-8">Sign up with Passkey</h4>
                         <div v-if="!apiSuccess">
-                            <div class="mb-5">
+                            <div class="mb-7">
                                 <input
                                     v-model="emailAuthn"
                                     v-bind:class="{ 'error': emailAuthnError }"
@@ -40,7 +40,7 @@
                         </h1>
                         <h4 class="text-center mb-8">Sign up with email and password</h4>
                         <div v-if="!apiSuccess">
-                            <div class="mb-5">
+                            <div class="mb-7">
                                 <input
                                     v-model="email"
                                     v-bind:class="{ 'error': emailError }"
@@ -52,7 +52,7 @@
                                 >
                                 <p v-if="emailError" class="error">Required</p>
                             </div>
-                            <div class="mb-3">
+                            <div class="mb-7">
                                 <input
                                     v-model="password"
                                     v-bind:class="{ 'error': passwordError }"

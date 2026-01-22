@@ -18,7 +18,7 @@
                                 To disable two-factor authentication, please enter code from TOTP app or a backup code.
                             </p>
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-5">
                             <label for="totp_disable_code">
                                 Code from TOTP app:
                             </label>

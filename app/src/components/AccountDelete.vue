@@ -28,7 +28,7 @@
                                     <span class="text-black dark:text-white">{{ otp }}</span>
                                 </p>
                             </div>
-                            <div class="mb-5">
+                            <div class="mb-7">
                                 <input
                                     v-model="req.otp"
                                     v-bind:class="{ 'error': otpError }"

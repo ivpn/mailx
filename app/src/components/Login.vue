@@ -10,7 +10,7 @@
                         </h1>
                         <h4 class="text-center mb-8">Log in with Passkey</h4>
                         <div>
-                            <div class="mb-5">
+                            <div class="mb-7">
                                 <input
                                     v-model="emailAuthn"
                                     v-bind:class="{ 'error': emailAuthnError }"
@@ -38,7 +38,7 @@
                                 <span class="logo"></span>
                             </h1>
                             <h4 class="text-center mb-8">Log in with email and password</h4>
-                            <div class="mb-5">
+                            <div class="mb-7">
                                 <input
                                     v-model="email"
                                     v-bind:class="{ 'error': emailError }"
@@ -69,7 +69,7 @@
                                     </router-link>
                                 </p>
                             </div>
-                            <div v-if="otpRequired" class="mb-5">
+                            <div v-if="otpRequired" class="mb-7">
                                 <label for="password">
                                     Two-factor authentication token:
                                 </label>

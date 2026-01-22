@@ -27,7 +27,7 @@
                             <div class="mb-5 container">
                                 <canvas class="mx-auto" id="totp_qr_code"></canvas>
                             </div>
-                            <div class="mb-3">
+                            <div class="mb-5">
                                 <label for="totp_enable_code">
                                     Code from TOTP app:
                                 </label>

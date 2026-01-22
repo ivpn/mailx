@@ -15,7 +15,7 @@
                                 To send an email using an alias, you need a specific forwarding address generated after providing the target email address. Only emails originating from your verified recipient email addresses are forwarded.
                             </p>
                         </div>
-                        <div class="mb-5">
+                        <div class="mb-7">
                             <label v-bind:for="'from_alias_' + alias.id">
                                 From alias:
                             </label>
@@ -25,7 +25,7 @@
                                 type="text"
                             >
                         </div>
-                        <div class="mb-5">
+                        <div class="mb-7">
                             <label v-bind:for="'to_email_' + alias.id">
                                 To email:
                             </label>

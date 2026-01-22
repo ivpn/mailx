@@ -45,10 +45,10 @@ function injectButton(input: HTMLInputElement) {
   if (!isValidEmailInput(input)) return
   input.dataset.aliasInjected = 'true'
 
-  // Measure BEFORE moving the input
-  const rect = input.getBoundingClientRect()
-  const height = rect.height
-  const width = rect.width
+  // Measure the input
+  // const rect = input.getBoundingClientRect()
+  // const height = rect.height
+  // const width = rect.width
 
   const parent = input.parentNode
   if (!parent) return
@@ -57,21 +57,11 @@ function injectButton(input: HTMLInputElement) {
   const wrapper = document.createElement('div')
   Object.assign(wrapper.style, {
     position: 'relative',
-    display: 'inline-block',
-    height: `${height}px`,
-    width: `${width}px`,
   })
 
   // Move input into wrapper
   parent.insertBefore(wrapper, input)
   wrapper.appendChild(input)
-
-  // Ensure input fills wrapper
-  Object.assign(input.style, {
-    height: '100%',
-    width: '100%',
-    boxSizing: 'border-box',
-  })
 
   // Button host
   const host = document.createElement('div')

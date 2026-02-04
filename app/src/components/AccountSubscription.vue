@@ -85,7 +85,7 @@ const sessionid = ref('')
 const currentRoute = useRoute()
 const syncing = ref(false)
 const activateUrl = import.meta.env.VITE_RESYNC_URL
-const resyncUrl = import.meta.env.VITE_RESYNC_URL + '?action=resync'
+const resyncUrl = import.meta.env.VITE_RESYNC_URL + '?action=sync'
 
 const getSubscription = async () => {
     try {

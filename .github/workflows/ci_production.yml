@@ -29,6 +29,7 @@ jobs:
           echo "VITE_API_URL=${{ secrets.PROD_VITE_API_URL }}" >> app/.env
           echo "VITE_DOMAINS=${{ secrets.PROD_VITE_DOMAINS }}" >> app/.env
           echo "VITE_APP_NAME=${{ secrets.PROD_VITE_APP_NAME }}" >> app/.env
+          echo "VITE_RESYNC_URL=${{ secrets.PROD_VITE_RESYNC_URL }}" >> app/.env
 
       - name: Build api image
         run: docker build -t $REGISTRY/$API_IMAGE:$TAG api/.

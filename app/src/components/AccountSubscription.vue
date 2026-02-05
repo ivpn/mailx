@@ -60,6 +60,7 @@
             </footer>
         </div>
         <p v-if="error" class="error">Error: {{ error }}</p>
+        <p v-if="success" class="success">{{ success }}</p>
     </div>
 </template>
 
@@ -79,6 +80,7 @@ const sub = ref({
     outage: false,
 })
 const error = ref('')
+const success = ref('')
 const email = ref(localStorage.getItem('email'))
 const subid = ref('')
 const sessionid = ref('')
@@ -105,13 +107,16 @@ const updateSubscription = async () => {
 
     syncing.value = true
     try {
-        await subscriptionApi.update({
+        const res = await subscriptionApi.update({
             id: sub.value.id,
             subid: subid.value,
         })
+        success.value = res.data.message
+        error.value = ''
         await getSubscription()
     } catch (err) {
         if (axios.isAxiosError(err)) {
+            success.value = ''
             error.value = err.response?.data.error || err.message
         }
     } finally {

@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"strings"
 	"time"
 )
 
@@ -16,6 +17,7 @@ const (
 	GracePeriod   SubscriptionStatus = "grace_period"
 	LimitedAccess SubscriptionStatus = "limited_access"
 	PendingDelete SubscriptionStatus = "pending_delete"
+	Tier1         string             = "Tier 1"
 )
 
 type Subscription struct {
@@ -33,7 +35,7 @@ type Subscription struct {
 }
 
 func (s *Subscription) Active() bool {
-	return s.ActiveUntil.After(time.Now())
+	return s.ActiveUntil.After(time.Now()) && !strings.Contains(s.Tier, Tier1)
 }
 
 func (s *Subscription) GracePeriod() bool {

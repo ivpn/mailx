@@ -11,31 +11,53 @@ func TestSubscriptionActive(t *testing.T) {
 	tests := []struct {
 		name        string
 		activeUntil time.Time
+		tier        string
 		want        bool
 	}{
 		{
-			name:        "future time returns true",
+			name:        "future time with Tier 2 returns true",
 			activeUntil: now.Add(2 * time.Second),
+			tier:        "Tier 2",
 			want:        true,
 		},
 		{
 			name:        "past time returns false",
 			activeUntil: now.Add(-2 * time.Second),
+			tier:        "Tier 2",
 			want:        false,
 		},
 		{
 			name:        "equal to now returns false",
-			activeUntil: now, // ActiveUntil.After(time.Now()) is strictly greater, so should be false
+			activeUntil: now,
+			tier:        "Tier 2",
 			want:        false,
+		},
+		{
+			name:        "future time but Tier 1 returns false",
+			activeUntil: now.Add(2 * time.Second),
+			tier:        "Tier 1",
+			want:        false,
+		},
+		{
+			name:        "future time but tier contains Tier 1 returns false",
+			activeUntil: now.Add(2 * time.Second),
+			tier:        "Plan Tier 1 Special",
+			want:        false,
+		},
+		{
+			name:        "future time with empty tier returns true",
+			activeUntil: now.Add(2 * time.Second),
+			tier:        "",
+			want:        true,
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			s := &Subscription{ActiveUntil: tc.activeUntil}
+			s := &Subscription{ActiveUntil: tc.activeUntil, Tier: tc.tier}
 			got := s.Active()
 			if got != tc.want {
-				t.Fatalf("Active() = %v, want %v (activeUntil=%v, now=%v)", got, tc.want, tc.activeUntil, time.Now())
+				t.Fatalf("Active() = %v, want %v (activeUntil=%v, tier=%q, now=%v)", got, tc.want, tc.activeUntil, tc.tier, time.Now())
 			}
 		})
 	}
@@ -327,6 +349,137 @@ func TestSubscriptionGracePeriodDays(t *testing.T) {
 			got := s.GracePeriodDays(tc.days)
 			if got != tc.want {
 				t.Fatalf("GracePeriodDays(%d) = %v, want %v (activeUntil=%v now=%v boundary=%v)", tc.days, got, tc.want, tc.activeUntil, time.Now(), tc.activeUntil.AddDate(0, 0, tc.days))
+			}
+		})
+	}
+}
+
+func TestSubscriptionActiveStatus(t *testing.T) {
+	now := time.Now()
+
+	tests := []struct {
+		name        string
+		updatedAt   time.Time
+		activeUntil time.Time
+		tier        string
+		want        bool
+	}{
+		{
+			name:        "active subscription => true",
+			updatedAt:   now.Add(-24 * time.Hour),
+			activeUntil: now.Add(24 * time.Hour),
+			tier:        "Tier 2",
+			want:        true,
+		},
+		{
+			name:        "in grace period => true",
+			updatedAt:   now.Add(-49 * time.Hour),
+			activeUntil: now.Add(-48 * time.Hour),
+			tier:        "Tier 2",
+			want:        true,
+		},
+		{
+			name:        "expired and no outage => false",
+			updatedAt:   now.Add(-24 * time.Hour),
+			activeUntil: now.Add(-1 * time.Second),
+			tier:        "Tier 2",
+			want:        false,
+		},
+		{
+			name:        "Tier 1 even if has future time => false (not Active, but may be GracePeriod)",
+			updatedAt:   now.Add(-49 * time.Hour),
+			activeUntil: now.Add(24 * time.Hour),
+			tier:        "Tier 1",
+			want:        true, // GracePeriod returns true if outage and within 3-day window
+		},
+		{
+			name:        "Tier 1 without outage => false",
+			updatedAt:   now.Add(-24 * time.Hour),
+			activeUntil: now.Add(24 * time.Hour),
+			tier:        "Tier 1",
+			want:        false,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			s := &Subscription{
+				UpdatedAt:   tc.updatedAt,
+				ActiveUntil: tc.activeUntil,
+				Tier:        tc.tier,
+			}
+			got := s.ActiveStatus()
+			if got != tc.want {
+				t.Fatalf("ActiveStatus() = %v, want %v (updatedAt=%v activeUntil=%v tier=%q now=%v)", got, tc.want, tc.updatedAt, tc.activeUntil, tc.tier, time.Now())
+			}
+		})
+	}
+}
+
+func TestSubscriptionGetStatus(t *testing.T) {
+	now := time.Now()
+
+	tests := []struct {
+		name        string
+		updatedAt   time.Time
+		activeUntil time.Time
+		tier        string
+		want        SubscriptionStatus
+	}{
+		{
+			name:        "active tier 2 subscription => Active",
+			updatedAt:   now.Add(-24 * time.Hour),
+			activeUntil: now.Add(24 * time.Hour),
+			tier:        "Tier 2",
+			want:        Active,
+		},
+		{
+			name:        "in grace period => GracePeriod",
+			updatedAt:   now.Add(-49 * time.Hour),
+			activeUntil: now.Add(-48 * time.Hour),
+			tier:        "Tier 2",
+			want:        GracePeriod,
+		},
+		{
+			name:        "limited access (14d window) => LimitedAccess",
+			updatedAt:   now.Add(-24 * time.Hour),
+			activeUntil: now.Add(-5 * 24 * time.Hour),
+			tier:        "Tier 2",
+			want:        LimitedAccess,
+		},
+		{
+			name:        "pending delete (>14d) => PendingDelete",
+			updatedAt:   now.Add(-24 * time.Hour),
+			activeUntil: now.Add(-30 * 24 * time.Hour),
+			tier:        "Tier 2",
+			want:        PendingDelete,
+		},
+		{
+			name:        "Tier 1 with future time and outage => GracePeriod",
+			updatedAt:   now.Add(-49 * time.Hour),
+			activeUntil: now.Add(24 * time.Hour),
+			tier:        "Tier 1",
+			want:        GracePeriod,
+		},
+		{
+			name:        "Tier 1 without outage but within 14d => LimitedAccess",
+			updatedAt:   now.Add(-24 * time.Hour),
+			activeUntil: now.Add(-5 * 24 * time.Hour),
+			tier:        "Tier 1",
+			want:        LimitedAccess,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			s := &Subscription{
+				UpdatedAt:   tc.updatedAt,
+				ActiveUntil: tc.activeUntil,
+				Tier:        tc.tier,
+			}
+			got := s.GetStatus()
+			if got != tc.want {
+				t.Fatalf("GetStatus() = %v, want %v (updatedAt=%v activeUntil=%v tier=%q now=%v)", got, tc.want, tc.updatedAt, tc.activeUntil, tc.tier, time.Now())
 			}
 		})
 	}

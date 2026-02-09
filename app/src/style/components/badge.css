@@ -22,6 +22,10 @@
             @apply bg-violet-500 dark:bg-violet-700 text-white font-semibold;
         }
 
+        &.inactive_subscription {
+            @apply bg-gray-500 text-white font-semibold;
+        }
+
         &.small {
             @apply py-0.5 px-1.5 text-xs;
         }

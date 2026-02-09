@@ -104,12 +104,38 @@ func (s *Service) ProcessMessage(data []byte) error {
 		// Forward
 		if relayType == model.Forward && sub.PendingDelete() {
 			log.Println("inactive subscription for forward")
+			settings, err := s.GetSettings(context.Background(), alias.UserID)
+			if err != nil {
+				log.Println("error getting settings", err)
+				continue
+			}
+
+			if settings.LogIssues {
+				err := s.ProcessDiscardLog(alias, msg.From, to, ErrInactiveSubscription.Error(), model.InactiveSubscription)
+				if err != nil {
+					log.Println("error processing discard log", err)
+				}
+			}
+
 			continue
 		}
 
 		// Reply | Send
 		if relayType != model.Forward && !sub.ActiveStatus() {
 			log.Println("inactive subscription for reply/send")
+			settings, err := s.GetSettings(context.Background(), alias.UserID)
+			if err != nil {
+				log.Println("error getting settings", err)
+				continue
+			}
+
+			if settings.LogIssues {
+				err := s.ProcessDiscardLog(alias, msg.From, to, ErrInactiveSubscription.Error(), model.InactiveSubscription)
+				if err != nil {
+					log.Println("error processing discard log", err)
+				}
+			}
+
 			continue
 		}
 

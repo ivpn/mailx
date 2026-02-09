@@ -4,10 +4,13 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"log"
 	"mime"
 	"mime/multipart"
 	"net/mail"
 	"strings"
+
+	"ivpn.net/email/api/internal/utils"
 )
 
 type Msg struct {
@@ -20,7 +23,14 @@ type Msg struct {
 }
 
 func ParseMsg(data []byte) (Msg, error) {
-	msg, err := mail.ReadMessage(bytes.NewReader(data))
+	// Preprocess email data to decode RFC 2047 encoded headers
+	processedData, err := utils.PreprocessEmailData(data)
+	if err != nil {
+		log.Printf("Warning: failed to preprocess email data: %v", err)
+		processedData = data // Fallback to original data
+	}
+
+	msg, err := mail.ReadMessage(bytes.NewReader(processedData))
 	if err != nil {
 		return Msg{}, err
 	}
@@ -57,7 +67,7 @@ func ParseMsg(data []byte) (Msg, error) {
 
 	if isBounce(msg) {
 		msgType = FailBounce
-		fromAddress, err = ExtractOriginalFrom(data)
+		fromAddress, err = ExtractOriginalFrom(processedData)
 		if err != nil {
 			return Msg{}, fmt.Errorf("extract original from bounce: %w", err)
 		}

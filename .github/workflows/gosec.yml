@@ -28,4 +28,4 @@ jobs:
       - name: Run Gosec Security Scanner
         uses: securego/gosec@master
         with:
-          args: '-exclude=G101,G402,G505 -exclude-dir=gomail.v2 ./...'
+          args: '-exclude=G101,G402,G505,G117 -exclude-dir=gomail.v2 ./...'

@@ -29,6 +29,11 @@ func DeleteOldLogs(db *gorm.DB) {
 }
 
 func cleanupOldLogFiles(maxAge time.Duration) error {
+	// Check if directory exists, create if not
+	if _, err := os.Stat(EmlLogBaseDir); os.IsNotExist(err) {
+		return nil // Nothing to clean up
+	}
+
 	cutoff := time.Now().Add(-maxAge)
 
 	err := filepath.Walk(EmlLogBaseDir, func(path string, info os.FileInfo, err error) error {

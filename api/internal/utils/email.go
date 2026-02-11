@@ -239,13 +239,13 @@ func PreprocessEmailData(data []byte) ([]byte, error) {
 			if currentHeader != "" {
 				currentValue.WriteString(lineStr)
 			}
-		} else if idx := strings.Index(lineStr, ":"); idx != -1 {
+		} else if before, after, ok := strings.Cut(lineStr, ":"); ok {
 			// Process previous header if any
 			processHeader()
 
 			// Start new header
-			currentHeader = lineStr[:idx]
-			currentValue.WriteString(strings.TrimLeft(lineStr[idx+1:], " \t"))
+			currentHeader = before
+			currentValue.WriteString(strings.TrimLeft(after, " \t"))
 		}
 	}
 

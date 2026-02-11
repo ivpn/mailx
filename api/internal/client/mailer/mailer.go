@@ -91,7 +91,14 @@ func (mailer Mailer) Send(to string, subject string, body string) error {
 }
 
 func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data []byte) error {
-	reader := bytes.NewReader(data)
+	// Preprocess email data to decode RFC 2047 encoded headers
+	processedData, err := utils.PreprocessEmailData(data)
+	if err != nil {
+		log.Printf("Warning: failed to preprocess email data: %v", err)
+		processedData = data // Fallback to original data
+	}
+
+	reader := bytes.NewReader(processedData)
 	email, err := letters.ParseEmail(reader)
 	if err != nil {
 		return err
@@ -144,7 +151,14 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 }
 
 func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data []byte, templateFile string, templateData any, settings model.Settings) error {
-	reader := bytes.NewReader(data)
+	// Preprocess email data to decode RFC 2047 encoded headers
+	processedData, err := utils.PreprocessEmailData(data)
+	if err != nil {
+		log.Printf("Warning: failed to preprocess email data: %v", err)
+		processedData = data // Fallback to original data
+	}
+
+	reader := bytes.NewReader(processedData)
 	email, err := letters.ParseEmail(reader)
 	if err != nil {
 		return err

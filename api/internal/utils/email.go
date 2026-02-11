@@ -4,7 +4,10 @@ import (
 	"bytes"
 	"crypto/rand"
 	"fmt"
+	"io"
 	"math/big"
+	"mime"
+	"net/mail"
 	"regexp"
 	"strings"
 	"time"
@@ -146,4 +149,93 @@ func cryptoRandInt(max int) (int, error) {
 		return 0, err
 	}
 	return int(nBig.Int64()), nil
+}
+
+// PreprocessEmailData decodes RFC 2047 encoded headers to fix parsing issues
+// with email addresses containing encoded display names
+func PreprocessEmailData(data []byte) ([]byte, error) {
+	msg, err := mail.ReadMessage(bytes.NewReader(data))
+	if err != nil {
+		return data, nil // Return original data if it can't be parsed
+	}
+
+	decoder := mime.WordDecoder{
+		CharsetReader: func(charset string, input io.Reader) (io.Reader, error) {
+			// Default charset handling
+			return input, nil
+		},
+	}
+
+	// Headers that commonly contain RFC 2047 encoded addresses
+	addressHeaders := []string{"From", "To", "Cc", "Bcc", "Reply-To", "Sender"}
+
+	var buf bytes.Buffer
+
+	// Write headers
+	for key := range msg.Header {
+		values := msg.Header[key]
+		for _, value := range values {
+			// Try to decode RFC 2047 encoded-words for address headers
+			needsDecoding := false
+			for _, addrHeader := range addressHeaders {
+				if strings.EqualFold(key, addrHeader) {
+					needsDecoding = true
+					break
+				}
+			}
+
+			if needsDecoding && strings.Contains(value, "=?") {
+				// Decode the RFC 2047 encoded display name
+				decoded, err := decoder.DecodeHeader(value)
+				if err == nil {
+					value = decoded
+				} else {
+					// If decoding fails (e.g., malformed base64), try to clean it up
+					// Extract just the email address part if possible
+					value = CleanupMalformedEncodedAddress(value)
+				}
+			}
+
+			buf.WriteString(key)
+			buf.WriteString(": ")
+			buf.WriteString(value)
+			buf.WriteString("\r\n")
+		}
+	}
+
+	// Blank line between headers and body
+	buf.WriteString("\r\n")
+
+	// Copy body
+	_, err = io.Copy(&buf, msg.Body)
+	if err != nil {
+		return data, nil // Return original data on error
+	}
+
+	return buf.Bytes(), nil
+}
+
+// CleanupMalformedEncodedAddress attempts to extract a valid email address
+// from a malformed RFC 2047 encoded string
+func CleanupMalformedEncodedAddress(addr string) string {
+	// Look for email address in angle brackets
+	if idx := strings.Index(addr, "<"); idx != -1 {
+		if endIdx := strings.Index(addr[idx:], ">"); endIdx != -1 {
+			email := addr[idx : idx+endIdx+1]
+			// Try to decode any remaining encoded-words before the email
+			before := addr[:idx]
+
+			// Check if there's an encoded-word
+			if strings.Contains(before, "=?") {
+				// Remove the malformed encoded-word entirely
+				// and just use the email address
+				return strings.TrimSpace(email[1 : len(email)-1])
+			}
+
+			return strings.TrimSpace(before) + " " + email
+		}
+	}
+
+	// If no angle brackets, return as-is
+	return addr
 }

@@ -7,7 +7,6 @@ import (
 	"io"
 	"math/big"
 	"mime"
-	"net/mail"
 	"regexp"
 	"strings"
 	"time"
@@ -152,11 +151,19 @@ func cryptoRandInt(max int) (int, error) {
 }
 
 // PreprocessEmailData decodes RFC 2047 encoded headers to fix parsing issues
-// with email addresses containing encoded display names
+// with email addresses containing encoded display names.
+// Only address headers are decoded and rewritten; all other headers (including
+// Content-Disposition, Content-Type, etc.) are preserved in their original form
+// to avoid corrupting MIME structure.
 func PreprocessEmailData(data []byte) ([]byte, error) {
-	msg, err := mail.ReadMessage(bytes.NewReader(data))
-	if err != nil {
-		return data, nil // Return original data if it can't be parsed
+	// Headers that commonly contain RFC 2047 encoded addresses
+	addressHeaders := map[string]bool{
+		"from":     true,
+		"to":       true,
+		"cc":       true,
+		"bcc":      true,
+		"reply-to": true,
+		"sender":   true,
 	}
 
 	decoder := mime.WordDecoder{
@@ -166,51 +173,88 @@ func PreprocessEmailData(data []byte) ([]byte, error) {
 		},
 	}
 
-	// Headers that commonly contain RFC 2047 encoded addresses
-	addressHeaders := []string{"From", "To", "Cc", "Bcc", "Reply-To", "Sender"}
+	// Split email into headers and body
+	headerEnd := bytes.Index(data, []byte("\r\n\r\n"))
+	if headerEnd == -1 {
+		headerEnd = bytes.Index(data, []byte("\n\n"))
+		if headerEnd == -1 {
+			return data, nil // Can't find header/body separator
+		}
+	}
+
+	headerData := data[:headerEnd]
+	bodySeparator := data[headerEnd : headerEnd+4] // Preserve the separator (\r\n\r\n or \n\n)
+	if len(bodySeparator) == 2 {
+		bodySeparator = []byte("\n\n")
+	} else {
+		bodySeparator = []byte("\r\n\r\n")
+	}
+	bodyData := data[headerEnd+len(bodySeparator):]
 
 	var buf bytes.Buffer
+	lines := bytes.Split(headerData, []byte("\n"))
 
-	// Write headers
-	for key := range msg.Header {
-		values := msg.Header[key]
-		for _, value := range values {
-			// Try to decode RFC 2047 encoded-words for address headers
-			needsDecoding := false
-			for _, addrHeader := range addressHeaders {
-				if strings.EqualFold(key, addrHeader) {
-					needsDecoding = true
-					break
-				}
+	var currentHeader string
+	var currentValue bytes.Buffer
+
+	processHeader := func() {
+		if currentHeader == "" {
+			return
+		}
+
+		headerName := strings.ToLower(strings.TrimSpace(currentHeader))
+		value := currentValue.String()
+
+		// Only decode address headers that contain RFC 2047 encoded-words
+		if addressHeaders[headerName] && strings.Contains(value, "=?") {
+			decoded, err := decoder.DecodeHeader(value)
+			if err == nil {
+				value = decoded
+			} else {
+				// If decoding fails, try to clean it up
+				value = CleanupMalformedEncodedAddress(value)
 			}
-
-			if needsDecoding && strings.Contains(value, "=?") {
-				// Decode the RFC 2047 encoded display name
-				decoded, err := decoder.DecodeHeader(value)
-				if err == nil {
-					value = decoded
-				} else {
-					// If decoding fails (e.g., malformed base64), try to clean it up
-					// Extract just the email address part if possible
-					value = CleanupMalformedEncodedAddress(value)
-				}
-			}
-
-			buf.WriteString(key)
+			// Write the decoded header
+			buf.WriteString(currentHeader)
+			buf.WriteString(": ")
+			buf.WriteString(value)
+			buf.WriteString("\r\n")
+		} else {
+			// Preserve non-address headers in their original form
+			buf.WriteString(currentHeader)
 			buf.WriteString(": ")
 			buf.WriteString(value)
 			buf.WriteString("\r\n")
 		}
+
+		currentValue.Reset()
 	}
 
-	// Blank line between headers and body
-	buf.WriteString("\r\n")
+	for _, line := range lines {
+		lineStr := string(bytes.TrimRight(line, "\r"))
 
-	// Copy body
-	_, err = io.Copy(&buf, msg.Body)
-	if err != nil {
-		return data, nil // Return original data on error
+		// Check if this is a continuation line (starts with space or tab)
+		if len(lineStr) > 0 && (lineStr[0] == ' ' || lineStr[0] == '\t') {
+			// Continuation of previous header
+			if currentHeader != "" {
+				currentValue.WriteString(lineStr)
+			}
+		} else if idx := strings.Index(lineStr, ":"); idx != -1 {
+			// Process previous header if any
+			processHeader()
+
+			// Start new header
+			currentHeader = lineStr[:idx]
+			currentValue.WriteString(strings.TrimLeft(lineStr[idx+1:], " \t"))
+		}
 	}
+
+	// Process the last header
+	processHeader()
+
+	// Write separator and body
+	buf.Write(bodySeparator)
+	buf.Write(bodyData)
 
 	return buf.Bytes(), nil
 }

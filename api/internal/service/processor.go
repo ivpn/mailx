@@ -21,7 +21,7 @@ var (
 func (s *Service) ProcessMessage(data []byte) error {
 	msg, err := model.ParseMsg(data)
 	if err != nil {
-		log.Println("error parsing message", err)
+		log.Println("error parsing message:", err)
 		return err
 	}
 

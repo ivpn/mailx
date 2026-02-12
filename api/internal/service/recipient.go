@@ -298,7 +298,7 @@ func (s *Service) FindRecipients(from string, to string, msgType model.MessageTy
 	name, replyTo := model.ParseReplyTo(to)
 	alias, err := s.GetAliasByName(name)
 	if err != nil {
-		return []model.Recipient{}, model.Alias{}, 0, err
+		return []model.Recipient{}, model.Alias{Name: name}, 0, err
 	}
 
 	// Handle disabled alias

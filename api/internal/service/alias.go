@@ -13,7 +13,8 @@ import (
 var (
 	ErrGetAlias            = errors.New("Unable to retrieve alias by ID.")
 	ErrGetAliases          = errors.New("Unable to retrieve aliases.")
-	ErrGetAliasByName      = errors.New("Unable to retrieve alias by name.")
+	ErrGetAliasByName      = errors.New("alias not found:")
+	ErrDisabledAlias       = errors.New("alias disabled:")
 	ErrPostAlias           = errors.New("Unable to create alias. Please try again.")
 	ErrPostAliasLimit      = errors.New("You’ve reached the maximum number of allowed aliases.")
 	ErrUpdateAlias         = errors.New("Unable to update alias. Please try again.")
@@ -81,8 +82,7 @@ func (s *Service) GetAllAliases(ctx context.Context, userID string) ([]model.Ali
 func (s *Service) GetAliasByName(name string) (model.Alias, error) {
 	alias, err := s.Store.GetAliasByName(name)
 	if err != nil {
-		log.Printf("error fetching alias %s: %s", name, err.Error())
-		return model.Alias{}, ErrGetAliasByName
+		return model.Alias{Name: name}, ErrGetAliasByName
 	}
 
 	return alias, nil
@@ -192,7 +192,7 @@ func (s *Service) FindAlias(email string) (model.Alias, error) {
 	name, _ := model.ParseReplyTo(email)
 	alias, err := s.GetAliasByName(name)
 	if err != nil {
-		return model.Alias{}, err
+		return model.Alias{Name: name}, err
 	}
 
 	return alias, nil

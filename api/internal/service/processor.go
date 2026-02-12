@@ -13,7 +13,6 @@ import (
 
 var (
 	ErrInactiveSubscription = errors.New("Subscription is inactive.")
-	ErrDisabledAlias        = errors.New("This alias is disabled.")
 	ErrNoRecipients         = errors.New("No recipients found.")
 	ErrNoVerifiedRecipients = errors.New("Sender is not a verified address.")
 	ErrInactiveRecipient    = errors.New("The recipient is inactive.")
@@ -22,7 +21,12 @@ var (
 func (s *Service) ProcessMessage(data []byte) error {
 	msg, err := model.ParseMsg(data)
 	if err != nil {
-		log.Println("error parsing message", err)
+		if errors.Is(err, model.ErrExtractOriginalFrom) {
+			// Fail silently so bounce messages are not kept in postfix queue
+			return nil
+		}
+
+		log.Println("error parsing message:", err)
 		return err
 	}
 
@@ -30,16 +34,17 @@ func (s *Service) ProcessMessage(data []byte) error {
 	if msg.Type == model.FailBounce {
 		alias, err := s.FindAlias(msg.From)
 		if err != nil {
-			log.Println("error processing bounce", err)
-			return err
+			log.Println("error processing bounce:", err, alias.Name)
+			// Fail silently so bounce messages are not kept in postfix queue
+			return nil
 		}
 
 		err = s.ProcessBounceLog(alias.UserID, alias.ID, data, msg)
 		if err != nil {
-			log.Println("error processing bounce", err)
-			return err
+			log.Println("error processing bounce:", err, alias.Name)
 		}
 
+		// Fail silently so bounce messages are not kept in postfix queue
 		return nil
 	}
 
@@ -58,7 +63,7 @@ func (s *Service) ProcessMessage(data []byte) error {
 	for _, to := range msg.To {
 		recipients, alias, relayType, err := s.FindRecipients(msg.From, to, msg.Type)
 		if err != nil {
-			log.Println("error processing message", err)
+			log.Println("error processing message:", err, alias.Name)
 
 			// Handle ErrNoVerifiedRecipients
 			if errors.Is(err, ErrNoVerifiedRecipients) {

@@ -30,13 +30,11 @@ func (s *Service) ProcessMessage(data []byte) error {
 		alias, err := s.FindAlias(msg.From)
 		if err != nil {
 			log.Println("error processing bounce:", err, alias.Name)
-			return err
 		}
 
 		err = s.ProcessBounceLog(alias.UserID, alias.ID, data, msg)
 		if err != nil {
 			log.Println("error processing bounce:", err, alias.Name)
-			return err
 		}
 
 		return nil

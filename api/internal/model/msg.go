@@ -13,6 +13,10 @@ import (
 	"ivpn.net/email/api/internal/utils"
 )
 
+var (
+	ErrExtractOriginalFrom = fmt.Errorf("error extracting original From from bounce")
+)
+
 type Msg struct {
 	From     string
 	FromName string
@@ -69,7 +73,8 @@ func ParseMsg(data []byte) (Msg, error) {
 		msgType = FailBounce
 		fromAddress, err = ExtractOriginalFrom(processedData)
 		if err != nil {
-			return Msg{}, fmt.Errorf("extract original from bounce: %w", err)
+			log.Println("error extracting original From from bounce:", err)
+			return Msg{}, ErrExtractOriginalFrom
 		}
 	}
 

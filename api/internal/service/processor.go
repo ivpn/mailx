@@ -21,6 +21,11 @@ var (
 func (s *Service) ProcessMessage(data []byte) error {
 	msg, err := model.ParseMsg(data)
 	if err != nil {
+		if errors.Is(err, model.ErrExtractOriginalFrom) {
+			// Fail silently so bounce messages are not kept in postfix queue
+			return nil
+		}
+
 		log.Println("error parsing message:", err)
 		return err
 	}
@@ -30,6 +35,8 @@ func (s *Service) ProcessMessage(data []byte) error {
 		alias, err := s.FindAlias(msg.From)
 		if err != nil {
 			log.Println("error processing bounce:", err, alias.Name)
+			// Fail silently so bounce messages are not kept in postfix queue
+			return nil
 		}
 
 		err = s.ProcessBounceLog(alias.UserID, alias.ID, data, msg)
@@ -37,6 +44,7 @@ func (s *Service) ProcessMessage(data []byte) error {
 			log.Println("error processing bounce:", err, alias.Name)
 		}
 
+		// Fail silently so bounce messages are not kept in postfix queue
 		return nil
 	}
 

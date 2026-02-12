@@ -24,6 +24,7 @@ const (
 	AUTH_COOKIE       = "auth"
 	AUTHN_COOKIE      = "authn"
 	AUTHN_TEMP_COOKIE = "authntemp"
+	PA_SESSION_COOKIE = "pasession"
 	USER_ID           = "user_id"
 )
 
@@ -121,6 +122,17 @@ func NewCookieTempAuthn(token string, path string, cfg config.APIConfig) *fiber.
 		Secure:   true,
 		MaxAge:   int(cfg.TokenExpiration.Seconds()),
 		Expires:  time.Now().Add(time.Duration(cfg.TokenExpiration)),
+	}
+}
+
+func NewCookiePASession(id string) *fiber.Cookie {
+	return &fiber.Cookie{
+		Name:     PA_SESSION_COOKIE,
+		Value:    id,
+		HTTPOnly: true,
+		Secure:   true,
+		MaxAge:   900, // 15 minutes
+		Expires:  time.Now().Add(15 * time.Minute),
 	}
 }
 

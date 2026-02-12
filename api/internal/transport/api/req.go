@@ -26,8 +26,8 @@ type SignupEmailReq struct {
 }
 
 type SubscriptionReq struct {
-	ID          string `json:"id" validate:"required,uuid"`
-	ActiveUntil string `json:"active_until" validate:"required"`
+	ID    string `json:"id" validate:"required,uuid"`
+	SubID string `json:"subid" validate:"required,uuid"`
 }
 
 type AliasReq struct {
@@ -80,6 +80,16 @@ type ActivateReq struct {
 
 type TotpReq struct {
 	OTP string `json:"otp" validate:"required,min=6,max=8"`
+}
+
+type PASessionReq struct {
+	ID        string `json:"id" validate:"required,uuid"`
+	PreauthId string `json:"preauth_id" validate:"required,uuid"`
+	Token     string `json:"token" validate:"required"`
+}
+
+type RotatePASessionReq struct {
+	ID string `json:"sessionid" validate:"required,uuid"`
 }
 
 type AccessKeyReq struct {

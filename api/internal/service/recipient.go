@@ -84,7 +84,7 @@ func (s *Service) PostRecipient(ctx context.Context, recipient model.Recipient) 
 		return ErrPostRecipient
 	}
 
-	if !sub.IsActive() {
+	if !sub.ActiveStatus() {
 		log.Println("error creating recipient: subscription is not active")
 		return ErrPostRecipient
 	}
@@ -182,7 +182,7 @@ func (s *Service) UpdateRecipient(ctx context.Context, recipient model.Recipient
 		return ErrUpdateRecipient
 	}
 
-	if !sub.IsActive() {
+	if !sub.ActiveStatus() {
 		log.Println("error updating recipient: subscription is not active")
 		return ErrUpdateRecipient
 	}

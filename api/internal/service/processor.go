@@ -13,7 +13,6 @@ import (
 
 var (
 	ErrInactiveSubscription = errors.New("Subscription is inactive.")
-	ErrDisabledAlias        = errors.New("This alias is disabled.")
 	ErrNoRecipients         = errors.New("No recipients found.")
 	ErrNoVerifiedRecipients = errors.New("Sender is not a verified address.")
 	ErrInactiveRecipient    = errors.New("The recipient is inactive.")
@@ -30,13 +29,13 @@ func (s *Service) ProcessMessage(data []byte) error {
 	if msg.Type == model.FailBounce {
 		alias, err := s.FindAlias(msg.From)
 		if err != nil {
-			log.Println("error processing bounce", err)
+			log.Println("error processing bounce:", err, alias.Name)
 			return err
 		}
 
 		err = s.ProcessBounceLog(alias.UserID, alias.ID, data, msg)
 		if err != nil {
-			log.Println("error processing bounce", err)
+			log.Println("error processing bounce:", err, alias.Name)
 			return err
 		}
 
@@ -58,7 +57,7 @@ func (s *Service) ProcessMessage(data []byte) error {
 	for _, to := range msg.To {
 		recipients, alias, relayType, err := s.FindRecipients(msg.From, to, msg.Type)
 		if err != nil {
-			log.Println("error processing message", err)
+			log.Println("error processing message:", err, alias.Name)
 
 			// Handle ErrNoVerifiedRecipients
 			if errors.Is(err, ErrNoVerifiedRecipients) {

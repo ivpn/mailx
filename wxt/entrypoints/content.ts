@@ -78,7 +78,9 @@ function injectButton(input: HTMLInputElement) {
     width: '24px',
     height: '24px',
     pointerEvents: 'auto',
-    zIndex: '10',
+    zIndex: '1',
+    opacity: '0',
+    transition: 'opacity 0.15s ease',
   })
 
   const icon = browser.runtime.getURL('/mailx.svg')
@@ -138,16 +140,16 @@ function positionButtonRelativeToInput(input: HTMLInputElement, host: HTMLDivEle
     
     // Check if input is still visible
     if (inputRect.width === 0 || inputRect.height === 0) {
-      host.style.display = 'none'
+      host.style.opacity = '0'
       return
     }
-    
-    host.style.display = 'block'
 
     // Calculate button position (middle-right of input)
     const buttonWidth = 24
     const buttonHeight = 24
-    const rightOffset = 10 // 10px from right edge of input
+    const rightOffset = 10 // 10px from right edge
+    
+    // const paddingRight = parseFloat(inputStyle.paddingRight) || 0
     
     // Use absolute positioning with page offsets
     const left = inputRect.right + window.pageXOffset - buttonWidth - rightOffset
@@ -155,6 +157,7 @@ function positionButtonRelativeToInput(input: HTMLInputElement, host: HTMLDivEle
 
     host.style.left = `${left}px`
     host.style.top = `${top}px`
+    host.style.opacity = '1'
   }
 
   // Store update function for cleanup

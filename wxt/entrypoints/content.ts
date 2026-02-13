@@ -78,7 +78,7 @@ function injectButton(input: HTMLInputElement) {
     width: '24px',
     height: '24px',
     pointerEvents: 'auto',
-    zIndex: '999999',
+    zIndex: '10',
   })
 
   const icon = browser.runtime.getURL('/mailx.svg')
@@ -147,12 +147,10 @@ function positionButtonRelativeToInput(input: HTMLInputElement, host: HTMLDivEle
     // Calculate button position (middle-right of input)
     const buttonWidth = 24
     const buttonHeight = 24
-    const rightOffset = 8 // 8px from right edge
-    
-    const paddingRight = parseFloat(inputStyle.paddingRight) || 0
+    const rightOffset = 10 // 10px from right edge of input
     
     // Use absolute positioning with page offsets
-    const left = inputRect.right + window.pageXOffset - buttonWidth - rightOffset - paddingRight
+    const left = inputRect.right + window.pageXOffset - buttonWidth - rightOffset
     const top = inputRect.top + window.pageYOffset + (inputRect.height - buttonHeight) / 2
 
     host.style.left = `${left}px`

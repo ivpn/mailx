@@ -146,9 +146,9 @@
     @apply absolute pointer-events-none;
     @apply hidden md:block;
     /* Tether to top, right, bottom - resize with container while maintaining 1:1 ratio */
-    top: 0;
+    top: -30px;
     right: 0;
-    bottom: 0;
+    bottom: -30px;
     /* Use aspect ratio to maintain 1:1 while filling height */
     aspect-ratio: 1 / 1;
     background-size: contain;
@@ -179,10 +179,12 @@
 }
 
 .hero-content {
-    @apply w-full flex flex-col;
+    @apply flex flex-col;
     @apply py-8 md:py-8 lg:py-8;
-    @apply mx-0 px-4 md:px-8 md:mx-0 lg:mx-[220px] lg:block lg:w-auto;
+    @apply px-4 md:px-8;
+    @apply max-w-[1000px] mx-auto;
     @apply relative;
+    @apply w-full;
 }
 
 .hero-text {
@@ -261,9 +263,10 @@
 
 /* Screenshot Section */
 .hero-screenshot {
-    @apply w-full;
     @apply relative z-10;
-    @apply px-2 md:px-0 lg:px-[220px];
+    @apply px-4 md:px-8;
+    @apply max-w-[1000px] mx-auto;
+    @apply w-full;
 }
 
 .screenshot-container {
@@ -294,5 +297,14 @@
 
 .dark-only {
     @apply hidden dark:block;
+}
+
+/* Override theme visibility for backgrounds on mobile - force hide */
+.hero-background.light-only {
+    @apply dark:hidden md:block;
+}
+
+.hero-background.dark-only {
+    @apply hidden dark:md:block;
 }
 </style>

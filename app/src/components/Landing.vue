@@ -18,10 +18,6 @@
         <!-- Section 2: Hero Content -->
         <section class="hero-section">
             <div class="hero-content">
-                <!-- Background patterns - hidden on mobile, shown on tablet/desktop -->
-                <div class="hero-background light-only" aria-hidden="true"></div>
-                <div class="hero-background dark-only" aria-hidden="true"></div>
-                
                 <div class="hero-text">
                     <h1 class="hero-title">
                         RESIST_EMAIL_<br>SURVEILLANCE
@@ -53,6 +49,9 @@
                         ./VIEW_SOURCE
                     </a>
                 </div>
+                <!-- Background patterns - hidden on mobile, shown on tablet/desktop -->
+                <div class="hero-background light-only" aria-hidden="true"></div>
+                <div class="hero-background dark-only" aria-hidden="true"></div>
             </div>
             <div class="hero-screenshot">
                 <div class="screenshot-container">
@@ -182,12 +181,13 @@
 .hero-content {
     @apply w-full flex flex-col;
     @apply py-8 md:py-8 lg:py-8;
-    @apply px-4 md:px-8 lg:px-[220px];
+    @apply mx-0 px-4 md:px-8 md:mx-0 lg:mx-[220px] lg:block lg:w-auto;
     @apply relative;
 }
 
 .hero-text {
-    @apply flex flex-col gap-5 md:gap-6;
+    @apply flex flex-col gap-5 md:gap-6 z-10;
+    @apply relative;
 }
 
 .hero-title {
@@ -223,9 +223,10 @@
 }
 
 .hero-cta {
-    @apply flex gap-2 items-center mt-8;
+    @apply flex gap-2 items-center mt-8 z-10;
     /* Full width buttons on mobile, auto width on desktop */
     @apply flex-col md:flex-row w-full md:w-auto;
+    @apply relative;
 }
 
 .cta-btn {
@@ -248,6 +249,7 @@
 }
 
 .cta-secondary {
+    @apply px-[15px] py-[12px];
     @apply border border-solid;
     @apply border-[#1a75da] dark:border-[#0179ff];
     @apply text-[#1a75da] dark:text-[#0179ff];

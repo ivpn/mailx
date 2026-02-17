@@ -74,6 +74,195 @@
                 </div>
             </div>
         </section>
+
+        <!-- Section 3: How It Works -->
+        <section class="how-it-works-section">
+            <div class="how-it-works-container">
+                <!-- Title and Subtitle -->
+                <div class="how-it-works-header">
+                    <h2 class="how-it-works-title">HOW_IT_WORKS</h2>
+                    <p class="how-it-works-subtitle">Mailx generates unique aliases for each service and sender.</p>
+                </div>
+
+                <!-- Flow Diagrams -->
+                <div class="flow-diagrams">
+                    <!-- Receive Flow -->
+                    <div class="flow-card">
+                        <div class="flow-header">
+                            <span class="flow-title"># RECEIVE_FLOW</span>
+                        </div>
+                        <div class="flow-diagram">
+                            <div class="flow-steps">
+                                <!-- Step 1: Sender -->
+                                <div class="flow-step">
+                                    <div class="flow-icon-row">
+                                        <img src="../assets/icons/flow-icon-user.svg" alt="" class="flow-icon" />
+                                        <div class="flow-arrow">
+                                            <svg width="100%" height="6" viewBox="0 0 100 6" preserveAspectRatio="none">
+                                                <line x1="0" y1="3" x2="100%" y2="3" stroke="currentColor" stroke-width="1" stroke-dasharray="4 2" />
+                                            </svg>
+                                            <span class="flow-arrow-char">&gt;</span>
+                                        </div>
+                                    </div>
+                                    <span class="flow-label">Sender</span>
+                                </div>
+
+                                <!-- Step 2: Alias -->
+                                <div class="flow-step">
+                                    <div class="flow-icon-row">
+                                        <img src="../assets/icons/flow-icon-mail.svg" alt="" class="flow-icon" />
+                                        <div class="flow-arrow">
+                                            <svg width="100%" height="6" viewBox="0 0 100 6" preserveAspectRatio="none">
+                                                <line x1="0" y1="3" x2="100%" y2="3" stroke="currentColor" stroke-width="1" stroke-dasharray="4 2" />
+                                            </svg>
+                                            <span class="flow-arrow-char">&gt;</span>
+                                        </div>
+                                    </div>
+                                    <span class="flow-label">Alias</span>
+                                </div>
+
+                                <!-- Step 3: Mailx -->
+                                <div class="flow-step">
+                                    <div class="flow-icon-row">
+                                        <img src="../assets/icons/flow-icon-server.svg" alt="" class="flow-icon" />
+                                        <div class="flow-arrow">
+                                            <svg width="100%" height="6" viewBox="0 0 100 6" preserveAspectRatio="none">
+                                                <line x1="0" y1="3" x2="100%" y2="3" stroke="currentColor" stroke-width="1" stroke-dasharray="4 2" />
+                                            </svg>
+                                            <span class="flow-arrow-char">&gt;</span>
+                                        </div>
+                                    </div>
+                                    <span class="flow-label">Mailx</span>
+                                </div>
+
+                                <!-- Step 4: Inbox -->
+                                <div class="flow-step flow-step-last">
+                                    <div class="flow-icon-row">
+                                        <img src="../assets/icons/flow-icon-mail.svg" alt="" class="flow-icon" />
+                                    </div>
+                                    <span class="flow-label">Inbox</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flow-instructions">
+                            <div class="instruction-item">
+                                <span class="instruction-number">#1</span>
+                                <span class="instruction-text">Create an email alias</span>
+                            </div>
+                            <div class="instruction-item">
+                                <span class="instruction-number">#2</span>
+                                <span class="instruction-text">Share the alias instead of your real email</span>
+                            </div>
+                            <div class="instruction-item">
+                                <span class="instruction-number">#3</span>
+                                <span class="instruction-text">Receive forwarded emails in your inbox</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Send/Reply Flow -->
+                    <div class="flow-card">
+                        <div class="flow-header">
+                            <span class="flow-title"># SEND/REPLY_FLOW</span>
+                        </div>
+                        <div class="flow-diagram">
+                            <div class="flow-steps">
+                                <!-- Step 1: Outbox -->
+                                <div class="flow-step">
+                                    <div class="flow-icon-row">
+                                        <img src="../assets/icons/flow-icon-mail.svg" alt="" class="flow-icon" />
+                                        <div class="flow-arrow">
+                                            <svg width="100%" height="6" viewBox="0 0 100 6" preserveAspectRatio="none">
+                                                <line x1="0" y1="3" x2="100%" y2="3" stroke="currentColor" stroke-width="1" stroke-dasharray="4 2" />
+                                            </svg>
+                                            <span class="flow-arrow-char">&gt;</span>
+                                        </div>
+                                    </div>
+                                    <span class="flow-label">Outbox</span>
+                                </div>
+
+                                <!-- Step 2: Mailx -->
+                                <div class="flow-step">
+                                    <div class="flow-icon-row">
+                                        <img src="../assets/icons/flow-icon-server.svg" alt="" class="flow-icon" />
+                                        <div class="flow-arrow">
+                                            <svg width="100%" height="6" viewBox="0 0 100 6" preserveAspectRatio="none">
+                                                <line x1="0" y1="3" x2="100%" y2="3" stroke="currentColor" stroke-width="1" stroke-dasharray="4 2" />
+                                            </svg>
+                                            <span class="flow-arrow-char">&gt;</span>
+                                        </div>
+                                    </div>
+                                    <span class="flow-label">Mailx</span>
+                                </div>
+
+                                <!-- Step 3: Alias -->
+                                <div class="flow-step">
+                                    <div class="flow-icon-row">
+                                        <img src="../assets/icons/flow-icon-mail.svg" alt="" class="flow-icon" />
+                                        <div class="flow-arrow">
+                                            <svg width="100%" height="6" viewBox="0 0 100 6" preserveAspectRatio="none">
+                                                <line x1="0" y1="3" x2="100%" y2="3" stroke="currentColor" stroke-width="1" stroke-dasharray="4 2" />
+                                            </svg>
+                                            <span class="flow-arrow-char">&gt;</span>
+                                        </div>
+                                    </div>
+                                    <span class="flow-label">Alias</span>
+                                </div>
+
+                                <!-- Step 4: Recipient -->
+                                <div class="flow-step flow-step-last">
+                                    <div class="flow-icon-row">
+                                        <img src="../assets/icons/flow-icon-user.svg" alt="" class="flow-icon" />
+                                    </div>
+                                    <span class="flow-label">Recipient</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flow-instructions">
+                            <div class="instruction-item">
+                                <span class="instruction-number">#1</span>
+                                <span class="instruction-text">Create a send address for your recipient</span>
+                            </div>
+                            <div class="instruction-item">
+                                <span class="instruction-number">#2</span>
+                                <span class="instruction-text">Email that address from your inbox</span>
+                            </div>
+                            <div class="instruction-item">
+                                <span class="instruction-number">#3</span>
+                                <span class="instruction-text">Recipient gets your email from the alias</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature Cards -->
+                <div class="feature-cards">
+                    <div class="feature-card">
+                        <div class="feature-card-header">
+                            <img src="../assets/icons/feature-icon-lock.svg" alt="" class="feature-icon" />
+                            <h3 class="feature-card-title">BLOCK_SPAM_AND_PHISHING</h3>
+                        </div>
+                        <p class="feature-card-text">Disable or delete any alias instantly. Even if one gets compromised, your real email remains unexposed.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-card-header">
+                            <img src="../assets/icons/feature-icon-data-leak.svg" alt="" class="feature-icon" />
+                            <h3 class="feature-card-title">DETECT_DATA_LEAKS</h3>
+                        </div>
+                        <p class="feature-card-text">One alias per service means you'll know exactly who shared your email without your consent.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-card-header">
+                            <img src="../assets/icons/feature-icon-users.svg" alt="" class="feature-icon" />
+                            <h3 class="feature-card-title">PREVENT_IDENTITY_CORRELATION</h3>
+                        </div>
+                        <p class="feature-card-text">Each service gets a unique alias. Advertisers and data brokers can't connect your accounts across platforms.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 </template>
 
@@ -82,6 +271,10 @@
     @apply w-full;
     @apply bg-white dark:bg-[#0a0a0a];
     @apply min-h-screen;
+
+    * {
+        @apply font-secondary;
+    }
 }
 
 .landing-header {
@@ -306,5 +499,175 @@
 
 .hero-background.dark-only {
     @apply hidden dark:md:block;
+}
+
+/* Section 3: How It Works */
+.how-it-works-section {
+    @apply w-full;
+    @apply bg-white dark:bg-[#0a0a0a];
+    @apply py-[72px];
+}
+
+.how-it-works-container {
+    @apply flex flex-col gap-8;
+    @apply w-full;
+    @apply max-w-[1000px] mx-auto;
+    @apply px-4 md:px-8;
+}
+
+.how-it-works-header {
+    @apply flex flex-col gap-4;
+}
+
+.how-it-works-title {
+    @apply font-bold uppercase;
+    @apply text-[#1a75da] dark:text-[#449cf8];
+    @apply text-[36px] leading-[40px];
+    @apply m-0;
+}
+
+.how-it-works-subtitle {
+    @apply text-[#115190] dark:text-[#82b8ed];
+    @apply text-base leading-4;
+    @apply m-0;
+    @apply max-w-[587px];
+}
+
+/* Flow Diagrams */
+.flow-diagrams {
+    @apply flex flex-col lg:flex-row gap-0;
+    @apply border border-solid;
+    @apply border-[#dbdfe5] dark:border-[#282727];
+}
+
+.flow-card {
+    @apply flex-1;
+    @apply border-[#dbdfe5] dark:border-[#282727];
+    @apply lg:border-r lg:last:border-r-0;
+    @apply border-b lg:border-b-0 last:border-b-0;
+}
+
+.flow-header {
+    @apply bg-[#f3f4f5] dark:bg-[#0a0a0a];
+    @apply border-b border-dashed;
+    @apply border-[#dbdfe5] dark:border-[#282727];
+    @apply px-5 py-3;
+}
+
+.flow-title {
+    @apply text-[#1a75da] dark:text-[#449cf8];
+    @apply text-xs leading-3;
+    @apply font-normal;
+}
+
+.flow-diagram {
+    @apply bg-[#fafbfc] dark:bg-[#0f0f11];
+    @apply p-5;
+}
+
+.flow-steps {
+    @apply flex items-center gap-1;
+}
+
+.flow-step {
+    @apply flex-1;
+    @apply flex flex-col gap-[10px];
+}
+
+.flow-step-last {
+    @apply flex-none;
+}
+
+.flow-icon-row {
+    @apply flex items-center gap-0;
+}
+
+.flow-icon {
+    @apply w-5 h-5;
+    @apply shrink-0;
+}
+
+.flow-arrow {
+    @apply flex-1;
+    @apply text-[#1a75da] dark:text-[#282727];
+    @apply flex items-center;
+    @apply relative;
+    @apply mx-2;
+}
+
+.flow-arrow-char {
+    @apply text-[#1a75da] dark:text-[#282727];
+    @apply text-xs;
+    @apply absolute right-[-4px] top-[-4px];
+    @apply leading-none;
+}
+
+.flow-label {
+    @apply text-[#1a75da] dark:text-[#449cf8];
+    @apply text-xs leading-4;
+}
+
+.flow-instructions {
+    @apply bg-[#fafbfc] dark:bg-[#0f0f11];
+    @apply border-t border-solid;
+    @apply border-[#dbdfe5] dark:border-[#282727];
+    @apply p-5;
+    @apply flex flex-col gap-4;
+}
+
+.instruction-item {
+    @apply flex gap-2 items-start;
+}
+
+.instruction-number {
+    @apply text-[#1a75da] dark:text-[#449cf8];
+    @apply text-sm leading-4;
+    @apply w-5 h-5;
+    @apply flex items-center justify-center;
+    @apply shrink-0;
+}
+
+.instruction-text {
+    @apply text-[#115190] dark:text-[#82b8ed];
+    @apply text-sm leading-5;
+    @apply flex-1;
+}
+
+/* Feature Cards */
+.feature-cards {
+    @apply border border-solid;
+    @apply border-[#dbdfe5] dark:border-[#282727];
+    @apply flex flex-col lg:flex-row;
+}
+
+.feature-card {
+    @apply flex-1;
+    @apply p-6;
+    @apply flex flex-col gap-4;
+    @apply border-[#dbdfe5] dark:border-[#282727];
+    @apply border-b lg:border-b-0 lg:border-r;
+    @apply last:border-b-0 lg:last:border-r-0;
+}
+
+.feature-card-header {
+    @apply flex gap-3 items-center;
+}
+
+.feature-icon {
+    @apply w-6 h-6;
+    @apply shrink-0;
+}
+
+.feature-card-title {
+    @apply text-[#1a75da] dark:text-[#449cf8];
+    @apply text-base leading-4;
+    @apply font-medium uppercase;
+    @apply m-0;
+}
+
+.feature-card-text {
+    @apply text-[#115190] dark:text-[#82b8ed];
+    @apply text-sm leading-5;
+    @apply m-0;
 }
 </style>

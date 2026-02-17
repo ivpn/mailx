@@ -18,6 +18,10 @@
         <!-- Section 2: Hero Content -->
         <section class="hero-section">
             <div class="hero-content">
+                <!-- Background patterns - hidden on mobile, shown on tablet/desktop -->
+                <div class="hero-background light-only" aria-hidden="true"></div>
+                <div class="hero-background dark-only" aria-hidden="true"></div>
+                
                 <div class="hero-text">
                     <h1 class="hero-title">
                         RESIST_EMAIL_<br>SURVEILLANCE
@@ -77,6 +81,8 @@
 <style scoped>
 .landing-page {
     @apply w-full;
+    @apply bg-white dark:bg-[#0a0a0a];
+    @apply min-h-screen;
 }
 
 .landing-header {
@@ -133,12 +139,51 @@
 /* Hero Section */
 .hero-section {
     @apply w-full flex flex-col;
+    @apply relative overflow-hidden;
+}
+
+/* Background patterns - hidden on mobile, shown on tablet/desktop */
+.hero-background {
+    @apply absolute pointer-events-none;
+    @apply hidden md:block;
+    /* Tether to top, right, bottom - resize with container while maintaining 1:1 ratio */
+    top: 0;
+    right: 0;
+    bottom: 0;
+    /* Use aspect ratio to maintain 1:1 while filling height */
+    aspect-ratio: 1 / 1;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center right;
+}
+
+/* Light mode backgrounds */
+.hero-background.light-only {
+    background-image: url('../assets/hero-bg-light-tablet.svg');
+}
+
+@media (min-width: 1024px) {
+    .hero-background.light-only {
+        background-image: url('../assets/hero-bg-light-desktop.svg');
+    }
+}
+
+/* Dark mode backgrounds */
+.hero-background.dark-only {
+    background-image: url('../assets/hero-bg-dark-tablet.svg');
+}
+
+@media (min-width: 1024px) {
+    .hero-background.dark-only {
+        background-image: url('../assets/hero-bg-dark-desktop.svg');
+    }
 }
 
 .hero-content {
     @apply w-full flex flex-col;
     @apply py-8 md:py-8 lg:py-8;
     @apply px-4 md:px-8 lg:px-[220px];
+    @apply relative;
 }
 
 .hero-text {
@@ -159,6 +204,7 @@
 
 .feature-item {
     @apply flex gap-2 items-center;
+    @apply relative z-10;
 }
 
 .feature-bullet {
@@ -214,6 +260,7 @@
 /* Screenshot Section */
 .hero-screenshot {
     @apply w-full;
+    @apply relative z-10;
     @apply px-2 md:px-0 lg:px-[220px];
 }
 

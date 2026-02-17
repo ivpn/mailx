@@ -96,7 +96,8 @@
                                 <!-- Step 1: Sender -->
                                 <div class="flow-step">
                                     <div class="flow-icon-row">
-                                        <img src="../assets/icons/flow-icon-user.svg" alt="" class="flow-icon" />
+                                        <img src="../assets/icons/flow-icon-user-light.svg" alt="" class="flow-icon light-only" />
+                                        <img src="../assets/icons/flow-icon-user-dark.svg" alt="" class="flow-icon dark-only" />
                                         <div class="flow-arrow">
                                             <svg width="100%" height="6" viewBox="0 0 100 6" preserveAspectRatio="none">
                                                 <line x1="0" y1="3" x2="100%" y2="3" stroke="currentColor" stroke-width="1" stroke-dasharray="4 2" />
@@ -110,7 +111,8 @@
                                 <!-- Step 2: Alias -->
                                 <div class="flow-step">
                                     <div class="flow-icon-row">
-                                        <img src="../assets/icons/flow-icon-mail.svg" alt="" class="flow-icon" />
+                                        <img src="../assets/icons/flow-icon-mail-light.svg" alt="" class="flow-icon light-only" />
+                                        <img src="../assets/icons/flow-icon-mail-dark.svg" alt="" class="flow-icon dark-only" />
                                         <div class="flow-arrow">
                                             <svg width="100%" height="6" viewBox="0 0 100 6" preserveAspectRatio="none">
                                                 <line x1="0" y1="3" x2="100%" y2="3" stroke="currentColor" stroke-width="1" stroke-dasharray="4 2" />
@@ -124,7 +126,8 @@
                                 <!-- Step 3: Mailx -->
                                 <div class="flow-step">
                                     <div class="flow-icon-row">
-                                        <img src="../assets/icons/flow-icon-server.svg" alt="" class="flow-icon" />
+                                        <img src="../assets/icons/flow-icon-server-light.svg" alt="" class="flow-icon light-only" />
+                                        <img src="../assets/icons/flow-icon-server-dark.svg" alt="" class="flow-icon dark-only" />
                                         <div class="flow-arrow">
                                             <svg width="100%" height="6" viewBox="0 0 100 6" preserveAspectRatio="none">
                                                 <line x1="0" y1="3" x2="100%" y2="3" stroke="currentColor" stroke-width="1" stroke-dasharray="4 2" />
@@ -138,7 +141,8 @@
                                 <!-- Step 4: Inbox -->
                                 <div class="flow-step flow-step-last">
                                     <div class="flow-icon-row">
-                                        <img src="../assets/icons/flow-icon-mail.svg" alt="" class="flow-icon" />
+                                        <img src="../assets/icons/flow-icon-mail-light.svg" alt="" class="flow-icon light-only" />
+                                        <img src="../assets/icons/flow-icon-mail-dark.svg" alt="" class="flow-icon dark-only" />
                                     </div>
                                     <span class="flow-label">Inbox</span>
                                 </div>
@@ -170,7 +174,8 @@
                                 <!-- Step 1: Outbox -->
                                 <div class="flow-step">
                                     <div class="flow-icon-row">
-                                        <img src="../assets/icons/flow-icon-mail.svg" alt="" class="flow-icon" />
+                                        <img src="../assets/icons/flow-icon-mail-light.svg" alt="" class="flow-icon light-only" />
+                                        <img src="../assets/icons/flow-icon-mail-dark.svg" alt="" class="flow-icon dark-only" />
                                         <div class="flow-arrow">
                                             <svg width="100%" height="6" viewBox="0 0 100 6" preserveAspectRatio="none">
                                                 <line x1="0" y1="3" x2="100%" y2="3" stroke="currentColor" stroke-width="1" stroke-dasharray="4 2" />
@@ -184,7 +189,8 @@
                                 <!-- Step 2: Mailx -->
                                 <div class="flow-step">
                                     <div class="flow-icon-row">
-                                        <img src="../assets/icons/flow-icon-server.svg" alt="" class="flow-icon" />
+                                        <img src="../assets/icons/flow-icon-server-light.svg" alt="" class="flow-icon light-only" />
+                                        <img src="../assets/icons/flow-icon-server-dark.svg" alt="" class="flow-icon dark-only" />
                                         <div class="flow-arrow">
                                             <svg width="100%" height="6" viewBox="0 0 100 6" preserveAspectRatio="none">
                                                 <line x1="0" y1="3" x2="100%" y2="3" stroke="currentColor" stroke-width="1" stroke-dasharray="4 2" />
@@ -198,7 +204,8 @@
                                 <!-- Step 3: Alias -->
                                 <div class="flow-step">
                                     <div class="flow-icon-row">
-                                        <img src="../assets/icons/flow-icon-mail.svg" alt="" class="flow-icon" />
+                                        <img src="../assets/icons/flow-icon-mail-light.svg" alt="" class="flow-icon light-only" />
+                                        <img src="../assets/icons/flow-icon-mail-dark.svg" alt="" class="flow-icon dark-only" />
                                         <div class="flow-arrow">
                                             <svg width="100%" height="6" viewBox="0 0 100 6" preserveAspectRatio="none">
                                                 <line x1="0" y1="3" x2="100%" y2="3" stroke="currentColor" stroke-width="1" stroke-dasharray="4 2" />
@@ -212,7 +219,8 @@
                                 <!-- Step 4: Recipient -->
                                 <div class="flow-step flow-step-last">
                                     <div class="flow-icon-row">
-                                        <img src="../assets/icons/flow-icon-user.svg" alt="" class="flow-icon" />
+                                        <img src="../assets/icons/flow-icon-user-light.svg" alt="" class="flow-icon light-only" />
+                                        <img src="../assets/icons/flow-icon-user-dark.svg" alt="" class="flow-icon dark-only" />
                                     </div>
                                     <span class="flow-label">Recipient</span>
                                 </div>
@@ -239,7 +247,8 @@
                 <div class="feature-cards">
                     <div class="feature-card">
                         <div class="feature-card-header">
-                            <img src="../assets/icons/feature-icon-lock.svg" alt="" class="feature-icon" />
+                            <img src="../assets/icons/feature-icon-lock-light.svg" alt="" class="feature-icon light-only" />
+                            <img src="../assets/icons/feature-icon-lock-dark.svg" alt="" class="feature-icon dark-only" />
                             <h3 class="feature-card-title">BLOCK_SPAM_AND_PHISHING</h3>
                         </div>
                         <p class="feature-card-text">Disable or delete any alias instantly. Even if one gets compromised, your real email remains unexposed.</p>
@@ -247,7 +256,8 @@
 
                     <div class="feature-card">
                         <div class="feature-card-header">
-                            <img src="../assets/icons/feature-icon-data-leak.svg" alt="" class="feature-icon" />
+                            <img src="../assets/icons/feature-icon-data-leak-light.svg" alt="" class="feature-icon light-only" />
+                            <img src="../assets/icons/feature-icon-data-leak-dark.svg" alt="" class="feature-icon dark-only" />
                             <h3 class="feature-card-title">DETECT_DATA_LEAKS</h3>
                         </div>
                         <p class="feature-card-text">One alias per service means you'll know exactly who shared your email without your consent.</p>
@@ -255,7 +265,8 @@
 
                     <div class="feature-card">
                         <div class="feature-card-header">
-                            <img src="../assets/icons/feature-icon-users.svg" alt="" class="feature-icon" />
+                            <img src="../assets/icons/feature-icon-users-light.svg" alt="" class="feature-icon light-only" />
+                            <img src="../assets/icons/feature-icon-users-dark.svg" alt="" class="feature-icon dark-only" />
                             <h3 class="feature-card-title">PREVENT_IDENTITY_CORRELATION</h3>
                         </div>
                         <p class="feature-card-text">Each service gets a unique alias. Advertisers and data brokers can't connect your accounts across platforms.</p>

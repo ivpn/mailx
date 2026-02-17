@@ -15,6 +15,7 @@ import Terms from './components/Terms.vue'
 import Privacy from './components/Privacy.vue'
 import Faq from './components/Faq.vue'
 import NotFound from './components/NotFound.vue'
+import Landing from './components/Landing.vue'
 import { type IStaticMethods } from 'preline/preline'
 
 declare global {
@@ -115,6 +116,11 @@ const routes: RouteRecordRaw[] = [
         path: '/faq',
         name: `${AppName} - FAQ`,
         component: Faq
+    },
+    {
+        path: '/landing',
+        name: `${AppName} - Landing`,
+        component: Landing
     },
     {
         path: '/:pathMatch(.*)*',

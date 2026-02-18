@@ -649,6 +649,21 @@
             </div>
         </section>
 
+        <!-- Section 9: Footer Strip -->
+        <section class="landing-footer-strip-section">
+            <div class="landing-footer-strip">
+                <span class="landing-footer-strip-text">2026 Mailx</span>
+                <span class="landing-footer-strip-divider" aria-hidden="true"></span>
+                <a
+                    href="https://github.com/ivpn/email/blob/master/LICENSE"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="landing-footer-strip-text landing-footer-strip-link"
+                >
+                    ./LICENSE.txt
+                </a>
+            </div>
+        </section>
         
     </div>
 </template>
@@ -1716,5 +1731,39 @@ img.dark-only {
         @apply border-y-0 border-x;
         @apply mb-0 mr-[-1px];
     }
+}
+
+/* Section 9: Footer Strip */
+.landing-footer-strip-section {
+    @apply w-full;
+    @apply bg-[#ffffff] dark:bg-[#050607];
+}
+
+.landing-footer-strip {
+    @apply w-full;
+    @apply flex items-center justify-center;
+    @apply gap-3;
+    @apply py-4;
+    @apply px-8 md:px-8 lg:px-0;
+}
+
+.landing-footer-strip-text {
+    @apply text-sm leading-[14px];
+    @apply text-[#285e93];
+    @apply whitespace-nowrap;
+}
+
+.landing-footer-strip-link {
+    @apply no-underline;
+}
+
+.landing-footer-strip-link:hover {
+    @apply opacity-80;
+}
+
+.landing-footer-strip-divider {
+    @apply w-0 h-2;
+    @apply border-l border-solid;
+    @apply border-[#b6c1ce] dark:border-[#2d3d4d];
 }
 </style>

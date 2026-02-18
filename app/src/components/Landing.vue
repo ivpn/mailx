@@ -6,9 +6,9 @@
                 <span class="landing-logo"></span>
             </router-link>
             <div class="landing-actions">
-                <router-link to="/signup" class="landing-btn landing-btn-signup">
+                <a href="https://www.ivpn.net" class="landing-btn landing-btn-signup" target="_blank">
                     [SIGN UP]
-                </router-link>
+                </a>
                 <router-link to="/login" class="landing-btn landing-btn-login">
                     [LOG IN]
                 </router-link>
@@ -42,10 +42,10 @@
                     </div>
                 </div>
                 <div class="hero-cta">
-                    <router-link to="/signup" class="cta-btn cta-primary">
+                    <a href="https://www.ivpn.net" class="cta-btn cta-primary" target="_blank">
                         ./GET_ACCESS
-                    </router-link>
-                    <a href="https://github.com/ivpn/email" target="_blank" rel="noopener noreferrer" class="cta-btn cta-secondary">
+                    </a>
+                    <a href="https://github.com/ivpn/mailx" target="_blank" class="cta-btn cta-secondary">
                         ./VIEW_SOURCE
                     </a>
                 </div>
@@ -96,8 +96,8 @@
                                 <!-- Step 1: Sender -->
                                 <div class="flow-step">
                                     <div class="flow-icon-row">
-                                        <img src="../assets/icons/flow-icon-user-light.svg" alt="" class="flow-icon light-only" />
-                                        <img src="../assets/icons/flow-icon-user-dark.svg" alt="" class="flow-icon dark-only" />
+                                        <img src="../assets/icons/flow-icon-user-light.svg" class="flow-icon light-only" />
+                                        <img src="../assets/icons/flow-icon-user-dark.svg" class="flow-icon dark-only" />
                                         <div class="flow-arrow">
                                             <svg width="100%" height="6" viewBox="0 0 100 6" preserveAspectRatio="none">
                                                 <line x1="0" y1="3" x2="100%" y2="3" stroke="currentColor" stroke-width="1" stroke-dasharray="4 2" />
@@ -111,8 +111,8 @@
                                 <!-- Step 2: Alias -->
                                 <div class="flow-step">
                                     <div class="flow-icon-row">
-                                        <img src="../assets/icons/flow-icon-mail-light.svg" alt="" class="flow-icon light-only" />
-                                        <img src="../assets/icons/flow-icon-mail-dark.svg" alt="" class="flow-icon dark-only" />
+                                        <img src="../assets/icons/flow-icon-mail-light.svg" class="flow-icon light-only" />
+                                        <img src="../assets/icons/flow-icon-mail-dark.svg" class="flow-icon dark-only" />
                                         <div class="flow-arrow">
                                             <svg width="100%" height="6" viewBox="0 0 100 6" preserveAspectRatio="none">
                                                 <line x1="0" y1="3" x2="100%" y2="3" stroke="currentColor" stroke-width="1" stroke-dasharray="4 2" />
@@ -126,8 +126,8 @@
                                 <!-- Step 3: Mailx -->
                                 <div class="flow-step">
                                     <div class="flow-icon-row">
-                                        <img src="../assets/icons/flow-icon-server-light.svg" alt="" class="flow-icon light-only" />
-                                        <img src="../assets/icons/flow-icon-server-dark.svg" alt="" class="flow-icon dark-only" />
+                                        <img src="../assets/icons/flow-icon-server-light.svg" class="flow-icon light-only" />
+                                        <img src="../assets/icons/flow-icon-server-dark.svg" class="flow-icon dark-only" />
                                         <div class="flow-arrow">
                                             <svg width="100%" height="6" viewBox="0 0 100 6" preserveAspectRatio="none">
                                                 <line x1="0" y1="3" x2="100%" y2="3" stroke="currentColor" stroke-width="1" stroke-dasharray="4 2" />
@@ -141,8 +141,8 @@
                                 <!-- Step 4: Inbox -->
                                 <div class="flow-step flow-step-last">
                                     <div class="flow-icon-row">
-                                        <img src="../assets/icons/flow-icon-mail-light.svg" alt="" class="flow-icon light-only" />
-                                        <img src="../assets/icons/flow-icon-mail-dark.svg" alt="" class="flow-icon dark-only" />
+                                        <img src="../assets/icons/flow-icon-mail-light.svg" class="flow-icon light-only" />
+                                        <img src="../assets/icons/flow-icon-mail-dark.svg" class="flow-icon dark-only" />
                                     </div>
                                     <span class="flow-label">Inbox</span>
                                 </div>
@@ -174,8 +174,8 @@
                                 <!-- Step 1: Outbox -->
                                 <div class="flow-step">
                                     <div class="flow-icon-row">
-                                        <img src="../assets/icons/flow-icon-mail-light.svg" alt="" class="flow-icon light-only" />
-                                        <img src="../assets/icons/flow-icon-mail-dark.svg" alt="" class="flow-icon dark-only" />
+                                        <img src="../assets/icons/flow-icon-mail-light.svg" class="flow-icon light-only" />
+                                        <img src="../assets/icons/flow-icon-mail-dark.svg" class="flow-icon dark-only" />
                                         <div class="flow-arrow">
                                             <svg width="100%" height="6" viewBox="0 0 100 6" preserveAspectRatio="none">
                                                 <line x1="0" y1="3" x2="100%" y2="3" stroke="currentColor" stroke-width="1" stroke-dasharray="4 2" />
@@ -189,8 +189,8 @@
                                 <!-- Step 2: Mailx -->
                                 <div class="flow-step">
                                     <div class="flow-icon-row">
-                                        <img src="../assets/icons/flow-icon-server-light.svg" alt="" class="flow-icon light-only" />
-                                        <img src="../assets/icons/flow-icon-server-dark.svg" alt="" class="flow-icon dark-only" />
+                                        <img src="../assets/icons/flow-icon-server-light.svg" class="flow-icon light-only" />
+                                        <img src="../assets/icons/flow-icon-server-dark.svg" class="flow-icon dark-only" />
                                         <div class="flow-arrow">
                                             <svg width="100%" height="6" viewBox="0 0 100 6" preserveAspectRatio="none">
                                                 <line x1="0" y1="3" x2="100%" y2="3" stroke="currentColor" stroke-width="1" stroke-dasharray="4 2" />
@@ -204,8 +204,8 @@
                                 <!-- Step 3: Alias -->
                                 <div class="flow-step">
                                     <div class="flow-icon-row">
-                                        <img src="../assets/icons/flow-icon-mail-light.svg" alt="" class="flow-icon light-only" />
-                                        <img src="../assets/icons/flow-icon-mail-dark.svg" alt="" class="flow-icon dark-only" />
+                                        <img src="../assets/icons/flow-icon-mail-light.svg" class="flow-icon light-only" />
+                                        <img src="../assets/icons/flow-icon-mail-dark.svg" class="flow-icon dark-only" />
                                         <div class="flow-arrow">
                                             <svg width="100%" height="6" viewBox="0 0 100 6" preserveAspectRatio="none">
                                                 <line x1="0" y1="3" x2="100%" y2="3" stroke="currentColor" stroke-width="1" stroke-dasharray="4 2" />
@@ -219,8 +219,8 @@
                                 <!-- Step 4: Recipient -->
                                 <div class="flow-step flow-step-last">
                                     <div class="flow-icon-row">
-                                        <img src="../assets/icons/flow-icon-user-light.svg" alt="" class="flow-icon light-only" />
-                                        <img src="../assets/icons/flow-icon-user-dark.svg" alt="" class="flow-icon dark-only" />
+                                        <img src="../assets/icons/flow-icon-user-light.svg" class="flow-icon light-only" />
+                                        <img src="../assets/icons/flow-icon-user-dark.svg" class="flow-icon dark-only" />
                                     </div>
                                     <span class="flow-label">Recipient</span>
                                 </div>
@@ -247,8 +247,8 @@
                 <div class="feature-cards">
                     <div class="feature-card">
                         <div class="feature-card-header">
-                            <img src="../assets/icons/feature-icon-lock-light.svg" alt="" class="feature-icon light-only" />
-                            <img src="../assets/icons/feature-icon-lock-dark.svg" alt="" class="feature-icon dark-only" />
+                            <img src="../assets/icons/feature-icon-lock-light.svg" class="feature-icon light-only" />
+                            <img src="../assets/icons/feature-icon-lock-dark.svg" class="feature-icon dark-only" />
                             <h3 class="feature-card-title">BLOCK_SPAM_AND_PHISHING</h3>
                         </div>
                         <p class="feature-card-text">Disable or delete any alias instantly. Even if one gets compromised, your real email remains unexposed.</p>
@@ -256,8 +256,8 @@
 
                     <div class="feature-card">
                         <div class="feature-card-header">
-                            <img src="../assets/icons/feature-icon-data-leak-light.svg" alt="" class="feature-icon light-only" />
-                            <img src="../assets/icons/feature-icon-data-leak-dark.svg" alt="" class="feature-icon dark-only" />
+                            <img src="../assets/icons/feature-icon-data-leak-light.svg" class="feature-icon light-only" />
+                            <img src="../assets/icons/feature-icon-data-leak-dark.svg" class="feature-icon dark-only" />
                             <h3 class="feature-card-title">DETECT_DATA_LEAKS</h3>
                         </div>
                         <p class="feature-card-text">One alias per service means you'll know exactly who shared your email without your consent.</p>
@@ -265,8 +265,8 @@
 
                     <div class="feature-card">
                         <div class="feature-card-header">
-                            <img src="../assets/icons/feature-icon-users-light.svg" alt="" class="feature-icon light-only" />
-                            <img src="../assets/icons/feature-icon-users-dark.svg" alt="" class="feature-icon dark-only" />
+                            <img src="../assets/icons/feature-icon-users-light.svg" class="feature-icon light-only" />
+                            <img src="../assets/icons/feature-icon-users-dark.svg" class="feature-icon dark-only" />
                             <h3 class="feature-card-title">PREVENT_IDENTITY_CORRELATION</h3>
                         </div>
                         <p class="feature-card-text">Each service gets a unique alias. Advertisers and data brokers can't connect your accounts across platforms.</p>
@@ -377,44 +377,44 @@
                     <div class="verifiable-privacy-card trust-card-accountable">
                         <div class="verifiable-privacy-card-content">
                             <div class="verifiable-privacy-card-title-row">
-                                <img src="../assets/icons/trust-accountable-light.svg" alt="" class="verifiable-privacy-icon light-only" />
-                                <img src="../assets/icons/trust-accountable-dark.svg" alt="" class="verifiable-privacy-icon dark-only" />
+                                <img src="../assets/icons/trust-accountable-light.svg" class="verifiable-privacy-icon light-only" />
+                                <img src="../assets/icons/trust-accountable-dark.svg" class="verifiable-privacy-icon dark-only" />
                                 <h3 class="verifiable-privacy-card-title">ACCOUNTABLE_OPERATORS</h3>
                             </div>
                             <p class="verifiable-privacy-card-text">Built by the public team behind IVPN, with a 15-year history in operating privacy services.</p>
                         </div>
-                        <a href="https://www.ivpn.net/" target="_blank" rel="noopener noreferrer" class="verifiable-privacy-card-link">./MEET_TEAM</a>
+                        <a href="https://www.ivpn.net/en/team/" target="_blank" class="verifiable-privacy-card-link">./MEET_TEAM</a>
                     </div>
 
                     <div class="verifiable-privacy-card trust-card-open-source">
                         <div class="verifiable-privacy-card-content">
                             <div class="verifiable-privacy-card-title-row">
-                                <img src="../assets/icons/trust-open-source-light.svg" alt="" class="verifiable-privacy-icon light-only" />
-                                <img src="../assets/icons/trust-open-source-dark.svg" alt="" class="verifiable-privacy-icon dark-only" />
+                                <img src="../assets/icons/trust-open-source-light.svg" class="verifiable-privacy-icon light-only" />
+                                <img src="../assets/icons/trust-open-source-dark.svg" class="verifiable-privacy-icon dark-only" />
                                 <h3 class="verifiable-privacy-card-title">OPEN_SOURCE</h3>
                             </div>
                             <p class="verifiable-privacy-card-text">The entire Mailx project is open-source. Our implementation is public and available for review.</p>
                         </div>
-                        <a href="https://github.com/ivpn/email" target="_blank" rel="noopener noreferrer" class="verifiable-privacy-card-link">./VIEW_SOURCE</a>
+                        <a href="https://github.com/ivpn/mailx" target="_blank" class="verifiable-privacy-card-link">./VIEW_SOURCE</a>
                     </div>
 
                     <div class="verifiable-privacy-card trust-card-security">
                         <div class="verifiable-privacy-card-content">
                             <div class="verifiable-privacy-card-title-row">
-                                <img src="../assets/icons/trust-audit-light.svg" alt="" class="verifiable-privacy-icon light-only" />
-                                <img src="../assets/icons/trust-audit-dark.svg" alt="" class="verifiable-privacy-icon dark-only" />
+                                <img src="../assets/icons/trust-audit-light.svg" class="verifiable-privacy-icon light-only" />
+                                <img src="../assets/icons/trust-audit-dark.svg" class="verifiable-privacy-icon dark-only" />
                                 <h3 class="verifiable-privacy-card-title">SECURITY_AUDIT</h3>
                             </div>
                             <p class="verifiable-privacy-card-text">Mailx has undergone a third-party security audit to validate our claims and architecture.</p>
                         </div>
-                        <a href="https://github.com/ivpn/email" target="_blank" rel="noopener noreferrer" class="verifiable-privacy-card-link">./READ_AUDIT</a>
+                        <a href="https://www.ivpn.net/resources/IVP-07-report.pdf" class="verifiable-privacy-card-link">./READ_AUDIT</a>
                     </div>
 
                     <div class="verifiable-privacy-card trust-card-no-tracking">
                         <div class="verifiable-privacy-card-content">
                             <div class="verifiable-privacy-card-title-row">
-                                <img src="../assets/icons/trust-no-tracking-light.svg" alt="" class="verifiable-privacy-icon light-only" />
-                                <img src="../assets/icons/trust-no-tracking-dark.svg" alt="" class="verifiable-privacy-icon dark-only" />
+                                <img src="../assets/icons/trust-no-tracking-light.svg" class="verifiable-privacy-icon light-only" />
+                                <img src="../assets/icons/trust-no-tracking-dark.svg" class="verifiable-privacy-icon dark-only" />
                                 <h3 class="verifiable-privacy-card-title">NO_TRACKING</h3>
                             </div>
                             <p class="verifiable-privacy-card-text">Your IP address is never logged. Forwarded emails are automatically deleted after delivery.</p>
@@ -446,34 +446,34 @@
                             <div class="comp-arch-left">
                                 <img src="../assets/icons/comp-mailx-light.svg" alt="MailX" class="light-only comp-logo-mailx" />
                                 <img src="../assets/icons/comp-mailx-dark.svg" alt="MailX" class="dark-only comp-logo-mailx" />
-                                <img src="../assets/icons/comp-arrow-left-light.svg" alt="" class="light-only comp-arrow-side comp-arrow-side-left" />
-                                <img src="../assets/icons/comp-arrow-left-dark.svg" alt="" class="dark-only comp-arrow-side comp-arrow-side-left" />
+                                <img src="../assets/icons/comp-arrow-left-light.svg" class="light-only comp-arrow-side comp-arrow-side-left" />
+                                <img src="../assets/icons/comp-arrow-left-dark.svg" class="dark-only comp-arrow-side comp-arrow-side-left" />
                             </div>
 
                             <div class="comp-arch-center">
                                 <div class="comp-arch-center-top">
                                     <img src="../assets/icons/comp-ivpn-desktop.svg" alt="IVPN" class="comp-logo-ivpn" />
-                                    <img src="../assets/icons/comp-arrow-vertical-light.svg" alt="" class="light-only comp-arrow-vertical-down" />
-                                    <img src="../assets/icons/comp-arrow-vertical-dark.svg" alt="" class="dark-only comp-arrow-vertical-down" />
+                                    <img src="../assets/icons/comp-arrow-vertical-light.svg" class="light-only comp-arrow-vertical-down" />
+                                    <img src="../assets/icons/comp-arrow-vertical-dark.svg" class="dark-only comp-arrow-vertical-down" />
                                 </div>
 
                                 <div class="comp-arch-core">
-                                    <img src="../assets/icons/comp-db-light.svg" alt="" class="light-only comp-logo-db" />
-                                    <img src="../assets/icons/comp-db-dark.svg" alt="" class="dark-only comp-logo-db" />
+                                    <img src="../assets/icons/comp-db-light.svg" class="light-only comp-logo-db" />
+                                    <img src="../assets/icons/comp-db-dark.svg" class="dark-only comp-logo-db" />
                                     <p class="comp-arch-core-text">#ZERO-LINK<br>ACCESS ARCHITECTURE</p>
                                 </div>
 
                                 <div class="comp-arch-center-bottom">
-                                    <img src="../assets/icons/comp-arrow-vertical-light.svg" alt="" class="light-only comp-arrow-vertical-down" />
-                                    <img src="../assets/icons/comp-arrow-vertical-dark.svg" alt="" class="dark-only comp-arrow-vertical-down" />
+                                    <img src="../assets/icons/comp-arrow-vertical-light.svg" class="light-only comp-arrow-vertical-down" />
+                                    <img src="../assets/icons/comp-arrow-vertical-dark.svg" class="dark-only comp-arrow-vertical-down" />
                                     <img src="../assets/icons/comp-portmark-light.svg" alt="Portmaster" class="light-only comp-logo-port" />
                                     <img src="../assets/icons/comp-portmark-dark.svg" alt="Portmaster" class="dark-only comp-logo-port" />
                                 </div>
                             </div>
 
                             <div class="comp-arch-right">
-                                <img src="../assets/icons/comp-arrow-right-light.svg" alt="" class="light-only comp-arrow-side comp-arrow-side-right" />
-                                <img src="../assets/icons/comp-arrow-right-dark.svg" alt="" class="dark-only comp-arrow-side comp-arrow-side-right" />
+                                <img src="../assets/icons/comp-arrow-right-light.svg" class="light-only comp-arrow-side comp-arrow-side-right" />
+                                <img src="../assets/icons/comp-arrow-right-dark.svg" class="dark-only comp-arrow-side comp-arrow-side-right" />
                                 <img src="../assets/icons/comp-moddns-light.svg" alt="modDNS" class="light-only comp-logo-moddns" />
                                 <img src="../assets/icons/comp-moddns-dark.svg" alt="modDNS" class="dark-only comp-logo-moddns" />
                             </div>
@@ -482,10 +482,10 @@
                         <div class="comp-arch-mobile">
                             <div class="comp-arch-mobile-top">
                                 <img src="../assets/icons/comp-ivpn-mobile.svg" alt="IVPN" class="comp-logo-ivpn-mobile" />
-                                <img src="../assets/icons/comp-arrow-vertical-light.svg" alt="" class="light-only comp-arrow-vertical-mobile-down" />
-                                <img src="../assets/icons/comp-arrow-vertical-dark.svg" alt="" class="dark-only comp-arrow-vertical-mobile-down" />
-                                <img src="../assets/icons/comp-db-light.svg" alt="" class="light-only comp-logo-db" />
-                                <img src="../assets/icons/comp-db-dark.svg" alt="" class="dark-only comp-logo-db" />
+                                <img src="../assets/icons/comp-arrow-vertical-light.svg" class="light-only comp-arrow-vertical-mobile-down" />
+                                <img src="../assets/icons/comp-arrow-vertical-dark.svg" class="dark-only comp-arrow-vertical-mobile-down" />
+                                <img src="../assets/icons/comp-db-light.svg" class="light-only comp-logo-db" />
+                                <img src="../assets/icons/comp-db-dark.svg" class="dark-only comp-logo-db" />
                                 <p class="comp-arch-core-text comp-arch-core-text-mobile">#ZERO-LINK ACCESS ARCHITECTURE</p>
                             </div>
 
@@ -496,8 +496,8 @@
                                     <img src="../assets/icons/comp-mobile-left-dark.svg" alt="MailX" class="dark-only comp-mobile-side" />
                                 </div>
                                 <div class="comp-arch-mobile-center">
-                                    <img src="../assets/icons/comp-mobile-vertical-light.svg" alt="" class="light-only comp-arrow-mobile-center-down" />
-                                    <img src="../assets/icons/comp-mobile-vertical-dark.svg" alt="" class="dark-only comp-arrow-mobile-center-down" />
+                                    <img src="../assets/icons/comp-mobile-vertical-light.svg" class="light-only comp-arrow-mobile-center-down" />
+                                    <img src="../assets/icons/comp-mobile-vertical-dark.svg" class="dark-only comp-arrow-mobile-center-down" />
                                     <img src="../assets/icons/comp-portmark-light.svg" alt="Portmaster" class="light-only comp-logo-port-mobile" />
                                     <img src="../assets/icons/comp-portmark-dark.svg" alt="Portmaster" class="dark-only comp-logo-port-mobile" />
                                 </div>
@@ -512,33 +512,33 @@
 
                     <div class="comp-services-cards">
                         <div class="comp-services-card">
-                            <img src="../assets/icons/comp-signin-light.svg" alt="" class="comp-services-card-icon light-only" />
-                            <img src="../assets/icons/comp-signin-dark.svg" alt="" class="comp-services-card-icon dark-only" />
+                            <img src="../assets/icons/comp-signin-light.svg" class="comp-services-card-icon light-only" />
+                            <img src="../assets/icons/comp-signin-dark.svg" class="comp-services-card-icon dark-only" />
                             <p class="comp-services-card-text">Sign up to Mailx with true account separation</p>
                         </div>
 
                         <div class="comp-services-card">
-                            <img src="../assets/icons/comp-cross-light.svg" alt="" class="comp-services-card-icon light-only" />
-                            <img src="../assets/icons/comp-cross-dark.svg" alt="" class="comp-services-card-icon dark-only" />
+                            <img src="../assets/icons/comp-cross-light.svg" class="comp-services-card-icon light-only" />
+                            <img src="../assets/icons/comp-cross-dark.svg" class="comp-services-card-icon dark-only" />
                             <p class="comp-services-card-text">No cross-service correlation, even by administrators</p>
                         </div>
 
                         <div class="comp-services-card">
-                            <img src="../assets/icons/comp-repeat-light.svg" alt="" class="comp-services-card-icon light-only" />
-                            <img src="../assets/icons/comp-repeat-dark.svg" alt="" class="comp-services-card-icon dark-only" />
+                            <img src="../assets/icons/comp-repeat-light.svg" class="comp-services-card-icon light-only" />
+                            <img src="../assets/icons/comp-repeat-dark.svg" class="comp-services-card-icon dark-only" />
                             <p class="comp-services-card-text">Automatic and anonymous subscription management</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="comp-services-footnote">
-                    <img src="../assets/icons/comp-bulb-light.svg" alt="" class="comp-services-footnote-icon light-only" />
-                    <img src="../assets/icons/comp-bulb-dark.svg" alt="" class="comp-services-footnote-icon dark-only" />
+                    <img src="../assets/icons/comp-bulb-light.svg" class="comp-services-footnote-icon light-only" />
+                    <img src="../assets/icons/comp-bulb-dark.svg" class="comp-services-footnote-icon dark-only" />
                     <p class="comp-services-footnote-text">
                         Read more in our
-                        <a href="https://www.ivpn.net/blog/" target="_blank" rel="noopener noreferrer" class="comp-services-link">./BLOG</a>
+                        <a href="https://www.ivpn.net/blog/" target="_blank" class="comp-services-link">./BLOG</a>
                         and review the
-                        <a href="https://github.com/ivpn/email" target="_blank" rel="noopener noreferrer" class="comp-services-link">./SOURCE</a>
+                        <a href="https://github.com/ivpn/mailx" target="_blank" class="comp-services-link">./SOURCE</a>
                         implementation.
                     </p>
                 </div>
@@ -595,7 +595,7 @@
                                     <span class="get-access-price-unit">/YEAR</span>
                                 </p>
                             </div>
-                            <router-link to="/signup" class="get-access-signup">./SIGNUP</router-link>
+                            <a href="https://www.ivpn.net" class="get-access-signup" target="_blank">./SIGNUP</a>
                         </div>
 
                         <div class="get-access-divider"></div>
@@ -625,7 +625,7 @@
                                     <span class="get-access-price-unit">/YEAR</span>
                                 </p>
                             </div>
-                            <router-link to="/signup" class="get-access-signup">./SIGNUP</router-link>
+                            <a href="https://www.ivpn.net" class="get-access-signup" target="_blank">./SIGNUP</a>
                         </div>
 
                         <div class="get-access-divider"></div>
@@ -659,9 +659,8 @@
                 <span class="landing-footer-strip-text">2026 Mailx</span>
                 <span class="landing-footer-strip-divider" aria-hidden="true"></span>
                 <a
-                    href="https://github.com/ivpn/email/blob/master/LICENSE"
+                    href="https://github.com/ivpn/mailx/blob/main/LICENSE.md"
                     target="_blank"
-                    rel="noopener noreferrer"
                     class="landing-footer-strip-text landing-footer-strip-link"
                 >
                     ./LICENSE.txt

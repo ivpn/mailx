@@ -430,8 +430,7 @@
             <div class="comp-services-container">
                 <div class="comp-services-header">
                     <div class="comp-services-command">
-                        <span class="dark-only">$ cat /etc/ivpn/architecture.txt</span>
-                        <span class="light-only">/etc/ivpn/unlinked_auth.txt</span>
+                        $ cat /etc/ivpn/architecture.txt
                     </div>
                     <h2 class="comp-services-title">
                         COMPARTMENTALIZED_<br class="comp-services-break">SERVICES

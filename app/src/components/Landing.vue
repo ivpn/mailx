@@ -1321,6 +1321,7 @@ img.dark-only {
 .comp-services-panel {
     @apply border border-solid;
     @apply border-[#dbdfe5] dark:border-[#282727];
+    @apply border-b-0 md:border-b lg:border-b;
 }
 
 .comp-services-panel-head {

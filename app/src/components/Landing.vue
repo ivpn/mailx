@@ -493,8 +493,8 @@
                                 <div class="comp-arch-mobile-center">
                                     <img src="../assets/icons/comp-mobile-vertical-light.svg" alt="" class="light-only comp-arrow-mobile-center-down" />
                                     <img src="../assets/icons/comp-mobile-vertical-dark.svg" alt="" class="dark-only comp-arrow-mobile-center-down" />
-                                    <img src="../assets/icons/comp-portmark-mobile-light.svg" alt="Portmaster" class="light-only comp-logo-port-mobile" />
-                                    <img src="../assets/icons/comp-portmark-mobile-dark.svg" alt="Portmaster" class="dark-only comp-logo-port-mobile" />
+                                    <img src="../assets/icons/comp-portmark-light.svg" alt="Portmaster" class="light-only comp-logo-port-mobile" />
+                                    <img src="../assets/icons/comp-portmark-dark.svg" alt="Portmaster" class="dark-only comp-logo-port-mobile" />
                                 </div>
 
                                 <img src="../assets/icons/comp-mobile-right-light.svg" alt="modDNS" class="light-only comp-mobile-side" />
@@ -1333,7 +1333,7 @@
 
 .comp-arch-mobile-center {
     @apply flex flex-col items-center;
-    @apply gap-2;
+    @apply gap-20;
 }
 
 .comp-arrow-mobile-center {

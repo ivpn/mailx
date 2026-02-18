@@ -570,6 +570,82 @@
             </div>
         </section>
 
+        <!-- Section 8: Get Access -->
+        <section class="get-access-section">
+            <div class="get-access-container">
+                <div class="get-access-header">
+                    <div class="get-access-command">mailx auth --init</div>
+                    <h2 class="get-access-title">GET_ACCESS</h2>
+                </div>
+
+                <div class="get-access-cards">
+                    <div class="get-access-card">
+                        <div class="get-access-card-header">
+                            <div class="get-access-card-info">
+                                <div class="get-access-plan">IVPN_PLUS</div>
+                                <p class="get-access-price">
+                                    <span class="get-access-price-value">$60</span>
+                                    <span class="get-access-price-unit">/YEAR</span>
+                                </p>
+                            </div>
+                            <router-link to="/signup" class="get-access-signup">./SIGNUP</router-link>
+                        </div>
+
+                        <div class="get-access-divider"></div>
+
+                        <div class="get-access-features">
+                            <div class="get-access-feature">
+                                <span class="get-access-feature-bullet">&gt;</span>
+                                <p class="get-access-feature-text">IVPN 5 Devices</p>
+                            </div>
+                            <div class="get-access-feature">
+                                <span class="get-access-feature-bullet">&gt;</span>
+                                <p class="get-access-feature-text">MailX</p>
+                            </div>
+                            <div class="get-access-feature">
+                                <span class="get-access-feature-bullet">&gt;</span>
+                                <p class="get-access-feature-text">modDNS</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="get-access-card">
+                        <div class="get-access-card-header">
+                            <div class="get-access-card-info">
+                                <div class="get-access-plan">IVPN_PRO_Suite</div>
+                                <p class="get-access-price">
+                                    <span class="get-access-price-value">$100</span>
+                                    <span class="get-access-price-unit">/YEAR</span>
+                                </p>
+                            </div>
+                            <router-link to="/signup" class="get-access-signup">./SIGNUP</router-link>
+                        </div>
+
+                        <div class="get-access-divider"></div>
+
+                        <div class="get-access-features">
+                            <div class="get-access-feature">
+                                <span class="get-access-feature-bullet">&gt;</span>
+                                <p class="get-access-feature-text">IVPN 10 Devices</p>
+                            </div>
+                            <div class="get-access-feature">
+                                <span class="get-access-feature-bullet">&gt;</span>
+                                <p class="get-access-feature-text">MailX</p>
+                            </div>
+                            <div class="get-access-feature">
+                                <span class="get-access-feature-bullet">&gt;</span>
+                                <p class="get-access-feature-text">modDNS</p>
+                            </div>
+                            <div class="get-access-feature">
+                                <span class="get-access-feature-bullet">&gt;</span>
+                                <p class="get-access-feature-text">Portmaster</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         
     </div>
 </template>
@@ -1207,7 +1283,8 @@ img.dark-only {
 
 .comp-services-container {
     @apply w-full;
-    @apply px-4 md:px-8 lg:px-[220px];
+    @apply max-w-[1060px] mx-auto;
+    @apply px-4 md:px-8;
     @apply flex flex-col gap-8 md:gap-[42px] lg:gap-8;
 }
 
@@ -1433,7 +1510,8 @@ img.dark-only {
 
 .constraints-container {
     @apply w-full;
-    @apply px-4 md:px-8 lg:px-[220px];
+    @apply max-w-[1060px] mx-auto;
+    @apply px-4 md:px-8;
     @apply flex flex-col gap-8;
 }
 
@@ -1478,5 +1556,149 @@ img.dark-only {
     @apply flex-1;
     @apply text-[#8d1719] dark:text-[#eb7676];
     @apply text-sm leading-5 md:text-base md:leading-4;
+}
+
+/* Section 8: Get Access */
+.get-access-section {
+    @apply w-full;
+    @apply bg-[#f3f4f5] dark:bg-[rgba(255,255,255,0.02)];
+    @apply py-6 md:py-[52px] lg:py-[72px];
+    @apply md:border md:border-solid;
+    @apply md:border-[#dbdfe5] md:dark:border-[#282727];
+}
+
+.get-access-container {
+    @apply w-full;
+    @apply max-w-[1060px] mx-auto;
+    @apply px-4 md:px-8;
+    @apply flex flex-col gap-8;
+}
+
+.get-access-header {
+    @apply flex flex-col gap-4;
+}
+
+.get-access-command {
+    @apply bg-[rgba(26,117,218,0.12)] dark:bg-[#12161b];
+    @apply text-[#1a75da] dark:text-[#449cf8];
+    @apply text-xs leading-3;
+    @apply px-3 py-3;
+    @apply w-fit;
+}
+
+.get-access-title {
+    @apply m-0;
+    @apply uppercase font-bold;
+    @apply text-[#1a75da] dark:text-[#449cf8];
+    @apply text-[32px] leading-[32px] md:text-[36px] md:leading-[40px];
+}
+
+.get-access-cards {
+    @apply w-full;
+    @apply bg-[#fffeff] dark:bg-[#0a0a0a];
+    @apply border border-solid;
+    @apply border-[#dbdfe5] dark:border-[#282727];
+    @apply flex flex-col;
+    @apply pb-px md:pb-0;
+}
+
+.get-access-card {
+    @apply flex flex-col gap-[25px];
+    @apply p-6;
+    @apply border-b border-solid;
+    @apply border-[#dbdfe5] dark:border-[#282727];
+    @apply mb-[-1px];
+}
+
+.get-access-card:last-child {
+    @apply border-b-0;
+}
+
+.get-access-card-header {
+    @apply flex items-start gap-3;
+}
+
+.get-access-card-info {
+    @apply flex-1 min-w-0;
+    @apply flex flex-col gap-2;
+}
+
+.get-access-plan {
+    @apply text-sm leading-[14px];
+    @apply text-[#115190] dark:text-[#82b8ed];
+}
+
+.get-access-price {
+    @apply m-0;
+    @apply text-[#1a75da] dark:text-[#449cf8];
+    @apply leading-none;
+}
+
+.get-access-price-value {
+    @apply text-[32px] leading-8;
+    @apply font-medium;
+}
+
+.get-access-price-unit {
+    @apply text-[18px] leading-8;
+    @apply font-medium;
+}
+
+.get-access-signup {
+    @apply h-9;
+    @apply border border-solid;
+    @apply border-[#1a75da] dark:border-[#0179ff];
+    @apply text-[#1a75da] dark:text-[#0179ff];
+    @apply pl-3 pr-4;
+    @apply text-sm leading-4 font-medium;
+    @apply flex items-center justify-center;
+    @apply whitespace-nowrap;
+    @apply no-underline;
+}
+
+.get-access-signup:hover {
+    @apply opacity-80;
+}
+
+.get-access-divider {
+    @apply border-b border-dashed;
+    @apply border-[#dbdfe5] dark:border-[#282727];
+}
+
+.get-access-features {
+    @apply flex flex-col gap-3;
+}
+
+.get-access-feature {
+    @apply flex items-center gap-2;
+}
+
+.get-access-feature-bullet {
+    @apply text-[16px] leading-5;
+    @apply text-[#1a75da] dark:text-[#449cf8];
+    @apply w-5 h-5;
+    @apply shrink-0;
+    @apply flex items-center justify-center;
+}
+
+.get-access-feature-text {
+    @apply m-0;
+    @apply text-sm leading-5;
+    @apply text-[#115190] dark:text-[#82b8ed];
+}
+
+@media (min-width: 768px) {
+    .get-access-cards {
+        @apply border-y border-x-0;
+        @apply pr-px;
+        @apply flex-row;
+    }
+
+    .get-access-card {
+        @apply flex-1;
+        @apply self-stretch;
+        @apply border-y-0 border-x;
+        @apply mb-0 mr-[-1px];
+    }
 }
 </style>

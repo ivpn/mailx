@@ -538,6 +538,38 @@
             </div>
         </section>
 
+        <!-- Section 7: Constraints -->
+        <section class="constraints-section">
+            <div class="constraints-container">
+                <div class="constraints-header">
+                    <div class="constraints-command">/etc/mailx/limitations.txt</div>
+                    <h2 class="constraints-title">CONSTRAINTS</h2>
+                </div>
+
+                <div class="constraints-list">
+                    <div class="constraints-item">
+                        <span class="constraints-bullet">&gt;</span>
+                        <p class="constraints-text">Mailx is not an email provider, it can't replace your primary email</p>
+                    </div>
+
+                    <div class="constraints-item">
+                        <span class="constraints-bullet">&gt;</span>
+                        <p class="constraints-text">Messages are visible to Mailx servers during relay (use PGP)</p>
+                    </div>
+
+                    <div class="constraints-item">
+                        <span class="constraints-bullet">&gt;</span>
+                        <p class="constraints-text">No IMAP/POP3 access. Email forwarding only.</p>
+                    </div>
+
+                    <div class="constraints-item">
+                        <span class="constraints-bullet">&gt;</span>
+                        <p class="constraints-text">Not designed for protection against targeted surveillance</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         
     </div>
 </template>
@@ -1390,5 +1422,61 @@ img.dark-only {
     @apply text-[#1a75da] dark:text-[#449cf8];
     @apply underline;
     @apply mx-1;
+}
+
+/* Section 7: Constraints */
+.constraints-section {
+    @apply w-full;
+    @apply bg-[#fffeff] dark:bg-[#0a0a0a];
+    @apply py-6 md:py-[52px] lg:py-[72px];
+}
+
+.constraints-container {
+    @apply w-full;
+    @apply px-4 md:px-8 lg:px-[220px];
+    @apply flex flex-col gap-8;
+}
+
+.constraints-header {
+    @apply flex flex-col gap-4;
+}
+
+.constraints-command {
+    @apply bg-[rgba(195,31,31,0.05)] dark:bg-[rgba(214,64,64,0.05)];
+    @apply lg:bg-[rgba(195,31,31,0.1)] lg:dark:bg-[rgba(214,64,64,0.05)];
+    @apply text-[#c31f1f] dark:text-[#d64040];
+    @apply text-xs leading-3;
+    @apply px-3 py-3;
+    @apply w-fit;
+}
+
+.constraints-title {
+    @apply m-0;
+    @apply uppercase font-bold;
+    @apply text-[#c31f1f] dark:text-[#d64040];
+    @apply text-[32px] leading-[32px] md:text-[36px] md:leading-[40px];
+}
+
+.constraints-list {
+    @apply flex flex-col gap-3;
+}
+
+.constraints-item {
+    @apply flex items-center gap-2;
+}
+
+.constraints-bullet {
+    @apply text-[#c31f1f] dark:text-[#d64040];
+    @apply text-base;
+    @apply w-6 h-6;
+    @apply shrink-0;
+    @apply flex items-center justify-center;
+}
+
+.constraints-text {
+    @apply m-0;
+    @apply flex-1;
+    @apply text-[#8d1719] dark:text-[#eb7676];
+    @apply text-sm leading-5 md:text-base md:leading-4;
 }
 </style>

@@ -425,6 +425,119 @@
             </div>
         </section>
 
+        <!-- Section 6: Compartmentalized Services -->
+        <section class="comp-services-section">
+            <div class="comp-services-container">
+                <div class="comp-services-header">
+                    <div class="comp-services-command">
+                        <span class="dark-only">$ cat /etc/ivpn/architecture.txt</span>
+                        <span class="light-only">/etc/ivpn/unlinked_auth.txt</span>
+                    </div>
+                    <h2 class="comp-services-title">
+                        COMPARTMENTALIZED_<br class="comp-services-break">SERVICES
+                    </h2>
+                    <p class="comp-services-subtitle">Unlike other privacy suites, the IVPN stack works without persistent account identifiers that correlate your activity across services.</p>
+                </div>
+
+                <div class="comp-services-panel">
+                    <div class="comp-services-panel-head"># Service Architecture</div>
+
+                    <div class="comp-services-architecture">
+                        <div class="comp-arch-desktop">
+                            <div class="comp-arch-left">
+                                <img src="../assets/icons/comp-mailx-light.svg" alt="MailX" class="light-only comp-logo-mailx" />
+                                <img src="../assets/icons/comp-mailx-dark.svg" alt="MailX" class="dark-only comp-logo-mailx" />
+                                <img src="../assets/icons/comp-arrow-left-light.svg" alt="" class="light-only comp-arrow-side" />
+                                <img src="../assets/icons/comp-arrow-left-dark.svg" alt="" class="dark-only comp-arrow-side" />
+                            </div>
+
+                            <div class="comp-arch-center">
+                                <img src="../assets/icons/comp-ivpn-desktop.svg" alt="IVPN" class="comp-logo-ivpn" />
+                                <img src="../assets/icons/comp-arrow-vertical-light.svg" alt="" class="light-only comp-arrow-vertical-down" />
+                                <img src="../assets/icons/comp-arrow-vertical-dark.svg" alt="" class="dark-only comp-arrow-vertical-down" />
+
+                                <div class="comp-arch-core">
+                                    <img src="../assets/icons/comp-db-light.svg" alt="" class="light-only comp-logo-db" />
+                                    <img src="../assets/icons/comp-db-dark.svg" alt="" class="dark-only comp-logo-db" />
+                                    <p class="comp-arch-core-text">#ZERO-LINK<br>ACCESS ARCHITECTURE</p>
+                                </div>
+
+                                <img src="../assets/icons/comp-arrow-vertical-light.svg" alt="" class="light-only comp-arrow-vertical" />
+                                <img src="../assets/icons/comp-arrow-vertical-dark.svg" alt="" class="dark-only comp-arrow-vertical" />
+                                <img src="../assets/icons/comp-portmark-light.svg" alt="Portmaster" class="light-only comp-logo-port" />
+                                <img src="../assets/icons/comp-portmark-dark.svg" alt="Portmaster" class="dark-only comp-logo-port" />
+                            </div>
+
+                            <div class="comp-arch-right">
+                                <img src="../assets/icons/comp-arrow-right-light.svg" alt="" class="light-only comp-arrow-side" />
+                                <img src="../assets/icons/comp-arrow-right-dark.svg" alt="" class="dark-only comp-arrow-side" />
+                                <img src="../assets/icons/comp-moddns-light.svg" alt="modDNS" class="light-only comp-logo-moddns" />
+                                <img src="../assets/icons/comp-moddns-dark.svg" alt="modDNS" class="dark-only comp-logo-moddns" />
+                            </div>
+                        </div>
+
+                        <div class="comp-arch-mobile">
+                            <div class="comp-arch-mobile-top">
+                                <img src="../assets/icons/comp-ivpn-mobile.svg" alt="IVPN" class="comp-logo-ivpn-mobile" />
+                                <img src="../assets/icons/comp-arrow-vertical-light.svg" alt="" class="light-only comp-arrow-vertical-mobile-down" />
+                                <img src="../assets/icons/comp-arrow-vertical-dark.svg" alt="" class="dark-only comp-arrow-vertical-mobile-down" />
+                                <img src="../assets/icons/comp-db-light.svg" alt="" class="light-only comp-logo-db" />
+                                <img src="../assets/icons/comp-db-dark.svg" alt="" class="dark-only comp-logo-db" />
+                                <p class="comp-arch-core-text comp-arch-core-text-mobile">#ZERO-LINK ACCESS ARCHITECTURE</p>
+                            </div>
+
+                            <div class="comp-arch-mobile-bottom">
+                                <img src="../assets/icons/comp-mobile-left-light.svg" alt="MailX" class="light-only comp-mobile-side" />
+                                <img src="../assets/icons/comp-mobile-left-dark.svg" alt="MailX" class="dark-only comp-mobile-side" />
+
+                                <div class="comp-arch-mobile-center">
+                                    <img src="../assets/icons/comp-mobile-vertical-light.svg" alt="" class="light-only comp-arrow-mobile-center-down" />
+                                    <img src="../assets/icons/comp-mobile-vertical-dark.svg" alt="" class="dark-only comp-arrow-mobile-center-down" />
+                                    <img src="../assets/icons/comp-portmark-mobile-light.svg" alt="Portmaster" class="light-only comp-logo-port-mobile" />
+                                    <img src="../assets/icons/comp-portmark-mobile-dark.svg" alt="Portmaster" class="dark-only comp-logo-port-mobile" />
+                                </div>
+
+                                <img src="../assets/icons/comp-mobile-right-light.svg" alt="modDNS" class="light-only comp-mobile-side" />
+                                <img src="../assets/icons/comp-mobile-right-dark.svg" alt="modDNS" class="dark-only comp-mobile-side" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="comp-services-cards">
+                        <div class="comp-services-card">
+                            <img src="../assets/icons/comp-signin-light.svg" alt="" class="comp-services-card-icon light-only" />
+                            <img src="../assets/icons/comp-signin-dark.svg" alt="" class="comp-services-card-icon dark-only" />
+                            <p class="comp-services-card-text">Sign up to Mailx with true account separation</p>
+                        </div>
+
+                        <div class="comp-services-card">
+                            <img src="../assets/icons/comp-cross-light.svg" alt="" class="comp-services-card-icon light-only" />
+                            <img src="../assets/icons/comp-cross-dark.svg" alt="" class="comp-services-card-icon dark-only" />
+                            <p class="comp-services-card-text">No cross-service correlation, even by administrators</p>
+                        </div>
+
+                        <div class="comp-services-card">
+                            <img src="../assets/icons/comp-repeat-light.svg" alt="" class="comp-services-card-icon light-only" />
+                            <img src="../assets/icons/comp-repeat-dark.svg" alt="" class="comp-services-card-icon dark-only" />
+                            <p class="comp-services-card-text">Automatic and anonymous subscription management</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comp-services-footnote">
+                    <img src="../assets/icons/comp-bulb-light.svg" alt="" class="comp-services-footnote-icon light-only" />
+                    <img src="../assets/icons/comp-bulb-dark.svg" alt="" class="comp-services-footnote-icon dark-only" />
+                    <p class="comp-services-footnote-text">
+                        Read more in our
+                        <a href="https://www.ivpn.net/blog/" target="_blank" rel="noopener noreferrer" class="comp-services-link">./BLOG</a>
+                        and review the
+                        <a href="https://github.com/ivpn/email" target="_blank" rel="noopener noreferrer" class="comp-services-link">./SOURCE</a>
+                        implementation.
+                    </p>
+                </div>
+            </div>
+        </section>
+
         
     </div>
 </template>
@@ -1049,5 +1162,233 @@
 
 .trust-card-no-tracking {
     @apply order-4;
+}
+
+/* Section 6: Compartmentalized Services */
+.comp-services-section {
+    @apply w-full;
+    @apply bg-[#f3f4f5] dark:bg-[rgba(255,255,255,0.02)];
+    @apply py-6 md:py-[52px] lg:py-[72px];
+    @apply md:border md:border-solid;
+    @apply md:border-[#dbdfe5] md:dark:border-[#282727];
+}
+
+.comp-services-container {
+    @apply w-full;
+    @apply px-4 md:px-8 lg:px-[220px];
+    @apply flex flex-col gap-8 md:gap-[42px] lg:gap-8;
+}
+
+.comp-services-header {
+    @apply flex flex-col gap-4;
+}
+
+.comp-services-command {
+    @apply bg-[rgba(26,117,218,0.12)] dark:bg-[#12161b];
+    @apply text-[#1a75da] dark:text-[#449cf8];
+    @apply text-xs leading-3;
+    @apply px-3 py-3;
+    @apply w-fit;
+}
+
+.comp-services-title {
+    @apply m-0;
+    @apply uppercase font-bold;
+    @apply text-[#1a75da] dark:text-[#449cf8];
+    @apply text-[32px] leading-[32px] md:text-[36px] md:leading-[40px];
+}
+
+.comp-services-break {
+    @apply md:hidden;
+}
+
+.comp-services-subtitle {
+    @apply m-0;
+    @apply text-base leading-[21px];
+    @apply text-[#115190] dark:text-[#82b8ed];
+    @apply max-w-[784px];
+}
+
+.comp-services-panel {
+    @apply border border-solid;
+    @apply border-[#dbdfe5] dark:border-[#282727];
+}
+
+.comp-services-panel-head {
+    @apply px-5 md:px-6 py-3;
+    @apply text-xs leading-3;
+    @apply text-[#115190] dark:text-[#449cf8];
+    @apply border-b border-dashed;
+    @apply border-[#dbdfe5] dark:border-[#282727];
+}
+
+.comp-services-architecture {
+    @apply border-b border-solid;
+    @apply border-[#dbdfe5] dark:border-[#282727];
+    @apply bg-[#fffeff] dark:bg-[#0a0a0a];
+    @apply px-5 py-5 md:px-6 md:py-[42px];
+}
+
+.comp-arch-desktop {
+    @apply hidden md:flex;
+    @apply items-center justify-center;
+    @apply gap-3;
+}
+
+.comp-arch-left,
+.comp-arch-right {
+    @apply flex items-center gap-3;
+    @apply pt-[18px];
+}
+
+.comp-arch-center {
+    @apply flex flex-col items-center;
+    @apply gap-2;
+}
+
+.comp-logo-mailx {
+    @apply w-[88px] h-[19px];
+}
+
+.comp-logo-moddns {
+    @apply w-[92px] h-[18px];
+}
+
+.comp-logo-ivpn {
+    @apply w-[61px] h-[21px];
+}
+
+.comp-arrow-side {
+    @apply w-8 h-[6px];
+}
+
+.comp-arrow-vertical {
+    @apply w-8 h-[6px] rotate-90;
+}
+
+.comp-arrow-vertical-up {
+    @apply w-8 h-[6px] rotate-90;
+}
+
+.comp-arrow-vertical-down {
+    @apply w-8 h-[6px] rotate-[270deg];
+}
+
+.comp-arch-core {
+    @apply flex flex-col items-center;
+    @apply gap-3 p-3;
+}
+
+.comp-logo-db {
+    @apply w-7 h-7;
+}
+
+.comp-arch-core-text {
+    @apply m-0;
+    @apply uppercase font-bold text-center;
+    @apply text-[#1a75da] dark:text-[#449cf8];
+    @apply text-sm leading-4;
+}
+
+.comp-logo-port {
+    @apply w-[128px] h-[26px];
+}
+
+.comp-arch-mobile {
+    @apply flex md:hidden;
+    @apply flex-col items-center;
+    @apply w-full;
+    @apply gap-4;
+}
+
+.comp-arch-mobile-top {
+    @apply flex flex-col items-center;
+    @apply gap-2;
+}
+
+.comp-logo-ivpn-mobile {
+    @apply w-[51px] h-[18px];
+}
+
+.comp-arrow-vertical-mobile {
+    @apply w-8 h-[6px] rotate-90;
+}
+
+.comp-arrow-vertical-mobile-down {
+    @apply w-8 h-[6px] rotate-[270deg];
+}
+
+.comp-arch-core-text-mobile {
+    @apply text-center;
+}
+
+.comp-arch-mobile-bottom {
+    @apply flex items-start justify-between;
+    @apply w-full;
+}
+
+.comp-mobile-side {
+    @apply w-[96px] h-[60px];
+}
+
+.comp-arch-mobile-center {
+    @apply flex flex-col items-center;
+    @apply gap-2;
+}
+
+.comp-arrow-mobile-center {
+    @apply w-[72px] h-[6px] rotate-90;
+}
+
+.comp-arrow-mobile-center-down {
+    @apply w-[72px] h-[6px] rotate-[270deg];
+}
+
+.comp-logo-port-mobile {
+    @apply w-[128px] h-[26px];
+}
+
+.comp-services-cards {
+    @apply flex flex-col md:flex-row;
+}
+
+.comp-services-card {
+    @apply flex-1;
+    @apply flex flex-col gap-4;
+    @apply px-4 py-5 md:p-6;
+    @apply border-[#dbdfe5] dark:border-[#282727];
+    @apply border-b md:border-b-0 md:border-r md:last:border-r-0;
+}
+
+.comp-services-card-icon {
+    @apply w-6 h-6;
+}
+
+.comp-services-card-text {
+    @apply m-0;
+    @apply text-sm leading-5;
+    @apply text-[#115190] dark:text-[#82b8ed];
+}
+
+.comp-services-footnote {
+    @apply flex items-start md:items-center gap-2;
+}
+
+.comp-services-footnote-icon {
+    @apply w-4 h-4;
+    @apply mt-[2px] md:mt-0;
+}
+
+.comp-services-footnote-text {
+    @apply m-0;
+    @apply text-sm leading-5;
+    @apply text-[#115190] dark:text-[#82b8ed];
+}
+
+.comp-services-link {
+    @apply text-sm leading-5 font-medium;
+    @apply text-[#1a75da] dark:text-[#449cf8];
+    @apply underline;
+    @apply mx-1;
 }
 </style>

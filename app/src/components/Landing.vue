@@ -760,11 +760,11 @@
 }
 
 /* Show/hide images based on theme */
-.light-only {
+img.light-only {
     @apply dark:hidden !important;
 }
 
-.dark-only {
+img.dark-only {
     @apply hidden dark:block !important;
 }
 

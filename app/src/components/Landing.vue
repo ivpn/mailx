@@ -274,6 +274,96 @@
                 </div>
             </div>
         </section>
+
+        <!-- Section 4: Feature Set -->
+        <section class="feature-set-section">
+            <div class="feature-set-container">
+                <div class="feature-set-header">
+                    <div class="feature-set-command">$ mailx --list-features</div>
+                    <h2 class="feature-set-title">FEATURE_SET</h2>
+                </div>
+
+                <div class="feature-set-grid">
+                    <div class="feature-set-card">
+                        <div class="feature-set-preview">
+                            <div class="feature-set-preview-bg">
+                                <div class="feature-set-preview-frame">
+                                    <img
+                                        src="../assets/feature-set-alias-light.png"
+                                        alt="New alias feature preview"
+                                        class="feature-set-image light-only"
+                                    />
+                                    <img
+                                        src="../assets/feature-set-alias-dark.png"
+                                        alt="New alias feature preview"
+                                        class="feature-set-image dark-only"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="feature-set-list">
+                            <div class="feature-set-item">
+                                <span class="feature-set-bullet">&gt;</span>
+                                <p class="feature-set-text">Create aliases via Mailx browser extension</p>
+                            </div>
+                            <div class="feature-set-item">
+                                <span class="feature-set-bullet">&gt;</span>
+                                <p class="feature-set-text">Use preset domains or your own for aliases</p>
+                            </div>
+                            <div class="feature-set-item">
+                                <span class="feature-set-bullet">&gt;</span>
+                                <p class="feature-set-text">Send and reply from any alias</p>
+                            </div>
+                            <div class="feature-set-item">
+                                <span class="feature-set-bullet">&gt;</span>
+                                <p class="feature-set-text">Generate aliases on-the-fly with wildcards</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="feature-set-card">
+                        <div class="feature-set-preview">
+                            <div class="feature-set-preview-bg">
+                                <div class="feature-set-preview-frame">
+                                    <img
+                                        src="../assets/feature-set-stats-light.png"
+                                        alt="Forwarding stats feature preview"
+                                        class="feature-set-image light-only"
+                                    />
+                                    <img
+                                        src="../assets/feature-set-stats-dark.png"
+                                        alt="Forwarding stats feature preview"
+                                        class="feature-set-image dark-only"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="feature-set-list">
+                            <div class="feature-set-item">
+                                <span class="feature-set-bullet">&gt;</span>
+                                <p class="feature-set-text">Route forwards to one or more recipients</p>
+                            </div>
+                            <div class="feature-set-item">
+                                <span class="feature-set-bullet">&gt;</span>
+                                <p class="feature-set-text">Encrypt forwarded messages with your PGP key</p>
+                            </div>
+                            <div class="feature-set-item">
+                                <span class="feature-set-bullet">&gt;</span>
+                                <p class="feature-set-text">Enable 2FA to prevent unauthorized access</p>
+                            </div>
+                            <div class="feature-set-item">
+                                <span class="feature-set-bullet">&gt;</span>
+                                <p class="feature-set-text">Review forwarding stats and delivery logs</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        
     </div>
 </template>
 
@@ -385,8 +475,8 @@
 .hero-content {
     @apply flex flex-col;
     @apply py-8 md:py-8 lg:py-8;
+    @apply max-w-[1060px] mx-auto;
     @apply px-4 md:px-8;
-    @apply max-w-[1000px] mx-auto;
     @apply relative;
     @apply w-full;
 }
@@ -468,8 +558,8 @@
 /* Screenshot Section */
 .hero-screenshot {
     @apply relative z-10;
+    @apply max-w-[1060px] mx-auto;
     @apply px-4 md:px-8;
-    @apply max-w-[1000px] mx-auto;
     @apply w-full;
 }
 
@@ -496,11 +586,11 @@
 
 /* Show/hide images based on theme */
 .light-only {
-    @apply dark:hidden;
+    @apply dark:hidden !important;
 }
 
 .dark-only {
-    @apply hidden dark:block;
+    @apply hidden dark:block !important;
 }
 
 /* Override theme visibility for backgrounds on mobile - force hide */
@@ -522,7 +612,7 @@
 .how-it-works-container {
     @apply flex flex-col gap-8;
     @apply w-full;
-    @apply max-w-[1000px] mx-auto;
+    @apply max-w-[1060px] mx-auto;
     @apply px-4 md:px-8;
 }
 
@@ -680,5 +770,115 @@
     @apply text-[#115190] dark:text-[#82b8ed];
     @apply text-sm leading-5;
     @apply m-0;
+}
+
+/* Section 4: Feature Set */
+.feature-set-section {
+    @apply w-full;
+    @apply bg-[#f3f4f5] dark:bg-[rgba(255,255,255,0.02)];
+    @apply border-x border-solid;
+    @apply py-6 md:py-[52px] lg:py-[72px];
+    @apply border border-solid;
+    @apply border-[#dbdfe5] dark:border-[#282727];
+}
+
+.feature-set-container {
+    @apply w-full;
+    @apply px-4 md:px-8 lg:px-[220px];
+    @apply flex flex-col gap-8;
+    @apply max-w-[1060px] mx-auto;
+    @apply px-4 md:px-8;
+}
+
+.feature-set-header {
+    @apply flex flex-col gap-4;
+}
+
+.feature-set-command {
+    @apply bg-[rgba(26,117,218,0.12)] dark:bg-[#12161b];
+    @apply text-[#1a75da] dark:text-[#449cf8];
+    @apply text-xs leading-3;
+    @apply px-3 py-3;
+    @apply w-fit;
+}
+
+.feature-set-title {
+    @apply m-0;
+    @apply uppercase font-bold;
+    @apply text-[#1a75da] dark:text-[#449cf8];
+    @apply text-[32px] leading-[32px] md:text-[36px] md:leading-[40px];
+}
+
+.feature-set-grid {
+    @apply w-full;
+    @apply flex flex-col md:flex-row;
+    @apply pb-px md:pb-0;
+}
+
+.feature-set-card {
+    @apply flex-1;
+    @apply border border-solid;
+    @apply border-[#dbdfe5] dark:border-[#282727];
+    @apply -mb-px md:mb-0 md:-mr-px;
+    @apply overflow-hidden;
+    @apply flex flex-col;
+}
+
+.feature-set-preview {
+    @apply bg-white dark:bg-[#0a0a0a];
+    @apply border-b;
+    @apply border-[#dbdfe5] dark:border-[#282727];
+    @apply px-4 pt-4 md:px-6 md:pt-6;
+    @apply flex items-end justify-center;
+    @apply relative;
+}
+
+.feature-set-preview::after {
+    content: none;
+}
+
+.feature-set-preview-bg {
+    @apply bg-[#f3f4f5] dark:bg-[#141212];
+    @apply p-[6px];
+    @apply w-full max-w-[450px];
+}
+
+.feature-set-preview-frame {
+    @apply bg-white dark:bg-[#191919];
+    @apply border border-solid;
+    @apply border-[#dbdfe5] dark:border-[#262626];
+    @apply p-[2px];
+    @apply overflow-hidden;
+}
+
+.feature-set-image {
+    @apply w-full h-auto;
+    @apply block;
+}
+
+.feature-set-list {
+    /* @apply border border-solid;
+    @apply border-[#dbdfe5] dark:border-[#282727]; */
+    @apply p-4 md:p-6;
+    @apply flex flex-col;
+    @apply gap-3 md:gap-4;
+}
+
+.feature-set-item {
+    @apply flex gap-2 items-start;
+}
+
+.feature-set-bullet {
+    @apply text-[#1a75da] dark:text-[#449cf8];
+    @apply text-base;
+    @apply w-5 h-5;
+    @apply shrink-0;
+    @apply flex items-center justify-center;
+}
+
+.feature-set-text {
+    @apply m-0;
+    @apply text-sm leading-5;
+    @apply text-[#115190] dark:text-[#82b8ed];
 }
 </style>

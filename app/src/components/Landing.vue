@@ -490,18 +490,22 @@
                             </div>
 
                             <div class="comp-arch-mobile-bottom">
-                                <img src="../assets/icons/comp-mobile-left-light.svg" alt="MailX" class="light-only comp-mobile-side" />
-                                <img src="../assets/icons/comp-mobile-left-dark.svg" alt="MailX" class="dark-only comp-mobile-side" />
-
+                                <div></div>
+                                <div>
+                                    <img src="../assets/icons/comp-mobile-left-light.svg" alt="MailX" class="light-only comp-mobile-side" />
+                                    <img src="../assets/icons/comp-mobile-left-dark.svg" alt="MailX" class="dark-only comp-mobile-side" />
+                                </div>
                                 <div class="comp-arch-mobile-center">
                                     <img src="../assets/icons/comp-mobile-vertical-light.svg" alt="" class="light-only comp-arrow-mobile-center-down" />
                                     <img src="../assets/icons/comp-mobile-vertical-dark.svg" alt="" class="dark-only comp-arrow-mobile-center-down" />
                                     <img src="../assets/icons/comp-portmark-light.svg" alt="Portmaster" class="light-only comp-logo-port-mobile" />
                                     <img src="../assets/icons/comp-portmark-dark.svg" alt="Portmaster" class="dark-only comp-logo-port-mobile" />
                                 </div>
-
-                                <img src="../assets/icons/comp-mobile-right-light.svg" alt="modDNS" class="light-only comp-mobile-side" />
-                                <img src="../assets/icons/comp-mobile-right-dark.svg" alt="modDNS" class="dark-only comp-mobile-side" />
+                                <div>
+                                    <img src="../assets/icons/comp-mobile-right-light.svg" alt="modDNS" class="light-only comp-mobile-side" />
+                                    <img src="../assets/icons/comp-mobile-right-dark.svg" alt="modDNS" class="dark-only comp-mobile-side" />
+                                </div>
+                                <div></div>
                             </div>
                         </div>
                     </div>
@@ -1390,6 +1394,10 @@ img.dark-only {
     @apply w-[61px] h-[21px];
 }
 
+.comp-logo-port {
+    @apply w-[128px] h-[26px];
+}
+
 .comp-arrow-side {
     @apply w-8 h-[6px];
 }
@@ -1443,11 +1451,15 @@ img.dark-only {
 
 .comp-arch-mobile-top {
     @apply flex flex-col items-center;
-    @apply gap-2;
+    @apply gap-6;
 }
 
 .comp-logo-ivpn-mobile {
     @apply w-[51px] h-[18px];
+}
+
+.comp-logo-port-mobile {
+    @apply w-[128px] h-[26px];
 }
 
 .comp-arrow-vertical-mobile {
@@ -1473,7 +1485,8 @@ img.dark-only {
 
 .comp-arch-mobile-center {
     @apply flex flex-col items-center;
-    @apply gap-20;
+    @apply gap-12;
+    @apply pt-8;
 }
 
 .comp-arrow-mobile-center {

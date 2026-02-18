@@ -447,14 +447,16 @@
                             <div class="comp-arch-left">
                                 <img src="../assets/icons/comp-mailx-light.svg" alt="MailX" class="light-only comp-logo-mailx" />
                                 <img src="../assets/icons/comp-mailx-dark.svg" alt="MailX" class="dark-only comp-logo-mailx" />
-                                <img src="../assets/icons/comp-arrow-left-light.svg" alt="" class="light-only comp-arrow-side" />
-                                <img src="../assets/icons/comp-arrow-left-dark.svg" alt="" class="dark-only comp-arrow-side" />
+                                <img src="../assets/icons/comp-arrow-left-light.svg" alt="" class="light-only comp-arrow-side comp-arrow-side-left" />
+                                <img src="../assets/icons/comp-arrow-left-dark.svg" alt="" class="dark-only comp-arrow-side comp-arrow-side-left" />
                             </div>
 
                             <div class="comp-arch-center">
-                                <img src="../assets/icons/comp-ivpn-desktop.svg" alt="IVPN" class="comp-logo-ivpn" />
-                                <img src="../assets/icons/comp-arrow-vertical-light.svg" alt="" class="light-only comp-arrow-vertical-down" />
-                                <img src="../assets/icons/comp-arrow-vertical-dark.svg" alt="" class="dark-only comp-arrow-vertical-down" />
+                                <div class="comp-arch-center-top">
+                                    <img src="../assets/icons/comp-ivpn-desktop.svg" alt="IVPN" class="comp-logo-ivpn" />
+                                    <img src="../assets/icons/comp-arrow-vertical-light.svg" alt="" class="light-only comp-arrow-vertical-down" />
+                                    <img src="../assets/icons/comp-arrow-vertical-dark.svg" alt="" class="dark-only comp-arrow-vertical-down" />
+                                </div>
 
                                 <div class="comp-arch-core">
                                     <img src="../assets/icons/comp-db-light.svg" alt="" class="light-only comp-logo-db" />
@@ -462,15 +464,17 @@
                                     <p class="comp-arch-core-text">#ZERO-LINK<br>ACCESS ARCHITECTURE</p>
                                 </div>
 
-                                <img src="../assets/icons/comp-arrow-vertical-light.svg" alt="" class="light-only comp-arrow-vertical" />
-                                <img src="../assets/icons/comp-arrow-vertical-dark.svg" alt="" class="dark-only comp-arrow-vertical" />
-                                <img src="../assets/icons/comp-portmark-light.svg" alt="Portmaster" class="light-only comp-logo-port" />
-                                <img src="../assets/icons/comp-portmark-dark.svg" alt="Portmaster" class="dark-only comp-logo-port" />
+                                <div class="comp-arch-center-bottom">
+                                    <img src="../assets/icons/comp-arrow-vertical-light.svg" alt="" class="light-only comp-arrow-vertical-down" />
+                                    <img src="../assets/icons/comp-arrow-vertical-dark.svg" alt="" class="dark-only comp-arrow-vertical-down" />
+                                    <img src="../assets/icons/comp-portmark-light.svg" alt="Portmaster" class="light-only comp-logo-port" />
+                                    <img src="../assets/icons/comp-portmark-dark.svg" alt="Portmaster" class="dark-only comp-logo-port" />
+                                </div>
                             </div>
 
                             <div class="comp-arch-right">
-                                <img src="../assets/icons/comp-arrow-right-light.svg" alt="" class="light-only comp-arrow-side" />
-                                <img src="../assets/icons/comp-arrow-right-dark.svg" alt="" class="dark-only comp-arrow-side" />
+                                <img src="../assets/icons/comp-arrow-right-light.svg" alt="" class="light-only comp-arrow-side comp-arrow-side-right" />
+                                <img src="../assets/icons/comp-arrow-right-dark.svg" alt="" class="dark-only comp-arrow-side comp-arrow-side-right" />
                                 <img src="../assets/icons/comp-moddns-light.svg" alt="modDNS" class="light-only comp-logo-moddns" />
                                 <img src="../assets/icons/comp-moddns-dark.svg" alt="modDNS" class="dark-only comp-logo-moddns" />
                             </div>
@@ -1342,7 +1346,6 @@ img.dark-only {
 .comp-arch-desktop {
     @apply hidden md:flex;
     @apply items-center justify-center;
-    @apply gap-3;
 }
 
 .comp-arch-left,
@@ -1353,7 +1356,12 @@ img.dark-only {
 
 .comp-arch-center {
     @apply flex flex-col items-center;
-    @apply gap-2;
+}
+
+.comp-arch-center-top,
+.comp-arch-center-bottom {
+    @apply flex flex-col items-center;
+    @apply gap-6;
 }
 
 .comp-logo-mailx {
@@ -1372,6 +1380,14 @@ img.dark-only {
     @apply w-8 h-[6px];
 }
 
+.comp-arrow-side-left {
+    @apply rotate-0;
+}
+
+.comp-arrow-side-right {
+    @apply rotate-180;
+}
+
 .comp-arrow-vertical {
     @apply w-8 h-[6px] rotate-90;
 }
@@ -1386,7 +1402,7 @@ img.dark-only {
 
 .comp-arch-core {
     @apply flex flex-col items-center;
-    @apply gap-3 p-3;
+    @apply gap-3 py-7 px-3;
 }
 
 .comp-logo-db {

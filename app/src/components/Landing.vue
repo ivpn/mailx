@@ -947,7 +947,7 @@
 /* Section 5: Verifiable Privacy */
 .verifiable-privacy-section {
     @apply w-full;
-    @apply bg-[#f3f4f5] dark:bg-[#050607];
+    @apply bg-white dark:bg-[#050607];
     @apply py-6 md:py-[52px] lg:py-[72px];
 }
 

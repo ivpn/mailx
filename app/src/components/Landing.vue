@@ -363,6 +363,68 @@
             </div>
         </section>
 
+        <!-- Section 5: Verifiable Privacy -->
+        <section class="verifiable-privacy-section">
+            <div class="verifiable-privacy-container">
+                <div class="verifiable-privacy-header">
+                    <div class="verifiable-privacy-command">/etc/mailx/trust.cfg</div>
+                    <h2 class="verifiable-privacy-title">
+                        VERIFIABLE_<br class="verifiable-privacy-break">PRIVACY
+                    </h2>
+                </div>
+
+                <div class="verifiable-privacy-grid">
+                    <div class="verifiable-privacy-card trust-card-accountable">
+                        <div class="verifiable-privacy-card-content">
+                            <div class="verifiable-privacy-card-title-row">
+                                <img src="../assets/icons/trust-accountable-light.svg" alt="" class="verifiable-privacy-icon light-only" />
+                                <img src="../assets/icons/trust-accountable-dark.svg" alt="" class="verifiable-privacy-icon dark-only" />
+                                <h3 class="verifiable-privacy-card-title">ACCOUNTABLE_OPERATORS</h3>
+                            </div>
+                            <p class="verifiable-privacy-card-text">Built by the public team behind IVPN, with a 15-year history in operating privacy services.</p>
+                        </div>
+                        <a href="https://www.ivpn.net/" target="_blank" rel="noopener noreferrer" class="verifiable-privacy-card-link">./MEET_TEAM</a>
+                    </div>
+
+                    <div class="verifiable-privacy-card trust-card-open-source">
+                        <div class="verifiable-privacy-card-content">
+                            <div class="verifiable-privacy-card-title-row">
+                                <img src="../assets/icons/trust-open-source-light.svg" alt="" class="verifiable-privacy-icon light-only" />
+                                <img src="../assets/icons/trust-open-source-dark.svg" alt="" class="verifiable-privacy-icon dark-only" />
+                                <h3 class="verifiable-privacy-card-title">OPEN_SOURCE</h3>
+                            </div>
+                            <p class="verifiable-privacy-card-text">The entire Mailx project is open-source. Our implementation is public and available for review.</p>
+                        </div>
+                        <a href="https://github.com/ivpn/email" target="_blank" rel="noopener noreferrer" class="verifiable-privacy-card-link">./VIEW_SOURCE</a>
+                    </div>
+
+                    <div class="verifiable-privacy-card trust-card-security">
+                        <div class="verifiable-privacy-card-content">
+                            <div class="verifiable-privacy-card-title-row">
+                                <img src="../assets/icons/trust-audit-light.svg" alt="" class="verifiable-privacy-icon light-only" />
+                                <img src="../assets/icons/trust-audit-dark.svg" alt="" class="verifiable-privacy-icon dark-only" />
+                                <h3 class="verifiable-privacy-card-title">SECURITY_AUDIT</h3>
+                            </div>
+                            <p class="verifiable-privacy-card-text">Mailx has undergone a third-party security audit to validate our claims and architecture.</p>
+                        </div>
+                        <a href="https://github.com/ivpn/email" target="_blank" rel="noopener noreferrer" class="verifiable-privacy-card-link">./READ_AUDIT</a>
+                    </div>
+
+                    <div class="verifiable-privacy-card trust-card-no-tracking">
+                        <div class="verifiable-privacy-card-content">
+                            <div class="verifiable-privacy-card-title-row">
+                                <img src="../assets/icons/trust-no-tracking-light.svg" alt="" class="verifiable-privacy-icon light-only" />
+                                <img src="../assets/icons/trust-no-tracking-dark.svg" alt="" class="verifiable-privacy-icon dark-only" />
+                                <h3 class="verifiable-privacy-card-title">NO_TRACKING</h3>
+                            </div>
+                            <p class="verifiable-privacy-card-text">Your IP address is never logged. Forwarded emails are automatically deleted after delivery.</p>
+                        </div>
+                        <router-link to="/privacy" class="verifiable-privacy-card-link">./PRIVACY_POLICY</router-link>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         
     </div>
 </template>
@@ -880,5 +942,112 @@
     @apply m-0;
     @apply text-sm leading-5;
     @apply text-[#115190] dark:text-[#82b8ed];
+}
+
+/* Section 5: Verifiable Privacy */
+.verifiable-privacy-section {
+    @apply w-full;
+    @apply bg-[#f3f4f5] dark:bg-[#050607];
+    @apply py-6 md:py-[52px] lg:py-[72px];
+}
+
+.verifiable-privacy-container {
+    @apply w-full;
+    @apply max-w-[1060px] mx-auto;
+    @apply px-4 md:px-8;
+    @apply flex flex-col gap-8;
+}
+
+.verifiable-privacy-header {
+    @apply flex flex-col gap-4;
+}
+
+.verifiable-privacy-command {
+    @apply bg-[rgba(26,117,218,0.12)] dark:bg-[#12161b];
+    @apply text-[#1a75da] dark:text-[#449cf8];
+    @apply text-xs leading-3;
+    @apply px-3 py-3;
+    @apply w-fit;
+}
+
+.verifiable-privacy-title {
+    @apply m-0;
+    @apply uppercase font-bold;
+    @apply text-[#1a75da] dark:text-[#449cf8];
+    @apply text-[32px] leading-[32px] md:text-[36px] md:leading-[40px];
+}
+
+.verifiable-privacy-break {
+    @apply md:hidden;
+}
+
+.verifiable-privacy-grid {
+    @apply w-full;
+    @apply flex flex-col md:flex-row md:flex-wrap;
+    @apply pb-px md:pb-0 md:pr-px;
+}
+
+.verifiable-privacy-card {
+    @apply w-full md:w-1/2;
+    @apply border border-solid;
+    @apply border-[#dbdfe5] dark:border-[#282727];
+    @apply -mb-px md:mb-0 md:-mr-px;
+    @apply px-4 py-5 md:p-6;
+    @apply flex flex-col gap-4;
+    @apply md:mb-[-1px] lg:mb-[-1px];
+}
+
+.verifiable-privacy-card-content {
+    @apply flex flex-col gap-3;
+}
+
+.verifiable-privacy-card-title-row {
+    @apply flex items-center gap-3;
+}
+
+.verifiable-privacy-icon {
+    @apply w-6 h-6;
+    @apply shrink-0;
+}
+
+.verifiable-privacy-card-title {
+    @apply m-0;
+    @apply text-base leading-4 font-medium uppercase;
+    @apply text-[#1a75da] dark:text-[#449cf8];
+}
+
+.verifiable-privacy-card-text {
+    @apply m-0;
+    @apply text-sm leading-5;
+    @apply text-[#115190] dark:text-[#82b8ed];
+}
+
+.verifiable-privacy-card-link {
+    @apply m-0;
+    @apply inline-block;
+    @apply pt-2;
+    @apply text-sm leading-4 font-medium;
+    @apply text-[#1a75da] dark:text-[#0179ff];
+    @apply no-underline;
+}
+
+.verifiable-privacy-card-link:hover {
+    @apply opacity-80;
+}
+
+.trust-card-accountable {
+    @apply order-1;
+}
+
+.trust-card-open-source {
+    @apply order-2 md:order-3 lg:order-2;
+}
+
+.trust-card-security {
+    @apply order-3 md:order-2 lg:order-3;
+}
+
+.trust-card-no-tracking {
+    @apply order-4;
 }
 </style>

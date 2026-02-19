@@ -1,3 +1,55 @@
+<script setup lang="ts">
+// --- Hero -------------------------------------------------------------------
+const heroFeatures = [
+    'Forward emails through isolated aliases with Mailx.',
+    'Send and reply without exposing your primary email address.',
+    'Supports PGP encryption, domain choice, multiple',
+    'recipients, and catch-all aliases.',
+]
+
+// --- How It Works -----------------------------------------------------------
+const receiveInstructions = [
+    'Create an email alias',
+    'Share the alias instead of your real email',
+    'Receive forwarded emails in your inbox',
+]
+
+const sendInstructions = [
+    'Create a send address for your recipient',
+    'Email that address from your inbox',
+    'Recipient gets your email from the alias',
+]
+
+// --- Feature Set ------------------------------------------------------------
+const aliasFeatureItems = [
+    'Create aliases via Mailx browser extension',
+    'Use preset domains or your own for aliases',
+    'Send and reply from any alias',
+    'Generate aliases on-the-fly with wildcards',
+]
+
+const statsFeatureItems = [
+    'Route forwards to one or more recipients',
+    'Encrypt forwarded messages with your PGP key',
+    'Enable 2FA to prevent unauthorized access',
+    'Review forwarding stats and delivery logs',
+]
+
+// --- Constraints ------------------------------------------------------------
+const constraints = [
+    "Mailx is not an email provider, it can't replace your primary email",
+    'Messages are visible to Mailx servers during relay (use PGP)',
+    'No IMAP/POP3 access. Email forwarding only.',
+    'Not designed for protection against targeted surveillance',
+]
+
+// --- Pricing ----------------------------------------------------------------
+const pricingPlans = [
+    { plan: 'IVPN_PLUS',      price: '$60',  features: ['IVPN 5 Devices',  'MailX', 'modDNS'] },
+    { plan: 'IVPN_PRO_Suite', price: '$100', features: ['IVPN 10 Devices', 'MailX', 'modDNS', 'Portmaster'] },
+]
+</script>
+
 <template>
     <div class="landing-page">
         <!-- Section 1: Header -->
@@ -23,21 +75,9 @@
                         RESIST_EMAIL_<br>SURVEILLANCE
                     </h1>
                     <div class="hero-features">
-                        <div class="feature-item">
+                        <div v-for="text in heroFeatures" :key="text" class="feature-item">
                             <span class="feature-bullet">&gt;</span>
-                            <p class="feature-text">Forward emails through isolated aliases with Mailx.</p>
-                        </div>
-                        <div class="feature-item">
-                            <span class="feature-bullet">&gt;</span>
-                            <p class="feature-text">Send and reply without exposing your primary email address.</p>
-                        </div>
-                        <div class="feature-item">
-                            <span class="feature-bullet">&gt;</span>
-                            <p class="feature-text">Supports PGP encryption, domain choice, multiple</p>
-                        </div>
-                        <div class="feature-item">
-                            <span class="feature-bullet">&gt;</span>
-                            <p class="feature-text">recipients, and catch-all aliases.</p>
+                            <p class="feature-text">{{ text }}</p>
                         </div>
                     </div>
                 </div>
@@ -77,9 +117,9 @@
 
         <!-- Section 3: How It Works -->
         <section class="how-it-works-section">
-            <div class="how-it-works-container">
+            <div class="section-container">
                 <!-- Title and Subtitle -->
-                <div class="how-it-works-header">
+                <div class="section-header">
                     <h2 class="how-it-works-title">HOW_IT_WORKS</h2>
                     <p class="how-it-works-subtitle">Mailx generates unique aliases for each service and sender.</p>
                 </div>
@@ -149,17 +189,9 @@
                             </div>
                         </div>
                         <div class="flow-instructions">
-                            <div class="instruction-item">
-                                <span class="instruction-number">#1</span>
-                                <span class="instruction-text">Create an email alias</span>
-                            </div>
-                            <div class="instruction-item">
-                                <span class="instruction-number">#2</span>
-                                <span class="instruction-text">Share the alias instead of your real email</span>
-                            </div>
-                            <div class="instruction-item">
-                                <span class="instruction-number">#3</span>
-                                <span class="instruction-text">Receive forwarded emails in your inbox</span>
+                            <div v-for="(text, i) in receiveInstructions" :key="i" class="instruction-item">
+                                <span class="instruction-number">#{{ i + 1 }}</span>
+                                <span class="instruction-text">{{ text }}</span>
                             </div>
                         </div>
                     </div>
@@ -227,17 +259,9 @@
                             </div>
                         </div>
                         <div class="flow-instructions">
-                            <div class="instruction-item">
-                                <span class="instruction-number">#1</span>
-                                <span class="instruction-text">Create a send address for your recipient</span>
-                            </div>
-                            <div class="instruction-item">
-                                <span class="instruction-number">#2</span>
-                                <span class="instruction-text">Email that address from your inbox</span>
-                            </div>
-                            <div class="instruction-item">
-                                <span class="instruction-number">#3</span>
-                                <span class="instruction-text">Recipient gets your email from the alias</span>
+                            <div v-for="(text, i) in sendInstructions" :key="i" class="instruction-item">
+                                <span class="instruction-number">#{{ i + 1 }}</span>
+                                <span class="instruction-text">{{ text }}</span>
                             </div>
                         </div>
                     </div>
@@ -277,10 +301,10 @@
 
         <!-- Section 4: Feature Set -->
         <section class="feature-set-section">
-            <div class="feature-set-container">
-                <div class="feature-set-header">
-                    <div class="feature-set-command">$ mailx --list-features</div>
-                    <h2 class="feature-set-title">FEATURE_SET</h2>
+            <div class="section-container">
+                <div class="section-header">
+                    <div class="section-command">$ mailx --list-features</div>
+                    <h2 class="section-title">FEATURE_SET</h2>
                 </div>
 
                 <div class="feature-set-grid">
@@ -303,21 +327,9 @@
                         </div>
 
                         <div class="feature-set-list">
-                            <div class="feature-set-item">
+                            <div v-for="text in aliasFeatureItems" :key="text" class="feature-set-item">
                                 <span class="feature-set-bullet">&gt;</span>
-                                <p class="feature-set-text">Create aliases via Mailx browser extension</p>
-                            </div>
-                            <div class="feature-set-item">
-                                <span class="feature-set-bullet">&gt;</span>
-                                <p class="feature-set-text">Use preset domains or your own for aliases</p>
-                            </div>
-                            <div class="feature-set-item">
-                                <span class="feature-set-bullet">&gt;</span>
-                                <p class="feature-set-text">Send and reply from any alias</p>
-                            </div>
-                            <div class="feature-set-item">
-                                <span class="feature-set-bullet">&gt;</span>
-                                <p class="feature-set-text">Generate aliases on-the-fly with wildcards</p>
+                                <p class="feature-set-text">{{ text }}</p>
                             </div>
                         </div>
                     </div>
@@ -341,21 +353,9 @@
                         </div>
 
                         <div class="feature-set-list">
-                            <div class="feature-set-item">
+                            <div v-for="text in statsFeatureItems" :key="text" class="feature-set-item">
                                 <span class="feature-set-bullet">&gt;</span>
-                                <p class="feature-set-text">Route forwards to one or more recipients</p>
-                            </div>
-                            <div class="feature-set-item">
-                                <span class="feature-set-bullet">&gt;</span>
-                                <p class="feature-set-text">Encrypt forwarded messages with your PGP key</p>
-                            </div>
-                            <div class="feature-set-item">
-                                <span class="feature-set-bullet">&gt;</span>
-                                <p class="feature-set-text">Enable 2FA to prevent unauthorized access</p>
-                            </div>
-                            <div class="feature-set-item">
-                                <span class="feature-set-bullet">&gt;</span>
-                                <p class="feature-set-text">Review forwarding stats and delivery logs</p>
+                                <p class="feature-set-text">{{ text }}</p>
                             </div>
                         </div>
                     </div>
@@ -365,10 +365,10 @@
 
         <!-- Section 5: Verifiable Privacy -->
         <section class="verifiable-privacy-section">
-            <div class="verifiable-privacy-container">
-                <div class="verifiable-privacy-header">
-                    <div class="verifiable-privacy-command">/etc/mailx/trust.cfg</div>
-                    <h2 class="verifiable-privacy-title">
+            <div class="section-container">
+                <div class="section-header">
+                    <div class="section-command">/etc/mailx/trust.cfg</div>
+                    <h2 class="section-title">
                         VERIFIABLE_<br class="verifiable-privacy-break">PRIVACY
                     </h2>
                 </div>
@@ -428,11 +428,11 @@
         <!-- Section 6: Compartmentalized Services -->
         <section class="comp-services-section">
             <div class="comp-services-container">
-                <div class="comp-services-header">
-                    <div class="comp-services-command">
+                <div class="section-header">
+                    <div class="section-command">
                         $ cat /etc/ivpn/architecture.txt
                     </div>
-                    <h2 class="comp-services-title">
+                    <h2 class="section-title">
                         COMPARTMENTALIZED_<br class="comp-services-break">SERVICES
                     </h2>
                     <p class="comp-services-subtitle">Unlike other privacy suites, the IVPN stack works without persistent account identifiers that correlate your activity across services.</p>
@@ -547,31 +547,16 @@
 
         <!-- Section 7: Constraints -->
         <section class="constraints-section">
-            <div class="constraints-container">
-                <div class="constraints-header">
+            <div class="section-container">
+                <div class="section-header">
                     <div class="constraints-command">/etc/mailx/limitations.txt</div>
                     <h2 class="constraints-title">CONSTRAINTS</h2>
                 </div>
 
                 <div class="constraints-list">
-                    <div class="constraints-item">
+                    <div v-for="text in constraints" :key="text" class="constraints-item">
                         <span class="constraints-bullet">&gt;</span>
-                        <p class="constraints-text">Mailx is not an email provider, it can't replace your primary email</p>
-                    </div>
-
-                    <div class="constraints-item">
-                        <span class="constraints-bullet">&gt;</span>
-                        <p class="constraints-text">Messages are visible to Mailx servers during relay (use PGP)</p>
-                    </div>
-
-                    <div class="constraints-item">
-                        <span class="constraints-bullet">&gt;</span>
-                        <p class="constraints-text">No IMAP/POP3 access. Email forwarding only.</p>
-                    </div>
-
-                    <div class="constraints-item">
-                        <span class="constraints-bullet">&gt;</span>
-                        <p class="constraints-text">Not designed for protection against targeted surveillance</p>
+                        <p class="constraints-text">{{ text }}</p>
                     </div>
                 </div>
             </div>
@@ -579,19 +564,19 @@
 
         <!-- Section 8: Get Access -->
         <section class="get-access-section">
-            <div class="get-access-container">
-                <div class="get-access-header">
-                    <div class="get-access-command">mailx auth --init</div>
-                    <h2 class="get-access-title">GET_ACCESS</h2>
+            <div class="section-container">
+                <div class="section-header">
+                    <div class="section-command">mailx auth --init</div>
+                    <h2 class="section-title">GET_ACCESS</h2>
                 </div>
 
                 <div class="get-access-cards">
-                    <div class="get-access-card">
+                    <div v-for="plan in pricingPlans" :key="plan.plan" class="get-access-card">
                         <div class="get-access-card-header">
                             <div class="get-access-card-info">
-                                <div class="get-access-plan">IVPN_PLUS</div>
+                                <div class="get-access-plan">{{ plan.plan }}</div>
                                 <p class="get-access-price">
-                                    <span class="get-access-price-value">$60</span>
+                                    <span class="get-access-price-value">{{ plan.price }}</span>
                                     <span class="get-access-price-unit">/YEAR</span>
                                 </p>
                             </div>
@@ -601,51 +586,9 @@
                         <div class="get-access-divider"></div>
 
                         <div class="get-access-features">
-                            <div class="get-access-feature">
+                            <div v-for="feature in plan.features" :key="feature" class="get-access-feature">
                                 <span class="get-access-feature-bullet">&gt;</span>
-                                <p class="get-access-feature-text">IVPN 5 Devices</p>
-                            </div>
-                            <div class="get-access-feature">
-                                <span class="get-access-feature-bullet">&gt;</span>
-                                <p class="get-access-feature-text">MailX</p>
-                            </div>
-                            <div class="get-access-feature">
-                                <span class="get-access-feature-bullet">&gt;</span>
-                                <p class="get-access-feature-text">modDNS</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="get-access-card">
-                        <div class="get-access-card-header">
-                            <div class="get-access-card-info">
-                                <div class="get-access-plan">IVPN_PRO_Suite</div>
-                                <p class="get-access-price">
-                                    <span class="get-access-price-value">$100</span>
-                                    <span class="get-access-price-unit">/YEAR</span>
-                                </p>
-                            </div>
-                            <a href="https://www.ivpn.net" class="get-access-signup" target="_blank">./SIGNUP</a>
-                        </div>
-
-                        <div class="get-access-divider"></div>
-
-                        <div class="get-access-features">
-                            <div class="get-access-feature">
-                                <span class="get-access-feature-bullet">&gt;</span>
-                                <p class="get-access-feature-text">IVPN 10 Devices</p>
-                            </div>
-                            <div class="get-access-feature">
-                                <span class="get-access-feature-bullet">&gt;</span>
-                                <p class="get-access-feature-text">MailX</p>
-                            </div>
-                            <div class="get-access-feature">
-                                <span class="get-access-feature-bullet">&gt;</span>
-                                <p class="get-access-feature-text">modDNS</p>
-                            </div>
-                            <div class="get-access-feature">
-                                <span class="get-access-feature-bullet">&gt;</span>
-                                <p class="get-access-feature-text">Portmaster</p>
+                                <p class="get-access-feature-text">{{ feature }}</p>
                             </div>
                         </div>
                     </div>
@@ -672,6 +615,37 @@
 </template>
 
 <style scoped>
+/* =============================================================================
+   Shared section layout helpers
+   Used across: How It Works, Feature Set, Verifiable Privacy,
+   Constraints, Get Access.
+   Comp Services uses .comp-services-container (different tablet gap).
+   ========================================================================== */
+
+.section-container {
+    @apply w-full flex flex-col gap-8;
+    @apply max-w-[1060px] mx-auto;
+    @apply px-4 md:px-8;
+}
+
+.section-header {
+    @apply flex flex-col gap-4;
+}
+
+/* Blue command / path badge */
+.section-command {
+    @apply text-xs leading-3 px-3 py-3 w-fit;
+    @apply bg-[rgba(26,117,218,0.12)] dark:bg-[#12161b];
+    @apply text-[#1a75da] dark:text-[#449cf8];
+}
+
+/* Blue section title (32 px mobile -> 36 px desktop) */
+.section-title {
+    @apply m-0 uppercase font-bold;
+    @apply text-[#1a75da] dark:text-[#449cf8];
+    @apply text-[32px] leading-[32px] md:text-[36px] md:leading-[40px];
+}
+
 .landing-page {
     @apply w-full;
     @apply bg-white dark:bg-[#0a0a0a];
@@ -913,16 +887,7 @@ img.dark-only {
     @apply py-[72px];
 }
 
-.how-it-works-container {
-    @apply flex flex-col gap-8;
-    @apply w-full;
-    @apply max-w-[1060px] mx-auto;
-    @apply px-4 md:px-8;
-}
-
-.how-it-works-header {
-    @apply flex flex-col gap-4;
-}
+/* .section-container / .section-header cover this section */
 
 .how-it-works-title {
     @apply font-bold uppercase;
@@ -1080,38 +1045,12 @@ img.dark-only {
 .feature-set-section {
     @apply w-full;
     @apply bg-[#f3f4f5] dark:bg-[rgba(255,255,255,0.02)];
-    @apply border-x border-solid;
     @apply py-6 md:py-[52px] lg:py-[72px];
     @apply border border-solid;
     @apply border-[#dbdfe5] dark:border-[#282727];
 }
 
-.feature-set-container {
-    @apply w-full;
-    @apply px-4 md:px-8 lg:px-[220px];
-    @apply flex flex-col gap-8;
-    @apply max-w-[1060px] mx-auto;
-    @apply px-4 md:px-8;
-}
-
-.feature-set-header {
-    @apply flex flex-col gap-4;
-}
-
-.feature-set-command {
-    @apply bg-[rgba(26,117,218,0.12)] dark:bg-[#12161b];
-    @apply text-[#1a75da] dark:text-[#449cf8];
-    @apply text-xs leading-3;
-    @apply px-3 py-3;
-    @apply w-fit;
-}
-
-.feature-set-title {
-    @apply m-0;
-    @apply uppercase font-bold;
-    @apply text-[#1a75da] dark:text-[#449cf8];
-    @apply text-[32px] leading-[32px] md:text-[36px] md:leading-[40px];
-}
+/* .section-container / .section-header / .section-command / .section-title cover this section */
 
 .feature-set-grid {
     @apply w-full;
@@ -1193,31 +1132,7 @@ img.dark-only {
     @apply py-6 md:py-[52px] lg:py-[72px];
 }
 
-.verifiable-privacy-container {
-    @apply w-full;
-    @apply max-w-[1060px] mx-auto;
-    @apply px-4 md:px-8;
-    @apply flex flex-col gap-8;
-}
-
-.verifiable-privacy-header {
-    @apply flex flex-col gap-4;
-}
-
-.verifiable-privacy-command {
-    @apply bg-[rgba(26,117,218,0.12)] dark:bg-[#12161b];
-    @apply text-[#1a75da] dark:text-[#449cf8];
-    @apply text-xs leading-3;
-    @apply px-3 py-3;
-    @apply w-fit;
-}
-
-.verifiable-privacy-title {
-    @apply m-0;
-    @apply uppercase font-bold;
-    @apply text-[#1a75da] dark:text-[#449cf8];
-    @apply text-[32px] leading-[32px] md:text-[36px] md:leading-[40px];
-}
+/* .section-container / .section-header / .section-command / .section-title cover this section */
 
 .verifiable-privacy-break {
     @apply md:hidden;
@@ -1309,24 +1224,7 @@ img.dark-only {
     @apply flex flex-col gap-8 md:gap-[42px] lg:gap-8;
 }
 
-.comp-services-header {
-    @apply flex flex-col gap-4;
-}
-
-.comp-services-command {
-    @apply bg-[rgba(26,117,218,0.12)] dark:bg-[#12161b];
-    @apply text-[#1a75da] dark:text-[#449cf8];
-    @apply text-xs leading-3;
-    @apply px-3 py-3;
-    @apply w-fit;
-}
-
-.comp-services-title {
-    @apply m-0;
-    @apply uppercase font-bold;
-    @apply text-[#1a75da] dark:text-[#449cf8];
-    @apply text-[32px] leading-[32px] md:text-[36px] md:leading-[40px];
-}
+/* .section-header / .section-command / .section-title cover this section */
 
 .comp-services-break {
     @apply md:hidden;
@@ -1409,14 +1307,6 @@ img.dark-only {
     @apply rotate-180;
 }
 
-.comp-arrow-vertical {
-    @apply w-8 h-[6px] rotate-90;
-}
-
-.comp-arrow-vertical-up {
-    @apply w-8 h-[6px] rotate-90;
-}
-
 .comp-arrow-vertical-down {
     @apply w-8 h-[6px] rotate-[270deg];
 }
@@ -1435,10 +1325,6 @@ img.dark-only {
     @apply uppercase font-bold text-center;
     @apply text-[#1a75da] dark:text-[#449cf8];
     @apply text-sm leading-4;
-}
-
-.comp-logo-port {
-    @apply w-[128px] h-[26px];
 }
 
 .comp-arch-mobile {
@@ -1486,10 +1372,6 @@ img.dark-only {
     @apply flex flex-col items-center;
     @apply gap-12;
     @apply pt-8;
-}
-
-.comp-arrow-mobile-center {
-    @apply w-[72px] h-[6px] rotate-90;
 }
 
 .comp-arrow-mobile-center-down {
@@ -1551,16 +1433,7 @@ img.dark-only {
     @apply py-6 md:py-[52px] lg:py-[72px];
 }
 
-.constraints-container {
-    @apply w-full;
-    @apply max-w-[1060px] mx-auto;
-    @apply px-4 md:px-8;
-    @apply flex flex-col gap-8;
-}
-
-.constraints-header {
-    @apply flex flex-col gap-4;
-}
+/* .section-container / .section-header cover this section */
 
 .constraints-command {
     @apply bg-[rgba(195,31,31,0.05)] dark:bg-[rgba(214,64,64,0.05)];
@@ -1610,31 +1483,7 @@ img.dark-only {
     @apply md:border-[#dbdfe5] md:dark:border-[#282727];
 }
 
-.get-access-container {
-    @apply w-full;
-    @apply max-w-[1060px] mx-auto;
-    @apply px-4 md:px-8;
-    @apply flex flex-col gap-8;
-}
-
-.get-access-header {
-    @apply flex flex-col gap-4;
-}
-
-.get-access-command {
-    @apply bg-[rgba(26,117,218,0.12)] dark:bg-[#12161b];
-    @apply text-[#1a75da] dark:text-[#449cf8];
-    @apply text-xs leading-3;
-    @apply px-3 py-3;
-    @apply w-fit;
-}
-
-.get-access-title {
-    @apply m-0;
-    @apply uppercase font-bold;
-    @apply text-[#1a75da] dark:text-[#449cf8];
-    @apply text-[32px] leading-[32px] md:text-[36px] md:leading-[40px];
-}
+/* .section-container / .section-header / .section-command / .section-title cover this section */
 
 .get-access-cards {
     @apply w-full;
@@ -1756,7 +1605,7 @@ img.dark-only {
     @apply flex items-center justify-center;
     @apply gap-3;
     @apply py-4;
-    @apply px-8 md:px-8 lg:px-0;
+    @apply px-8 lg:px-0;
 }
 
 .landing-footer-strip-text {

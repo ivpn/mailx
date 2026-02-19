@@ -15,6 +15,7 @@ import Terms from './components/Terms.vue'
 import Privacy from './components/Privacy.vue'
 import Faq from './components/Faq.vue'
 import NotFound from './components/NotFound.vue'
+import Landing from './components/Landing.vue'
 import { type IStaticMethods } from 'preline/preline'
 
 declare global {
@@ -32,37 +33,37 @@ const PROTECTED_ROUTES = ['/', '/recipients', '/stats', '/settings', '/account']
 const dashboardChildren: RouteRecordRaw[] = [
     {
         path: '',
-        name: `${AppName} - Aliases`,
+        name: `${AppName}: Aliases`,
         component: QuickActions,
     },
     {
         path: 'wildcard',
-        name: `${AppName} - Wildcard`,
+        name: `${AppName}: Wildcard`,
         component: Wildcards,
     },
     {
         path: 'recipients',
-        name: `${AppName} - Recipients`,
+        name: `${AppName}: Recipients`,
         component: Recipients,
     },
     {
         path: 'stats',
-        name: `${AppName} - Stats`,
+        name: `${AppName}: Stats`,
         component: Stats,
     },
     {
         path: 'diagnostics',
-        name: `${AppName} - Diagnostics`,
+        name: `${AppName}: Diagnostics`,
         component: Diagnostics,
     },
     {
         path: 'settings',
-        name: `${AppName} - Settings`,
+        name: `${AppName}: Settings`,
         component: Settings,
     },
     {
         path: 'account',
-        name: `${AppName} - Account`,
+        name: `${AppName}: Account`,
         component: Account,
     },
 ]
@@ -77,48 +78,53 @@ const routes: RouteRecordRaw[] = [
     },
     {
         path: '/signup/:subid',
-        name: `${AppName} - Sign Up`,
+        name: `${AppName}: Sign Up`,
         component: Signup
     },
     {
         path: '/login',
-        name: `${AppName} - Log In`,
+        name: `${AppName}: Log In`,
         component: Login
     },
     {
         path: '/signup-complete',
-        name: `${AppName} - Signup Complete`,
+        name: `${AppName}: Signup Complete`,
         component: Login
     },
     {
         path: '/reset/password/initiate',
-        name: `${AppName} - Reset Password`,
+        name: `${AppName}: Reset Password`,
         component: InitiateResetPassword
     },
     {
         path: '/reset/password/:otp',
-        name: `${AppName} - Set New Password`,
+        name: `${AppName}: Set New Password`,
         component: ResetPassword,
         props: true // Better approach than accessing params directly
     },
     {
         path: '/tos',
-        name: `${AppName} - Terms`,
+        name: `${AppName}: Terms`,
         component: Terms
     },
     {
         path: '/privacy',
-        name: `${AppName} - Privacy Policy`,
+        name: `${AppName}: Privacy Policy`,
         component: Privacy
     },
     {
         path: '/faq',
-        name: `${AppName} - FAQ`,
+        name: `${AppName}: FAQ`,
         component: Faq
     },
     {
+        path: '/welcome',
+        name: `${AppName}: Home`,
+        component: Landing
+    },
+    {
         path: '/:pathMatch(.*)*',
-        name: '404 - Not Found',
+        name: '404: Not Found',
         component: NotFound
     }
 ]
@@ -138,8 +144,17 @@ const isLoggedIn = (): boolean => {
 router.beforeEach((to, _) => {
     document.title = to.name as string
 
+    if (to.path === '/') {
+        if (!isLoggedIn()) return { name: `${AppName}: Home` }
+        return
+    }
+
+    if (to.path === '/welcome' && isLoggedIn()) {
+        return { name: AppName }
+    }
+
     if (PROTECTED_ROUTES.includes(to.path) && !isLoggedIn()) {
-        return { name: `${AppName} - Log In` }
+        return { name: `${AppName}: Log In` }
     }
 })
 

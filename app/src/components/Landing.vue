@@ -652,7 +652,7 @@ const pricingPlans = [
     @apply min-h-screen;
 
     * {
-        @apply font-secondary;
+        font-family: 'Roboto Mono', monospace;
     }
 }
 

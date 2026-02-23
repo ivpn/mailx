@@ -1,7 +1,7 @@
 <template>
     <div class="container mx-auto max-w-screen-lg sm:p-10 p-5">
         <p class="py-5">
-            <router-link to="/login" class="flex items-center gap-2">
+            <router-link to="/" class="flex items-center gap-2">
                 <i class="icon arrow-left-line icon-accent"></i>
                 Back
             </router-link>

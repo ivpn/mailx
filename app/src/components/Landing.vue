@@ -45,7 +45,7 @@ const constraints = [
 
 // --- Pricing ----------------------------------------------------------------
 const pricingPlans = [
-    { plan: 'IVPN_PLUS',      price: '$60',  features: ['IVPN 5 Devices',  'MailX', 'modDNS'] },
+    { plan: 'IVPN_PLUS',      price: '$80',  features: ['IVPN 10 Devices',  'MailX', 'modDNS'] },
     { plan: 'IVPN_PRO_Suite', price: '$100', features: ['IVPN 10 Devices', 'MailX', 'modDNS', 'Portmaster'] },
 ]
 </script>

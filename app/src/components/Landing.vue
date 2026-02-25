@@ -58,7 +58,7 @@ const pricingPlans = [
                 <span class="landing-logo"></span>
             </router-link>
             <div class="landing-actions">
-                <a href="https://www.ivpn.net" class="landing-btn landing-btn-signup" target="_blank">
+                <a href="https://www.ivpn.net/en/pricing/" class="landing-btn landing-btn-signup" target="_blank">
                     [SIGN UP]
                 </a>
                 <router-link to="/login" class="landing-btn landing-btn-login">
@@ -82,7 +82,7 @@ const pricingPlans = [
                     </div>
                 </div>
                 <div class="hero-cta">
-                    <a href="https://www.ivpn.net" class="cta-btn cta-primary" target="_blank">
+                    <a href="https://www.ivpn.net/en/pricing/" class="cta-btn cta-primary" target="_blank">
                         ./GET_ACCESS
                     </a>
                     <a href="https://github.com/ivpn/mailx" target="_blank" class="cta-btn cta-secondary">
@@ -580,7 +580,7 @@ const pricingPlans = [
                                     <span class="get-access-price-unit">/YEAR</span>
                                 </p>
                             </div>
-                            <a href="https://www.ivpn.net" class="get-access-signup" target="_blank">./SIGNUP</a>
+                            <a href="https://www.ivpn.net/en/pricing/" class="get-access-signup" target="_blank">./SIGNUP</a>
                         </div>
 
                         <div class="get-access-divider"></div>

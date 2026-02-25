@@ -9,14 +9,16 @@ import (
 )
 
 var (
-	ErrGetDomains   = errors.New("Unable to retrieve domains.")
-	ErrPostDomain   = errors.New("Unable to create domain. Please try again.")
-	ErrUpdateDomain = errors.New("Unable to update domain. Please try again.")
-	ErrDeleteDomain = errors.New("Unable to delete domain. Please try again.")
+	ErrGetDomains      = errors.New("Unable to retrieve domains.")
+	ErrGetDomainsCount = errors.New("Unable to retrieve domains count.")
+	ErrPostDomain      = errors.New("Unable to create domain. Please try again.")
+	ErrUpdateDomain    = errors.New("Unable to update domain. Please try again.")
+	ErrDeleteDomain    = errors.New("Unable to delete domain. Please try again.")
 )
 
 type DomainStore interface {
 	GetDomains(context.Context, string) ([]model.Domain, error)
+	GetDomainsCount(context.Context, string) (int64, error)
 	PostDomain(context.Context, model.Domain) (model.Domain, error)
 	UpdateDomain(context.Context, model.Domain) error
 	DeleteDomain(context.Context, string, string) error
@@ -31,6 +33,16 @@ func (s *Service) GetDomains(ctx context.Context, userId string) ([]model.Domain
 	}
 
 	return domains, nil
+}
+
+func (s *Service) GetDomainsCount(ctx context.Context, userId string) (int64, error) {
+	count, err := s.Store.GetDomainsCount(ctx, userId)
+	if err != nil {
+		log.Printf("error getting domains count: %s", err.Error())
+		return 0, ErrGetDomainsCount
+	}
+
+	return count, nil
 }
 
 func (s *Service) PostDomain(ctx context.Context, domain model.Domain) (model.Domain, error) {

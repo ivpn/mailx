@@ -12,6 +12,12 @@ func (d *Database) GetDomains(ctx context.Context, userID string) ([]model.Domai
 	return domains, err
 }
 
+func (d *Database) GetDomainsCount(ctx context.Context, userID string) (int64, error) {
+	var count int64
+	err := d.Client.Model(&model.Domain{}).Where("user_id = ?", userID).Count(&count).Error
+	return count, err
+}
+
 func (d *Database) PostDomain(ctx context.Context, domain model.Domain) (model.Domain, error) {
 	err := d.Client.Create(&domain).Error
 	return domain, err

@@ -2,8 +2,11 @@ package service
 
 import (
 	"context"
+	"crypto/sha256"
 	"errors"
+	"fmt"
 	"log"
+	"strings"
 
 	"ivpn.net/email/api/internal/model"
 )
@@ -11,6 +14,7 @@ import (
 var (
 	ErrGetDomains      = errors.New("Unable to retrieve domains.")
 	ErrGetDomainsCount = errors.New("Unable to retrieve domains count.")
+	ErrGetDNSConfig    = errors.New("Unable to retrieve DNS config.")
 	ErrPostDomain      = errors.New("Unable to create domain. Please try again.")
 	ErrUpdateDomain    = errors.New("Unable to update domain. Please try again.")
 	ErrDeleteDomain    = errors.New("Unable to delete domain. Please try again.")
@@ -43,6 +47,34 @@ func (s *Service) GetDomainsCount(ctx context.Context, userId string) (int64, er
 	}
 
 	return count, nil
+}
+
+func (s *Service) GetDNSConfig(ctx context.Context, userId string) (model.DNSConfig, error) {
+	count, err := s.GetDomainsCount(ctx, userId)
+	if err != nil {
+		log.Printf("error getting domains count for DNS config: %s", err.Error())
+		return model.DNSConfig{}, ErrGetDNSConfig
+	}
+
+	domains := strings.Split(s.Cfg.API.Domains, ",")
+	if len(domains) == 0 {
+		log.Printf("no domains configured for DNS config")
+		return model.DNSConfig{}, ErrGetDNSConfig
+	}
+
+	verify := sha256.Sum256([]byte(s.Cfg.API.TokenSecret + userId + fmt.Sprint(count)))
+	domain := domains[0]
+	dkim := strings.Split(s.Cfg.SMTPClient.DkimSelector, ",")
+	hosts := strings.Split(s.Cfg.SMTPClient.Host, ",")
+
+	dnsConfig := model.DNSConfig{
+		Verify: fmt.Sprintf("%x", verify),
+		Domain: domain,
+		DKIM:   dkim,
+		Hosts:  hosts,
+	}
+
+	return dnsConfig, nil
 }
 
 func (s *Service) PostDomain(ctx context.Context, domain model.Domain) (model.Domain, error) {

@@ -14,3 +14,10 @@ type Domain struct {
 	InboundVerifiedAt  *time.Time `json:"inbound_verified_at"`  // nullable
 	OutboundVerifiedAt *time.Time `json:"outbound_verified_at"` // nullable
 }
+
+type DNSConfig struct {
+	Verify string   `json:"verify"`
+	Domain string   `json:"domain"`
+	DKIM   []string `json:"dkim_selectors"`
+	Hosts  []string `json:"mx_hosts"`
+}

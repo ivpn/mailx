@@ -9,11 +9,12 @@ import (
 )
 
 var (
-	ErrGetDomains   = "Unable to retrieve custom domains for this user."
-	ErrGetDNSConfig = "Unable to retrieve custom domains DNS config for this user."
-	ErrPostDomain   = "Unable to create custom domain. Please try again."
-	ErrUpdateDomain = "Unable to update custom domain. Please try again."
-	ErrDeleteDomain = "Unable to delete custom domain. Please try again."
+	ErrGetDomains     = "Unable to retrieve custom domains for this user."
+	ErrGetDNSConfig   = "Unable to retrieve custom domains DNS config for this user."
+	ErrPostDomain     = "Unable to create custom domain. Please try again."
+	ErrUpdateDomain   = "Unable to update custom domain. Please try again."
+	ErrDeleteDomain   = "Unable to delete custom domain. Please try again."
+	PostDomainSuccess = "Custom domain added successfully."
 )
 
 type DomainService interface {
@@ -64,4 +65,53 @@ func (h *Handler) GetDNSConfig(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(dnsConfig)
+}
+
+// @Summary Create custom domain
+// @Description Create a new custom domain for the authenticated user
+// @Tags domain
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param domain body DomainReq true "Custom Domain Request"
+// @Success 201 {object} map[string]string "message"
+// @Failure 400 {object} ErrorRes
+// @Router /domains [post]
+func (h *Handler) PostDomain(c *fiber.Ctx) error {
+	// Parse the request
+	userID := auth.GetUserID(c)
+	req := DomainReq{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	// Validate the request
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	// Create domain
+	domain := model.Domain{
+		UserID:  userID,
+		Name:    req.Name,
+		Enabled: true,
+	}
+
+	// Post domain
+	_, err = h.Service.PostDomain(c.Context(), domain)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrPostDomain,
+		})
+	}
+
+	return c.Status(201).JSON(fiber.Map{
+		"message": PostDomainSuccess,
+	})
 }

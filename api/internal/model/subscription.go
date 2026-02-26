@@ -35,19 +35,19 @@ type Subscription struct {
 }
 
 func (s *Subscription) Active() bool {
-	return s.ActiveUntil.After(time.Now()) && !strings.Contains(s.Tier, Tier1)
+	return s.ActiveUntil.After(time.Now()) && !strings.Contains(s.Tier, Tier1) && !s.IsOutage()
 }
 
 func (s *Subscription) GracePeriod() bool {
-	return s.IsOutage() && s.GracePeriodDays(3)
+	return s.IsOutage() && s.GracePeriodDays(3) && s.OutageGracePeriodDays(3)
 }
 
 func (s *Subscription) LimitedAccess() bool {
-	return s.GracePeriodDays(14)
+	return s.GracePeriodDays(14) || s.OutageGracePeriodDays(14)
 }
 
 func (s *Subscription) PendingDelete() bool {
-	return !s.GracePeriodDays(14)
+	return !s.GracePeriodDays(14) || !s.OutageGracePeriodDays(14)
 }
 
 func (s *Subscription) ActiveStatus() bool {
@@ -60,6 +60,10 @@ func (s *Subscription) IsOutage() bool {
 
 func (s *Subscription) GracePeriodDays(days int) bool {
 	return s.ActiveUntil.AddDate(0, 0, days).After(time.Now())
+}
+
+func (s *Subscription) OutageGracePeriodDays(days int) bool {
+	return s.UpdatedAt.AddDate(0, 0, days).After(time.Now())
 }
 
 func (s *Subscription) GetStatus() SubscriptionStatus {

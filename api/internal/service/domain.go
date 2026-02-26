@@ -13,6 +13,7 @@ import (
 
 var (
 	ErrGetDomains      = errors.New("Unable to retrieve domains.")
+	ErrGetDomain       = errors.New("Unable to retrieve domain.")
 	ErrGetDomainsCount = errors.New("Unable to retrieve domains count.")
 	ErrGetDNSConfig    = errors.New("Unable to retrieve DNS config.")
 	ErrPostDomain      = errors.New("Unable to create domain. Please try again.")
@@ -22,6 +23,7 @@ var (
 
 type DomainStore interface {
 	GetDomains(context.Context, string) ([]model.Domain, error)
+	GetDomain(context.Context, string, string) (model.Domain, error)
 	GetDomainsCount(context.Context, string) (int64, error)
 	PostDomain(context.Context, model.Domain) (model.Domain, error)
 	UpdateDomain(context.Context, model.Domain) error
@@ -37,6 +39,16 @@ func (s *Service) GetDomains(ctx context.Context, userId string) ([]model.Domain
 	}
 
 	return domains, nil
+}
+
+func (s *Service) GetDomain(ctx context.Context, domainID string, userID string) (model.Domain, error) {
+	domain, err := s.Store.GetDomain(ctx, domainID, userID)
+	if err != nil {
+		log.Printf("error getting domain: %s", err.Error())
+		return model.Domain{}, ErrGetDomain
+	}
+
+	return domain, nil
 }
 
 func (s *Service) GetDomainsCount(ctx context.Context, userId string) (int64, error) {

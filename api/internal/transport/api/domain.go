@@ -9,16 +9,19 @@ import (
 )
 
 var (
-	ErrGetDomains     = "Unable to retrieve custom domains for this user."
-	ErrGetDNSConfig   = "Unable to retrieve custom domains DNS config for this user."
-	ErrPostDomain     = "Unable to create custom domain. Please try again."
-	ErrUpdateDomain   = "Unable to update custom domain. Please try again."
-	ErrDeleteDomain   = "Unable to delete custom domain. Please try again."
-	PostDomainSuccess = "Custom domain added successfully."
+	ErrGetDomains       = "Unable to retrieve custom domains for this user."
+	ErrGetDomain        = "Unable to retrieve custom domain for this user."
+	ErrGetDNSConfig     = "Unable to retrieve custom domains DNS config for this user."
+	ErrPostDomain       = "Unable to create custom domain. Please try again."
+	ErrUpdateDomain     = "Unable to update custom domain. Please try again."
+	ErrDeleteDomain     = "Unable to delete custom domain. Please try again."
+	PostDomainSuccess   = "Custom domain added successfully."
+	UpdateDomainSuccess = "Custom domain updated successfully."
 )
 
 type DomainService interface {
 	GetDomains(context.Context, string) ([]model.Domain, error)
+	GetDomain(context.Context, string, string) (model.Domain, error)
 	GetDNSConfig(context.Context, string) (model.DNSConfig, error)
 	PostDomain(context.Context, model.Domain) (model.Domain, error)
 	UpdateDomain(context.Context, model.Domain) error
@@ -113,5 +116,61 @@ func (h *Handler) PostDomain(c *fiber.Ctx) error {
 
 	return c.Status(201).JSON(fiber.Map{
 		"message": PostDomainSuccess,
+	})
+}
+
+// @Summary Update custom domain
+// @Description Update an existing custom domain for the authenticated user
+// @Tags domain
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param domain body UpdateDomainReq true "Update Custom Domain Request"
+// @Success 200 {object} map[string]string "message"
+// @Failure 400 {object} ErrorRes
+// @Router /domains [put]
+func (h *Handler) UpdateDomain(c *fiber.Ctx) error {
+	// Parse the request
+	userID := auth.GetUserID(c)
+	req := UpdateDomainReq{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	// Validate the request
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	// Get existing domain
+	domain, err := h.Service.GetDomain(c.Context(), req.ID, userID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrGetDomain,
+		})
+	}
+
+	// Update domain fields
+	domain.Description = req.Description
+	domain.Recipient = req.Recipient
+	domain.FromName = req.FromName
+	domain.Enabled = req.Enabled
+
+	// Update domain
+	err = h.Service.UpdateDomain(c.Context(), domain)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrUpdateDomain,
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"message": UpdateDomainSuccess,
 	})
 }

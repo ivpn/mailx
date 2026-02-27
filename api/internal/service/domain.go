@@ -97,6 +97,15 @@ func (s *Service) GetDNSConfig(ctx context.Context, userId string) (model.DNSCon
 }
 
 func (s *Service) PostDomain(ctx context.Context, domain model.Domain) (model.Domain, error) {
+	err := s.VerifyDomainOwner(ctx, domain.Name, domain.UserID)
+	if err != nil {
+		log.Printf("error verifying domain ownership: %s", err.Error())
+		return model.Domain{}, ErrDNSLookupOwner
+	}
+
+	now := time.Now()
+	domain.OwnerVerifiedAt = &now
+
 	createdDomain, err := s.Store.PostDomain(ctx, domain)
 	if err != nil {
 		log.Printf("error posting domain: %s", err.Error())

@@ -31,14 +31,14 @@ func (d *Database) PostDomain(ctx context.Context, domain model.Domain) (model.D
 
 func (d *Database) UpdateDomain(ctx context.Context, domain model.Domain) error {
 	return d.Client.Model(&domain).Where("user_id = ?", domain.UserID).Updates(map[string]any{
-		"name":                 domain.Name,
-		"description":          domain.Description,
-		"recipient":            domain.Recipient,
-		"from_name":            domain.FromName,
-		"enabled":              domain.Enabled,
-		"owner_verified_at":    domain.OwnerVerifiedAt,
-		"inbound_verified_at":  domain.InboundVerifiedAt,
-		"outbound_verified_at": domain.OutboundVerifiedAt,
+		"name":              domain.Name,
+		"description":       domain.Description,
+		"recipient":         domain.Recipient,
+		"from_name":         domain.FromName,
+		"enabled":           domain.Enabled,
+		"owner_verified_at": domain.OwnerVerifiedAt,
+		"mx_verified_at":    domain.MXVerifiedAt,
+		"send_verified_at":  domain.SendVerifiedAt,
 	}).Error
 }
 

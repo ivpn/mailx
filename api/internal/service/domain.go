@@ -21,6 +21,10 @@ var (
 	ErrUpdateDomain    = errors.New("Unable to update domain. Please try again.")
 	ErrDeleteDomain    = errors.New("Unable to delete domain. Please try again.")
 	ErrDNSLookupOwner  = errors.New("Unable to verify domain ownership. Please ensure the correct TXT record is set.")
+	ErrDNSLookupSPF    = errors.New("Unable to verify domain DNS records. Please ensure the correct SPF record is set.")
+	ErrDNSLookupDKIM   = errors.New("Unable to verify domain DNS records. Please ensure the correct DKIM records are set.")
+	ErrDNSLookupDMARC  = errors.New("Unable to verify domain DNS records. Please ensure the correct DMARC record is set.")
+	ErrDNSLookupMX     = errors.New("Unable to verify domain DNS records. Please ensure the correct MX records are set.")
 )
 
 type DomainStore interface {
@@ -138,6 +142,7 @@ func (s *Service) VerifyDomainOwner(ctx context.Context, domain string, userID s
 		return ErrGetDNSConfig
 	}
 
+	// TXT record for ownership verification
 	ok, err := utils.LookupTXTExact(domain, "mailx-verify="+dnsConfig.Verify)
 	if err != nil {
 		log.Printf("error looking up TXT record for domain ownership verification: %s", err.Error())
@@ -147,6 +152,90 @@ func (s *Service) VerifyDomainOwner(ctx context.Context, domain string, userID s
 	if !ok {
 		log.Printf("TXT record not found for domain ownership verification")
 		return ErrDNSLookupOwner
+	}
+
+	return nil
+}
+
+func (s *Service) VerifyDomainDNSRecords(ctx context.Context, domain string, userID string) error {
+	if err := s.VerifyDomainMX(ctx, domain, userID); err != nil {
+		return err
+	}
+
+	if err := s.VerifyDomainSend(ctx, domain, userID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *Service) VerifyDomainMX(ctx context.Context, domain string, userID string) error {
+	dnsConfig, err := s.GetDNSConfig(ctx, userID)
+	if err != nil {
+		log.Printf("error getting DNS config for domain MX verification: %s", err.Error())
+		return ErrGetDNSConfig
+	}
+
+	// MX records
+	for _, host := range dnsConfig.Hosts {
+		ok, err := utils.LookupMX(domain, host)
+		if err != nil {
+			log.Printf("error looking up MX record for domain MX verification: %s", err.Error())
+			return ErrDNSLookupMX
+		}
+
+		if !ok {
+			log.Printf("MX record not found for host %s in domain MX verification", host)
+			return ErrDNSLookupMX
+		}
+	}
+
+	return nil
+}
+
+func (s *Service) VerifyDomainSend(ctx context.Context, domain string, userID string) error {
+	dnsConfig, err := s.GetDNSConfig(ctx, userID)
+	if err != nil {
+		log.Printf("error getting DNS config for domain MX verification: %s", err.Error())
+		return ErrGetDNSConfig
+	}
+
+	// SPF record
+	ok, err := utils.LookupTXTContains(domain, "v=spf1 include:"+dnsConfig.Domain+" ~all")
+	if err != nil {
+		log.Printf("error looking up TXT record for domain SPF verification: %s", err.Error())
+		return ErrDNSLookupSPF
+	}
+
+	if !ok {
+		log.Printf("SPF record not found for domain SPF verification")
+		return ErrDNSLookupSPF
+	}
+
+	// DKIM records
+	for _, selector := range dnsConfig.DKIM {
+		ok, err := utils.LookupCNAME(selector+"._domainkey."+domain, selector+"._domainkey."+dnsConfig.Domain)
+		if err != nil {
+			log.Printf("error looking up CNAME record for selector %s in domain DKIM verification: %s", selector, err.Error())
+			return ErrDNSLookupDKIM
+		}
+
+		if !ok {
+			log.Printf("DKIM record not found for selector %s in domain DKIM verification", selector)
+			return ErrDNSLookupDKIM
+		}
+	}
+
+	// DMARC record
+	ok, err = utils.LookupTXTContains("_dmarc."+domain, "v=DMARC1; p=quarantine; adkim=s")
+	if err != nil {
+		log.Printf("error looking up TXT record for domain DMARC verification: %s", err.Error())
+		return ErrDNSLookupDMARC
+	}
+
+	if !ok {
+		log.Printf("DMARC record not found for domain DMARC verification")
+		return ErrDNSLookupDMARC
 	}
 
 	return nil

@@ -207,6 +207,88 @@ func TestExtractOriginalFrom(t *testing.T) {
 	}
 }
 
+func TestParseMsg(t *testing.T) {
+	tests := []struct {
+		name    string
+		data    string
+		want    Msg
+		wantErr bool
+	}{
+		{
+			name: "To address with plus and equals in local part",
+			data: "From: John Doe <john.doe@example.com>\r\nTo: Jane Doe <werb.noun12+jane.doe=examplemta.com@mailx.net>\r\nSubject: Test\r\n\r\nBody",
+			want: Msg{
+				From:     "john.doe@example.com",
+				FromName: "John Doe",
+				To:       []string{"werb.noun12+jane.doe=examplemta.com@mailx.net"},
+				Subject:  "Test",
+				Body:     "Body",
+				Type:     Send,
+			},
+		},
+		{
+			name: "To address with display name containing comma",
+			data: "From: Jane Smith <jane.smith@example.com>\r\nTo: \"Doe, John\" <john.doe@example.com>\r\nSubject: Hello\r\n\r\nHi",
+			want: Msg{
+				From:     "jane.smith@example.com",
+				FromName: "Jane Smith",
+				To:       []string{"john.doe@example.com"},
+				Subject:  "Hello",
+				Body:     "Hi",
+				Type:     Send,
+			},
+		},
+		{
+			name: "multiple To recipients",
+			data: "From: John Doe <john.doe@example.com>\r\nTo: alice.jones@example.com, bob.brown@example.com\r\nSubject: Multi\r\n\r\nHello",
+			want: Msg{
+				From:     "john.doe@example.com",
+				FromName: "John Doe",
+				To:       []string{"alice.jones@example.com", "bob.brown@example.com"},
+				Subject:  "Multi",
+				Body:     "Hello",
+				Type:     Send,
+			},
+		},
+		{
+			name: "RFC 2047 encoded display name in From",
+			data: "From: =?UTF-8?B?SmFuZSBEb2U=?= <jane.doe@example.com>\r\nTo: john.doe@example.com\r\nSubject: Encoded\r\n\r\nBody",
+			want: Msg{
+				From:     "jane.doe@example.com",
+				FromName: "Jane Doe",
+				To:       []string{"john.doe@example.com"},
+				Subject:  "Encoded",
+				Body:     "Body",
+				Type:     Send,
+			},
+		},
+		{
+			name: "reply message",
+			data: "From: John Doe <john.doe@example.com>\r\nTo: jane.smith@example.com\r\nSubject: Re: Test\r\nIn-Reply-To: <abc@example.com>\r\n\r\nReplying",
+			want: Msg{
+				From:     "john.doe@example.com",
+				FromName: "John Doe",
+				To:       []string{"jane.smith@example.com"},
+				Subject:  "Re: Test",
+				Body:     "Replying",
+				Type:     Reply,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ParseMsg([]byte(tt.data))
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("ParseMsg() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !compareMessages(got, tt.want) {
+				t.Errorf("ParseMsg() = %+v, want %+v", got, tt.want)
+			}
+		})
+	}
+}
+
 func compareMessages(a, b Msg) bool {
 	if a.From != b.From || a.FromName != b.FromName || a.Subject != b.Subject || a.Body != b.Body || a.Type != b.Type {
 		return false

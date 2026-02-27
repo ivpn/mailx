@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"ivpn.net/email/api/internal/model"
+	"ivpn.net/email/api/internal/utils"
 )
 
 var (
@@ -19,6 +20,7 @@ var (
 	ErrPostDomain      = errors.New("Unable to create domain. Please try again.")
 	ErrUpdateDomain    = errors.New("Unable to update domain. Please try again.")
 	ErrDeleteDomain    = errors.New("Unable to delete domain. Please try again.")
+	ErrDNSLookupOwner  = errors.New("Unable to verify domain ownership. Please ensure the correct TXT record is set.")
 )
 
 type DomainStore interface {
@@ -124,6 +126,27 @@ func (s *Service) DeleteDomainsByUserID(ctx context.Context, userID string) erro
 	if err != nil {
 		log.Printf("error deleting domains by user ID: %s", err.Error())
 		return ErrDeleteDomain
+	}
+
+	return nil
+}
+
+func (s *Service) VerifyDomainOwner(ctx context.Context, domain string, userID string) error {
+	dnsConfig, err := s.GetDNSConfig(ctx, userID)
+	if err != nil {
+		log.Printf("error getting DNS config for domain ownership verification: %s", err.Error())
+		return ErrGetDNSConfig
+	}
+
+	ok, err := utils.LookupTXTExact(domain, "mailx-verify="+dnsConfig.Verify)
+	if err != nil {
+		log.Printf("error looking up TXT record for domain ownership verification: %s", err.Error())
+		return ErrDNSLookupOwner
+	}
+
+	if !ok {
+		log.Printf("TXT record not found for domain ownership verification")
+		return ErrDNSLookupOwner
 	}
 
 	return nil

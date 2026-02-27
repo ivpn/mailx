@@ -116,7 +116,21 @@ func (s *Service) PostDomain(ctx context.Context, domain model.Domain) (model.Do
 }
 
 func (s *Service) DeleteDomain(ctx context.Context, domainID string, userID string) error {
-	err := s.Store.DeleteDomain(ctx, domainID, userID)
+	// Delete aliases associated with the domain
+	domain, err := s.GetDomain(ctx, domainID, userID)
+	if err != nil {
+		log.Printf("error getting domain for alias deletion: %s", err.Error())
+		return ErrGetDomain
+	}
+
+	err = s.DeleteAliasByDomain(ctx, domain.Name, userID)
+	if err != nil {
+		log.Printf("error deleting aliases by domain: %s", err.Error())
+		return ErrDeleteAliasByDomain
+	}
+
+	// Delete the domain
+	err = s.Store.DeleteDomain(ctx, domainID, userID)
 	if err != nil {
 		log.Printf("error deleting domain: %s", err.Error())
 		return ErrDeleteDomain

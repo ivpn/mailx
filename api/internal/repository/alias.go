@@ -94,6 +94,12 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 	return aliases, nil
 }
 
+func (d *Database) GetAliasesByDomain(ctx context.Context, domain string, userId string) ([]model.Alias, error) {
+	aliases := []model.Alias{}
+	err := d.Client.Where("name LIKE ? AND user_id = ?", "%@"+domain, userId).Find(&aliases).Error
+	return aliases, err
+}
+
 func (d *Database) GetAllAliases(ctx context.Context, userID string) ([]model.Alias, error) {
 	aliases := []model.Alias{}
 	err := d.Client.Where("user_id = ?", userID).Order("created_at desc").Find(&aliases).Error
@@ -149,4 +155,8 @@ func (d *Database) DeleteAlias(ctx context.Context, ID string, userID string) er
 
 func (d *Database) DeleteAliasByUserID(ctx context.Context, userID string) error {
 	return d.Client.Where("user_id = ?", userID).Delete(&model.Alias{}).Error
+}
+
+func (d *Database) DeleteAliasByDomain(ctx context.Context, domain string, userID string) error {
+	return d.Client.Where("name LIKE ? AND user_id = ?", "%@"+domain, userID).Delete(&model.Alias{}).Error
 }

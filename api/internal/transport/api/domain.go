@@ -17,6 +17,7 @@ var (
 	ErrDeleteDomain              = "Unable to delete custom domain. Please try again."
 	PostDomainSuccess            = "Custom domain added successfully."
 	UpdateDomainSuccess          = "Custom domain updated successfully."
+	DeleteDomainSuccess          = "Custom domain deleted successfully."
 	DNSRecordVerificationSuccess = "Custom domain DNS records verified successfully."
 )
 
@@ -174,6 +175,32 @@ func (h *Handler) UpdateDomain(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{
 		"message": UpdateDomainSuccess,
+	})
+}
+
+// @Summary Delete custom domain
+// @Description Delete an existing custom domain for the authenticated user
+// @Tags domain
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path string true "Domain ID"
+// @Success 200 {object} map[string]string "message"
+// @Failure 400 {object} ErrorRes
+// @Router /domains/{id} [delete]
+func (h *Handler) DeleteDomain(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
+	domainID := c.Params("id")
+
+	err := h.Service.DeleteDomain(c.Context(), domainID, userID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrDeleteDomain,
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"message": DeleteDomainSuccess,
 	})
 }
 

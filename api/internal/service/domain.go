@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"ivpn.net/email/api/internal/model"
 	"ivpn.net/email/api/internal/utils"
@@ -157,13 +158,31 @@ func (s *Service) VerifyDomainOwner(ctx context.Context, domain string, userID s
 	return nil
 }
 
-func (s *Service) VerifyDomainDNSRecords(ctx context.Context, domain string, userID string) error {
-	if err := s.VerifyDomainMX(ctx, domain, userID); err != nil {
+func (s *Service) VerifyDomainDNSRecords(ctx context.Context, domainId string, userID string) error {
+	domain, err := s.GetDomain(ctx, domainId, userID)
+	if err != nil {
+		log.Printf("error getting domain for DNS record verification: %s", err.Error())
+		return ErrGetDomain
+	}
+
+	err = s.VerifyDomainMX(ctx, domain.Name, userID)
+	if err != nil {
 		return err
 	}
 
-	if err := s.VerifyDomainSend(ctx, domain, userID); err != nil {
+	err = s.VerifyDomainSend(ctx, domain.Name, userID)
+	if err != nil {
 		return err
+	}
+
+	now := time.Now()
+	domain.MXVerifiedAt = &now
+	domain.SendVerifiedAt = &now
+
+	err = s.UpdateDomain(ctx, domain)
+	if err != nil {
+		log.Printf("error updating domain verification timestamps: %s", err.Error())
+		return ErrUpdateDomain
 	}
 
 	return nil

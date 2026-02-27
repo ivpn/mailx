@@ -9,14 +9,15 @@ import (
 )
 
 var (
-	ErrGetDomains       = "Unable to retrieve custom domains for this user."
-	ErrGetDomain        = "Unable to retrieve custom domain for this user."
-	ErrGetDNSConfig     = "Unable to retrieve custom domains DNS config for this user."
-	ErrPostDomain       = "Unable to create custom domain. Please try again."
-	ErrUpdateDomain     = "Unable to update custom domain. Please try again."
-	ErrDeleteDomain     = "Unable to delete custom domain. Please try again."
-	PostDomainSuccess   = "Custom domain added successfully."
-	UpdateDomainSuccess = "Custom domain updated successfully."
+	ErrGetDomains                = "Unable to retrieve custom domains for this user."
+	ErrGetDomain                 = "Unable to retrieve custom domain for this user."
+	ErrGetDNSConfig              = "Unable to retrieve custom domains DNS config for this user."
+	ErrPostDomain                = "Unable to create custom domain. Please try again."
+	ErrUpdateDomain              = "Unable to update custom domain. Please try again."
+	ErrDeleteDomain              = "Unable to delete custom domain. Please try again."
+	PostDomainSuccess            = "Custom domain added successfully."
+	UpdateDomainSuccess          = "Custom domain updated successfully."
+	DNSRecordVerificationSuccess = "Custom domain DNS records verified successfully."
 )
 
 type DomainService interface {
@@ -26,6 +27,7 @@ type DomainService interface {
 	PostDomain(context.Context, model.Domain) (model.Domain, error)
 	UpdateDomain(context.Context, model.Domain) error
 	DeleteDomain(context.Context, string, string) error
+	VerifyDomainDNSRecords(context.Context, string, string) error
 }
 
 // @Summary Get custom domains
@@ -172,5 +174,31 @@ func (h *Handler) UpdateDomain(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{
 		"message": UpdateDomainSuccess,
+	})
+}
+
+// @Summary Verify custom domain DNS records
+// @Description Verify the DNS records for a custom domain of the authenticated user
+// @Tags domain
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path string true "Domain ID"
+// @Success 200 {object} map[string]string "message"
+// @Failure 400 {object} ErrorRes
+// @Router /domains/{id}/verify-dns [post]
+func (h *Handler) VerifyDomainDNSRecords(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
+	domainID := c.Params("id")
+
+	err := h.Service.VerifyDomainDNSRecords(c.Context(), domainID, userID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"message": DNSRecordVerificationSuccess,
 	})
 }

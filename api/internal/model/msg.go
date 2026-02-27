@@ -42,12 +42,11 @@ func ParseMsg(data []byte) (Msg, error) {
 	subject := msg.Header.Get("Subject")
 
 	to := make([]string, 0)
-	for t := range strings.SplitSeq(msg.Header.Get("To"), ",") {
-		address, err := mail.ParseAddress(t)
-		if err != nil {
-			return Msg{}, err
-		}
-
+	addresses, err := mail.ParseAddressList(msg.Header.Get("To"))
+	if err != nil {
+		return Msg{}, err
+	}
+	for _, address := range addresses {
 		to = append(to, address.Address)
 	}
 

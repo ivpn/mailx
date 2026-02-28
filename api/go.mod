@@ -13,12 +13,12 @@ require (
 	github.com/gofiber/swagger v1.0.0
 	github.com/google/uuid v1.6.0
 	github.com/jasonlvhit/gocron v0.0.1
-	github.com/mnako/letters v0.2.5
+	github.com/mnako/letters v0.2.8
 	github.com/redis/go-redis/v9 v9.5.5
 	github.com/stretchr/testify v1.10.0
 	github.com/swaggo/swag v1.16.3
 	github.com/valyala/fasthttp v1.51.0
-	golang.org/x/crypto v0.36.0
+	golang.org/x/crypto v0.44.0
 	golang.org/x/sync v0.19.0
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
@@ -69,10 +69,10 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
-	golang.org/x/net v0.38.0 // indirect
-	golang.org/x/sys v0.31.0 // indirect
-	golang.org/x/text v0.23.0 // indirect
-	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d // indirect
+	golang.org/x/net v0.47.0 // indirect
+	golang.org/x/sys v0.38.0 // indirect
+	golang.org/x/text v0.32.0 // indirect
+	golang.org/x/tools v0.39.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

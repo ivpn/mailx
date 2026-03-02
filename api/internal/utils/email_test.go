@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -130,5 +131,156 @@ func TestRemoveHtmlHeader(t *testing.T) {
 				t.Errorf("RemoveHtmlHeader() = %q, want %q", result, tt.expected)
 			}
 		})
+	}
+}
+
+func TestSafeDecodeAddressName(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "plain name without encoding",
+			input:    "John Doe",
+			expected: "John Doe",
+		},
+		{
+			name:     "empty string",
+			input:    "",
+			expected: "",
+		},
+		{
+			name:     "UTF-8 base64 encoded word",
+			input:    "=?UTF-8?B?SmFuZSBEb2U=?=",
+			expected: "Jane Doe",
+		},
+		{
+			// =?UTF-8?Q?John_D=C5=8De?= encodes "John Dōe" (ō = U+014D)
+			name:     "UTF-8 QP encoded word with multibyte char",
+			input:    "=?UTF-8?Q?John_D=C5=8De?=",
+			expected: "John D\u014de",
+		},
+		{
+			// When the charset is iso-8859-2, Go's mime.WordDecoder returns raw bytes
+			// that are not valid UTF-8.  SafeDecodeAddressName must fall back to
+			// stripping the encoded word and returning only the plain-text prefix.
+			name:     "iso-8859-2 encoded word falls back to plain-text prefix",
+			input:    "John =?iso-8859-2?q?D=F6e?=",
+			expected: "John",
+		},
+		{
+			name:     "no encoded words passed through unchanged",
+			input:    "John Doe",
+			expected: "John Doe",
+		},
+		{
+			name:     "us-ascii QP encoded word is decoded normally",
+			input:    "=?us-ascii?Q?John_Doe?=",
+			expected: "John Doe",
+		},
+		{
+			// =??q?...?= has an empty charset.  SafeDecodeAddressName decoding
+			// fails (empty charset lookup), so the fallback regex strips it.
+			// In practice, PreprocessEmailData fixes this before it reaches here,
+			// but SafeDecodeAddressName must be safe against it regardless.
+			name:     "empty charset encoded word stripped by fallback",
+			input:    "Service =??q?Support_Team?=",
+			expected: "Service",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := SafeDecodeAddressName(tt.input)
+			if result != tt.expected {
+				t.Errorf("SafeDecodeAddressName(%q) = %q, want %q", tt.input, result, tt.expected)
+			}
+		})
+	}
+}
+
+func TestFixEmptyCharsetEncodedWords(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "empty charset QP encoded word is fixed",
+			input:    "=??q?Hello_World?=",
+			expected: "=?UTF-8?q?Hello_World?=",
+		},
+		{
+			name:     "empty charset base64 encoded word is fixed",
+			input:    "=??B?SGVsbG8gV29ybGQ=?=",
+			expected: "=?UTF-8?B?SGVsbG8gV29ybGQ=?=",
+		},
+		{
+			name:     "well-formed UTF-8 encoded word is unchanged",
+			input:    "=?UTF-8?q?Hello_World?=",
+			expected: "=?UTF-8?q?Hello_World?=",
+		},
+		{
+			name:     "well-formed iso-8859-1 encoded word is unchanged",
+			input:    "=?iso-8859-1?q?Hello?=",
+			expected: "=?iso-8859-1?q?Hello?=",
+		},
+		{
+			name:     "plain text without encoded words is unchanged",
+			input:    "John Doe <john.doe@example.com>",
+			expected: "John Doe <john.doe@example.com>",
+		},
+		{
+			// Regression: display name with empty charset followed by address with '=' in local part.
+			name:     "empty charset encoded word in display name alongside address with equals",
+			input:    "=??q?Service_Name?= <jane.doe+tag=example.net@example.com>",
+			expected: "=?UTF-8?q?Service_Name?= <jane.doe+tag=example.net@example.com>",
+		},
+		{
+			name:     "multiple encoded words, one with empty charset",
+			input:    "=??q?First?= =?UTF-8?q?Second?=",
+			expected: "=?UTF-8?q?First?= =?UTF-8?q?Second?=",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := fixEmptyCharsetEncodedWords(tt.input)
+			if result != tt.expected {
+				t.Errorf("fixEmptyCharsetEncodedWords(%q) = %q, want %q", tt.input, result, tt.expected)
+			}
+		})
+	}
+}
+
+func TestPreprocessEmailData_EmptyCharsetEncodedWord(t *testing.T) {
+	// Regression: letters.ParseEmail fails with "cannot lookup encoding" when
+	// the From or To header contains an RFC 2047 encoded word with an empty
+	// charset field (=??q?…?=).  PreprocessEmailData must rewrite these to
+	// =?UTF-8?q?…?= before returning.
+	input := strings.Join([]string{
+		"From: =??q?Service_Support?= <support@example.com>",
+		"To: John Doe <john.doe+tag=example.net@example.com>",
+		"Subject: Hello",
+		"",
+		"Body text",
+	}, "\r\n")
+
+	processed, err := PreprocessEmailData([]byte(input))
+	if err != nil {
+		t.Fatalf("PreprocessEmailData() error = %v", err)
+	}
+
+	processedStr := string(processed)
+	if strings.Contains(processedStr, "=??q?") {
+		t.Errorf("processed data still contains empty-charset encoded word: %q", processedStr)
+	}
+	if !strings.Contains(processedStr, "=?UTF-8?q?Service_Support?=") {
+		t.Errorf("processed data missing fixed encoded word; got: %q", processedStr)
+	}
+	// The To address with '=' in the local part must not be corrupted.
+	if !strings.Contains(processedStr, "john.doe+tag=example.net@example.com") {
+		t.Errorf("processed data corrupted To address; got: %q", processedStr)
 	}
 }

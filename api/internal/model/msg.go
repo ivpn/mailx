@@ -41,19 +41,23 @@ func ParseMsg(data []byte) (Msg, error) {
 
 	subject := msg.Header.Get("Subject")
 
-	to := make([]string, 0)
-	for t := range strings.SplitSeq(msg.Header.Get("To"), ",") {
-		address, err := mail.ParseAddress(t)
-		if err != nil {
-			return Msg{}, err
-		}
+	originalMsg, err := mail.ReadMessage(bytes.NewReader(data))
+	if err != nil {
+		return Msg{}, err
+	}
 
+	to := make([]string, 0)
+	addresses, err := mail.ParseAddressList(originalMsg.Header.Get("To"))
+	if err != nil {
+		return Msg{}, fmt.Errorf("error parsing To header: %w", err)
+	}
+	for _, address := range addresses {
 		to = append(to, address.Address)
 	}
 
 	from, err := mail.ParseAddress(msg.Header.Get("From"))
 	if err != nil {
-		return Msg{}, err
+		return Msg{}, fmt.Errorf("error parsing From header: %w", err)
 	}
 	fromAddress := from.Address
 

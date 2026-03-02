@@ -11,6 +11,7 @@ import (
 	"regexp"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/ProtonMail/gopenpgp/v3/crypto"
 	"ivpn.net/email/api/internal/utils/gomail.v2"
@@ -151,54 +152,45 @@ func cryptoRandInt(max int) (int, error) {
 	return int(nBig.Int64()), nil
 }
 
-// PreprocessEmailData decodes RFC 2047 encoded headers to fix parsing issues
-// with email addresses containing encoded display names
+// emptyCharsetEncodedWordRe matches RFC 2047 encoded words with an empty
+// charset field, e.g. =??q?text?= or =??B?text?=.
+var emptyCharsetEncodedWordRe = regexp.MustCompile(`=\?\?([bqBQ]\?[^?]*)\?=`)
+
+// fixEmptyCharsetEncodedWords replaces malformed RFC 2047 encoded words that
+// have an empty charset (=??encoding?content?=) with UTF-8 as the charset.
+// Some mailers omit the charset field while still encoding content as UTF-8.
+// Without this fix the letters library (and other strict parsers) return
+// "cannot lookup encoding" and refuse to process the message.
+func fixEmptyCharsetEncodedWords(s string) string {
+	return emptyCharsetEncodedWordRe.ReplaceAllString(s, "=?UTF-8?$1?=")
+}
+
+// PreprocessEmailData normalises raw email bytes so that the standard
+// net/mail parser and the letters library can handle them reliably.
+// It deliberately does NOT attempt to decode RFC 2047 encoded-words in
+// address headers (From, To, Cc, …): Go's net/mail.ParseAddress already
+// handles RFC 2047 display names natively, and running a second decode
+// pass with a no-op charset reader produces invalid UTF-8 bytes that
+// cause parsing to fail.  Use SafeDecodeAddressName to decode display
+// names after parsing.
+//
+// It does fix malformed encoded words with an empty charset field
+// (=??q?…?=) by substituting UTF-8, so that strict third-party parsers
+// such as letters do not abort with "cannot lookup encoding".
 func PreprocessEmailData(data []byte) ([]byte, error) {
 	msg, err := mail.ReadMessage(bytes.NewReader(data))
 	if err != nil {
 		return data, nil // Return original data if it can't be parsed
 	}
 
-	decoder := mime.WordDecoder{
-		CharsetReader: func(charset string, input io.Reader) (io.Reader, error) {
-			// Default charset handling
-			return input, nil
-		},
-	}
-
-	// Headers that commonly contain RFC 2047 encoded addresses
-	addressHeaders := []string{"From", "To", "Cc", "Bcc", "Reply-To", "Sender"}
-
 	var buf bytes.Buffer
 
-	// Write headers
+	// Write headers, fixing any malformed encoded words in each value.
 	for key := range msg.Header {
-		values := msg.Header[key]
-		for _, value := range values {
-			// Try to decode RFC 2047 encoded-words for address headers
-			needsDecoding := false
-			for _, addrHeader := range addressHeaders {
-				if strings.EqualFold(key, addrHeader) {
-					needsDecoding = true
-					break
-				}
-			}
-
-			if needsDecoding && strings.Contains(value, "=?") {
-				// Decode the RFC 2047 encoded display name
-				decoded, err := decoder.DecodeHeader(value)
-				if err == nil {
-					value = decoded
-				} else {
-					// If decoding fails (e.g., malformed base64), try to clean it up
-					// Extract just the email address part if possible
-					value = CleanupMalformedEncodedAddress(value)
-				}
-			}
-
+		for _, value := range msg.Header[key] {
 			buf.WriteString(key)
 			buf.WriteString(": ")
-			buf.WriteString(value)
+			buf.WriteString(fixEmptyCharsetEncodedWords(value))
 			buf.WriteString("\r\n")
 		}
 	}
@@ -213,6 +205,30 @@ func PreprocessEmailData(data []byte) ([]byte, error) {
 	}
 
 	return buf.Bytes(), nil
+}
+
+// SafeDecodeAddressName decodes an RFC 2047 encoded display name returned
+// by net/mail.ParseAddress.  If the decoded string is not valid UTF-8
+// (e.g. the encoded word used a non-UTF-8 charset and the bytes were
+// returned verbatim), it falls back to stripping encoded-word tokens and
+// returning only the plain-text fragments, producing a best-effort
+// human-readable name rather than a garbled or empty string.
+func SafeDecodeAddressName(name string) string {
+	if !strings.Contains(name, "=?") {
+		return name
+	}
+
+	decoder := mime.WordDecoder{}
+	decoded, err := decoder.DecodeHeader(name)
+	if err == nil && utf8.ValidString(decoded) {
+		return decoded
+	}
+
+	// Fallback: strip encoded-word tokens (including those with an empty
+	// charset, e.g. =??q?…?=) and keep only the plain-text fragments.
+	re := regexp.MustCompile(`=\?[^?]*\?[bqBQ]\?[^?]*\?=`)
+	plain := re.ReplaceAllString(name, "")
+	return strings.TrimSpace(plain)
 }
 
 // CleanupMalformedEncodedAddress attempts to extract a valid email address

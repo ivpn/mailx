@@ -21,9 +21,8 @@ import (
 var templateFS embed.FS
 
 type Mailer struct {
-	dialer     *gomail.Dialer
-	Sender     string
-	SenderName string
+	dialer *gomail.Dialer
+	cfg    config.SMTPClientConfig
 }
 
 // #nosec G104
@@ -32,9 +31,8 @@ func New(cfg config.SMTPClientConfig) Mailer {
 	if err != nil {
 		log.Println("Invalid SMTP port:", cfg.Port)
 		return Mailer{
-			dialer:     nil,
-			Sender:     cfg.Sender,
-			SenderName: cfg.SenderName,
+			dialer: nil,
+			cfg:    cfg,
 		}
 	}
 
@@ -61,22 +59,20 @@ func New(cfg config.SMTPClientConfig) Mailer {
 
 	if dialer == nil {
 		return Mailer{
-			dialer:     nil,
-			Sender:     cfg.Sender,
-			SenderName: cfg.SenderName,
+			dialer: nil,
+			cfg:    cfg,
 		}
 	}
 
 	return Mailer{
-		dialer:     dialer,
-		Sender:     cfg.Sender,
-		SenderName: cfg.SenderName,
+		dialer: dialer,
+		cfg:    cfg,
 	}
 }
 
 func (mailer Mailer) Send(to string, subject string, body string) error {
 	m := gomail.NewMessage()
-	m.SetAddressHeader("From", mailer.Sender, mailer.SenderName)
+	m.SetAddressHeader("From", mailer.cfg.Sender, mailer.cfg.SenderName)
 	m.SetHeader("To", to)
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/plain", body)
@@ -127,6 +123,14 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 	m.SetHeader("Subject", email.Headers.Subject)
 	m.SetBody("text/plain", email.Text)
 	m.AddAlternative("text/html", email.HTML)
+
+	// Preserve original metadata
+	if len(email.Headers.InReplyTo) > 0 {
+		m.SetHeader("In-Reply-To", string(email.Headers.InReplyTo[0]))
+	}
+	m.SetHeader("X-Complaints-To", mailer.cfg.Report)
+	m.SetHeader("X-Report-Abuse", mailer.cfg.Report)
+	m.SetHeader("X-Report-Abuse-To", mailer.cfg.Report)
 
 	for _, a := range email.AttachedFiles {
 		m.Attach(a.ContentDisposition.Params["filename"], gomail.SetCopyFunc(func(w io.Writer) error {
@@ -214,6 +218,29 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 	m.SetHeader("Subject", email.Headers.Subject)
 	m.SetBody("text/plain", header.String()+email.Text)
 
+	// Preserve original metadata
+	if len(email.Headers.From) > 0 {
+		m.SetHeader("X-Mailx-Original-From", email.Headers.From[0].String())
+	}
+	if email.Headers.MessageID != "" {
+		m.SetHeader("X-Mailx-Original-Message-ID", string(email.Headers.MessageID))
+	}
+	if fromAddr, ok := email.Headers.ExtraHeaders["Return-Path"]; ok && len(fromAddr) > 0 {
+		m.SetHeader("X-Mailx-Original-Envelope-From", fromAddr[0])
+	}
+	if authResults, ok := email.Headers.ExtraHeaders["Authentication-Results"]; ok && len(authResults) > 0 {
+		m.SetHeader("X-Mailx-Authentication-Results", authResults...)
+	}
+	if len(email.Headers.InReplyTo) > 0 {
+		m.SetHeader("In-Reply-To", string(email.Headers.InReplyTo[0]))
+	}
+	m.SetHeader("X-Mailx-Original-To", rcp.Email)
+	m.SetHeader("X-Forwarded-For", from)
+	m.SetHeader("X-Forwarded-By", mailer.cfg.SenderName)
+	m.SetHeader("X-Complaints-To", mailer.cfg.Report)
+	m.SetHeader("X-Report-Abuse", mailer.cfg.Report)
+	m.SetHeader("X-Report-Abuse-To", mailer.cfg.Report)
+
 	// PGP/Inline encryption
 	if rcp.PGPEnabled && rcp.PGPKey != "" && rcp.PGPInline {
 		armored, err := utils.EncryptWithPGPInline(email.Text, rcp.PGPKey)
@@ -292,7 +319,7 @@ func (mailer Mailer) SendTemplate(to string, subject string, templateFile string
 	}
 
 	m := gomail.NewMessage()
-	m.SetAddressHeader("From", mailer.Sender, mailer.SenderName)
+	m.SetAddressHeader("From", mailer.cfg.Sender, mailer.cfg.SenderName)
 	m.SetHeader("To", to)
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/plain", body.String())

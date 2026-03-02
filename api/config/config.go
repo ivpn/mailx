@@ -55,6 +55,7 @@ type SMTPClientConfig struct {
 	Password   string
 	Sender     string
 	SenderName string
+	Report     string
 }
 
 type ServiceConfig struct {
@@ -192,6 +193,7 @@ func New() (Config, error) {
 			Password:   os.Getenv("SMTP_CLIENT_PASSWORD"),
 			Sender:     os.Getenv("SMTP_CLIENT_SENDER"),
 			SenderName: os.Getenv("SMTP_CLIENT_SENDER_NAME"),
+			Report:     os.Getenv("SMTP_CLIENT_REPORT"),
 		},
 
 		Service: ServiceConfig{

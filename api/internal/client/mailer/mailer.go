@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"io"
 	"log"
+	"net/mail"
 	"strconv"
 	"strings"
 
@@ -98,8 +99,17 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 		processedData = data // Fallback to original data
 	}
 
+	parser := letters.NewEmailParser(
+		// Skip "Reply-To" header
+		letters.WithReplyToHeaderParser(
+			func(header mail.Header, s string) ([]*mail.Address, error) {
+				return nil, nil
+			},
+		),
+	)
+
 	reader := bytes.NewReader(processedData)
-	email, err := letters.ParseEmail(reader)
+	email, err := parser.Parse(reader)
 	if err != nil {
 		return err
 	}
@@ -158,8 +168,17 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 		processedData = data // Fallback to original data
 	}
 
+	parser := letters.NewEmailParser(
+		// Skip "Reply-To" header
+		letters.WithReplyToHeaderParser(
+			func(header mail.Header, s string) ([]*mail.Address, error) {
+				return nil, nil
+			},
+		),
+	)
+
 	reader := bytes.NewReader(processedData)
-	email, err := letters.ParseEmail(reader)
+	email, err := parser.Parse(reader)
 	if err != nil {
 		return err
 	}

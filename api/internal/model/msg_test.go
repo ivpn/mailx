@@ -207,6 +207,134 @@ func TestExtractOriginalFrom(t *testing.T) {
 	}
 }
 
+func TestParseMsg(t *testing.T) {
+	tests := []struct {
+		name    string
+		data    string
+		want    Msg
+		wantErr bool
+	}{
+		{
+			name: "To address with plus and equals in local part",
+			data: "From: John Doe <john.doe@example.com>\r\nTo: Jane Doe <werb.noun12+jane.doe=examplemta.com@mailx.net>\r\nSubject: Test\r\n\r\nBody",
+			want: Msg{
+				From:     "john.doe@example.com",
+				FromName: "John Doe",
+				To:       []string{"werb.noun12+jane.doe=examplemta.com@mailx.net"},
+				Subject:  "Test",
+				Body:     "Body",
+				Type:     Send,
+			},
+		},
+		{
+			name: "To address with display name containing comma",
+			data: "From: Jane Smith <jane.smith@example.com>\r\nTo: \"Doe, John\" <john.doe@example.com>\r\nSubject: Hello\r\n\r\nHi",
+			want: Msg{
+				From:     "jane.smith@example.com",
+				FromName: "Jane Smith",
+				To:       []string{"john.doe@example.com"},
+				Subject:  "Hello",
+				Body:     "Hi",
+				Type:     Send,
+			},
+		},
+		{
+			name: "multiple To recipients",
+			data: "From: John Doe <john.doe@example.com>\r\nTo: alice.jones@example.com, bob.brown@example.com\r\nSubject: Multi\r\n\r\nHello",
+			want: Msg{
+				From:     "john.doe@example.com",
+				FromName: "John Doe",
+				To:       []string{"alice.jones@example.com", "bob.brown@example.com"},
+				Subject:  "Multi",
+				Body:     "Hello",
+				Type:     Send,
+			},
+		},
+		{
+			name: "RFC 2047 encoded display name in From",
+			data: "From: =?UTF-8?B?SmFuZSBEb2U=?= <jane.doe@example.com>\r\nTo: john.doe@example.com\r\nSubject: Encoded\r\n\r\nBody",
+			want: Msg{
+				From:     "jane.doe@example.com",
+				FromName: "Jane Doe",
+				To:       []string{"john.doe@example.com"},
+				Subject:  "Encoded",
+				Body:     "Body",
+				Type:     Send,
+			},
+		},
+		{
+			name: "reply message",
+			data: "From: John Doe <john.doe@example.com>\r\nTo: jane.smith@example.com\r\nSubject: Re: Test\r\nIn-Reply-To: <abc@example.com>\r\n\r\nReplying",
+			want: Msg{
+				From:     "john.doe@example.com",
+				FromName: "John Doe",
+				To:       []string{"jane.smith@example.com"},
+				Subject:  "Re: Test",
+				Body:     "Replying",
+				Type:     Reply,
+			},
+		},
+		{
+			// Regression: From with an ISO-8859-2 RFC 2047 encoded-word combined with
+			// a To address whose local part contains '='. Previously PreprocessEmailData
+			// decoded address headers using a no-op charset reader, producing invalid
+			// UTF-8 that caused mail.ParseAddress to return "missing '@' or angle-addr".
+			name: "From with iso-8859-2 encoded display name and To with equals in local part",
+			data: "From: John =?iso-8859-2?q?D=F6e?= <john.doe@example.com>\r\nTo: Jane Doe <jane.doe+alias=example.net@example.com>\r\nSubject: Hello\r\nIn-Reply-To: <abc@example.com>\r\n\r\nBody",
+			want: Msg{
+				From: "john.doe@example.com",
+				// iso-8859-2 is unsupported; SafeDecodeAddressName strips the encoded
+				// word and returns only the plain-text prefix.
+				FromName: "John",
+				To:       []string{"jane.doe+alias=example.net@example.com"},
+				Subject:  "Hello",
+				Body:     "Body",
+				Type:     Reply,
+			},
+		},
+		{
+			// Regression: From with a UTF-8 QP RFC 2047 encoded display name combined
+			// with a To address whose local part contains '='.
+			name: "From with UTF-8 QP encoded display name and To with equals in local part",
+			data: "From: =?UTF-8?Q?John_D=C5=8De?= <john.doe@example.com>\r\nTo: Jane Doe <jane.doe+alias=example.net@example.com>\r\nSubject: Hi\r\n\r\nBody",
+			want: Msg{
+				From:     "john.doe@example.com",
+				FromName: "John D\u014de",
+				To:       []string{"jane.doe+alias=example.net@example.com"},
+				Subject:  "Hi",
+				Body:     "Body",
+				Type:     Send,
+			},
+		}, {
+			// Regression: From display name uses an empty-charset RFC 2047 encoded
+			// word (=??q?...?=).  PreprocessEmailData rewrites it to UTF-8, so
+			// mail.ParseAddress can decode it, and SafeDecodeAddressName returns
+			// the human-readable name.
+			name: "From with empty-charset encoded display name",
+			data: "From: =??q?Service_Support?= <support@example.com>\r\nTo: john.doe@example.com\r\nSubject: Hello\r\n\r\nBody",
+			want: Msg{
+				From:     "support@example.com",
+				FromName: "Service Support",
+				To:       []string{"john.doe@example.com"},
+				Subject:  "Hello",
+				Body:     "Body",
+				Type:     Send,
+			},
+		}}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ParseMsg([]byte(tt.data))
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("ParseMsg() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !compareMessages(got, tt.want) {
+				t.Errorf("ParseMsg() = %+v, want %+v", got, tt.want)
+			}
+		})
+	}
+}
+
 func compareMessages(a, b Msg) bool {
 	if a.From != b.From || a.FromName != b.FromName || a.Subject != b.Subject || a.Body != b.Body || a.Type != b.Type {
 		return false

@@ -20,7 +20,7 @@ func TestSend(t *testing.T) {
 			name: "Send email with error",
 			mailer: Mailer{
 				dialer: &gomail.Dialer{Host: "invalid-host", Port: 587},
-				Sender: "sender@example.com",
+				cfg:    config.SMTPClientConfig{Sender: "sender@example.com"},
 			},
 			to:      "recipient@example.com",
 			subject: "Test Subject",
@@ -50,8 +50,8 @@ func TestNew_InvalidPort(t *testing.T) {
 	if mailer.dialer != nil {
 		t.Errorf("expected dialer to be nil, got %v", mailer.dialer)
 	}
-	if mailer.Sender != cfg.Sender {
-		t.Errorf("expected sender %s, got %s", cfg.Sender, mailer.Sender)
+	if mailer.cfg.Sender != cfg.Sender {
+		t.Errorf("expected sender %s, got %s", cfg.Sender, mailer.cfg.Sender)
 	}
 }
 
@@ -64,7 +64,7 @@ func TestNew_MultipleHosts_Failure(t *testing.T) {
 		Password: "",
 	}
 	mailer := New(cfg)
-	if mailer.Sender != cfg.Sender {
-		t.Errorf("expected sender %s, got %s", cfg.Sender, mailer.Sender)
+	if mailer.cfg.Sender != cfg.Sender {
+		t.Errorf("expected sender %s, got %s", cfg.Sender, mailer.cfg.Sender)
 	}
 }

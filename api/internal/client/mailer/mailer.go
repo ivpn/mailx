@@ -2,6 +2,7 @@ package mailer
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"embed"
 	"fmt"
 	"html/template"
@@ -132,7 +133,7 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 	m.SetHeader("X-Complaints-To", mailer.cfg.Report)
 	m.SetHeader("X-Report-Abuse", mailer.cfg.Report)
 	m.SetHeader("X-Report-Abuse-To", mailer.cfg.Report)
-	m.SetHeader("Feedback-ID", fmt.Sprintf("mailx:%s:reply", alias.ID))
+	m.SetHeader("Feedback-ID", fmt.Sprintf("mailx:%x:reply", sha256.Sum256([]byte(mailer.cfg.TokenSecret+alias.ID))))
 
 	for _, a := range email.AttachedFiles {
 		m.Attach(a.ContentDisposition.Params["filename"], gomail.SetCopyFunc(func(w io.Writer) error {
@@ -240,7 +241,7 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 	m.SetHeader("X-Complaints-To", mailer.cfg.Report)
 	m.SetHeader("X-Report-Abuse", mailer.cfg.Report)
 	m.SetHeader("X-Report-Abuse-To", mailer.cfg.Report)
-	m.SetHeader("Feedback-ID", fmt.Sprintf("mailx:%s:forward", alias.ID))
+	m.SetHeader("Feedback-ID", fmt.Sprintf("mailx:%x:forward", sha256.Sum256([]byte(mailer.cfg.TokenSecret+alias.ID))))
 	m.SetHeader("X-Forwarded-For", from)
 	m.SetHeader("X-Forwarded-By", mailer.cfg.SenderName)
 

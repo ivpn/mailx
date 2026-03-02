@@ -96,8 +96,6 @@ func sendSubscriptionExpiryEmail(cfg config.Config, db *gorm.DB, sub model.Subsc
 			"from": cfg.SMTPClient.SenderName,
 		}
 		mailer := mailer.New(cfg.SMTPClient)
-		mailer.Sender = cfg.SMTPClient.Sender
-		mailer.SenderName = cfg.SMTPClient.SenderName
 		err = mailer.SendTemplate(user.Email, "Limited Access Mode", "expiring_sub.tmpl", data)
 		if err != nil {
 			log.Printf("error sending expiring subscription email: %s", err.Error())

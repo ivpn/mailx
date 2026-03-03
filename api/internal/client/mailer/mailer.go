@@ -228,6 +228,12 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 	if fromAddr, ok := email.Headers.ExtraHeaders["Return-Path"]; ok && len(fromAddr) > 0 {
 		m.SetHeader("X-Mailx-Original-Envelope-From", fromAddr[0])
 	}
+	if fromHeader, ok := email.Headers.ExtraHeaders["From"]; ok && len(fromHeader) > 0 {
+		m.SetHeader("X-Mailx-Original-From-Header", fromHeader[0])
+	}
+	if sender, ok := email.Headers.ExtraHeaders["Sender"]; ok && len(sender) > 0 {
+		m.SetHeader("X-Mailx-Original-Sender", sender[0])
+	}
 	m.SetHeader("X-Mailx-Original-To", rcp.Email)
 	if email.Headers.MessageID != "" {
 		m.SetHeader("X-Mailx-Original-Message-ID", string(email.Headers.MessageID))

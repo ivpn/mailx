@@ -11,6 +11,7 @@ import (
 	"net/mail"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/mnako/letters"
 	"ivpn.net/email/api/config"
@@ -222,19 +223,12 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 	m.SetBody("text/plain", header.String()+email.Text)
 
 	// Preserve original metadata
-	if len(email.Headers.From) > 0 {
-		m.SetHeader("X-Mailx-Original-From", email.Headers.From[0].String())
-	}
-	if fromAddr, ok := email.Headers.ExtraHeaders["Return-Path"]; ok && len(fromAddr) > 0 {
-		m.SetHeader("X-Mailx-Original-Envelope-From", fromAddr[0])
-	}
-	if fromHeader, ok := email.Headers.ExtraHeaders["From"]; ok && len(fromHeader) > 0 {
-		m.SetHeader("X-Mailx-Original-From-Header", fromHeader[0])
-	}
-	if sender, ok := email.Headers.ExtraHeaders["Sender"]; ok && len(sender) > 0 {
-		m.SetHeader("X-Mailx-Original-Sender", sender[0])
-	}
+	m.SetHeader("X-Mailx-Original-Envelope-From", from)
+	m.SetHeader("X-Mailx-Original-Sender", from)
 	m.SetHeader("X-Mailx-Original-To", rcp.Email)
+	if len(email.Headers.From) > 0 {
+		m.SetHeader("X-Mailx-Original-From-Header", email.Headers.From[0].String())
+	}
 	if email.Headers.MessageID != "" {
 		m.SetHeader("Message-ID", string(email.Headers.MessageID))
 	}
@@ -247,11 +241,19 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 	if refs, ok := email.Headers.ExtraHeaders["References"]; ok && len(refs) > 0 {
 		m.SetHeader("References", refs...)
 	}
+
+	// Preserve full Received chain
 	if received, ok := email.Headers.ExtraHeaders["Received"]; ok && len(received) > 0 {
-		for _, r := range received {
-			m.SetHeader("Received", r)
-		}
+		ownHop := fmt.Sprintf(
+			"from %s by %s with ESMTPS; %s",
+			from,
+			mailer.cfg.Host,
+			time.Now().UTC().Format(time.RFC1123Z),
+		)
+		fullChain := append([]string{ownHop}, received...)
+		m.SetHeader("Received", fullChain...)
 	}
+
 	arcHeaders := []string{
 		"ARC-Seal",
 		"ARC-Message-Signature",

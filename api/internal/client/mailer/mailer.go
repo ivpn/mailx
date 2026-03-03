@@ -223,8 +223,12 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 	m.SetBody("text/plain", header.String()+email.Text)
 
 	// Preserve original metadata
-	m.SetHeader("X-Mailx-Original-Envelope-From", from)
-	m.SetHeader("X-Mailx-Original-Sender", from)
+	originalSender := from
+	if envFrom, ok := email.Headers.ExtraHeaders["Return-Path"]; ok && len(envFrom) > 0 {
+		originalSender = envFrom[0]
+	}
+	m.SetHeader("X-Mailx-Original-Envelope-From", originalSender)
+	m.SetHeader("X-Mailx-Original-Sender", originalSender)
 	m.SetHeader("X-Mailx-Original-To", rcp.Email)
 	if len(email.Headers.From) > 0 {
 		m.SetHeader("X-Mailx-Original-From-Header", email.Headers.From[0].String())
@@ -241,19 +245,16 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 	if refs, ok := email.Headers.ExtraHeaders["References"]; ok && len(refs) > 0 {
 		m.SetHeader("References", refs...)
 	}
-
-	// Preserve full Received chain
 	if received, ok := email.Headers.ExtraHeaders["Received"]; ok && len(received) > 0 {
 		ownHop := fmt.Sprintf(
 			"from %s by %s with ESMTPS; %s",
-			from,
+			mailer.cfg.Host,
 			mailer.cfg.Host,
 			time.Now().UTC().Format(time.RFC1123Z),
 		)
 		fullChain := append([]string{ownHop}, received...)
 		m.SetHeader("Received", fullChain...)
 	}
-
 	arcHeaders := []string{
 		"ARC-Seal",
 		"ARC-Message-Signature",

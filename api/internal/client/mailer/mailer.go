@@ -247,13 +247,12 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 	}
 	if received, ok := email.Headers.ExtraHeaders["Received"]; ok && len(received) > 0 {
 		ownHop := fmt.Sprintf(
-			"from %s by %s with ESMTPS; %s",
-			mailer.cfg.Host,
+			"from unknown by %s with ESMTPS; %s",
 			mailer.cfg.Host,
 			time.Now().UTC().Format(time.RFC1123Z),
 		)
-		fullChain := append([]string{ownHop}, received...)
-		m.SetHeader("Received", fullChain...)
+		allReceived := append([]string{ownHop}, received...)
+		m.SetHeader("Received", allReceived...)
 	}
 	arcHeaders := []string{
 		"ARC-Seal",

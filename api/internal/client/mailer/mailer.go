@@ -236,7 +236,7 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 	}
 	m.SetHeader("X-Mailx-Original-To", rcp.Email)
 	if email.Headers.MessageID != "" {
-		m.SetHeader("X-Mailx-Original-Message-ID", string(email.Headers.MessageID))
+		m.SetHeader("Message-ID", string(email.Headers.MessageID))
 	}
 	if authResults, ok := email.Headers.ExtraHeaders["Authentication-Results"]; ok && len(authResults) > 0 {
 		m.SetHeader("X-Mailx-Authentication-Results", authResults...)
@@ -244,12 +244,28 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 	if len(email.Headers.InReplyTo) > 0 {
 		m.SetHeader("In-Reply-To", string(email.Headers.InReplyTo[0]))
 	}
+	if refs, ok := email.Headers.ExtraHeaders["References"]; ok && len(refs) > 0 {
+		m.SetHeader("References", refs...)
+	}
+	if received, ok := email.Headers.ExtraHeaders["Received"]; ok && len(received) > 0 {
+		for _, r := range received {
+			m.SetHeader("Received", r)
+		}
+	}
+	arcHeaders := []string{
+		"ARC-Seal",
+		"ARC-Message-Signature",
+		"ARC-Authentication-Results",
+	}
+	for _, h := range arcHeaders {
+		if vals, ok := email.Headers.ExtraHeaders[h]; ok && len(vals) > 0 {
+			m.SetHeader(h, vals...)
+		}
+	}
 	m.SetHeader("X-Complaints-To", mailer.cfg.Report)
 	m.SetHeader("X-Report-Abuse", mailer.cfg.Report)
 	m.SetHeader("X-Report-Abuse-To", mailer.cfg.Report)
 	m.SetHeader("Feedback-ID", fmt.Sprintf("mailx:%x:forward", sha256.Sum256([]byte(mailer.cfg.TokenSecret+alias.ID))))
-	m.SetHeader("X-Forwarded-For", from)
-	m.SetHeader("X-Forwarded-By", mailer.cfg.SenderName)
 
 	// PGP/Inline encryption
 	if rcp.PGPEnabled && rcp.PGPKey != "" && rcp.PGPInline {

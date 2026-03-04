@@ -283,9 +283,8 @@ func TestParseMsg(t *testing.T) {
 			data: "From: John =?iso-8859-2?q?D=F6e?= <john.doe@example.com>\r\nTo: Jane Doe <jane.doe+alias=example.net@example.com>\r\nSubject: Hello\r\nIn-Reply-To: <abc@example.com>\r\n\r\nBody",
 			want: Msg{
 				From: "john.doe@example.com",
-				// iso-8859-2 is unsupported; SafeDecodeAddressName strips the encoded
-				// word and returns only the plain-text prefix.
-				FromName: "John",
+				// iso-8859-2 is transcoded to UTF-8 by DecodeHeaderWithCharset.
+				FromName: "John D\u00f6e",
 				To:       []string{"jane.doe+alias=example.net@example.com"},
 				Subject:  "Hello",
 				Body:     "Body",
@@ -319,8 +318,62 @@ func TestParseMsg(t *testing.T) {
 				Subject:  "Hello",
 				Body:     "Body",
 				Type:     Send,
-			},
-		}}
+			}},
+		{
+			// Regression: To display name uses a windows-1251 RFC 2047 encoded word.
+			// Go's default mime.WordDecoder only supports UTF-8/ASCII/ISO-8859-1, so
+			// mail.ParseAddressList would fail with "charset not supported: windows-1251".
+			// DecodeHeaderWithCharset transcodes it to UTF-8 before parsing.
+			name: "To with windows-1251 encoded display name",
+			data: "From: sender@example.com\r\nTo: =?windows-1251?B?U3RhcnJ5?= <fussy.monster00@sample.app>\r\nSubject: Test\r\n\r\nBody",
+			want: Msg{
+				From:     "sender@example.com",
+				FromName: "",
+				To:       []string{"fussy.monster00@sample.app"},
+				Subject:  "Test",
+				Body:     "Body",
+				Type:     Send,
+			}},
+		{
+			// Regression: Outlook-style To header with a trailing semicolon.
+			// mail.ParseAddressList fails with "expected comma" on semicolons.
+			// NormalizeAddressSeparators converts semicolons to commas.
+			name: "To with trailing semicolon",
+			data: "From: sender@example.com\r\nTo: fussy.monster00@sample.app;\r\nSubject: Test\r\n\r\nBody",
+			want: Msg{
+				From:     "sender@example.com",
+				FromName: "",
+				To:       []string{"fussy.monster00@sample.app"},
+				Subject:  "Test",
+				Body:     "Body",
+				Type:     Send,
+			}},
+		{
+			// Regression: Outlook-style To header with semicolon-separated list.
+			name: "To with semicolon-separated list",
+			data: "From: sender@example.com\r\nTo: alice@example.com; bob@example.com\r\nSubject: Test\r\n\r\nBody",
+			want: Msg{
+				From:     "sender@example.com",
+				FromName: "",
+				To:       []string{"alice@example.com", "bob@example.com"},
+				Subject:  "Test",
+				Body:     "Body",
+				Type:     Send,
+			}},
+		{
+			// Regression: From display name uses a windows-1251 RFC 2047 encoded word.
+			// mail.ParseAddress would fail with "charset not supported: windows-1251".
+			// DecodeHeaderWithCharset transcodes it to UTF-8 before parsing.
+			name: "From with windows-1251 encoded display name",
+			data: "From: =?windows-1251?B?U3RhcnJ5?= <alice@example.org>\r\nTo: =?windows-1251?B?U3RhcnJ5?= <fussy.monster00@sample.app>\r\nSubject: Test Email\r\n\r\nBody",
+			want: Msg{
+				From:     "alice@example.org",
+				FromName: "Starry",
+				To:       []string{"fussy.monster00@sample.app"},
+				Subject:  "Test Email",
+				Body:     "Body",
+				Type:     Send,
+			}}}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

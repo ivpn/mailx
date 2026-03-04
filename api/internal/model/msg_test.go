@@ -335,6 +335,32 @@ func TestParseMsg(t *testing.T) {
 				Type:     Send,
 			}},
 		{
+			// Regression: Outlook-style To header with a trailing semicolon.
+			// mail.ParseAddressList fails with "expected comma" on semicolons.
+			// NormalizeAddressSeparators converts semicolons to commas.
+			name: "To with trailing semicolon",
+			data: "From: sender@example.com\r\nTo: fussy.monster00@sample.app;\r\nSubject: Test\r\n\r\nBody",
+			want: Msg{
+				From:     "sender@example.com",
+				FromName: "",
+				To:       []string{"fussy.monster00@sample.app"},
+				Subject:  "Test",
+				Body:     "Body",
+				Type:     Send,
+			}},
+		{
+			// Regression: Outlook-style To header with semicolon-separated list.
+			name: "To with semicolon-separated list",
+			data: "From: sender@example.com\r\nTo: alice@example.com; bob@example.com\r\nSubject: Test\r\n\r\nBody",
+			want: Msg{
+				From:     "sender@example.com",
+				FromName: "",
+				To:       []string{"alice@example.com", "bob@example.com"},
+				Subject:  "Test",
+				Body:     "Body",
+				Type:     Send,
+			}},
+		{
 			// Regression: From display name uses a windows-1251 RFC 2047 encoded word.
 			// mail.ParseAddress would fail with "charset not supported: windows-1251".
 			// DecodeHeaderWithCharset transcodes it to UTF-8 before parsing.

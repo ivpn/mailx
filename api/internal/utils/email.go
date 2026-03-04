@@ -250,6 +250,15 @@ func DecodeHeaderWithCharset(s string) string {
 	return decoded
 }
 
+// NormalizeAddressSeparators replaces semicolon address separators with commas
+// so that Go's mail.ParseAddressList can handle Outlook-style To/Cc headers
+// such as "a@b.com; c@d.com" or a trailing semicolon "a@b.com;". The returned
+// string has any leading/trailing commas and whitespace trimmed.
+func NormalizeAddressSeparators(s string) string {
+	s = strings.ReplaceAll(s, ";", ",")
+	return strings.Trim(s, ", \t")
+}
+
 // CleanupMalformedEncodedAddress attempts to extract a valid email address
 // from a malformed RFC 2047 encoded string
 func CleanupMalformedEncodedAddress(addr string) string {

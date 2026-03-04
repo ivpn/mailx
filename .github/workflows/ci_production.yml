@@ -5,6 +5,9 @@ on:
     tags:
     - '*'
 
+permissions:
+  contents: read
+
 env:
   API_IMAGE: email/api
   APP_IMAGE: email/app
@@ -17,12 +20,14 @@ jobs:
 
     steps:
       - name: Checkout PR branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           ref: ${{ github.ref }}
 
       - name: Pull changes from branch
-        run: git pull origin ${{ github.ref }}
+        env:
+          GIT_REF: ${{ github.ref }}
+        run: git pull origin "$GIT_REF"
 
       - name: create app/.env file
         run: |

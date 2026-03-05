@@ -9,12 +9,16 @@ on:
   pull_request:
     branches:
       - main
+
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout PR branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           ref: ${{ github.event.pull_request.head.ref }}
       - name: Set up sparse checkout
@@ -22,12 +26,14 @@ jobs:
           git sparse-checkout init --cone
           git sparse-checkout set api
       - name: Pull changes from PR branch
-        run: git pull origin ${{ github.event.pull_request.head.ref }}
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: git pull origin "$HEAD_REF"
       - name: Move directory
         run: |
           mv api/* .
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@7b8cf10d4e4a01d4992d18a89f4d7dc5a3e6d6f4 # v4
         with:
             go-version: '1.23'
       - name: Build

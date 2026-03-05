@@ -14,6 +14,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/ProtonMail/gopenpgp/v3/crypto"
+	xcharset "golang.org/x/net/html/charset"
 	"ivpn.net/email/api/internal/utils/gomail.v2"
 )
 
@@ -229,6 +230,33 @@ func SafeDecodeAddressName(name string) string {
 	re := regexp.MustCompile(`=\?[^?]*\?[bqBQ]\?[^?]*\?=`)
 	plain := re.ReplaceAllString(name, "")
 	return strings.TrimSpace(plain)
+}
+
+// DecodeHeaderWithCharset decodes an RFC 2047 encoded header value using a
+// charset-aware decoder backed by golang.org/x/net/html/charset. Unlike the
+// default mime.WordDecoder, this handles legacy charsets such as windows-1251,
+// koi8-r, and iso-8859-* by transcoding them to UTF-8. If decoding fails the
+// original string is returned as-is so parsing can continue.
+func DecodeHeaderWithCharset(s string) string {
+	decoder := mime.WordDecoder{
+		CharsetReader: func(charset string, input io.Reader) (io.Reader, error) {
+			return xcharset.NewReaderLabel(charset, input)
+		},
+	}
+	decoded, err := decoder.DecodeHeader(s)
+	if err != nil {
+		return s
+	}
+	return decoded
+}
+
+// NormalizeAddressSeparators replaces semicolon address separators with commas
+// so that Go's mail.ParseAddressList can handle Outlook-style To/Cc headers
+// such as "a@b.com; c@d.com" or a trailing semicolon "a@b.com;". The returned
+// string has any leading/trailing commas and whitespace trimmed.
+func NormalizeAddressSeparators(s string) string {
+	s = strings.ReplaceAll(s, ";", ",")
+	return strings.Trim(s, ", \t")
 }
 
 // CleanupMalformedEncodedAddress attempts to extract a valid email address

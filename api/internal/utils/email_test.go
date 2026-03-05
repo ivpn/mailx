@@ -284,3 +284,71 @@ func TestPreprocessEmailData_EmptyCharsetEncodedWord(t *testing.T) {
 		t.Errorf("processed data corrupted To address; got: %q", processedStr)
 	}
 }
+
+func TestNormalizeAddressSeparators(t *testing.T) {
+	tests := []struct {
+		name string
+		in   string
+		want string
+	}{
+		{
+			name: "plain address unchanged",
+			in:   "alice@example.com",
+			want: "alice@example.com",
+		},
+		{
+			name: "trailing semicolon removed",
+			in:   "alice@example.com;",
+			want: "alice@example.com",
+		},
+		{
+			name: "semicolon separator converted to comma",
+			in:   "alice@example.com; bob@example.com",
+			want: "alice@example.com, bob@example.com",
+		},
+		{
+			name: "multiple semicolons converted",
+			in:   "alice@example.com; bob@example.com; carol@example.com",
+			want: "alice@example.com, bob@example.com, carol@example.com",
+		},
+		{
+			name: "comma-separated list unchanged",
+			in:   "alice@example.com, bob@example.com",
+			want: "alice@example.com, bob@example.com",
+		},
+		{
+			name: "display name with angle brackets",
+			in:   "Alice <alice@example.com>; Bob <bob@example.com>",
+			want: "Alice <alice@example.com>, Bob <bob@example.com>",
+		},
+		{
+			name: "trailing comma trimmed",
+			in:   "alice@example.com,",
+			want: "alice@example.com",
+		},
+		{
+			name: "leading and trailing whitespace trimmed",
+			in:   "  alice@example.com  ",
+			want: "alice@example.com",
+		},
+		{
+			name: "empty string",
+			in:   "",
+			want: "",
+		},
+		{
+			name: "only semicolon",
+			in:   ";",
+			want: "",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := NormalizeAddressSeparators(tt.in)
+			if got != tt.want {
+				t.Errorf("NormalizeAddressSeparators(%q) = %q, want %q", tt.in, got, tt.want)
+			}
+		})
+	}
+}

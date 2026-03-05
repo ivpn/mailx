@@ -95,8 +95,7 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 		return model.Alias{}, ErrPostAlias
 	}
 
-	if !sub.IsActive() {
-		log.Println("error creating alias: subscription is not active")
+	if !sub.ActiveStatus() {
 		return model.Alias{}, ErrPostAlias
 	}
 

@@ -91,8 +91,15 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Get("/log/file/:id", h.GetLogFile)
 
 	v1.Get("/accesskeys", h.GetAccessKeys)
-	v1.Post("/accesskeys", h.PostAccessKey)
+	v1.Post("/accesskeys", limiter.New(), h.PostAccessKey)
 	v1.Delete("/accesskeys/:id", h.DeleteAccessKey)
+
+	v1.Get("/domains", h.GetDomains)
+	v1.Get("/domains/dns-config", h.GetDNSConfig)
+	v1.Post("/domain", limiter.New(), h.PostDomain)
+	v1.Put("/domain/:id", h.UpdateDomain)
+	v1.Delete("/domain/:id", h.DeleteDomain)
+	v1.Post("/domain/:id/verify-dns", h.VerifyDomainDNSRecords)
 
 	docs := h.Server.Group("/docs")
 	docs.Use(auth.NewBasicAuth(cfg))

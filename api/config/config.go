@@ -56,6 +56,8 @@ type SMTPClientConfig struct {
 	Sender       string
 	SenderName   string
 	DkimSelector string
+	Report       string
+	TokenSecret  string
 }
 
 type ServiceConfig struct {
@@ -194,6 +196,8 @@ func New() (Config, error) {
 			Sender:       os.Getenv("SMTP_CLIENT_SENDER"),
 			SenderName:   os.Getenv("SMTP_CLIENT_SENDER_NAME"),
 			DkimSelector: os.Getenv("SMTP_CLIENT_DKIM_SELECTOR"),
+			Report:       os.Getenv("SMTP_CLIENT_REPORT"),
+			TokenSecret:  os.Getenv("TOKEN_SECRET"),
 		},
 
 		Service: ServiceConfig{

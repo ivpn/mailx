@@ -2,13 +2,16 @@ package mailer
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"embed"
+	"fmt"
 	"html/template"
 	"io"
 	"log"
 	"net/mail"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/mnako/letters"
 	"ivpn.net/email/api/config"
@@ -21,9 +24,8 @@ import (
 var templateFS embed.FS
 
 type Mailer struct {
-	dialer     *gomail.Dialer
-	Sender     string
-	SenderName string
+	dialer *gomail.Dialer
+	cfg    config.SMTPClientConfig
 }
 
 // #nosec G104
@@ -32,9 +34,8 @@ func New(cfg config.SMTPClientConfig) Mailer {
 	if err != nil {
 		log.Println("Invalid SMTP port:", cfg.Port)
 		return Mailer{
-			dialer:     nil,
-			Sender:     cfg.Sender,
-			SenderName: cfg.SenderName,
+			dialer: nil,
+			cfg:    cfg,
 		}
 	}
 
@@ -61,22 +62,20 @@ func New(cfg config.SMTPClientConfig) Mailer {
 
 	if dialer == nil {
 		return Mailer{
-			dialer:     nil,
-			Sender:     cfg.Sender,
-			SenderName: cfg.SenderName,
+			dialer: nil,
+			cfg:    cfg,
 		}
 	}
 
 	return Mailer{
-		dialer:     dialer,
-		Sender:     cfg.Sender,
-		SenderName: cfg.SenderName,
+		dialer: dialer,
+		cfg:    cfg,
 	}
 }
 
 func (mailer Mailer) Send(to string, subject string, body string) error {
 	m := gomail.NewMessage()
-	m.SetAddressHeader("From", mailer.Sender, mailer.SenderName)
+	m.SetAddressHeader("From", mailer.cfg.Sender, mailer.cfg.SenderName)
 	m.SetHeader("To", to)
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/plain", body)
@@ -91,7 +90,7 @@ func (mailer Mailer) Send(to string, subject string, body string) error {
 	return nil
 }
 
-func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data []byte) error {
+func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data []byte, alias model.Alias) error {
 	// Preprocess email data to decode RFC 2047 encoded headers
 	processedData, err := utils.PreprocessEmailData(data)
 	if err != nil {
@@ -134,6 +133,15 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 	m.SetBody("text/plain", email.Text)
 	m.AddAlternative("text/html", email.HTML)
 
+	// Preserve original metadata
+	if len(email.Headers.InReplyTo) > 0 {
+		m.SetHeader("In-Reply-To", string(email.Headers.InReplyTo[0]))
+	}
+	m.SetHeader("X-Complaints-To", mailer.cfg.Report)
+	m.SetHeader("X-Report-Abuse", mailer.cfg.Report)
+	m.SetHeader("X-Report-Abuse-To", mailer.cfg.Report)
+	m.SetHeader("Feedback-ID", fmt.Sprintf("mailx:%x:reply", sha256.Sum256([]byte(mailer.cfg.TokenSecret+alias.ID))))
+
 	for _, a := range email.AttachedFiles {
 		m.Attach(a.ContentDisposition.Params["filename"], gomail.SetCopyFunc(func(w io.Writer) error {
 			_, err = w.Write(a.Data)
@@ -166,7 +174,7 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 	return nil
 }
 
-func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data []byte, templateFile string, templateData any, settings model.Settings) error {
+func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data []byte, templateFile string, templateData any, settings model.Settings, alias model.Alias) error {
 	// Preprocess email data to decode RFC 2047 encoded headers
 	processedData, err := utils.PreprocessEmailData(data)
 	if err != nil {
@@ -225,6 +233,53 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 	m.SetHeader("To", rcp.Email)
 	m.SetHeader("Subject", email.Headers.Subject)
 	m.SetBody("text/plain", header.String()+email.Text)
+
+	// Preserve original metadata
+	originalSender := from
+	if envFrom, ok := email.Headers.ExtraHeaders["Return-Path"]; ok && len(envFrom) > 0 {
+		originalSender = envFrom[0]
+	}
+	m.SetHeader("X-Mailx-Original-Envelope-From", originalSender)
+	m.SetHeader("X-Mailx-Original-Sender", originalSender)
+	m.SetHeader("X-Mailx-Original-To", rcp.Email)
+	if len(email.Headers.From) > 0 {
+		m.SetHeader("X-Mailx-Original-From-Header", email.Headers.From[0].String())
+	}
+	if email.Headers.MessageID != "" {
+		m.SetHeader("Message-ID", string(email.Headers.MessageID))
+	}
+	if authResults, ok := email.Headers.ExtraHeaders["Authentication-Results"]; ok && len(authResults) > 0 {
+		m.SetHeader("X-Mailx-Authentication-Results", authResults...)
+	}
+	if len(email.Headers.InReplyTo) > 0 {
+		m.SetHeader("In-Reply-To", string(email.Headers.InReplyTo[0]))
+	}
+	if refs, ok := email.Headers.ExtraHeaders["References"]; ok && len(refs) > 0 {
+		m.SetHeader("References", refs...)
+	}
+	if received, ok := email.Headers.ExtraHeaders["Received"]; ok && len(received) > 0 {
+		ownHop := fmt.Sprintf(
+			"from unknown by %s with ESMTPS; %s",
+			mailer.cfg.Host,
+			time.Now().UTC().Format(time.RFC1123Z),
+		)
+		allReceived := append([]string{ownHop}, received...)
+		m.SetHeader("Received", allReceived...)
+	}
+	arcHeaders := []string{
+		"ARC-Seal",
+		"ARC-Message-Signature",
+		"ARC-Authentication-Results",
+	}
+	for _, h := range arcHeaders {
+		if vals, ok := email.Headers.ExtraHeaders[h]; ok && len(vals) > 0 {
+			m.SetHeader(h, vals...)
+		}
+	}
+	m.SetHeader("X-Complaints-To", mailer.cfg.Report)
+	m.SetHeader("X-Report-Abuse", mailer.cfg.Report)
+	m.SetHeader("X-Report-Abuse-To", mailer.cfg.Report)
+	m.SetHeader("Feedback-ID", fmt.Sprintf("mailx:%x:forward", sha256.Sum256([]byte(mailer.cfg.TokenSecret+alias.ID))))
 
 	// PGP/Inline encryption
 	if rcp.PGPEnabled && rcp.PGPKey != "" && rcp.PGPInline {
@@ -304,7 +359,7 @@ func (mailer Mailer) SendTemplate(to string, subject string, templateFile string
 	}
 
 	m := gomail.NewMessage()
-	m.SetAddressHeader("From", mailer.Sender, mailer.SenderName)
+	m.SetAddressHeader("From", mailer.cfg.Sender, mailer.cfg.SenderName)
 	m.SetHeader("To", to)
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/plain", body.String())

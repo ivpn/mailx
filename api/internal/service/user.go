@@ -211,8 +211,6 @@ func (s *Service) SendUserOTP(ctx context.Context, userID string) error {
 			"from": s.Cfg.SMTPClient.SenderName,
 		}
 		mailer := mailer.New(s.Cfg.SMTPClient)
-		mailer.Sender = s.Cfg.SMTPClient.Sender
-		mailer.SenderName = s.Cfg.SMTPClient.SenderName
 		err = mailer.SendTemplate(user.Email, "Verify Your Email Address", "otp_account.tmpl", data)
 		if err != nil {
 			log.Printf("error sending OTP: %s", err.Error())
@@ -460,9 +458,7 @@ func (s *Service) InitiatePasswordReset(ctx context.Context, email string) error
 			"expiration": s.Cfg.Service.OTPExpiration.Minutes(),
 		}
 		mailer := mailer.New(s.Cfg.SMTPClient)
-		mailer.Sender = s.Cfg.SMTPClient.Sender
-		mailer.SenderName = s.Cfg.SMTPClient.SenderName
-		err = mailer.SendTemplate(user.Email, "["+mailer.SenderName+"] Reset Password Notification", "password_reset.tmpl", data)
+		err = mailer.SendTemplate(user.Email, "["+s.Cfg.SMTPClient.SenderName+"] Reset Password Notification", "password_reset.tmpl", data)
 		if err != nil {
 			log.Printf("error initiating password reset: %s", err.Error())
 		}

@@ -100,7 +100,13 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 	}
 
 	parser := letters.NewEmailParser(
-		// Skip "Reply-To" header
+		// Malformed headers can cause the parser to fail,
+		// so we skip parsing of headers that are not needed for forwarding
+		letters.WithToHeaderParser(
+			func(header mail.Header, s string) ([]*mail.Address, error) {
+				return nil, nil
+			},
+		),
 		letters.WithReplyToHeaderParser(
 			func(header mail.Header, s string) ([]*mail.Address, error) {
 				return nil, nil
@@ -169,7 +175,13 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 	}
 
 	parser := letters.NewEmailParser(
-		// Skip "Reply-To" header
+		// Malformed headers can cause the parser to fail,
+		// so we skip parsing of headers that are not needed for forwarding
+		letters.WithToHeaderParser(
+			func(header mail.Header, s string) ([]*mail.Address, error) {
+				return nil, nil
+			},
+		),
 		letters.WithReplyToHeaderParser(
 			func(header mail.Header, s string) ([]*mail.Address, error) {
 				return nil, nil

@@ -154,7 +154,7 @@ func (s *Service) QueueMessage(from string, fromName string, rcp model.Recipient
 			"from":  from,
 		}
 		generatedFrom := model.GenerateReplyTo(alias.Name, from)
-		err := mailer.Forward(generatedFrom, fromName, rcp, data, "header.tmpl", templateData, settings)
+		err := mailer.Forward(generatedFrom, fromName, rcp, data, "header.tmpl", templateData, settings, alias)
 		if err != nil {
 			log.Println("error forwarding message", err)
 			return err
@@ -172,7 +172,7 @@ func (s *Service) QueueMessage(from string, fromName string, rcp model.Recipient
 			name = settings.FromName
 		}
 
-		err = mailer.Reply(alias.Name, name, rcp, data)
+		err = mailer.Reply(alias.Name, name, rcp, data, alias)
 		if err != nil {
 			log.Println("error sending message", err)
 			return err

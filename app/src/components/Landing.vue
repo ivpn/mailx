@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
+const signupUrl = import.meta.env.VITE_RESYNC_URL
+
 const isLoggedIn = computed(() => {
     const email = localStorage.getItem('email')
     return email !== null && email.trim() !== ''
@@ -74,7 +76,7 @@ const pricingPlans = [
                     </router-link>
                 </template>
                 <template v-else>
-                    <a href="https://www.ivpn.net/en/pricing/" class="landing-btn landing-btn-signup" target="_blank">
+                    <a :href="signupUrl" class="landing-btn landing-btn-signup" target="_blank">
                         [SIGN UP]
                     </a>
                     <router-link to="/login" class="landing-btn landing-btn-login">
@@ -99,7 +101,7 @@ const pricingPlans = [
                     </div>
                 </div>
                 <div class="hero-cta">
-                    <a href="https://www.ivpn.net/en/pricing/" class="cta-btn cta-primary" target="_blank">
+                    <a :href="signupUrl" class="cta-btn cta-primary" target="_blank">
                         ./GET_ACCESS
                     </a>
                     <a href="https://github.com/ivpn/mailx" target="_blank" class="cta-btn cta-secondary">
@@ -597,7 +599,7 @@ const pricingPlans = [
                                     <span class="get-access-price-unit">/YEAR</span>
                                 </p>
                             </div>
-                            <a href="https://www.ivpn.net/en/pricing/" class="get-access-signup" target="_blank">./SIGNUP</a>
+                            <a :href="signupUrl" class="get-access-signup" target="_blank">./SIGNUP</a>
                         </div>
 
                         <div class="get-access-divider"></div>

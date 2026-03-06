@@ -64,7 +64,7 @@
                                 >
                                 <p v-if="passwordError" class="error mb-2">Required</p>
                                 <p class="text-right">
-                                    <router-link to="/reset/password/initiate">
+                                    <router-link to="/forgot-password">
                                         <button class="plain-alt">Forgot password?</button>
                                     </router-link>
                                 </p>
@@ -124,7 +124,7 @@
 
 <script setup lang="ts">
 import { onMounted, onUpdated, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 import { userApi } from '../api/user.ts'
 import { startAuthentication, browserSupportsWebAuthn } from '@simplewebauthn/browser'
@@ -144,6 +144,17 @@ const error = ref('')
 const isLoading = ref(false)
 const passkeySupported = ref(false)
 const signupSuccess = ref('')
+const route = useRoute()
+const router = useRouter()
+
+const redirectAfterLogin = () => {
+    const redirect = route.query.redirect as string
+    if (redirect && redirect.startsWith('/account')) {
+        window.location.href = redirect
+    } else {
+        window.location.href = '/account'
+    }
+}
 
 const validateEmail = () => {
     emailError.value = !email.value
@@ -189,7 +200,7 @@ const login = async () => {
         if (response.status === 200) {
             // Redirect to the dashboard
             localStorage.setItem('email', data.email)
-            window.location.href = '/'
+            redirectAfterLogin()
         }
     } catch (err) {
         if (axios.isAxiosError(err)) {
@@ -242,7 +253,7 @@ const startAuth = async (data: any, res: any) => {
         if (res.status === 200) {
             // Redirect to the dashboard
             localStorage.setItem('email', data.email)
-            window.location.href = '/'
+            redirectAfterLogin()
         }
     } catch (err: Error) {
         if (axios.isAxiosError(err)) {
@@ -270,13 +281,12 @@ const onTabChange = () => {
 
 onMounted(() => {
     if (isLoggedIn()) {
-        window.location.href = '/'
+        window.location.href = '/account'
     }
 
     passkeySupported.value = browserSupportsWebAuthn()
     tabs.autoInit()
 
-    const route = useRoute()
     if (route.path.includes('signup-complete')) {
         signupSuccess.value = 'Account created successfully. Please log in.'
     }

@@ -124,7 +124,7 @@
 
 <script setup lang="ts">
 import { onMounted, onUpdated, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import axios from 'axios'
 import { userApi } from '../api/user.ts'
 import { startAuthentication, browserSupportsWebAuthn } from '@simplewebauthn/browser'
@@ -145,7 +145,6 @@ const isLoading = ref(false)
 const passkeySupported = ref(false)
 const signupSuccess = ref('')
 const route = useRoute()
-const router = useRouter()
 
 const redirectAfterLogin = () => {
     const redirect = route.query.redirect as string

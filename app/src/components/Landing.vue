@@ -1,4 +1,11 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+
+const isLoggedIn = computed(() => {
+    const email = localStorage.getItem('email')
+    return email !== null && email.trim() !== ''
+})
+
 // --- Hero -------------------------------------------------------------------
 const heroFeatures = [
     'Forward emails through isolated aliases with Mailx.',
@@ -58,12 +65,22 @@ const pricingPlans = [
                 <span class="landing-logo"></span>
             </router-link>
             <div class="landing-actions">
-                <a href="https://www.ivpn.net/en/pricing/" class="landing-btn landing-btn-signup" target="_blank">
-                    [SIGN UP]
-                </a>
-                <router-link to="/login" class="landing-btn landing-btn-login">
-                    [LOG IN]
-                </router-link>
+                <template v-if="isLoggedIn">
+                    <router-link to="/account" class="landing-btn landing-btn-signup">
+                        [DASHBOARD]
+                    </router-link>
+                    <router-link to="/logout" class="landing-btn landing-btn-login">
+                        [LOG OUT]
+                    </router-link>
+                </template>
+                <template v-else>
+                    <a href="https://www.ivpn.net/en/pricing/" class="landing-btn landing-btn-signup" target="_blank">
+                        [SIGN UP]
+                    </a>
+                    <router-link to="/login" class="landing-btn landing-btn-login">
+                        [LOG IN]
+                    </router-link>
+                </template>
             </div>
         </header>
 

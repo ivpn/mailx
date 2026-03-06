@@ -14,7 +14,7 @@
             </span>
             <h4 class="mb-6">You have no wildcards yet</h4>
             <p v-if="!recipients.length && loaded" class="text-tertiary mb-6">
-                To get started, first <router-link to="/account">verify</router-link> your primary email address.
+                To get started, first <router-link to="/account/profile">verify</router-link> your primary email address.
             </p>
              <button v-if="recipients.length && loaded" class="cta" data-hs-overlay="#modal-create-alias-true">
                 New Wildcard

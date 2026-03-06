@@ -1,6 +1,6 @@
 <template>
     <div v-if="!res.is_active && isDashboard" class="card-secondary m-8 mb-0">
-        <p class="m-0"><router-link to="/account">Verify</router-link> your primary email address to start receiving forwarded mail</p>
+        <p class="m-0"><router-link to="/account/profile">Verify</router-link> your primary email address to start receiving forwarded mail</p>
     </div>
     <div v-if="!res.is_active && !isDashboard">
         <h2>Verify Your Email</h2>

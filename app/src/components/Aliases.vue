@@ -35,7 +35,7 @@
                 <span v-if="searchQuery || loading">No aliases found</span>
             </h4>
             <p v-if="!recipients.length" class="text-tertiary mb-6">
-                To get started, first <router-link to="/account">verify</router-link> your primary email address.
+                To get started, first <router-link to="/account/profile">verify</router-link> your primary email address.
             </p>
             <button v-if="!searchQuery && !loading && recipients.length" class="cta" data-hs-overlay="#modal-create-alias-false">
                 New Alias

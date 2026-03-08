@@ -14,18 +14,19 @@ import (
 )
 
 var (
-	ErrGetDomains      = errors.New("Unable to retrieve domains.")
-	ErrGetDomain       = errors.New("Unable to retrieve domain.")
-	ErrGetDomainsCount = errors.New("Unable to retrieve domains count.")
-	ErrGetDNSConfig    = errors.New("Unable to retrieve DNS config.")
-	ErrPostDomain      = errors.New("Unable to create domain. Please try again.")
-	ErrUpdateDomain    = errors.New("Unable to update domain. Please try again.")
-	ErrDeleteDomain    = errors.New("Unable to delete domain. Please try again.")
-	ErrDNSLookupOwner  = errors.New("Unable to verify domain ownership. Please ensure the correct TXT record is set.")
-	ErrDNSLookupSPF    = errors.New("Unable to verify domain DNS records. Please ensure the correct SPF record is set.")
-	ErrDNSLookupDKIM   = errors.New("Unable to verify domain DNS records. Please ensure the correct DKIM records are set.")
-	ErrDNSLookupDMARC  = errors.New("Unable to verify domain DNS records. Please ensure the correct DMARC record is set.")
-	ErrDNSLookupMX     = errors.New("Unable to verify domain DNS records. Please ensure the correct MX records are set.")
+	ErrGetDomains           = errors.New("Unable to retrieve domains.")
+	ErrGetDomain            = errors.New("Unable to retrieve domain.")
+	ErrGetDomainsCount      = errors.New("Unable to retrieve domains count.")
+	ErrGetDNSConfig         = errors.New("Unable to retrieve DNS config.")
+	ErrPostDomain           = errors.New("Unable to create domain. Please try again.")
+	ErrPostDomainPredefined = errors.New("Please enter a different domain.")
+	ErrUpdateDomain         = errors.New("Unable to update domain. Please try again.")
+	ErrDeleteDomain         = errors.New("Unable to delete domain. Please try again.")
+	ErrDNSLookupOwner       = errors.New("Unable to verify domain ownership. Please ensure the correct TXT record is set.")
+	ErrDNSLookupSPF         = errors.New("Unable to verify domain DNS records. Please ensure the correct SPF record is set.")
+	ErrDNSLookupDKIM        = errors.New("Unable to verify domain DNS records. Please ensure the correct DKIM records are set.")
+	ErrDNSLookupDMARC       = errors.New("Unable to verify domain DNS records. Please ensure the correct DMARC record is set.")
+	ErrDNSLookupMX          = errors.New("Unable to verify domain DNS records. Please ensure the correct MX records are set.")
 )
 
 type DomainStore interface {
@@ -97,6 +98,11 @@ func (s *Service) GetDNSConfig(ctx context.Context, userId string) (model.DNSCon
 }
 
 func (s *Service) PostDomain(ctx context.Context, domain model.Domain) (model.Domain, error) {
+	if strings.Contains(s.Cfg.API.Domains, domain.Name) {
+		log.Printf("domain %s is in predefined list of domains", domain.Name)
+		return model.Domain{}, ErrPostDomainPredefined
+	}
+
 	err := s.VerifyDomainOwner(ctx, domain.Name, domain.UserID)
 	if err != nil {
 		log.Printf("error verifying domain ownership: %s", err.Error())

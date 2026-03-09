@@ -2,6 +2,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import Dashboard from './components/Dashboard.vue'
 import QuickActions from './components/QuickActions.vue'
 import Recipients from './components/Recipients.vue'
+import Domains from './components/Domains.vue'
 import Wildcards from './components/Wildcards.vue'
 import Stats from './components/Stats.vue'
 import Diagnostics from './components/Diagnostics.vue'
@@ -26,7 +27,7 @@ declare global {
 const AppName = import.meta.env.VITE_APP_NAME
 
 // Protected routes that require authentication
-const PROTECTED_ROUTES = ['/', '/recipients', '/stats', '/settings', '/account']
+const PROTECTED_ROUTES = ['/', '/recipients', '/domains', '/stats', '/settings', '/account']
 
 // Dashboard child routes
 const dashboardChildren: RouteRecordRaw[] = [
@@ -44,6 +45,11 @@ const dashboardChildren: RouteRecordRaw[] = [
         path: 'recipients',
         name: `${AppName} - Recipients`,
         component: Recipients,
+    },
+    {
+        path: 'domains',
+        name: `${AppName} - Domains`,
+        component: Domains,
     },
     {
         path: 'stats',

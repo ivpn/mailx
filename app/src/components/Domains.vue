@@ -37,7 +37,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
+import axios from 'axios'
+import { domainApi } from '../api/domain.ts'
 
 const domain = {
     id: '',
@@ -48,5 +50,28 @@ const domain = {
 const list = ref([] as typeof domain[])
 const error = ref('')
 const loaded = ref(false)
-// const rowKey = ref(0)
+const rowKey = ref(0)
+
+const getList = async () => {
+    try {
+        const response = await domainApi.getList()
+        list.value = response.data
+        error.value = ''
+        renderRow()
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.response?.data.error || err.message
+        }
+    } finally {
+        loaded.value = true
+    }
+}
+
+const renderRow = () => {
+    rowKey.value++
+}
+
+onMounted(() => {
+    getList()
+})
 </script>

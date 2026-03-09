@@ -18,9 +18,8 @@
                                 To confirm that you own the domain, add the TXT record shown below and then click Add Domain. After the domain has been successfully added, you may remove the TXT record if you wish.
                             </p>
                             <p class="break-all">
-                                Type: <span class="text-black dark:text-white">TXT</span><br>
-                                Host: <span class="text-black dark:text-white">@</span><br>
-                                Value: <span class="text-black dark:text-white">mailx-verify={{ config.verify }}</span>
+                                DNS Record:<br>
+                                <span class="text-black dark:text-white">TXT @ mailx-verify={{ config.verify }}</span>
                             </p>
                         </div>
                         <div class="mb-5">

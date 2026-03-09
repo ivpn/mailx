@@ -15,7 +15,12 @@
                     <article>
                         <div class="mb-5">
                             <p>
-                                Add a new domain to receive forwarded emails.
+                                To confirm that you own the domain, add the TXT record shown below and then click Add Domain. After the domain has been successfully added, you may remove the TXT record if you wish.
+                            </p>
+                            <p class="break-all">
+                                Type: <span class="text-black dark:text-white">TXT</span><br>
+                                Host: <span class="text-black dark:text-white">@</span><br>
+                                Value: <span class="text-black dark:text-white">mailx-verify={{ config.verify }}</span>
                             </p>
                         </div>
                         <div class="mb-5">
@@ -56,6 +61,9 @@ import axios from 'axios'
 import { domainApi } from '../api/domain.ts'
 import events from '../events.ts'
 
+const config = ref({
+    verify: '',
+})
 const domain = ref({
     name: '',
 })
@@ -65,6 +73,17 @@ const nameError = ref(false)
 const validateName = () => {
     nameError.value = !domain.value.name
     return !nameError.value
+}
+
+const getConfig = async () => {
+    try {
+        const res = await domainApi.getConfig()
+        config.value = res.data
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.response?.data.error || err.message
+        }
+    }
 }
 
 const postDomain = async () => {
@@ -127,5 +146,6 @@ const handleKeydown = (event: KeyboardEvent) => {
 onMounted(() => {
     overlay.autoInit()
     addEvents()
+    getConfig()
 })
 </script>

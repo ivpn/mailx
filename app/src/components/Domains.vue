@@ -8,7 +8,7 @@
         </header>
         <div v-if="!list.length && loaded" class="card-empty">
             <span class="bg-secondary rounded flex items-center justify-center p-2 mb-5">
-                <i class="icon inbox icon-accent text-2xl"></i>
+                <i class="icon global icon-accent text-2xl"></i>
             </span>
             <h4 class="mb-6">You have no domains yet</h4>
             <DomainCreate />

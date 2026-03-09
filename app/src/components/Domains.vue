@@ -3,7 +3,7 @@
         <header class="head">
             <h2>Domains</h2>
             <div class="flex items-center justify-between">
-                <!-- <DomainCreate /> -->
+                <DomainCreate />
             </div>
         </header>
         <div v-if="!list.length && loaded" class="card-empty">
@@ -11,7 +11,7 @@
                 <i class="icon inbox icon-accent text-2xl"></i>
             </span>
             <h4 class="mb-6">You have no domains yet</h4>
-            <!-- <DomainCreate /> -->
+            <DomainCreate />
         </div>
         <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="card-primary">
             <div class="table-container">
@@ -40,6 +40,7 @@
 import { onMounted, ref } from 'vue'
 import axios from 'axios'
 import { domainApi } from '../api/domain.ts'
+import DomainCreate from './DomainCreate.vue'
 
 const domain = {
     id: '',

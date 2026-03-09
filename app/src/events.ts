@@ -15,6 +15,7 @@ type Events = {
     'recipient.delete.error': { error: string }
     'recipient.reload': {}
     'accesskey.create': {}
+    'domain.create': {}
 }
 
 export default mitt<Events>()

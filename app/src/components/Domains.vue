@@ -41,6 +41,7 @@ import { onMounted, ref } from 'vue'
 import axios from 'axios'
 import { domainApi } from '../api/domain.ts'
 import DomainCreate from './DomainCreate.vue'
+import events from '../events.ts'
 
 const domain = {
     id: '',
@@ -74,5 +75,6 @@ const renderRow = () => {
 
 onMounted(() => {
     getList()
+    events.on('domain.create', getList)
 })
 </script>

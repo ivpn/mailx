@@ -20,14 +20,13 @@
                         <tr>
                             <th>Created</th>
                             <th>Domain</th>
-                            <th>Default Recipient</th>
                             <th>Verified</th>
                             <th>Active</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <DomainRow v-for="domain in list" :domain="domain" :recipients="recipients" :key="domain.id" />
+                        <DomainRow v-for="domain in list" :domain="domain" :key="domain.id" />
                     </tbody>
                 </table>
                 <p v-if="error" class="error">Error: {{ error }}</p>
@@ -40,7 +39,6 @@
 import { onMounted, ref } from 'vue'
 import axios from 'axios'
 import { domainApi } from '../api/domain.ts'
-import { recipientApi } from '../api/recipient.ts'
 import DomainCreate from './DomainCreate.vue'
 import DomainRow from './DomainRow.vue'
 import events from '../events.ts'
@@ -50,15 +48,12 @@ const domain = {
     created_at: '',
     name: '',
     enabled: false,
-    description: '',
-    recipient: '',
     owner_verified_at: '',
     mx_verified_at: '',
     send_verified_at: '',
 }
 
 const list = ref([] as typeof domain[])
-const recipients = ref([])
 const error = ref('')
 const loaded = ref(false)
 const rowKey = ref(0)
@@ -78,26 +73,12 @@ const getList = async () => {
     }
 }
 
-const getRecipients = async () => {
-    try {
-        const res = await recipientApi.getList()
-        const list = res.data.filter((item: { is_active: boolean }) => item.is_active)
-        recipients.value = list.map((recipient: { email: string }) => recipient.email)
-        error.value = ''
-    } catch (err) {
-        if (axios.isAxiosError(err)) {
-            error.value = err.message
-        }
-    }
-}
-
 const renderRow = () => {
     rowKey.value++
 }
 
 onMounted(() => {
     getList()
-    getRecipients()
     events.on('domain.create', getList)
     events.on('domain.reload', getList)
     events.on('domain.update', getList)

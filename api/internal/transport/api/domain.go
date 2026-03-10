@@ -113,7 +113,7 @@ func (h *Handler) PostDomain(c *fiber.Ctx) error {
 	_, err = h.Service.PostDomain(c.Context(), domain)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
-			"error": ErrPostDomain,
+			"error": err.Error(),
 		})
 	}
 

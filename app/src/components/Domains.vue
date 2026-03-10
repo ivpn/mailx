@@ -27,7 +27,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- <DomainRow v-for="domain in list" :domain="domain" :key="domain.id" /> -->
+                        <DomainRow v-for="domain in list" :domain="domain" :key="domain.id" />
                     </tbody>
                 </table>
                 <p v-if="error" class="error">Error: {{ error }}</p>
@@ -41,6 +41,7 @@ import { onMounted, ref } from 'vue'
 import axios from 'axios'
 import { domainApi } from '../api/domain.ts'
 import DomainCreate from './DomainCreate.vue'
+import DomainRow from './DomainRow.vue'
 import events from '../events.ts'
 
 const domain = {

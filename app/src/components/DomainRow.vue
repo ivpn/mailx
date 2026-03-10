@@ -7,9 +7,6 @@
             <p>{{ domain.name }}</p>
         </td>
         <td>
-            <p>{{ domain.description }}</p>
-        </td>
-        <td>
             <p>{{ domain.default_recipient }}</p>
         </td>
         <td>
@@ -46,12 +43,15 @@
             </div>
         </td>
     </tr>
+
+    <DomainDelete :domain="domain" />
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import dropdown from '@preline/dropdown'
 import { domainApi } from '../api/domain.ts'
+import DomainDelete from './DomainDelete.vue'
 
 const props = defineProps(['domain'])
 const domain = ref(props.domain)

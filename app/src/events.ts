@@ -16,6 +16,7 @@ type Events = {
     'recipient.reload': {}
     'accesskey.create': {}
     'domain.create': {}
+    'domain.reload': {}
 }
 
 export default mitt<Events>()

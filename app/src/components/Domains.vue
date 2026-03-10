@@ -20,7 +20,6 @@
                         <tr>
                             <th>Created</th>
                             <th>Domain</th>
-                            <th>Description</th>
                             <th>Default Recipient</th>
                             <th>Active</th>
                             <th>DNS Records</th>
@@ -84,5 +83,6 @@ const renderRow = () => {
 onMounted(() => {
     getList()
     events.on('domain.create', getList)
+    events.on('domain.reload', getList)
 })
 </script>

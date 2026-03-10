@@ -88,7 +88,7 @@ type AccessKeyReq struct {
 }
 
 type DomainReq struct {
-	Name string `json:"name" validate:"required,hostname"`
+	Name string `json:"name" validate:"required,fqdn"`
 }
 
 type UpdateDomainReq struct {

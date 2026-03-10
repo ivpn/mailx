@@ -17,6 +17,7 @@ type Events = {
     'accesskey.create': {}
     'domain.create': {}
     'domain.reload': {}
+    'domain.update': {}
 }
 
 export default mitt<Events>()

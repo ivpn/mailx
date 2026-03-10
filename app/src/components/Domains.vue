@@ -100,5 +100,6 @@ onMounted(() => {
     getRecipients()
     events.on('domain.create', getList)
     events.on('domain.reload', getList)
+    events.on('domain.update', getList)
 })
 </script>

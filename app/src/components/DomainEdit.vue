@@ -60,6 +60,7 @@ const props = defineProps(['domain', 'recipients'])
 const domain = ref(props.domain)
 const recipients = ref(props.recipients)
 const error = ref('')
+import events from '../events.ts'
 
 const updateDomain = async () => {
     const payload = {
@@ -70,6 +71,8 @@ const updateDomain = async () => {
     try {
         await domainApi.update(domain.value.id, payload)
         error.value = ''
+        events.emit('domain.update', {})
+        close()
     } catch (err) {
         if (axios.isAxiosError(err)) {
             const errorMsg = err.response?.data.error || err.message

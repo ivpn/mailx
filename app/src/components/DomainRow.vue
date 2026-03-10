@@ -10,6 +10,9 @@
             <p>{{ domain.default_recipient }}</p>
         </td>
         <td>
+            <p>{{ dnsRecordsVerified() ? 'Verified' : 'Not Verified' }}</p>
+        </td>
+        <td>
             <div class="flex items-center hs-tooltip">
                 <input
                     @change="updateDomain"
@@ -17,9 +20,6 @@
                     type="checkbox"
                 >
             </div>
-        </td>
-        <td>
-            <p>{{ dnsRecordsVerified() ? 'Verified' : 'Not Verified' }}</p>
         </td>
         <td>
             <div class="hs-dropdown [--offset:0]">
@@ -44,6 +44,7 @@
         </td>
     </tr>
 
+    <DomainEdit :domain="domain" :recipients="recipients" />
     <DomainDelete :domain="domain" />
 </template>
 
@@ -52,9 +53,11 @@ import { ref, onMounted } from 'vue'
 import dropdown from '@preline/dropdown'
 import { domainApi } from '../api/domain.ts'
 import DomainDelete from './DomainDelete.vue'
+import DomainEdit from './DomainEdit.vue'
 
-const props = defineProps(['domain'])
+const props = defineProps(['domain', 'recipients'])
 const domain = ref(props.domain)
+const recipients = ref(props.recipients)
 
 const updateDomain = async () => {
     domain.value.enabled = !domain.value.enabled

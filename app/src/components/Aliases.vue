@@ -46,7 +46,7 @@
                 <table>
                     <thead class="desktop">
                         <tr>
-                            <th>Status</th>
+                            <th>Active</th>
                             <th>
                                 <button
                                 @click="sort"

@@ -16,10 +16,13 @@
             <div class="flex items-center hs-tooltip">
                 <input
                     @change="updateDomain"
-                    v-bind:checked="domain.active"
+                    v-bind:checked="domain.enabled"
                     type="checkbox"
                 >
             </div>
+        </td>
+        <td>
+            <p>{{ dnsRecordsVerified() ? 'Verified' : 'Not Verified' }}</p>
         </td>
         <td>
             <div class="hs-dropdown [--offset:0]">
@@ -54,10 +57,14 @@ const props = defineProps(['domain'])
 const domain = ref(props.domain)
 
 const updateDomain = async () => {
-    domain.value.active = !domain.value.active
+    domain.value.enabled = !domain.value.enabled
     try {
         await domainApi.update(domain.value.id, domain.value)
     } catch {}
+}
+
+const dnsRecordsVerified = () => {
+    return domain.value.mx_verified_at && domain.value.send_verified_at
 }
 
 onMounted(() => {

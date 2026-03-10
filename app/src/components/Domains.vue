@@ -23,6 +23,7 @@
                             <th>Description</th>
                             <th>Default Recipient</th>
                             <th>Active</th>
+                            <th>DNS Records</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -48,6 +49,12 @@ const domain = {
     id: '',
     created_at: '',
     name: '',
+    enabled: false,
+    description: '',
+    recipient: '',
+    owner_verified_at: '',
+    mx_verified_at: '',
+    send_verified_at: '',
 }
 
 const list = ref([] as typeof domain[])

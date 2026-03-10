@@ -16,6 +16,8 @@ services:
       - api:/var/log
     networks:
       net:
+    environment:
+      - GODEBUG=netdns=cgo
   
   app:
     build: ../app

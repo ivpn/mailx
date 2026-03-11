@@ -71,6 +71,16 @@ func (s *Service) GetDomain(ctx context.Context, domainID string, userID string)
 	return domain, nil
 }
 
+func (s *Service) GetVerifiedDomain(ctx context.Context, domainID string, userID string) (model.Domain, error) {
+	domain, err := s.Store.GetVerifiedDomain(ctx, domainID, userID)
+	if err != nil {
+		log.Printf("error getting verified domain: %s", err.Error())
+		return model.Domain{}, ErrGetDomain
+	}
+
+	return domain, nil
+}
+
 func (s *Service) GetDomainsCount(ctx context.Context, userId string) (int64, error) {
 	count, err := s.Store.GetDomainsCount(ctx, userId)
 	if err != nil {

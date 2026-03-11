@@ -63,6 +63,13 @@ definitions:
     required:
     - otp
     type: object
+  api.DomainReq:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
   api.EmailReq:
     properties:
       email:
@@ -182,6 +189,21 @@ definitions:
     required:
     - otp
     type: object
+  api.UpdateDomainReq:
+    properties:
+      description:
+        type: string
+      enabled:
+        type: boolean
+      from_name:
+        type: string
+      id:
+        type: string
+      recipient:
+        type: string
+    required:
+    - id
+    type: object
   api.UserReq:
     properties:
       email:
@@ -257,6 +279,47 @@ definitions:
       id:
         type: string
       user_id:
+        type: string
+    type: object
+  model.DNSConfig:
+    properties:
+      dkim_selectors:
+        items:
+          type: string
+        type: array
+      domain:
+        type: string
+      mx_hosts:
+        items:
+          type: string
+        type: array
+      verify:
+        type: string
+    type: object
+  model.Domain:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      enabled:
+        type: boolean
+      from_name:
+        type: string
+      id:
+        type: string
+      mx_verified_at:
+        description: nullable
+        type: string
+      name:
+        type: string
+      owner_verified_at:
+        description: nullable
+        type: string
+      recipient:
+        type: string
+      send_verified_at:
+        description: nullable
         type: string
     type: object
   model.Log:
@@ -815,6 +878,168 @@ paths:
       summary: Logout API user
       tags:
       - access_key
+  /domains:
+    get:
+      consumes:
+      - application/json
+      description: Get all custom domains for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Domain'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get custom domains
+      tags:
+      - domain
+    post:
+      consumes:
+      - application/json
+      description: Create a new custom domain for the authenticated user
+      parameters:
+      - description: Custom Domain Request
+        in: body
+        name: domain
+        required: true
+        schema:
+          $ref: '#/definitions/api.DomainReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Create custom domain
+      tags:
+      - domain
+    put:
+      consumes:
+      - application/json
+      description: Update an existing custom domain for the authenticated user
+      parameters:
+      - description: Update Custom Domain Request
+        in: body
+        name: domain
+        required: true
+        schema:
+          $ref: '#/definitions/api.UpdateDomainReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update custom domain
+      tags:
+      - domain
+  /domains/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an existing custom domain for the authenticated user
+      parameters:
+      - description: Domain ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete custom domain
+      tags:
+      - domain
+  /domains/{id}/verify-dns:
+    post:
+      consumes:
+      - application/json
+      description: Verify the DNS records for a custom domain of the authenticated
+        user
+      parameters:
+      - description: Domain ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Verify custom domain DNS records
+      tags:
+      - domain
+  /domains/dns-config:
+    get:
+      consumes:
+      - application/json
+      description: Get the DNS configuration for all custom domains of the authenticated
+        user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.DNSConfig'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get custom domains DNS config
+      tags:
+      - domain
   /email:
     post:
       consumes:

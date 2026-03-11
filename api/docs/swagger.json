@@ -661,6 +661,261 @@
                 }
             }
         },
+        "/domains": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all custom domains for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "domain"
+                ],
+                "summary": "Get custom domains",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Domain"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update an existing custom domain for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "domain"
+                ],
+                "summary": "Update custom domain",
+                "parameters": [
+                    {
+                        "description": "Update Custom Domain Request",
+                        "name": "domain",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.UpdateDomainReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create a new custom domain for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "domain"
+                ],
+                "summary": "Create custom domain",
+                "parameters": [
+                    {
+                        "description": "Custom Domain Request",
+                        "name": "domain",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.DomainReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "message",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/domains/dns-config": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get the DNS configuration for all custom domains of the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "domain"
+                ],
+                "summary": "Get custom domains DNS config",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.DNSConfig"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/domains/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete an existing custom domain for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "domain"
+                ],
+                "summary": "Delete custom domain",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Domain ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/domains/{id}/verify-dns": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Verify the DNS records for a custom domain of the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "domain"
+                ],
+                "summary": "Verify custom domain DNS records",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Domain ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
         "/email": {
             "post": {
                 "description": "Handle incoming email",
@@ -2370,6 +2625,17 @@
                 }
             }
         },
+        "api.DomainReq": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "api.EmailReq": {
             "type": "object",
             "required": [
@@ -2551,6 +2817,29 @@
                 }
             }
         },
+        "api.UpdateDomainReq": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "from_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "recipient": {
+                    "type": "string"
+                }
+            }
+        },
         "api.UserReq": {
             "type": "object",
             "required": [
@@ -2664,6 +2953,67 @@
                     "type": "string"
                 },
                 "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.DNSConfig": {
+            "type": "object",
+            "properties": {
+                "dkim_selectors": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "domain": {
+                    "type": "string"
+                },
+                "mx_hosts": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "verify": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Domain": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "from_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "mx_verified_at": {
+                    "description": "nullable",
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "owner_verified_at": {
+                    "description": "nullable",
+                    "type": "string"
+                },
+                "recipient": {
+                    "type": "string"
+                },
+                "send_verified_at": {
+                    "description": "nullable",
                     "type": "string"
                 }
             }

@@ -20,11 +20,13 @@ var (
 	ErrUpdateAlias         = errors.New("Unable to update alias. Please try again.")
 	ErrDeleteAlias         = errors.New("Unable to delete alias. Please try again.")
 	ErrDeleteAliasByUserID = errors.New("Unable to delete aliases for this user.")
+	ErrDeleteAliasByDomain = errors.New("Unable to delete aliases for this domain.")
 )
 
 type AliasStore interface {
 	GetAlias(context.Context, string, string) (model.Alias, error)
 	GetAliases(context.Context, string, int, int, string, string, string, string) ([]model.Alias, error)
+	GetAliasesByDomain(context.Context, string, string) ([]model.Alias, error)
 	GetAllAliases(context.Context, string) ([]model.Alias, error)
 	GetAliasCount(context.Context, string, string, string) (int, error)
 	GetAliasDailyCount(context.Context, string) (int, error)
@@ -33,6 +35,7 @@ type AliasStore interface {
 	UpdateAlias(context.Context, model.Alias) error
 	DeleteAlias(context.Context, string, string) error
 	DeleteAliasByUserID(context.Context, string) error
+	DeleteAliasByDomain(context.Context, string, string) error
 }
 
 func (s *Service) GetAlias(ctx context.Context, ID string, userID string) (model.Alias, error) {
@@ -67,6 +70,16 @@ func (s *Service) GetAliases(ctx context.Context, userID string, limit int, page
 		Aliases: aliases,
 		Total:   total,
 	}, nil
+}
+
+func (s *Service) GetAliasesByDomain(ctx context.Context, domain string, userID string) ([]model.Alias, error) {
+	aliases, err := s.Store.GetAliasesByDomain(ctx, domain, userID)
+	if err != nil {
+		log.Printf("error fetching aliases by domain: %s", err.Error())
+		return nil, ErrGetAliases
+	}
+
+	return aliases, nil
 }
 
 func (s *Service) GetAllAliases(ctx context.Context, userID string) ([]model.Alias, error) {
@@ -183,6 +196,16 @@ func (s *Service) DeleteAliasByUserID(ctx context.Context, userID string) error 
 	if err != nil {
 		log.Printf("error deleting alias: %s", err.Error())
 		return ErrDeleteAliasByUserID
+	}
+
+	return nil
+}
+
+func (s *Service) DeleteAliasByDomain(ctx context.Context, domain string, userID string) error {
+	err := s.Store.DeleteAliasByDomain(ctx, domain, userID)
+	if err != nil {
+		log.Printf("error deleting aliases by domain: %s", err.Error())
+		return ErrDeleteAliasByDomain
 	}
 
 	return nil

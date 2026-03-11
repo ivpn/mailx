@@ -89,6 +89,7 @@ import { ref, onMounted } from 'vue'
 import overlay from '@preline/overlay'
 import { domainApi } from '../api/domain.ts'
 import axios from 'axios'
+import events from '../events.ts'
 
 const props = defineProps(['domain'])
 const domain = ref(props.domain)
@@ -112,7 +113,18 @@ const getConfig = async () => {
     }
 }
 
-const verifyDomain = async () => {}
+const verifyDomain = async () => {
+    try {
+        await domainApi.verifyDns(domain.value.id)
+        error.value = ''
+        events.emit('domain.reload', {})
+        close()
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.response?.data.error || err.message
+        }
+    }
+}
 
 const close = () => {
     error.value = ''

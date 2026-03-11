@@ -104,6 +104,10 @@
                                                     :selected="domain == alias.domain || index === 0" :key="domain">
                                                     {{ domain }}
                                                 </option>
+                                                <option v-for="(domain, _) in customDomains" v-bind:domain.id
+                                                    :selected="domain.name == alias.domain" :key="domain.id">
+                                                    {{ domain.name }}
+                                                </option>
                                             </select>
                                         </div>
                                         <div class="pb-5">
@@ -171,6 +175,7 @@ const recipients = ref(props.recipients)
 const settings = ref(props.settings)
 const selectRecipients = ref([settings.value.recipient ? settings.value.recipient : props.recipients[0]])
 const domains = ref(envDomains)
+const customDomains = ref(props.settings.custom_domains || [])
 const formats = ref([{
     name: 'Words',
     value: 'words'

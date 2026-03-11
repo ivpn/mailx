@@ -136,6 +136,7 @@ const recipients = ref([])
 const settings = ref({
     id: '',
     domain: '',
+    domains: [],
     custom_domains: [],
     recipient: '',
     from_name: ''

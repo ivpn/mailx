@@ -7,7 +7,10 @@
             <p>{{ domain.name }}</p>
         </td>
         <td>
-            <p>{{ dnsRecordsVerified() ? 'Verified' : 'Not Verified' }}</p>
+            <p>
+                <button v-if="dnsRecordsVerified()" class="cta xs success" v-bind:data-hs-overlay="'#modal-verify-domain' + domain.id">Recheck</button>
+                <button v-if="!dnsRecordsVerified()" class="cta xs plain" v-bind:data-hs-overlay="'#modal-verify-domain' + domain.id">Unverified</button>
+            </p>
         </td>
         <td>
             <div class="flex items-center hs-tooltip">
@@ -37,6 +40,7 @@
         </td>
     </tr>
 
+    <DomainVerify :domain="domain" />
     <DomainDelete :domain="domain" />
 </template>
 
@@ -45,6 +49,7 @@ import { ref, onMounted } from 'vue'
 import dropdown from '@preline/dropdown'
 import { domainApi } from '../api/domain.ts'
 import DomainDelete from './DomainDelete.vue'
+import DomainVerify from './DomainVerify.vue'
 
 const props = defineProps(['domain'])
 const domain = ref(props.domain)

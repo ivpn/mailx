@@ -54,6 +54,16 @@
                 }
             }
         }
+
+        &.sm {
+            th {
+                @apply px-1 py-3 text-[13px];
+            }
+
+            td {
+                @apply px-1 py-3 text-[13px];
+            }
+        }
     }
 
     .table-container {

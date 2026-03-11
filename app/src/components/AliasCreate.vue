@@ -104,7 +104,7 @@
                                                     :selected="domain == alias.domain || index === 0" :key="domain">
                                                     {{ domain }}
                                                 </option>
-                                                <option v-for="(domain, _) in customDomains" v-bind:domain.id
+                                                <option v-for="(domain, _) in customDomains" v-bind:domain.attribute:value="domain.id"
                                                     :selected="domain.name == alias.domain" :key="domain.id">
                                                     {{ domain.name }}
                                                 </option>
@@ -194,7 +194,10 @@ const loading = ref(false)
 const postAlias = async () => {
     if (loading.value) return
 
-    alias.value.domain = (document.getElementById('alias_domain') as HTMLInputElement).value
+    const select = document.getElementById('alias_domain') as HTMLSelectElement
+    const selectedOption = select.options[select.selectedIndex]
+    const domain = selectedOption.getAttribute('domain')
+    alias.value.domain = domain
     alias.value.recipients = selectRecipients.value.join(',')
     alias.value.enabled = true
     

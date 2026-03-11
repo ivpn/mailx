@@ -276,11 +276,20 @@ func (h *Handler) GetDefaults(c *fiber.Ctx) error {
 		})
 	}
 
+	customDomains, err := h.Service.GetVerifiedDomains(c.Context(), userId)
+	if err != nil {
+		log.Printf("error get defaults: %s", err.Error())
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrGetDefaults,
+		})
+	}
+
 	return c.Status(200).JSON(fiber.Map{
-		"domain":       settings.Domain,
-		"domains":      strings.Split(h.Cfg.Domains, ","),
-		"recipient":    settings.Recipient,
-		"recipients":   rcps,
-		"alias_format": settings.AliasFormat,
+		"domain":         settings.Domain,
+		"domains":        strings.Split(h.Cfg.Domains, ","),
+		"custom_domains": customDomains,
+		"recipient":      settings.Recipient,
+		"recipients":     rcps,
+		"alias_format":   settings.AliasFormat,
 	})
 }

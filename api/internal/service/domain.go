@@ -31,6 +31,7 @@ var (
 
 type DomainStore interface {
 	GetDomains(context.Context, string) ([]model.Domain, error)
+	GetVerifiedDomains(context.Context, string) ([]model.Domain, error)
 	GetDomain(context.Context, string, string) (model.Domain, error)
 	GetDomainsCount(context.Context, string) (int64, error)
 	PostDomain(context.Context, model.Domain) (model.Domain, error)
@@ -43,6 +44,16 @@ func (s *Service) GetDomains(ctx context.Context, userId string) ([]model.Domain
 	domains, err := s.Store.GetDomains(ctx, userId)
 	if err != nil {
 		log.Printf("error getting domains: %s", err.Error())
+		return nil, ErrGetDomains
+	}
+
+	return domains, nil
+}
+
+func (s *Service) GetVerifiedDomains(ctx context.Context, userId string) ([]model.Domain, error) {
+	domains, err := s.Store.GetVerifiedDomains(ctx, userId)
+	if err != nil {
+		log.Printf("error getting verified domains: %s", err.Error())
 		return nil, ErrGetDomains
 	}
 

@@ -12,6 +12,12 @@ func (d *Database) GetDomains(ctx context.Context, userID string) ([]model.Domai
 	return domains, err
 }
 
+func (d *Database) GetVerifiedDomains(ctx context.Context, userID string) ([]model.Domain, error) {
+	var domains []model.Domain
+	err := d.Client.Where("user_id = ? AND owner_verified_at IS NOT NULL AND mx_verified_at IS NOT NULL AND send_verified_at IS NOT NULL", userID).Order("created_at desc").Find(&domains).Error
+	return domains, err
+}
+
 func (d *Database) GetDomain(ctx context.Context, domainID string, userID string) (model.Domain, error) {
 	var domain model.Domain
 	err := d.Client.Where("id = ? AND user_id = ?", domainID, userID).First(&domain).Error

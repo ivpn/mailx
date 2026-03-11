@@ -25,6 +25,7 @@ type DomainService interface {
 	GetDomains(context.Context, string) ([]model.Domain, error)
 	GetVerifiedDomains(context.Context, string) ([]model.Domain, error)
 	GetDomain(context.Context, string, string) (model.Domain, error)
+	GetVerifiedDomain(context.Context, string, string) (model.Domain, error)
 	GetDNSConfig(context.Context, string) (model.DNSConfig, error)
 	PostDomain(context.Context, model.Domain) (model.Domain, error)
 	UpdateDomain(context.Context, model.Domain) error

@@ -24,6 +24,12 @@ func (d *Database) GetDomain(ctx context.Context, domainID string, userID string
 	return domain, err
 }
 
+func (d *Database) GetVerifiedDomain(ctx context.Context, domainID string, userID string) (model.Domain, error) {
+	var domain model.Domain
+	err := d.Client.Where("id = ? AND user_id = ? AND owner_verified_at IS NOT NULL AND mx_verified_at IS NOT NULL AND send_verified_at IS NOT NULL", domainID, userID).First(&domain).Error
+	return domain, err
+}
+
 func (d *Database) GetDomainsCount(ctx context.Context, userID string) (int64, error) {
 	var count int64
 	err := d.Client.Model(&model.Domain{}).Where("user_id = ?", userID).Count(&count).Error

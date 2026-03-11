@@ -33,6 +33,7 @@ type DomainStore interface {
 	GetDomains(context.Context, string) ([]model.Domain, error)
 	GetVerifiedDomains(context.Context, string) ([]model.Domain, error)
 	GetDomain(context.Context, string, string) (model.Domain, error)
+	GetVerifiedDomain(context.Context, string, string) (model.Domain, error)
 	GetDomainsCount(context.Context, string) (int64, error)
 	PostDomain(context.Context, model.Domain) (model.Domain, error)
 	UpdateDomain(context.Context, model.Domain) error

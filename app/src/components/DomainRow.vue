@@ -8,7 +8,7 @@
         </td>
         <td>
             <p>
-                <button v-if="dnsRecordsVerified()" class="cta xs success" v-bind:data-hs-overlay="'#modal-verify-domain' + domain.id">Recheck</button>
+                <button v-if="dnsRecordsVerified()" class="cta xs success" v-bind:data-hs-overlay="'#modal-verify-domain' + domain.id">Verified</button>
                 <button v-if="!dnsRecordsVerified()" class="cta xs plain" v-bind:data-hs-overlay="'#modal-verify-domain' + domain.id">Unverified</button>
             </p>
         </td>
@@ -30,6 +30,10 @@
                     class="hs-dropdown-menu hs-dropdown-open:opacity-100 hidden"
                     v-bind:aria-labelledby="'hs-dropdown-domain-edit-' + domain.id"
                     >
+                    <button v-bind:data-hs-overlay="'#modal-verify-domain' + domain.id">
+                        <i class="icon icon-primary check text-xs"></i>
+                        Verify
+                    </button>
                     <button class="delete"
                         v-bind:data-hs-overlay="'#modal-delete-domain' + domain.id">
                         <i class="icon icon-error trash text-xs"></i>

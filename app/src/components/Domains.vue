@@ -26,7 +26,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <DomainRow v-for="domain in list" :domain="domain" :key="domain.id" />
+                        <DomainRow v-for="domain in list" :domain="domain" :key="rowKey" />
                     </tbody>
                 </table>
                 <p v-if="error" class="error">Error: {{ error }}</p>

@@ -86,3 +86,15 @@ type AccessKeyReq struct {
 	Name      string `json:"name" validate:"required"`
 	ExpiresAt string `json:"expires_at"`
 }
+
+type DomainReq struct {
+	Name string `json:"name" validate:"required,fqdn"`
+}
+
+type UpdateDomainReq struct {
+	ID          string `json:"id" validate:"required,uuid"`
+	Description string `json:"description"`
+	Recipient   string `json:"recipient"`
+	FromName    string `json:"from_name"`
+	Enabled     bool   `json:"enabled"`
+}

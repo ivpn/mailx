@@ -6,5 +6,5 @@ export const domainApi = {
     verifyDns: (id: string) => api.post('/domain/' + id + '/verify-dns'),
     create: (data: any) => api.post('/domain', data),
     update: (id: string, data: any) => api.put('/domain/' + id, data),
-    delete: (id: string) => api.put('/domain/' + id),
+    delete: (id: string) => api.delete('/domain/' + id),
 }

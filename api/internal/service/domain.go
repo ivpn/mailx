@@ -249,7 +249,7 @@ func (s *Service) VerifyDomainSend(ctx context.Context, domain string, userID st
 	}
 
 	// SPF record
-	ok, err := utils.LookupTXTContains(domain, "v=spf1 include:"+dnsConfig.Domain+" ~all")
+	ok, err := utils.LookupTXTContains(domain, "v=spf1 include:spf."+dnsConfig.Domain+" -all")
 	if err != nil {
 		log.Printf("error looking up TXT record for domain SPF verification: %s", err.Error())
 		return ErrDNSLookupSPF

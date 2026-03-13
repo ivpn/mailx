@@ -26,6 +26,7 @@ type DomainService interface {
 	GetVerifiedDomains(context.Context, string) ([]model.Domain, error)
 	GetDomain(context.Context, string, string) (model.Domain, error)
 	GetVerifiedDomain(context.Context, string, string) (model.Domain, error)
+	GetVerifiedDomainByName(context.Context, string) (model.Domain, error)
 	GetDNSConfig(context.Context, string) (model.DNSConfig, error)
 	PostDomain(context.Context, model.Domain) (model.Domain, error)
 	UpdateDomain(context.Context, model.Domain) error
@@ -230,4 +231,44 @@ func (h *Handler) VerifyDomainDNSRecords(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"message": DNSRecordVerificationSuccess,
 	})
+}
+
+// @Summary Check custom domain
+// @Description Check if a custom domain exists for the authenticated user
+// @Tags domain
+// @Accept json
+// @Produce json
+// @Param domain body DomainReq true "Custom Domain Request"
+// @Success 200 {string} string "OK"
+// @Failure 400 {object} ErrorRes
+// @Router /email/domain/check [post]
+func (h *Handler) CheckDomain(c *fiber.Ctx) error {
+	// Parse the request
+	req := DomainReq{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	// Validate the request
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	// Check if domain exists
+	domain, err := h.Service.GetVerifiedDomainByName(c.Context(), req.Name)
+	if err != nil {
+		return c.Status(400).SendString("Not Found")
+	}
+
+	if domain.Name != req.Name {
+		return c.Status(400).SendString("Not Found")
+	}
+
+	return c.SendString("OK")
 }

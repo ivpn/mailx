@@ -57,7 +57,7 @@ services:
     build: ./daemon
     container_name: daemon
     environment:
-      - API_URL=http://email-api:3000
+      - API_URL=${API_URL}
       - PSK=${PSK}
       - LOCAL_DOMAINS=${DOMAINS}
       - CACHE_POSITIVE_TTL=10m

@@ -11,6 +11,7 @@ permissions:
 env:
   API_IMAGE: email/api
   APP_IMAGE: email/app
+  DAEMON_IMAGE: mailserver/daemon
   TAG: staging
   REGISTRY: ${{ secrets.REGISTRY_NAME }}
 
@@ -38,6 +39,9 @@ jobs:
 
       - name: Build app image
         run: docker build -t $REGISTRY/$APP_IMAGE:$TAG app/.
+      
+      - name: Build daemon image
+        run: docker build -t $REGISTRY/$DAEMON_IMAGE:$TAG mailserver/daemon/.
 
       - name: Log in to registry
         run: echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login ${{ secrets.REGISTRY_NAME }} -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
@@ -47,3 +51,6 @@ jobs:
 
       - name: Push app:${{ env.TAG }}
         run: docker push $REGISTRY/$APP_IMAGE:$TAG
+
+      - name: Push daemon:${{ env.TAG }}
+        run: docker push $REGISTRY/$DAEMON_IMAGE:$TAG

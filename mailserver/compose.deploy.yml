@@ -54,6 +54,19 @@ services:
       net:
         ipv4_address: ${DMS_IP}
 
+  daemon:
+    image: ${IMAGE_REGISTRY}${DAEMON_IMAGE}:${IMAGE_TAG}
+    container_name: daemon
+    environment:
+      - API_URL=${API_URL}
+      - PSK=${PSK}
+      - LOCAL_DOMAINS=${DOMAINS}
+      - CACHE_POSITIVE_TTL=10m
+      - CACHE_NEGATIVE_TTL=2m
+    restart: always
+    networks:
+      net:
+
 networks:
   net:
     driver: bridge

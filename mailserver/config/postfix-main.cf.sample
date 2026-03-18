@@ -32,3 +32,11 @@ smtpd_helo_restrictions =
     reject_invalid_helo_hostname
     reject_non_fqdn_helo_hostname
     reject_unknown_helo_hostname
+
+mydestination = $myhostname, localhost
+transport_maps = regexp:/tmp/docker-mailserver/postfix-transport.cf
+smtpd_recipient_restrictions =
+    permit_mynetworks,
+    permit_sasl_authenticated,
+    check_policy_service inet:daemon:10025,
+    reject_unauth_destination

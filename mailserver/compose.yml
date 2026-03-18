@@ -52,6 +52,19 @@ services:
       retries: 0
     networks:
       email_net:
+  
+  daemon:
+    build: ./daemon
+    container_name: daemon
+    environment:
+      - API_URL=${API_URL}
+      - PSK=${PSK}
+      - LOCAL_DOMAINS=${DOMAINS}
+      - CACHE_POSITIVE_TTL=10m
+      - CACHE_NEGATIVE_TTL=2m
+    restart: always
+    networks:
+      email_net:
 
 networks:
   email_net:

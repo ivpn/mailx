@@ -11,7 +11,7 @@ chmod 640 /etc/sasldb2
 # curl-email.sh script
 echo "#!/bin/sh
 
-curl --silent --fail --data-binary @- -H  \"Authorization: Bearer $PSK\" -X POST http://email-api:3000/v1/email
+curl --silent --fail --data-binary @- -H  \"Authorization: Bearer $PSK\" -X POST $API_URL/v1/email
 
 rc=\$?
 
@@ -24,6 +24,9 @@ fi
 exit 0" >> /usr/local/bin/curl-email.sh
 
 chmod +x /usr/local/bin/curl-email.sh
+
+# Add curl_email service to master.cf
+postconf -M "curl_email/unix=curl_email unix - n n - - pipe flags=RqX user=nobody argv=/usr/local/bin/curl-email.sh \${sender} \${recipient}"
 
 # reload Postfix to apply changes
 postfix reload

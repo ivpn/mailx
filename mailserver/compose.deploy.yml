@@ -66,6 +66,12 @@ services:
     restart: always
     networks:
       net:
+        ipv4_address: ${DAEMON_IP}
 
 networks:
   net:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: ${NET_SUBNET}
+         gateway: ${NET_GATEWAY}

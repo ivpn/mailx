@@ -57,8 +57,6 @@ services:
   daemon:
     image: ${IMAGE_REGISTRY}${DAEMON_IMAGE}:${IMAGE_TAG}
     container_name: daemon
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
     environment:
       - API_URL=${API_URL}
       - PSK=${PSK}
@@ -68,25 +66,6 @@ services:
     restart: always
     networks:
       net:
-  
-  watchtower:
-    image: containrrr/watchtower
-    container_name: mailserver-watchtower
-    restart: unless-stopped
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./config.json:/config.json
-    environment:
-      - WATCHTOWER_CLEANUP=true
-      - WATCHTOWER_LABEL_ENABLE=true
-      - WATCHTOWER_POLL_INTERVAL=300
-    networks:
-      - net
 
 networks:
   net:
-    driver: bridge
-    ipam:
-     config:
-       - subnet: ${NET_SUBNET}
-         gateway: ${NET_GATEWAY}

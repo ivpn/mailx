@@ -12,8 +12,14 @@ non_smtpd_milters = $rspamd_milter
 
 mydestination = $myhostname, localhost
 local_recipient_maps =
-receive_override_options = no_address_mappings
 smtpd_policy_service_timeout = 10s
+relay_domains = regexp:/tmp/docker-mailserver/postfix-relay-domains.cf
+
+smtpd_relay_restrictions =
+    permit_mynetworks,
+    permit_sasl_authenticated,
+    permit_auth_destination,
+    reject_unauth_destination
 
 smtpd_recipient_restrictions =
     permit_mynetworks,
@@ -32,14 +38,9 @@ smtpd_sender_restrictions =
     reject_unknown_sender_domain,
     reject_unauth_pipelining
 
-smtpd_relay_restrictions =
+smtpd_helo_restrictions =
     permit_mynetworks,
     permit_sasl_authenticated,
-    reject_unauth_destination
-
-smtpd_helo_restrictions =
-    permit_mynetworks
-    permit_sasl_authenticated
-    reject_invalid_helo_hostname
-    reject_non_fqdn_helo_hostname
+    reject_invalid_helo_hostname,
+    reject_non_fqdn_helo_hostname,
     reject_unknown_helo_hostname

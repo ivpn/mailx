@@ -121,14 +121,14 @@ func handle(conn net.Conn) {
 
 	// Skip check for local domains
 	if localDomains[domain] {
-		fmt.Fprintf(conn, "action=OK FILTER curl_email\n\n")
+		fmt.Fprintf(conn, "action=OK FILTER curl_email:\n\n")
 		return
 	}
 
 	// Check cache
 	if valid, found := checkCache(domain); found {
 		if valid {
-			fmt.Fprintf(conn, "action=OK FILTER curl_email\n\n")
+			fmt.Fprintf(conn, "action=OK FILTER curl_email:\n\n")
 		} else {
 			fmt.Fprintf(conn, "action=REJECT domain not configured\n\n")
 		}
@@ -140,7 +140,7 @@ func handle(conn net.Conn) {
 	storeCache(domain, valid)
 
 	if valid {
-		fmt.Fprintf(conn, "action=OK FILTER curl_email\n\n")
+		fmt.Fprintf(conn, "action=OK FILTER curl_email:\n\n")
 	} else {
 		fmt.Fprintf(conn, "action=REJECT domain not configured\n\n")
 	}

@@ -85,7 +85,6 @@ func (s *Service) GetVerifiedDomain(ctx context.Context, domainID string, userID
 func (s *Service) GetVerifiedDomainByName(ctx context.Context, domainName string) (model.Domain, error) {
 	domain, err := s.Store.GetVerifiedDomainByName(ctx, domainName)
 	if err != nil {
-		log.Printf("error getting verified domain by name: %s", err.Error())
 		return model.Domain{}, ErrGetDomain
 	}
 

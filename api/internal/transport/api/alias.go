@@ -219,7 +219,7 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 	}
 
 	// Validate custom alias format
-	if req.Format == model.AliasFormatCustom && isCustomDomain {
+	if req.Format == model.AliasFormatCustom && !isCustomDomain {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidRequest,
 		})

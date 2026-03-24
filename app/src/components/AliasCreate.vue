@@ -22,15 +22,29 @@
                                     Alias suffix (6-12 alphanumeric chars.):
                                 </label>
                                 <input 
-                                    v-model="alias.catch_all_suffix"
-                                    v-bind:class="{ 'error': errorCatchAllSuffix }"
+                                    v-model="alias.local_part"
+                                    v-bind:class="{ 'error': errorLocalPart }"
                                     id="alias_catch_all_suffix"
                                     type="text"
                                 >
-                                <p v-if="errorCatchAllSuffix" class="error">Wildcard suffix must be between 6 and 12 characters</p>
+                                <p v-if="errorLocalPart" class="error">Wildcard suffix must be between 6 and 12 characters</p>
                                 <p class="text-primary mb-1">
-                                    *+{{ alias.catch_all_suffix }}@{{ alias.domain }}
+                                    *+{{ alias.local_part }}@{{ alias.domain }}
                                 </p>
+                            </div>
+                        </div>
+                        <div v-if="alias.format === 'custom'">
+                            <div class="mb-3">
+                                <label for="alias_custom_alias">
+                                    Custom alias (6-12 alphanumeric chars.):
+                                </label>
+                                <input 
+                                    v-model="alias.local_part"
+                                    v-bind:class="{ 'error': errorLocalPart }"
+                                    id="alias_custom_alias"
+                                    type="text"
+                                >
+                                <p v-if="errorLocalPart" class="error">Custom alias must be between 6 and 12 characters</p>
                             </div>
                         </div>
                         <div>
@@ -169,7 +183,7 @@ const alias = ref({
     recipients: '',
     domain: envDomains[0],
     catch_all: props.catchAll ? 'true' : 'false',
-    catch_all_suffix: ''
+    local_part: ''
 })
 const recipients = ref(props.recipients)
 const settings = ref(props.settings)
@@ -188,7 +202,7 @@ const formats = ref([{
 }])
 const error = ref('')
 const errorRecipients = ref('')
-const errorCatchAllSuffix = ref(false)
+const errorLocalPart = ref(false)
 const loading = ref(false)
 
 const postAlias = async () => {
@@ -235,7 +249,7 @@ const postAlias = async () => {
 const close = () => {
     resetAlias()
     error.value = ''
-    errorCatchAllSuffix.value = false
+    errorLocalPart.value = false
 
     document.removeEventListener('keydown', handleKeydown)
 
@@ -265,6 +279,12 @@ const addEvents = () => {
     multiselect.element.on('change', (val: any) => {
         errorRecipients.value = val.length === 0 ? 'Select one or more recipients' : ''
     })
+
+    const domainSelect = document.getElementById('alias_domain') as HTMLSelectElement
+    domainSelect.addEventListener('change', updateFormats)
+
+    const formatElement = document.getElementById('alias_format') as HTMLInputElement
+    formatElement.addEventListener('change', updateFormat)
 }
 
 const handleKeydown = (event: KeyboardEvent) => {
@@ -285,13 +305,52 @@ const validate = (rcps: string) => {
         return false
     }
 
-    if (props.catchAll) {
-        errorCatchAllSuffix.value = alias.value.catch_all_suffix.length < 6 || alias.value.catch_all_suffix.length > 12
+    if (props.catchAll || alias.value.format === 'custom') {
+        errorLocalPart.value = alias.value.local_part.length < 6 || alias.value.local_part.length > 12
     } else {
-        errorCatchAllSuffix.value = false
+        errorLocalPart.value = false
     }
 
-    return !errorCatchAllSuffix.value
+    return !errorLocalPart.value
+}
+
+const updateFormats = () => {
+    const select = document.getElementById('alias_domain') as HTMLSelectElement
+    const selectedOption = select.options[select.selectedIndex]
+    const domain = selectedOption.getAttribute('domain')
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(domain || '')
+
+    if (isUUID) {
+        formats.value = [{
+            name: 'Words',
+            value: 'words'
+        }, {
+            name: 'Random',
+            value: 'random'
+        }, {
+            name: 'UUID',
+            value: 'uuid'
+        }, {
+            name: 'Custom',
+            value: 'custom'
+        }]
+    } else {
+        formats.value = [{
+            name: 'Words',
+            value: 'words'
+        }, {
+            name: 'Random',
+            value: 'random'
+        }, {
+            name: 'UUID',
+            value: 'uuid'
+        }]
+    }
+}
+
+const updateFormat = () => {
+    const formatElement = document.getElementById('alias_format') as HTMLInputElement
+    alias.value.format = formatElement.value
 }
 
 const resetAlias = () => {
@@ -303,7 +362,7 @@ const resetAlias = () => {
         recipients: '',
         domain: props.settings.domain || envDomains[0],
         catch_all: props.catchAll ? 'true' : 'false',
-        catch_all_suffix: ''
+        local_part: ''
     }
 }
 

@@ -101,7 +101,7 @@ func (s *Service) GetAliasByName(name string) (model.Alias, error) {
 	return alias, nil
 }
 
-func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format string, domain string, sufix string) (model.Alias, error) {
+func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format string, domain string, localPart string) (model.Alias, error) {
 	sub, err := s.GetSubscription(context.Background(), alias.UserID)
 	if err != nil {
 		log.Printf("error fetching subscription: %s", err.Error())
@@ -141,7 +141,7 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 			}
 		}
 
-		alias.Name = model.GenerateAlias(format, sufix) + "@" + domain
+		alias.Name = model.GenerateAlias(format, localPart) + "@" + domain
 		alias.CatchAll = true
 		alias, err = s.Store.PostAlias(ctx, alias)
 		if err != nil {
@@ -154,7 +154,7 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 
 	// Standard alias
 	for range 5 {
-		alias.Name = model.GenerateAlias(format, "") + "@" + domain
+		alias.Name = model.GenerateAlias(format, localPart) + "@" + domain
 		alias, err = s.Store.PostAlias(ctx, alias)
 		if err != nil {
 			log.Printf("error creating standard alias: %s", err.Error())

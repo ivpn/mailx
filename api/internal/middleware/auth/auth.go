@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"fmt"
+	"slices"
 	"strings"
 	"time"
 
@@ -55,14 +56,26 @@ func New(cfg config.APIConfig, cache Cache, service Service) fiber.Handler {
 	}
 }
 
-func NewPSK(cfg config.APIConfig) fiber.Handler {
+func NewIPFilter(allowedIPs []string) fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
-		if GetAuthToken(c) != cfg.PSK {
-			return c.SendStatus(fiber.StatusUnauthorized)
+		clientIP := c.IP()
+		if slices.Contains(allowedIPs, clientIP) {
+			return c.Next()
 		}
 
-		return c.Next()
+		return c.SendStatus(fiber.StatusForbidden)
+	}
+}
+
+func NewPSK(psk string) fiber.Handler {
+
+	return func(c *fiber.Ctx) error {
+		if GetAuthToken(c) == psk {
+			return c.Next()
+		}
+
+		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 }
 

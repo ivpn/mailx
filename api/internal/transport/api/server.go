@@ -41,7 +41,11 @@ type Cache interface {
 func Start(cfg config.APIConfig, service Service, cache Cache) error {
 	log.Printf("API server starting on :%s", cfg.Port)
 
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		EnableTrustedProxyCheck: true,
+		TrustedProxies:          cfg.ApiTrustedProxies,
+		ProxyHeader:             fiber.HeaderXForwardedFor,
+	})
 
 	h := &Handler{
 		Cfg:       cfg,

@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"fmt"
+	"slices"
 	"strings"
 	"time"
 
@@ -54,14 +55,26 @@ func New(cfg config.APIConfig, cache Cache, service Service) fiber.Handler {
 	}
 }
 
-func NewPSK(cfg config.APIConfig) fiber.Handler {
+func NewIPFilter(allowedIPs []string) fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
-		if GetAuthToken(c) != cfg.PSK {
-			return c.SendStatus(fiber.StatusUnauthorized)
+		clientIP := c.IP()
+		if slices.Contains(allowedIPs, clientIP) {
+			return c.Next()
 		}
 
-		return c.Next()
+		return c.SendStatus(fiber.StatusForbidden)
+	}
+}
+
+func NewPSK(psk string) fiber.Handler {
+
+	return func(c *fiber.Ctx) error {
+		if GetAuthToken(c) == psk {
+			return c.Next()
+		}
+
+		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 }
 
@@ -127,9 +140,9 @@ func NewCookieTempAuthn(token string, path string, cfg config.APIConfig) *fiber.
 func NewWebAuthn(cfg config.APIConfig) *webauthn.WebAuthn {
 	var webAuthn *webauthn.WebAuthn
 	config := &webauthn.Config{
-		RPDisplayName: cfg.Name,                     // Display Name for your site
-		RPID:          cfg.FQDN,                     // Generally the FQDN for your site
-		RPOrigins:     []string{cfg.ApiAllowOrigin}, // The origin URLs allowed for WebAuthn requests
+		RPDisplayName: cfg.Name,                               // Display Name for your site
+		RPID:          cfg.FQDN,                               // Generally the FQDN for your site
+		RPOrigins:     strings.Split(cfg.ApiAllowOrigin, ","), // The origin URLs allowed for WebAuthn requests
 	}
 
 	webAuthn, err := webauthn.New(config)

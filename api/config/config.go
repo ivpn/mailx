@@ -12,11 +12,12 @@ type APIConfig struct {
 	Name               string
 	Port               string
 	ApiAllowOrigin     string
+	ApiTrustedProxies  []string
+	ApiAllowIPs        []string
 	TokenSecret        string
 	TokenExpiration    time.Duration
 	ApiTokenExpiration time.Duration
 	PSK                string
-	PSKAllowOrigin     string
 	Domains            string
 	LogFile            string
 	BasicAuthUser      string
@@ -148,6 +149,8 @@ func New() (Config, error) {
 
 	dbHosts := strings.Split(os.Getenv("DB_HOSTS"), ",")
 	redisAddrs := strings.Split(os.Getenv("REDIS_ADDRESSES"), ",")
+	apiTrustedProxies := strings.Split(os.Getenv("API_TRUSTED_PROXIES"), ",")
+	apiAllowIPs := strings.Split(os.Getenv("API_ALLOW_IPS"), ",")
 
 	return Config{
 		API: APIConfig{
@@ -155,11 +158,12 @@ func New() (Config, error) {
 			Name:               os.Getenv("API_NAME"),
 			Port:               os.Getenv("API_PORT"),
 			ApiAllowOrigin:     os.Getenv("API_ALLOW_ORIGIN"),
+			ApiTrustedProxies:  apiTrustedProxies,
+			ApiAllowIPs:        apiAllowIPs,
 			TokenSecret:        os.Getenv("TOKEN_SECRET"),
 			TokenExpiration:    tokenExp,
 			ApiTokenExpiration: apiTokenExp,
 			PSK:                os.Getenv("PSK"),
-			PSKAllowOrigin:     os.Getenv("PSK_ALLOW_ORIGIN"),
 			Domains:            os.Getenv("DOMAINS"),
 			LogFile:            os.Getenv("LOG_FILE"),
 			BasicAuthUser:      os.Getenv("BASIC_AUTH_USER"),

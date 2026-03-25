@@ -15,7 +15,8 @@ import (
 
 func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	email := h.Server.Group("/v1/email")
-	email.Use(auth.NewPSK(cfg))
+	email.Use(auth.NewIPFilter(cfg.ApiAllowIPs))
+	email.Use(auth.NewPSK(cfg.PSK))
 	email.Post("", h.HandleEmail)
 	email.Post("/domain/check", h.CheckDomain)
 
@@ -35,7 +36,8 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	h.Server.Post("/v1/login/finish", limiter.New(), h.FinishLogin)
 
 	sub := h.Server.Group("/v1/subscription")
-	sub.Use(auth.NewPSK(cfg))
+	sub.Use(auth.NewIPFilter(cfg.ApiAllowIPs))
+	sub.Use(auth.NewPSK(cfg.PSK))
 	sub.Post("/add", h.AddSubscription)
 
 	api := h.Server.Group("/v1/api")

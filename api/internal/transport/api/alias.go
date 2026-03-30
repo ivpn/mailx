@@ -2,6 +2,9 @@ package api
 
 import (
 	"context"
+	"encoding/csv"
+	"io"
+	"log"
 	"strconv"
 	"strings"
 
@@ -120,6 +123,83 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(list)
+}
+
+func (h *Handler) ImportAliases(c *fiber.Ctx) error {
+	// userID := auth.GetUserID(c)
+
+	// Get uploaded file
+	file, err := c.FormFile("file")
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "No file uploaded",
+		})
+	}
+
+	f, err := file.Open()
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "Failed to open file",
+		})
+	}
+	defer f.Close()
+
+	// Initialize CSV reader
+	reader := csv.NewReader(f)
+
+	// Skip the header row
+	_, err = reader.Read()
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "Failed to read CSV header",
+		})
+	}
+
+	var rows []AliasReq
+
+	// Iterate through rows
+	for {
+		record, err := reader.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return c.Status(400).JSON(fiber.Map{"error": "Error reading CSV row"})
+		}
+
+		// record[0] = alias, record[1] = description, record[2] = enabled, record[3] = recipients
+		fullAlias := record[0]
+		parts := strings.Split(fullAlias, "@")
+
+		var local, domain string
+		if len(parts) == 2 {
+			local = parts[0]
+			domain = parts[1]
+		}
+
+		req := AliasReq{
+			Description: record[1],
+			Enabled:     strings.ToLower(record[2]) == "true",
+			Recipients:  record[3],
+			LocalPart:   local,
+			Domain:      domain,
+			Format:      model.AliasFormatCustom,
+		}
+
+		// Validate alias row
+		err = h.Validator.Struct(req)
+		if err != nil {
+			return c.Status(400).JSON(fiber.Map{
+				"error": ErrInvalidRequest,
+			})
+		}
+
+		log.Printf("Parsed alias: %+v\n", req)
+
+		rows = append(rows, req)
+	}
+
+	return nil
 }
 
 // @Summary Export aliases

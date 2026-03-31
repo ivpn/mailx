@@ -281,10 +281,14 @@ const addEvents = () => {
     })
 
     const domainSelect = document.getElementById('alias_domain') as HTMLSelectElement
-    domainSelect.addEventListener('change', updateFormats)
+    if (domainSelect) {
+        domainSelect.addEventListener('change', updateFormats)
+    }
 
     const formatElement = document.getElementById('alias_format') as HTMLInputElement
-    formatElement.addEventListener('change', updateFormat)
+    if (formatElement) {
+        formatElement.addEventListener('change', updateFormat)
+    }
 }
 
 const handleKeydown = (event: KeyboardEvent) => {

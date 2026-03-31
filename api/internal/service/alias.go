@@ -21,6 +21,7 @@ var (
 	ErrDeleteAlias         = errors.New("Unable to delete alias. Please try again.")
 	ErrDeleteAliasByUserID = errors.New("Unable to delete aliases for this user.")
 	ErrDeleteAliasByDomain = errors.New("Unable to delete aliases for this domain.")
+	ErrFailedImport        = errors.New("Failed to import aliases. Please check the format and try again.")
 )
 
 type AliasStore interface {
@@ -225,16 +226,26 @@ func (s *Service) FindAlias(email string) (model.Alias, error) {
 func (s *Service) ImportAliases(ctx context.Context, aliases []model.AliasImportReq, userID string) ([]model.Alias, error) {
 	var importedAliases []model.Alias
 
+	domains, err := s.GetDomains(ctx, userID)
+	if err != nil {
+		return nil, ErrFailedImport
+	}
+
 	for _, req := range aliases {
 		rcps, err := s.GetVerifiedRecipients(ctx, req.Recipients, userID)
 		if err != nil || len(rcps) == 0 {
-			log.Printf("error importing alias: %s", err.Error())
 			continue
 		}
 
-		fqdn, err := s.GetVerifiedDomain(ctx, req.Domain, userID)
-		if err != nil {
-			log.Printf("error importing alias: %s", err.Error())
+		domainFound := false
+		for _, domain := range domains {
+			if domain.Name == req.Domain {
+				domainFound = true
+				break
+			}
+		}
+
+		if !domainFound {
 			continue
 		}
 
@@ -246,7 +257,7 @@ func (s *Service) ImportAliases(ctx context.Context, aliases []model.AliasImport
 			FromName:    req.FromName,
 		}
 
-		importedAlias, err := s.PostAlias(ctx, alias, req.Format, fqdn.Name, req.LocalPart)
+		importedAlias, err := s.PostAlias(ctx, alias, req.Format, req.Domain, req.LocalPart)
 		if err != nil {
 			log.Printf("error importing alias: %s", err.Error())
 			continue

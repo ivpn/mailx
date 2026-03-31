@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/csv"
 	"io"
-	"log"
 	"strconv"
 	"strings"
 
@@ -196,8 +195,6 @@ func (h *Handler) ImportAliases(c *fiber.Ctx) error {
 		if err != nil {
 			continue
 		}
-
-		log.Printf("Parsed alias: %+v\n", req)
 
 		rows = append(rows, req)
 	}

@@ -221,3 +221,39 @@ func (s *Service) FindAlias(email string) (model.Alias, error) {
 
 	return alias, nil
 }
+
+func (s *Service) ImportAliases(ctx context.Context, aliases []model.AliasImportReq, userID string) ([]model.Alias, error) {
+	var importedAliases []model.Alias
+
+	for _, req := range aliases {
+		rcps, err := s.GetVerifiedRecipients(ctx, req.Recipients, userID)
+		if err != nil || len(rcps) == 0 {
+			log.Printf("error importing alias: %s", err.Error())
+			continue
+		}
+
+		fqdn, err := s.GetVerifiedDomain(ctx, req.Domain, userID)
+		if err != nil {
+			log.Printf("error importing alias: %s", err.Error())
+			continue
+		}
+
+		alias := model.Alias{
+			UserID:      userID,
+			Description: req.Description,
+			Enabled:     req.Enabled,
+			Recipients:  model.GetEmails(rcps),
+			FromName:    req.FromName,
+		}
+
+		importedAlias, err := s.PostAlias(ctx, alias, req.Format, fqdn.Name, req.LocalPart)
+		if err != nil {
+			log.Printf("error importing alias: %s", err.Error())
+			continue
+		}
+
+		importedAliases = append(importedAliases, importedAlias)
+	}
+
+	return importedAliases, nil
+}

@@ -9,7 +9,7 @@
             <br>
             <code class="text-sm">
                 alias,description,enabled,recipients<br>
-                some.alias@example.net,A description,true,recipient1@provider.net recipient2@provider.net
+                some.alias@example.net,A description,true,recipient1@example.net recipient2@example.net
             </code>
         </p>
         <div class="mb-6">

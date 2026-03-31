@@ -259,7 +259,6 @@ func (s *Service) ImportAliases(ctx context.Context, aliases []model.AliasImport
 
 		importedAlias, err := s.PostAlias(ctx, alias, req.Format, req.Domain, req.LocalPart)
 		if err != nil {
-			log.Printf("error importing alias: %s", err.Error())
 			continue
 		}
 

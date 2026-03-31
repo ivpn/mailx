@@ -14,7 +14,6 @@
         </p>
         <div class="mb-6">
             <input type="file" name="csv" id="csv" accept=".csv">
-            <p class="text-sm">Only .csv files are supported.</p>
         </div>
         <div>
             <button

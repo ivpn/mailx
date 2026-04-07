@@ -1,4 +1,10 @@
+import { store } from './store'
+
 const BASE_URL = import.meta.env.VITE_API_URL
+
+function clearSession() {
+    store.clearAll()
+}
 
 async function livez() {
     const res = await fetch(`${BASE_URL}/livez`)
@@ -20,6 +26,7 @@ async function fetchAliases(apiToken: string, search = '') {
         headers: { Authorization: `Bearer ${apiToken}` },
     })
 
+    if (res.status === 401) { clearSession(); return null }
     return res.json()
 }
 
@@ -33,6 +40,7 @@ async function createAlias(apiToken: string, data: any) {
         body: JSON.stringify(data),
     })
 
+    if (res.status === 401) { clearSession(); return null }
     return res.json()
 }
 
@@ -46,6 +54,7 @@ async function updateAlias(apiToken: string, aliasId: string, data: any) {
         body: JSON.stringify(data),
     })
 
+    if (res.status === 401) { clearSession(); return null }
     return res.json()
 }
 
@@ -57,6 +66,7 @@ async function deleteAlias(apiToken: string, aliasId: string) {
         },
     })
 
+    if (res.status === 401) { clearSession(); return null }
     return res.json()
 }
 
@@ -65,6 +75,7 @@ async function fetchDefaults(apiToken: string) {
         headers: { Authorization: `Bearer ${apiToken}` },
     })
 
+    if (res.status === 401) { clearSession(); return null }
     return res.json()
 }
 
@@ -76,6 +87,7 @@ async function logout(apiToken: string) {
         },
     })
 
+    if (res.status === 401) { clearSession(); return null }
     return res.json()
 }
 
@@ -88,4 +100,5 @@ export const api = {
     deleteAlias,
     fetchDefaults,
     logout,
+    clearSession,
 }

@@ -43,7 +43,7 @@ func (s *Subscription) GracePeriod() bool {
 }
 
 func (s *Subscription) LimitedAccess() bool {
-	return s.GracePeriodDays(14) || s.OutageGracePeriodDays(14)
+	return s.GracePeriodDays(14) || (s.OutageGracePeriodDays(14) && s.IsOutage())
 }
 
 func (s *Subscription) PendingDelete() bool {

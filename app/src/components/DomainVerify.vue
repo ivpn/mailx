@@ -13,7 +13,7 @@
                         <div>
                             <div class="mb-5">
                                 <p>
-                                    Set the following DNS records for your domain. It may take some time for changes to propagate.
+                                    Set the following DNS records for your domain. It may take some time for the DNS changes to propagate.
                                 </p>
                             </div>
                             <div class="mb-5">

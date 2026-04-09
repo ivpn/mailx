@@ -55,6 +55,10 @@ func (s *Subscription) ActiveStatus() bool {
 }
 
 func (s *Subscription) IsOutage() bool {
+	if s.UpdatedAt.IsZero() {
+		return false
+	}
+
 	return s.UpdatedAt.Add(time.Duration(48) * time.Hour).Before(time.Now())
 }
 

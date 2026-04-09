@@ -127,6 +127,7 @@ const addEvents = () => {
     modal.element.on('open', () => {
         document.addEventListener('keydown', handleKeydown)
         focusFirstInput()
+        getConfig()
     })
 }
 
@@ -145,6 +146,5 @@ const handleKeydown = (event: KeyboardEvent) => {
 onMounted(() => {
     overlay.autoInit()
     addEvents()
-    getConfig()
 })
 </script>

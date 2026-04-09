@@ -22,46 +22,6 @@ func expiredSubscription() *Subscription {
 	}
 }
 
-// --- IsOutage ---
-
-func TestIsOutage(t *testing.T) {
-	tests := []struct {
-		name      string
-		updatedAt time.Time
-		want      bool
-	}{
-		{
-			name:      "updated more than 48h ago is outage",
-			updatedAt: time.Now().Add(-49 * time.Hour),
-			want:      true,
-		},
-		{
-			name:      "updated exactly 48h ago is outage",
-			updatedAt: time.Now().Add(-48 * time.Hour).Add(-time.Second),
-			want:      true,
-		},
-		{
-			name:      "updated less than 48h ago is not outage",
-			updatedAt: time.Now().Add(-1 * time.Hour),
-			want:      false,
-		},
-		{
-			name:      "updated just now is not outage",
-			updatedAt: time.Now(),
-			want:      false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			s := &Subscription{UpdatedAt: tt.updatedAt}
-			if got := s.IsOutage(); got != tt.want {
-				t.Errorf("IsOutage() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 // --- GracePeriodDays ---
 
 func TestGracePeriodDays(t *testing.T) {
@@ -491,6 +451,49 @@ func TestGetStatus(t *testing.T) {
 			}
 			if got := s.GetStatus(); got != tt.want {
 				t.Errorf("GetStatus() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestIsOutage(t *testing.T) {
+	tests := []struct {
+		name      string
+		updatedAt time.Time
+		want      bool
+	}{
+		{
+			name:      "updated more than 48h ago is outage",
+			updatedAt: time.Now().Add(-49 * time.Hour),
+			want:      true,
+		},
+		{
+			name:      "updated exactly 48h ago is outage",
+			updatedAt: time.Now().Add(-48 * time.Hour).Add(-time.Second),
+			want:      true,
+		},
+		{
+			name:      "updated less than 48h ago is not outage",
+			updatedAt: time.Now().Add(-1 * time.Hour),
+			want:      false,
+		},
+		{
+			name:      "updated just now is not outage",
+			updatedAt: time.Now(),
+			want:      false,
+		},
+		{
+			name:      "zero time is not outage",
+			updatedAt: time.Time{},
+			want:      false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &Subscription{UpdatedAt: tt.updatedAt}
+			if got := s.IsOutage(); got != tt.want {
+				t.Errorf("IsOutage() = %v, want %v", got, tt.want)
 			}
 		})
 	}

@@ -294,5 +294,6 @@ func (h *Handler) GetDefaults(c *fiber.Ctx) error {
 		"alias_format":   settings.AliasFormat,
 		"from_name":      settings.FromName,
 		"log_issues":     settings.LogIssues,
+		"remove_header":  settings.RemoveHeader,
 	})
 }

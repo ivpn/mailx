@@ -446,6 +446,20 @@ func TestGetStatus(t *testing.T) {
 			tier:        "Tier 2",
 			want:        PendingDelete,
 		},
+		{
+			name:        "status PendingDelete: ActiveUntil grace(14) valid but outage grace(14) exceeded",
+			activeUntil: time.Now().AddDate(0, 0, -5),
+			updatedAt:   time.Now().AddDate(0, 0, -15),
+			tier:        "Tier 2",
+			want:        PendingDelete,
+		},
+		{
+			name:        "status PendingDelete: ActiveUntil grace(14) exceeded, outage grace(14) valid",
+			activeUntil: time.Now().AddDate(0, 0, -15),
+			updatedAt:   time.Now().AddDate(0, 0, -5),
+			tier:        "Tier 2",
+			want:        PendingDelete,
+		},
 	}
 
 	for _, tt := range tests {
@@ -457,6 +471,108 @@ func TestGetStatus(t *testing.T) {
 			}
 			if got := s.GetStatus(); got != tt.want {
 				t.Errorf("GetStatus() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+// --- ExpiredGracePeriodDays ---
+
+func TestExpiredGracePeriodDays(t *testing.T) {
+	tests := []struct {
+		name        string
+		activeUntil time.Time
+		days        int
+		want        bool
+	}{
+		{
+			name:        "expired 15 days ago + 14-day window = expired",
+			activeUntil: time.Now().AddDate(0, 0, -15),
+			days:        14,
+			want:        true,
+		},
+		{
+			name:        "expired 13 days ago + 14-day window = not expired",
+			activeUntil: time.Now().AddDate(0, 0, -13),
+			days:        14,
+			want:        false,
+		},
+		{
+			name:        "active (future) + 14-day window = not expired",
+			activeUntil: time.Now().Add(30 * 24 * time.Hour),
+			days:        14,
+			want:        false,
+		},
+		{
+			name:        "expired 4 days ago + 3-day window = expired",
+			activeUntil: time.Now().AddDate(0, 0, -4),
+			days:        3,
+			want:        true,
+		},
+		{
+			name:        "expired 1 day ago + 3-day window = not expired",
+			activeUntil: time.Now().Add(-24 * time.Hour),
+			days:        3,
+			want:        false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &Subscription{ActiveUntil: tt.activeUntil}
+			if got := s.ExpiredGracePeriodDays(tt.days); got != tt.want {
+				t.Errorf("ExpiredGracePeriodDays(%d) = %v, want %v", tt.days, got, tt.want)
+			}
+		})
+	}
+}
+
+// --- ExpiredOutageGracePeriodDays ---
+
+func TestExpiredOutageGracePeriodDays(t *testing.T) {
+	tests := []struct {
+		name      string
+		updatedAt time.Time
+		days      int
+		want      bool
+	}{
+		{
+			name:      "updated 15 days ago + 14-day window = expired",
+			updatedAt: time.Now().AddDate(0, 0, -15),
+			days:      14,
+			want:      true,
+		},
+		{
+			name:      "updated 13 days ago + 14-day window = not expired",
+			updatedAt: time.Now().AddDate(0, 0, -13),
+			days:      14,
+			want:      false,
+		},
+		{
+			name:      "updated 1 hour ago + 14-day window = not expired",
+			updatedAt: time.Now().Add(-1 * time.Hour),
+			days:      14,
+			want:      false,
+		},
+		{
+			name:      "updated 4 days ago + 3-day window = expired",
+			updatedAt: time.Now().AddDate(0, 0, -4),
+			days:      3,
+			want:      true,
+		},
+		{
+			name:      "updated 1 day ago + 3-day window = not expired",
+			updatedAt: time.Now().Add(-24 * time.Hour),
+			days:      3,
+			want:      false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &Subscription{UpdatedAt: tt.updatedAt}
+			if got := s.ExpiredOutageGracePeriodDays(tt.days); got != tt.want {
+				t.Errorf("ExpiredOutageGracePeriodDays(%d) = %v, want %v", tt.days, got, tt.want)
 			}
 		})
 	}

@@ -63,11 +63,11 @@ func (s *Subscription) IsOutage() bool {
 }
 
 func (s *Subscription) GracePeriodDays(days int) bool {
-	return s.ActiveUntil.AddDate(0, 0, days).After(time.Now())
+	return s.ActiveUntil.AddDate(0, 0, days).After(time.Now()) && s.ActiveUntil.Before(time.Now())
 }
 
 func (s *Subscription) OutageGracePeriodDays(days int) bool {
-	return s.UpdatedAt.AddDate(0, 0, days).After(time.Now())
+	return s.UpdatedAt.AddDate(0, 0, days).After(time.Now()) && s.UpdatedAt.Before(time.Now())
 }
 
 func (s *Subscription) GetStatus() SubscriptionStatus {

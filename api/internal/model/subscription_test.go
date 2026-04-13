@@ -44,10 +44,10 @@ func TestGracePeriodDays(t *testing.T) {
 			want:        false,
 		},
 		{
-			name:        "active until tomorrow + 0 days = in grace",
+			name:        "active until tomorrow + 0 days = not in grace (not yet expired)",
 			activeUntil: time.Now().Add(24 * time.Hour),
 			days:        0,
-			want:        true,
+			want:        false,
 		},
 		{
 			name:        "active until 15 days ago + 14 days grace = outside grace",
@@ -275,6 +275,12 @@ func TestLimitedAccess(t *testing.T) {
 			name:        "not limited: both 14-day graces exceeded",
 			activeUntil: time.Now().AddDate(0, 0, -15),
 			updatedAt:   time.Now().AddDate(0, 0, -15),
+			want:        false,
+		},
+		{
+			name:        "not limited: outage grace within 14d but no outage (updatedAt recent)",
+			activeUntil: time.Now().AddDate(0, 0, -20),  // outside 14d ActiveUntil grace
+			updatedAt:   time.Now().Add(-1 * time.Hour), // within 14d outage grace but NOT an outage
 			want:        false,
 		},
 	}

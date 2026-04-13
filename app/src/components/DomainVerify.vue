@@ -30,25 +30,69 @@
                                             <tr>
                                                 <td>MX {{ 10 * (index + 1) }}</td>
                                                 <td>@</td>
-                                                <td>{{ mx_host }}.</td>
+                                                <td>
+                                                    <div class="hs-tooltip inline-block">
+                                                        <div class="hs-tooltip-toggle">
+                                                            <button class="plain truncate max-w-[320px] text-[13px] p-0" @click="copyToClipboard(mx_host + '.')">
+                                                                {{ mx_host }}.
+                                                            </button>
+                                                            <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
+                                                                {{ copyText }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </td>
                                             </tr>
                                         </template>
                                         <tr>
                                             <td>TXT</td>
                                             <td>@</td>
-                                            <td>v=spf1 include:spf.{{ config.domain }} -all</td>
+                                            <td>
+                                                <div class="hs-tooltip inline-block">
+                                                        <div class="hs-tooltip-toggle">
+                                                        <button class="plain truncate max-w-[320px] text-[13px] p-0" @click="copyToClipboard('v=spf1 include:spf.' + config.domain + ' -all')">
+                                                            v=spf1 include:spf.{{ config.domain }} -all
+                                                        </button>
+                                                        <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
+                                                            {{ copyText }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </td>
                                         </tr>
                                         <template v-for="selector in config.dkim_selectors" :key="selector">
                                             <tr>
                                                 <td>CNAME</td>
                                                 <td>{{ selector }}._domainkey</td>
-                                                <td>{{ selector }}._domainkey.{{ config.domain }}.</td>
+                                                <td>
+                                                    <div class="hs-tooltip inline-block">
+                                                        <div class="hs-tooltip-toggle">
+                                                            <button class="plain truncate max-w-[320px] text-[13px] p-0" @click="copyToClipboard(selector + '._domainkey.' + config.domain + '.')">
+                                                                {{ selector }}._domainkey.{{ config.domain }}.
+                                                            </button>
+                                                            <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
+                                                                {{ copyText }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </td>
                                             </tr>
                                         </template>
                                         <tr>
                                             <td>TXT</td>
                                             <td>_dmarc</td>
-                                            <td>v=DMARC1; p=quarantine; adkim=s</td>
+                                            <td>
+                                                <div class="hs-tooltip inline-block">
+                                                    <div class="hs-tooltip-toggle">
+                                                        <button class="plain truncate max-w-[320px] text-[13px] p-0" @click="copyToClipboard('v=DMARC1; p=quarantine; adkim=s')">
+                                                            v=DMARC1; p=quarantine; adkim=s
+                                                        </button>
+                                                        <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
+                                                            {{ copyText }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -90,10 +134,12 @@ import overlay from '@preline/overlay'
 import { domainApi } from '../api/domain.ts'
 import axios from 'axios'
 import events from '../events.ts'
+import tooltip from '@preline/tooltip'
 
 const props = defineProps(['domain'])
 const domain = ref(props.domain)
 const error = ref('')
+const copyText = ref('Click to copy')
 
 const config = ref({
     verify: '',
@@ -137,6 +183,17 @@ const addEvents = () => {
     modal.element.on('close', () => {
         close()
     })
+    modal.element.on('open', () => {
+        tooltip.autoInit()
+    })
+}
+
+const copyToClipboard = (txt: string) => {
+    navigator.clipboard.writeText(txt)
+    copyText.value = 'Copied'
+    setTimeout(() => {
+        copyText.value = 'Click to copy'
+    }, 2000)
 }
 
 onMounted(() => {

@@ -117,15 +117,15 @@ const pricingPlans = [
                     <div class="screenshot-border">
                         <!-- Light mode screenshot -->
                         <img 
-                            src="../assets/landing-screenshot-light.png" 
-                            srcset="../assets/landing-screenshot-light.png 1x, ../assets/landing-screenshot-light@2x.png 2x"
+                            src="../assets/landing-screenshot-light2.png" 
+                            srcset="../assets/landing-screenshot-light2.png 1x, ../assets/landing-screenshot-light2@2x.png 2x"
                             alt="Mailx Application Screenshot"
                             class="screenshot-image light-only"
                         />
                         <!-- Dark mode screenshot -->
                         <img 
-                            src="../assets/landing-screenshot-dark.png" 
-                            srcset="../assets/landing-screenshot-dark.png 1x, ../assets/landing-screenshot-dark@2x.png 2x"
+                            src="../assets/landing-screenshot-dark2.png" 
+                            srcset="../assets/landing-screenshot-dark2.png 1x, ../assets/landing-screenshot-dark2@2x.png 2x"
                             alt="Mailx Application Screenshot"
                             class="screenshot-image dark-only"
                         />

@@ -15,7 +15,7 @@
                     <article>
                         <div class="mb-5">
                             <p>
-                                To confirm that you own the domain, add the TXT record shown below and then click Add Domain. After the domain has been successfully added, you may remove the TXT record if you wish.
+                                To confirm that you own the domain, add the TXT record shown below and then click Add Domain. After the domain has been successfully added, you may remove the TXT record if you wish. It may take some time for the DNS changes to propagate.
                             </p>
                             <p class="break-all">
                                 DNS Record:<br>
@@ -127,6 +127,7 @@ const addEvents = () => {
     modal.element.on('open', () => {
         document.addEventListener('keydown', handleKeydown)
         focusFirstInput()
+        getConfig()
     })
 }
 
@@ -145,6 +146,5 @@ const handleKeydown = (event: KeyboardEvent) => {
 onMounted(() => {
     overlay.autoInit()
     addEvents()
-    getConfig()
 })
 </script>

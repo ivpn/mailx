@@ -154,9 +154,11 @@ const loaded = ref(false)
 
 const getSettings = async () => {
     try {
-        const response = await settingsApi.get()
+        const response = await settingsApi.getDefaults()
         req.value = response.data
         includeHeader.value = !req.value.remove_header
+        const customDomains = response.data.custom_domains.map((item: { name: string }) => item.name)
+        domains.value = [...new Set([...envDomains, ...customDomains])]
         error.value = ''
     } catch (err) {
         if (axios.isAxiosError(err)) {

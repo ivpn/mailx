@@ -19,7 +19,7 @@
         <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="card-primary">
             <div class="table-container">
                 <table>
-                    <thead class="desktop">
+                    <thead class="desktop-lg">
                         <tr>
                             <th>Created</th>
                             <th>Email</th>

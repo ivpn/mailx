@@ -181,7 +181,7 @@ const postAlias = async () => {
         events.emit('alias.create', { alias: res.alias})
         close()
     } catch (err) {
-        error.value = 'An unexpected error occurred'
+        error.value = err instanceof Error ? err.message : 'An unexpected error occurred'
         console.error('Create alias error:', err)
     } finally {
         loading.value = false

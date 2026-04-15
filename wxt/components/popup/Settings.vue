@@ -41,7 +41,7 @@ const refreshDefaults = async () => {
     } catch (err) {
         console.error('Fetch defaults error:', err)
         success.value = ''
-        error.value = 'An unexpected error occurred'
+        error.value = err instanceof Error ? err.message : 'An unexpected error occurred'
     }
 }
 
@@ -57,7 +57,7 @@ const logout = async () => {
     } catch (err) {
         console.error('Logout error:', err)
         success.value = ''
-        error.value = 'An unexpected error occurred during logout'
+        error.value = err instanceof Error ? err.message : 'An unexpected error occurred during logout'
     }
 }
 

@@ -18,7 +18,9 @@ async function authenticate(apiKey: string) {
         body: JSON.stringify({ access_key: apiKey }),
     })
 
-    return res.json()
+    const body = await res.json()
+    if (!res.ok) throw new Error(body.error ?? 'Authentication failed')
+    return body
 }
 
 async function fetchAliases(apiToken: string, search = '') {
@@ -26,8 +28,10 @@ async function fetchAliases(apiToken: string, search = '') {
         headers: { Authorization: `Bearer ${apiToken}` },
     })
 
-    if (res.status === 401) { clearSession(); return null }
-    return res.json()
+    const body = await res.json()
+    if (res.status === 401) { clearSession(); throw new Error(body.error ?? 'Unauthorized') }
+    if (!res.ok) throw new Error(body.error ?? 'Failed to fetch aliases')
+    return body
 }
 
 async function createAlias(apiToken: string, data: any) {
@@ -40,8 +44,10 @@ async function createAlias(apiToken: string, data: any) {
         body: JSON.stringify(data),
     })
 
-    if (res.status === 401) { clearSession(); return null }
-    return res.json()
+    const body = await res.json()
+    if (res.status === 401) { clearSession(); throw new Error(body.error ?? 'Unauthorized') }
+    if (!res.ok) throw new Error(body.error ?? 'Failed to create alias')
+    return body
 }
 
 async function updateAlias(apiToken: string, aliasId: string, data: any) {
@@ -54,8 +60,10 @@ async function updateAlias(apiToken: string, aliasId: string, data: any) {
         body: JSON.stringify(data),
     })
 
-    if (res.status === 401) { clearSession(); return null }
-    return res.json()
+    const body = await res.json()
+    if (res.status === 401) { clearSession(); throw new Error(body.error ?? 'Unauthorized') }
+    if (!res.ok) throw new Error(body.error ?? 'Failed to update alias')
+    return body
 }
 
 async function deleteAlias(apiToken: string, aliasId: string) {
@@ -66,8 +74,10 @@ async function deleteAlias(apiToken: string, aliasId: string) {
         },
     })
 
-    if (res.status === 401) { clearSession(); return null }
-    return res.json()
+    const body = await res.json()
+    if (res.status === 401) { clearSession(); throw new Error(body.error ?? 'Unauthorized') }
+    if (!res.ok) throw new Error(body.error ?? 'Failed to delete alias')
+    return body
 }
 
 async function fetchDefaults(apiToken: string) {
@@ -75,8 +85,10 @@ async function fetchDefaults(apiToken: string) {
         headers: { Authorization: `Bearer ${apiToken}` },
     })
 
-    if (res.status === 401) { clearSession(); return null }
-    return res.json()
+    const body = await res.json()
+    if (res.status === 401) { clearSession(); throw new Error(body.error ?? 'Unauthorized') }
+    if (!res.ok) throw new Error(body.error ?? 'Failed to fetch defaults')
+    return body
 }
 
 async function logout(apiToken: string) {
@@ -87,8 +99,10 @@ async function logout(apiToken: string) {
         },
     })
 
-    if (res.status === 401) { clearSession(); return null }
-    return res.json()
+    const body = await res.json()
+    if (res.status === 401) { clearSession(); throw new Error(body.error ?? 'Unauthorized') }
+    if (!res.ok) throw new Error(body.error ?? 'Failed to log out')
+    return body
 }
 
 export const api = {

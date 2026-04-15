@@ -75,7 +75,7 @@ const fetchAliases = async () => {
         list.value = res.aliases
         console.log('Fetched aliases:', res.aliases)
     } catch (err) {
-        error.value = 'An unexpected error occurred'
+        error.value = err instanceof Error ? err.message : 'An unexpected error occurred'
         console.error('Fetch aliases error:', err)
     } finally {
         isLoading.value = false

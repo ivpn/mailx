@@ -59,7 +59,7 @@ const loginWithAccessKey = async () => {
         processResponse(res)
         console.log('Login successful:', res)
     } catch (err) {
-        error.value = 'An unexpected error occurred'
+        error.value = err instanceof Error ? err.message : 'An unexpected error occurred'
         console.error('Login error:', err)
     } finally {
         isLoading.value = false

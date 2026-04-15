@@ -28,7 +28,7 @@
             </article>
             <footer>
                 <div>
-                    <p>To create Mailx access key, go to <a href="https://app.mailx.net/account">mailx.net</a> and look for "Access Keys" section.</p>
+                    <p>To create Mailx access key, go to <a href="https://mailx.net/account" target="_blank">mailx.net</a> and look for "Access Keys" section.</p>
                 </div>
             </footer>
         </form>

@@ -273,6 +273,7 @@ const addEvents = () => {
     modal.element.on('open', () => {
         document.addEventListener('keydown', handleKeydown)
         focusFirstInput()
+        updateFormats()
     })
 
     const multiselect = select.getInstance('#create-alias-recipient' as any, true) as any
@@ -283,6 +284,7 @@ const addEvents = () => {
     const domainSelect = document.getElementById('alias_domain') as HTMLSelectElement
     if (domainSelect) {
         domainSelect.addEventListener('change', updateFormats)
+        domainSelect.addEventListener('change', updateFormat)
     }
 
     const formatElement = document.getElementById('alias_format') as HTMLInputElement

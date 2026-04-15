@@ -3,7 +3,7 @@
         <header class="head">
             <h2>Aliases</h2>
             <div class="flex gap-3 items-center justify-between">
-                <div class="max-md:hidden relative">
+                <div class="max-lg:hidden relative">
                     <form v-if="loaded" @submit.prevent="getList" autocomplete="off">
                         <input class="search" type="text" v-model="search" placeholder="Search aliases..." id="input_search">
                     </form>
@@ -16,7 +16,7 @@
                 </button>
             </div>
         </header>
-        <div class="mb-7 tablet">
+        <div class="mb-7 tablet-lg">
             <div class="relative">
                 <form v-if="loaded" @submit.prevent="getList" autocomplete="off">
                     <input class="search" type="text" v-model="search" placeholder="Search aliases...">
@@ -44,7 +44,7 @@
         <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="card-primary">
             <div  class="table-container">
                 <table>
-                    <thead class="desktop">
+                    <thead class="desktop-lg">
                         <tr>
                             <th>Active</th>
                             <th>

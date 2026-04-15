@@ -1,6 +1,6 @@
 @layer components {
     table {
-        @apply table-auto w-full md:divide-y divide-primary;
+        @apply table-auto w-full lg:divide-y divide-primary;
 
         thead {
 
@@ -40,6 +40,21 @@
             }
 
             .tablet {
+
+                td {
+                    @apply p-0;
+
+                    &:last-child {
+                        @apply text-end px-0 pl-0;
+                    }
+                }
+
+                hr {
+                    @apply my-5;
+                }
+            }
+
+            .tablet-lg {
 
                 td {
                     @apply p-0;

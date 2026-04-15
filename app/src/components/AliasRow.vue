@@ -1,5 +1,5 @@
 <template>
-    <tr class="desktop">
+    <tr class="desktop-lg">
         <td>
             <div class="flex items-center hs-tooltip">
                 <input
@@ -90,7 +90,7 @@
             </div>
         </td>
     </tr>
-    <tr class="tablet">
+    <tr class="tablet-lg">
         <td>
             <div class="flex gap-2 justify-between">
                 <div class="text-start">
@@ -98,7 +98,7 @@
                         <p class="mb-3">{{ formatDistanceToNow(new Date(alias.created_at)) }}</p>
                     </div>
                     <div>
-                        <div class="hs-tooltip inline-block mb-5">
+                        <div class="hs-tooltip inline-block mb-5 break-all">
                             <p class="hs-tooltip-toggle mb-0">
                                 <button class="plain truncate text-base p-0 text-wrap text-start" @click="copyAlias(alias.name)">
                                     <span v-if="alias.description">{{ truncatedDescription }}<br></span>

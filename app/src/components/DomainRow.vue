@@ -1,5 +1,5 @@
 <template>
-    <tr class="desktop">
+    <tr class="desktop-lg">
         <td>
             <p>{{ new Date(domain.created_at).toDateString() }}</p>
         </td>
@@ -43,7 +43,7 @@
             </div>
         </td>
     </tr>
-    <tr class="tablet">
+    <tr class="tablet-lg">
         <td>
             <div class="flex gap-2 justify-between">
                 <div class="text-start">

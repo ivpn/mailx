@@ -19,8 +19,41 @@
                             </p>
                             <p class="break-all">
                                 DNS Record:<br>
-                                <span class="text-black dark:text-white">TXT @ mailx-verify={{ config.verify }}</span>
                             </p>
+                        </div>
+                        <div class="mb-5">
+                            <table class="sm desktop">
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Host</th>
+                                        <th>Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>TXT</td>
+                                        <td>@</td>
+                                        <td>
+                                            <div class="hs-tooltip break-all">
+                                                <div class="hs-tooltip-toggle">
+                                                    <button class="plain max-w-[320px] text-[13px] p-0   plain truncate text-wrap text-end" @click="copyToClipboard('mailx-verify=' + config.verify)">
+                                                        mailx-verify={{ config.verify }}
+                                                    </button>
+                                                    <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
+                                                        {{ copyText }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="tablet">
+                                <p class="font-secondary text-sm leading-[2rem] text-black dark:text-white">
+                                    TXT @ mailx-verify={{ config.verify }}
+                                </p>
+                            </div>
                         </div>
                         <div class="mb-5">
                             <label for="domain_name">
@@ -59,6 +92,7 @@ import overlay from '@preline/overlay'
 import axios from 'axios'
 import { domainApi } from '../api/domain.ts'
 import events from '../events.ts'
+import tooltip from '@preline/tooltip'
 
 const config = ref({
     verify: '',
@@ -68,6 +102,7 @@ const domain = ref({
 })
 const error = ref('')
 const nameError = ref(false)
+const copyText = ref('Click to copy')
 
 const validateName = () => {
     nameError.value = !domain.value.name
@@ -78,6 +113,9 @@ const getConfig = async () => {
     try {
         const res = await domainApi.getConfig()
         config.value = res.data
+        setTimeout(() => {
+            tooltip.autoInit()
+        }, 0)
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.response?.data.error || err.message
@@ -128,6 +166,7 @@ const addEvents = () => {
         document.addEventListener('keydown', handleKeydown)
         focusFirstInput()
         getConfig()
+        tooltip.autoInit()
     })
 }
 
@@ -141,6 +180,14 @@ const handleKeydown = (event: KeyboardEvent) => {
         event.preventDefault()
         postDomain()
     }
+}
+
+const copyToClipboard = (txt: string) => {
+    navigator.clipboard.writeText(txt)
+    copyText.value = 'Copied'
+    setTimeout(() => {
+        copyText.value = 'Click to copy'
+    }, 2000)
 }
 
 onMounted(() => {

@@ -23,9 +23,9 @@
                     <div class="flex items-center">
                         <input @change="updateAlias(alias)" v-bind:checked="alias.enabled" type="checkbox" class="xs">
                     </div>
-                    <div class="grow min-w-24">
+                    <div class="grow min-w-24 break-all">
                         <p class="m-0 min-width-0 text-primary font-medium text-base text-nowrap overflow-hidden text-ellipsis">{{ alias.name }}</p>
-                        <p class="m-0">{{ alias.description }}</p>
+                        <p class="m-0">{{ truncatedDescription(alias) }}</p>
                     </div>
                     <div class="hs-tooltip">
                         <button class="hs-tooltip-toggle plain" @click="copyAlias(alias.name)">
@@ -64,6 +64,12 @@ const error = ref<string | null>(null)
 const copyText = ref('Click to copy')
 const search = ref('')
 const searchQuery = ref('')
+
+const truncatedDescription = (alias: Alias) => {
+    const desc = alias.description
+    if (!desc) return ''
+    return desc.length > 45 ? desc.slice(0, 45) + '...' : desc
+}
 
 const fetchAliases = async () => {
     error.value = null

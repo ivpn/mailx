@@ -30,8 +30,8 @@
             </button>
         </div>
         <p v-if="error" class="error">Error: {{ error }}</p>
-        <p v-if="success.count > 0" class="success">Successfully imported {{ success.count }} aliases.</p>
-        <p v-if="success.count === 0 && success.message" class="success">0 aliases imported.</p>
+        <p v-if="success.count > 0" class="success">Successfully imported {{ success.count }} aliases</p>
+        <p v-if="success.count === 0 && success.message" class="success">0 aliases imported</p>
     </div>
 </template>
 

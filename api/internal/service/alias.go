@@ -153,6 +153,18 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 		return alias, nil
 	}
 
+	// Custom alias with custom domain
+	if format == model.AliasFormatCustom {
+		alias.Name = model.GenerateAlias(format, localPart) + "@" + domain
+		alias, err = s.Store.PostAlias(ctx, alias)
+		if err != nil {
+			log.Printf("error creating custom alias: %s", err.Error())
+			return model.Alias{}, ErrPostAlias
+		}
+
+		return alias, nil
+	}
+
 	// Standard alias
 	for range 5 {
 		alias.Name = model.GenerateAlias(format, localPart) + "@" + domain
@@ -227,6 +239,10 @@ func (s *Service) ImportAliases(ctx context.Context, aliases []model.AliasImport
 
 	domains, err := s.GetDomains(ctx, userID)
 	if err != nil {
+		return nil, ErrFailedImport
+	}
+
+	if len(aliases) > 500 {
 		return nil, ErrFailedImport
 	}
 

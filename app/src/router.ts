@@ -158,7 +158,7 @@ router.beforeEach((to, _) => {
 
     // Redirect logged-in users away from login/signup
     if ((to.path === '/login' || to.path === '/signup') && isLoggedIn()) {
-        return { name: AppName }
+        return { path: '/account' }
     }
 })
 

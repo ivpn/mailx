@@ -47,7 +47,15 @@ func (s *Subscription) LimitedAccess() bool {
 }
 
 func (s *Subscription) PendingDelete() bool {
-	return !s.GracePeriodDays(14) || !s.OutageGracePeriodDays(14)
+	if s.UpdatedAt.AddDate(0, 0, 14).Before(time.Now()) {
+		return true
+	}
+
+	if s.ActiveUntil.AddDate(0, 0, 14).Before(time.Now()) {
+		return true
+	}
+
+	return false
 }
 
 func (s *Subscription) ActiveStatus() bool {
@@ -70,14 +78,6 @@ func (s *Subscription) OutageGracePeriodDays(days int) bool {
 	return s.UpdatedAt.AddDate(0, 0, days).After(time.Now()) && s.UpdatedAt.Before(time.Now())
 }
 
-func (s *Subscription) ExpiredGracePeriodDays(days int) bool {
-	return s.ActiveUntil.AddDate(0, 0, days).Before(time.Now())
-}
-
-func (s *Subscription) ExpiredOutageGracePeriodDays(days int) bool {
-	return s.UpdatedAt.AddDate(0, 0, days).Before(time.Now())
-}
-
 func (s *Subscription) GetStatus() SubscriptionStatus {
 	if s.Active() {
 		return Active
@@ -85,7 +85,7 @@ func (s *Subscription) GetStatus() SubscriptionStatus {
 	if s.GracePeriod() {
 		return GracePeriod
 	}
-	if s.ExpiredGracePeriodDays(14) || s.ExpiredOutageGracePeriodDays(14) {
+	if s.PendingDelete() {
 		return PendingDelete
 	}
 	if s.LimitedAccess() {

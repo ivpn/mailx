@@ -208,11 +208,13 @@ const loading = ref(false)
 const postAlias = async () => {
     if (loading.value) return
 
+    alias.value.recipients = selectRecipients.value.join(',')
+    if (!validate(alias.value.recipients)) return
+
     const select = document.getElementById('alias_domain') as HTMLSelectElement
     const selectedOption = select.options[select.selectedIndex]
     const domain = selectedOption.getAttribute('domain')
     alias.value.domain = domain
-    alias.value.recipients = selectRecipients.value.join(',')
     alias.value.enabled = true
     
     if (props.catchAll) {
@@ -223,8 +225,6 @@ const postAlias = async () => {
             alias.value.format = formatElement.value;
         }
     }
-
-    if (!validate(alias.value.recipients)) return
 
     try {
         loading.value = true

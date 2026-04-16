@@ -13,6 +13,18 @@
                     </header>
                     <article>
                         <div>
+                            <div v-if="alias.format === 'custom'" class="pb-3">
+                                <label for="alias_custom_alias">
+                                    Custom alias (6-12 alphanumeric chars.):
+                                </label>
+                                <input 
+                                    v-model="alias.local_part"
+                                    v-bind:class="{ 'error': errorLocalPart }"
+                                    id="alias_custom_alias"
+                                    type="text"
+                                >
+                                <p v-if="errorLocalPart" class="error">Custom alias must be between 6 and 12 characters</p>
+                            </div>
                             <div class="pb-3">
                                 <label for="alias_description">
                                     Description (optional)
@@ -81,6 +93,10 @@
                                                 <option v-for="(domain, index) in defaults.domains" v-bind:domain
                                                     :selected="domain == defaults.domain || index === 0" :key="domain">
                                                     {{ domain }}
+                                                </option>
+                                                <option v-for="(domain, _) in defaults.custom_domains" v-bind:domain.attribute:value="domain.id"
+                                                    :selected="domain.name == alias.domain" :key="domain.id">
+                                                    {{ domain.name }}
                                                 </option>
                                             </select>
                                         </div>
@@ -156,12 +172,16 @@ const formats = ref([{
 }])
 const error = ref('')
 const errorRecipients = ref('')
+const errorLocalPart = ref(false)
 const loading = ref(false)
 
 const postAlias = async () => {
     if (loading.value) return
 
-    alias.value.domain = (document.getElementById('alias_domain') as HTMLInputElement).value
+    const select = document.getElementById('alias_domain') as HTMLSelectElement
+    const selectedOption = select.options[select.selectedIndex]
+    const domain = selectedOption.getAttribute('domain')
+    alias.value.domain = domain || ''
     alias.value.recipients = selectRecipients.value.join(',')
     alias.value.enabled = true
     
@@ -191,6 +211,7 @@ const postAlias = async () => {
 const close = () => {
     resetAlias()
     error.value = ''
+    errorLocalPart.value = false
 
     document.removeEventListener('keydown', handleKeydown)
 
@@ -214,12 +235,24 @@ const addEvents = () => {
     modal.element.on('open', () => {
         document.addEventListener('keydown', handleKeydown)
         focusFirstInput()
+        updateFormats()
     })
 
     const multiselect = select.getInstance('#create-alias-recipient' as any, true) as any
     multiselect.element.on('change', (val: any) => {
         errorRecipients.value = val.length === 0 ? 'Select one or more recipients' : ''
     })
+
+    const domainSelect = document.getElementById('alias_domain') as HTMLSelectElement
+    if (domainSelect) {
+        domainSelect.addEventListener('change', updateFormats)
+        domainSelect.addEventListener('change', updateFormat)
+    }
+
+    const formatElement = document.getElementById('alias_format') as HTMLInputElement
+    if (formatElement) {
+        formatElement.addEventListener('change', updateFormat)
+    }
 }
 
 const handleKeydown = (event: KeyboardEvent) => {
@@ -240,7 +273,18 @@ const validate = (rcps: string) => {
         return false
     }
 
-    return true
+    if (alias.value.format === 'custom') {
+        if (!alias.value.local_part) {
+            errorLocalPart.value = true
+            return false
+        }
+
+        errorLocalPart.value = alias.value.local_part.length < 6 || alias.value.local_part.length > 12
+    } else {
+        errorLocalPart.value = false
+    }
+
+    return !errorLocalPart.value
 }
 
 const resetAlias = () => {
@@ -253,6 +297,45 @@ const resetAlias = () => {
 
 const copyAlias = (alias: string) => {
     navigator.clipboard.writeText(alias)
+}
+
+const updateFormats = () => {
+    const select = document.getElementById('alias_domain') as HTMLSelectElement
+    const selectedOption = select.options[select.selectedIndex]
+    const domain = selectedOption.getAttribute('domain')
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(domain || '')
+
+    if (isUUID) {
+        formats.value = [{
+            name: 'Words',
+            value: 'words'
+        }, {
+            name: 'Random',
+            value: 'random'
+        }, {
+            name: 'UUID',
+            value: 'uuid'
+        }, {
+            name: 'Custom',
+            value: 'custom'
+        }]
+    } else {
+        formats.value = [{
+            name: 'Words',
+            value: 'words'
+        }, {
+            name: 'Random',
+            value: 'random'
+        }, {
+            name: 'UUID',
+            value: 'uuid'
+        }]
+    }
+}
+
+const updateFormat = () => {
+    const formatElement = document.getElementById('alias_format') as HTMLInputElement
+    alias.value.format = formatElement.value
 }
 
 onMounted(async () => {

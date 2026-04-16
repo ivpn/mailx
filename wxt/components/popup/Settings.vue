@@ -65,6 +65,7 @@ const processResponse = (res: any) => {
     const defaults = {
         domain: res.domain,
         domains: res.domains,
+        custom_domains: res.custom_domains,
         recipient: res.recipient,
         recipients: res.recipients,
         alias_format: res.alias_format,

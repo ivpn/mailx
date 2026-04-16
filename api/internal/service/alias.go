@@ -231,6 +231,10 @@ func (s *Service) ImportAliases(ctx context.Context, aliases []model.AliasImport
 		return nil, ErrFailedImport
 	}
 
+	if len(aliases) > 500 {
+		return nil, ErrFailedImport
+	}
+
 	for _, req := range aliases {
 		rcps, err := s.GetVerifiedRecipients(ctx, req.Recipients, userID)
 		if err != nil || len(rcps) == 0 {

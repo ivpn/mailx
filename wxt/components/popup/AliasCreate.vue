@@ -184,7 +184,6 @@ const postAlias = async () => {
     const select = document.getElementById('alias_domain') as HTMLSelectElement
     const selectedOption = select.options[select.selectedIndex]
     const domain = selectedOption.getAttribute('domain')
-    alias.value.domain = domain || ''
     alias.value.enabled = true
     
     const formatElement = document.getElementById('alias_format') as HTMLInputElement;
@@ -192,9 +191,12 @@ const postAlias = async () => {
         alias.value.format = formatElement.value;
     }
 
+    let req = { ...alias.value }
+    req.domain = domain  || ''
+
     try {
         loading.value = true
-        const res = await api.createAlias(props.apiToken, alias.value)
+        const res = await api.createAlias(props.apiToken, req)
         console.log('Created alias:', res)
         copyAlias(res.alias.name)
         error.value = ''

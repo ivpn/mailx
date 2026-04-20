@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { userApi } from '../api/user.ts'
 
 const signupUrl = import.meta.env.VITE_RESYNC_URL
 
@@ -7,6 +8,15 @@ const isLoggedIn = computed(() => {
     const email = localStorage.getItem('email')
     return email !== null && email.trim() !== ''
 })
+
+const logout = async () => {
+    if (!confirm('Do you want to proceed with the logout?')) return
+
+    try {
+        await userApi.logout()
+        userApi.clearSession()
+    } catch { }
+}
 
 // --- Hero -------------------------------------------------------------------
 const heroFeatures = [
@@ -71,9 +81,9 @@ const pricingPlans = [
                     <router-link to="/account" class="landing-btn landing-btn-signup">
                         [DASHBOARD]
                     </router-link>
-                    <router-link to="/logout" class="landing-btn landing-btn-login">
+                    <a @click="logout" class="landing-btn landing-btn-login" style="cursor:pointer">
                         [LOG OUT]
-                    </router-link>
+                    </a>
                 </template>
                 <template v-else>
                     <a :href="signupUrl" class="landing-btn landing-btn-signup" target="_blank">

@@ -22,6 +22,7 @@ var (
 	ErrDeleteAliasByUserID = errors.New("Unable to delete aliases for this user.")
 	ErrDeleteAliasByDomain = errors.New("Unable to delete aliases for this domain.")
 	ErrFailedImport        = errors.New("Failed to import aliases. Please check the format and try again.")
+	ErrFailedImportLimit   = errors.New("Failed to import aliases. You can only import up to 500 aliases at a time.")
 )
 
 type AliasStore interface {
@@ -244,7 +245,7 @@ func (s *Service) ImportAliases(ctx context.Context, aliases []model.AliasImport
 	}
 
 	if len(aliases) > 500 {
-		return nil, ErrFailedImport
+		return nil, ErrFailedImportLimit
 	}
 
 	for _, req := range aliases {

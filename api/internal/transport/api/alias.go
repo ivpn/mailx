@@ -202,7 +202,7 @@ func (h *Handler) ImportAliases(c *fiber.Ctx) error {
 	aliases, err := h.Service.ImportAliases(c.Context(), rows, userID)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
-			"error": ErrFailedImport,
+			"error": err.Error(),
 		})
 	}
 

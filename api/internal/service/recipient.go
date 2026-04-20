@@ -13,14 +13,16 @@ import (
 )
 
 var (
-	ErrGetRecipient            = errors.New("Unable to retrieve recipient by ID.")
-	ErrGetRecipients           = errors.New("Unable to retrieve recipients by user ID.")
-	ErrPostRecipient           = errors.New("Unable to create recipient.")
-	ErrMaxExceededRecipient    = errors.New("Maximum number of allowed recipients reached.")
-	ErrUpdateRecipient         = errors.New("Unable to update recipient.")
-	ErrDeleteRecipient         = errors.New("Unable to delete recipient.")
-	ErrDeleteRecipientByUserID = errors.New("Unable to delete recipient for this user.")
-	ErrActivateRecipient       = errors.New("Unable to activate recipient.")
+	ErrGetRecipient               = errors.New("Unable to retrieve recipient by ID.")
+	ErrGetRecipients              = errors.New("Unable to retrieve recipients by user ID.")
+	ErrPostRecipient              = errors.New("Unable to create recipient.")
+	ErrPostRecipientInactiveSub   = errors.New("Your subscription is not active. Please renew to create new recipients.")
+	ErrMaxExceededRecipient       = errors.New("Maximum number of allowed recipients reached.")
+	ErrUpdateRecipient            = errors.New("Unable to update recipient.")
+	ErrUpdateRecipientInactiveSub = errors.New("Your subscription is not active. Please renew to update recipients.")
+	ErrDeleteRecipient            = errors.New("Unable to delete recipient.")
+	ErrDeleteRecipientByUserID    = errors.New("Unable to delete recipient for this user.")
+	ErrActivateRecipient          = errors.New("Unable to activate recipient.")
 )
 
 type RecipientsStore interface {
@@ -86,7 +88,7 @@ func (s *Service) PostRecipient(ctx context.Context, recipient model.Recipient) 
 
 	if !sub.ActiveStatus() {
 		log.Println("error creating recipient: subscription is not active")
-		return ErrPostRecipient
+		return ErrPostRecipientInactiveSub
 	}
 
 	count, err := s.Store.GetRecipientsCount(ctx, recipient.UserID)
@@ -180,7 +182,7 @@ func (s *Service) UpdateRecipient(ctx context.Context, recipient model.Recipient
 
 	if !sub.ActiveStatus() {
 		log.Println("error updating recipient: subscription is not active")
-		return ErrUpdateRecipient
+		return ErrUpdateRecipientInactiveSub
 	}
 
 	err = s.Store.UpdateRecipient(ctx, recipient)

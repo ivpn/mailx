@@ -121,7 +121,7 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 		return model.Alias{}, ErrPostAlias
 	}
 
-	if count >= s.Cfg.Service.MaxDailyAliases {
+	if count >= s.Cfg.Service.MaxDailyAliases && format != model.AliasFormatCustom {
 		return model.Alias{}, ErrPostAliasLimit
 	}
 

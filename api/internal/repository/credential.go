@@ -51,7 +51,21 @@ func (d *Database) UpdateCredential(ctx context.Context, credential webauthn.Cre
 		return err
 	}
 
-	return d.Client.Model(&model.Credential{}).Where("user_id = ?", userID).Update("data", data).Error
+	var credentials []model.Credential
+	if err = d.Client.Where("user_id = ?", userID).Find(&credentials).Error; err != nil {
+		return err
+	}
+
+	for i := range credentials {
+		if err = credentials[i].Unmarshal(); err != nil {
+			continue
+		}
+		if bytes.Equal(credentials[i].CredID, credential.ID) {
+			return d.Client.Model(&model.Credential{}).Where("id = ? AND user_id = ?", credentials[i].ID, userID).Update("data", data).Error
+		}
+	}
+
+	return nil
 }
 
 func (d *Database) DeleteCredential(ctx context.Context, credential webauthn.Credential, userID string) error {

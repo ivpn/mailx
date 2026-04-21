@@ -10,19 +10,6 @@
                         </h1>
                         <h4 class="text-center mb-8">Log in with Passkey</h4>
                         <div>
-                            <div class="mb-7">
-                                <input
-                                    v-model="emailAuthn"
-                                    v-bind:class="{ 'error': emailAuthnError }"
-                                    id="email_authn"
-                                    type="email"
-                                    placeholder="Email Address"
-                                    class="email"
-                                    autocomplete="false"
-                                    @keypress.enter.prevent
-                                >
-                                <p v-if="emailAuthnError" class="error">Required</p>
-                            </div>
                             <div class="flex items-center w-full">
                                 <button :disabled="isLoading" @click="loginWithPasskey" class="cta full">
                                     Log in with Passkey
@@ -132,11 +119,9 @@ import tabs from '@preline/tabs'
 import Footer from './Footer.vue'
 
 const email = ref('')
-const emailAuthn = ref('')
 const password = ref('')
 const otp = ref('')
 const emailError = ref(false)
-const emailAuthnError = ref(false)
 const passwordError = ref(false)
 const otpError = ref(false)
 const otpRequired = ref(false)
@@ -148,11 +133,6 @@ const signupSuccess = ref('')
 const validateEmail = () => {
     emailError.value = !email.value
     return !emailError.value
-}
-
-const validateEmailAuthn = () => {
-    emailAuthnError.value = !emailAuthn.value
-    return !emailAuthnError.value
 }
 
 const validatePassword = () => {
@@ -210,17 +190,11 @@ const login = async () => {
 }
 
 const loginWithPasskey = async () => {
-    if (!validateEmailAuthn()) return
-
     isLoading.value = true // Start loading
 
-    const data = {
-        email: emailAuthn.value
-    }
-
     try {
-        var res = await userApi.loginBegin(data)
-        startAuth(data, res)
+        var res = await userApi.loginBegin()
+        startAuth(res)
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.response?.data.error || err.message
@@ -234,14 +208,14 @@ const loginWithPasskey = async () => {
     }
 }
 
-const startAuth = async (data: any, res: any) => {
+const startAuth = async (res: any) => {
     try {
         const creds = await startAuthentication({ optionsJSON: res.data['publicKey'] })
         res = await userApi.loginFinish(creds)
         error.value = ''
         if (res.status === 200) {
             // Redirect to the dashboard
-            localStorage.setItem('email', data.email)
+            localStorage.setItem('email', res.data.email ?? '')
             window.location.href = '/'
         }
     } catch (err: Error) {

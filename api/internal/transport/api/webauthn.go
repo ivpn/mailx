@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/go-webauthn/webauthn/webauthn"
@@ -363,45 +364,11 @@ func (h *Handler) FinishAddPasskey(c *fiber.Ctx) error {
 // @Failure 400 {object} ErrorRes
 // @Router /login/begin [post]
 func (h *Handler) BeginLogin(c *fiber.Ctx) error {
-	// Parse the request
-	req := EmailReq{}
-	err := c.BodyParser(&req)
+	// Begin discoverable login (no email required)
+	options, sessionData, err := h.WebAuthn.BeginDiscoverableLogin()
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
-			"error": ErrInvalidRequest,
-		})
-	}
-
-	// Validate the request
-	err = h.Validator.Struct(req)
-	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"error": ErrInvalidRequest,
-		})
-	}
-
-	// Get user
-	user, err := h.Service.GetUserByEmail(c.Context(), req.Email)
-	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"error": ErrGetUser,
-		})
-	}
-
-	// Check max sessions limit
-	ok, err := h.Service.CheckSessionCount(c.Context(), user.ID)
-	if !ok || err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"error": ErrTooManySessions,
-		})
-	}
-
-	// Begin login
-	options, sessionData, err := h.WebAuthn.BeginLogin(user)
-	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"error": err.Error(),
-			"code":  70002,
+			"error": ErrBeginLogin,
 		})
 	}
 
@@ -414,7 +381,7 @@ func (h *Handler) BeginLogin(c *fiber.Ctx) error {
 		})
 	}
 	sessionData.Expires = exp
-	err = h.Service.SaveSession(c.Context(), *sessionData, token, user.ID, exp)
+	err = h.Service.SaveSession(c.Context(), *sessionData, token, "", exp)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrSaveSession,
@@ -447,15 +414,7 @@ func (h *Handler) FinishLogin(c *fiber.Ctx) error {
 		})
 	}
 
-	// Get user
-	user, err := h.Service.GetUser(c.Context(), session.UserID)
-	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"error": err.Error(),
-		})
-	}
-
-	// Finish login
+	// Finish discoverable login
 	r, err := adaptor.ConvertRequest(c, true)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -463,7 +422,20 @@ func (h *Handler) FinishLogin(c *fiber.Ctx) error {
 		})
 	}
 
-	credential, err := h.WebAuthn.FinishLogin(user, session.SessionData, r)
+	var foundUser model.User
+	handler := func(rawID, userHandle []byte) (webauthn.User, error) {
+		if len(userHandle) == 0 {
+			return nil, fmt.Errorf("user handle is missing")
+		}
+		u, err := h.Service.GetUser(c.Context(), string(userHandle))
+		if err != nil {
+			return nil, err
+		}
+		foundUser = u
+		return u, nil
+	}
+
+	credential, err := h.WebAuthn.FinishDiscoverableLogin(handler, session.SessionData, r)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
@@ -476,8 +448,16 @@ func (h *Handler) FinishLogin(c *fiber.Ctx) error {
 		})
 	}
 
+	// Check max sessions limit
+	sessionOk, err := h.Service.CheckSessionCount(c.Context(), foundUser.ID)
+	if !sessionOk || err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrTooManySessions,
+		})
+	}
+
 	// Update user credential
-	err = h.Service.UpdateCredential(c.Context(), *credential, user.ID)
+	err = h.Service.UpdateCredential(c.Context(), *credential, foundUser.ID)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
@@ -498,7 +478,7 @@ func (h *Handler) FinishLogin(c *fiber.Ctx) error {
 	// Save the session
 	exp := time.Now().Add(h.Cfg.TokenExpiration)
 	sessionData := webauthn.SessionData{
-		UserID:  user.WebAuthnID(),
+		UserID:  foundUser.WebAuthnID(),
 		Expires: exp,
 	}
 	token, err = model.GenSessionToken()
@@ -507,7 +487,7 @@ func (h *Handler) FinishLogin(c *fiber.Ctx) error {
 			"error": ErrSaveSession,
 		})
 	}
-	err = h.Service.SaveSession(c.Context(), sessionData, token, user.ID, exp)
+	err = h.Service.SaveSession(c.Context(), sessionData, token, foundUser.ID, exp)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrSaveSession,
@@ -519,6 +499,7 @@ func (h *Handler) FinishLogin(c *fiber.Ctx) error {
 
 	return c.Status(200).JSON(fiber.Map{
 		"message": FinishLoginSuccess,
+		"email":   foundUser.Email,
 	})
 }
 

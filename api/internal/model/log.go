@@ -5,9 +5,10 @@ import "time"
 type LogType string
 
 const (
-	BounceMessage    LogType = "bounce"
-	DisabledAlias    LogType = "disabled_alias"
-	UnauthorisedSend LogType = "unauthorised_send"
+	BounceMessage        LogType = "bounce"
+	DisabledAlias        LogType = "disabled_alias"
+	UnauthorisedSend     LogType = "unauthorised_send"
+	InactiveSubscription LogType = "inactive_subscription"
 )
 
 type Log struct {

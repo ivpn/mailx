@@ -3,7 +3,7 @@
         <header class="head">
             <h2>Aliases</h2>
             <div class="flex gap-3 items-center justify-between">
-                <div class="max-md:hidden relative">
+                <div class="max-lg:hidden relative">
                     <form v-if="loaded" @submit.prevent="getList" autocomplete="off">
                         <input class="search" type="text" v-model="search" placeholder="Search aliases..." id="input_search">
                     </form>
@@ -16,7 +16,7 @@
                 </button>
             </div>
         </header>
-        <div class="mb-7 tablet">
+        <div class="mb-7 tablet-lg">
             <div class="relative">
                 <form v-if="loaded" @submit.prevent="getList" autocomplete="off">
                     <input class="search" type="text" v-model="search" placeholder="Search aliases...">
@@ -44,9 +44,9 @@
         <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="card-primary">
             <div  class="table-container">
                 <table>
-                    <thead class="desktop">
+                    <thead class="desktop-lg">
                         <tr>
-                            <th>Status</th>
+                            <th>Active</th>
                             <th>
                                 <button
                                 @click="sort"
@@ -108,7 +108,6 @@
 import { onMounted, onUnmounted, ref } from 'vue'
 import axios from 'axios'
 import { aliasApi } from '../api/alias'
-import { recipientApi } from '../api/recipient.ts'
 import { settingsApi } from '../api/settings.ts'
 import AliasRow from './AliasRow.vue'
 import AliasCreate from './AliasCreate.vue'
@@ -137,6 +136,8 @@ const recipients = ref([])
 const settings = ref({
     id: '',
     domain: '',
+    domains: [],
+    custom_domains: [],
     recipient: '',
     from_name: ''
 })
@@ -181,23 +182,11 @@ const getList = async () => {
     }
 }
 
-const getRecipients = async () => {
-    try {
-        const res = await recipientApi.getList()
-        const list = res.data.filter((item: { is_active: boolean }) => item.is_active)
-        recipients.value = list.map((recipient: { email: string }) => recipient.email)
-        error.value = ''
-    } catch (err) {
-        if (axios.isAxiosError(err)) {
-            error.value = err.message
-        }
-    }
-}
-
 const getSettings = async () => {
     try {
-        const res = await settingsApi.get()
+        const res = await settingsApi.getDefaults()
         settings.value = res.data
+        recipients.value = res.data.recipients
         error.value = ''
     } catch (err) {
         if (axios.isAxiosError(err)) {
@@ -274,7 +263,6 @@ const handleKeydown = (event: KeyboardEvent) => {
 }
 
 onMounted(async () => {
-    await getRecipients()
     await getSettings()
     fetch()
     events.on('alias.create', fetch)

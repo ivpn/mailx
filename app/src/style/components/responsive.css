@@ -10,4 +10,12 @@
     .desktop {
         @apply max-md:hidden;
     }
+
+    .tablet-lg {
+        @apply lg:hidden;
+    }
+
+    .desktop-lg {
+        @apply max-lg:hidden;
+    }
 }

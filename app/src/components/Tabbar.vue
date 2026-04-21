@@ -11,6 +11,9 @@
                 <router-link v-bind:class="{ 'active': route == '/recipients' }" to="/recipients" title="Recipients">
                     <i class="icon inbox icon-primary"></i>
                 </router-link>
+                <router-link v-bind:class="{ 'active': route == '/domains' }" to="/domains" title="Domains">
+                    <i class="icon global icon-primary"></i>
+                </router-link>
                 <router-link v-bind:class="{ 'active': route == '/stats' }" to="/stats" title="Stats">
                     <i class="icon chart icon-primary"></i>
                 </router-link>

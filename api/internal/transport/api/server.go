@@ -22,6 +22,7 @@ type Service interface {
 	CredentialService
 	LogService
 	AccessKeyService
+	DomainService
 }
 
 type Handler struct {

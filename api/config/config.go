@@ -50,14 +50,15 @@ type RedisConfig struct {
 }
 
 type SMTPClientConfig struct {
-	Host        string
-	Port        string
-	User        string
-	Password    string
-	Sender      string
-	SenderName  string
-	Report      string
-	TokenSecret string
+	Host         string
+	Port         string
+	User         string
+	Password     string
+	Sender       string
+	SenderName   string
+	DkimSelector string
+	Report       string
+	TokenSecret  string
 }
 
 type ServiceConfig struct {
@@ -192,14 +193,15 @@ func New() (Config, error) {
 			TLSInsecureSkipVerify: os.Getenv("REDIS_TLS_INSECURE_SKIP_VERIFY") == "true",
 		},
 		SMTPClient: SMTPClientConfig{
-			Host:        os.Getenv("SMTP_CLIENT_HOST"),
-			Port:        os.Getenv("SMTP_CLIENT_PORT"),
-			User:        os.Getenv("SMTP_CLIENT_USER"),
-			Password:    os.Getenv("SMTP_CLIENT_PASSWORD"),
-			Sender:      os.Getenv("SMTP_CLIENT_SENDER"),
-			SenderName:  os.Getenv("SMTP_CLIENT_SENDER_NAME"),
-			Report:      os.Getenv("SMTP_CLIENT_REPORT"),
-			TokenSecret: os.Getenv("TOKEN_SECRET"),
+			Host:         os.Getenv("SMTP_CLIENT_HOST"),
+			Port:         os.Getenv("SMTP_CLIENT_PORT"),
+			User:         os.Getenv("SMTP_CLIENT_USER"),
+			Password:     os.Getenv("SMTP_CLIENT_PASSWORD"),
+			Sender:       os.Getenv("SMTP_CLIENT_SENDER"),
+			SenderName:   os.Getenv("SMTP_CLIENT_SENDER_NAME"),
+			DkimSelector: os.Getenv("SMTP_CLIENT_DKIM_SELECTOR"),
+			Report:       os.Getenv("SMTP_CLIENT_REPORT"),
+			TokenSecret:  os.Getenv("TOKEN_SECRET"),
 		},
 
 		Service: ServiceConfig{

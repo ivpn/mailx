@@ -1,20 +1,17 @@
 <template>
     <div class="card-container">
         <header class="head">
-            <h2>Recipients</h2>
+            <h2>Domains</h2>
             <div class="flex items-center justify-between">
-                <RecipientCreate />
+                <DomainCreate />
             </div>
         </header>
         <div v-if="!list.length && loaded" class="card-empty">
             <span class="bg-secondary rounded flex items-center justify-center p-2 mb-5">
-                <i class="icon inbox icon-accent text-2xl"></i>
+                <i class="icon global icon-accent text-2xl"></i>
             </span>
-            <h4 class="mb-6">You have no recipients yet</h4>
-            <p class="text-tertiary mb-6">
-                <router-link to="/account">Verify</router-link> your primary email address or add a new recipient address.
-            </p>
-            <RecipientCreate />
+            <h4 class="mb-6">You have no domains yet</h4>
+            <DomainCreate />
         </div>
         <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="card-primary">
             <div class="table-container">
@@ -22,14 +19,14 @@
                     <thead class="desktop-lg">
                         <tr>
                             <th>Created</th>
-                            <th>Email</th>
+                            <th>Domain</th>
                             <th>Verified</th>
-                            <th>Encryption</th>
+                            <th>Active</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <RecipientRow v-for="recipient in list" :recipient="recipient" :recipients="list" :key="rowKey" />
+                        <DomainRow v-for="domain in list" :domain="domain" :key="rowKey" />
                     </tbody>
                 </table>
                 <p v-if="error" class="error">Error: {{ error }}</p>
@@ -41,43 +38,39 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import axios from 'axios'
-import { recipientApi } from '../api/recipient.ts'
-import RecipientRow from './RecipientRow.vue'
-import RecipientCreate from './RecipientCreate.vue'
+import { domainApi } from '../api/domain.ts'
+import DomainCreate from './DomainCreate.vue'
+import DomainRow from './DomainRow.vue'
 import events from '../events.ts'
 
-const recipient = {
+const domain = {
     id: '',
     created_at: '',
-    email: '',
-    is_active: false,
+    name: '',
+    enabled: false,
+    owner_verified_at: '',
+    mx_verified_at: '',
+    send_verified_at: '',
 }
 
-const list = ref([] as typeof recipient[])
+const list = ref([] as typeof domain[])
 const error = ref('')
 const loaded = ref(false)
 const rowKey = ref(0)
 
 const getList = async () => {
     try {
-        const response = await recipientApi.getList()
+        const response = await domainApi.getList()
         list.value = response.data
-        loaded.value = true
         error.value = ''
         renderRow()
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.response?.data.error || err.message
         }
+    } finally {
+        loaded.value = true
     }
-}
-
-const onDeleteRecipientError = (payload: { error: string }) => {
-    error.value = payload.error
-}
-
-const reload = () => {
-    getList()
 }
 
 const renderRow = () => {
@@ -86,10 +79,8 @@ const renderRow = () => {
 
 onMounted(() => {
     getList()
-    events.on('recipient.create', getList)
-    events.on('recipient.update', reload)
-    events.on('recipient.verify', reload)
-    events.on('recipient.delete.error', onDeleteRecipientError)
-    events.on('recipient.reload', reload)
+    events.on('domain.create', getList)
+    events.on('domain.reload', getList)
+    events.on('domain.update', getList)
 })
 </script>

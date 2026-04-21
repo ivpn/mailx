@@ -21,6 +21,8 @@ var (
 	ErrDeleteAlias         = errors.New("Unable to delete alias. Please try again.")
 	ErrDeleteAliasByUserID = errors.New("Unable to delete aliases for this user.")
 	ErrDeleteAliasByDomain = errors.New("Unable to delete aliases for this domain.")
+	ErrFailedImport        = errors.New("Failed to import aliases. Please check the format and try again.")
+	ErrFailedImportLimit   = errors.New("Failed to import aliases. You can only import up to 500 aliases at a time.")
 )
 
 type AliasStore interface {
@@ -119,7 +121,7 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 		return model.Alias{}, ErrPostAlias
 	}
 
-	if count >= s.Cfg.Service.MaxDailyAliases {
+	if count >= s.Cfg.Service.MaxDailyAliases && format != model.AliasFormatCustom {
 		return model.Alias{}, ErrPostAliasLimit
 	}
 
@@ -147,6 +149,18 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 		alias, err = s.Store.PostAlias(ctx, alias)
 		if err != nil {
 			log.Printf("error creating catch-all alias: %s", err.Error())
+			return model.Alias{}, ErrPostAlias
+		}
+
+		return alias, nil
+	}
+
+	// Custom alias with custom domain
+	if format == model.AliasFormatCustom {
+		alias.Name = model.GenerateAlias(format, localPart) + "@" + domain
+		alias, err = s.Store.PostAlias(ctx, alias)
+		if err != nil {
+			log.Printf("error creating custom alias: %s", err.Error())
 			return model.Alias{}, ErrPostAlias
 		}
 
@@ -220,4 +234,53 @@ func (s *Service) FindAlias(email string) (model.Alias, error) {
 	}
 
 	return alias, nil
+}
+
+func (s *Service) ImportAliases(ctx context.Context, aliases []model.AliasImportReq, userID string) ([]model.Alias, error) {
+	var importedAliases []model.Alias
+
+	domains, err := s.GetDomains(ctx, userID)
+	if err != nil {
+		return nil, ErrFailedImport
+	}
+
+	if len(aliases) > 500 {
+		return nil, ErrFailedImportLimit
+	}
+
+	for _, req := range aliases {
+		rcps, err := s.GetVerifiedRecipients(ctx, req.Recipients, userID)
+		if err != nil || len(rcps) == 0 {
+			continue
+		}
+
+		domainFound := false
+		for _, domain := range domains {
+			if domain.Name == req.Domain {
+				domainFound = true
+				break
+			}
+		}
+
+		if !domainFound {
+			continue
+		}
+
+		alias := model.Alias{
+			UserID:      userID,
+			Description: req.Description,
+			Enabled:     req.Enabled,
+			Recipients:  model.GetEmails(rcps),
+			FromName:    req.FromName,
+		}
+
+		importedAlias, err := s.PostAlias(ctx, alias, req.Format, req.Domain, req.LocalPart)
+		if err != nil {
+			continue
+		}
+
+		importedAliases = append(importedAliases, importedAlias)
+	}
+
+	return importedAliases, nil
 }

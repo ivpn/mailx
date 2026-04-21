@@ -1,9 +1,9 @@
 <template>
     <div>
-        <button v-bind:data-hs-overlay="'#modal-create-domain'" class="cta">
+        <button v-bind:data-hs-overlay="'#' + modalId" class="cta">
             New Domain
         </button>
-        <div v-bind:id="'modal-create-domain'" class="hs-overlay hidden">
+        <div v-bind:id="modalId" class="hs-overlay hidden">
             <div>
                 <div>
                     <header>
@@ -87,12 +87,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, getCurrentInstance } from 'vue'
 import overlay from '@preline/overlay'
 import axios from 'axios'
 import { domainApi } from '../api/domain.ts'
 import events from '../events.ts'
 import tooltip from '@preline/tooltip'
+
+const modalId = 'modal-create-domain-' + getCurrentInstance()!.uid
 
 const config = ref({
     verify: '',
@@ -153,12 +155,12 @@ const close = () => {
     error.value = ''
     nameError.value = false
     document.removeEventListener('keydown', handleKeydown)
-    const modal = document.querySelector('#modal-create-domain') as any
+    const modal = document.querySelector('#' + modalId) as any
     overlay.close(modal)
 }
 
 const addEvents = () => {
-    const modal = overlay.getInstance('#modal-create-domain' as any, true) as any
+    const modal = overlay.getInstance(('#' + modalId) as any, true) as any
     modal.element.on('close', () => {
         close()
     })

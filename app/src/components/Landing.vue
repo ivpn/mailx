@@ -819,7 +819,7 @@ const pricingPlans = [
 }
 
 .feature-text {
-    @apply text-[#115190] dark:text-[#82b8ed];
+    @apply text-black dark:text-[#fffeff];
     @apply text-base leading-[21px] md:leading-4;
     @apply m-0;
     @apply flex-1;
@@ -1027,7 +1027,7 @@ img.dark-only {
 }
 
 .instruction-text {
-    @apply text-[#115190] dark:text-[#82b8ed];
+    @apply text-black dark:text-[#fffeff];
     @apply text-sm leading-5;
     @apply flex-1;
 }
@@ -1065,7 +1065,7 @@ img.dark-only {
 }
 
 .feature-card-text {
-    @apply text-[#115190] dark:text-[#82b8ed];
+    @apply text-black dark:text-[#fffeff];
     @apply text-sm leading-5;
     @apply m-0;
 }
@@ -1151,7 +1151,7 @@ img.dark-only {
 .feature-set-text {
     @apply m-0;
     @apply text-sm leading-5;
-    @apply text-[#115190] dark:text-[#82b8ed];
+    @apply text-black dark:text-[#fffeff];
 }
 
 /* Section 5: Verifiable Privacy */
@@ -1205,7 +1205,7 @@ img.dark-only {
 .verifiable-privacy-card-text {
     @apply m-0;
     @apply text-sm leading-5;
-    @apply text-[#115190] dark:text-[#82b8ed];
+    @apply text-black dark:text-[#fffeff];
 }
 
 .verifiable-privacy-card-link {
@@ -1430,7 +1430,7 @@ img.dark-only {
 .comp-services-card-text {
     @apply m-0;
     @apply text-sm leading-5;
-    @apply text-[#115190] dark:text-[#82b8ed];
+    @apply text-black dark:text-[#fffeff];
 }
 
 .comp-services-footnote {
@@ -1605,7 +1605,7 @@ img.dark-only {
 .get-access-feature-text {
     @apply m-0;
     @apply text-sm leading-5;
-    @apply text-[#115190] dark:text-[#82b8ed];
+    @apply text-black dark:text-[#fffeff];
 }
 
 @media (min-width: 768px) {

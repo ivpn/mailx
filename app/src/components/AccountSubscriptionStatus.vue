@@ -1,7 +1,7 @@
 <template>
     <div v-if="!isActive && isDashboard" class="card-secondary m-8 mb-0">
         <p class="m-0">
-            Your <router-link to="/account">subscription</router-link> is inactive
+            Your <router-link to="/account/profile">subscription</router-link> is inactive
         </p>
     </div>
 </template>

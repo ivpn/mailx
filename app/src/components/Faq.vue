@@ -1,10 +1,10 @@
 <template>
     <div class="container mx-auto max-w-screen-lg sm:p-10 p-5">
         <p class="py-5">
-            <router-link to="/login" class="flex items-center gap-2">
+            <button @click="goBack" class="flex items-center gap-2">
                 <i class="icon arrow-left-line icon-accent"></i>
                 Back
-            </router-link>
+            </button>
         </p>
         <h1>Mailx FAQ</h1>
         <p class="text-sm">Last updated: 20 June 2025</p>
@@ -87,7 +87,11 @@
 </template>
 
 <script setup lang="ts">
+import { useRouter } from 'vue-router'
 import Footer from './Footer.vue'
+
+const router = useRouter()
+const goBack = () => router.back()
 </script>
 
 <style scoped>

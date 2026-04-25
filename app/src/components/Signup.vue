@@ -185,7 +185,7 @@ const registerWithPasskey = async () => {
         res = await userApi.registerFinish(creds)
         apiError.value = ''
         localStorage.setItem('email', data.email)
-        window.location.href = '/'
+        window.location.href = '/account'
     } catch (err) {
         if (axios.isAxiosError(err)) {
             apiError.value = err.response?.data.error || err.message
@@ -202,7 +202,7 @@ const registerWithPasskey = async () => {
 const parseSubid = () => {
     const route = useRoute()
     subid.value = route.params.subid as string
-    if (!subid.value || !subid.value.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
+    if (subid.value && !subid.value.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
         window.location.href = '/login'
     }
 }
@@ -214,7 +214,7 @@ const isLoggedIn = (): boolean => {
 
 onMounted(() => {
     if (isLoggedIn()) {
-        window.location.href = '/'
+        window.location.href = '/account'
     }
     
     parseSubid()

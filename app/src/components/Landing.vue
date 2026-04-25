@@ -320,7 +320,7 @@ const pricingPlans = [
                         <div class="feature-card-header">
                             <img src="../assets/icons/feature-icon-users-light.svg" class="feature-icon light-only" />
                             <img src="../assets/icons/feature-icon-users-dark.svg" class="feature-icon dark-only" />
-                            <h3 class="feature-card-title">PREVENT_IDENTITY_CORRELATION</h3>
+                            <h3 class="feature-card-title">PREVENT_IDENTITY_MAPPING</h3>
                         </div>
                         <p class="feature-card-text">Each service gets a unique alias. Advertisers and data brokers can't connect your accounts across platforms.</p>
                     </div>

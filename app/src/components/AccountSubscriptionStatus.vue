@@ -20,7 +20,7 @@
             <div>
                 <h4>Pending Deletion</h4>
                 <p>
-                    Your account is pending deletion. To reinstate access add time to your <a target="_blank" :href="activateUrl">IVPN account</a>.
+                    Your account is pending deletion. Forwards and replies are disabled. To reinstate access add time to your <a target="_blank" :href="activateUrl">IVPN account</a>.
                 </p>
             </div>
         </footer>

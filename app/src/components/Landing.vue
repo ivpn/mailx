@@ -489,7 +489,7 @@ const pricingPlans = [
                                 <div class="comp-arch-core">
                                     <img src="../assets/icons/comp-db-light.svg" class="light-only comp-logo-db" />
                                     <img src="../assets/icons/comp-db-dark.svg" class="dark-only comp-logo-db" />
-                                    <p class="comp-arch-core-text">#ZERO-LINK<br>ACCESS ARCHITECTURE</p>
+                                    <p class="comp-arch-core-text">#UNLINKED ACCESS<br>ARCHITECTURE</p>
                                 </div>
 
                                 <div class="comp-arch-center-bottom">
@@ -515,7 +515,7 @@ const pricingPlans = [
                                 <img src="../assets/icons/comp-arrow-vertical-dark.svg" class="dark-only comp-arrow-vertical-mobile-down" />
                                 <img src="../assets/icons/comp-db-light.svg" class="light-only comp-logo-db" />
                                 <img src="../assets/icons/comp-db-dark.svg" class="dark-only comp-logo-db" />
-                                <p class="comp-arch-core-text comp-arch-core-text-mobile">#ZERO-LINK ACCESS ARCHITECTURE</p>
+                                <p class="comp-arch-core-text comp-arch-core-text-mobile">#UNLINKED ACCESS ARCHITECTURE</p>
                             </div>
 
                             <div class="comp-arch-mobile-bottom">
@@ -567,7 +567,7 @@ const pricingPlans = [
                         Read more in our
                         <a href="https://www.ivpn.net/blog/" target="_blank" class="comp-services-link">./BLOG</a>
                         and review the
-                        <a href="https://github.com/ivpn/mailx" target="_blank" class="comp-services-link">./SOURCE</a>
+                        <a href="https://github.com/ivpn/unlinked-access" target="_blank" class="comp-services-link">./SOURCE</a>
                         implementation.
                     </p>
                 </div>

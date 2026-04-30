@@ -222,11 +222,17 @@ const deleteAlias = () => {
 }
 
 const copyAlias = (alias: string) => {
-    navigator.clipboard.writeText(alias)
-    copyText.value = 'Copied'
-    setTimeout(() => {
-        copyText.value = 'Click to copy'
-    }, 2000)
+    navigator.clipboard.writeText(alias).then(() => {
+        copyText.value = 'Copied'
+        setTimeout(() => {
+            copyText.value = 'Click to copy'
+        }, 2000)
+    }).catch(() => {
+        copyText.value = 'Failed to copy'
+        setTimeout(() => {
+            copyText.value = 'Click to copy'
+        }, 2000)
+    })
 }
 
 const renderRow = () => {

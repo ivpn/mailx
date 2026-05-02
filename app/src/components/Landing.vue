@@ -462,9 +462,9 @@ const pricingPlans = [
                         $ cat /etc/ivpn/architecture.txt
                     </div>
                     <h2 class="section-title">
-                        COMPARTMENTALIZED_<br class="comp-services-break">SERVICES
+                        UNLINKED_<br class="comp-services-break">ACCESS
                     </h2>
-                    <p class="comp-services-subtitle">Unlike other privacy suites, the IVPN stack works without persistent account identifiers that correlate your activity across services.</p>
+                    <p class="comp-services-subtitle">Additional services in the IVPN privacy stack do not receive or store your IVPN account ID. There is no shared identity layer connecting your accounts across services.</p>
                 </div>
 
                 <div class="comp-services-panel">
@@ -489,7 +489,7 @@ const pricingPlans = [
                                 <div class="comp-arch-core">
                                     <img src="../assets/icons/comp-db-light.svg" class="light-only comp-logo-db" />
                                     <img src="../assets/icons/comp-db-dark.svg" class="dark-only comp-logo-db" />
-                                    <p class="comp-arch-core-text">#UNLINKED ACCESS<br>ARCHITECTURE</p>
+                                    <p class="comp-arch-core-text">#UNLINKED ACCESS</p>
                                 </div>
 
                                 <div class="comp-arch-center-bottom">
@@ -515,7 +515,7 @@ const pricingPlans = [
                                 <img src="../assets/icons/comp-arrow-vertical-dark.svg" class="dark-only comp-arrow-vertical-mobile-down" />
                                 <img src="../assets/icons/comp-db-light.svg" class="light-only comp-logo-db" />
                                 <img src="../assets/icons/comp-db-dark.svg" class="dark-only comp-logo-db" />
-                                <p class="comp-arch-core-text comp-arch-core-text-mobile">#UNLINKED ACCESS ARCHITECTURE</p>
+                                <p class="comp-arch-core-text comp-arch-core-text-mobile">#UNLINKED ACCESS</p>
                             </div>
 
                             <div class="comp-arch-mobile-bottom">
@@ -543,19 +543,19 @@ const pricingPlans = [
                         <div class="comp-services-card">
                             <img src="../assets/icons/comp-signin-light.svg" class="comp-services-card-icon light-only" />
                             <img src="../assets/icons/comp-signin-dark.svg" class="comp-services-card-icon dark-only" />
-                            <p class="comp-services-card-text">Sign up to Mailx with true account separation</p>
-                        </div>
-
-                        <div class="comp-services-card">
-                            <img src="../assets/icons/comp-cross-light.svg" class="comp-services-card-icon light-only" />
-                            <img src="../assets/icons/comp-cross-dark.svg" class="comp-services-card-icon dark-only" />
-                            <p class="comp-services-card-text">No cross-service correlation, even by administrators</p>
+                            <p class="comp-services-card-text">Sign up to Mailx without sharing your IVPN account ID</p>
                         </div>
 
                         <div class="comp-services-card">
                             <img src="../assets/icons/comp-repeat-light.svg" class="comp-services-card-icon light-only" />
                             <img src="../assets/icons/comp-repeat-dark.svg" class="comp-services-card-icon dark-only" />
-                            <p class="comp-services-card-text">Automatic and anonymous subscription management</p>
+                            <p class="comp-services-card-text">Subscription sync uses token hashes, not account identifiers</p>
+                        </div>
+
+                        <div class="comp-services-card">
+                            <img src="../assets/icons/comp-cross-light.svg" class="comp-services-card-icon light-only" />
+                            <img src="../assets/icons/comp-cross-dark.svg" class="comp-services-card-icon dark-only" />
+                            <p class="comp-services-card-text">Cross-service correlation reduced, not eliminated — see docs</p>
                         </div>
                     </div>
                 </div>

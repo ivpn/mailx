@@ -75,7 +75,7 @@ const dashboardChildren: RouteRecordRaw[] = [
 const routes: RouteRecordRaw[] = [
     {
         path: '/',
-        name: `${AppName}: Home`,
+        name: `Mailx — Email Aliasing by IVPN`,
         component: Landing,
     },
     {

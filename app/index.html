@@ -5,9 +5,28 @@
     if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) { document.head.insertAdjacentHTML('beforeend', '<meta name="color-scheme" content="dark">');document.documentElement.classList.add('dark'); } else {
       document.documentElement.classList.remove('dark') }
     </script>
+    
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>App</title>
+    <title>Mailx — Email Aliasing by IVPN</title>
+    <meta name="description" content="Forward emails through isolated aliases with Mailx. Send and reply without exposing your primary address. Open source, independently audited.">
+    <link rel="canonical" href="https://mailx.net/">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Mailx">
+    <meta property="og:title" content="Mailx — Email Aliasing by IVPN">
+    <meta property="og:description" content="Forward emails through isolated aliases. Send and reply without exposing your primary address. Open source and independently audited.">
+    <meta property="og:url" content="https://mailx.net/">
+    <meta property="og:image" content="/src/assets/mailx-og.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/png">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Mailx — Email Aliasing by IVPN">
+    <meta name="twitter:description" content="Forward emails through isolated aliases. Send and reply without exposing your primary address. Open source and independently audited.">
+    <meta name="twitter:image" content="/src/assets/mailx-og.png">
+
     <link rel="icon" type="image/png" href="/src/assets/favicon-light.png" media="(prefers-color-scheme: light)" />
     <link rel="icon" type="image/png" href="/src/assets/favicon-dark.png" media="(prefers-color-scheme: dark)" />
   </head>

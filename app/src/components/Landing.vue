@@ -564,9 +564,10 @@ const pricingPlans = [
                     <img src="../assets/icons/comp-bulb-light.svg" class="comp-services-footnote-icon light-only" />
                     <img src="../assets/icons/comp-bulb-dark.svg" class="comp-services-footnote-icon dark-only" />
                     <p class="comp-services-footnote-text">
-                        Read more in our
+                        <!-- Read more in our
                         <a href="https://www.ivpn.net/blog/" target="_blank" class="comp-services-link">./BLOG</a>
-                        and review the
+                        and review the -->
+                        Review the
                         <a href="https://github.com/ivpn/unlinked-access" target="_blank" class="comp-services-link">./SOURCE</a>
                         implementation.
                     </p>

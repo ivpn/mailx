@@ -108,15 +108,15 @@
                 </nav>
                 <p v-if="signupSuccess" class="success text-center">{{ signupSuccess }}</p>
             </article>
-            <footer>
+            <!-- <footer>
                 <div>
                     <i class="icon info icon-primary"></i>
                 </div>
                 <div>
-                    <h4>Here to try Mailx? You need an active IVPN account.</h4>
-                    <p>Sign up or log in on <a href="https://www.ivpn.net/account/">ivpn.net</a> and look for "Email Beta" in your account settings.</p>
+                    <h4></h4>
+                    <p>/p>
                 </div>
-            </footer>
+            </footer> -->
         </form>
         <Footer />
     </div>

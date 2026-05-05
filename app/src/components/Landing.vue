@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { userApi } from '../api/user.ts'
 
-const signupUrl = import.meta.env.VITE_RESYNC_URL
+const signupUrl = import.meta.env.VITE_PRICING_URL
 
 const isLoggedIn = computed(() => {
     const email = localStorage.getItem('email')
@@ -567,9 +567,7 @@ const pricingPlans = [
                         <!-- Read more in our
                         <a href="https://www.ivpn.net/blog/" target="_blank" class="comp-services-link">./BLOG</a>
                         and review the -->
-                        Review the
-                        <a href="https://github.com/ivpn/unlinked-access" target="_blank" class="comp-services-link">./SOURCE</a>
-                        implementation.
+                        Read more in our <a href="https://www.ivpn.net/unlinked-access/" target="_blank" class="comp-services-link">./UNLINKED-ACCESS</a> explainer and review the <a href="https://github.com/ivpn/unlinked-access" target="_blank" class="comp-services-link">./SOURCE</a> implementation.
                     </p>
                 </div>
             </div>

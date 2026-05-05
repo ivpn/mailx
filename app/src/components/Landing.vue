@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { userApi } from '../api/user.ts'
 
-const signupUrl = import.meta.env.VITE_RESYNC_URL
+const signupUrl = import.meta.env.VITE_PRICING_URL
 
 const isLoggedIn = computed(() => {
     const email = localStorage.getItem('email')

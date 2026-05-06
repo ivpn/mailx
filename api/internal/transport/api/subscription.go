@@ -11,7 +11,7 @@ import (
 var (
 	UpdateSubscriptionSuccess = "Subscription updated successfully."
 	AddSubscriptionSuccess    = "Subscription added successfully."
-	InvalidPASessionId        = "This signup link has expired."
+	InvalidPASessionId        = "Signup link expired. Reload IVPN account page and try again."
 )
 
 type SubscriptionService interface {

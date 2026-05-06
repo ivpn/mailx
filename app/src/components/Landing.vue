@@ -29,13 +29,13 @@ const heroFeatures = [
 // --- How It Works -----------------------------------------------------------
 const receiveInstructions = [
     'Create an email alias',
-    'Share the alias instead of your real email',
-    'Receive forwarded emails in your inbox',
+    'Use alias instead of your real email address',
+    'Receive forwarded emails in your regular inbox',
 ]
 
 const sendInstructions = [
     'Create a send address for your recipient',
-    'Email that address from your inbox',
+    'Send or reply from your regular inbox',
     'Recipient gets your email from the alias',
 ]
 
@@ -177,22 +177,7 @@ const pricingPlans = [
                                     <span class="flow-label">Sender</span>
                                 </div>
 
-                                <!-- Step 2: Alias -->
-                                <div class="flow-step">
-                                    <div class="flow-icon-row">
-                                        <img src="../assets/icons/flow-icon-mail-light.svg" class="flow-icon light-only" />
-                                        <img src="../assets/icons/flow-icon-mail-dark.svg" class="flow-icon dark-only" />
-                                        <div class="flow-arrow">
-                                            <svg width="100%" height="6" viewBox="0 0 100 6" preserveAspectRatio="none">
-                                                <line x1="0" y1="3" x2="100%" y2="3" stroke="currentColor" stroke-width="1" stroke-dasharray="4 2" />
-                                            </svg>
-                                            <span class="flow-arrow-char">&gt;</span>
-                                        </div>
-                                    </div>
-                                    <span class="flow-label">Alias</span>
-                                </div>
-
-                                <!-- Step 3: Mailx -->
+                                <!-- Step 2: Mailx -->
                                 <div class="flow-step">
                                     <div class="flow-icon-row">
                                         <img src="../assets/icons/flow-icon-server-light.svg" class="flow-icon light-only" />
@@ -204,16 +189,16 @@ const pricingPlans = [
                                             <span class="flow-arrow-char">&gt;</span>
                                         </div>
                                     </div>
-                                    <span class="flow-label">Mailx</span>
+                                    <span class="flow-label">Mailx Alias</span>
                                 </div>
 
-                                <!-- Step 4: Inbox -->
+                                <!-- Step 3: Inbox -->
                                 <div class="flow-step flow-step-last">
                                     <div class="flow-icon-row">
                                         <img src="../assets/icons/flow-icon-mail-light.svg" class="flow-icon light-only" />
                                         <img src="../assets/icons/flow-icon-mail-dark.svg" class="flow-icon dark-only" />
                                     </div>
-                                    <span class="flow-label">Inbox</span>
+                                    <span class="flow-label">Your Inbox</span>
                                 </div>
                             </div>
                         </div>
@@ -244,7 +229,7 @@ const pricingPlans = [
                                             <span class="flow-arrow-char">&gt;</span>
                                         </div>
                                     </div>
-                                    <span class="flow-label">Outbox</span>
+                                    <span class="flow-label">Your Inbox</span>
                                 </div>
 
                                 <!-- Step 2: Mailx -->
@@ -262,22 +247,7 @@ const pricingPlans = [
                                     <span class="flow-label">Mailx</span>
                                 </div>
 
-                                <!-- Step 3: Alias -->
-                                <div class="flow-step">
-                                    <div class="flow-icon-row">
-                                        <img src="../assets/icons/flow-icon-mail-light.svg" class="flow-icon light-only" />
-                                        <img src="../assets/icons/flow-icon-mail-dark.svg" class="flow-icon dark-only" />
-                                        <div class="flow-arrow">
-                                            <svg width="100%" height="6" viewBox="0 0 100 6" preserveAspectRatio="none">
-                                                <line x1="0" y1="3" x2="100%" y2="3" stroke="currentColor" stroke-width="1" stroke-dasharray="4 2" />
-                                            </svg>
-                                            <span class="flow-arrow-char">&gt;</span>
-                                        </div>
-                                    </div>
-                                    <span class="flow-label">Alias</span>
-                                </div>
-
-                                <!-- Step 4: Recipient -->
+                                <!-- Step 3: Recipient -->
                                 <div class="flow-step flow-step-last">
                                     <div class="flow-icon-row">
                                         <img src="../assets/icons/flow-icon-user-light.svg" class="flow-icon light-only" />

@@ -194,7 +194,7 @@ const registerWithPasskey = async () => {
         res = await userApi.registerFinish(creds)
         apiError.value = ''
         localStorage.setItem('email', data.email)
-        window.location.href = '/'
+        window.location.href = '/account'
     } catch (err) {
         if (axios.isAxiosError(err)) {
             apiError.value = err.response?.data.error || err.message
@@ -259,7 +259,7 @@ const isLoggedIn = (): boolean => {
 
 onMounted(() => {
     if (isLoggedIn()) {
-        window.location.href = '/'
+        window.location.href = '/account'
     }
     
     parseParams()

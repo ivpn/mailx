@@ -76,7 +76,7 @@ const routes: RouteRecordRaw[] = [
         children: dashboardChildren
     },
     {
-        path: '/signup/:subid',
+        path: '/signup',
         name: `${AppName} - Sign Up`,
         component: Signup
     },

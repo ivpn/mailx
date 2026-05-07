@@ -32,13 +32,12 @@ var (
 )
 
 type UserService interface {
-	PostUser(context.Context, model.User, string) error
 	SendUserOTP(context.Context, string) error
 	ActivateUser(context.Context, string, string) error
 	GetUserByCredentials(context.Context, string, string) (model.User, error)
 	GetUserByPassword(context.Context, string, string) (model.User, error)
 	GetUserByEmail(context.Context, string) (model.User, error)
-	GetUnfinishedSignupOrPostUser(context.Context, model.User, string) (model.User, error)
+	GetUnfinishedSignupOrPostUser(context.Context, model.User, string, string) (model.User, error)
 	SaveUser(context.Context, model.User) error
 	DeleteUserRequest(context.Context, string) (string, error)
 	DeleteUser(context.Context, string, string) error
@@ -66,6 +65,9 @@ type UserService interface {
 // @Failure 400 {object} ErrorRes
 // @Router /register [post]
 func (h *Handler) Register(c *fiber.Ctx) error {
+	// Get session ID from cookie
+	sessionId := c.Cookies(auth.PA_SESSION_COOKIE)
+
 	// Parse the request
 	req := SignupUserReq{}
 	err := c.BodyParser(&req)
@@ -91,7 +93,7 @@ func (h *Handler) Register(c *fiber.Ctx) error {
 	}
 
 	// Get unfinished signup user or create new user
-	user, err = h.Service.GetUnfinishedSignupOrPostUser(c.Context(), user, req.SubID)
+	user, err = h.Service.GetUnfinishedSignupOrPostUser(c.Context(), user, req.SubID, sessionId)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),

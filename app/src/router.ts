@@ -79,6 +79,11 @@ const routes: RouteRecordRaw[] = [
         children: dashboardChildren
     },
     {
+        path: '/signup',
+        name: `${AppName}: Sign Up`,
+        component: Signup
+    },
+    {
         path: '/login',
         name: `${AppName}: Log In`,
         component: Login
@@ -87,11 +92,6 @@ const routes: RouteRecordRaw[] = [
         path: '/logout',
         name: `${AppName}: Log Out`,
         component: Logout
-    },
-    {
-        path: '/signup/:subid?',
-        name: `${AppName}: Sign Up`,
-        component: Signup
     },
     {
         path: '/signup-complete',

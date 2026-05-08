@@ -1,6 +1,6 @@
 <template>
     <header class="flex items-center justify-between py-5">
-        <router-link to="/" class="p-0">
+        <router-link to="/account" class="p-0">
             <h1 class="px-5 md:px-8 m-0 text-accent head flex items-center justify-between">
                 <span class="logo"></span>
             </h1>

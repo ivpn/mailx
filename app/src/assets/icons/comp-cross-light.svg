@@ -1,0 +1,10 @@
+<svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="dinkie-icons:black-cross-square-small" clip-path="url(#clip0_21_214)">
+<path id="Vector" d="M3 3H0V24H3V3ZM3 3H24V0H3V3ZM6 21H9V18H6V21ZM3 27H24V24H3V27ZM9 18H12V15H9V18ZM12 15H15V12H12V15ZM6 9H9V6H6V9ZM9 12H12V9H9V12ZM15 18H18V15H15V18ZM18 21H21V18H18V21ZM15 12H18V9H15V12ZM18 9H21V6H18V9ZM24 24H27V3H24V24Z" fill="var(--fill-0, #1A75DA)"/>
+</g>
+<defs>
+<clipPath id="clip0_21_214">
+<rect width="24" height="24" fill="white"/>
+</clipPath>
+</defs>
+</svg>

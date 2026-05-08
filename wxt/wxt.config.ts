@@ -8,13 +8,20 @@ export default defineConfig({
     console.log('API URL:', apiUrl)
     return {
       host_permissions: apiUrl ? [apiUrl + '/*'] : [],
-      permissions: ['storage', 'webRequest', 'activeTab'],
+      permissions: ['storage', 'activeTab'],
       web_accessible_resources: [
         {
           resources: ['mailx.svg'],
           matches: ['<all_urls>'],
         },
       ],
+      browser_specific_settings: {
+        gecko: {
+          data_collection_permissions: {
+            required: ['authenticationInfo', 'personallyIdentifyingInfo'],
+          },
+        },
+      },
     }
   },
 })

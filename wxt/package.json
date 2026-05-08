@@ -2,7 +2,7 @@
   "name": "Mailx",
   "description": "Audited, Open-Source Email Aliasing Service",
   "private": true,
-  "version": "0.1.10",
+  "version": "0.1.11",
   "type": "module",
   "scripts": {
     "dev": "wxt",

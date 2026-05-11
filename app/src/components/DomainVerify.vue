@@ -152,6 +152,9 @@ const getConfig = async () => {
     try {
         const res = await domainApi.getConfig()
         config.value = res.data
+        setTimeout(() => {
+            tooltip.autoInit()
+        }, 0)
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.response?.data.error || err.message
@@ -198,7 +201,7 @@ const copyToClipboard = (txt: string) => {
 
 onMounted(() => {
     overlay.autoInit()
-    addEvents()
     getConfig()
+    addEvents()
 })
 </script>

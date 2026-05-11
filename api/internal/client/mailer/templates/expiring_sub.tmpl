@@ -1,0 +1,24 @@
+{{define "body"}}
+Hello,
+
+Your {{.from}} account is in limited access mode. 
+
+You cannot create new aliases or recipients, reply to forwards or send emails via {{.from}}. 
+
+Incoming forwards are still processed for 14 days from the date of this message.
+
+To regain full access with no restrictions, add time to your IVPN account.
+
+Sent by {{.from}}
+{{end}}
+
+{{define "bodyHtml"}}
+<div style="font-family: Arial, Helvetica, sans-serif;font-size: 15px;">
+Hello,<br><br>
+Your {{.from}} account is in limited access mode.<br><br>
+You cannot create new aliases or recipients, reply to forwards or send emails via {{.from}}.<br><br>
+Incoming forwards are still processed for 14 days from the date of this message.<br><br>
+To regain full access with no restrictions, add time to your IVPN account.<br><br>
+Sent by {{.from}}
+</div>
+{{end}}

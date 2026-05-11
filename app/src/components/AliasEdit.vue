@@ -10,7 +10,7 @@
                         <h4>EDIT ALIAS</h4>
                     </header>
                     <article>
-                        <h3>{{ alias.name }}</h3>
+                        <h3 class="break-all">{{ alias.name }}</h3>
                         <div class="mb-7">
                             <label v-bind:for="'description_' + alias.id">
                                 Description:

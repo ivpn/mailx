@@ -9,7 +9,7 @@
             </span>
             <h4 class="mb-6">No Diagnostic logs</h4>
             <p class="text-tertiary mb-6">
-                <span v-if="!settings.log_issues">Enable email delivery diagnostics in <router-link to="/settings">Settings</router-link>.<br></br></span>
+                <span v-if="!settings.log_issues">Enable email delivery diagnostics in <router-link to="/account/settings">Settings</router-link>.<br></br></span>
                 <span v-if="settings.log_issues">Email delivery diagnostics will be logged here.</span>
             </p>
         </div>

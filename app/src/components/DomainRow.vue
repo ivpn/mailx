@@ -1,10 +1,10 @@
 <template>
-    <tr class="desktop">
+    <tr class="desktop-lg">
         <td>
             <p>{{ new Date(domain.created_at).toDateString() }}</p>
         </td>
         <td>
-            <p>{{ domain.name }}</p>
+            <p class="text-wrap break-all">{{ domain.name }}</p>
         </td>
         <td>
             <p>
@@ -43,15 +43,15 @@
             </div>
         </td>
     </tr>
-    <tr class="tablet">
+    <tr class="tablet-lg">
         <td>
             <div class="flex gap-2 justify-between">
                 <div class="text-start">
                     <div>
                         <p class="mb-3">{{ new Date(domain.created_at).toDateString() }}</p>
                     </div>
-                    <div class="hs-tooltip inline-block">
-                        <p class="plain text-base text-primary">
+                    <div class="hs-tooltip inline-block break-all">
+                        <p class="plain text-base text-primary text-wrap">
                             {{ domain.name }}
                         </p>
                     </div>

@@ -1,5 +1,5 @@
 <template>
-    <tr class="desktop">
+    <tr class="desktop-lg">
         <td>
             <p>{{ new Date(recipient.created_at).toDateString() }}</p>
         </td>
@@ -69,7 +69,7 @@
             </div>
         </td>
     </tr>
-    <tr class="tablet">
+    <tr class="tablet-lg">
         <td>
             <div class="flex gap-2 justify-between">
                 <div class="text-start">
@@ -221,11 +221,17 @@ const deletePgpKey = async () => {
 }
 
 const copyAlias = (alias: string) => {
-    navigator.clipboard.writeText(alias)
-    copyText.value = 'Copied'
-    setTimeout(() => {
-        copyText.value = 'Click to copy'
-    }, 2000)
+    navigator.clipboard.writeText(alias).then(() => {
+        copyText.value = 'Copied'
+        setTimeout(() => {
+            copyText.value = 'Click to copy'
+        }, 2000)
+    }).catch(() => {
+        copyText.value = 'Failed to copy'
+        setTimeout(() => {
+            copyText.value = 'Click to copy'
+        }, 2000)
+    })
 }
 
 onMounted(() => {

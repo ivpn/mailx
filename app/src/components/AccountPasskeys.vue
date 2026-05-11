@@ -27,7 +27,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="cred in list" :key="rowKey" class="desktop">
+                    <tr v-for="cred in list" :key="`desktop-${cred.id}`" class="desktop">
                         <td>
                             {{ new Date(cred.created_at).toDateString() }}
                         </td>
@@ -41,7 +41,7 @@
                             </button>
                         </td>
                     </tr>
-                    <tr v-for="cred in list" :key="rowKey" class="tablet">
+                    <tr v-for="cred in list" :key="`tablet-${cred.id}`" class="tablet">
                         <hr>
                         <div class="flex gap-2 justify-between">
                             <div class="text-start">
@@ -78,14 +78,12 @@ const credential = {
 const list = ref([] as typeof credential[])
 const error = ref('')
 const passkeySupported = ref(false)
-const rowKey = ref(0)
 
 const getList = async () => {
     try {
         const res = await userApi.getCredentials()
         list.value = res.data
         error.value = ''
-        renderRow()
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.message
@@ -100,7 +98,6 @@ const deleteCred = async (id: string) => {
         await userApi.deleteCredential(id)
         list.value = list.value.filter((cred: any) => cred.id !== id)
         error.value = ''
-        renderRow()
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.message
@@ -140,10 +137,6 @@ const startAddPasskey = async (res: any) => {
             error.value = 'The operation was aborted or failed.'
         }
     }
-}
-
-const renderRow = () => {
-    rowKey.value++
 }
 
 onMounted(() => {

@@ -9,7 +9,7 @@ export const api = axios.create({
 api.interceptors.response.use(
     response => response, // simply return the response in case of success
     error => {
-        if (error.response && error.response.status === 401 && window.location.pathname !== '/login') {
+        if (error.response && error.response.status === 401 && window.location.pathname.startsWith('/account')) {
             // Handle the 401 error
             userApi.clearSession()
         }

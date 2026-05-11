@@ -113,6 +113,6 @@ const resetPassword = async () => {
 
 onMounted(() => {
     const route = useRoute()
-    otp.value = route.params.otp as string
+    otp.value = route.params.token as string
 })
 </script>

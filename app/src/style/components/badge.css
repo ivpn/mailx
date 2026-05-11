@@ -6,6 +6,10 @@
             @apply bg-success text-white font-semibold;
         }
 
+        &.progress {
+            @apply bg-accent text-white font-semibold;
+        }
+        
         &.bounce {
             @apply bg-amber-500 dark:bg-amber-700 text-white font-semibold;
         }
@@ -16,6 +20,10 @@
 
         &.unauthorised_send {
             @apply bg-violet-500 dark:bg-violet-700 text-white font-semibold;
+        }
+
+        &.inactive_subscription {
+            @apply bg-gray-500 text-white font-semibold;
         }
 
         &.small {

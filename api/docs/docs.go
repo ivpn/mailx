@@ -1742,6 +1742,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/rotatepasession": {
+            "put": {
+                "description": "Rotate pre-auth session ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "subscription"
+                ],
+                "summary": "Rotate pre-auth session ID",
+                "parameters": [
+                    {
+                        "description": "Rotate pre-auth session request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.RotatePASessionReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
         "/settings": {
             "get": {
                 "security": [
@@ -1853,14 +1893,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/subscription/add": {
+        "/sub/session": {
             "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Add subscription",
+                "description": "Add pre-auth session",
                 "consumes": [
                     "application/json"
                 ],
@@ -1870,15 +1910,15 @@ const docTemplate = `{
                 "tags": [
                     "subscription"
                 ],
-                "summary": "Add subscription",
+                "summary": "Add pre-auth session",
                 "parameters": [
                     {
-                        "description": "Subscription request",
+                        "description": "Pre-auth session request",
                         "name": "body",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api.SubscriptionReq"
+                            "$ref": "#/definitions/api.PASessionReq"
                         }
                     }
                 ],
@@ -2626,6 +2666,25 @@ const docTemplate = `{
                 }
             }
         },
+        "api.PASessionReq": {
+            "type": "object",
+            "required": [
+                "id",
+                "preauth_id",
+                "token"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "preauth_id": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
         "api.RecipientReq": {
             "type": "object",
             "required": [
@@ -2656,6 +2715,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.RotatePASessionReq": {
+            "type": "object",
+            "required": [
+                "sessionid"
+            ],
+            "properties": {
+                "sessionid": {
                     "type": "string"
                 }
             }
@@ -2725,14 +2795,14 @@ const docTemplate = `{
         "api.SubscriptionReq": {
             "type": "object",
             "required": [
-                "active_until",
-                "id"
+                "id",
+                "subid"
             ],
             "properties": {
-                "active_until": {
+                "id": {
                     "type": "string"
                 },
-                "id": {
+                "subid": {
                     "type": "string"
                 }
             }
@@ -3071,20 +3141,33 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "type": {
-                    "$ref": "#/definitions/model.SubscriptionType"
+                "outage": {
+                    "type": "boolean"
+                },
+                "status": {
+                    "$ref": "#/definitions/model.SubscriptionStatus"
+                },
+                "tier": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
                 }
             }
         },
-        "model.SubscriptionType": {
+        "model.SubscriptionStatus": {
             "type": "string",
             "enum": [
-                "Free",
-                "Managed"
+                "active",
+                "grace_period",
+                "limited_access",
+                "pending_delete"
             ],
             "x-enum-varnames": [
-                "Free",
-                "Managed"
+                "Active",
+                "GracePeriod",
+                "LimitedAccess",
+                "PendingDelete"
             ]
         },
         "model.TOTPBackup": {

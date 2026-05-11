@@ -11,16 +11,17 @@ import (
 )
 
 var (
-	ErrGetAlias            = errors.New("Unable to retrieve alias by ID.")
-	ErrGetAliases          = errors.New("Unable to retrieve aliases.")
-	ErrGetAliasByName      = errors.New("alias not found:")
-	ErrDisabledAlias       = errors.New("alias disabled:")
-	ErrPostAlias           = errors.New("Unable to create alias. Please try again.")
-	ErrPostAliasLimit      = errors.New("You’ve reached the maximum number of allowed aliases.")
-	ErrUpdateAlias         = errors.New("Unable to update alias. Please try again.")
-	ErrDeleteAlias         = errors.New("Unable to delete alias. Please try again.")
-	ErrDeleteAliasByUserID = errors.New("Unable to delete aliases for this user.")
-	ErrDeleteAliasByDomain = errors.New("Unable to delete aliases for this domain.")
+	ErrGetAlias             = errors.New("Unable to retrieve alias by ID.")
+	ErrGetAliases           = errors.New("Unable to retrieve aliases.")
+	ErrGetAliasByName       = errors.New("alias not found:")
+	ErrDisabledAlias        = errors.New("alias disabled:")
+	ErrPostAlias            = errors.New("Unable to create alias. Please try again.")
+	ErrPostAliasLimit       = errors.New("You’ve reached the maximum number of allowed aliases.")
+	ErrPostAliasInactiveSub = errors.New("Your subscription is not active. Please renew to create new aliases.")
+	ErrUpdateAlias          = errors.New("Unable to update alias. Please try again.")
+	ErrDeleteAlias          = errors.New("Unable to delete alias. Please try again.")
+	ErrDeleteAliasByUserID  = errors.New("Unable to delete aliases for this user.")
+	ErrDeleteAliasByDomain  = errors.New("Unable to delete aliases for this domain.")
 )
 
 type AliasStore interface {
@@ -108,9 +109,8 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 		return model.Alias{}, ErrPostAlias
 	}
 
-	if !sub.IsActive() {
-		log.Println("error creating alias: subscription is not active")
-		return model.Alias{}, ErrPostAlias
+	if !sub.ActiveStatus() {
+		return model.Alias{}, ErrPostAliasInactiveSub
 	}
 
 	count, err := s.Store.GetAliasDailyCount(ctx, alias.UserID)

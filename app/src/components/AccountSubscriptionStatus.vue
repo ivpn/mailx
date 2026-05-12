@@ -7,20 +7,7 @@
             <div>
                 <h4>Limited Access Mode</h4>
                 <p>
-                    Your MailX account is in limited access mode. To regain full access add time to your <a target="_blank" :href="activateUrl">IVPN account</a>.
-                </p>
-            </div>
-        </footer>
-    </div>
-    <div v-if="isPendingDelete() && isDashboard && sub.id" class="card-tertiary m-8 mb-0">
-        <footer>
-            <div>
-                <i class="icon info icon-primary"></i>
-            </div>
-            <div>
-                <h4>Pending Deletion</h4>
-                <p>
-                    Your account is pending deletion. Forwards and replies are disabled. To reinstate access add time to your <a target="_blank" :href="activateUrl">IVPN account</a>.
+                    Existing aliases forward normally. New aliases are disabled. Add time to your <a target="_blank" :href="activateUrl">IVPN account</a> to restore access.
                 </p>
             </div>
         </footer>
@@ -56,10 +43,6 @@ const getSubscription = async () => {
 
 const isLimited = () => {
     return sub.value.status === 'limited_access'
-}
-
-const isPendingDelete = () => {
-    return sub.value.status === 'pending_delete'
 }
 
 onMounted(() => {

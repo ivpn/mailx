@@ -43,10 +43,10 @@ func UpdateActiveSubscriptions(db *gorm.DB) {
 	}
 }
 
-// Find subscriptions with `notified` false and `active_until` expired 1 day ago
+// Find subscriptions with `notified` false and in limited access (updated_at or active_until expired 3 days ago)
 func GetExpiringSubscriptions(db *gorm.DB) ([]model.Subscription, error) {
 	subs := []model.Subscription{}
-	err := db.Where("notified = false AND active_until < NOW() - INTERVAL 1 DAY").Find(&subs).Error
+	err := db.Where("notified = false AND (updated_at < NOW() - INTERVAL 3 DAY OR active_until < NOW() - INTERVAL 3 DAY)").Find(&subs).Error
 	if err != nil {
 		log.Println("Error fetching expiring subscriptions:", err)
 		return nil, err

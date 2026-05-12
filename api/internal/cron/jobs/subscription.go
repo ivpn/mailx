@@ -36,7 +36,7 @@ func NotifyExpiringSubscriptionsJob(cfg config.Config, db *gorm.DB) {
 // Set `notified` to false for all subscriptions that are active
 func UpdateActiveSubscriptions(db *gorm.DB) {
 	err := db.Model(&model.Subscription{}).
-		Where("active_until >= NOW()").
+		Where("updated_at >= NOW() - INTERVAL 3 DAY AND active_until >= NOW() - INTERVAL 3 DAY").
 		UpdateColumn("notified", false).Error
 	if err != nil {
 		log.Println("Error resetting notified flag for active subscriptions:", err)

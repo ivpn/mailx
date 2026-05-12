@@ -121,6 +121,12 @@ func (s *Service) GetDNSConfig(ctx context.Context, userId string) (model.DNSCon
 }
 
 func (s *Service) PostDomain(ctx context.Context, domain model.Domain) (model.Domain, error) {
+	sub, err := s.GetSubscription(context.Background(), domain.UserID)
+	if err != nil {
+		log.Printf("error fetching subscription: %s", err.Error())
+		return model.Domain{}, ErrPostDomain
+	}
+
 	if !sub.ActiveStatus() {
 		log.Println("error creating domain: subscription is not active")
 		return model.Domain{}, ErrPostDomainInactiveSub
@@ -131,7 +137,7 @@ func (s *Service) PostDomain(ctx context.Context, domain model.Domain) (model.Do
 		return model.Domain{}, ErrPostDomainPredefined
 	}
 
-	err := s.VerifyDomainOwner(ctx, domain.Name, domain.UserID)
+	err = s.VerifyDomainOwner(ctx, domain.Name, domain.UserID)
 	if err != nil {
 		log.Printf("error verifying domain ownership: %s", err.Error())
 		return model.Domain{}, ErrDNSLookupOwner

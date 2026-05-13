@@ -77,7 +77,7 @@ func (s *Service) AddSubscription(ctx context.Context, subscription model.Subscr
 	return nil
 }
 
-func (s *Service) UpdateSubscription(ctx context.Context, sub model.Subscription, subID string, sessionId string) error {
+func (s *Service) UpdateSubscription(ctx context.Context, sub model.Subscription, sessionId string) error {
 	paSession, err := s.GetPASession(ctx, sessionId)
 	if err != nil {
 		log.Printf("error updating subscription: %s", err.Error())
@@ -116,13 +116,6 @@ func (s *Service) UpdateSubscription(ctx context.Context, sub model.Subscription
 		log.Printf("error updating subscription: %s", err.Error())
 		return ErrUpdateSubscription
 	}
-
-	// Removed as redundant
-	// err = s.Http.SignupWebhook(subID)
-	// if err != nil {
-	// 	log.Printf("error updating subscription: %s", err.Error())
-	// 	return ErrSignupWebhook
-	// }
 
 	return nil
 }

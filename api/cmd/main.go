@@ -40,6 +40,14 @@ func Run() error {
 }
 
 func main() {
+	if len(os.Args) > 1 && os.Args[1] == "send-template-managed" {
+		if err := runSendTemplateManaged(os.Args[2:]); err != nil {
+			log.Println(err)
+			os.Exit(1)
+		}
+		return
+	}
+
 	if len(os.Args) > 1 && os.Args[1] == "send-template" {
 		if err := runSendTemplate(os.Args[2:]); err != nil {
 			log.Println(err)

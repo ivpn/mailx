@@ -17,7 +17,7 @@ const (
 	GracePeriod   SubscriptionStatus = "grace_period"
 	LimitedAccess SubscriptionStatus = "limited_access"
 	PendingDelete SubscriptionStatus = "pending_delete"
-	Tier1         string             = "Tier 1"
+	Tier1         string             = "IVPN Tier 1"
 )
 
 type Subscription struct {

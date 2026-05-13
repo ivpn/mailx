@@ -22,6 +22,85 @@ func expiredSubscription() *Subscription {
 	}
 }
 
+// --- Active ---
+
+func TestActive(t *testing.T) {
+	future := time.Now().Add(30 * 24 * time.Hour)
+	recent := time.Now().Add(-1 * time.Hour)
+	outageTime := time.Now().Add(-49 * time.Hour)
+
+	tests := []struct {
+		name        string
+		activeUntil time.Time
+		updatedAt   time.Time
+		tier        string
+		want        bool
+	}{
+		{
+			name:        "active: future ActiveUntil, non-Tier1, no outage",
+			activeUntil: future,
+			updatedAt:   recent,
+			tier:        "Tier 2",
+			want:        true,
+		},
+		{
+			name:        "not active: ActiveUntil in the past",
+			activeUntil: time.Now().Add(-1 * time.Hour),
+			updatedAt:   recent,
+			tier:        "Tier 2",
+			want:        false,
+		},
+		{
+			name:        "not active: tier is IVPN Tier 1",
+			activeUntil: future,
+			updatedAt:   recent,
+			tier:        Tier1,
+			want:        false,
+		},
+		{
+			name:        "not active: outage (UpdatedAt > 48h ago)",
+			activeUntil: future,
+			updatedAt:   outageTime,
+			tier:        "Tier 2",
+			want:        false,
+		},
+		{
+			name:        "not active: expired and outage and Tier1",
+			activeUntil: time.Now().Add(-1 * time.Hour),
+			updatedAt:   outageTime,
+			tier:        Tier1,
+			want:        false,
+		},
+		{
+			name:        "not active: UpdatedAt is zero (no outage), but ActiveUntil in past",
+			activeUntil: time.Now().Add(-1 * time.Hour),
+			updatedAt:   time.Time{},
+			tier:        "Tier 2",
+			want:        false,
+		},
+		{
+			name:        "active: UpdatedAt is zero (no outage), ActiveUntil in future, non-Tier1",
+			activeUntil: future,
+			updatedAt:   time.Time{},
+			tier:        "Tier 2",
+			want:        true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &Subscription{
+				ActiveUntil: tt.activeUntil,
+				UpdatedAt:   tt.updatedAt,
+				Tier:        tt.tier,
+			}
+			if got := s.Active(); got != tt.want {
+				t.Errorf("Active() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 // --- GracePeriodDays ---
 
 func TestGracePeriodDays(t *testing.T) {
@@ -113,79 +192,6 @@ func TestOutageGracePeriodDays(t *testing.T) {
 			s := &Subscription{UpdatedAt: tt.updatedAt}
 			if got := s.OutageGracePeriodDays(tt.days); got != tt.want {
 				t.Errorf("OutageGracePeriodDays(%d) = %v, want %v", tt.days, got, tt.want)
-			}
-		})
-	}
-}
-
-// --- Active ---
-
-func TestActive(t *testing.T) {
-	future := time.Now().Add(30 * 24 * time.Hour)
-	past := time.Now().Add(-30 * 24 * time.Hour)
-	recent := time.Now().Add(-1 * time.Hour)
-	outageTime := time.Now().Add(-49 * time.Hour)
-
-	tests := []struct {
-		name        string
-		activeUntil time.Time
-		updatedAt   time.Time
-		tier        string
-		want        bool
-	}{
-		{
-			name:        "active: future expiry, non-Tier1, no outage",
-			activeUntil: future,
-			updatedAt:   recent,
-			tier:        "Tier 2",
-			want:        true,
-		},
-		{
-			name:        "inactive: expired subscription",
-			activeUntil: past,
-			updatedAt:   recent,
-			tier:        "Tier 2",
-			want:        false,
-		},
-		{
-			name:        "inactive: Tier 1 subscription",
-			activeUntil: future,
-			updatedAt:   recent,
-			tier:        Tier1,
-			want:        false,
-		},
-		{
-			name:        "inactive: tier contains 'Tier 1' string",
-			activeUntil: future,
-			updatedAt:   recent,
-			tier:        "Tier 1 Plus",
-			want:        false,
-		},
-		{
-			name:        "inactive: outage (updatedAt > 48h ago)",
-			activeUntil: future,
-			updatedAt:   outageTime,
-			tier:        "Tier 2",
-			want:        false,
-		},
-		{
-			name:        "inactive: expired and Tier 1",
-			activeUntil: past,
-			updatedAt:   recent,
-			tier:        Tier1,
-			want:        false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			s := &Subscription{
-				ActiveUntil: tt.activeUntil,
-				UpdatedAt:   tt.updatedAt,
-				Tier:        tt.tier,
-			}
-			if got := s.Active(); got != tt.want {
-				t.Errorf("Active() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -435,7 +441,7 @@ func TestGetStatus(t *testing.T) {
 			want:        LimitedAccess,
 		},
 		{
-			name:        "Tier 1 subscription (not active) returns LimitedAccess",
+			name:        "IVPN Tier 1 subscription (not active) returns LimitedAccess",
 			activeUntil: future,
 			updatedAt:   recent,
 			tier:        Tier1,

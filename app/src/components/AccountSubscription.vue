@@ -20,6 +20,18 @@
                 {{ activeUntilDate() }}
             </p>
         </div>
+        <div v-if="isManaged()" class="card-tertiary">
+            <footer>
+                <div class="pt-1.5">
+                    <i class="icon info icon-primary"></i>
+                </div>
+                <div class="pt-1.5">
+                    <p>
+                        Mailx beta ends May 19. To keep access, follow  <a target="_blank" :href="resyncUrl">this link</a> and sync with your IVPN account.
+                    </p>
+                </div>
+            </footer>
+        </div>
         <div v-if="isLimited()" class="card-tertiary">
             <footer>
                 <div>
@@ -65,6 +77,7 @@ const sub = ref({
     active_until: '',
     status: '',
     outage: false,
+    type: '',
 })
 const error = ref('')
 const success = ref('')
@@ -138,6 +151,10 @@ const isActive = () => {
 
 const isLimited = () => {
     return sub.value.status === 'limited_access'
+}
+
+const isManaged = () => {
+    return sub.value.type === 'Managed'
 }
 
 const activeUntilDate = () => {

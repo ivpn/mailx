@@ -1,4 +1,16 @@
 <template>
+    <div v-if="isManaged() && isDashboard && sub.id" class="card-tertiary md:m-8 md:mb-0 sm:mb-0 m-5">
+        <footer>
+            <div class="pt-1.5">
+                <i class="icon info icon-primary"></i>
+            </div>
+            <div class="pt-1.5">
+                <p>
+                    Mailx beta ends May 19. To keep access, follow  <a target="_blank" :href="resyncUrl">this link</a> and sync with your IVPN account.
+                </p>
+            </div>
+        </footer>
+    </div>
     <div v-if="isLimited() && isDashboard && sub.id" class="card-tertiary md:m-8 md:mb-0 sm:mb-0 m-5">
         <footer>
             <div>
@@ -25,6 +37,7 @@ const sub = ref({
     active_until: '',
     status: '',
     outage: false,
+    type: '',
 })
 
 const route = ref('/')
@@ -32,6 +45,7 @@ const currentRoute = useRoute()
 const props = defineProps(['dashboard'])
 const isDashboard = props.dashboard
 const activateUrl = import.meta.env.VITE_RESYNC_URL
+const resyncUrl = import.meta.env.VITE_RESYNC_URL + '?action=sync&service=mail'
 
 const getSubscription = async () => {
     try {
@@ -43,6 +57,10 @@ const getSubscription = async () => {
 
 const isLimited = () => {
     return sub.value.status === 'limited_access'
+}
+
+const isManaged = () => {
+    return sub.value.type === 'Managed'
 }
 
 onMounted(() => {

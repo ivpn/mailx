@@ -32,6 +32,7 @@ type Subscription struct {
 	Notified    bool               `json:"-"`
 	Status      SubscriptionStatus `gorm:"-" json:"status"`
 	Outage      bool               `gorm:"-" json:"outage"`
+	Type        string             `json:"type"`
 }
 
 func (s *Subscription) Active() bool {

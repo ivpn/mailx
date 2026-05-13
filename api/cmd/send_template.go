@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -9,6 +10,7 @@ import (
 
 	"ivpn.net/email/api/config"
 	"ivpn.net/email/api/internal/client/mailer"
+	"ivpn.net/email/api/internal/repository"
 )
 
 func smtpConfigFromEnv() config.SMTPClientConfig {
@@ -22,6 +24,70 @@ func smtpConfigFromEnv() config.SMTPClientConfig {
 		Report:      os.Getenv("SMTP_CLIENT_REPORT"),
 		TokenSecret: os.Getenv("TOKEN_SECRET"),
 	}
+}
+
+func dbConfigFromEnv() config.DBConfig {
+	return config.DBConfig{
+		Hosts:    strings.Split(os.Getenv("DB_HOSTS"), ","),
+		Port:     os.Getenv("DB_PORT"),
+		Name:     os.Getenv("DB_NAME"),
+		User:     os.Getenv("DB_USER"),
+		Password: os.Getenv("DB_PASSWORD"),
+	}
+}
+
+func runSendTemplateManaged(args []string) error {
+	fs := flag.NewFlagSet("send-template-managed", flag.ContinueOnError)
+	tmpl := fs.String("template", "", "Template filename (e.g. expiring_beta.tmpl)")
+	subject := fs.String("subject", "", "Email subject")
+
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
+
+	if *tmpl == "" {
+		fs.Usage()
+		return fmt.Errorf("--template is required")
+	}
+	if *subject == "" {
+		fs.Usage()
+		return fmt.Errorf("--subject is required")
+	}
+
+	db, err := repository.NewDB(dbConfigFromEnv())
+	if err != nil {
+		return fmt.Errorf("connecting to database: %w", err)
+	}
+
+	emails, err := db.GetManagedUserEmails(context.Background())
+	if err != nil {
+		return fmt.Errorf("querying managed users: %w", err)
+	}
+
+	if len(emails) == 0 {
+		log.Println("no managed users found")
+		return nil
+	}
+
+	log.Printf("found %d managed user(s)", len(emails))
+
+	m := mailer.New(smtpConfigFromEnv())
+
+	var failed int
+	for _, email := range emails {
+		err := m.SendTemplate(email, *subject, *tmpl, nil)
+		if err != nil {
+			log.Printf("failed to send to %s: %s", email, err.Error())
+			failed++
+		} else {
+			log.Printf("sent to %s", email)
+		}
+	}
+
+	if failed > 0 {
+		return fmt.Errorf("%d recipient(s) failed", failed)
+	}
+	return nil
 }
 
 func runSendTemplate(args []string) error {

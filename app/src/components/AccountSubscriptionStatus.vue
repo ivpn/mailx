@@ -1,5 +1,5 @@
 <template>
-    <div v-if="isLimited() && isDashboard && sub.id" class="card-tertiary m-8 mb-0">
+    <div v-if="isLimited() && isDashboard && sub.id" class="card-tertiary md:m-8 md:mb-0 sm:mb-0 m-5">
         <footer>
             <div>
                 <i class="icon info icon-primary"></i>

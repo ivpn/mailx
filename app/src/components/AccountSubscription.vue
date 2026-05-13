@@ -82,7 +82,6 @@ const sub = ref({
 const error = ref('')
 const success = ref('')
 const email = ref(localStorage.getItem('email'))
-const subid = ref('')
 const sessionid = ref('')
 const currentRoute = useRoute()
 const syncing = ref(false)
@@ -101,15 +100,10 @@ const getSubscription = async () => {
 }
 
 const updateSubscription = async () => {
-    if (!subid.value) {
-        return
-    }
-
     syncing.value = true
     try {
         const res = await subscriptionApi.update({
             id: sub.value.id,
-            subid: subid.value,
         })
         success.value = res.data.message
         error.value = ''
@@ -177,12 +171,7 @@ const parseParams = () => {
     const route = useRoute()
     const q = route.query
     const first = (v: unknown) => typeof v === 'string' ? v : Array.isArray(v) ? v[0] : ''
-    subid.value = first(q.subid) || (route.params.subid as string) || ''
     sessionid.value = first(q.sessionid) || (route.params.sessionid as string) || ''
-
-    if (!subid.value || !subid.value.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
-        return
-    }
 
     if (!sessionid.value || !sessionid.value.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
         return

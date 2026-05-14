@@ -117,10 +117,13 @@ func (s *Service) UpdateSubscription(ctx context.Context, sub model.Subscription
 		return ErrUpdateSubscription
 	}
 
-	err = s.Http.SignupWebhook(subID)
-	if err != nil {
-		log.Printf("error updating subscription: %s", err.Error())
-		return ErrSignupWebhook
+	_, err = uuid.Parse(subID)
+	if err == nil && subID != "" {
+		err = s.Http.SignupWebhook(subID)
+		if err != nil {
+			log.Printf("error updating subscription: %s", err.Error())
+			return ErrSignupWebhook
+		}
 	}
 
 	return nil

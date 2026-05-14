@@ -16,7 +16,7 @@ var (
 
 type SubscriptionService interface {
 	GetSubscription(context.Context, string) (model.Subscription, error)
-	UpdateSubscription(context.Context, model.Subscription, string) error
+	UpdateSubscription(context.Context, model.Subscription, string, string) error
 	AddPASession(context.Context, model.PASession) error
 	RotatePASessionId(context.Context, string) (string, error)
 }
@@ -81,7 +81,7 @@ func (h *Handler) UpdateSubscription(c *fiber.Ctx) error {
 		})
 	}
 
-	err = h.Service.UpdateSubscription(c.Context(), sub, sessionId)
+	err = h.Service.UpdateSubscription(c.Context(), sub, req.SubID, sessionId)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),

@@ -101,10 +101,6 @@ const getSubscription = async () => {
 }
 
 const updateSubscription = async () => {
-    if (!subid.value) {
-        return
-    }
-
     syncing.value = true
     try {
         const res = await subscriptionApi.update({
@@ -179,10 +175,6 @@ const parseParams = () => {
     const first = (v: unknown) => typeof v === 'string' ? v : Array.isArray(v) ? v[0] : ''
     subid.value = first(q.subid) || (route.params.subid as string) || ''
     sessionid.value = first(q.sessionid) || (route.params.sessionid as string) || ''
-
-    if (!subid.value || !subid.value.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
-        return
-    }
 
     if (!sessionid.value || !sessionid.value.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
         return

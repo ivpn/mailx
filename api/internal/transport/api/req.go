@@ -27,7 +27,7 @@ type SignupEmailReq struct {
 
 type SubscriptionReq struct {
 	ID    string `json:"id" validate:"required,uuid"`
-	SubID string `json:"subid" validate:"required,uuid"`
+	SubID string `json:"subid"`
 }
 
 type AliasReq struct {

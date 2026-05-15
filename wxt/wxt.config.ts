@@ -8,7 +8,7 @@ export default defineConfig({
     console.log('API URL:', apiUrl)
     return {
       host_permissions: apiUrl ? [apiUrl + '/*'] : [],
-      permissions: ['storage', 'activeTab'],
+      permissions: ['storage'],
       web_accessible_resources: [
         {
           resources: ['mailx.svg'],

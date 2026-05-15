@@ -17,7 +17,7 @@ const (
 	GracePeriod   SubscriptionStatus = "grace_period"
 	LimitedAccess SubscriptionStatus = "limited_access"
 	PendingDelete SubscriptionStatus = "pending_delete"
-	Tier1         string             = "Tier 1"
+	Tier1         string             = "IVPN Tier 1"
 )
 
 type Subscription struct {
@@ -25,6 +25,7 @@ type Subscription struct {
 	CreatedAt   time.Time          `json:"created_at"`
 	UpdatedAt   time.Time          `json:"updated_at"`
 	UserID      string             `json:"-"`
+	Type        string             `json:"type"`
 	ActiveUntil time.Time          `json:"active_until"`
 	IsActive    bool               `json:"-"`
 	Tier        string             `json:"tier"`
@@ -43,15 +44,11 @@ func (s *Subscription) GracePeriod() bool {
 }
 
 func (s *Subscription) LimitedAccess() bool {
-	return s.GracePeriodDays(14) || (s.OutageGracePeriodDays(14) && s.IsOutage())
-}
-
-func (s *Subscription) PendingDelete() bool {
-	if s.UpdatedAt.AddDate(0, 0, 14).Before(time.Now()) {
+	if s.UpdatedAt.AddDate(0, 0, 3).Before(time.Now()) {
 		return true
 	}
 
-	if s.ActiveUntil.AddDate(0, 0, 14).Before(time.Now()) {
+	if s.ActiveUntil.AddDate(0, 0, 3).Before(time.Now()) {
 		return true
 	}
 
@@ -85,11 +82,5 @@ func (s *Subscription) GetStatus() SubscriptionStatus {
 	if s.GracePeriod() {
 		return GracePeriod
 	}
-	if s.PendingDelete() {
-		return PendingDelete
-	}
-	if s.LimitedAccess() {
-		return LimitedAccess
-	}
-	return PendingDelete
+	return LimitedAccess
 }

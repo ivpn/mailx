@@ -9,7 +9,7 @@ ENV CGO_ENABLED=0
 ENV GOOS=linux
 ENV GOARCH=amd64
 
-RUN go build -o api cmd/main.go
+RUN go build -o api ./cmd/
 
 # stage 2: copy only the application binary file and necessary files to the alpine container
 FROM alpine:latest AS production

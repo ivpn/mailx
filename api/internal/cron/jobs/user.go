@@ -4,7 +4,6 @@ import (
 	"log"
 
 	"gorm.io/gorm"
-	"ivpn.net/email/api/config"
 	"ivpn.net/email/api/internal/model"
 )
 
@@ -17,34 +16,6 @@ func DeleteUnverifiedUsers(db *gorm.DB) {
 		return
 	}
 
-	deleteUsers(db, users)
-}
-
-// Delete expired users after grace period
-func DeleteExpiredUsers(db *gorm.DB, cfg config.ServiceConfig) {
-	// Get expired subscriptions
-	subs := []model.Subscription{}
-	err := db.Where("active_until < NOW() - INTERVAL ? DAY", cfg.AccountGracePeriodDays).Find(&subs).Error
-	if err != nil {
-		log.Println("Error fetching expired subscriptions:", err)
-		return
-	}
-
-	// Make userIDs slice from subscriptions
-	userIDs := make([]string, 0, len(subs))
-	for _, sub := range subs {
-		userIDs = append(userIDs, sub.UserID)
-	}
-
-	// Make user models from userIDs
-	users := []model.User{}
-	err = db.Where("id IN ?", userIDs).Find(&users).Error
-	if err != nil {
-		log.Println("Error fetching users:", err)
-		return
-	}
-
-	// Delete users
 	deleteUsers(db, users)
 }
 

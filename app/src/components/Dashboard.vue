@@ -7,6 +7,7 @@
             <div class="mobile">
                 <MobileHeader />
             </div>
+            <SubscriptionStatus v-if="route.path !== '/account/profile'" :dashboard="true" />
             <router-view></router-view>
             <div class="mobile">
                 <Tabbar />
@@ -16,7 +17,11 @@
 </template>
 
 <script setup lang="ts">
+import { useRoute } from 'vue-router'
 import Sidebar from './Sidebar.vue'
 import Tabbar from './Tabbar.vue';
 import MobileHeader from './MobileHeader.vue';
+import SubscriptionStatus from './AccountSubscriptionStatus.vue';
+
+const route = useRoute()
 </script>

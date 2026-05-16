@@ -28,11 +28,11 @@ func New(db *gorm.DB) {
 		return
 	}
 
-	err = gocron.Every(1).Hour().Do(jobs.DeleteUnverifiedUsers, db)
-	if err != nil {
-		log.Println("Error scheduling job:", err)
-		return
-	}
+	// err = gocron.Every(1).Hour().Do(jobs.DeleteUnverifiedUsers, db)
+	// if err != nil {
+	// 	log.Println("Error scheduling job:", err)
+	// 	return
+	// }
 
 	err = gocron.Every(1).Hour().Do(jobs.CleanupDeletedAliases, db)
 	if err != nil {
@@ -41,12 +41,6 @@ func New(db *gorm.DB) {
 	}
 
 	err = gocron.Every(1).Hour().Do(jobs.DeleteExpiredSessions, db, cfg.API)
-	if err != nil {
-		log.Println("Error scheduling job:", err)
-		return
-	}
-
-	err = gocron.Every(1).Hour().Do(jobs.DeleteExpiredUsers, db, cfg.Service)
 	if err != nil {
 		log.Println("Error scheduling job:", err)
 		return

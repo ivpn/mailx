@@ -1,10 +1,15 @@
 <template>
-    <div class="p-4">
+    <div class="p-4 pb-16">
         <h2 class="m-0">Settings</h2>
         <hr class="my-5">
         <p class="text-sm my-4">Show Mailx button on email input fields:</p>
         <div class="flex items-center">
             <input @change="toggleInputButton(($event.target as HTMLInputElement).checked)" v-bind:checked="preferences.input_button" type="checkbox">
+        </div>
+        <hr class="my-5">
+        <p class="text-sm my-4">Add website description when creating alias via input button:</p>
+        <div class="flex items-center">
+            <input @change="toggleAddDescription(($event.target as HTMLInputElement).checked)" v-bind:checked="preferences.add_description" type="checkbox">
         </div>
         <hr class="my-5">
         <p class="text-sm my-4">Refresh recipients, domains and defaults:</p>
@@ -74,6 +79,11 @@ const processResponse = (res: any) => {
 
 const toggleInputButton = async (enabled: boolean) => {
     const newPreferences = { ...props.preferences, input_button: enabled }
+    store.setPreferences(newPreferences)
+}
+
+const toggleAddDescription = async (enabled: boolean) => {
+    const newPreferences = { ...props.preferences, add_description: enabled }
     store.setPreferences(newPreferences)
 }
 </script>

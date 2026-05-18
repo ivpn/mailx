@@ -54,7 +54,7 @@ export const store = {
 
     async getPreferences(): Promise<Preferences> {
         const { preferences } = await browser.storage.local.get(STORAGE_KEYS.preferences)
-        return preferences || { input_button: true }
+        return preferences || { input_button: true, add_description: true }
     },
 
     async setPreferences(preferences: Preferences): Promise<void> {

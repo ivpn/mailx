@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"slices"
 
 	"ivpn.net/email/api/internal/model"
 )
@@ -92,9 +93,9 @@ func (s *Service) RemoveLastMessage(ctx context.Context, aliasId string, userId 
 	}
 
 	var lastMessageID uint
-	for i := len(messages) - 1; i >= 0; i-- {
-		if messages[i].Type == typ {
-			lastMessageID = messages[i].ID
+	for _, m := range slices.Backward(messages) {
+		if m.Type == typ {
+			lastMessageID = m.ID
 			break
 		}
 	}

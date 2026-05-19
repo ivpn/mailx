@@ -21,18 +21,20 @@ const (
 )
 
 type Subscription struct {
-	ID          string             `gorm:"unique" json:"id"`
-	CreatedAt   time.Time          `json:"created_at"`
-	UpdatedAt   time.Time          `json:"updated_at"`
-	UserID      string             `json:"-"`
-	Type        string             `json:"type"`
-	ActiveUntil time.Time          `json:"active_until"`
-	IsActive    bool               `json:"-"`
-	Tier        string             `json:"tier"`
-	TokenHash   string             `gorm:"unique" json:"-"`
-	Notified    bool               `json:"-"`
-	Status      SubscriptionStatus `gorm:"-" json:"status"`
-	Outage      bool               `gorm:"-" json:"outage"`
+	ID           string             `gorm:"unique" json:"id"`
+	CreatedAt    time.Time          `json:"created_at"`
+	UpdatedAt    time.Time          `json:"updated_at"`
+	UserID       string             `json:"-"`
+	Type         string             `json:"type"`
+	ActiveUntil  time.Time          `json:"active_until"`
+	IsActive     bool               `json:"-"`
+	Tier         string             `json:"tier"`
+	TokenHash    string             `gorm:"unique" json:"-"`
+	Notified     bool               `json:"-"`
+	Status       SubscriptionStatus `gorm:"-" json:"status"`
+	Outage       bool               `gorm:"-" json:"outage"`
+	Terminated   bool               `json:"terminated"`
+	TerminatedAt time.Time          `json:"terminated_at"`
 }
 
 func (s *Subscription) Active() bool {

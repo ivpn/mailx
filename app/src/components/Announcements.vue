@@ -9,15 +9,15 @@
         <h1>News</h1>
         <hr>
 
-        <div v-if="!loaded && !error" class="card-empty">
+        <div v-if="!loaded && !error">
             <p>Loading...</p>
         </div>
 
-        <div v-if="error" class="card-empty">
+        <div v-if="error">
             <p class="text-red-500">{{ error }}</p>
         </div>
 
-        <div v-if="loaded && list.length === 0" class="card-empty">
+        <div v-if="loaded && list.length === 0">
             <p>No news.</p>
         </div>
 
@@ -66,6 +66,10 @@ const getList = async () => {
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.response?.data.error || err.message
+
+            if (err.response?.status === 429) {
+                error.value = 'Too many requests, please try again later.'
+            }
         }
     }
 }

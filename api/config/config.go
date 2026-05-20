@@ -27,6 +27,7 @@ type APIConfig struct {
 	PreauthURL         string
 	PreauthPSK         string
 	PreauthTTL         time.Duration
+	AnnouncementsURL   string
 }
 
 type DBConfig struct {
@@ -168,6 +169,7 @@ func New() (Config, error) {
 			PreauthURL:         os.Getenv("PREAUTH_URL"),
 			PreauthPSK:         os.Getenv("PREAUTH_PSK"),
 			PreauthTTL:         preauthTTL,
+			AnnouncementsURL:   os.Getenv("ANNOUNCEMENTS_URL"),
 		},
 		DB: DBConfig{
 			Hosts:    dbHosts,

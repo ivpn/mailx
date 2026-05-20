@@ -23,6 +23,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	h.Server.Use(helmet.New())
 	h.Server.Use(healthcheck.New())
 
+	h.Server.Get("/v1/announcements", limiter.New(), h.GetAnnouncements)
 	h.Server.Post("/v1/register", limiter.New(), h.Register)
 	h.Server.Post("/v1/login", limit.New(5, 10*time.Minute), h.Login)
 	h.Server.Post("/v1/initiatepasswordreset", limiter.New(), h.InitiatePasswordReset)

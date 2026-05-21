@@ -22,6 +22,10 @@
 
 - [Docker Mailserver](https://github.com/docker-mailserver/docker-mailserver)  
 
+## Browser Extension
+
+- [WXT](https://wxt.dev)  
+
 ## Installation
 
 ### Prerequisites
@@ -160,6 +164,32 @@ docker compose down
 docker compose up -d
 ```
 
+### Browser Extension
+
+#### Move to wxt directory
+```bash
+cd wxt
+```
+
+#### Run (development)
+```bash
+yarn dev
+yarn dev:firefox
+```
+
+#### Build (beta, testing)
+```bash
+yarn build
+yarn build:staging
+yarn build:production
+yarn build:firefox
+```
+
+#### Build (distribution)
+```bash
+yarn zip
+yarn zip:firefox
+```
 
 ## Add New Domain
 

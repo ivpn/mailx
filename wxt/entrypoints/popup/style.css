@@ -1,0 +1,32 @@
+@import "../../../app/src/style/fonts/fonts.css";
+@import "../../../app/src/style/components/color.css";
+@import "../../../app/src/style/components/page.css";
+@import "../../../app/src/style/components/button.css";
+@import "../../../app/src/style/components/form.css";
+@import "../../../app/src/style/components/text.css";
+@import "../../../app/src/style/components/icon.css";
+@import "../../../app/src/style/components/plugin.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    nav {
+
+        button {
+            @apply text-secondary py-3 font-medium text-sm w-full cursor-pointer px-6 flex flex-row items-center gap-x-2 justify-center;
+
+            &.active {
+                @apply text-accent;
+            }
+        }
+    }
+
+    .card-tertiary {
+
+        article {
+            @apply pt-10;
+        }
+    }
+}

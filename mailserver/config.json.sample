@@ -1,0 +1,7 @@
+{
+    "auths": {
+        "<REGISTRY_NAME>": {
+            "auth": "<echo -n 'username:password' | base64>"
+        }
+    }
+}

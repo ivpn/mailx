@@ -51,6 +51,7 @@ cp mailserver/config/rspamd/override.d/milter_headers.conf.sample mailserver/doc
 > - app/src/env.json
 > - mailserver/.env
 > - mailserver/docker-data/dms/config/user-patches.sh: `-X POST {API_URL}`
+> - create and configure `config.json` (registry credentials for daemon): `cp config.json.sample config.json`
 
 > [!TIP]
 > For local testing, you can use [MailHog](https://github.com/mailhog/MailHog) or [MailTrap](https://mailtrap.io/email-sandbox/) as outbound SMTP client (`SMTP_CLIENT_*`).

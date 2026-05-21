@@ -20,6 +20,18 @@
                 {{ activeUntilDate() }}
             </p>
         </div>
+        <div v-if="isManaged()" class="card-tertiary">
+            <footer>
+                <div class="pt-1.5">
+                    <i class="icon info icon-primary"></i>
+                </div>
+                <div class="pt-1.5">
+                    <p>
+                        Mailx beta ends May 19. To keep access, follow  <a target="_blank" :href="resyncUrl">this link</a> and sync with your IVPN account.
+                    </p>
+                </div>
+            </footer>
+        </div>
         <div v-if="isLimited()" class="card-tertiary">
             <footer>
                 <div>
@@ -28,20 +40,7 @@
                 <div>
                     <h4>Limited Access Mode</h4>
                     <p>
-                        Your MailX account is in limited access mode. To regain full access add time to your <a target="_blank" :href="activateUrl">IVPN account</a>.
-                    </p>
-                </div>
-            </footer>
-        </div>
-        <div v-if="isPendingDelete()" class="card-tertiary">
-            <footer>
-                <div>
-                    <i class="icon info icon-primary"></i>
-                </div>
-                <div>
-                    <h4>Pending Deletion</h4>
-                    <p>
-                        Your account is pending deletion. Forwards and replies are disabled. To reinstate access add time to your <a target="_blank" :href="activateUrl">IVPN account</a>.
+                        Existing aliases forward normally. New aliases are disabled. Add time to your <a target="_blank" :href="activateUrl">IVPN account</a> to restore access.
                     </p>
                 </div>
             </footer>
@@ -78,6 +77,7 @@ const sub = ref({
     active_until: '',
     status: '',
     outage: false,
+    type: '',
 })
 const error = ref('')
 const success = ref('')
@@ -101,10 +101,6 @@ const getSubscription = async () => {
 }
 
 const updateSubscription = async () => {
-    if (!subid.value) {
-        return
-    }
-
     syncing.value = true
     try {
         const res = await subscriptionApi.update({
@@ -153,8 +149,8 @@ const isLimited = () => {
     return sub.value.status === 'limited_access'
 }
 
-const isPendingDelete = () => {
-    return sub.value.status === 'pending_delete'
+const isManaged = () => {
+    return sub.value.type === 'Managed'
 }
 
 const activeUntilDate = () => {
@@ -179,10 +175,6 @@ const parseParams = () => {
     const first = (v: unknown) => typeof v === 'string' ? v : Array.isArray(v) ? v[0] : ''
     subid.value = first(q.subid) || (route.params.subid as string) || ''
     sessionid.value = first(q.sessionid) || (route.params.sessionid as string) || ''
-
-    if (!subid.value || !subid.value.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
-        return
-    }
 
     if (!sessionid.value || !sessionid.value.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
         return

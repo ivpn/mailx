@@ -600,11 +600,29 @@ const pricingPlans = [
                 <span class="landing-footer-strip-text">2026 Mailx</span>
                 <span class="landing-footer-strip-divider" aria-hidden="true"></span>
                 <a
+                    href="/privacy"
+                    class="landing-footer-strip-text landing-footer-strip-link"
+                >
+                    ./PRIVACY
+                </a>
+                <a
+                    href="/tos"
+                    class="landing-footer-strip-text landing-footer-strip-link"
+                >
+                    ./TERMS
+                </a>
+                <a
+                    href="/faq"
+                    class="landing-footer-strip-text landing-footer-strip-link"
+                >
+                    ./FAQ
+                </a>
+                <a
                     href="https://github.com/ivpn/mailx/blob/main/LICENSE.md"
                     target="_blank"
                     class="landing-footer-strip-text landing-footer-strip-link"
                 >
-                    ./LICENSE.txt
+                    ./LICENSE
                 </a>
             </div>
         </section>
@@ -1600,10 +1618,10 @@ img.dark-only {
 
 .landing-footer-strip {
     @apply w-full;
-    @apply flex items-center justify-center;
-    @apply gap-3;
+    @apply flex flex-wrap items-center justify-center;
+    @apply gap-x-3 gap-y-2;
     @apply py-4;
-    @apply px-8 lg:px-0;
+    @apply px-4 md:px-8 lg:px-0;
 }
 
 .landing-footer-strip-text {
@@ -1621,6 +1639,7 @@ img.dark-only {
 }
 
 .landing-footer-strip-divider {
+    @apply hidden md:block;
     @apply w-0 h-2;
     @apply border-l border-solid;
     @apply border-[#b6c1ce] dark:border-[#2d3d4d];

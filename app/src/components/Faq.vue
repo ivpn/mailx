@@ -35,6 +35,11 @@
         <p>On the 'Aliases' page, choose an alias, and click the ellipsis menu button under the 'Actions' column on the right side.  Click the 'Edit' option.</p>
         <p>Update the optional 'Description', optional 'From name', and/or the 'Recipient(s)' list, then click the 'Save' button.</p>
 
+        <h2>Account: What happens if my account expires?</h2>
+        <p>Your Mailx account enters limited access mode. Existing aliases continue to forward email as normal with no time limit. You cannot create new aliases, wildcard aliases, or recipients.</p>
+        <p>To restore full access, you need to add time to your IVPN account.</p>
+        <p>You can delete your account at any time, including in limited access mode. Deleting your account permanently removes all aliases, recipients, and associated data.</p>
+
         <h2>Aliases: How do I delete an alias?</h2>
         <p>On the 'Aliases' page, choose an alias, and click the ellipsis menu button under the 'Actions' column on the right side.  Click the 'Delete' option.</p>
         <p>A confirmation box will appear.  Click 'OK' to delete the alias, or click 'Cancel'.</p>

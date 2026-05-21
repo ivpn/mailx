@@ -65,16 +65,14 @@ type SMTPClientConfig struct {
 }
 
 type ServiceConfig struct {
-	OTPExpiration          time.Duration
-	SubscriptionType       string
-	MaxCredentials         int
-	MaxRecipients          int
-	MaxDailyAliases        int
-	MaxDailySendReply      int
-	MaxSessions            int
-	AccountGracePeriodDays int
-	IdLimiterMax           int
-	IdLimiterExpiration    time.Duration
+	OTPExpiration       time.Duration
+	MaxCredentials      int
+	MaxRecipients       int
+	MaxDailyAliases     int
+	MaxDailySendReply   int
+	MaxSessions         int
+	IdLimiterMax        int
+	IdLimiterExpiration time.Duration
 }
 
 type Config struct {
@@ -135,11 +133,6 @@ func New() (Config, error) {
 	}
 
 	maxSessions, err := strconv.Atoi(os.Getenv("MAX_SESSIONS"))
-	if err != nil {
-		return Config{}, err
-	}
-
-	accountGracePeriodDays, err := strconv.Atoi(os.Getenv("ACCOUNT_GRACE_PERIOD_DAYS"))
 	if err != nil {
 		return Config{}, err
 	}
@@ -211,16 +204,14 @@ func New() (Config, error) {
 		},
 
 		Service: ServiceConfig{
-			OTPExpiration:          otpExp,
-			SubscriptionType:       os.Getenv("SUBSCRIPTION_TYPE"),
-			MaxCredentials:         maxCredentials,
-			MaxRecipients:          maxRecipients,
-			MaxDailyAliases:        maxDailyAliases,
-			MaxDailySendReply:      maxDailySendReply,
-			MaxSessions:            maxSessions,
-			AccountGracePeriodDays: accountGracePeriodDays,
-			IdLimiterMax:           idLimiterMax,
-			IdLimiterExpiration:    idLimiterExpiration,
+			OTPExpiration:       otpExp,
+			MaxCredentials:      maxCredentials,
+			MaxRecipients:       maxRecipients,
+			MaxDailyAliases:     maxDailyAliases,
+			MaxDailySendReply:   maxDailySendReply,
+			MaxSessions:         maxSessions,
+			IdLimiterMax:        idLimiterMax,
+			IdLimiterExpiration: idLimiterExpiration,
 		},
 	}, nil
 }

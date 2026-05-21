@@ -104,6 +104,7 @@ func (s *Service) UpdateSubscription(ctx context.Context, sub model.Subscription
 	sub.IsActive = preauth.IsActive
 	sub.Tier = preauth.Tier
 	sub.TokenHash = preauth.TokenHash
+	sub.Type = ""
 
 	if sub.ID == "" || sub.UserID == "" {
 		log.Printf("error updating subscription: Subscription ID is required")
@@ -116,12 +117,14 @@ func (s *Service) UpdateSubscription(ctx context.Context, sub model.Subscription
 		return ErrUpdateSubscription
 	}
 
-	// Removed as redundant
-	// err = s.Http.SignupWebhook(subID)
-	// if err != nil {
-	// 	log.Printf("error updating subscription: %s", err.Error())
-	// 	return ErrSignupWebhook
-	// }
+	_, err = uuid.Parse(subID)
+	if err == nil && subID != "" {
+		err = s.Http.SignupWebhook(subID)
+		if err != nil {
+			log.Printf("error updating subscription: %s", err.Error())
+			return ErrSignupWebhook
+		}
+	}
 
 	return nil
 }

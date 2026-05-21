@@ -254,6 +254,7 @@ async function postAlias(): Promise<string | undefined> {
     recipients: defaults.recipient,
     format: defaults.alias_format,
     enabled: true,
+    ...(preferences?.add_description ? { description: window.location.hostname } : {}),
   }
 
   let res: CreateAliasResponse | undefined

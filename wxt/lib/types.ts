@@ -31,4 +31,5 @@ export interface Defaults {
 
 export interface Preferences {
   input_button: boolean
+  add_description: boolean
 }

@@ -39,7 +39,7 @@ cp app/.env.sample app/.env
 cp mailserver/.env.sample mailserver/.env
 mkdir -p mailserver/docker-data/dms/config/rspamd/override.d
 cp mailserver/config/postfix-main.cf.sample mailserver/docker-data/dms/config/postfix-main.cf
-cp mailserver/config/postfix-virtual.cf.sample mailserver/docker-data/dms/config/postfix-virtual.cf
+cp mailserver/config/postfix-relay-domains.cf.sample mailserver/docker-data/dms/config/postfix-relay-domains.cf
 cp mailserver/config/postfix-aliases.cf.sample mailserver/docker-data/dms/config/postfix-aliases.cf
 cp mailserver/config/user-patches.sh.sample mailserver/docker-data/dms/config/user-patches.sh
 cp mailserver/config/rspamd/override.d/milter_headers.conf.sample mailserver/docker-data/dms/config/rspamd/override.d/milter_headers.conf
@@ -47,10 +47,11 @@ cp mailserver/config/rspamd/override.d/milter_headers.conf.sample mailserver/doc
 
 > [!IMPORTANT]
 > Make sure to set up the required config:
-> - api/.env: `DOMAINS`, `SMTP_CLIENT_*`
-> - app/src/env.json: `DOMAINS`
-> - mailserver/.env: `HOSTNAME`
-> - mailserver/docker-data/dms/config/postfix-virtual.cf: `@your-domain.net curl_email`
+> - api/.env
+> - app/src/env.json
+> - mailserver/.env
+> - mailserver/docker-data/dms/config/user-patches.sh: `-X POST {API_URL}`
+> - create and configure `config.json` (registry credentials for daemon): `cp config.json.sample config.json`
 
 > [!TIP]
 > For local testing, you can use [MailHog](https://github.com/mailhog/MailHog) or [MailTrap](https://mailtrap.io/email-sandbox/) as outbound SMTP client (`SMTP_CLIENT_*`).

@@ -37,6 +37,10 @@
         @apply form-radio border-secondary bg-secondary rounded-full text-accent focus:ring-transparent dark:checked:border-transparent dark:focus:ring-offset-transparent;
     }
 
+    input[type=file] {
+        @apply text-sm text-secondary border-primary cursor-pointer focus:outline-none focus:border-accent focus:ring-transparent;
+    }
+
     select {
         @apply bg-secondary text-secondary border-primary form-select py-2.5 px-4 pe-9 block w-full border focus:border-accent disabled:opacity-50 disabled:pointer-events-none outline-none focus:ring-transparent cursor-pointer mb-2;
 

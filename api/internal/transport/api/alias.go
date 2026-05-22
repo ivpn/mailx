@@ -2,6 +2,8 @@ package api
 
 import (
 	"context"
+	"encoding/csv"
+	"io"
 	"strconv"
 	"strings"
 
@@ -17,6 +19,8 @@ var (
 	DeleteAliasSuccess = "Alias deleted successfully."
 	ErrInvalidDomain   = "Selected domain is invalid."
 	ErrUnverifiedRcp   = "The recipient address has not been verified."
+	ErrFailedImport    = "Failed to import aliases. Please check the format and try again."
+	AliasImportSuccess = "Aliases imported successfully."
 )
 
 type AliasService interface {
@@ -26,6 +30,7 @@ type AliasService interface {
 	PostAlias(context.Context, model.Alias, string, string, string) (model.Alias, error)
 	UpdateAlias(context.Context, model.Alias) error
 	DeleteAlias(context.Context, string, string) error
+	ImportAliases(context.Context, []model.AliasImportReq, string) ([]model.Alias, error)
 }
 
 // @Summary Get alias
@@ -120,6 +125,91 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(list)
+}
+
+func (h *Handler) ImportAliases(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
+
+	// Get uploaded file
+	file, err := c.FormFile("file")
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrFailedImport,
+		})
+	}
+
+	f, err := file.Open()
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrFailedImport,
+		})
+	}
+	defer f.Close()
+
+	// Initialize CSV reader
+	reader := csv.NewReader(f)
+
+	// Skip the header row
+	_, err = reader.Read()
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrFailedImport,
+		})
+	}
+
+	var rows []model.AliasImportReq
+
+	// Iterate through rows
+	for {
+		record, err := reader.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return c.Status(400).JSON(fiber.Map{
+				"error": ErrFailedImport,
+			})
+		}
+
+		// record[0] = alias, record[1] = description, record[2] = enabled, record[3] = recipients
+		fullAlias := record[0]
+		parts := strings.Split(fullAlias, "@")
+
+		var local, domain string
+		if len(parts) == 2 {
+			local = parts[0]
+			domain = parts[1]
+		}
+
+		req := model.AliasImportReq{
+			Description: record[1],
+			Enabled:     strings.ToLower(record[2]) == "true",
+			Recipients:  strings.ReplaceAll(record[3], " ", ","),
+			LocalPart:   local,
+			Domain:      domain,
+			Format:      model.AliasFormatCustom,
+		}
+
+		// Validate alias row
+		err = h.Validator.Struct(req)
+		if err != nil {
+			continue
+		}
+
+		rows = append(rows, req)
+	}
+
+	aliases, err := h.Service.ImportAliases(c.Context(), rows, userID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"message": AliasImportSuccess,
+		"count":   len(aliases),
+	})
 }
 
 // @Summary Export aliases

@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"ivpn.net/email/api/internal/middleware/auth"
 	"ivpn.net/email/api/internal/model"
 )
@@ -175,6 +176,7 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 		})
 	}
 
+	// Validate request
 	err = h.Validator.Struct(req)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -182,12 +184,26 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 		})
 	}
 
-	if !strings.Contains(h.Cfg.Domains, req.Domain) {
+	// Validate domain
+	domain := req.Domain
+	isCustomDomain := false
+	_, err = uuid.Parse(domain)
+	if err == nil {
+		isCustomDomain = true
+		fqdn, err := h.Service.GetVerifiedDomain(c.Context(), domain, userID)
+		if err != nil {
+			return c.Status(400).JSON(fiber.Map{
+				"error": ErrInvalidDomain,
+			})
+		}
+		domain = fqdn.Name
+	} else if !strings.Contains(h.Cfg.Domains, domain) {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidDomain,
 		})
 	}
 
+	// Validate recipients
 	rcps, err := h.Service.GetVerifiedRecipients(c.Context(), req.Recipients, userID)
 	if err != nil || len(rcps) == 0 {
 		return c.Status(400).JSON(fiber.Map{
@@ -195,7 +211,15 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 		})
 	}
 
+	// Validate catch-all suffix
 	if req.Format == model.AliasFormatCatchAll && req.CatchAllSuffix == "" {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	// Validate custom alias format
+	if req.Format == model.AliasFormatCustom && !isCustomDomain {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidRequest,
 		})
@@ -209,7 +233,7 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 		FromName:    req.FromName,
 	}
 
-	alias, err = h.Service.PostAlias(c.Context(), alias, req.Format, req.Domain, req.CatchAllSuffix)
+	alias, err = h.Service.PostAlias(c.Context(), alias, req.Format, domain, req.CatchAllSuffix)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),

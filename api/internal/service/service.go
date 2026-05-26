@@ -19,6 +19,7 @@ type Store interface {
 	CredentialStore
 	LogStore
 	AccessKeyStore
+	DomainStore
 }
 
 type Cache interface {

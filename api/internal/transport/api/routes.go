@@ -18,6 +18,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	email.Use(auth.NewIPFilter(cfg.ApiAllowIPs))
 	email.Use(auth.NewPSK(cfg.PSK))
 	email.Post("", h.HandleEmail)
+	email.Post("/domain/check", h.CheckDomain)
 
 	h.Server.Use(auth.NewAPICORS(cfg))
 	h.Server.Use(helmet.New())

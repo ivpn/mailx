@@ -13,6 +13,7 @@ const (
 	AliasFormatRandomChars = "random"
 	AliasFormatUUID        = "uuid"
 	AliasFormatCatchAll    = "catch_all"
+	AliasFormatCustom      = "custom"
 )
 
 var (

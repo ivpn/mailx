@@ -1,5 +1,5 @@
 <template>
-    <tr class="desktop">
+    <tr class="desktop-lg">
         <td>
             <div class="flex items-center hs-tooltip">
                 <input
@@ -17,7 +17,7 @@
             <div class="hs-tooltip inline-block">
                 <p class="hs-tooltip-toggle">
                     <button class="plain text-wrap text-start text-base p-0" @click="copyAlias(alias.name)">
-                        <span v-if="alias.description">{{ alias.description }}<br></span>
+                        <span v-if="alias.description">{{ truncatedDescription }}<br></span>
                         <span v-if="alias.description" class="text-sm">{{ alias.name.split('@')[0] }}</span>
                         <span v-if="!alias.description" class="text-base">{{ alias.name.split('@')[0] }}</span>
                     </button>
@@ -90,7 +90,7 @@
             </div>
         </td>
     </tr>
-    <tr class="tablet">
+    <tr class="tablet-lg">
         <td>
             <div class="flex gap-2 justify-between">
                 <div class="text-start">
@@ -98,10 +98,10 @@
                         <p class="mb-3">{{ formatDistanceToNow(new Date(alias.created_at)) }}</p>
                     </div>
                     <div>
-                        <div class="hs-tooltip inline-block mb-5">
+                        <div class="hs-tooltip inline-block mb-5 break-all">
                             <p class="hs-tooltip-toggle mb-0">
                                 <button class="plain truncate text-base p-0 text-wrap text-start" @click="copyAlias(alias.name)">
-                                    <span v-if="alias.description">{{ alias.description }}<br></span>
+                                    <span v-if="alias.description">{{ truncatedDescription }}<br></span>
                                     <span v-if="alias.description" class="text-sm">{{ alias.name.split('@')[0] }}</span>
                                     <span v-if="!alias.description" class="text-base">{{ alias.name.split('@')[0] }}</span>
                                 </button>
@@ -186,7 +186,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import tooltip from '@preline/tooltip'
 import AliasEdit from './AliasEdit.vue'
 import AliasSend from './AliasSend.vue'
@@ -198,6 +198,11 @@ import dropdown from '@preline/dropdown'
 const props = defineProps(['alias', 'recipients', 'catchAll'])
 const alias = ref(props.alias)
 const recipients = ref(props.recipients)
+const truncatedDescription = computed(() => {
+    const desc = alias.value.description
+    if (!desc) return ''
+    return desc.length > 45 ? desc.slice(0, 45) + '...' : desc
+})
 const copyText = ref('Click to copy')
 const rowKey = ref(0)
 

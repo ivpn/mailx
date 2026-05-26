@@ -23,7 +23,7 @@ func DeleteUnverifiedUsers(db *gorm.DB) {
 // Delete users with terminated subscriptions older than 2 days
 func DeleteTerminatedUsers(db *gorm.DB) {
 	subscriptions := []model.Subscription{}
-	err := db.Where("terminated = ? AND terminated_at < ?", true, time.Now().AddDate(0, 0, -2)).Find(&subscriptions).Error
+	err := db.Where("`terminated` = ? AND `terminated_at` < ?", true, time.Now().AddDate(0, 0, -2)).Find(&subscriptions).Error
 	if err != nil {
 		log.Println("Error finding terminated subscriptions:", err)
 		return

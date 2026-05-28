@@ -16,6 +16,8 @@ services:
       - api:/var/log
     networks:
       net:
+    dns:
+      - ${API_DNS_RESOLVER}
   
   app:
     build: ../app

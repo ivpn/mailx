@@ -38,11 +38,11 @@ type Subscription struct {
 }
 
 func (s *Subscription) Active() bool {
-	return s.ActiveUntil.After(time.Now()) && !strings.Contains(s.Tier, Tier1) && !s.IsOutage()
+	return s.ActiveUntil.After(time.Now()) && !strings.Contains(s.Tier, Tier1) && !s.IsOutage() && !s.Terminated
 }
 
 func (s *Subscription) GracePeriod() bool {
-	return s.IsOutage() && s.GracePeriodDays(3) && s.OutageGracePeriodDays(3)
+	return s.IsOutage() && s.GracePeriodDays(3) && s.OutageGracePeriodDays(3) && !s.Terminated
 }
 
 func (s *Subscription) LimitedAccess() bool {

@@ -57,6 +57,10 @@ func (s *Subscription) LimitedAccess() bool {
 	return false
 }
 
+func (s *Subscription) PendingDelete() bool {
+	return s.Terminated
+}
+
 func (s *Subscription) ActiveStatus() bool {
 	return s.Active() || s.GracePeriod()
 }
@@ -78,6 +82,9 @@ func (s *Subscription) OutageGracePeriodDays(days int) bool {
 }
 
 func (s *Subscription) GetStatus() SubscriptionStatus {
+	if s.PendingDelete() {
+		return PendingDelete
+	}
 	if s.Active() {
 		return Active
 	}

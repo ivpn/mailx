@@ -24,6 +24,19 @@
             </div>
         </footer>
     </div>
+    <div v-if="isPendingDelete() && isDashboard && sub.id" class="card-tertiary m-8 mb-0">
+        <footer>
+            <div>
+                <i class="icon info icon-primary"></i>
+            </div>
+            <div>
+                <h4>Pending Deletion</h4>
+                <p>
+                    Your account is pending deletion.
+                </p>
+            </div>
+        </footer>
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -57,6 +70,10 @@ const getSubscription = async () => {
 
 const isLimited = () => {
     return sub.value.status === 'limited_access'
+}
+
+const isPendingDelete = () => {
+    return sub.value.status === 'pending_delete'
 }
 
 const isManaged = () => {

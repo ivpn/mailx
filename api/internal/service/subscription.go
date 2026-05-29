@@ -48,7 +48,7 @@ func (s *Service) PostSubscription(ctx context.Context, userID string, preauth m
 	// Support for signup reset
 	existingSub, err := s.Store.GetSubscriptionByTokenHash(ctx, preauth.TokenHash)
 	if err == nil {
-		existingSub.TokenHash = ""
+		existingSub.TokenHash = nil
 		existingSub.Terminated = true
 		existingSub.TerminatedAt = time.Now()
 		err = s.Store.UpdateSubscription(ctx, existingSub)
@@ -63,7 +63,7 @@ func (s *Service) PostSubscription(ctx context.Context, userID string, preauth m
 		ActiveUntil: preauth.ActiveUntil,
 		IsActive:    preauth.IsActive,
 		Tier:        preauth.Tier,
-		TokenHash:   preauth.TokenHash,
+		TokenHash:   &preauth.TokenHash,
 	}
 	sub.ID = uuid.New().String()
 
@@ -117,7 +117,7 @@ func (s *Service) UpdateSubscription(ctx context.Context, sub model.Subscription
 	sub.ActiveUntil = preauth.ActiveUntil
 	sub.IsActive = preauth.IsActive
 	sub.Tier = preauth.Tier
-	sub.TokenHash = preauth.TokenHash
+	sub.TokenHash = &preauth.TokenHash
 	sub.Type = ""
 
 	if sub.ID == "" || sub.UserID == "" {

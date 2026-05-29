@@ -390,8 +390,8 @@ func (s *Service) DeleteUser(ctx context.Context, userID string, OTP string) err
 	return nil
 }
 
-func (s *Service) DeleteUnfinishedSignup(ctx context.Context, email string) error {
-	user, err := s.Store.GetUserByEmailUnfinishedSignup(ctx, email)
+func (s *Service) DeleteUnfinishedSignup(ctx context.Context, UserId string) error {
+	user, err := s.Store.GetUser(ctx, UserId)
 	if err != nil {
 		log.Printf("error deleting unfinished signup: %s", err.Error())
 		return ErrGetUser

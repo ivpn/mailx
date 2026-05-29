@@ -96,7 +96,7 @@ func (h *Handler) Register(c *fiber.Ctx) error {
 	// Get unfinished signup user or create new user
 	user, err = h.Service.GetUnfinishedSignupOrPostUser(c.Context(), user, req.SubID, sessionId)
 	if err != nil {
-		err = h.Service.DeleteUnfinishedSignup(c.Context(), user.Email)
+		err = h.Service.DeleteUnfinishedSignup(c.Context(), user.ID)
 		if err != nil {
 			log.Printf("error deleting unfinished signup: %s", err.Error())
 		}

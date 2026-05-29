@@ -34,6 +34,7 @@ func TestActive(t *testing.T) {
 		activeUntil time.Time
 		updatedAt   time.Time
 		tier        string
+		terminated  bool
 		want        bool
 	}{
 		{
@@ -85,6 +86,14 @@ func TestActive(t *testing.T) {
 			tier:        "Tier 2",
 			want:        true,
 		},
+		{
+			name:        "not active: terminated, even with otherwise valid subscription",
+			activeUntil: future,
+			updatedAt:   recent,
+			tier:        "Tier 2",
+			terminated:  true,
+			want:        false,
+		},
 	}
 
 	for _, tt := range tests {
@@ -93,6 +102,7 @@ func TestActive(t *testing.T) {
 				ActiveUntil: tt.activeUntil,
 				UpdatedAt:   tt.updatedAt,
 				Tier:        tt.tier,
+				Terminated:  tt.terminated,
 			}
 			if got := s.Active(); got != tt.want {
 				t.Errorf("Active() = %v, want %v", got, tt.want)
@@ -209,6 +219,7 @@ func TestGracePeriod(t *testing.T) {
 		name        string
 		activeUntil time.Time
 		updatedAt   time.Time
+		terminated  bool
 		want        bool
 	}{
 		{
@@ -235,6 +246,13 @@ func TestGracePeriod(t *testing.T) {
 			updatedAt:   outageOutside3Days,
 			want:        false,
 		},
+		{
+			name:        "no grace period: terminated, even with otherwise valid grace period conditions",
+			activeUntil: time.Now().Add(-24 * time.Hour), // expired 1d ago, within 3d grace
+			updatedAt:   outageTime,                      // outage, but < 3d
+			terminated:  true,
+			want:        false,
+		},
 	}
 
 	for _, tt := range tests {
@@ -242,6 +260,7 @@ func TestGracePeriod(t *testing.T) {
 			s := &Subscription{
 				ActiveUntil: tt.activeUntil,
 				UpdatedAt:   tt.updatedAt,
+				Terminated:  tt.terminated,
 			}
 			if got := s.GracePeriod(); got != tt.want {
 				t.Errorf("GracePeriod() = %v, want %v", got, tt.want)

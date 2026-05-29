@@ -51,9 +51,9 @@
                     <i class="icon info icon-primary"></i>
                 </div>
                 <div>
-                    <h4>Pending Deletion</h4>
+                    <h4>This account has been replaced and is scheduled for deletion.</h4>
                     <p>
-                        Your account is pending deletion.
+                        A new Mailx signup was completed for your IVPN account, so this account will be deleted in 48 hours. Export any data you need before then.
                     </p>
                 </div>
             </footer>

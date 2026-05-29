@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/go-webauthn/webauthn/webauthn"
@@ -80,6 +81,11 @@ func (h *Handler) BeginRegistration(c *fiber.Ctx) error {
 	// Get unfinished signup user or create new user
 	user, err = h.Service.GetUnfinishedSignupOrPostUser(c.Context(), user, req.SubID, sessionId)
 	if err != nil {
+		err = h.Service.DeleteUnfinishedSignup(c.Context(), user.Email)
+		if err != nil {
+			log.Printf("error deleting unfinished signup: %s", err.Error())
+		}
+
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
 		})

@@ -2,6 +2,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import Dashboard from './components/Dashboard.vue'
 import QuickActions from './components/QuickActions.vue'
 import Recipients from './components/Recipients.vue'
+import Domains from './components/Domains.vue'
 import Wildcards from './components/Wildcards.vue'
 import Stats from './components/Stats.vue'
 import Diagnostics from './components/Diagnostics.vue'
@@ -44,6 +45,11 @@ const dashboardChildren: RouteRecordRaw[] = [
         path: 'recipients',
         name: `${AppName}: Recipients`,
         component: Recipients,
+    },
+    {
+        path: 'domains',
+        name: `${AppName}: Domains`,
+        component: Domains,
     },
     {
         path: 'stats',

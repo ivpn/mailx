@@ -92,6 +92,10 @@
         &.alert {
             mask-image: url("../../assets/icons/icon-alert.svg");
         }
+
+        &.global {
+            mask-image: url("../../assets/icons/icon-global.svg");
+        }
     }
 
     .logo {

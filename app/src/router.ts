@@ -131,8 +131,8 @@ const routes: RouteRecordRaw[] = [
         component: Faq
     },
     {
-        path: '/announcements',
-        name: `${AppName}: Announcements`,
+        path: '/news',
+        name: `${AppName}: News`,
         component: Announcements
     },
     {

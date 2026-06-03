@@ -3,6 +3,7 @@
 #################################################
 
 .env
+config.json
 compose.override.yaml
 docs/site/
 docker-data/

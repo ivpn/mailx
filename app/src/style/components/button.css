@@ -17,6 +17,10 @@
                 @apply bg-tertiary hover:bg-secondary text-secondary hover:text-secondary;
             }
 
+            &.success {
+                @apply bg-success text-white;
+            }
+
             &.sm {
                 @apply font-medium text-sm py-1.5 px-2;
             }

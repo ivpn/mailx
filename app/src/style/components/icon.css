@@ -96,6 +96,10 @@
         &.copy {
             mask-image: url("../../assets/icons/icon-copy.svg");
         }
+        
+        &.global {
+            mask-image: url("../../assets/icons/icon-global.svg");
+        }
     }
 
     .logo {

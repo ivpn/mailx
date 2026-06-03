@@ -25,5 +25,8 @@ exit 0" >> /usr/local/bin/curl-email.sh
 
 chmod +x /usr/local/bin/curl-email.sh
 
+# Add curl_email service to master.cf
+postconf -M "curl_email/unix=curl_email unix - n n - - pipe flags=RqX user=nobody argv=/usr/local/bin/curl-email.sh \${sender} \${recipient}"
+
 # reload Postfix to apply changes
 postfix reload

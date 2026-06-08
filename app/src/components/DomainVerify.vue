@@ -172,6 +172,7 @@ const verifyDomain = async () => {
         if (axios.isAxiosError(err)) {
             error.value = err.response?.data.error || err.message
         }
+        events.emit('domain.reload', {})
     }
 }
 

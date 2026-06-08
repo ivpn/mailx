@@ -35,3 +35,13 @@ type AliasList struct {
 	Aliases []Alias `json:"aliases"`
 	Total   int     `json:"total"`
 }
+
+type AliasImportReq struct {
+	Description string `json:"description"`
+	Enabled     bool   `json:"enabled"`
+	Recipients  string `json:"recipients" validate:"required"`
+	FromName    string `json:"from_name"`
+	Format      string `json:"format"`
+	Domain      string `json:"domain" validate:"required"`
+	LocalPart   string `json:"local_part" validate:"omitempty,min=6,max=24"`
+}

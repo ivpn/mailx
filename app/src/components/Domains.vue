@@ -20,7 +20,7 @@
                         <tr>
                             <th>Created</th>
                             <th>Domain</th>
-                            <th>Verified</th>
+                            <th>Verification</th>
                             <th>Active</th>
                             <th>Actions</th>
                         </tr>

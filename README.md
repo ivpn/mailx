@@ -22,6 +22,10 @@
 
 - [Docker Mailserver](https://github.com/docker-mailserver/docker-mailserver)  
 
+## Browser Extension
+
+- [WXT](https://wxt.dev)  
+
 ## Installation
 
 ### Prerequisites
@@ -125,7 +129,7 @@ enabled = true;
 
 sign_authenticated = true;
 sign_local = true;
-try_fallback = false;
+try_fallback = true;
 
 use_domain = "header";
 use_domain_sign_local = "header";
@@ -134,6 +138,10 @@ use_esld = true;
 allow_username_mismatch = true;
 
 check_pubkey = false; # you want to use this in the beginning
+
+# Fallback: sign any unrecognized domain with domain.com key (d=domain.com)
+path = "/tmp/docker-mailserver/rspamd/dkim/rsa-2048-mail-domain.com.private.txt";
+selector = "mail";
 
 domain {
     domain.com {
@@ -161,6 +169,32 @@ docker compose down
 docker compose up -d
 ```
 
+### Browser Extension
+
+#### Move to wxt directory
+```bash
+cd wxt
+```
+
+#### Run (development)
+```bash
+yarn dev
+yarn dev:firefox
+```
+
+#### Build (beta, testing)
+```bash
+yarn build
+yarn build:staging
+yarn build:production
+yarn build:firefox
+```
+
+#### Build (distribution)
+```bash
+yarn zip
+yarn zip:firefox
+```
 
 ## Add New Domain
 

@@ -21,26 +21,28 @@ const (
 )
 
 type Subscription struct {
-	ID          string             `gorm:"unique" json:"id"`
-	CreatedAt   time.Time          `json:"created_at"`
-	UpdatedAt   time.Time          `json:"updated_at"`
-	UserID      string             `json:"-"`
-	Type        string             `json:"type"`
-	ActiveUntil time.Time          `json:"active_until"`
-	IsActive    bool               `json:"-"`
-	Tier        string             `json:"tier"`
-	TokenHash   string             `gorm:"unique" json:"-"`
-	Notified    bool               `json:"-"`
-	Status      SubscriptionStatus `gorm:"-" json:"status"`
-	Outage      bool               `gorm:"-" json:"outage"`
+	ID           string             `gorm:"unique" json:"id"`
+	CreatedAt    time.Time          `json:"created_at"`
+	UpdatedAt    time.Time          `json:"updated_at"`
+	UserID       string             `json:"-"`
+	Type         string             `json:"type"`
+	ActiveUntil  time.Time          `json:"active_until"`
+	IsActive     bool               `json:"-"`
+	Tier         string             `json:"tier"`
+	TokenHash    *string            `gorm:"unique" json:"-"`
+	Notified     bool               `json:"-"`
+	Status       SubscriptionStatus `gorm:"-" json:"status"`
+	Outage       bool               `gorm:"-" json:"outage"`
+	Terminated   bool               `json:"terminated"`
+	TerminatedAt time.Time          `json:"terminated_at"`
 }
 
 func (s *Subscription) Active() bool {
-	return s.ActiveUntil.After(time.Now()) && !strings.Contains(s.Tier, Tier1) && !s.IsOutage()
+	return s.ActiveUntil.After(time.Now()) && !strings.Contains(s.Tier, Tier1) && !s.IsOutage() && !s.Terminated
 }
 
 func (s *Subscription) GracePeriod() bool {
-	return s.IsOutage() && s.GracePeriodDays(3) && s.OutageGracePeriodDays(3)
+	return s.IsOutage() && s.GracePeriodDays(3) && s.OutageGracePeriodDays(3) && !s.Terminated
 }
 
 func (s *Subscription) LimitedAccess() bool {
@@ -53,6 +55,10 @@ func (s *Subscription) LimitedAccess() bool {
 	}
 
 	return false
+}
+
+func (s *Subscription) PendingDelete() bool {
+	return s.Terminated
 }
 
 func (s *Subscription) ActiveStatus() bool {
@@ -76,6 +82,9 @@ func (s *Subscription) OutageGracePeriodDays(days int) bool {
 }
 
 func (s *Subscription) GetStatus() SubscriptionStatus {
+	if s.PendingDelete() {
+		return PendingDelete
+	}
 	if s.Active() {
 		return Active
 	}

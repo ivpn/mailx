@@ -26,6 +26,7 @@ var (
 
 type SubscriptionStore interface {
 	GetSubscription(context.Context, string) (model.Subscription, error)
+	GetSubscriptionByTokenHash(context.Context, string) (model.Subscription, error)
 	PostSubscription(context.Context, model.Subscription) error
 	UpdateSubscription(context.Context, model.Subscription) error
 	DeleteSubscription(context.Context, string) error
@@ -44,16 +45,29 @@ func (s *Service) GetSubscription(ctx context.Context, userID string) (model.Sub
 }
 
 func (s *Service) PostSubscription(ctx context.Context, userID string, preauth model.Preauth) error {
+	// Support for signup reset
+	existingSub, err := s.Store.GetSubscriptionByTokenHash(ctx, preauth.TokenHash)
+	if err == nil {
+		existingSub.TokenHash = nil
+		existingSub.Terminated = true
+		existingSub.TerminatedAt = time.Now()
+		err = s.Store.UpdateSubscription(ctx, existingSub)
+		if err != nil {
+			log.Printf("error clearing token hash for existing subscription: %s", err.Error())
+			return ErrPostSubscription
+		}
+	}
+
 	sub := model.Subscription{
 		UserID:      userID,
 		ActiveUntil: preauth.ActiveUntil,
 		IsActive:    preauth.IsActive,
 		Tier:        preauth.Tier,
-		TokenHash:   preauth.TokenHash,
+		TokenHash:   &preauth.TokenHash,
 	}
 	sub.ID = uuid.New().String()
 
-	err := s.Store.PostSubscription(ctx, sub)
+	err = s.Store.PostSubscription(ctx, sub)
 	if err != nil {
 		log.Printf("error posting subscription: %s", err.Error())
 		var mysqlErr *mysql.MySQLError
@@ -103,7 +117,7 @@ func (s *Service) UpdateSubscription(ctx context.Context, sub model.Subscription
 	sub.ActiveUntil = preauth.ActiveUntil
 	sub.IsActive = preauth.IsActive
 	sub.Tier = preauth.Tier
-	sub.TokenHash = preauth.TokenHash
+	sub.TokenHash = &preauth.TokenHash
 	sub.Type = ""
 
 	if sub.ID == "" || sub.UserID == "" {

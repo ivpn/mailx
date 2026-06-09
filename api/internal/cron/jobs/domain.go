@@ -19,8 +19,6 @@ const domainVerifyBatchSize = 100
 // when the respective check fails. Domains are processed in batches of 100 with
 // a 200ms sleep between each domain to avoid saturating DNS resolvers or the DB.
 func VerifyDomainsJob(cfg config.Config, db *gorm.DB) {
-	log.Println("VerifyDomainsJob: starting")
-
 	repo := &repository.Database{Client: db}
 	svc := service.New(cfg, repo, nil)
 	ctx := context.Background()
@@ -42,7 +40,6 @@ func VerifyDomainsJob(cfg config.Config, db *gorm.DB) {
 		for _, domain := range batch {
 			// ownership check
 			if err := svc.VerifyDomainOwner(ctx, domain.Name, domain.UserID); err != nil {
-				log.Printf("VerifyDomainsJob: ownership check failed for domain %s: %s", domain.Name, err)
 				if dbErr := db.Model(&model.Domain{}).Where("id = ?", domain.ID).Updates(map[string]any{
 					"owner_verified_at": nil,
 				}).Error; dbErr != nil {
@@ -52,7 +49,6 @@ func VerifyDomainsJob(cfg config.Config, db *gorm.DB) {
 
 			// MX records check
 			if err := svc.VerifyDomainMX(ctx, domain.Name, domain.UserID); err != nil {
-				log.Printf("VerifyDomainsJob: MX check failed for domain %s: %s", domain.Name, err)
 				if dbErr := db.Model(&model.Domain{}).Where("id = ?", domain.ID).Updates(map[string]any{
 					"mx_verified_at": nil,
 				}).Error; dbErr != nil {
@@ -62,7 +58,6 @@ func VerifyDomainsJob(cfg config.Config, db *gorm.DB) {
 
 			// Send records check (SPF, DKIM, DMARC)
 			if err := svc.VerifyDomainSend(ctx, domain.Name, domain.UserID); err != nil {
-				log.Printf("VerifyDomainsJob: send records check failed for domain %s: %s", domain.Name, err)
 				if dbErr := db.Model(&model.Domain{}).Where("id = ?", domain.ID).Updates(map[string]any{
 					"send_verified_at": nil,
 				}).Error; dbErr != nil {
@@ -76,6 +71,4 @@ func VerifyDomainsJob(cfg config.Config, db *gorm.DB) {
 		total += len(batch)
 		offset += len(batch)
 	}
-
-	log.Printf("VerifyDomainsJob: completed, processed %d domains", total)
 }

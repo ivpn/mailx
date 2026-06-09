@@ -166,13 +166,11 @@ const verifyDomain = async () => {
     try {
         await domainApi.verifyDns(domain.value.id)
         error.value = ''
-        events.emit('domain.reload', {})
         close()
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.response?.data.error || err.message
         }
-        events.emit('domain.reload', {})
     }
 }
 
@@ -180,6 +178,7 @@ const close = () => {
     error.value = ''
     const modal = document.querySelector('#modal-verify-domain' + domain.value.id) as any
     overlay.close(modal)
+    events.emit('domain.reload', {})
 }
 
 const addEvents = () => {

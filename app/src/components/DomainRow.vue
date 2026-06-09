@@ -33,7 +33,7 @@
                     >
                     <button v-bind:data-hs-overlay="'#modal-verify-domain' + domain.id">
                         <i class="icon icon-primary check text-xs"></i>
-                        Verify
+                        Verify DNS
                     </button>
                     <button class="delete"
                         v-bind:data-hs-overlay="'#modal-delete-domain' + domain.id">
@@ -75,7 +75,7 @@
                             >
                             <button v-bind:data-hs-overlay="'#modal-verify-domain' + domain.id">
                                 <i class="icon icon-primary check text-xs"></i>
-                                Verify
+                                Verify DNS
                             </button>
                             <button class="delete"
                                 v-bind:data-hs-overlay="'#modal-delete-domain' + domain.id">

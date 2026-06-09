@@ -224,7 +224,6 @@ func (s *Service) VerifyDomainOwner(ctx context.Context, domain string, userID s
 	}
 
 	if !ok {
-		log.Printf("TXT record not found for domain ownership verification")
 		return ErrDNSLookupOwner
 	}
 
@@ -277,7 +276,6 @@ func (s *Service) VerifyDomainMX(ctx context.Context, domain string, userID stri
 		}
 
 		if !ok {
-			log.Printf("MX record not found for host %s in domain MX verification", host)
 			return ErrDNSLookupMX
 		}
 	}
@@ -300,7 +298,6 @@ func (s *Service) VerifyDomainSend(ctx context.Context, domain string, userID st
 	}
 
 	if !ok {
-		log.Printf("SPF record not found for domain SPF verification")
 		return ErrDNSLookupSPF
 	}
 

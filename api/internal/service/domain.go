@@ -239,11 +239,19 @@ func (s *Service) VerifyDomainDNSRecords(ctx context.Context, domainId string, u
 
 	err = s.VerifyDomainMX(ctx, domain.Name, userID)
 	if err != nil {
+		domain.MXVerifiedAt = nil
+		if updateErr := s.UpdateDomain(ctx, domain); updateErr != nil {
+			log.Printf("error nulling mx_verified_at for domain %s: %s", domain.Name, updateErr.Error())
+		}
 		return err
 	}
 
 	err = s.VerifyDomainSend(ctx, domain.Name, userID)
 	if err != nil {
+		domain.SendVerifiedAt = nil
+		if updateErr := s.UpdateDomain(ctx, domain); updateErr != nil {
+			log.Printf("error nulling send_verified_at for domain %s: %s", domain.Name, updateErr.Error())
+		}
 		return err
 	}
 

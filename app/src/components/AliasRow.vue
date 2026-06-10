@@ -17,11 +17,11 @@
             </div>
         </td>
         <td>
-            <p class="py-3">{{ alias.description }}</p>
+            <p class="py-3 m-0">{{ truncatedDescription }}</p>
         </td>
         <td>
             <div class="hs-tooltip inline-block">
-                <p class="hs-tooltip-toggle">
+                <p class="hs-tooltip-toggle m-0">
                     <button class="plain text-wrap text-start text-base p-0" @click="copyAlias(alias.name)">
                         {{ alias.name }}
                     </button>

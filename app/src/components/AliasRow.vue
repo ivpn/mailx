@@ -22,7 +22,7 @@
         <td>
             <div class="hs-tooltip inline-block">
                 <p class="hs-tooltip-toggle m-0">
-                    <button class="plain text-wrap text-start text-base p-0" @click="copyAlias(alias.name)">
+                    <button class="plain text-wrap text-start text-sm p-0" @click="copyAlias(alias.name)">
                         {{ alias.name }}
                     </button>
                     <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
@@ -101,7 +101,7 @@
                     <div>
                         <div class="hs-tooltip inline-block mb-5 break-all">
                             <p class="hs-tooltip-toggle mb-0">
-                                <button class="plain truncate text-base p-0 text-wrap text-start" @click="copyAlias(alias.name)">
+                                <button class="plain truncate text-sm p-0 text-wrap text-start" @click="copyAlias(alias.name)">
                                     <span v-if="alias.description" class="block break-words">{{ truncatedDescription }}</span>
                                     <span class="block text-sm break-all">{{ alias.name }}</span>
                                 </button>

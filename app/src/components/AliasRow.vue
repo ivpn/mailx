@@ -14,21 +14,19 @@
             </div>
         </td>
         <td>
+            <p class="py-3">{{ alias.description }}</p>
+        </td>
+        <td>
             <div class="hs-tooltip inline-block">
                 <p class="hs-tooltip-toggle">
                     <button class="plain text-wrap text-start text-base p-0" @click="copyAlias(alias.name)">
-                        <span v-if="alias.description">{{ truncatedDescription }}<br></span>
-                        <span v-if="alias.description" class="text-sm">{{ alias.name.split('@')[0] }}</span>
-                        <span v-if="!alias.description" class="text-base">{{ alias.name.split('@')[0] }}</span>
+                        {{ alias.name }}
                     </button>
                     <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                         {{ copyText }}: {{ alias.name }}
                     </span>
                 </p>
             </div>
-        </td>
-        <td>
-            <p class="py-3">@{{ alias.name.split('@')[1] }}</p>
         </td>
         <td>
             <div class="flex items-center gap-3 mb-1">
@@ -101,9 +99,8 @@
                         <div class="hs-tooltip inline-block mb-5 break-all">
                             <p class="hs-tooltip-toggle mb-0">
                                 <button class="plain truncate text-base p-0 text-wrap text-start" @click="copyAlias(alias.name)">
-                                    <span v-if="alias.description">{{ truncatedDescription }}<br></span>
-                                    <span v-if="alias.description" class="text-sm">{{ alias.name.split('@')[0] }}</span>
-                                    <span v-if="!alias.description" class="text-base">{{ alias.name.split('@')[0] }}</span>
+                                    <span v-if="alias.description" class="block break-words">{{ truncatedDescription }}</span>
+                                    <span class="block text-sm break-all">{{ alias.name }}</span>
                                 </button>
                                 <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                                     {{ copyText }}: {{ alias.name }}

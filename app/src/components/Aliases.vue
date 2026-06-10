@@ -47,6 +47,7 @@
                     <thead class="desktop-lg">
                         <tr>
                             <th>Active</th>
+                            <th>Description</th>
                             <th>
                                 <button
                                 @click="sort"
@@ -65,9 +66,8 @@
                                         v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'name' }"
                                         class="icon arrow-down text-xl icon-accent"
                                     ></i>
-                                </button>    
+                                </button>
                             </th>
-                            <th>Domain</th>
                             <th>Count</th>
                             <th>
                                 <button

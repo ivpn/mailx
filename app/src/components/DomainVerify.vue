@@ -7,7 +7,7 @@
                         <button @click="close" class="close">
                             <i class="icon arrow-left-line icon-primary"></i>
                         </button>
-                        <h4>VERIFY DNS RECORDS</h4>
+                        <h4>VERIFY DNS RECORDS · Step 2 of 2</h4>
                     </header>
                     <article>
                         <div>
@@ -120,7 +120,7 @@
                                 Cancel
                             </button>
                         </nav>
-                        <p v-if="error" class="error px-5">Error: {{ error }}</p>
+                        <p v-if="error" class="error px-5">Unable to verify domain DNS records. {{ error }} or try again later.</p>
                     </footer>
                 </div>
             </div>
@@ -166,7 +166,6 @@ const verifyDomain = async () => {
     try {
         await domainApi.verifyDns(domain.value.id)
         error.value = ''
-        events.emit('domain.reload', {})
         close()
     } catch (err) {
         if (axios.isAxiosError(err)) {
@@ -179,6 +178,7 @@ const close = () => {
     error.value = ''
     const modal = document.querySelector('#modal-verify-domain' + domain.value.id) as any
     overlay.close(modal)
+    events.emit('domain.reload', {})
 }
 
 const addEvents = () => {

@@ -64,6 +64,12 @@ func New(db *gorm.DB) {
 		return
 	}
 
+	err = gocron.Every(12).Hour().Do(jobs.VerifyDomainsJob, cfg, db)
+	if err != nil {
+		log.Println("Error scheduling job:", err)
+		return
+	}
+
 	gocron.Start()
 
 	log.Println("Cron jobs started")

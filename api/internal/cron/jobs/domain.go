@@ -45,6 +45,12 @@ func VerifyDomainsJob(cfg config.Config, db *gorm.DB) {
 				}).Error; dbErr != nil {
 					log.Printf("VerifyDomainsJob: error nulling owner_verified_at for domain %s: %s", domain.Name, dbErr)
 				}
+			} else {
+				if dbErr := db.Model(&model.Domain{}).Where("id = ?", domain.ID).Updates(map[string]any{
+					"owner_verified_at": time.Now().UTC(),
+				}).Error; dbErr != nil {
+					log.Printf("VerifyDomainsJob: error setting owner_verified_at for domain %s: %s", domain.Name, dbErr)
+				}
 			}
 
 			// MX records check
@@ -54,6 +60,12 @@ func VerifyDomainsJob(cfg config.Config, db *gorm.DB) {
 				}).Error; dbErr != nil {
 					log.Printf("VerifyDomainsJob: error nulling mx_verified_at for domain %s: %s", domain.Name, dbErr)
 				}
+			} else {
+				if dbErr := db.Model(&model.Domain{}).Where("id = ?", domain.ID).Updates(map[string]any{
+					"mx_verified_at": time.Now().UTC(),
+				}).Error; dbErr != nil {
+					log.Printf("VerifyDomainsJob: error setting mx_verified_at for domain %s: %s", domain.Name, dbErr)
+				}
 			}
 
 			// Send records check (SPF, DKIM, DMARC)
@@ -62,6 +74,12 @@ func VerifyDomainsJob(cfg config.Config, db *gorm.DB) {
 					"send_verified_at": nil,
 				}).Error; dbErr != nil {
 					log.Printf("VerifyDomainsJob: error nulling send_verified_at for domain %s: %s", domain.Name, dbErr)
+				}
+			} else {
+				if dbErr := db.Model(&model.Domain{}).Where("id = ?", domain.ID).Updates(map[string]any{
+					"send_verified_at": time.Now().UTC(),
+				}).Error; dbErr != nil {
+					log.Printf("VerifyDomainsJob: error setting send_verified_at for domain %s: %s", domain.Name, dbErr)
 				}
 			}
 

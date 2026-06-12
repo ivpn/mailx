@@ -23,11 +23,11 @@ var (
 	ErrPostDomainInactiveSub = errors.New("Unable to create domain. Subscription is not active.")
 	ErrUpdateDomain          = errors.New("Unable to update domain. Please try again.")
 	ErrDeleteDomain          = errors.New("Unable to delete domain. Please try again.")
-	ErrDNSLookupOwner        = errors.New("Unable to verify domain ownership. Please ensure the correct TXT record is set.")
-	ErrDNSLookupSPF          = errors.New("Unable to verify domain DNS records. Please ensure the correct SPF record is set.")
-	ErrDNSLookupDKIM         = errors.New("Unable to verify domain DNS records. Please ensure the correct DKIM records are set.")
-	ErrDNSLookupDMARC        = errors.New("Unable to verify domain DNS records. Please ensure the correct DMARC record is set.")
-	ErrDNSLookupMX           = errors.New("Unable to verify domain DNS records. Please ensure the correct MX records are set.")
+	ErrDNSLookupOwner        = errors.New("Unable to verify domain ownership. Please ensure the correct TXT record is set or try again later.")
+	ErrDNSLookupSPF          = errors.New("Unable to verify domain DNS records. Please ensure the correct SPF record is set or try again later.")
+	ErrDNSLookupDKIM         = errors.New("Unable to verify domain DNS records. Please ensure the correct DKIM records are set or try again later.")
+	ErrDNSLookupDMARC        = errors.New("Unable to verify domain DNS records. Please ensure the correct DMARC record is set or try again later.")
+	ErrDNSLookupMX           = errors.New("Unable to verify domain DNS records. Please ensure the correct MX records are set or try again later.")
 )
 
 type DomainStore interface {

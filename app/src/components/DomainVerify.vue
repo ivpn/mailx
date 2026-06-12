@@ -29,7 +29,18 @@
                                         <template v-for="(mx_host, index) in config.mx_hosts" :key="mx_host">
                                             <tr>
                                                 <td>MX {{ 10 * (index + 1) }}</td>
-                                                <td>@</td>
+                                                <td>
+                                                    <div class="hs-tooltip inline-block">
+                                                        <div class="hs-tooltip-toggle">
+                                                            <button class="plain truncate max-w-[320px] text-[13px] p-0" @click="copyToClipboard('@')">
+                                                                @
+                                                            </button>
+                                                            <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
+                                                                {{ copyText }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </td>
                                                 <td>
                                                     <div class="hs-tooltip inline-block">
                                                         <div class="hs-tooltip-toggle">
@@ -46,7 +57,18 @@
                                         </template>
                                         <tr>
                                             <td>TXT</td>
-                                            <td>@</td>
+                                            <td>
+                                                <div class="hs-tooltip inline-block">
+                                                    <div class="hs-tooltip-toggle">
+                                                        <button class="plain truncate max-w-[320px] text-[13px] p-0" @click="copyToClipboard('@')">
+                                                            @
+                                                        </button>
+                                                        <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
+                                                            {{ copyText }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </td>
                                             <td>
                                                 <div class="hs-tooltip inline-block">
                                                         <div class="hs-tooltip-toggle">
@@ -63,7 +85,18 @@
                                         <template v-for="selector in config.dkim_selectors" :key="selector">
                                             <tr>
                                                 <td>CNAME</td>
-                                                <td>{{ selector }}._domainkey</td>
+                                                <td>
+                                                    <div class="hs-tooltip inline-block">
+                                                        <div class="hs-tooltip-toggle">
+                                                            <button class="plain truncate max-w-[320px] text-[13px] p-0" @click="copyToClipboard(selector + '._domainkey')">
+                                                                {{ selector }}._domainkey
+                                                            </button>
+                                                            <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
+                                                                {{ copyText }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </td>
                                                 <td>
                                                     <div class="hs-tooltip inline-block">
                                                         <div class="hs-tooltip-toggle">
@@ -80,7 +113,18 @@
                                         </template>
                                         <tr>
                                             <td>TXT</td>
-                                            <td>_dmarc</td>
+                                            <td>
+                                                <div class="hs-tooltip inline-block">
+                                                    <div class="hs-tooltip-toggle">
+                                                        <button class="plain truncate max-w-[320px] text-[13px] p-0" @click="copyToClipboard('_dmarc')">
+                                                            _dmarc
+                                                        </button>
+                                                        <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
+                                                            {{ copyText }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </td>
                                             <td>
                                                 <div class="hs-tooltip inline-block">
                                                     <div class="hs-tooltip-toggle">
@@ -120,7 +164,7 @@
                                 Cancel
                             </button>
                         </nav>
-                        <p v-if="error" class="error px-5">Unable to verify domain DNS records. {{ error }} or try again later.</p>
+                        <p v-if="error" class="error px-5">Error: {{ error }}</p>
                     </footer>
                 </div>
             </div>

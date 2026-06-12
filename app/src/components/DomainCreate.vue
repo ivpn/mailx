@@ -212,7 +212,7 @@
                                     Cancel
                                 </button>
                             </nav>
-                            <p v-if="step2Error" class="error px-5">Unable to verify domain DNS records. {{ step2Error }} or try again later.</p>
+                            <p v-if="step2Error" class="error px-5">Error: {{ error }}</p>
                         </footer>
                     </template>
                 </div>

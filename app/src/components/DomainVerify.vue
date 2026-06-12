@@ -120,7 +120,7 @@
                                 Cancel
                             </button>
                         </nav>
-                        <p v-if="error" class="error px-5">Unable to verify domain DNS records. {{ error }} or try again later.</p>
+                        <p v-if="error" class="error px-5">Error: {{ error }}</p>
                     </footer>
                 </div>
             </div>

@@ -118,7 +118,7 @@ const updateDomain = async () => {
 }
 
 const dnsRecordsVerified = () => {
-    return domain.value.mx_verified_at && domain.value.send_verified_at
+    return domain.value.owner_verified_at && domain.value.mx_verified_at && domain.value.send_verified_at
 }
 
 onMounted(() => {

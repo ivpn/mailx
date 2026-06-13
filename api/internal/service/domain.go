@@ -299,28 +299,28 @@ func (s *Service) VerifyDomainDNSRecords(ctx context.Context, domainId string, u
 		return ErrGetDomain
 	}
 
-	verify, err := s.GetOwnerVerifyRecordExistingDomain(ctx, domainId, userID)
-	if err != nil {
-		log.Printf("error getting owner verify record for existing domain: %s", err.Error())
-		return ErrGetDNSConfig
-	}
+	// verify, err := s.GetOwnerVerifyRecordExistingDomain(ctx, domainId, userID)
+	// if err != nil {
+	// 	log.Printf("error getting owner verify record for existing domain: %s", err.Error())
+	// 	return ErrGetDNSConfig
+	// }
 
-	ok, err := utils.LookupTXTExact(domain.Name, "mailx-verify="+verify)
-	if err != nil {
-		domain.OwnerVerifiedAt = nil
-		if updateErr := s.UpdateDomain(ctx, domain); updateErr != nil {
-			log.Printf("error nulling owner_verified_at for domain %s: %s", domain.Name, updateErr.Error())
-		}
-		return ErrDNSLookupOwner
-	}
+	// ok, err := utils.LookupTXTExact(domain.Name, "mailx-verify="+verify)
+	// if err != nil {
+	// 	domain.OwnerVerifiedAt = nil
+	// 	if updateErr := s.UpdateDomain(ctx, domain); updateErr != nil {
+	// 		log.Printf("error nulling owner_verified_at for domain %s: %s", domain.Name, updateErr.Error())
+	// 	}
+	// 	return ErrDNSLookupOwner
+	// }
 
-	if !ok {
-		domain.OwnerVerifiedAt = nil
-		if updateErr := s.UpdateDomain(ctx, domain); updateErr != nil {
-			log.Printf("error nulling owner_verified_at for domain %s: %s", domain.Name, updateErr.Error())
-		}
-		return ErrDNSLookupOwner
-	}
+	// if !ok {
+	// 	domain.OwnerVerifiedAt = nil
+	// 	if updateErr := s.UpdateDomain(ctx, domain); updateErr != nil {
+	// 		log.Printf("error nulling owner_verified_at for domain %s: %s", domain.Name, updateErr.Error())
+	// 	}
+	// 	return ErrDNSLookupOwner
+	// }
 
 	err = s.VerifyDomainMX(ctx, domain.Name, userID)
 	if err != nil {

@@ -17,6 +17,7 @@ func runVerifyDomains() error {
 			Domains:     os.Getenv("DOMAINS"),
 		},
 		SMTPClient: config.SMTPClientConfig{
+			Host:         os.Getenv("SMTP_CLIENT_HOST"),
 			DkimSelector: os.Getenv("SMTP_CLIENT_DKIM_SELECTOR"),
 		},
 		DB: dbConfigFromEnv(),

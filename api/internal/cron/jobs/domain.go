@@ -39,7 +39,7 @@ func VerifyDomainsJob(cfg config.Config, db *gorm.DB) {
 
 		for _, domain := range batch {
 			// ownership check
-			if err := svc.VerifyDomainOwner(ctx, domain.Name, domain.UserID); err != nil {
+			if err := svc.VerifyOwnerExistingDomain(ctx, domain.ID, domain.UserID); err != nil {
 				if dbErr := db.Model(&model.Domain{}).Where("id = ?", domain.ID).Updates(map[string]any{
 					"owner_verified_at": nil,
 				}).Error; dbErr != nil {

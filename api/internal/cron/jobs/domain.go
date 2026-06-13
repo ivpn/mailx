@@ -39,19 +39,19 @@ func VerifyDomainsJob(cfg config.Config, db *gorm.DB) {
 
 		for _, domain := range batch {
 			// ownership check
-			if err := svc.VerifyOwnerExistingDomain(ctx, domain.ID, domain.UserID); err != nil {
-				if dbErr := db.Model(&model.Domain{}).Where("id = ?", domain.ID).Updates(map[string]any{
-					"owner_verified_at": nil,
-				}).Error; dbErr != nil {
-					log.Printf("VerifyDomainsJob: error nulling owner_verified_at for domain %s: %s", domain.Name, dbErr)
-				}
-			} else {
-				if dbErr := db.Model(&model.Domain{}).Where("id = ?", domain.ID).Updates(map[string]any{
-					"owner_verified_at": time.Now().UTC(),
-				}).Error; dbErr != nil {
-					log.Printf("VerifyDomainsJob: error setting owner_verified_at for domain %s: %s", domain.Name, dbErr)
-				}
-			}
+			// if err := svc.VerifyOwnerExistingDomain(ctx, domain.ID, domain.UserID); err != nil {
+			// 	if dbErr := db.Model(&model.Domain{}).Where("id = ?", domain.ID).Updates(map[string]any{
+			// 		"owner_verified_at": nil,
+			// 	}).Error; dbErr != nil {
+			// 		log.Printf("VerifyDomainsJob: error nulling owner_verified_at for domain %s: %s", domain.Name, dbErr)
+			// 	}
+			// } else {
+			// 	if dbErr := db.Model(&model.Domain{}).Where("id = ?", domain.ID).Updates(map[string]any{
+			// 		"owner_verified_at": time.Now().UTC(),
+			// 	}).Error; dbErr != nil {
+			// 		log.Printf("VerifyDomainsJob: error setting owner_verified_at for domain %s: %s", domain.Name, dbErr)
+			// 	}
+			// }
 
 			// MX records check
 			if err := svc.VerifyDomainMX(ctx, domain.Name, domain.UserID); err != nil {

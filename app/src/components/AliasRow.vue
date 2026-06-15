@@ -9,7 +9,7 @@
                     type="checkbox"
                 >
                 <span v-if="isDomainUnverified" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
-                    Domain not verified. Address is not forwarding mail.
+                    Domain not verified or disabled. Address is not forwarding mail.
                 </span>
                 <span v-else-if="!alias.recipients.length" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                     Disabled
@@ -204,7 +204,7 @@ import dropdown from '@preline/dropdown'
 const props = defineProps(['alias', 'recipients', 'catchAll'])
 const alias = ref(props.alias)
 const recipients = ref(props.recipients)
-const isDomainUnverified = computed(() => alias.value.is_custom_domain === true && alias.value.is_domain_verified === false)
+const isDomainUnverified = computed(() => alias.value.is_custom_domain === true && (alias.value.is_domain_verified === false || alias.value.is_domain_enabled === false))
 const truncatedDescription = computed(() => {
     const desc = alias.value.description
     if (!desc) return ''

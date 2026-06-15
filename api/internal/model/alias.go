@@ -24,6 +24,7 @@ type Alias struct {
 	Stats            AliasStats     `gorm:"-" json:"stats"`
 	IsCustomDomain   bool           `gorm:"-" json:"is_custom_domain"`
 	IsDomainVerified *bool          `gorm:"-" json:"is_domain_verified"`
+	IsDomainEnabled  bool           `gorm:"-" json:"is_domain_enabled"`
 }
 
 type AliasStats struct {

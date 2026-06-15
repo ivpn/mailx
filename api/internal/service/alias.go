@@ -15,6 +15,7 @@ var (
 	ErrGetAliases           = errors.New("Unable to retrieve aliases.")
 	ErrGetAliasByName       = errors.New("alias not found:")
 	ErrDisabledAlias        = errors.New("alias disabled:")
+	ErrDisabledDomain       = errors.New("domain disabled:")
 	ErrPostAlias            = errors.New("Unable to create alias. Please try again.")
 	ErrPostAliasLimit       = errors.New("You’ve reached the maximum number of allowed aliases.")
 	ErrPostAliasInactiveSub = errors.New("Your subscription is not active. Please renew to create new aliases.")

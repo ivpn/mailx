@@ -66,9 +66,10 @@ func (s *Service) GetAlias(ctx context.Context, ID string, userID string) (model
 	domainPart := aliasDomainPart(alias.Name)
 	alias.IsCustomDomain = isCustomAliasDomain(domainPart, s.Cfg.API.Domains)
 	if alias.IsCustomDomain {
-		_, err := s.Store.GetVerifiedDomainByName(ctx, domainPart)
+		domain, err := s.Store.GetVerifiedDomainByName(ctx, domainPart)
 		verified := err == nil
 		alias.IsDomainVerified = &verified
+		alias.IsDomainEnabled = domain.Enabled
 	}
 
 	return alias, nil

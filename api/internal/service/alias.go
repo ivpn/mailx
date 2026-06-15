@@ -54,6 +54,16 @@ func isCustomAliasDomain(domainPart, predefinedDomains string) bool {
 	return !strings.Contains(predefinedDomains, domainPart)
 }
 
+// isCustomDomainEnabled checks if the given domainPart is in the list of verified domains and is enabled.
+func isCustomDomainEnabled(domainPart string, verifiedDomains []model.Domain) bool {
+	for _, d := range verifiedDomains {
+		if d.Name == domainPart {
+			return d.Enabled
+		}
+	}
+	return false
+}
+
 func (s *Service) GetAlias(ctx context.Context, ID string, userID string) (model.Alias, error) {
 	alias, err := s.Store.GetAlias(ctx, ID, userID)
 	if err != nil {
@@ -108,6 +118,7 @@ func (s *Service) GetAliases(ctx context.Context, userID string, limit int, page
 		if aliases[i].IsCustomDomain {
 			verified := verifiedDomains[domainPart]
 			aliases[i].IsDomainVerified = &verified
+			aliases[i].IsDomainEnabled = isCustomDomainEnabled(domainPart, domains)
 		}
 	}
 

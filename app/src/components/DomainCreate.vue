@@ -267,7 +267,7 @@
                                     Cancel
                                 </button>
                             </nav>
-                            <p v-if="step2Error" class="error px-5">Error: {{ error }}</p>
+                            <p v-if="step2Error" class="error px-5">Error: {{ error || step2Error }}</p>
                         </footer>
                     </template>
                 </div>
@@ -338,6 +338,9 @@ const postDomain = async () => {
         ownershipPending.value = false
         // events.emit('domain.create', {})
         step.value = 2
+        setTimeout(() => {
+            tooltip.autoInit()
+        }, 0)
     } catch (err) {
         if (axios.isAxiosError(err)) {
             if (err.response?.status === 429) {

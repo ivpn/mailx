@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-sql-driver/mysql"
 	"ivpn.net/email/api/internal/model"
 	"ivpn.net/email/api/internal/utils"
 )
@@ -195,7 +196,12 @@ func (s *Service) PostDomain(ctx context.Context, domain model.Domain) (model.Do
 	createdDomain, err := s.Store.PostDomain(ctx, domain)
 	if err != nil {
 		log.Printf("error creating domain: %s", err.Error())
-		return model.Domain{}, ErrPostDomain
+		var mysqlErr *mysql.MySQLError
+		if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
+			return model.Domain{}, model.ErrDuplicateDomain
+		} else {
+			return model.Domain{}, ErrPostDomain
+		}
 	}
 
 	return createdDomain, nil

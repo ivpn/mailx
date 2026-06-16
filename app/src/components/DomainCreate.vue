@@ -99,8 +99,7 @@
                                     Cancel
                                 </button>
                             </nav>
-                            <p v-if="ownershipPending && error" class="error px-5">Unable to verify ownership. Ensure the correct TXT record is set or try again later.</p>
-                            <p v-else-if="error" class="error px-5">{{ error }}</p>
+                            <p v-if="error" class="error px-5">Error: {{ error }}</p>
                         </footer>
                     </template>
 

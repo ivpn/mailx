@@ -14,8 +14,9 @@
             </div>
         </td>
         <td class="whitespace-normal">
-            <div class="block break-all">
-                <p class="m-0">{{ truncatedDescription }}</p>
+            <div class="block break-all hs-tooltip">
+                <p class="hs-tooltip-toggle m-0">{{ truncatedDescription }}</p>
+                <span v-if="alias.description && alias.description.length > 45" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">{{ alias.description }}</span>
             </div>
         </td>
         <td>

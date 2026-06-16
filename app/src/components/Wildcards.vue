@@ -26,6 +26,7 @@
                     <thead class="desktop-lg">
                         <tr>
                             <th>Status</th>
+                            <th>Description</th>
                             <th>
                                 <button
                                 @click="sort"
@@ -46,7 +47,6 @@
                                     ></i>
                                 </button>    
                             </th>
-                            <th>Domain</th>
                             <th>Count</th>
                             <th>
                                 <button

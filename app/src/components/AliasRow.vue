@@ -13,8 +13,10 @@
                 </span>
             </div>
         </td>
-        <td>
-            <p class="py-3 m-0">{{ truncatedDescription }}</p>
+        <td class="whitespace-normal">
+            <div class="block break-all">
+                <p class="m-0">{{ truncatedDescription }}</p>
+            </div>
         </td>
         <td>
             <div class="hs-tooltip inline-block">

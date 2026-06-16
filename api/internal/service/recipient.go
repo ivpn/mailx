@@ -311,10 +311,10 @@ func (s *Service) FindRecipients(from string, to string, msgType model.MessageTy
 
 	// Handle disabled domain
 	domains := s.Cfg.API.Domains
-	isCustomDomain := false
+	isCustomDomain := true
 	for _, domain := range domains {
 		if strings.HasSuffix(alias.Name, "@"+string(domain)) {
-			isCustomDomain = true
+			isCustomDomain = false
 			break
 		}
 	}

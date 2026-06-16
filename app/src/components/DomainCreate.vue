@@ -63,7 +63,7 @@
                                     </tbody>
                                 </table>
                                 <div class="tablet">
-                                    <p class="font-secondary text-sm leading-[2rem] text-black dark:text-white">
+                                    <p class="font-secondary text-sm leading-[2rem] text-black dark:text-white break-all">
                                         TXT @ mailx-verify={{ config.verify }}
                                     </p>
                                 </div>

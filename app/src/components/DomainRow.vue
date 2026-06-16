@@ -87,7 +87,7 @@
                     <div>
                         <p class="my-3">
                             <button v-if="dnsRecordsVerified()" class="cta xs success" v-bind:data-hs-overlay="'#modal-verify-domain' + domain.id">Verified</button>
-                            <button v-if="!dnsRecordsVerified()" class="cta xs plain" v-bind:data-hs-overlay="'#modal-verify-domain' + domain.id">Unverified</button>
+                            <button v-if="!dnsRecordsVerified()" class="cta xs plain" v-bind:data-hs-overlay="'#modal-verify-domain' + domain.id">Verify DNS</button>
                         </p>
                     </div>
                 </div>

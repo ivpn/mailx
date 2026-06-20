@@ -2,6 +2,7 @@ package jobs
 
 import (
 	"log"
+	"time"
 
 	"gorm.io/gorm"
 	"ivpn.net/email/api/internal/model"
@@ -10,9 +11,41 @@ import (
 // Delete unverified users older than 7 days
 func DeleteUnverifiedUsers(db *gorm.DB) {
 	users := []model.User{}
-	err := db.Where("is_active = ? AND created_at < NOW() - INTERVAL ? DAY", false, 7).Find(&users).Error
+	err := db.Where("is_active = ? AND created_at < ?", false, time.Now().AddDate(0, 0, -7)).Find(&users).Error
 	if err != nil {
 		log.Println("Error deleting unverified users:", err)
+		return
+	}
+
+	deleteUsers(db, users)
+}
+
+// Delete users with terminated subscriptions older than 2 days
+func DeleteTerminatedUsers(db *gorm.DB) {
+	subscriptions := []model.Subscription{}
+	err := db.Where("`terminated` = ? AND `terminated_at` < ?", true, time.Now().AddDate(0, 0, -2)).Find(&subscriptions).Error
+	if err != nil {
+		log.Println("Error finding terminated subscriptions:", err)
+		return
+	}
+
+	userIDs := make([]string, 0, len(subscriptions))
+	seen := make(map[string]struct{}, len(subscriptions))
+	for _, s := range subscriptions {
+		if _, ok := seen[s.UserID]; !ok {
+			seen[s.UserID] = struct{}{}
+			userIDs = append(userIDs, s.UserID)
+		}
+	}
+
+	if len(userIDs) == 0 {
+		return
+	}
+
+	users := []model.User{}
+	err = db.Where("id IN ?", userIDs).Find(&users).Error
+	if err != nil {
+		log.Println("Error finding terminated users:", err)
 		return
 	}
 

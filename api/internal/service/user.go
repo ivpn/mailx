@@ -390,6 +390,34 @@ func (s *Service) DeleteUser(ctx context.Context, userID string, OTP string) err
 	return nil
 }
 
+func (s *Service) DeleteUnfinishedSignup(ctx context.Context, UserId string) error {
+	user, err := s.Store.GetUser(ctx, UserId)
+	if err != nil {
+		log.Printf("error deleting unfinished signup: %s", err.Error())
+		return ErrGetUser
+	}
+
+	err = s.Store.DeleteSubscription(ctx, user.ID)
+	if err != nil {
+		log.Printf("error deleting user: %s", err.Error())
+		return ErrDeleteUser
+	}
+
+	err = s.Store.DeleteSettings(ctx, user.ID)
+	if err != nil {
+		log.Printf("error deleting user: %s", err.Error())
+		return ErrDeleteUser
+	}
+
+	err = s.Store.DeleteUser(ctx, user.ID)
+	if err != nil {
+		log.Printf("error deleting unfinished signup: %s", err.Error())
+		return ErrDeleteUser
+	}
+
+	return nil
+}
+
 func (s *Service) GetUserStats(ctx context.Context, userID string) (model.UserStats, error) {
 	stats, err := s.Store.GetUserStats(ctx, userID)
 	if err != nil {

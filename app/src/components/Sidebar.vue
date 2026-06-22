@@ -52,9 +52,9 @@
                 </div>
             </nav>
             <p class="px-5 mt-0 pl-6 text-sm">
-                Support:
-                <a href="mailto:mailx@ivpn.net">Email</a> /
-                <a href="/faq">FAQ</a>
+                <a href="mailto:mailx@ivpn.net">Support</a> /
+                <a href="/faq">FAQ</a> /
+                <a href="/news">News</a>
             </p>
         </div>
     </header>

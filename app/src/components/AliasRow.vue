@@ -4,11 +4,14 @@
             <div class="flex items-center hs-tooltip">
                 <input
                     @change="updateAlias"
-                    v-bind:checked="alias.enabled"
-                    v-bind:disabled="!alias.recipients.length"
+                    v-bind:checked="alias.enabled && !isDomainUnverified"
+                    v-bind:disabled="!alias.recipients.length || isDomainUnverified"
                     type="checkbox"
                 >
-                <span v-if="!alias.recipients.length" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
+                <span v-if="isDomainUnverified" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
+                    Domain not verified or disabled. Address is not forwarding mail.
+                </span>
+                <span v-else-if="!alias.recipients.length" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                     Disabled
                 </span>
             </div>
@@ -114,11 +117,14 @@
                     <div class="flex items-center hs-tooltip">
                         <input
                             @change="updateAlias"
-                            v-bind:checked="alias.enabled"
-                            v-bind:disabled="!alias.recipients.length"
+                            v-bind:checked="alias.enabled && !isDomainUnverified"
+                            v-bind:disabled="!alias.recipients.length || isDomainUnverified"
                             type="checkbox"
                         >
-                        <span v-if="!alias.recipients.length" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
+                        <span v-if="isDomainUnverified" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
+                            Domain not verified. Address is not forwarding mail.
+                        </span>
+                        <span v-else-if="!alias.recipients.length" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                             Disabled
                         </span>
                     </div>
@@ -198,6 +204,7 @@ import dropdown from '@preline/dropdown'
 const props = defineProps(['alias', 'recipients', 'catchAll'])
 const alias = ref(props.alias)
 const recipients = ref(props.recipients)
+const isDomainUnverified = computed(() => alias.value.is_custom_domain === true && (alias.value.is_domain_verified === false || alias.value.is_domain_enabled === false))
 const truncatedDescription = computed(() => {
     const desc = alias.value.description
     if (!desc) return ''

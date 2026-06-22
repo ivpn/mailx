@@ -309,6 +309,34 @@ func (s *Service) FindRecipients(from string, to string, msgType model.MessageTy
 		return []model.Recipient{}, alias, 0, ErrDisabledAlias
 	}
 
+	// Handle disabled domain
+	domains := s.Cfg.API.Domains
+	isCustomDomain := true
+	for domain := range strings.SplitSeq(domains, ",") {
+		if strings.HasSuffix(alias.Name, "@"+domain) {
+			isCustomDomain = false
+			break
+		}
+	}
+
+	if isCustomDomain {
+		domainName := strings.SplitN(alias.Name, "@", 2)[1]
+		domain, err := s.GetVerifiedDomainByName(context.Background(), domainName)
+		if err != nil {
+			log.Printf("error fetching domain: %s", err.Error())
+			return []model.Recipient{}, alias, 0, ErrDisabledDomain
+		}
+
+		if !domain.Enabled {
+			err = s.SaveMessage(context.Background(), alias, model.Block)
+			if err != nil {
+				log.Println("error saving message", err)
+			}
+
+			return []model.Recipient{}, alias, 0, ErrDisabledDomain
+		}
+	}
+
 	// Handle Reply | Send
 	err = utils.ValidateEmail(replyTo)
 	if err == nil {

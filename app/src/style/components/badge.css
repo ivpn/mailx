@@ -18,6 +18,10 @@
             @apply bg-cyan-500 dark:bg-cyan-700 text-white font-semibold;
         }
 
+        &.disabled_domain {
+            @apply bg-rose-500 dark:bg-rose-700 text-white font-semibold;
+        }
+
         &.unauthorised_send {
             @apply bg-violet-500 dark:bg-violet-700 text-white font-semibold;
         }

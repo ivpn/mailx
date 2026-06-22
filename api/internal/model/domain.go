@@ -1,6 +1,13 @@
 package model
 
-import "time"
+import (
+	"errors"
+	"time"
+)
+
+var (
+	ErrDuplicateDomain = errors.New("domain already exists")
+)
 
 type Domain struct {
 	BaseModel

@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-sql-driver/mysql"
 	"ivpn.net/email/api/internal/model"
 	"ivpn.net/email/api/internal/utils"
 )
@@ -23,15 +24,16 @@ var (
 	ErrPostDomainInactiveSub = errors.New("Unable to create domain. Subscription is not active.")
 	ErrUpdateDomain          = errors.New("Unable to update domain. Please try again.")
 	ErrDeleteDomain          = errors.New("Unable to delete domain. Please try again.")
-	ErrDNSLookupOwner        = errors.New("Unable to verify domain ownership. Please ensure the correct TXT record is set.")
-	ErrDNSLookupSPF          = errors.New("Unable to verify domain DNS records. Please ensure the correct SPF record is set.")
-	ErrDNSLookupDKIM         = errors.New("Unable to verify domain DNS records. Please ensure the correct DKIM records are set.")
-	ErrDNSLookupDMARC        = errors.New("Unable to verify domain DNS records. Please ensure the correct DMARC record is set.")
-	ErrDNSLookupMX           = errors.New("Unable to verify domain DNS records. Please ensure the correct MX records are set.")
+	ErrDNSLookupOwner        = errors.New("Unable to verify domain ownership. Please ensure the correct TXT record is set or try again later.")
+	ErrDNSLookupSPF          = errors.New("Unable to verify domain DNS records. Please ensure the correct SPF record is set or try again later.")
+	ErrDNSLookupDKIM         = errors.New("Unable to verify domain DNS records. Please ensure the correct DKIM records are set or try again later.")
+	ErrDNSLookupDMARC        = errors.New("Unable to verify domain DNS records. Please ensure the correct DMARC record is set or try again later.")
+	ErrDNSLookupMX           = errors.New("Unable to verify domain DNS records. Please ensure the correct MX records are set or try again later.")
 )
 
 type DomainStore interface {
 	GetDomains(context.Context, string) ([]model.Domain, error)
+	GetDomainsAsc(context.Context, string) ([]model.Domain, error)
 	GetVerifiedDomains(context.Context, string) ([]model.Domain, error)
 	GetDomain(context.Context, string, string) (model.Domain, error)
 	GetVerifiedDomain(context.Context, string, string) (model.Domain, error)
@@ -103,31 +105,66 @@ func (s *Service) GetDomainsCount(ctx context.Context, userId string) (int64, er
 }
 
 func (s *Service) GetDNSConfig(ctx context.Context, userId string) (model.DNSConfig, error) {
-	count, err := s.GetDomainsCount(ctx, userId)
-	if err != nil {
-		log.Printf("error getting domains count for DNS config: %s", err.Error())
-		return model.DNSConfig{}, ErrGetDNSConfig
-	}
-
 	domains := strings.Split(s.Cfg.API.Domains, ",")
 	if len(domains) == 0 {
 		log.Printf("no domains configured for DNS config")
 		return model.DNSConfig{}, ErrGetDNSConfig
 	}
 
-	verify := sha256.Sum256([]byte(s.Cfg.API.TokenSecret + userId + fmt.Sprint(count)))
+	verify, err := s.GetOwnerVerifyRecordNewDomain(ctx, userId)
+	if err != nil {
+		log.Printf("error getting owner verify record for DNS config: %s", err.Error())
+		return model.DNSConfig{}, ErrGetDNSConfig
+	}
+
 	domain := domains[0]
 	dkim := strings.Split(s.Cfg.SMTPClient.DkimSelector, ",")
 	hosts := strings.Split(s.Cfg.SMTPClient.Host, ",")
 
 	dnsConfig := model.DNSConfig{
-		Verify: fmt.Sprintf("%x", verify),
+		Verify: verify,
 		Domain: domain,
 		DKIM:   dkim,
 		Hosts:  hosts,
 	}
 
 	return dnsConfig, nil
+}
+
+func (s *Service) GetOwnerVerifyRecordNewDomain(ctx context.Context, userId string) (string, error) {
+	count, err := s.GetDomainsCount(ctx, userId)
+	if err != nil {
+		log.Printf("error getting domains count for DNS config: %s", err.Error())
+		return "", ErrGetDNSConfig
+	}
+
+	verify := sha256.Sum256([]byte(s.Cfg.API.TokenSecret + userId + fmt.Sprint(count)))
+	return fmt.Sprintf("%x", verify), nil
+}
+
+func (s *Service) GetOwnerVerifyRecordExistingDomain(ctx context.Context, domainId string, userId string) (string, error) {
+	domain, err := s.GetDomain(ctx, domainId, userId)
+	if err != nil {
+		log.Printf("error getting domain for owner verify record: %s", err.Error())
+		return "", ErrGetDomain
+	}
+
+	domains, err := s.Store.GetDomainsAsc(ctx, userId)
+	if err != nil {
+		log.Printf("error getting domains for owner verify record: %s", err.Error())
+		return "", ErrGetDomains
+	}
+
+	index := 0
+	for i, d := range domains {
+		if d.ID == domain.ID {
+			index = i
+			break
+		}
+	}
+
+	verify := sha256.Sum256([]byte(s.Cfg.API.TokenSecret + userId + fmt.Sprint(index)))
+	return fmt.Sprintf("%x", verify), nil
 }
 
 func (s *Service) PostDomain(ctx context.Context, domain model.Domain) (model.Domain, error) {
@@ -147,7 +184,7 @@ func (s *Service) PostDomain(ctx context.Context, domain model.Domain) (model.Do
 		return model.Domain{}, ErrPostDomainPredefined
 	}
 
-	err = s.VerifyDomainOwner(ctx, domain.Name, domain.UserID)
+	err = s.VerifyOwnerNewDomain(ctx, domain.Name, domain.UserID)
 	if err != nil {
 		log.Printf("error verifying domain ownership: %s", err.Error())
 		return model.Domain{}, ErrDNSLookupOwner
@@ -159,7 +196,12 @@ func (s *Service) PostDomain(ctx context.Context, domain model.Domain) (model.Do
 	createdDomain, err := s.Store.PostDomain(ctx, domain)
 	if err != nil {
 		log.Printf("error creating domain: %s", err.Error())
-		return model.Domain{}, ErrPostDomain
+		var mysqlErr *mysql.MySQLError
+		if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
+			return model.Domain{}, model.ErrDuplicateDomain
+		} else {
+			return model.Domain{}, ErrPostDomain
+		}
 	}
 
 	return createdDomain, nil
@@ -209,7 +251,7 @@ func (s *Service) DeleteDomainsByUserID(ctx context.Context, userID string) erro
 	return nil
 }
 
-func (s *Service) VerifyDomainOwner(ctx context.Context, domain string, userID string) error {
+func (s *Service) VerifyOwnerNewDomain(ctx context.Context, domain string, userID string) error {
 	dnsConfig, err := s.GetDNSConfig(ctx, userID)
 	if err != nil {
 		log.Printf("error getting DNS config for domain ownership verification: %s", err.Error())
@@ -224,7 +266,32 @@ func (s *Service) VerifyDomainOwner(ctx context.Context, domain string, userID s
 	}
 
 	if !ok {
-		log.Printf("TXT record not found for domain ownership verification")
+		return ErrDNSLookupOwner
+	}
+
+	return nil
+}
+
+func (s *Service) VerifyOwnerExistingDomain(ctx context.Context, domainId string, userID string) error {
+	domain, err := s.GetDomain(ctx, domainId, userID)
+	if err != nil {
+		log.Printf("error getting domain for ownership verification: %s", err.Error())
+		return ErrGetDomain
+	}
+
+	verify, err := s.GetOwnerVerifyRecordExistingDomain(ctx, domainId, userID)
+	if err != nil {
+		log.Printf("error getting owner verify record for existing domain: %s", err.Error())
+		return ErrGetDNSConfig
+	}
+
+	ok, err := utils.LookupTXTExact(domain.Name, "mailx-verify="+verify)
+	if err != nil {
+		log.Printf("error looking up TXT record for domain ownership verification: %s", err.Error())
+		return ErrDNSLookupOwner
+	}
+
+	if !ok {
 		return ErrDNSLookupOwner
 	}
 
@@ -238,17 +305,49 @@ func (s *Service) VerifyDomainDNSRecords(ctx context.Context, domainId string, u
 		return ErrGetDomain
 	}
 
+	// verify, err := s.GetOwnerVerifyRecordExistingDomain(ctx, domainId, userID)
+	// if err != nil {
+	// 	log.Printf("error getting owner verify record for existing domain: %s", err.Error())
+	// 	return ErrGetDNSConfig
+	// }
+
+	// ok, err := utils.LookupTXTExact(domain.Name, "mailx-verify="+verify)
+	// if err != nil {
+	// 	domain.OwnerVerifiedAt = nil
+	// 	if updateErr := s.UpdateDomain(ctx, domain); updateErr != nil {
+	// 		log.Printf("error nulling owner_verified_at for domain %s: %s", domain.Name, updateErr.Error())
+	// 	}
+	// 	return ErrDNSLookupOwner
+	// }
+
+	// if !ok {
+	// 	domain.OwnerVerifiedAt = nil
+	// 	if updateErr := s.UpdateDomain(ctx, domain); updateErr != nil {
+	// 		log.Printf("error nulling owner_verified_at for domain %s: %s", domain.Name, updateErr.Error())
+	// 	}
+	// 	return ErrDNSLookupOwner
+	// }
+
 	err = s.VerifyDomainMX(ctx, domain.Name, userID)
 	if err != nil {
+		domain.MXVerifiedAt = nil
+		if updateErr := s.UpdateDomain(ctx, domain); updateErr != nil {
+			log.Printf("error nulling mx_verified_at for domain %s: %s", domain.Name, updateErr.Error())
+		}
 		return err
 	}
 
 	err = s.VerifyDomainSend(ctx, domain.Name, userID)
 	if err != nil {
+		domain.SendVerifiedAt = nil
+		if updateErr := s.UpdateDomain(ctx, domain); updateErr != nil {
+			log.Printf("error nulling send_verified_at for domain %s: %s", domain.Name, updateErr.Error())
+		}
 		return err
 	}
 
 	now := time.Now()
+	domain.OwnerVerifiedAt = &now
 	domain.MXVerifiedAt = &now
 	domain.SendVerifiedAt = &now
 
@@ -277,7 +376,6 @@ func (s *Service) VerifyDomainMX(ctx context.Context, domain string, userID stri
 		}
 
 		if !ok {
-			log.Printf("MX record not found for host %s in domain MX verification", host)
 			return ErrDNSLookupMX
 		}
 	}
@@ -300,7 +398,6 @@ func (s *Service) VerifyDomainSend(ctx context.Context, domain string, userID st
 	}
 
 	if !ok {
-		log.Printf("SPF record not found for domain SPF verification")
 		return ErrDNSLookupSPF
 	}
 

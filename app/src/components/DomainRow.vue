@@ -9,14 +9,15 @@
         <td>
             <p>
                 <button v-if="dnsRecordsVerified()" class="cta xs success" v-bind:data-hs-overlay="'#modal-verify-domain' + domain.id">Verified</button>
-                <button v-if="!dnsRecordsVerified()" class="cta xs plain" v-bind:data-hs-overlay="'#modal-verify-domain' + domain.id">Unverified</button>
+                <button v-if="!dnsRecordsVerified()" class="cta xs plain" v-bind:data-hs-overlay="'#modal-verify-domain' + domain.id">Verify DNS</button>
             </p>
         </td>
         <td>
             <div class="flex items-center hs-tooltip">
                 <input
                     @change="updateDomain"
-                    v-bind:checked="domain.enabled"
+                    v-bind:checked="domain.enabled && dnsRecordsVerified()"
+                    v-bind:disabled="!dnsRecordsVerified()"
                     type="checkbox"
                 >
             </div>
@@ -32,7 +33,7 @@
                     >
                     <button v-bind:data-hs-overlay="'#modal-verify-domain' + domain.id">
                         <i class="icon icon-primary check text-xs"></i>
-                        Verify
+                        Verify DNS
                     </button>
                     <button class="delete"
                         v-bind:data-hs-overlay="'#modal-delete-domain' + domain.id">
@@ -74,7 +75,7 @@
                             >
                             <button v-bind:data-hs-overlay="'#modal-verify-domain' + domain.id">
                                 <i class="icon icon-primary check text-xs"></i>
-                                Verify
+                                Verify DNS
                             </button>
                             <button class="delete"
                                 v-bind:data-hs-overlay="'#modal-delete-domain' + domain.id">
@@ -86,7 +87,7 @@
                     <div>
                         <p class="my-3">
                             <button v-if="dnsRecordsVerified()" class="cta xs success" v-bind:data-hs-overlay="'#modal-verify-domain' + domain.id">Verified</button>
-                            <button v-if="!dnsRecordsVerified()" class="cta xs plain" v-bind:data-hs-overlay="'#modal-verify-domain' + domain.id">Unverified</button>
+                            <button v-if="!dnsRecordsVerified()" class="cta xs plain" v-bind:data-hs-overlay="'#modal-verify-domain' + domain.id">Verify DNS</button>
                         </p>
                     </div>
                 </div>
@@ -117,7 +118,7 @@ const updateDomain = async () => {
 }
 
 const dnsRecordsVerified = () => {
-    return domain.value.mx_verified_at && domain.value.send_verified_at
+    return domain.value.owner_verified_at && domain.value.mx_verified_at && domain.value.send_verified_at
 }
 
 onMounted(() => {

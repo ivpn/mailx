@@ -4,31 +4,35 @@
             <div class="flex items-center hs-tooltip">
                 <input
                     @change="updateAlias"
-                    v-bind:checked="alias.enabled"
-                    v-bind:disabled="!alias.recipients.length"
+                    v-bind:checked="alias.enabled && !isDomainUnverified"
+                    v-bind:disabled="!alias.recipients.length || isDomainUnverified"
                     type="checkbox"
                 >
-                <span v-if="!alias.recipients.length" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
+                <span v-if="isDomainUnverified" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
+                    Domain not verified or disabled. Address is not forwarding mail.
+                </span>
+                <span v-else-if="!alias.recipients.length" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                     Disabled
                 </span>
             </div>
         </td>
+        <td class="whitespace-normal">
+            <div class="block break-all hs-tooltip">
+                <p class="hs-tooltip-toggle m-0">{{ truncatedDescription }}</p>
+                <span v-if="alias.description && alias.description.length > 45" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">{{ alias.description }}</span>
+            </div>
+        </td>
         <td>
             <div class="hs-tooltip inline-block">
-                <p class="hs-tooltip-toggle">
-                    <button class="plain text-wrap text-start text-base p-0" @click="copyAlias(alias.name)">
-                        <span v-if="alias.description">{{ truncatedDescription }}<br></span>
-                        <span v-if="alias.description" class="text-sm">{{ alias.name.split('@')[0] }}</span>
-                        <span v-if="!alias.description" class="text-base">{{ alias.name.split('@')[0] }}</span>
+                <p class="hs-tooltip-toggle m-0">
+                    <button class="plain text-wrap text-start text-sm p-0" @click="copyAlias(alias.name)">
+                        {{ alias.name }}
                     </button>
                     <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                         {{ copyText }}: {{ alias.name }}
                     </span>
                 </p>
             </div>
-        </td>
-        <td>
-            <p class="py-3">@{{ alias.name.split('@')[1] }}</p>
         </td>
         <td>
             <div class="flex items-center gap-3 mb-1">
@@ -100,10 +104,9 @@
                     <div>
                         <div class="hs-tooltip inline-block mb-5 break-all">
                             <p class="hs-tooltip-toggle mb-0">
-                                <button class="plain truncate text-base p-0 text-wrap text-start" @click="copyAlias(alias.name)">
-                                    <span v-if="alias.description">{{ truncatedDescription }}<br></span>
-                                    <span v-if="alias.description" class="text-sm">{{ alias.name.split('@')[0] }}</span>
-                                    <span v-if="!alias.description" class="text-base">{{ alias.name.split('@')[0] }}</span>
+                                <button class="plain truncate text-sm p-0 text-wrap text-start" @click="copyAlias(alias.name)">
+                                    <span v-if="alias.description" class="block break-words">{{ truncatedDescription }}</span>
+                                    <span class="block text-sm break-all">{{ alias.name }}</span>
                                 </button>
                                 <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                                     {{ copyText }}: {{ alias.name }}
@@ -114,11 +117,14 @@
                     <div class="flex items-center hs-tooltip">
                         <input
                             @change="updateAlias"
-                            v-bind:checked="alias.enabled"
-                            v-bind:disabled="!alias.recipients.length"
+                            v-bind:checked="alias.enabled && !isDomainUnverified"
+                            v-bind:disabled="!alias.recipients.length || isDomainUnverified"
                             type="checkbox"
                         >
-                        <span v-if="!alias.recipients.length" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
+                        <span v-if="isDomainUnverified" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
+                            Domain not verified. Address is not forwarding mail.
+                        </span>
+                        <span v-else-if="!alias.recipients.length" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                             Disabled
                         </span>
                     </div>
@@ -198,6 +204,7 @@ import dropdown from '@preline/dropdown'
 const props = defineProps(['alias', 'recipients', 'catchAll'])
 const alias = ref(props.alias)
 const recipients = ref(props.recipients)
+const isDomainUnverified = computed(() => alias.value.is_custom_domain === true && (alias.value.is_domain_verified === false || alias.value.is_domain_enabled === false))
 const truncatedDescription = computed(() => {
     const desc = alias.value.description
     if (!desc) return ''

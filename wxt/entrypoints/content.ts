@@ -241,8 +241,16 @@ async function postAlias(): Promise<string | undefined> {
     return
   }
 
+  let domain = defaults.domain
+  if (defaults.custom_domains.length > 0) {
+    const customDomain = defaults.custom_domains.find(d => d.name === domain)
+    if (customDomain) {
+      domain = customDomain.id
+    }
+  }
+
   const alias = {
-    domain: defaults.domain,
+    domain: domain,
     recipients: defaults.recipient,
     format: defaults.alias_format,
     enabled: true,

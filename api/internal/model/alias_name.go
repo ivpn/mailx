@@ -26,14 +26,16 @@ var (
 	}
 )
 
-func GenerateAlias(format string, sufix string) string {
+func GenerateAlias(format string, localPart string) string {
 	switch format {
 	case AliasFormatRandomChars:
 		return generateRandomChars()
 	case AliasFormatUUID:
 		return uuid.New().String()
 	case AliasFormatCatchAll:
-		return fmt.Sprintf("*+%s", sufix)
+		return fmt.Sprintf("*+%s", localPart)
+	case AliasFormatCustom:
+		return localPart
 	default:
 		return generateRandomWords()
 	}

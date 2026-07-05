@@ -129,7 +129,7 @@ enabled = true;
 
 sign_authenticated = true;
 sign_local = true;
-try_fallback = false;
+try_fallback = true;
 
 use_domain = "header";
 use_domain_sign_local = "header";
@@ -138,6 +138,10 @@ use_esld = true;
 allow_username_mismatch = true;
 
 check_pubkey = false; # you want to use this in the beginning
+
+# Fallback: sign any unrecognized domain with domain.com key (d=domain.com)
+path = "/tmp/docker-mailserver/rspamd/dkim/rsa-2048-mail-domain.com.private.txt";
+selector = "mail";
 
 domain {
     domain.com {

@@ -116,6 +116,11 @@
                 <button @click="deleteAllLogs" class="cta sm delete">Delete All Logs</button>
             </div>
             <hr>
+            <p> 
+                <strong>Note:</strong><br>
+                If you use Mailx browser extension, in the extension go to "Settings" &gt; "Refresh Defaults" after saving to apply the new settings.
+            </p>
+            <hr>
             <div class="mb-6">
                 <button @click="saveSettings" class="cta">
                     Save Settings

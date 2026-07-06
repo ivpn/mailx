@@ -97,6 +97,22 @@ func (s *Service) ProcessMessage(data []byte) error {
 				}
 			}
 
+			// Handle ErrDisabledDomain
+			if errors.Is(err, ErrDisabledDomain) {
+				settings, err := s.GetSettings(context.Background(), alias.UserID)
+				if err != nil {
+					log.Println("error getting settings", err)
+					continue
+				}
+
+				if settings.LogIssues {
+					err := s.ProcessDiscardLog(alias, msg.From, to, ErrDisabledDomain.Error(), model.DisabledDomain)
+					if err != nil {
+						log.Println("error processing discard log", err)
+					}
+				}
+			}
+
 			continue
 		}
 

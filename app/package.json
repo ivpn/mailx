@@ -19,7 +19,7 @@
     "@simplewebauthn/browser": "13.1.0",
     "@tailwindcss/forms": "^0.5.7",
     "apexcharts": "^3.49.0",
-    "axios": "^1.15.2",
+    "axios": "^1.16.0",
     "date-fns": "^4.1.0",
     "jwt-decode": "^4.0.0",
     "mitt": "^3.0.1",

@@ -6,7 +6,7 @@
                 Back
             </button>
         </p>
-        <h1>News</h1>
+        <h1>Announcements</h1>
         <hr>
 
         <div v-if="!loaded && !error">
@@ -18,7 +18,7 @@
         </div>
 
         <div v-if="loaded && list.length === 0">
-            <p>No news.</p>
+            <p>No announcements.</p>
         </div>
 
         <template v-if="loaded">

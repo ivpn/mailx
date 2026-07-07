@@ -42,7 +42,25 @@
             </div>
         </nav>
         <div>
-            <nav>
+            <nav class="footer">
+                <div class="[@media(max-height:715px)]:hidden">
+                    <router-link to="/announcements">
+                        <i class="icon megaphone icon-primary"></i>
+                        Announcements
+                    </router-link>
+                    <router-link to="/faq">
+                        <i class="icon question icon-primary"></i>
+                        FAQ
+                    </router-link>
+                    <router-link to="/privacy">
+                        <i class="icon eye-off icon-primary"></i>
+                        Privacy
+                    </router-link>
+                    <a href="mailto:mailx@ivpn.net">
+                        <i class="icon mail icon-primary"></i>
+                        Support
+                    </a>
+                </div>
                 <div class="flex items-center py-5 pb-3 pr-5">
                     <a @click.stop="logout">
                         <i class="icon logout icon-primary"></i>
@@ -51,11 +69,6 @@
                     <ThemeSwitch />
                 </div>
             </nav>
-            <p class="px-5 mt-0 pl-6 text-sm">
-                <a href="mailto:mailx@ivpn.net">Support</a> /
-                <a href="/faq">FAQ</a> /
-                <a href="/news">News</a>
-            </p>
         </div>
     </header>
 </template>

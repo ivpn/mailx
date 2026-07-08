@@ -95,7 +95,7 @@ func (s *Service) DeleteLogs(ctx context.Context, userId string) error {
 	return nil
 }
 
-func (s *Service) ProcessDiscardLog(alias model.Alias, from string, destination string, message string, logType model.LogType) error {
+func (s *Service) ProcessDiagnosticLog(alias model.Alias, from string, destination string, message string, logType model.LogType) error {
 	lg := model.Log{
 		ID:          uuid.New().String(),
 		CreatedAt:   time.Now(),
@@ -109,7 +109,7 @@ func (s *Service) ProcessDiscardLog(alias model.Alias, from string, destination 
 
 	err := s.PostLog(context.Background(), lg)
 	if err != nil {
-		log.Printf("error processing discard log: %s", err.Error())
+		log.Printf("error processing diagnostic log: %s", err.Error())
 		return err
 	}
 

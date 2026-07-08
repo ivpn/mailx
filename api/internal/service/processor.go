@@ -74,9 +74,9 @@ func (s *Service) ProcessMessage(data []byte) error {
 				}
 
 				if settings.LogIssues {
-					err := s.ProcessDiscardLog(alias, msg.From, to, ErrNoVerifiedRecipients.Error(), model.UnauthorisedSend)
+					err := s.ProcessDiagnosticLog(alias, msg.From, to, ErrNoVerifiedRecipients.Error(), model.UnauthorisedSend)
 					if err != nil {
-						log.Println("error processing discard log", err)
+						log.Println("error processing diagnostic log", err)
 					}
 				}
 			}
@@ -90,9 +90,9 @@ func (s *Service) ProcessMessage(data []byte) error {
 				}
 
 				if settings.LogIssues {
-					err := s.ProcessDiscardLog(alias, msg.From, to, ErrDisabledAlias.Error(), model.DisabledAlias)
+					err := s.ProcessDiagnosticLog(alias, msg.From, to, ErrDisabledAlias.Error(), model.DisabledAlias)
 					if err != nil {
-						log.Println("error processing discard log", err)
+						log.Println("error processing diagnostic log", err)
 					}
 				}
 			}
@@ -106,9 +106,9 @@ func (s *Service) ProcessMessage(data []byte) error {
 				}
 
 				if settings.LogIssues {
-					err := s.ProcessDiscardLog(alias, msg.From, to, ErrDisabledDomain.Error(), model.DisabledDomain)
+					err := s.ProcessDiagnosticLog(alias, msg.From, to, ErrDisabledDomain.Error(), model.DisabledDomain)
 					if err != nil {
-						log.Println("error processing discard log", err)
+						log.Println("error processing diagnostic log", err)
 					}
 				}
 			}
@@ -131,9 +131,9 @@ func (s *Service) ProcessMessage(data []byte) error {
 			}
 
 			if settings.LogIssues {
-				err := s.ProcessDiscardLog(alias, msg.From, to, ErrInactiveSubscription.Error(), model.InactiveSubscription)
+				err := s.ProcessDiagnosticLog(alias, msg.From, to, ErrInactiveSubscription.Error(), model.InactiveSubscription)
 				if err != nil {
-					log.Println("error processing discard log", err)
+					log.Println("error processing diagnostic log", err)
 				}
 			}
 

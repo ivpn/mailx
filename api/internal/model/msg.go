@@ -52,14 +52,14 @@ func ParseMsg(data []byte) (Msg, error) {
 
 	from, err := mail.ParseAddress(utils.DecodeHeaderWithCharset(msg.Header.Get("From")))
 	if err != nil {
-		return Msg{}, fmt.Errorf("error parsing From header: %w", err)
+		return Msg{To: to}, fmt.Errorf("error parsing From header: %w", err)
 	}
 	fromAddress := from.Address
 
 	buf := new(bytes.Buffer)
 	_, err = buf.ReadFrom(msg.Body)
 	if err != nil {
-		return Msg{}, err
+		return Msg{To: to}, err
 	}
 	body := buf.String()
 	msgType := Send
@@ -73,7 +73,7 @@ func ParseMsg(data []byte) (Msg, error) {
 		fromAddress, err = ExtractOriginalFrom(processedData)
 		if err != nil {
 			log.Println("error extracting original From from bounce:", err)
-			return Msg{}, ErrExtractOriginalFrom
+			return Msg{To: to}, ErrExtractOriginalFrom
 		}
 	}
 

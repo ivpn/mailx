@@ -26,28 +26,30 @@ func (s *Service) ProcessMessage(data []byte) error {
 			return nil
 		}
 
-		alias, err := s.FindAlias(msg.From)
-		if err != nil {
-			log.Println("error fetching alias:", err)
-			// Fail silently so unknown aliases are not kept in postfix queue
-			return nil
-		}
-
-		settings, err := s.GetSettings(context.Background(), alias.UserID)
-		if err != nil {
-			log.Println("error getting settings", err)
-			// Fail silently so unknown aliases are not kept in postfix queue
-			return nil
-		}
-
-		if settings.LogIssues {
-			err := s.ProcessDiagnosticLog(alias, msg.From, msg.To[0], parseErr.Error(), model.DeferredDelivery)
-			if err != nil {
-				log.Println("error processing diagnostic log", err)
+		for _, to := range msg.To {
+			_, alias, _, err := s.FindRecipients(msg.From, to, msg.Type)
+			if alias.UserID == "" {
+				continue
 			}
+
+			settings, err := s.GetSettings(context.Background(), alias.UserID)
+			if err != nil {
+				log.Println("error getting settings", err)
+				continue
+			}
+
+			if settings.LogIssues {
+				err := s.ProcessDiagnosticLog(alias, msg.From, to, parseErr.Error(), model.DeferredDelivery)
+				if err != nil {
+					log.Println("error processing diagnostic log", err)
+				}
+			}
+
+			log.Println("error parsing message [alias:", alias.Name, "]:", parseErr)
 		}
 
-		log.Println("error parsing message:", parseErr, alias.Name)
+		// Disable fallback logging to avoid cluttering
+		// log.Println("error parsing message [data]:", parseErr)
 		return parseErr
 	}
 
@@ -206,7 +208,7 @@ func (s *Service) QueueMessage(from string, fromName string, rcp model.Recipient
 				}
 			}
 
-			log.Println("error forwarding message", err)
+			log.Println("error forwarding message [alias:", alias.Name, "]:", err)
 			return err
 		}
 	} else {
@@ -231,7 +233,7 @@ func (s *Service) QueueMessage(from string, fromName string, rcp model.Recipient
 				}
 			}
 
-			log.Println("error sending message", err)
+			log.Println("error sending message [alias:", alias.Name, "]:", err)
 			return err
 		}
 	}

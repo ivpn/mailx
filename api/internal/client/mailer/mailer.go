@@ -126,10 +126,16 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 		email.HTML = model.PlainTextToHTML(email.Text)
 	}
 
+	// Decode the subject: letters may return an undecoded RFC 2047 value when
+	// it cannot look up the charset (e.g. an empty-charset encoded-word that
+	// slipped through preprocessing).  DecodeHeaderWithCharset is a no-op when
+	// the subject is already plain text.
+	decodedSubject := utils.DecodeHeaderWithCharset(email.Headers.Subject)
+
 	m := gomail.NewMessage()
 	m.SetAddressHeader("From", from, name)
 	m.SetHeader("To", rcp.Email)
-	m.SetHeader("Subject", email.Headers.Subject)
+	m.SetHeader("Subject", decodedSubject)
 	m.SetBody("text/plain", email.Text)
 	m.AddAlternative("text/html", email.HTML)
 
@@ -228,10 +234,16 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 		email.HTML = model.PlainTextToHTML(email.Text)
 	}
 
+	// Decode the subject: letters may return an undecoded RFC 2047 value when
+	// it cannot look up the charset (e.g. an empty-charset encoded-word that
+	// slipped through preprocessing).  DecodeHeaderWithCharset is a no-op when
+	// the subject is already plain text.
+	decodedSubject := utils.DecodeHeaderWithCharset(email.Headers.Subject)
+
 	m := gomail.NewMessage()
 	m.SetAddressHeader("From", from, name)
 	m.SetHeader("To", rcp.Email)
-	m.SetHeader("Subject", email.Headers.Subject)
+	m.SetHeader("Subject", decodedSubject)
 	m.SetBody("text/plain", header.String()+email.Text)
 
 	// Preserve original metadata
@@ -317,7 +329,7 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 
 	// PGP/MIME encryption
 	if rcp.PGPEnabled && rcp.PGPKey != "" && !rcp.PGPInline {
-		em, err := utils.EncryptWithPGPMIME(m, from, name, email.Headers.Subject, rcp.Email, rcp.PGPKey)
+		em, err := utils.EncryptWithPGPMIME(m, from, name, decodedSubject, rcp.Email, rcp.PGPKey)
 		if err != nil {
 			return err
 		}

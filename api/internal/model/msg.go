@@ -39,7 +39,7 @@ func ParseMsg(data []byte) (Msg, error) {
 		return Msg{}, err
 	}
 
-	subject := msg.Header.Get("Subject")
+	subject := utils.DecodeHeaderWithCharset(msg.Header.Get("Subject"))
 
 	to := make([]string, 0)
 	addresses, err := mail.ParseAddressList(utils.NormalizeAddressSeparators(utils.DecodeHeaderWithCharset(msg.Header.Get("To"))))

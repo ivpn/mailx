@@ -19,15 +19,38 @@ var (
 )
 
 func (s *Service) ProcessMessage(data []byte) error {
-	msg, err := model.ParseMsg(data)
-	if err != nil {
-		if errors.Is(err, model.ErrExtractOriginalFrom) {
+	msg, parseErr := model.ParseMsg(data)
+	if parseErr != nil {
+		if errors.Is(parseErr, model.ErrExtractOriginalFrom) {
 			// Fail silently so bounce messages are not kept in postfix queue
 			return nil
 		}
 
-		log.Println("error parsing message:", err)
-		return err
+		for _, to := range msg.To {
+			_, alias, _, err := s.FindRecipients(msg.From, to, msg.Type)
+			if alias.UserID == "" {
+				continue
+			}
+
+			settings, err := s.GetSettings(context.Background(), alias.UserID)
+			if err != nil {
+				log.Println("error getting settings", err)
+				continue
+			}
+
+			if settings.LogIssues {
+				err := s.ProcessDiagnosticLog(alias, msg.From, to, parseErr.Error(), model.DeferredDelivery)
+				if err != nil {
+					log.Println("error processing diagnostic log", err)
+				}
+			}
+
+			log.Println("error parsing message [alias:", alias.Name, "]:", parseErr)
+		}
+
+		// Disable fallback logging to avoid cluttering
+		// log.Println("error parsing message [data]:", parseErr)
+		return parseErr
 	}
 
 	// Bounce
@@ -74,9 +97,9 @@ func (s *Service) ProcessMessage(data []byte) error {
 				}
 
 				if settings.LogIssues {
-					err := s.ProcessDiscardLog(alias, msg.From, to, ErrNoVerifiedRecipients.Error(), model.UnauthorisedSend)
+					err := s.ProcessDiagnosticLog(alias, msg.From, to, ErrNoVerifiedRecipients.Error(), model.UnauthorisedSend)
 					if err != nil {
-						log.Println("error processing discard log", err)
+						log.Println("error processing diagnostic log", err)
 					}
 				}
 			}
@@ -90,9 +113,9 @@ func (s *Service) ProcessMessage(data []byte) error {
 				}
 
 				if settings.LogIssues {
-					err := s.ProcessDiscardLog(alias, msg.From, to, ErrDisabledAlias.Error(), model.DisabledAlias)
+					err := s.ProcessDiagnosticLog(alias, msg.From, to, ErrDisabledAlias.Error(), model.DisabledAlias)
 					if err != nil {
-						log.Println("error processing discard log", err)
+						log.Println("error processing diagnostic log", err)
 					}
 				}
 			}
@@ -106,9 +129,9 @@ func (s *Service) ProcessMessage(data []byte) error {
 				}
 
 				if settings.LogIssues {
-					err := s.ProcessDiscardLog(alias, msg.From, to, ErrDisabledDomain.Error(), model.DisabledDomain)
+					err := s.ProcessDiagnosticLog(alias, msg.From, to, ErrDisabledDomain.Error(), model.DisabledDomain)
 					if err != nil {
-						log.Println("error processing discard log", err)
+						log.Println("error processing diagnostic log", err)
 					}
 				}
 			}
@@ -131,9 +154,9 @@ func (s *Service) ProcessMessage(data []byte) error {
 			}
 
 			if settings.LogIssues {
-				err := s.ProcessDiscardLog(alias, msg.From, to, ErrInactiveSubscription.Error(), model.InactiveSubscription)
+				err := s.ProcessDiagnosticLog(alias, msg.From, to, ErrInactiveSubscription.Error(), model.InactiveSubscription)
 				if err != nil {
-					log.Println("error processing discard log", err)
+					log.Println("error processing diagnostic log", err)
 				}
 			}
 
@@ -178,7 +201,14 @@ func (s *Service) QueueMessage(from string, fromName string, rcp model.Recipient
 		generatedFrom := model.GenerateReplyTo(alias.Name, from)
 		err := mailer.Forward(generatedFrom, fromName, rcp, data, "header.tmpl", templateData, settings, alias)
 		if err != nil {
-			log.Println("error forwarding message", err)
+			if settings.LogIssues {
+				err := s.ProcessDiagnosticLog(alias, from, rcp.Email, err.Error(), model.FailedDelivery)
+				if err != nil {
+					log.Println("error processing diagnostic log", err)
+				}
+			}
+
+			log.Println("error forwarding message [alias:", alias.Name, "]:", err)
 			return err
 		}
 	} else {
@@ -196,7 +226,14 @@ func (s *Service) QueueMessage(from string, fromName string, rcp model.Recipient
 
 		err = mailer.Reply(alias.Name, name, rcp, data, alias)
 		if err != nil {
-			log.Println("error sending message", err)
+			if settings.LogIssues {
+				err := s.ProcessDiagnosticLog(alias, from, rcp.Email, err.Error(), model.FailedDelivery)
+				if err != nil {
+					log.Println("error processing diagnostic log", err)
+				}
+			}
+
+			log.Println("error sending message [alias:", alias.Name, "]:", err)
 			return err
 		}
 	}

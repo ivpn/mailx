@@ -202,7 +202,7 @@ func (s *Service) QueueMessage(from string, fromName string, rcp model.Recipient
 		err := mailer.Forward(generatedFrom, fromName, rcp, data, "header.tmpl", templateData, settings, alias)
 		if err != nil {
 			if settings.LogIssues {
-				err := s.ProcessDiagnosticLog(alias, from, rcp.Email, err.Error(), model.FailedDelivery)
+				err := s.ProcessDiagnosticLog(alias, from, rcp.Email, err.Error(), model.DeferredDelivery)
 				if err != nil {
 					log.Println("error processing diagnostic log", err)
 				}
@@ -227,7 +227,7 @@ func (s *Service) QueueMessage(from string, fromName string, rcp model.Recipient
 		err = mailer.Reply(alias.Name, name, rcp, data, alias)
 		if err != nil {
 			if settings.LogIssues {
-				err := s.ProcessDiagnosticLog(alias, from, rcp.Email, err.Error(), model.FailedDelivery)
+				err := s.ProcessDiagnosticLog(alias, from, rcp.Email, err.Error(), model.DeferredDelivery)
 				if err != nil {
 					log.Println("error processing diagnostic log", err)
 				}

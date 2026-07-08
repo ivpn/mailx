@@ -6,6 +6,7 @@ type LogType string
 
 const (
 	BounceMessage        LogType = "bounce"
+	DeferredDelivery     LogType = "deferred_delivery"
 	DisabledAlias        LogType = "disabled_alias"
 	DisabledDomain       LogType = "disabled_domain"
 	UnauthorisedSend     LogType = "unauthorised_send"

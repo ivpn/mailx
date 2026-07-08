@@ -19,15 +19,36 @@ var (
 )
 
 func (s *Service) ProcessMessage(data []byte) error {
-	msg, err := model.ParseMsg(data)
-	if err != nil {
-		if errors.Is(err, model.ErrExtractOriginalFrom) {
+	msg, parseErr := model.ParseMsg(data)
+	if parseErr != nil {
+		if errors.Is(parseErr, model.ErrExtractOriginalFrom) {
 			// Fail silently so bounce messages are not kept in postfix queue
 			return nil
 		}
 
-		log.Println("error parsing message:", err)
-		return err
+		alias, err := s.FindAlias(msg.From)
+		if err != nil {
+			log.Println("error fetching alias:", err)
+			// Fail silently so unknown aliases are not kept in postfix queue
+			return nil
+		}
+
+		settings, err := s.GetSettings(context.Background(), alias.UserID)
+		if err != nil {
+			log.Println("error getting settings", err)
+			// Fail silently so unknown aliases are not kept in postfix queue
+			return nil
+		}
+
+		if settings.LogIssues {
+			err := s.ProcessDiagnosticLog(alias, msg.From, msg.To[0], parseErr.Error(), model.DeferredDelivery)
+			if err != nil {
+				log.Println("error processing diagnostic log", err)
+			}
+		}
+
+		log.Println("error parsing message:", parseErr, alias.Name)
+		return parseErr
 	}
 
 	// Bounce

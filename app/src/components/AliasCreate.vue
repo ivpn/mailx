@@ -318,7 +318,9 @@ const validate = (rcps: string) => {
         return false
     }
 
-    if (props.catchAll || alias.value.format === 'custom') {
+    if (alias.value.format === 'custom') {
+        errorLocalPart.value = alias.value.local_part.length < 1 || alias.value.local_part.length > 64
+    } else if (props.catchAll) {
         errorLocalPart.value = alias.value.local_part.length < 6 || alias.value.local_part.length > 12
     } else {
         errorLocalPart.value = false

@@ -36,7 +36,7 @@
                         <div v-if="alias.format === 'custom'">
                             <div class="mb-3">
                                 <label for="alias_custom_alias">
-                                    Custom alias (6-12 alphanumeric chars.):
+                                    Custom alias (1-64 alphanumeric chars.):
                                 </label>
                                 <input 
                                     v-model="alias.local_part"
@@ -44,7 +44,7 @@
                                     id="alias_custom_alias"
                                     type="text"
                                 >
-                                <p v-if="errorLocalPart" class="error">Custom alias must be between 6 and 12 characters</p>
+                                <p v-if="errorLocalPart" class="error">Custom alias must be between 1 and 64 characters</p>
                             </div>
                         </div>
                         <div>
@@ -225,8 +225,13 @@ const postAlias = async () => {
         }
     }
 
-    let req = { ...alias.value }
+    let req: any = { ...alias.value }
     req.domain = domain
+
+    if (req.format === 'custom') {
+        req.custom_local_part = req.local_part
+        delete req.local_part
+    }
 
     try {
         loading.value = true

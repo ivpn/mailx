@@ -225,6 +225,12 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 		})
 	}
 
+	if req.Format == model.AliasFormatCustom && req.CustomLocalPart == "" {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
 	alias := model.Alias{
 		UserID:      userID,
 		Description: req.Description,
@@ -233,7 +239,11 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 		FromName:    req.FromName,
 	}
 
-	alias, err = h.Service.PostAlias(c.Context(), alias, req.Format, domain, req.LocalPart)
+	localPart := req.LocalPart
+	if req.Format == model.AliasFormatCustom {
+		localPart = req.CustomLocalPart
+	}
+	alias, err = h.Service.PostAlias(c.Context(), alias, req.Format, domain, localPart)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),

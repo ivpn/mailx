@@ -12,11 +12,12 @@ import (
 )
 
 var (
-	PostAliasSuccess   = "Alias created successfully."
-	UpdateAliasSuccess = "Alias updated successfully."
-	DeleteAliasSuccess = "Alias deleted successfully."
-	ErrInvalidDomain   = "Selected domain is invalid."
-	ErrUnverifiedRcp   = "The recipient address has not been verified."
+	PostAliasSuccess    = "Alias created successfully."
+	UpdateAliasSuccess  = "Alias updated successfully."
+	DeleteAliasSuccess  = "Alias deleted successfully."
+	ErrInvalidDomain    = "Selected domain is invalid."
+	ErrUnverifiedRcp    = "The recipient address has not been verified."
+	RestoreAliasSuccess = "Alias restored successfully."
 )
 
 type AliasService interface {
@@ -26,6 +27,7 @@ type AliasService interface {
 	PostAlias(context.Context, model.Alias, string, string, string) (model.Alias, error)
 	UpdateAlias(context.Context, model.Alias) error
 	DeleteAlias(context.Context, string, string) error
+	RestoreAlias(context.Context, string, string) error
 }
 
 // @Summary Get alias
@@ -319,5 +321,31 @@ func (h *Handler) DeleteAlias(c *fiber.Ctx) error {
 
 	return c.Status(200).JSON(fiber.Map{
 		"message": DeleteAliasSuccess,
+	})
+}
+
+// @Summary Restore alias
+// @Description Restore alias
+// @Tags alias
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path string true "Alias ID"
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /alias/restore/{id} [post]
+// @Router /api/alias/restore/{id} [post]
+func (h *Handler) RestoreAlias(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
+	id := c.Params("id")
+	err := h.Service.RestoreAlias(c.Context(), id, userID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": RestoreAliasSuccess,
 	})
 }

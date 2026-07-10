@@ -38,6 +38,7 @@ type AliasStore interface {
 	DeleteAlias(context.Context, string, string) error
 	DeleteAliasByUserID(context.Context, string) error
 	DeleteAliasByDomain(context.Context, string, string) error
+	RestoreAlias(context.Context, string, string) error
 }
 
 // aliasDomainPart returns the domain portion of an alias name (e.g. "user@example.com" → "example.com").
@@ -275,4 +276,14 @@ func (s *Service) FindAlias(email string) (model.Alias, error) {
 	}
 
 	return alias, nil
+}
+
+func (s *Service) RestoreAlias(ctx context.Context, ID string, userID string) error {
+	err := s.Store.RestoreAlias(ctx, ID, userID)
+	if err != nil {
+		log.Printf("error restoring alias: %s", err.Error())
+		return ErrGetAlias
+	}
+
+	return nil
 }

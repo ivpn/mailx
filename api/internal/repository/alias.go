@@ -160,3 +160,7 @@ func (d *Database) DeleteAliasByUserID(ctx context.Context, userID string) error
 func (d *Database) DeleteAliasByDomain(ctx context.Context, domain string, userID string) error {
 	return d.Client.Where("name LIKE ? AND user_id = ?", "%@"+domain, userID).Delete(&model.Alias{}).Error
 }
+
+func (d *Database) RestoreAlias(ctx context.Context, ID string, userID string) error {
+	return d.Client.Model(&model.Alias{}).Unscoped().Where("id = ? AND user_id = ?", ID, userID).Update("deleted_at", nil).Error
+}

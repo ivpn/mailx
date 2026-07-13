@@ -118,10 +118,13 @@ func EncryptWithPGPMIME(orig *gomail.Message, fromAddr, fromName, subject, recip
 	body.WriteString(fmt.Sprintf("\r\n--%s--\r\n", boundary))
 
 	// --- 5) Build final raw email ---
-	em := gomail.NewRawMessage()
+	// NewRawMessage defaults to an empty charset, which would cause non-ASCII
+	// headers (Subject, From display name) to be encoded as =??Q?...?= instead
+	// of the correct =?UTF-8?Q?...?=.  Passing SetCharset("UTF-8") fixes this.
+	em := gomail.NewRawMessage(gomail.SetCharset("UTF-8"))
 	em.SetAddressHeader("From", fromAddr, fromName)
 	em.SetHeader("To", recipientEmail)
-	em.SetHeader("Subject", subject)
+	em.SetHeader("Subject", DecodeHeaderWithCharset(subject))
 	em.SetHeader("Date", time.Now().UTC().Format(time.RFC1123Z))
 	em.SetHeader("Content-Type", fmt.Sprintf("multipart/encrypted; protocol=\"application/pgp-encrypted\"; boundary=\"%s\"", boundary))
 

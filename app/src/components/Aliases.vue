@@ -26,7 +26,7 @@
                 </button>
             </div>
         </div>
-        <div v-if="!list.length && loaded" class="card-empty">
+        <div v-if="!list.length && loaded && status === 'active'" class="card-empty">
             <span class="bg-secondary rounded flex items-center justify-center p-2 mb-5">
                 <i class="icon at icon-accent text-2xl"></i>
             </span>
@@ -41,7 +41,7 @@
                 New Alias
             </button>
         </div>
-        <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="card-primary">
+        <div v-bind:class="{ 'hidden': (!list.length && status === 'active') || !loaded }" class="card-primary">
             <div  class="table-container">
                 <table>
                     <thead class="desktop-lg">
@@ -134,6 +134,7 @@ import dropdown from '@preline/dropdown'
 const alias = {
     id: '',
     created_at: '',
+    deleted_at: null as string | null,
     name: '',
     enabled: false,
     description: '',

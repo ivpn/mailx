@@ -86,6 +86,10 @@
                         <i class="icon icon-primary edit text-xs"></i>
                         Edit
                     </button>
+                    <button v-if="alias.deleted_at" @click.stop="restoreAlias">
+                        <i class="icon icon-primary reply text-xs"></i>
+                        Restore
+                    </button>
                     <button @click.stop="deleteAlias" class="delete">
                         <i class="icon icon-error trash text-xs"></i>
                         Delete
@@ -149,6 +153,10 @@
                             <button v-bind:data-hs-overlay="'#modal-alias-edit' + alias.id">
                                 <i class="icon icon-primary edit text-xs"></i>
                                 Edit
+                            </button>
+                            <button v-if="alias.deleted_at" @click.stop="restoreAlias">
+                                <i class="icon icon-primary reply text-xs"></i>
+                                Restore
                             </button>
                             <button @click.stop="deleteAlias" class="delete">
                                 <i class="icon icon-error trash text-xs"></i>
@@ -226,6 +234,13 @@ const deleteAlias = () => {
     if (!confirm(errMessage)) return
 
     events.emit('alias.delete', { id: alias.value.id, catchAll: props.catchAll })
+}
+
+const restoreAlias = async () => {
+    try {
+        await aliasApi.restore(alias.value.id)
+        events.emit('alias.update', {})
+    } catch {}
 }
 
 const copyAlias = (alias: string) => {

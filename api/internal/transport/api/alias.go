@@ -22,7 +22,7 @@ var (
 
 type AliasService interface {
 	GetAlias(context.Context, string, string) (model.Alias, error)
-	GetAliases(context.Context, string, int, int, string, string, string, string) (model.AliasList, error)
+	GetAliases(context.Context, string, int, int, string, string, string, string, string) (model.AliasList, error)
 	GetAllAliases(context.Context, string) ([]model.Alias, error)
 	PostAlias(context.Context, model.Alias, string, string, string) (model.Alias, error)
 	UpdateAlias(context.Context, model.Alias) error
@@ -59,6 +59,7 @@ func (h *Handler) GetAlias(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
+// @Param status query string false "Filter by alias status" Enums(active, deleted, all)
 // @Success 200 {object} model.AliasList
 // @Failure 400 {object} ErrorRes
 // @Router /aliases [get]
@@ -80,6 +81,7 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 	sortOrder := strings.ToUpper(c.Query("sort_order"))
 	catchAll := c.Query("catch_all")
 	search := c.Query("search")
+	status := c.Query("status")
 
 	var allowSortBy = map[string]bool{
 		"created_at": true,
@@ -95,6 +97,12 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 		"false": true,
 		"":      true,
 	}
+	var allowStatus = map[string]bool{
+		"active":  true,
+		"deleted": true,
+		"all":     true,
+		"":        true,
+	}
 
 	if _, ok := allowSortBy[sortBy]; !ok {
 		sortBy = "created_at"
@@ -105,6 +113,12 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 	if _, ok := allowCatchAll[catchAll]; !ok {
 		catchAll = ""
 	}
+	if _, ok := allowStatus[status]; !ok {
+		status = ""
+	}
+	if status == "" {
+		status = "active"
+	}
 
 	err = h.Validator.Var(search, "omitempty,required,search")
 	if err != nil {
@@ -114,7 +128,7 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 		})
 	}
 
-	list, err := h.Service.GetAliases(c.Context(), userID, limit, page, sortBy, sortOrder, catchAll, search)
+	list, err := h.Service.GetAliases(c.Context(), userID, limit, page, sortBy, sortOrder, catchAll, search, status)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),

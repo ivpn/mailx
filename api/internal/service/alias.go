@@ -27,10 +27,10 @@ var (
 
 type AliasStore interface {
 	GetAlias(context.Context, string, string) (model.Alias, error)
-	GetAliases(context.Context, string, int, int, string, string, string, string) ([]model.Alias, error)
+	GetAliases(context.Context, string, int, int, string, string, string, string, string) ([]model.Alias, error)
 	GetAliasesByDomain(context.Context, string, string) ([]model.Alias, error)
 	GetAllAliases(context.Context, string) ([]model.Alias, error)
-	GetAliasCount(context.Context, string, string, string) (int, error)
+	GetAliasCount(context.Context, string, string, string, string) (int, error)
 	GetAliasDailyCount(context.Context, string) (int, error)
 	GetAliasByName(string) (model.Alias, error)
 	PostAlias(context.Context, model.Alias) (model.Alias, error)
@@ -84,19 +84,19 @@ func (s *Service) GetAlias(ctx context.Context, ID string, userID string) (model
 	return alias, nil
 }
 
-func (s *Service) GetAliases(ctx context.Context, userID string, limit int, page int, sortBy string, sortOrder string, catchAll string, search string) (model.AliasList, error) {
+func (s *Service) GetAliases(ctx context.Context, userID string, limit int, page int, sortBy string, sortOrder string, catchAll string, search string, status string) (model.AliasList, error) {
 	offset := (page - 1) * limit
 	if page < 1 {
 		offset = 0
 	}
 
-	aliases, err := s.Store.GetAliases(ctx, userID, limit, offset, sortBy, sortOrder, catchAll, search)
+	aliases, err := s.Store.GetAliases(ctx, userID, limit, offset, sortBy, sortOrder, catchAll, search, status)
 	if err != nil {
 		log.Printf("error fetching aliases: %s", err.Error())
 		return model.AliasList{}, ErrGetAliases
 	}
 
-	total, err := s.Store.GetAliasCount(ctx, userID, catchAll, search)
+	total, err := s.Store.GetAliasCount(ctx, userID, catchAll, search, status)
 	if err != nil {
 		log.Printf("error fetching alias count: %s", err.Error())
 		return model.AliasList{}, ErrGetAliases
@@ -181,7 +181,7 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 
 	// Catch-all alias
 	if format == model.AliasFormatCatchAll {
-		userAliases, err := s.Store.GetAliases(ctx, alias.UserID, 0, 0, "created_at", "DESC", "true", "")
+		userAliases, err := s.Store.GetAliases(ctx, alias.UserID, 0, 0, "created_at", "DESC", "true", "", "active")
 		if err != nil {
 			log.Printf("error fetching user aliases: %s", err.Error())
 			return model.Alias{}, ErrPostAlias

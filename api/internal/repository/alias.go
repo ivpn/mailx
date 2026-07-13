@@ -33,7 +33,7 @@ func (d *Database) GetAlias(ctx context.Context, ID string, userID string) (mode
 	return alias, nil
 }
 
-func (d *Database) GetAliases(ctx context.Context, userID string, limit int, offset int, sortBy string, sortOrder string, catchAll string, search string) ([]model.Alias, error) {
+func (d *Database) GetAliases(ctx context.Context, userID string, limit int, offset int, sortBy string, sortOrder string, catchAll string, search string, status string) ([]model.Alias, error) {
 	sortBy = "a." + sortBy
 
 	if catchAll == "true" {
@@ -48,6 +48,15 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 		search = "AND (a.name LIKE '%" + search + "%' OR a.description LIKE '%" + search + "%')"
 	}
 
+	var statusFilter string
+	if status == "deleted" {
+		statusFilter = "AND a.deleted_at IS NOT NULL"
+	} else if status == "all" {
+		statusFilter = ""
+	} else {
+		statusFilter = "AND a.deleted_at IS NULL"
+	}
+
 	aliases := []model.Alias{}
 	query := `
 		SELECT a.*,
@@ -58,7 +67,7 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 		FROM aliases a
 		LEFT JOIN messages m
 		ON a.id = m.alias_id
-		WHERE a.user_id = ? AND a.deleted_at IS NULL ` + catchAll + " " + search + `
+		WHERE a.user_id = ? ` + statusFilter + " " + catchAll + " " + search + `
 		GROUP BY a.id
 		ORDER BY ` + sortBy + " " + sortOrder
 
@@ -106,7 +115,7 @@ func (d *Database) GetAllAliases(ctx context.Context, userID string) ([]model.Al
 	return aliases, err
 }
 
-func (d *Database) GetAliasCount(ctx context.Context, userID string, catchAll string, search string) (int, error) {
+func (d *Database) GetAliasCount(ctx context.Context, userID string, catchAll string, search string, status string) (int, error) {
 	if catchAll == "true" {
 		catchAll = " AND catch_all = true"
 	} else if catchAll == "false" {
@@ -120,7 +129,15 @@ func (d *Database) GetAliasCount(ctx context.Context, userID string, catchAll st
 	}
 
 	var count int64
-	err := d.Client.Model(&model.Alias{}).Where("user_id = ?"+catchAll+search, userID).Count(&count).Error
+	q := d.Client.Model(&model.Alias{})
+	if status == "deleted" {
+		q = q.Unscoped().Where("user_id = ? AND deleted_at IS NOT NULL"+catchAll+search, userID)
+	} else if status == "all" {
+		q = q.Unscoped().Where("user_id = ?"+catchAll+search, userID)
+	} else {
+		q = q.Where("user_id = ?"+catchAll+search, userID)
+	}
+	err := q.Count(&count).Error
 	return int(count), err
 }
 

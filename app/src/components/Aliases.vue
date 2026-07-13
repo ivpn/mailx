@@ -47,16 +47,16 @@
                     <thead class="desktop-lg">
                         <tr>
                             <th>
-                                <div class="hs-dropdown [--offset:0]">
+                                <div class="hs-dropdown [--placement:bottom-left]">
                                     <button id="hs-dropdown-alias-status" class="sort">
                                         {{ statusLabel }}
-                                        <i class="icon arrow-down text-xl" :class="status !== 'active' ? 'icon-accent' : 'icon-tertiary'"></i>
+                                        <i class="icon arrow-down icon-tertiary text-xl"></i>
                                     </button>
                                     <div
                                         class="hs-dropdown-menu hs-dropdown-open:opacity-100 hidden"
                                         aria-labelledby="hs-dropdown-alias-status"
                                     >
-                                        <button @click="setStatus('active')">Active</button>
+                                        <button @click="setStatus('')">Active</button>
                                         <button @click="setStatus('deleted')">Deleted</button>
                                         <button @click="setStatus('all')">All</button>
                                     </div>

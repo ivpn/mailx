@@ -66,7 +66,7 @@
             </div>
         </td>
         <td>
-            <div class="hs-dropdown [--offset:0]">
+            <div class="hs-dropdown">
                 <button v-bind:id="'hs-dropdown-alias-edit-' + alias.id">
                     <i class="icon icon-secondary more text-lg"></i>
                 </button>
@@ -134,7 +134,7 @@
                     </div>
                 </div>
                 <div>
-                    <div class="hs-dropdown [--offset:0] mb-3">
+                    <div class="hs-dropdown mb-3">
                         <button class="py-0" v-bind:id="'hs-dropdown-alias-edit-' + alias.id">
                             <i class="icon icon-secondary more text-lg"></i>
                         </button>

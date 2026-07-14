@@ -1,8 +1,12 @@
 package utils
 
 import (
+	"bytes"
+	"net/mail"
 	"strings"
 	"testing"
+
+	gomail "ivpn.net/email/api/internal/utils/gomail.v2"
 )
 
 func TestRemoveHeader(t *testing.T) {
@@ -350,5 +354,45 @@ func TestNormalizeAddressSeparators(t *testing.T) {
 				t.Errorf("NormalizeAddressSeparators(%q) = %q, want %q", tt.in, got, tt.want)
 			}
 		})
+	}
+}
+
+func TestRawMessageWithUTF8Charset_CyrillicHeaders(t *testing.T) {
+	// Regression: EncryptWithPGPMIME used gomail.NewRawMessage() which defaults
+	// to charset="".  When a Cyrillic (or any non-ASCII) Subject or From display
+	// name was set on that message, gomail encoded it as =??Q?...?= — an RFC 2047
+	// encoded-word with an empty charset field.  Recipients' email clients cannot
+	// decode empty-charset encoded-words and display them as raw gibberish.
+	//
+	// The fix passes gomail.SetCharset("UTF-8") to NewRawMessage so that header
+	// values are encoded as =?UTF-8?Q?...?=, which clients decode correctly.
+	//
+	// This test exercises the gomail header-encoding path used by EncryptWithPGPMIME
+	// without requiring a real PGP key.  We build the outer PGP/MIME wrapper message
+	// the same way EncryptWithPGPMIME does (NewRawMessage + SetCharset("UTF-8")),
+	// set a Cyrillic Subject and From display name, serialise the message, and then
+	// parse the raw headers to assert no empty-charset encoded-word is present.
+	goMsg := gomail.NewRawMessage(gomail.SetCharset("UTF-8"))
+	goMsg.SetHeader("Subject", "Татар жырлары")
+	goMsg.SetAddressHeader("From", "alias@example.com", "Татар")
+
+	var buf bytes.Buffer
+	if _, err := goMsg.WriteTo(&buf); err != nil {
+		t.Fatalf("WriteTo: %v", err)
+	}
+
+	msg, err := mail.ReadMessage(&buf)
+	if err != nil {
+		t.Fatalf("mail.ReadMessage: %v", err)
+	}
+
+	for _, hdr := range []string{"Subject", "From"} {
+		v := msg.Header.Get(hdr)
+		if strings.Contains(v, "=??") {
+			t.Errorf("%s header contains empty-charset encoded-word: %q", hdr, v)
+		}
+		if strings.Contains(v, "=?") && !strings.Contains(v, "=?UTF-8?") {
+			t.Errorf("%s header uses non-UTF-8 charset in encoded-word: %q", hdr, v)
+		}
 	}
 }

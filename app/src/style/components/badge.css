@@ -30,6 +30,14 @@
             @apply bg-gray-500 text-white font-semibold;
         }
 
+        &.deferred_delivery {
+            @apply bg-yellow-500 dark:bg-yellow-700 text-white font-semibold;
+        }
+
+        &.failed_delivery {
+            @apply bg-red-500 dark:bg-red-700 text-white font-semibold;
+        }
+
         &.small {
             @apply py-0.5 px-1.5 text-xs;
         }

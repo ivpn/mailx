@@ -373,6 +373,45 @@ func TestParseMsg(t *testing.T) {
 				Subject:  "Test Email",
 				Body:     "Body",
 				Type:     Send,
+			}},
+		{
+			// Regression: Cyrillic Subject encoded as UTF-8 QP (well-formed RFC 2047).
+			// ParseMsg must decode it to plain Unicode, not leave the encoded-word as-is.
+			name: "Cyrillic subject UTF-8 QP encoded",
+			data: "From: sender@example.com\r\nTo: recipient@example.com\r\nSubject: =?UTF-8?Q?=D0=A2=D0=B0=D1=82=D0=B0=D1=80?=\r\n\r\nBody",
+			want: Msg{
+				From:     "sender@example.com",
+				FromName: "",
+				To:       []string{"recipient@example.com"},
+				Subject:  "Татар",
+				Body:     "Body",
+				Type:     Send,
+			}},
+		{
+			// Regression: Cyrillic Subject with an empty charset (=??q?...?=).
+			// PreprocessEmailData rewrites it to =?UTF-8?q?...?= so it can be decoded.
+			name: "Cyrillic subject empty-charset encoded",
+			data: "From: sender@example.com\r\nTo: recipient@example.com\r\nSubject: =??q?=D0=A2=D0=B0=D1=82=D0=B0=D1=80?=\r\n\r\nBody",
+			want: Msg{
+				From:     "sender@example.com",
+				FromName: "",
+				To:       []string{"recipient@example.com"},
+				Subject:  "Татар",
+				Body:     "Body",
+				Type:     Send,
+			}},
+		{
+			// Regression: Cyrillic display name in From combined with Cyrillic Subject.
+			// Both fields must be decoded to plain Unicode.
+			name: "Cyrillic From display name and subject",
+			data: "From: =?UTF-8?Q?=D0=A2=D0=B0=D1=82=D0=B0=D1=80?= <tatar@example.com>\r\nTo: recipient@example.com\r\nSubject: =?UTF-8?Q?=D0=96=D1=8B=D1=80?=\r\n\r\nBody",
+			want: Msg{
+				From:     "tatar@example.com",
+				FromName: "Татар",
+				To:       []string{"recipient@example.com"},
+				Subject:  "Жыр",
+				Body:     "Body",
+				Type:     Send,
 			}}}
 
 	for _, tt := range tests {

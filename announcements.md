@@ -1,6 +1,6 @@
 # Announcements
 
-## Recent Mailx updates 2026-06-14
+## Recent Mailx updates - 2026-06-14
 
 ### Custom domains and custom aliases
 Add and verify your own domain, then use it for new aliases instead of the built-in options. Verification is DNS-based and starts on the "Domains" page. Aliases now have a "Custom" option: set the alias text yourself instead of a randomly generated name/ID when using your own domain. Both work in the web app and the browser extension.

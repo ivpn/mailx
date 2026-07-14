@@ -228,8 +228,8 @@ const postAlias = async () => {
     let req: any = { ...alias.value }
     req.domain = domain
 
-    if (req.format === 'custom') {
-        req.custom_local_part = req.local_part
+    if (props.catchAll) {
+        req.wildcard_local_part = req.local_part
         delete req.local_part
     }
 

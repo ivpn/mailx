@@ -4,11 +4,14 @@
             <div class="flex items-center hs-tooltip">
                 <input
                     @change="updateAlias"
-                    v-bind:checked="alias.enabled && !isDomainUnverified"
-                    v-bind:disabled="!alias.recipients.length || isDomainUnverified"
+                    v-bind:checked="alias.enabled && !isDomainUnverified && !isAliasDeleted"
+                    v-bind:disabled="!alias.recipients.length || isDomainUnverified || isAliasDeleted"
                     type="checkbox"
                 >
-                <span v-if="isDomainUnverified" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
+                <span v-if="isAliasDeleted" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
+                    Alias deleted. Address is not forwarding mail.
+                </span>
+                <span v-else-if="isDomainUnverified" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                     Domain not verified or disabled. Address is not forwarding mail.
                 </span>
                 <span v-else-if="!alias.recipients.length" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
@@ -121,12 +124,15 @@
                     <div class="flex items-center hs-tooltip">
                         <input
                             @change="updateAlias"
-                            v-bind:checked="alias.enabled && !isDomainUnverified"
-                            v-bind:disabled="!alias.recipients.length || isDomainUnverified"
+                            v-bind:checked="alias.enabled && !isDomainUnverified && !isAliasDeleted"
+                            v-bind:disabled="!alias.recipients.length || isDomainUnverified || isAliasDeleted"
                             type="checkbox"
                         >
-                        <span v-if="isDomainUnverified" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
-                            Domain not verified. Address is not forwarding mail.
+                        <span v-if="isAliasDeleted" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
+                            Alias deleted. Address is not forwarding mail.
+                        </span>
+                        <span v-else-if="isDomainUnverified" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
+                            Domain not verified or disabled. Address is not forwarding mail.
                         </span>
                         <span v-else-if="!alias.recipients.length" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                             Disabled
@@ -213,6 +219,7 @@ const props = defineProps(['alias', 'recipients', 'catchAll'])
 const alias = ref(props.alias)
 const recipients = ref(props.recipients)
 const isDomainUnverified = computed(() => alias.value.is_custom_domain === true && (alias.value.is_domain_verified === false || alias.value.is_domain_enabled === false))
+const isAliasDeleted = computed(() => alias.value.deleted_at !== null)
 const truncatedDescription = computed(() => {
     const desc = alias.value.description
     if (!desc) return ''

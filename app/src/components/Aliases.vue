@@ -26,7 +26,7 @@
                 </button>
             </div>
         </div>
-        <div v-if="!list.length && loaded" class="card-empty">
+        <div v-if="!list.length && loaded && status === 'active'" class="card-empty">
             <span class="bg-secondary rounded flex items-center justify-center p-2 mb-5">
                 <i class="icon at icon-accent text-2xl"></i>
             </span>
@@ -41,12 +41,27 @@
                 New Alias
             </button>
         </div>
-        <div v-bind:class="{ 'hidden': !list.length || !loaded }" class="card-primary">
+        <div v-bind:class="{ 'hidden': (!list.length && status === 'active') || !loaded }" class="card-primary">
             <div  class="table-container">
                 <table>
                     <thead class="desktop-lg">
                         <tr>
-                            <th>Active</th>
+                            <th>
+                                <div class="hs-dropdown [--placement:bottom-left]">
+                                    <button id="hs-dropdown-alias-status" class="sort">
+                                        {{ statusLabel }}
+                                        <i class="icon arrow-down icon-tertiary text-xl"></i>
+                                    </button>
+                                    <div
+                                        class="hs-dropdown-menu hs-dropdown-open:opacity-100 hidden"
+                                        aria-labelledby="hs-dropdown-alias-status"
+                                    >
+                                        <button @click="setStatus('')">Active</button>
+                                        <button @click="setStatus('deleted')">Deleted</button>
+                                        <button @click="setStatus('all')">All</button>
+                                    </div>
+                                </div>
+                            </th>
                             <th>Description</th>
                             <th>
                                 <button
@@ -105,7 +120,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref, computed } from 'vue'
 import axios from 'axios'
 import { aliasApi } from '../api/alias'
 import { settingsApi } from '../api/settings.ts'
@@ -114,10 +129,12 @@ import AliasCreate from './AliasCreate.vue'
 import Pagination from './Pagination.vue'
 import events from '../events.ts'
 import { RouterLink } from 'vue-router'
+import dropdown from '@preline/dropdown'
 
 const alias = {
     id: '',
     created_at: '',
+    deleted_at: null as string | null,
     name: '',
     enabled: false,
     description: '',
@@ -152,6 +169,12 @@ const sortBy = ref('created_at')
 const sortOrder = ref('DESC')
 const search = ref('')
 const searchQuery = ref('')
+const status = ref('active')
+const statusLabel = computed(() => {
+    if (status.value === 'deleted') return 'Deleted'
+    if (status.value === 'all') return 'All'
+    return 'Active'
+})
 
 const getList = async () => {
     loading.value = true
@@ -167,7 +190,8 @@ const getList = async () => {
             sort_by: sortBy.value,
             sort_order: sortOrder.value,
             catch_all: false,
-            search: searchQuery.value
+            search: searchQuery.value,
+            status: status.value
         })
         list.value = res.data.aliases
         total.value = res.data.total
@@ -243,6 +267,12 @@ const clearSearch = () => {
     getList()
 }
 
+const setStatus = (value: string) => {
+    status.value = value
+    page.value = 1
+    getList()
+}
+
 const handleKeydown = (event: KeyboardEvent) => {
     // Only trigger if not focused on an input or textarea
     const activeElement = document.activeElement
@@ -265,6 +295,7 @@ const handleKeydown = (event: KeyboardEvent) => {
 onMounted(async () => {
     await getSettings()
     fetch()
+    dropdown.autoInit()
     events.on('alias.create', fetch)
     events.on('alias.update', fetch)
     events.on('alias.delete', onDeleteAlias)

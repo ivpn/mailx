@@ -4,11 +4,14 @@
             <div class="flex items-center hs-tooltip">
                 <input
                     @change="updateAlias"
-                    v-bind:checked="alias.enabled && !isDomainUnverified"
-                    v-bind:disabled="!alias.recipients.length || isDomainUnverified"
+                    v-bind:checked="alias.enabled && !isDomainUnverified && !isAliasDeleted"
+                    v-bind:disabled="!alias.recipients.length || isDomainUnverified || isAliasDeleted"
                     type="checkbox"
                 >
-                <span v-if="isDomainUnverified" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
+                <span v-if="isAliasDeleted" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
+                    Alias deleted. Address is not forwarding mail.
+                </span>
+                <span v-else-if="isDomainUnverified" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                     Domain not verified or disabled. Address is not forwarding mail.
                 </span>
                 <span v-else-if="!alias.recipients.length" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
@@ -66,7 +69,7 @@
             </div>
         </td>
         <td>
-            <div class="hs-dropdown [--offset:0]">
+            <div class="hs-dropdown">
                 <button v-bind:id="'hs-dropdown-alias-edit-' + alias.id">
                     <i class="icon icon-secondary more text-lg"></i>
                 </button>
@@ -85,6 +88,10 @@
                     <button v-bind:data-hs-overlay="'#modal-alias-edit' + alias.id">
                         <i class="icon icon-primary edit text-xs"></i>
                         Edit
+                    </button>
+                    <button v-if="alias.deleted_at" @click.stop="restoreAlias">
+                        <i class="icon icon-primary reply text-xs"></i>
+                        Restore
                     </button>
                     <button @click.stop="deleteAlias" class="delete">
                         <i class="icon icon-error trash text-xs"></i>
@@ -117,12 +124,15 @@
                     <div class="flex items-center hs-tooltip">
                         <input
                             @change="updateAlias"
-                            v-bind:checked="alias.enabled && !isDomainUnverified"
-                            v-bind:disabled="!alias.recipients.length || isDomainUnverified"
+                            v-bind:checked="alias.enabled && !isDomainUnverified && !isAliasDeleted"
+                            v-bind:disabled="!alias.recipients.length || isDomainUnverified || isAliasDeleted"
                             type="checkbox"
                         >
-                        <span v-if="isDomainUnverified" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
-                            Domain not verified. Address is not forwarding mail.
+                        <span v-if="isAliasDeleted" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
+                            Alias deleted. Address is not forwarding mail.
+                        </span>
+                        <span v-else-if="isDomainUnverified" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
+                            Domain not verified or disabled. Address is not forwarding mail.
                         </span>
                         <span v-else-if="!alias.recipients.length" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                             Disabled
@@ -130,7 +140,7 @@
                     </div>
                 </div>
                 <div>
-                    <div class="hs-dropdown [--offset:0] mb-3">
+                    <div class="hs-dropdown mb-3">
                         <button class="py-0" v-bind:id="'hs-dropdown-alias-edit-' + alias.id">
                             <i class="icon icon-secondary more text-lg"></i>
                         </button>
@@ -149,6 +159,10 @@
                             <button v-bind:data-hs-overlay="'#modal-alias-edit' + alias.id">
                                 <i class="icon icon-primary edit text-xs"></i>
                                 Edit
+                            </button>
+                            <button v-if="alias.deleted_at" @click.stop="restoreAlias">
+                                <i class="icon icon-primary reply text-xs"></i>
+                                Restore
                             </button>
                             <button @click.stop="deleteAlias" class="delete">
                                 <i class="icon icon-error trash text-xs"></i>
@@ -205,6 +219,7 @@ const props = defineProps(['alias', 'recipients', 'catchAll'])
 const alias = ref(props.alias)
 const recipients = ref(props.recipients)
 const isDomainUnverified = computed(() => alias.value.is_custom_domain === true && (alias.value.is_domain_verified === false || alias.value.is_domain_enabled === false))
+const isAliasDeleted = computed(() => alias.value.deleted_at !== null)
 const truncatedDescription = computed(() => {
     const desc = alias.value.description
     if (!desc) return ''
@@ -226,6 +241,13 @@ const deleteAlias = () => {
     if (!confirm(errMessage)) return
 
     events.emit('alias.delete', { id: alias.value.id, catchAll: props.catchAll })
+}
+
+const restoreAlias = async () => {
+    try {
+        await aliasApi.restore(alias.value.id)
+        events.emit('alias.update', {})
+    } catch {}
 }
 
 const copyAlias = (alias: string) => {

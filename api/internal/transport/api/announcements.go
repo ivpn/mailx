@@ -43,6 +43,8 @@ func (h *Handler) GetAnnouncements(c *fiber.Ctx) error {
 }
 
 var linkPattern = regexp.MustCompile(`^\[.*?\]\((https?://[^)]+)\)$`)
+var headingPattern = regexp.MustCompile(`^(#{3,6}) (.+)`)
+var inlineLinkPattern = regexp.MustCompile(`\[([^\]]+)\]\((https?://[^)]+)\)`)
 
 func parseAnnouncements(content string) []Announcement {
 	lines := strings.Split(content, "\n")
@@ -108,7 +110,7 @@ func bodyLinesToHTML(lines []string) string {
 		text := strings.TrimSpace(strings.Join(paraLines, " "))
 		if text != "" {
 			sb.WriteString("<p>")
-			sb.WriteString(text)
+			sb.WriteString(inlineLinkPattern.ReplaceAllString(text, `<a href="$2">$1</a>`))
 			sb.WriteString("</p>")
 		}
 		paraLines = nil
@@ -120,9 +122,19 @@ func bodyLinesToHTML(lines []string) string {
 			flushList()
 			continue
 		}
+		if m := headingPattern.FindStringSubmatch(line); m != nil {
+			flushPara()
+			flushList()
+			tag := fmt.Sprintf("h%d", len(m[1]))
+			sb.WriteString("<" + tag + ">")
+			sb.WriteString(inlineLinkPattern.ReplaceAllString(m[2], `<a href="$2">$1</a>`))
+			sb.WriteString("</" + tag + ">")
+			continue
+		}
 		if strings.HasPrefix(line, "- ") {
 			flushPara()
-			listItems = append(listItems, strings.TrimPrefix(line, "- "))
+			item := inlineLinkPattern.ReplaceAllString(strings.TrimPrefix(line, "- "), `<a href="$2">$1</a>`)
+			listItems = append(listItems, item)
 			continue
 		}
 		flushList()

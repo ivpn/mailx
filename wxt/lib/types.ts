@@ -8,7 +8,7 @@ export interface Alias {
   format: string
   from_name: string
   catch_all: boolean
-  custom_local_part: string
+  local_part: string
 }
 
 export interface CustomDomain {

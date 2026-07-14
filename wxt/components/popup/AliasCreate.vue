@@ -18,7 +18,7 @@
                                     Custom alias (1-64 alphanumeric chars.):
                                 </label>
                                 <input 
-                                    v-model="alias.local_part"
+                                    v-model="alias.custom_local_part"
                                     v-bind:class="{ 'error': errorLocalPart }"
                                     id="alias_custom_alias"
                                     type="text"
@@ -276,12 +276,12 @@ const validate = (rcps: string) => {
     }
 
     if (alias.value.format === 'custom') {
-        if (!alias.value.local_part) {
+        if (!alias.value.custom_local_part) {
             errorLocalPart.value = true
             return false
         }
 
-        errorLocalPart.value = alias.value.local_part.length < 1 || alias.value.local_part.length > 64
+        errorLocalPart.value = alias.value.custom_local_part.length < 1 || alias.value.custom_local_part.length > 64
     } else {
         errorLocalPart.value = false
     }

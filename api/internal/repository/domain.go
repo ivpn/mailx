@@ -63,6 +63,7 @@ func (d *Database) UpdateDomain(ctx context.Context, domain model.Domain) error 
 		"owner_verified_at": domain.OwnerVerifiedAt,
 		"mx_verified_at":    domain.MXVerifiedAt,
 		"send_verified_at":  domain.SendVerifiedAt,
+		"catch_all":         domain.CatchAll,
 	}).Error
 }
 

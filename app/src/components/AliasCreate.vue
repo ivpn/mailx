@@ -36,7 +36,7 @@
                         <div v-if="alias.format === 'custom'">
                             <div class="mb-3">
                                 <label for="alias_custom_alias">
-                                    Custom alias (6-12 alphanumeric chars.):
+                                    Custom alias (1-64 alphanumeric chars.):
                                 </label>
                                 <input 
                                     v-model="alias.local_part"
@@ -44,7 +44,7 @@
                                     id="alias_custom_alias"
                                     type="text"
                                 >
-                                <p v-if="errorLocalPart" class="error">Custom alias must be between 6 and 12 characters</p>
+                                <p v-if="errorLocalPart" class="error">Custom alias must be between 1 and 64 characters</p>
                             </div>
                         </div>
                         <div>
@@ -225,8 +225,13 @@ const postAlias = async () => {
         }
     }
 
-    let req = { ...alias.value }
+    let req: any = { ...alias.value }
     req.domain = domain
+
+    if (props.catchAll) {
+        req.wildcard_local_part = req.local_part
+        delete req.local_part
+    }
 
     try {
         loading.value = true
@@ -313,7 +318,9 @@ const validate = (rcps: string) => {
         return false
     }
 
-    if (props.catchAll || alias.value.format === 'custom') {
+    if (alias.value.format === 'custom') {
+        errorLocalPart.value = alias.value.local_part.length < 1 || alias.value.local_part.length > 64
+    } else if (props.catchAll) {
         errorLocalPart.value = alias.value.local_part.length < 6 || alias.value.local_part.length > 12
     } else {
         errorLocalPart.value = false

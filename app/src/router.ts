@@ -16,6 +16,7 @@ import ResetPassword from './components/ResetPassword.vue'
 import Terms from './components/Terms.vue'
 import Privacy from './components/Privacy.vue'
 import Faq from './components/Faq.vue'
+import Announcements from './components/Announcements.vue'
 import NotFound from './components/NotFound.vue'
 import Landing from './components/Landing.vue'
 import { type IStaticMethods } from 'preline/preline'
@@ -128,6 +129,11 @@ const routes: RouteRecordRaw[] = [
         path: '/faq',
         name: `${AppName}: FAQ`,
         component: Faq
+    },
+    {
+        path: '/announcements',
+        name: `${AppName}: Announcements`,
+        component: Announcements
     },
     {
         path: '/:pathMatch(.*)*',

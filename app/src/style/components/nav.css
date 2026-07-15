@@ -8,6 +8,13 @@
                 @apply border-accent border-r-2 bg-tertiary;
             }
         }
+
+        &.footer {
+
+            a {
+                @apply text-primary hover:text-primary py-1.5 font-medium text-[13px] w-full cursor-pointer px-6 flex flex-row items-center gap-x-2;
+            }
+        }
     }
 
     nav.mobile {

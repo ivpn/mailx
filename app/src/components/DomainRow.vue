@@ -18,7 +18,7 @@
         <td>
             <div class="flex items-center hs-tooltip">
                 <input
-                    @change="updateDomain"
+                    @change="updateActive"
                     v-bind:checked="domain.enabled && dnsRecordsVerified()"
                     v-bind:disabled="!dnsRecordsVerified()"
                     type="checkbox"
@@ -28,9 +28,8 @@
         <td>
             <div class="flex items-center hs-tooltip">
                 <input
-                    @change="updateDomain"
-                    v-bind:checked="domain.catch_all && dnsRecordsVerified()"
-                    v-bind:disabled="!dnsRecordsVerified()"
+                    @change="updateCatchAll"
+                    v-bind:checked="domain.catch_all"
                     type="checkbox"
                 >
             </div>
@@ -74,16 +73,19 @@
                             {{ domain.recipient }}
                         </p>
                     </div>
-                    <div class="flex items-center hs-tooltip">
+                    <div class="flex items-center gap-2 hs-tooltip mb-5">
+                        Active:
                         <input
-                            @change="updateDomain"
-                            v-bind:checked="domain.enabled"
+                            @change="updateActive"
+                            v-bind:checked="domain.enabled && dnsRecordsVerified()"
+                            v-bind:disabled="!dnsRecordsVerified()"
                             type="checkbox"
                         >
                     </div>
-                    <div class="flex items-center hs-tooltip">
+                    <div class="flex items-center gap-2 hs-tooltip">
+                        Catch-All:
                         <input
-                            @change="updateDomain"
+                            @change="updateCatchAll"
                             v-bind:checked="domain.catch_all"
                             type="checkbox"
                         >
@@ -135,8 +137,14 @@ import DomainVerify from './DomainVerify.vue'
 const props = defineProps(['domain'])
 const domain = ref(props.domain)
 
-const updateDomain = async () => {
+const updateActive = async () => {
     domain.value.enabled = !domain.value.enabled
+    try {
+        await domainApi.update(domain.value.id, domain.value)
+    } catch {}
+}
+
+const updateCatchAll = async () => {
     domain.value.catch_all = !domain.value.catch_all
     try {
         await domainApi.update(domain.value.id, domain.value)

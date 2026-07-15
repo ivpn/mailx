@@ -13,7 +13,7 @@
                         <div class="mb-5">
                             <h4>Default Recipient</h4>
                             <p>
-                                Set the default recipient for this domain.
+                                Set the default recipient for this domain. This overrides the default recipient selected in the Settings.
                             </p>
                             <div class="mb-6">
                                 <label v-bind:for="'recipient_' + domain.id">

@@ -20,8 +20,10 @@
                         <tr>
                             <th>Created</th>
                             <th>Domain</th>
+                            <th>Recipient</th>
                             <th>Verification</th>
                             <th>Active</th>
+                            <th>Catch-All</th>
                             <th>Actions</th>
                         </tr>
                     </thead>

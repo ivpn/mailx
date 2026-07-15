@@ -7,6 +7,9 @@
             <p class="text-wrap break-all">{{ domain.name }}</p>
         </td>
         <td>
+            <p class="text-wrap break-all">{{ domain.recipient }}</p>
+        </td>
+        <td>
             <p>
                 <button v-if="dnsRecordsVerified()" class="cta xs success" v-bind:data-hs-overlay="'#modal-verify-domain' + domain.id">Verified</button>
                 <button v-if="!dnsRecordsVerified()" class="cta xs plain" v-bind:data-hs-overlay="'#modal-verify-domain' + domain.id">Verify DNS</button>
@@ -17,6 +20,16 @@
                 <input
                     @change="updateDomain"
                     v-bind:checked="domain.enabled && dnsRecordsVerified()"
+                    v-bind:disabled="!dnsRecordsVerified()"
+                    type="checkbox"
+                >
+            </div>
+        </td>
+        <td>
+            <div class="flex items-center hs-tooltip">
+                <input
+                    @change="updateDomain"
+                    v-bind:checked="domain.catch_all && dnsRecordsVerified()"
                     v-bind:disabled="!dnsRecordsVerified()"
                     type="checkbox"
                 >
@@ -56,10 +69,22 @@
                             {{ domain.name }}
                         </p>
                     </div>
+                    <div class="hs-tooltip inline-block break-all">
+                        <p class="plain text-base text-primary text-wrap">
+                            {{ domain.recipient }}
+                        </p>
+                    </div>
                     <div class="flex items-center hs-tooltip">
                         <input
                             @change="updateDomain"
                             v-bind:checked="domain.enabled"
+                            type="checkbox"
+                        >
+                    </div>
+                    <div class="flex items-center hs-tooltip">
+                        <input
+                            @change="updateDomain"
+                            v-bind:checked="domain.catch_all"
                             type="checkbox"
                         >
                     </div>
@@ -112,6 +137,7 @@ const domain = ref(props.domain)
 
 const updateDomain = async () => {
     domain.value.enabled = !domain.value.enabled
+    domain.value.catch_all = !domain.value.catch_all
     try {
         await domainApi.update(domain.value.id, domain.value)
     } catch {}

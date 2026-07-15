@@ -15,7 +15,7 @@
                         <div>
                             <div v-if="alias.format === 'custom'" class="pb-3">
                                 <label for="alias_custom_alias">
-                                    Custom alias (6-12 alphanumeric chars.):
+                                    Custom alias (1-64 alphanumeric chars.):
                                 </label>
                                 <input 
                                     v-model="alias.local_part"
@@ -23,7 +23,7 @@
                                     id="alias_custom_alias"
                                     type="text"
                                 >
-                                <p v-if="errorLocalPart" class="error">Custom alias must be between 6 and 12 characters</p>
+                                <p v-if="errorLocalPart" class="error">Custom alias must be between 1 and 64 characters</p>
                             </div>
                             <div class="pb-3">
                                 <label for="alias_description">
@@ -281,7 +281,7 @@ const validate = (rcps: string) => {
             return false
         }
 
-        errorLocalPart.value = alias.value.local_part.length < 6 || alias.value.local_part.length > 12
+        errorLocalPart.value = alias.value.local_part.length < 1 || alias.value.local_part.length > 64
     } else {
         errorLocalPart.value = false
     }

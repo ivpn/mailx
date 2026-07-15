@@ -212,7 +212,7 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 	}
 
 	// Validate catch-all suffix
-	if req.Format == model.AliasFormatCatchAll && req.LocalPart == "" {
+	if req.Format == model.AliasFormatCatchAll && req.WildcardLocalPart == "" {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidRequest,
 		})
@@ -220,6 +220,12 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 
 	// Validate custom alias format
 	if req.Format == model.AliasFormatCustom && !isCustomDomain {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	if req.Format == model.AliasFormatCustom && req.LocalPart == "" {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidRequest,
 		})
@@ -233,7 +239,11 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 		FromName:    req.FromName,
 	}
 
-	alias, err = h.Service.PostAlias(c.Context(), alias, req.Format, domain, req.LocalPart)
+	localPart := req.LocalPart
+	if req.Format == model.AliasFormatCatchAll {
+		localPart = req.WildcardLocalPart
+	}
+	alias, err = h.Service.PostAlias(c.Context(), alias, req.Format, domain, localPart)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),

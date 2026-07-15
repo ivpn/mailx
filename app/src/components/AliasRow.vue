@@ -24,7 +24,7 @@
         </td>
         <td>
             <div class="hs-tooltip inline-block">
-                <p class="hs-tooltip-toggle m-0">
+                <p class="hs-tooltip-toggle m-0 break-all">
                     <button class="plain text-wrap text-start text-sm p-0" @click="copyAlias(alias.name)">
                         {{ alias.name }}
                     </button>

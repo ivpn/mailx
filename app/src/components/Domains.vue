@@ -28,7 +28,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <DomainRow v-for="domain in list" :domain="domain" :key="rowKey" />
+                        <DomainRow v-for="domain in list" :domain="domain" :key="rowKey" :recipients="recipients" />
                     </tbody>
                 </table>
                 <p v-if="error" class="error">Error: {{ error }}</p>
@@ -41,6 +41,7 @@
 import { onMounted, ref } from 'vue'
 import axios from 'axios'
 import { domainApi } from '../api/domain.ts'
+import { recipientApi } from '../api/recipient.ts'
 import DomainCreate from './DomainCreate.vue'
 import DomainRow from './DomainRow.vue'
 import events from '../events.ts'
@@ -56,6 +57,7 @@ const domain = {
 }
 
 const list = ref([] as typeof domain[])
+const recipients = ref([] as string[])
 const error = ref('')
 const loaded = ref(false)
 const rowKey = ref(0)
@@ -79,7 +81,17 @@ const renderRow = () => {
     rowKey.value++
 }
 
-onMounted(() => {
+const getRecipients = async () => {
+    try {
+        const res = await recipientApi.getList()
+        recipients.value = res.data
+            .filter((item: { is_active: boolean }) => item.is_active)
+            .map((item: { email: string }) => item.email)
+    } catch {}
+}
+
+onMounted(async () => {
+    await getRecipients()
     getList()
     events.on('domain.create', getList)
     events.on('domain.reload', getList)

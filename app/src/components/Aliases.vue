@@ -41,82 +41,101 @@
                 New Alias
             </button>
         </div>
-        <div v-bind:class="{ 'hidden': (!list.length && status === 'active') || !loaded }" class="card-primary">
-            <div  class="table-container">
-                <table>
-                    <thead class="desktop-lg">
-                        <tr>
-                            <th>
-                                <div class="hs-dropdown [--placement:bottom-left]">
-                                    <button id="hs-dropdown-alias-status" class="sort">
-                                        <span class="flex mr-1">Show:</span>
-                                        <span class="text-accent flex items-center">
-                                            {{ statusLabel }}
-                                            <!-- <i class="icon arrow-down icon-accent text-xl"></i> -->
-                                        </span>
-                                    </button>
-                                    <div
-                                        class="hs-dropdown-menu hs-dropdown-open:opacity-100 hidden"
-                                        aria-labelledby="hs-dropdown-alias-status"
-                                    >
-                                        <button @click="setStatus('')">Active</button>
-                                        <button @click="setStatus('deleted')">Deleted</button>
-                                        <button @click="setStatus('all')">All</button>
-                                    </div>
-                                </div>
-                            </th>
-                            <th>Description</th>
-                            <th>
-                                <button
-                                @click="sort"
-                                data-sort="name"
-                                class="sort">
-                                    Alias
-                                    <i
-                                        data-sort="name"
-                                        v-if="sortBy !== 'name'"
-                                        v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'name' }"
-                                        class="icon arrow-down text-xl icon-tertiary"
-                                    ></i>
-                                    <i
-                                        data-sort="name"
-                                        v-if="sortBy === 'name'"
-                                        v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'name' }"
-                                        class="icon arrow-down text-xl icon-accent"
-                                    ></i>
-                                </button>
-                            </th>
-                            <th>Count</th>
-                            <th>
-                                <button
-                                @click="sort"
-                                data-sort="created_at"
-                                class="sort">
-                                    Created
-                                    <i
-                                        data-sort="created_at"
-                                        v-if="sortBy !== 'created_at'"
-                                        v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
-                                        class="icon arrow-down text-xl icon-tertiary"
-                                    ></i>
-                                    <i
-                                        data-sort="created_at"
-                                        v-if="sortBy === 'created_at'"
-                                        v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
-                                        class="icon arrow-down text-xl icon-accent"
-                                    ></i>
-                                </button>
-                            </th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <AliasRow v-for="alias in list" :alias="alias" :key="rowKey" :recipients.sync="recipients" :catchAll=false />
-                    </tbody>
-                </table>
+        <div v-bind:class="{ 'hidden': (!list.length && status === 'active') || !loaded }">
+            <div class="tablet-lg">
+                <div class="hs-dropdown [--placement:bottom-left] mb-2">
+                    <button id="hs-dropdown-alias-status-mobile" class="sort">
+                        <span class="flex mr-1">Show:</span>
+                        <span class="text-accent flex items-center">
+                            {{ statusLabel }}
+                        </span>
+                    </button>
+                    <div
+                        class="hs-dropdown-menu hs-dropdown-open:opacity-100 hidden"
+                        aria-labelledby="hs-dropdown-alias-status-mobile"
+                    >
+                        <button @click="setStatus('')">Active</button>
+                        <button @click="setStatus('deleted')">Deleted</button>
+                        <button @click="setStatus('all')">All</button>
+                    </div>
+                </div>
             </div>
-            <p v-if="error" class="error">Error: {{ error }}</p>
-            <Pagination v-if="list.length" :list.sync="list" :limit="limit" :page="page" :total="total" :key="rowKey" @onUpdatePage="onUpdatePage" />
+            <div class="card-primary">
+                <div class="table-container">
+                    <table>
+                        <thead class="desktop-lg">
+                            <tr>
+                                <th>
+                                    <div class="hs-dropdown [--placement:bottom-left]">
+                                        <button id="hs-dropdown-alias-status" class="sort">
+                                            <span class="flex mr-1">Show:</span>
+                                            <span class="text-accent flex items-center">
+                                                {{ statusLabel }}
+                                            </span>
+                                        </button>
+                                        <div
+                                            class="hs-dropdown-menu hs-dropdown-open:opacity-100 hidden"
+                                            aria-labelledby="hs-dropdown-alias-status"
+                                        >
+                                            <button @click="setStatus('')">Active</button>
+                                            <button @click="setStatus('deleted')">Deleted</button>
+                                            <button @click="setStatus('all')">All</button>
+                                        </div>
+                                    </div>
+                                </th>
+                                <th>Description</th>
+                                <th>
+                                    <button
+                                    @click="sort"
+                                    data-sort="name"
+                                    class="sort">
+                                        Alias
+                                        <i
+                                            data-sort="name"
+                                            v-if="sortBy !== 'name'"
+                                            v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'name' }"
+                                            class="icon arrow-down text-xl icon-tertiary"
+                                        ></i>
+                                        <i
+                                            data-sort="name"
+                                            v-if="sortBy === 'name'"
+                                            v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'name' }"
+                                            class="icon arrow-down text-xl icon-accent"
+                                        ></i>
+                                    </button>
+                                </th>
+                                <th>Count</th>
+                                <th>
+                                    <button
+                                    @click="sort"
+                                    data-sort="created_at"
+                                    class="sort">
+                                        Created
+                                        <i
+                                            data-sort="created_at"
+                                            v-if="sortBy !== 'created_at'"
+                                            v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
+                                            class="icon arrow-down text-xl icon-tertiary"
+                                        ></i>
+                                        <i
+                                            data-sort="created_at"
+                                            v-if="sortBy === 'created_at'"
+                                            v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
+                                            class="icon arrow-down text-xl icon-accent"
+                                        ></i>
+                                    </button>
+                                </th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <AliasRow v-for="alias in list" :alias="alias" :key="rowKey" :recipients.sync="recipients" :catchAll=false />
+                        </tbody>
+                    </table>
+                </div>
+                <p v-if="error" class="error">Error: {{ error }}</p>
+                <Pagination v-if="list.length" :list.sync="list" :limit="limit" :page="page" :total="total" :key="rowKey" @onUpdatePage="onUpdatePage" />
+            </div>
         </div>
     </div>
     <AliasCreate v-if="recipients.length && settings.id && loaded" :recipients.sync="recipients" :settings.sync="settings" :catchAll=false :label="'New Alias'" />

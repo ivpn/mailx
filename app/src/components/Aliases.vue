@@ -49,8 +49,11 @@
                             <th>
                                 <div class="hs-dropdown [--placement:bottom-left]">
                                     <button id="hs-dropdown-alias-status" class="sort">
-                                        {{ statusLabel }}
-                                        <i class="icon arrow-down icon-tertiary text-xl"></i>
+                                        <span class="flex mr-1">Show:</span>
+                                        <span class="text-accent flex items-center">
+                                            {{ statusLabel }}
+                                            <!-- <i class="icon arrow-down icon-accent text-xl"></i> -->
+                                        </span>
                                     </button>
                                     <div
                                         class="hs-dropdown-menu hs-dropdown-open:opacity-100 hidden"

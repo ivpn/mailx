@@ -7,6 +7,9 @@
             <p class="text-wrap break-all">{{ domain.name }}</p>
         </td>
         <td>
+            <p class="text-wrap break-all">{{ domain.recipient }}</p>
+        </td>
+        <td>
             <p>
                 <button v-if="dnsRecordsVerified()" class="cta xs success" v-bind:data-hs-overlay="'#modal-verify-domain' + domain.id">Verified</button>
                 <button v-if="!dnsRecordsVerified()" class="cta xs plain" v-bind:data-hs-overlay="'#modal-verify-domain' + domain.id">Verify DNS</button>
@@ -15,7 +18,7 @@
         <td>
             <div class="flex items-center hs-tooltip">
                 <input
-                    @change="updateDomain"
+                    @change="updateActive"
                     v-bind:checked="domain.enabled && dnsRecordsVerified()"
                     v-bind:disabled="!dnsRecordsVerified()"
                     type="checkbox"
@@ -23,7 +26,16 @@
             </div>
         </td>
         <td>
-            <div class="hs-dropdown">
+            <div class="flex items-center hs-tooltip">
+                <input
+                    @change="updateCatchAll"
+                    v-bind:checked="domain.catch_all"
+                    type="checkbox"
+                >
+            </div>
+        </td>
+        <td>
+            <div class="hs-dropdown [--offset:0]">
                 <button v-bind:id="'hs-dropdown-domain-edit-' + domain.id">
                     <i class="icon icon-secondary more text-lg"></i>
                 </button>
@@ -31,6 +43,10 @@
                     class="hs-dropdown-menu hs-dropdown-open:opacity-100 hidden"
                     v-bind:aria-labelledby="'hs-dropdown-domain-edit-' + domain.id"
                     >
+                    <button v-bind:data-hs-overlay="'#modal-edit-domain' + domain.id">
+                        <i class="icon icon-primary edit text-xs"></i>
+                        Edit
+                    </button>
                     <button v-bind:data-hs-overlay="'#modal-verify-domain' + domain.id">
                         <i class="icon icon-primary check text-xs"></i>
                         Verify DNS
@@ -56,10 +72,25 @@
                             {{ domain.name }}
                         </p>
                     </div>
-                    <div class="flex items-center hs-tooltip">
+                    <div class="hs-tooltip inline-block break-all">
+                        <p class="plain text-base text-primary text-wrap">
+                            {{ domain.recipient }}
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-2 hs-tooltip mb-5">
+                        Active:
                         <input
-                            @change="updateDomain"
-                            v-bind:checked="domain.enabled"
+                            @change="updateActive"
+                            v-bind:checked="domain.enabled && dnsRecordsVerified()"
+                            v-bind:disabled="!dnsRecordsVerified()"
+                            type="checkbox"
+                        >
+                    </div>
+                    <div class="flex items-center gap-2 hs-tooltip">
+                        Catch-All:
+                        <input
+                            @change="updateCatchAll"
+                            v-bind:checked="domain.catch_all"
                             type="checkbox"
                         >
                     </div>
@@ -73,6 +104,10 @@
                             class="hs-dropdown-menu hs-dropdown-open:opacity-100 hidden"
                             v-bind:aria-labelledby="'hs-dropdown-domain-edit-' + domain.id"
                             >
+                            <button v-bind:data-hs-overlay="'#modal-edit-domain' + domain.id">
+                                <i class="icon icon-primary edit text-xs"></i>
+                                Edit
+                            </button>
                             <button v-bind:data-hs-overlay="'#modal-verify-domain' + domain.id">
                                 <i class="icon icon-primary check text-xs"></i>
                                 Verify DNS
@@ -96,6 +131,7 @@
         </td>
     </tr>
 
+    <DomainEdit :domain="domain" :recipients="recipients" />
     <DomainVerify :domain="domain" />
     <DomainDelete :domain="domain" />
 </template>
@@ -105,13 +141,22 @@ import { ref, onMounted } from 'vue'
 import dropdown from '@preline/dropdown'
 import { domainApi } from '../api/domain.ts'
 import DomainDelete from './DomainDelete.vue'
+import DomainEdit from './DomainEdit.vue'
 import DomainVerify from './DomainVerify.vue'
 
-const props = defineProps(['domain'])
+const props = defineProps(['domain', 'recipients'])
 const domain = ref(props.domain)
+const recipients = ref(props.recipients)
 
-const updateDomain = async () => {
+const updateActive = async () => {
     domain.value.enabled = !domain.value.enabled
+    try {
+        await domainApi.update(domain.value.id, domain.value)
+    } catch {}
+}
+
+const updateCatchAll = async () => {
+    domain.value.catch_all = !domain.value.catch_all
     try {
         await domainApi.update(domain.value.id, domain.value)
     } catch {}

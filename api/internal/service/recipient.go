@@ -292,66 +292,130 @@ func (s *Service) DeleteRecipientByUserID(ctx context.Context, userID string) er
 }
 
 func (s *Service) FindRecipients(from string, to string, msgType model.MessageType) ([]model.Recipient, model.Alias, model.MessageType, error) {
-	// Extract alias name from the "to" email
 	name, replyTo := model.ParseReplyTo(to)
+
 	alias, err := s.GetAliasByName(name)
 	if err != nil {
+		domainPart := aliasDomainPart(name)
+		if isCustomAliasDomain(domainPart, s.Cfg.API.Domains) {
+			if ok, rcps, catchAllAlias, catchAllErr := s.resolveCatchAll(domainPart); ok {
+				if catchAllErr != nil {
+					return []model.Recipient{}, catchAllAlias, 0, catchAllErr
+				}
+				return rcps, catchAllAlias, model.Forward, nil
+			}
+		}
 		return []model.Recipient{}, model.Alias{Name: name}, 0, err
 	}
 
-	// Handle disabled alias
-	if !alias.Enabled {
-		err = s.SaveMessage(context.Background(), alias, model.Block)
+	if err = s.checkAliasEnabled(alias); err != nil {
+		return []model.Recipient{}, alias, 0, err
+	}
+
+	if err = s.checkCustomDomain(alias); err != nil {
+		return []model.Recipient{}, alias, 0, err
+	}
+
+	if utils.ValidateEmail(replyTo) == nil {
+		rcps, relayType, err := s.resolveReply(from, alias, msgType, replyTo)
 		if err != nil {
+			return []model.Recipient{}, alias, 0, err
+		}
+		return rcps, alias, relayType, nil
+	}
+
+	rcps, err := s.resolveForward(alias)
+	if err != nil {
+		return []model.Recipient{}, alias, 0, err
+	}
+
+	return rcps, alias, model.Forward, nil
+}
+
+func (s *Service) checkAliasEnabled(alias model.Alias) error {
+	if alias.Enabled {
+		return nil
+	}
+
+	if err := s.SaveMessage(context.Background(), alias, model.Block); err != nil {
+		log.Println("error saving message", err)
+	}
+
+	return ErrDisabledAlias
+}
+
+func (s *Service) checkCustomDomain(alias model.Alias) error {
+	domainPart := aliasDomainPart(alias.Name)
+	if !isCustomAliasDomain(domainPart, s.Cfg.API.Domains) {
+		return nil
+	}
+
+	domain, err := s.GetVerifiedDomainByName(context.Background(), domainPart)
+	if err != nil {
+		log.Printf("error fetching domain: %s", err.Error())
+		return ErrDisabledDomain
+	}
+
+	if !domain.Enabled {
+		if err = s.SaveMessage(context.Background(), alias, model.Block); err != nil {
 			log.Println("error saving message", err)
 		}
-
-		return []model.Recipient{}, alias, 0, ErrDisabledAlias
+		return ErrDisabledDomain
 	}
 
-	// Handle disabled domain
-	domains := s.Cfg.API.Domains
-	isCustomDomain := true
-	for domain := range strings.SplitSeq(domains, ",") {
-		if strings.HasSuffix(alias.Name, "@"+domain) {
-			isCustomDomain = false
-			break
+	return nil
+}
+
+func (s *Service) resolveReply(from string, alias model.Alias, msgType model.MessageType, replyTo string) ([]model.Recipient, model.MessageType, error) {
+	rcps, err := s.GetVerifiedRecipients(context.Background(), from, alias.UserID)
+	if err != nil || len(rcps) == 0 {
+		return []model.Recipient{}, 0, ErrNoVerifiedRecipients
+	}
+
+	return []model.Recipient{{Email: replyTo}}, msgType, nil
+}
+
+func (s *Service) resolveCatchAll(domainPart string) (bool, []model.Recipient, model.Alias, error) {
+	domain, err := s.GetVerifiedDomainByName(context.Background(), domainPart)
+	if err != nil || !domain.CatchAll {
+		return false, nil, model.Alias{}, nil
+	}
+
+	catchAllAlias := model.Alias{Name: "catchall@" + domain.Name, UserID: domain.UserID}
+
+	if !domain.Enabled {
+		if err = s.SaveMessage(context.Background(), catchAllAlias, model.Block); err != nil {
+			log.Println("error saving message", err)
 		}
+		return true, nil, catchAllAlias, ErrDisabledDomain
 	}
 
-	if isCustomDomain {
-		domainName := strings.SplitN(alias.Name, "@", 2)[1]
-		domain, err := s.GetVerifiedDomainByName(context.Background(), domainName)
+	recipientEmail := domain.Recipient
+	if recipientEmail == "" {
+		settings, err := s.GetSettings(context.Background(), domain.UserID)
 		if err != nil {
-			log.Printf("error fetching domain: %s", err.Error())
-			return []model.Recipient{}, alias, 0, ErrDisabledDomain
+			log.Printf("error fetching settings for catch-all: %s", err.Error())
+			return true, nil, catchAllAlias, ErrNoRecipients
 		}
-
-		if !domain.Enabled {
-			err = s.SaveMessage(context.Background(), alias, model.Block)
-			if err != nil {
-				log.Println("error saving message", err)
-			}
-
-			return []model.Recipient{}, alias, 0, ErrDisabledDomain
-		}
+		recipientEmail = settings.Recipient
 	}
 
-	// Handle Reply | Send
-	err = utils.ValidateEmail(replyTo)
-	if err == nil {
-		rcps, err := s.GetVerifiedRecipients(context.Background(), from, alias.UserID)
-		if err != nil || len(rcps) == 0 {
-			return []model.Recipient{}, alias, 0, ErrNoVerifiedRecipients
-		}
-
-		return []model.Recipient{{Email: replyTo}}, alias, model.MessageType(msgType), nil
+	if recipientEmail == "" {
+		return true, nil, catchAllAlias, ErrNoRecipients
 	}
 
-	// Handle Forward
+	rcps, err := s.GetVerifiedRecipients(context.Background(), recipientEmail, domain.UserID)
+	if err != nil || len(rcps) == 0 {
+		return true, nil, catchAllAlias, ErrNoRecipients
+	}
+
+	return true, rcps, catchAllAlias, nil
+}
+
+func (s *Service) resolveForward(alias model.Alias) ([]model.Recipient, error) {
 	rcps, err := s.GetRecipients(context.Background(), alias.UserID)
 	if err != nil || len(rcps) == 0 {
-		return []model.Recipient{}, alias, 0, ErrNoRecipients
+		return []model.Recipient{}, ErrNoRecipients
 	}
 
 	var recipients []model.Recipient
@@ -361,5 +425,5 @@ func (s *Service) FindRecipients(from string, to string, msgType model.MessageTy
 		}
 	}
 
-	return recipients, alias, model.Forward, nil
+	return recipients, nil
 }

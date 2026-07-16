@@ -13,17 +13,17 @@
                         <div class="mb-5">
                             <h4>Default Recipient</h4>
                             <p>
-                                Set the default recipient for this domain.
+                                Set the default recipient for this domain. This overrides the default recipient selected in the Settings.
                             </p>
                             <div class="mb-6">
-                                <label for="recipient">
+                                <label v-bind:for="'recipient_' + domain.id">
                                     Select default recipient:
                                 </label>
-                                <select id="recipient" :disabled="!recipients.length">
+                                <select v-bind:id="'recipient_' + domain.id" v-model="selectedRecipient">
+                                    <option value="">—</option>
                                     <option
                                         v-for="recipient in recipients"
-                                        v-bind:value=recipient
-                                        :selected="recipient == domain.recipient"
+                                        v-bind:value="recipient"
                                         :key="recipient">
                                         {{ recipient }}
                                     </option>
@@ -55,17 +55,18 @@ import { ref, onMounted } from 'vue'
 import overlay from '@preline/overlay'
 import axios from 'axios'
 import { domainApi } from '../api/domain.ts'
+import events from '../events.ts'
 
 const props = defineProps(['domain', 'recipients'])
 const domain = ref(props.domain)
 const recipients = ref(props.recipients)
+const selectedRecipient = ref(props.domain.recipient ?? '')
 const error = ref('')
-import events from '../events.ts'
 
 const updateDomain = async () => {
     const payload = {
         id: domain.value.id,
-        recipient: domain.value.recipient
+        recipient: selectedRecipient.value
     }
 
     try {
@@ -84,6 +85,7 @@ const updateDomain = async () => {
 }
 
 const close = () => {
+    selectedRecipient.value = props.domain.recipient ?? ''
     error.value = ''
     const modal = document.querySelector('#modal-edit-domain' + domain.value.id) as any
     overlay.close(modal)
@@ -99,7 +101,5 @@ const addEvents = () => {
 onMounted(() => {
     overlay.autoInit()
     addEvents()
-    // Prepend an empty option to allow unsetting default recipient
-    recipients.value.unshift('')
 })
 </script>

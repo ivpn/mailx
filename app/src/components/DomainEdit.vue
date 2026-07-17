@@ -11,7 +11,7 @@
                     </header>
                     <article>
                         <div class="mb-5">
-                            <h4>Default Recipient</h4>
+                            <h4>Catch-All Recipient</h4>
                             <p>
                                 Set the default recipient for this domain. This overrides the default recipient selected in the Settings.
                             </p>
@@ -28,6 +28,23 @@
                                         {{ recipient }}
                                     </option>
                                 </select>
+                            </div>
+                        </div>
+                        <div class="mb-5">
+                            <h4>Catch-All From Name</h4>
+                            <p>
+                                Set the default "From" name for this domain. This overrides the default "From" name selected in the Settings.
+                            </p>
+                            <div class="mb-6">
+                                <label v-bind:for="'from_name_' + domain.id">
+                                    From name:
+                                </label>
+                                <input
+                                    type="text"
+                                    v-bind:id="'from_name_' + domain.id"
+                                    v-model="fromName"
+                                    placeholder="e.g. John Doe"
+                                />
                             </div>
                         </div>
                     </article>
@@ -61,12 +78,14 @@ const props = defineProps(['domain', 'recipients'])
 const domain = ref(props.domain)
 const recipients = ref(props.recipients)
 const selectedRecipient = ref(props.domain.recipient ?? '')
+const fromName = ref(props.domain.from_name ?? '')
 const error = ref('')
 
 const updateDomain = async () => {
     const payload = {
         id: domain.value.id,
-        recipient: selectedRecipient.value
+        recipient: selectedRecipient.value,
+        from_name: fromName.value
     }
 
     try {
@@ -86,6 +105,7 @@ const updateDomain = async () => {
 
 const close = () => {
     selectedRecipient.value = props.domain.recipient ?? ''
+    fromName.value = props.domain.from_name ?? ''
     error.value = ''
     const modal = document.querySelector('#modal-edit-domain' + domain.value.id) as any
     overlay.close(modal)

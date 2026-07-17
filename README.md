@@ -256,8 +256,8 @@ dig TXT mail.domain.com +short
 
 #### DMARC (TXT record):
 ```
-_dmarc.domain.com. 3600 IN TXT v=DMARC1; p=quarantine
-_dmarc.mail.domain.com. 3600 IN TXT v=DMARC1; p=quarantine
+_dmarc.domain.com. 3600 IN TXT "v=DMARC1; p=quarantine"
+_dmarc.mail.domain.com. 3600 IN TXT "v=DMARC1; p=quarantine"
 ```
 Check:
 ```bash

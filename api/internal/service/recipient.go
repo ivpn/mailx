@@ -317,11 +317,11 @@ func (s *Service) FindRecipients(from string, to string, msgType model.MessageTy
 	}
 
 	if utils.ValidateEmail(replyTo) == nil {
-		rcps, relayType, err := s.resolveReply(from, alias, msgType, replyTo)
+		rcps, err := s.resolveReply(from, alias, replyTo)
 		if err != nil {
 			return []model.Recipient{}, alias, 0, err
 		}
-		return rcps, alias, relayType, nil
+		return rcps, alias, msgType, nil
 	}
 
 	rcps, err := s.resolveForward(alias)
@@ -366,13 +366,13 @@ func (s *Service) checkCustomDomain(alias model.Alias) error {
 	return nil
 }
 
-func (s *Service) resolveReply(from string, alias model.Alias, msgType model.MessageType, replyTo string) ([]model.Recipient, model.MessageType, error) {
+func (s *Service) resolveReply(from string, alias model.Alias, replyTo string) ([]model.Recipient, error) {
 	rcps, err := s.GetVerifiedRecipients(context.Background(), from, alias.UserID)
 	if err != nil || len(rcps) == 0 {
-		return []model.Recipient{}, 0, ErrNoVerifiedRecipients
+		return []model.Recipient{}, ErrNoVerifiedRecipients
 	}
 
-	return []model.Recipient{{Email: replyTo}}, msgType, nil
+	return []model.Recipient{{Email: replyTo}}, nil
 }
 
 func (s *Service) resolveCatchAll(domainPart string) (bool, []model.Recipient, model.Alias, error) {

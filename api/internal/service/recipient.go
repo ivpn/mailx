@@ -381,7 +381,7 @@ func (s *Service) resolveCatchAll(domainPart string) (bool, []model.Recipient, m
 		return false, nil, model.Alias{}, nil
 	}
 
-	catchAllAlias := model.Alias{Name: "catchall@" + domain.Name, UserID: domain.UserID}
+	catchAllAlias := model.Alias{Name: "catchall@" + domain.Name, UserID: domain.UserID, FromName: domain.FromName}
 
 	if !domain.Enabled {
 		if err = s.SaveMessage(context.Background(), catchAllAlias, model.Block); err != nil {

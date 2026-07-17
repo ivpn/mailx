@@ -85,7 +85,9 @@ const updateDomain = async () => {
     const payload = {
         id: domain.value.id,
         recipient: selectedRecipient.value,
-        from_name: fromName.value
+        from_name: fromName.value,
+        enabled: domain.value.enabled,
+        catch_all: domain.value.catch_all,
     }
 
     try {

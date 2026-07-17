@@ -292,20 +292,29 @@ func (s *Service) DeleteRecipientByUserID(ctx context.Context, userID string) er
 }
 
 func (s *Service) FindRecipients(from string, to string, msgType model.MessageType) ([]model.Recipient, model.Alias, model.MessageType, error) {
-	name, replyTo := model.ParseReplyTo(to)
+	aliasName, replyTo := model.ParseReplyTo(to)
 
-	alias, err := s.GetAliasByName(name)
+	alias, err := s.GetAliasByName(aliasName)
 	if err != nil {
-		domainPart := aliasDomainPart(name)
+		domainPart := aliasDomainPart(aliasName)
 		if isCustomAliasDomain(domainPart, s.Cfg.API.Domains) {
-			if ok, rcps, catchAllAlias, catchAllErr := s.resolveCatchAll(domainPart); ok {
+			if ok, rcps, catchAllAlias, catchAllErr := s.resolveCatchAll(domainPart, aliasName); ok {
 				if catchAllErr != nil {
-					return []model.Recipient{}, catchAllAlias, 0, catchAllErr
+					return []model.Recipient{}, catchAllAlias, msgType, catchAllErr
 				}
+
+				if utils.ValidateEmail(replyTo) == nil {
+					rcps, err := s.resolveReply(from, catchAllAlias, replyTo)
+					if err != nil {
+						return []model.Recipient{}, catchAllAlias, msgType, err
+					}
+					return rcps, catchAllAlias, msgType, nil
+				}
+
 				return rcps, catchAllAlias, model.Forward, nil
 			}
 		}
-		return []model.Recipient{}, model.Alias{Name: name}, 0, err
+		return []model.Recipient{}, model.Alias{Name: aliasName}, 0, err
 	}
 
 	if err = s.checkAliasEnabled(alias); err != nil {
@@ -375,13 +384,13 @@ func (s *Service) resolveReply(from string, alias model.Alias, replyTo string) (
 	return []model.Recipient{{Email: replyTo}}, nil
 }
 
-func (s *Service) resolveCatchAll(domainPart string) (bool, []model.Recipient, model.Alias, error) {
+func (s *Service) resolveCatchAll(domainPart string, aliasName string) (bool, []model.Recipient, model.Alias, error) {
 	domain, err := s.GetVerifiedDomainByName(context.Background(), domainPart)
 	if err != nil || !domain.CatchAll {
 		return false, nil, model.Alias{}, nil
 	}
 
-	catchAllAlias := model.Alias{Name: "catchall@" + domain.Name, UserID: domain.UserID, FromName: domain.FromName}
+	catchAllAlias := model.Alias{Name: aliasName, UserID: domain.UserID, FromName: domain.FromName}
 
 	if !domain.Enabled {
 		if err = s.SaveMessage(context.Background(), catchAllAlias, model.Block); err != nil {

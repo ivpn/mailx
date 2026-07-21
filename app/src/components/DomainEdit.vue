@@ -33,7 +33,7 @@
                         <div class="mb-5">
                             <h4>Catch-All From Name</h4>
                             <p>
-                                Set the default "From" name for this domain. This overrides the default "From" name selected in the Settings.
+                                Set the "From" name used in replies and emails sent from this domain. This overrides the default set in Settings. Replies from specific aliases use "From" name set for the alias.
                             </p>
                             <div class="mb-6">
                                 <label v-bind:for="'from_name_' + domain.id">

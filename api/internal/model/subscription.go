@@ -27,7 +27,6 @@ type Subscription struct {
 	UserID       string             `json:"-"`
 	Type         string             `json:"type"`
 	ActiveUntil  time.Time          `json:"active_until"`
-	IsActive     bool               `json:"-"`
 	Tier         string             `json:"tier"`
 	TokenHash    *string            `gorm:"unique" json:"-"`
 	Notified     bool               `json:"-"`

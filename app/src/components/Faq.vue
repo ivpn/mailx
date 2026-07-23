@@ -45,7 +45,8 @@
         <p>A confirmation box will appear.  Click 'OK' to delete the alias, or click 'Cancel'.</p>
 
         <h2>Aliases: What happens to deleted aliases?</h2>
-        <p>A deleted email alias cannot be recreated, resurrected, restored, or otherwise reused.  This is a privacy feature to prevent any access, intentional or otherwise, to incoming messages associated with any deleted alias.</p>
+        <p>A deleted email alias can be restored within 90 days. During this period, the alias remains inactive and cannot forward emails. This is a privacy feature to prevent any access, intentional or otherwise, to incoming messages associated with any deleted alias.</p>
+        <p>In Aliases list, use the "Show: Active | Deleted | All" button to filter aliases by their status.</p>
 
         <h2>Aliases: How do I stop an alias from receiving messages?</h2>
         <p>On the 'Aliases' page, choose an alias, and toggle the 'Status' switch to the left position.</p>

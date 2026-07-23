@@ -55,7 +55,7 @@
     }
 
     .hs-dropdown {
-        @apply relative [--placement:bottom-right];
+        @apply relative [--offset:0] [--placement:bottom-right];
 
         .hs-dropdown-menu {
             @apply transition-[opacity,margin] opacity-0 bg-primary border border-tertiary p-2 shadow-[4px_4px_0_rgba(81,81,81,100)] dark:shadow-[4px_4px_0_rgba(82,82,91,100)] z-10 min-w-36;

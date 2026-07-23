@@ -237,21 +237,41 @@ docker compose -f compose.deploy.yml up -d
 domain.com. . 14400 IN MX 10 mail.domain.com.
 mail.domain.com. . 14400 IN MX 10 MAIL_SERVER_IPV4
 ```
+Check:
+```bash
+dig MX domain.com +short
+dig MX mail.domain.com +short
+```
 
 #### SPF Records:
 ```
 domain.com. 3600 IN TXT "v=spf1 ip4:MAIL_SERVER_IPV4 -all"
 mail.domain.com. 3600 IN TXT "v=spf1 ip4:MAIL_SERVER_IPV4 -all"
 ```
+Check:
+```bash
+dig TXT domain.com +short
+dig TXT mail.domain.com +short
+```
 
 #### DMARC (TXT record):
 ```
-_dmarc.mail.domain.com. 3600 IN TXT v=DMARC1; p=quarantine
+_dmarc.domain.com. 3600 IN TXT "v=DMARC1; p=quarantine"
+_dmarc.mail.domain.com. 3600 IN TXT "v=DMARC1; p=quarantine"
+```
+Check:
+```bash
+dig TXT _dmarc.domain.com +short
+dig TXT _dmarc.mail.domain.com +short
 ```
 
 #### DKIM (TXT record):
 ```
 mail._domainkey.domain.com. 3600 IN TXT v=DKIM1;k=rsa;p=DKIM_PUBLIC_KEY
+```
+Check:
+```bash
+dig TXT mail._domainkey.domain.com +short
 ```
 
 ### API

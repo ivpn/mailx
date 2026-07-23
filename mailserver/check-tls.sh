@@ -1,13 +1,27 @@
 #!/usr/bin/env bash
 # check-tls.sh — Check TLS certificates for all domains listed in DOMAINS= in .env
-# Usage: ./check-tls.sh [path/to/.env]
+# Usage: ./check-tls.sh [--prefix <host-prefix>] [path/to/.env]
 #
 # Checks:
 #   - STARTTLS connectivity on port 25
 #   - Certificate expiry (warns at <14 days)
 #   - SAN match: cert must be valid for the MX hostname
 
-ENV_FILE="${1:-.env}"
+PREFIX=""
+ENV_FILE=".env"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --prefix)
+      PREFIX="$2"
+      shift 2
+      ;;
+    *)
+      ENV_FILE="$1"
+      shift
+      ;;
+  esac
+done
 SMTP_PORT=25
 TIMEOUT=10
 WARN_DAYS=14
@@ -45,6 +59,7 @@ fi
 # ── Header ─────────────────────────────────────────────────────────────────────
 echo -e "\n${BOLD}TLS Certificate Check${RESET}"
 echo -e "Config : ${CYAN}$ENV_FILE${RESET}"
+[[ -n "$PREFIX" ]] && echo -e "Prefix : ${CYAN}$PREFIX${RESET}"
 echo -e "Date   : $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
 echo "════════════════════════════════════════════════════════════════"
 
@@ -56,13 +71,18 @@ for domain in $domains; do
   echo -e "\n${BOLD}▶ $domain${RESET}"
   domain_ok=true
 
-  # 1. MX lookup
-  mx=$(dig +short MX "$domain" 2>/dev/null | sort -n | head -1 | awk '{print $2}' | sed 's/\.$//')
-  if [[ -z "$mx" ]]; then
-    warn "No MX record found — falling back to domain itself"
-    mx="$domain"
+  # 1. MX lookup (or prefix-based override)
+  if [[ -n "$PREFIX" ]]; then
+    mx="${PREFIX}.${domain}"
+    echo "  MX      : $mx (--prefix)"
   else
-    echo "  MX      : $mx"
+    mx=$(dig +short MX "$domain" 2>/dev/null | sort -n | head -1 | awk '{print $2}' | sed 's/\.$//')
+    if [[ -z "$mx" ]]; then
+      warn "No MX record found — falling back to domain itself"
+      mx="$domain"
+    else
+      echo "  MX      : $mx"
+    fi
   fi
 
   # 2. STARTTLS connect + grab cert

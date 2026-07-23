@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# check-tls.sh — Check TLS certificates for all domains in postfix-virtual.cf
-# Usage: ./check-tls.sh [path/to/postfix-virtual.cf]
+# check-tls.sh — Check TLS certificates for all domains listed in DOMAINS= in .env
+# Usage: ./check-tls.sh [path/to/.env]
 #
 # Checks:
 #   - STARTTLS connectivity on port 25
 #   - Certificate expiry (warns at <14 days)
 #   - SAN match: cert must be valid for the MX hostname
 
-VIRTUAL_CF="${1:-docker-data/dms/config/postfix-virtual.cf}"
+ENV_FILE="${1:-.env}"
 SMTP_PORT=25
 TIMEOUT=10
 WARN_DAYS=14
@@ -28,27 +28,23 @@ for cmd in openssl dig awk sed grep date timeout; do
   fi
 done
 
-if [[ ! -f "$VIRTUAL_CF" ]]; then
-  echo -e "${RED}ERROR: config file not found: $VIRTUAL_CF${RESET}" >&2
+if [[ ! -f "$ENV_FILE" ]]; then
+  echo -e "${RED}ERROR: env file not found: $ENV_FILE${RESET}" >&2
   exit 2
 fi
 
-# ── Extract unique domains ─────────────────────────────────────────────────────
-domains=$(grep -v '^\s*#' "$VIRTUAL_CF" \
-  | grep -v '^\s*$' \
-  | awk '{print $1}' \
-  | grep '@' \
-  | sed 's/.*@//' \
-  | sort -u)
+# ── Extract domains from .env DOMAINS= ────────────────────────────────────────
+domains_csv=$(grep -E '^\s*DOMAINS=' "$ENV_FILE" | tail -1 | cut -d= -f2-)
+domains=$(echo "$domains_csv" | tr ',' '\n' | sed 's/[[:space:]]//g' | grep -v '^$')
 
 if [[ -z "$domains" ]]; then
-  echo -e "${RED}No domains found in $VIRTUAL_CF${RESET}"
+  echo -e "${RED}No DOMAINS found in $ENV_FILE${RESET}"
   exit 1
 fi
 
 # ── Header ─────────────────────────────────────────────────────────────────────
 echo -e "\n${BOLD}TLS Certificate Check${RESET}"
-echo -e "Config : ${CYAN}$VIRTUAL_CF${RESET}"
+echo -e "Config : ${CYAN}$ENV_FILE${RESET}"
 echo -e "Date   : $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
 echo "════════════════════════════════════════════════════════════════"
 

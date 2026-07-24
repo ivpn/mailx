@@ -62,37 +62,43 @@
     </tr>
     <tr class="tablet-lg">
         <td>
-            <div class="flex gap-2 justify-between">
+            <div class="flex gap-3 justify-between">
                 <div class="text-start">
                     <div>
                         <p class="mb-3">{{ new Date(domain.created_at).toDateString() }}</p>
                     </div>
-                    <div class="hs-tooltip inline-block break-all">
+                    <div class="break-all">
                         <p class="plain text-base text-primary text-wrap">
+                            <span class="text-sm text-secondary">Domain:</span><br>
                             {{ domain.name }}
                         </p>
                     </div>
-                    <div class="hs-tooltip inline-block break-all">
+                    <div class="break-all">
                         <p class="plain text-base text-primary text-wrap">
+                            <span class="text-sm text-secondary">Recipient:</span><br>
                             {{ domain.recipient }}
                         </p>
                     </div>
-                    <div class="flex items-center gap-2 hs-tooltip mb-5">
-                        Active:
-                        <input
-                            @change="updateActive"
-                            v-bind:checked="domain.enabled && dnsRecordsVerified()"
-                            v-bind:disabled="!dnsRecordsVerified()"
-                            type="checkbox"
-                        >
+                    <div class="mb-5">
+                        <span class="text-sm text-secondary font-primary">Active:</span>
+                        <p>
+                            <input
+                                @change="updateActive"
+                                v-bind:checked="domain.enabled && dnsRecordsVerified()"
+                                v-bind:disabled="!dnsRecordsVerified()"
+                                type="checkbox"
+                            >
+                        </p>
                     </div>
-                    <div class="flex items-center gap-2 hs-tooltip">
-                        Catch-All:
-                        <input
-                            @change="updateCatchAll"
-                            v-bind:checked="domain.catch_all"
-                            type="checkbox"
-                        >
+                    <div>
+                        <span class="text-sm text-secondary font-primary">Catch-All:</span>
+                        <p>
+                            <input
+                                @change="updateCatchAll"
+                                v-bind:checked="domain.catch_all"
+                                type="checkbox"
+                            >
+                        </p>
                     </div>
                 </div>
                 <div class="text-end">

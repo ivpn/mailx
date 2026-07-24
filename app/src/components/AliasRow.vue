@@ -78,6 +78,7 @@
                     v-bind:aria-labelledby="'hs-dropdown-alias-edit-' + alias.id"
                 >
                     <button
+                        v-if="!alias.deleted_at"
                         v-bind:disabled="!alias.recipients.length"
                         v-bind:data-hs-overlay="'#modal-send-alias' + alias.id"
                         v-bind:class="{ 'hide': alias.catch_all }"
@@ -85,15 +86,21 @@
                         <i class="icon icon-primary send text-xs"></i>
                         Send
                     </button>
-                    <button v-bind:data-hs-overlay="'#modal-alias-edit' + alias.id">
+                    <button
+                        v-if="!alias.deleted_at"
+                        v-bind:data-hs-overlay="'#modal-alias-edit' + alias.id">
                         <i class="icon icon-primary edit text-xs"></i>
                         Edit
                     </button>
-                    <button v-if="alias.deleted_at" @click.stop="restoreAlias">
+                    <button 
+                        v-if="alias.deleted_at"
+                        @click.stop="restoreAlias">
                         <i class="icon icon-primary reply text-xs"></i>
                         Restore
                     </button>
-                    <button @click.stop="deleteAlias" class="delete">
+                    <button
+                        v-if="!alias.deleted_at"
+                        @click.stop="deleteAlias" class="delete">
                         <i class="icon icon-error trash text-xs"></i>
                         Delete
                     </button>
@@ -149,6 +156,7 @@
                             v-bind:aria-labelledby="'hs-dropdown-alias-edit-' + alias.id"
                         >
                             <button
+                                v-if="!alias.deleted_at"
                                 v-bind:disabled="!alias.recipients.length"
                                 v-bind:data-hs-overlay="'#modal-send-alias' + alias.id"
                                 v-bind:class="{ 'hide': alias.catch_all }"
@@ -156,15 +164,21 @@
                                 <i class="icon icon-primary send text-xs"></i>
                                 Send
                             </button>
-                            <button v-bind:data-hs-overlay="'#modal-alias-edit' + alias.id">
+                            <button
+                                v-if="!alias.deleted_at"
+                                v-bind:data-hs-overlay="'#modal-alias-edit' + alias.id">
                                 <i class="icon icon-primary edit text-xs"></i>
                                 Edit
                             </button>
-                            <button v-if="alias.deleted_at" @click.stop="restoreAlias">
+                            <button
+                                v-if="alias.deleted_at"
+                                @click.stop="restoreAlias">
                                 <i class="icon icon-primary reply text-xs"></i>
                                 Restore
                             </button>
-                            <button @click.stop="deleteAlias" class="delete">
+                            <button
+                                v-if="!alias.deleted_at"
+                                @click.stop="deleteAlias" class="delete">
                                 <i class="icon icon-error trash text-xs"></i>
                                 Delete
                             </button>
@@ -201,8 +215,8 @@
             <hr>
         </td>
     </tr>
-    <AliasSend :alias="alias" />
-    <AliasEdit :alias="alias" :recipients="recipients" :key="rowKey" />
+    <AliasSend :alias="alias" v-if="!alias.deleted_at" />
+    <AliasEdit :alias="alias" :recipients="recipients" :key="rowKey" v-if="!alias.deleted_at" />
 </template>
 
 <script setup lang="ts">

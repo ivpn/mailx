@@ -245,7 +245,7 @@ const deleteAlias = async (payload: any) => {
     try {
         await aliasApi.delete(payload.id)
         error.value = ''
-        fetch()
+        getList()
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.message
@@ -276,10 +276,6 @@ const sort = (e: any) => {
         sortOrder.value = 'DESC'
     }
 
-    getList()
-}
-
-const fetch = () => {
     getList()
 }
 
@@ -316,10 +312,10 @@ const handleKeydown = (event: KeyboardEvent) => {
 
 onMounted(async () => {
     await getSettings()
-    fetch()
+    getList()
     dropdown.autoInit()
-    events.on('alias.create', fetch)
-    events.on('alias.update', fetch)
+    events.on('alias.create', getList)
+    events.on('alias.update', getList)
     events.on('alias.delete', onDeleteAlias)
     document.addEventListener('keydown', handleKeydown)
 })

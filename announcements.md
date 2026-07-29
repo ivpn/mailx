@@ -6,7 +6,7 @@
 Turn on catch-all for a verified domain to forward mail sent to any address on it, not just addresses you set up as aliases. Set the catch-all recipient and from name per domain.
 
 ### Restore deleted aliases
-A deleted alias is now kept for 90 days and can be restored, rather than removed immediately. It stays inactive and does not forward while deleted. Filter the Aliases list with "Show: Active / Deleted / All" to see deleted aliases and restore them.
+A deleted alias can be restored 90 days after deletion. It stays inactive and does not forward while deleted. Filter the Aliases list with "Show: Active / Deleted / All" to see deleted aliases and restore them.
 
 ## Recent Mailx updates - 2026-06-14
 

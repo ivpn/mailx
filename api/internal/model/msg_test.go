@@ -27,6 +27,62 @@ func TestIsReply(t *testing.T) {
 			data: "From: sender@example.com\r\nTo: recipient@example.com\r\nSubject: Test Subject\r\n\r\nThis is the body of the email.",
 			want: false,
 		},
+		// Subject-prefix based detection (no In-Reply-To / References headers)
+		{
+			name: "reply subject prefix re:",
+			data: "From: sender@example.com\r\nTo: recipient@example.com\r\nSubject: Re: Test Subject\r\n\r\nBody.",
+			want: true,
+		},
+		{
+			name: "reply subject prefix RE: uppercase",
+			data: "From: sender@example.com\r\nTo: recipient@example.com\r\nSubject: RE: Test Subject\r\n\r\nBody.",
+			want: true,
+		},
+		{
+			name: "reply subject prefix re: with leading whitespace",
+			data: "From: sender@example.com\r\nTo: recipient@example.com\r\nSubject:   re:  Test Subject\r\n\r\nBody.",
+			want: true,
+		},
+		{
+			name: "reply subject prefix aw: (German)",
+			data: "From: sender@example.com\r\nTo: recipient@example.com\r\nSubject: Aw: Test Subject\r\n\r\nBody.",
+			want: true,
+		},
+		{
+			name: "reply subject prefix antw: (German)",
+			data: "From: sender@example.com\r\nTo: recipient@example.com\r\nSubject: Antw: Test Subject\r\n\r\nBody.",
+			want: true,
+		},
+		{
+			name: "reply subject prefix sv: (Scandinavian)",
+			data: "From: sender@example.com\r\nTo: recipient@example.com\r\nSubject: Sv: Test Subject\r\n\r\nBody.",
+			want: true,
+		},
+		{
+			name: "reply subject prefix rif: (Italian)",
+			data: "From: sender@example.com\r\nTo: recipient@example.com\r\nSubject: Rif: Test Subject\r\n\r\nBody.",
+			want: true,
+		},
+		{
+			name: "reply subject prefix 回复: (Chinese simplified)",
+			data: "From: sender@example.com\r\nTo: recipient@example.com\r\nSubject: 回复: Test Subject\r\n\r\nBody.",
+			want: true,
+		},
+		{
+			name: "reply subject prefix 回覆: (Chinese traditional)",
+			data: "From: sender@example.com\r\nTo: recipient@example.com\r\nSubject: 回覆: Test Subject\r\n\r\nBody.",
+			want: true,
+		},
+		{
+			name: "non-reply subject that starts with a similar word",
+			data: "From: sender@example.com\r\nTo: recipient@example.com\r\nSubject: Rethink the approach\r\n\r\nBody.",
+			want: false,
+		},
+		{
+			name: "empty subject",
+			data: "From: sender@example.com\r\nTo: recipient@example.com\r\nSubject: \r\n\r\nBody.",
+			want: false,
+		},
 	}
 
 	for _, tt := range tests {

@@ -108,4 +108,5 @@ type UpdateDomainReq struct {
 	Recipient   string `json:"recipient"`
 	FromName    string `json:"from_name"`
 	Enabled     bool   `json:"enabled"`
+	CatchAll    bool   `json:"catch_all"`
 }

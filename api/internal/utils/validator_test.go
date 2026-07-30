@@ -210,3 +210,57 @@ func TestSearchValidation(t *testing.T) {
 		}
 	}
 }
+
+func TestEmailLocalPartValidation(t *testing.T) {
+	v := NewValidator()
+
+	err := v.RegisterValidation("emaillocalpart", emailLocalPartValidation)
+	if err != nil {
+		t.Fatalf("expected no error when registering emaillocalpart validation, but got: %v", err)
+	}
+
+	tests := []struct {
+		value string
+		valid bool
+		desc  string
+	}{
+		// Valid
+		{"user", true, "simple lowercase"},
+		{"User123", true, "mixed case alphanumeric"},
+		{"user.name", true, "dot-separated parts"},
+		{"user+tag", true, "plus sign"},
+		{"user-name", true, "hyphen"},
+		{"user_name", true, "underscore"},
+		{"user!#$%&'*+/=?^_{|}~-", true, "all allowed special chars"},
+		{"a", true, "single character (minimum length)"},
+		{"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1", true, "64 characters (maximum length)"},
+		{"123", true, "digits only"},
+		// Invalid: length
+		{"", false, "empty string"},
+		{"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1", false, "65 characters (over maximum length)"},
+		// Invalid: leading/trailing dot
+		{".user", false, "starts with dot"},
+		{"user.", false, "ends with dot"},
+		// Invalid: consecutive dots
+		{"user..name", false, "consecutive dots"},
+		// Invalid: disallowed characters
+		{"user name", false, "space not allowed"},
+		{"user@name", false, "@ sign not allowed"},
+		{"user(name)", false, "parentheses not allowed"},
+		{"user<name>", false, "angle brackets not allowed"},
+		{"user\\name", false, "backslash not allowed"},
+		{"user\"name", false, "double quote not allowed"},
+		// Security
+		{"<script>alert(1)</script>", false, "XSS attempt"},
+		{"' OR '1'='1", false, "SQL injection attempt"},
+		{"../../../etc/passwd", false, "path traversal attempt"},
+	}
+
+	for _, tt := range tests {
+		err := v.Var(tt.value, "emaillocalpart")
+		isValid := err == nil
+		if isValid != tt.valid {
+			t.Errorf("emailLocalPartValidation(%q): got %v, want %v (%s)", tt.value, isValid, tt.valid, tt.desc)
+		}
+	}
+}

@@ -28,9 +28,11 @@ rm -f "$body"
 # echo "$(date -Iseconds) sender=$1 recipient=$2 http_code=$http_code body=$resp_body" >> /var/log/mail/curl-email.log
 
 if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
+    # Tell Postfix: temporary failure → defer message
     exit 75
 fi
 
+# Success
 exit 0" >> /usr/local/bin/curl-email.sh
 
 chmod +x /usr/local/bin/curl-email.sh

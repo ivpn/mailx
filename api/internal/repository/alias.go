@@ -141,6 +141,12 @@ func (d *Database) GetAliasCount(ctx context.Context, userID string, catchAll st
 	return int(count), err
 }
 
+func (d *Database) GetCreatedAliasesCount(ctx context.Context, userID string) (int, error) {
+	var count int64
+	err := d.Client.Model(&model.Alias{}).Where("user_id = ? AND origin = ? AND created_at > NOW() - INTERVAL 1 HOUR", userID, model.Inbound).Count(&count).Error
+	return int(count), err
+}
+
 func (d *Database) GetAliasDailyCount(ctx context.Context, userID string) (int, error) {
 	var count int64
 	err := d.Client.Model(&model.Alias{}).Where("user_id = ? AND created_at > NOW() - INTERVAL 1 DAY", userID).Count(&count).Error

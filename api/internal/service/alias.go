@@ -31,6 +31,7 @@ type AliasStore interface {
 	GetAliasesByDomain(context.Context, string, string) ([]model.Alias, error)
 	GetAllAliases(context.Context, string) ([]model.Alias, error)
 	GetAliasCount(context.Context, string, string, string, string) (int, error)
+	GetCreatedAliasesCount(context.Context, string) (int, error)
 	GetAliasDailyCount(context.Context, string) (int, error)
 	GetAliasByName(string) (model.Alias, error)
 	PostAlias(context.Context, model.Alias) (model.Alias, error)
@@ -269,6 +270,16 @@ func (s *Service) PostInboundAlias(ctx context.Context, alias model.Alias) error
 	}
 
 	if !isCreateAliasEnabled(domain, domains) {
+		return nil
+	}
+
+	count, err := s.Store.GetCreatedAliasesCount(ctx, alias.UserID)
+	if err != nil {
+		return nil
+	}
+
+	if count >= s.Cfg.Service.MaxInboundAliasesPerHour {
+		log.Printf("user reached maximum number of inbound aliases per hour for domain: %s", domain)
 		return nil
 	}
 

@@ -121,3 +121,49 @@ func TestIsCustomDomainEnabled(t *testing.T) {
 		})
 	}
 }
+
+func TestIsCreateAliasEnabled(t *testing.T) {
+	tests := []struct {
+		name            string
+		domainPart      string
+		verifiedDomains []model.Domain
+		expected        bool
+	}{
+		{
+			name:       "domain found and create alias enabled",
+			domainPart: "example.com",
+			verifiedDomains: []model.Domain{
+				{Name: "example.com", CreateAlias: true},
+				{Name: "other.com", CreateAlias: false},
+			},
+			expected: true,
+		},
+		{
+			name:       "domain found and create alias disabled",
+			domainPart: "example.com",
+			verifiedDomains: []model.Domain{
+				{Name: "example.com", CreateAlias: false},
+			},
+			expected: false,
+		},
+		{
+			name:       "domain not in list",
+			domainPart: "missing.com",
+			verifiedDomains: []model.Domain{
+				{Name: "example.com", CreateAlias: true},
+			},
+			expected: false,
+		},
+		{name: "empty domain list", domainPart: "example.com", verifiedDomains: []model.Domain{}, expected: false},
+		{name: "nil domain list", domainPart: "example.com", verifiedDomains: nil, expected: false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := isCreateAliasEnabled(tt.domainPart, tt.verifiedDomains)
+			if got != tt.expected {
+				t.Errorf("isCreateAliasEnabled(%q, ...) = %v, want %v", tt.domainPart, got, tt.expected)
+			}
+		})
+	}
+}

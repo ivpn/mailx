@@ -74,6 +74,16 @@ func isCustomDomainEnabled(domainPart string, verifiedDomains []model.Domain) bo
 	return false
 }
 
+// isCreateAliasEnabled checks if the given domainPart is in the list of verified domains and has CreateAlias enabled.
+func isCreateAliasEnabled(domainPart string, verifiedDomains []model.Domain) bool {
+	for _, d := range verifiedDomains {
+		if d.Name == domainPart {
+			return d.CreateAlias
+		}
+	}
+	return false
+}
+
 func (s *Service) GetAlias(ctx context.Context, ID string, userID string) (model.Alias, error) {
 	alias, err := s.Store.GetAlias(ctx, ID, userID)
 	if err != nil {
@@ -235,6 +245,41 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 	}
 
 	return alias, nil
+}
+
+func (s *Service) PostInboundAlias(ctx context.Context, alias model.Alias) error {
+	if alias.Origin != model.Inbound {
+		return nil
+	}
+
+	domain := aliasDomainPart(alias.Name)
+
+	if !isCustomAliasDomain(domain, s.Cfg.API.Domains) {
+		return nil
+	}
+
+	domains, err := s.Store.GetVerifiedDomains(ctx, alias.UserID)
+	if err != nil {
+		log.Printf("error fetching verified domains: %s", err.Error())
+		return nil
+	}
+
+	if !isCustomDomainEnabled(domain, domains) {
+		return nil
+	}
+
+	if !isCreateAliasEnabled(domain, domains) {
+		return nil
+	}
+
+	localPart := aliasLocalPart(alias.Name)
+	alias, err = s.PostAlias(ctx, alias, model.AliasFormatCustom, domain, localPart)
+	if err != nil {
+		log.Printf("error creating inbound alias: %s", err.Error())
+		return ErrPostAlias
+	}
+
+	return nil
 }
 
 func (s *Service) UpdateAlias(ctx context.Context, alias model.Alias) error {

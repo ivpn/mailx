@@ -11,11 +11,23 @@ chmod 640 /etc/sasldb2
 # curl-email.sh script
 echo "#!/bin/sh
 
-curl --silent --fail --data-binary @- -H  \"Authorization: Bearer $PSK\" -X POST http://email-api:3000/v1/email
+# Enable temporary debug logs:
+# echo "$(date -Iseconds) SCRIPT STARTED sender=$1 recipient=$2" >> /var/log/mail/curl-email.log
 
-rc=\$?
+body=$(mktemp /tmp/curl-email.XXXXXX)
+http_code=$(curl --silent --data-binary @- \
+  -H "Authorization: Bearer $PSK" \
+  -X POST http://email-api:3000/v1/email \
+  -o "$body" -w "%{http_code}" \
+  --max-time 120)
 
-if [ \"\$rc\" -ne 0 ]; then
+resp_body=$(cat "$body")
+rm -f "$body"
+
+# Enable temporary debug logs:
+# echo "$(date -Iseconds) sender=$1 recipient=$2 http_code=$http_code body=$resp_body" >> /var/log/mail/curl-email.log
+
+if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
     # Tell Postfix: temporary failure → defer message
     exit 75
 fi
@@ -24,6 +36,10 @@ fi
 exit 0" >> /usr/local/bin/curl-email.sh
 
 chmod +x /usr/local/bin/curl-email.sh
+
+# Ensure curl-email debug log exists and is writable by the pipe's 'nobody' user
+touch /var/log/mail/curl-email.log
+chmod 666 /var/log/mail/curl-email.log
 
 # Add curl_email service to master.cf
 postconf -M "curl_email/unix=curl_email unix - n n - - pipe flags=RqX user=nobody argv=/usr/local/bin/curl-email.sh \${sender} \${recipient}"

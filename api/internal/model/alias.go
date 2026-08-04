@@ -11,6 +11,14 @@ var (
 	ErrDuplicateAliasDomain = errors.New("wildcard aliases limit reached for this domain")
 )
 
+type AliasOrigin int
+
+const (
+	Manual  AliasOrigin = 0
+	Inbound AliasOrigin = 1
+	Import  AliasOrigin = 2
+)
+
 type Alias struct {
 	BaseModel
 	DeletedAt        gorm.DeletedAt `gorm:"index" json:"deleted_at"`
@@ -21,6 +29,7 @@ type Alias struct {
 	Recipients       string         `gorm:"default:''" json:"recipients"`
 	FromName         string         `gorm:"default:''" json:"from_name"`
 	CatchAll         bool           `json:"catch_all"`
+	Origin           AliasOrigin    `json:"origin"`
 	Stats            AliasStats     `gorm:"-" json:"stats"`
 	IsCustomDomain   bool           `gorm:"-" json:"is_custom_domain"`
 	IsDomainVerified *bool          `gorm:"-" json:"is_domain_verified"`

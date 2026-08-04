@@ -50,6 +50,15 @@ func aliasDomainPart(name string) string {
 	return ""
 }
 
+// aliasLocalPart returns the local portion of an alias name (e.g. "user@example.com" → "user").
+func aliasLocalPart(name string) string {
+	parts := strings.SplitN(name, "@", 2)
+	if len(parts) == 2 {
+		return parts[0]
+	}
+	return ""
+}
+
 // isCustomAliasDomain reports whether domainPart is not one of the predefined built-in domains.
 func isCustomAliasDomain(domainPart, predefinedDomains string) bool {
 	return !strings.Contains(predefinedDomains, domainPart)

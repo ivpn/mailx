@@ -180,6 +180,15 @@ func (s *Service) ProcessMessage(data []byte) error {
 					log.Println("error saving message", err)
 				}
 
+				if alias.Origin == model.Inbound {
+					domain := aliasDomainPart(alias.Name)
+					localPart := aliasLocalPart(alias.Name)
+					alias, err = s.PostAlias(context.Background(), alias, model.AliasFormatCustom, domain, localPart)
+					if err != nil {
+						log.Println("error creating catch-all alias", err)
+					}
+				}
+
 				return nil
 			})
 		}

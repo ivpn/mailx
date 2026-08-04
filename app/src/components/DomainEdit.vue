@@ -47,6 +47,21 @@
                                 />
                             </div>
                         </div>
+                        <div class="mb-5">
+                            <h4>Create alias when receiving Catch-All emails</h4>
+                            <p>
+                                When enabled, a new alias will be created for every email received by the catch-all recipient. This allows you to track which emails are sent to your domain and manage them individually.
+                            </p>
+                            <div class="mb-6">
+                                <label v-bind:for="'create_alias_' + domain.id">
+                                    <input
+                                        type="checkbox"
+                                        v-bind:id="'create_alias_' + domain.id"
+                                        v-model="domain.create_alias"
+                                    />
+                                </label>
+                            </div>
+                        </div>
                     </article>
                     <footer>
                         <nav>
@@ -88,6 +103,7 @@ const updateDomain = async () => {
         from_name: fromName.value,
         enabled: domain.value.enabled,
         catch_all: domain.value.catch_all,
+        create_alias: domain.value.create_alias,
     }
 
     try {

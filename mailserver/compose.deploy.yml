@@ -57,6 +57,8 @@ services:
   daemon:
     image: ${IMAGE_REGISTRY}${DAEMON_IMAGE}:${IMAGE_TAG}
     container_name: daemon
+    volumes:
+      - ./docker-data/dms/mail-logs/:/var/log/mail/
     environment:
       - API_URL=${API_URL}
       - PSK=${PSK}

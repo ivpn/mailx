@@ -56,6 +56,8 @@ services:
   daemon:
     build: ./daemon
     container_name: daemon
+    volumes:
+      - ./docker-data/dms/mail-logs/:/var/log/mail/
     environment:
       - API_URL=${API_URL}
       - PSK=${PSK}

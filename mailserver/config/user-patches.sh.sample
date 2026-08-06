@@ -12,7 +12,7 @@ chmod 640 /etc/sasldb2
 cat > /usr/local/bin/curl-email.sh <<EOF
 #!/bin/sh
 # Enable temporary debug logs:
-# echo "$(date -Iseconds) SCRIPT STARTED sender=$1 recipient=$2" >> /var/log/mail/curl-email.log
+# echo "\$(date -Iseconds) SCRIPT STARTED sender=\$1 recipient=\$2" >> /var/log/mail/curl-email.log
 body=\$(mktemp /tmp/curl-email.XXXXXX)
 http_code=\$(curl --silent --data-binary @- \\
   -H "Authorization: Bearer $PSK" \\
@@ -21,7 +21,7 @@ http_code=\$(curl --silent --data-binary @- \\
 resp_body=\$(cat "\$body")
 rm -f "\$body"
 # Enable temporary debug logs:
-# echo "$(date -Iseconds) sender=$1 recipient=$2 http_code=$http_code body=$resp_body" >> /var/log/mail/curl-email.log
+# echo "\$(date -Iseconds) sender=\$1 recipient=\$2 http_code=\$http_code body=\$resp_body" >> /var/log/mail/curl-email.log
 if [ "\$http_code" -lt 200 ] || [ "\$http_code" -ge 300 ]; then
     exit 75
 fi

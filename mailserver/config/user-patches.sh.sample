@@ -16,7 +16,7 @@ cat > /usr/local/bin/curl-email.sh <<EOF
 body=\$(mktemp /tmp/curl-email.XXXXXX)
 http_code=\$(curl --silent --data-binary @- \\
   -H "Authorization: Bearer $PSK" \\
-  -X POST $API_URL \\
+  -X POST $API_URL/v1/email \\
   -o "\$body" -w "%{http_code}")
 resp_body=\$(cat "\$body")
 rm -f "\$body"

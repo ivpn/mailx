@@ -177,14 +177,14 @@ func (s *Service) ProcessMessage(data []byte) error {
 				}
 
 				go func() {
-					err := s.SaveMessage(context.Background(), alias, relayType)
-					if err != nil {
-						log.Println("error saving message", err)
+					inboundAlias, err := s.PostInboundAlias(context.Background(), alias)
+					if err == nil {
+						alias.BaseModel = inboundAlias.BaseModel
 					}
 
-					err = s.PostInboundAlias(context.Background(), alias)
+					err = s.SaveMessage(context.Background(), alias, relayType)
 					if err != nil {
-						log.Println("error posting inbound alias", err)
+						log.Println("error saving message", err)
 					}
 				}()
 

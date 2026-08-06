@@ -407,12 +407,13 @@ func (s *Service) resolveCatchAll(domainPart string, aliasName string) (bool, []
 			return true, nil, catchAllAlias, ErrNoRecipients
 		}
 		recipientEmail = settings.Recipient
-		catchAllAlias.Recipients = settings.Recipient
 	}
 
 	if recipientEmail == "" {
 		return true, nil, catchAllAlias, ErrNoRecipients
 	}
+
+	catchAllAlias.Recipients = recipientEmail
 
 	rcps, err := s.GetVerifiedRecipients(context.Background(), recipientEmail, domain.UserID)
 	if err != nil || len(rcps) == 0 {

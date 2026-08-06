@@ -17,6 +17,7 @@ var (
 	ErrDisabledAlias        = errors.New("alias disabled:")
 	ErrDisabledDomain       = errors.New("domain disabled:")
 	ErrPostAlias            = errors.New("Unable to create alias. Please try again.")
+	ErrPostInboundAlias     = errors.New("Unable to create inbound alias. Please try again.")
 	ErrPostAliasLimit       = errors.New("You’ve reached the maximum number of allowed aliases.")
 	ErrPostAliasInactiveSub = errors.New("Your subscription is not active. Please renew to create new aliases.")
 	ErrUpdateAlias          = errors.New("Unable to update alias. Please try again.")
@@ -248,49 +249,49 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 	return alias, nil
 }
 
-func (s *Service) PostInboundAlias(ctx context.Context, alias model.Alias) error {
+func (s *Service) PostInboundAlias(ctx context.Context, alias model.Alias) (model.Alias, error) {
 	if alias.Origin != model.Inbound {
-		return nil
+		return model.Alias{}, ErrPostInboundAlias
 	}
 
 	domain := aliasDomainPart(alias.Name)
 
 	if !isCustomAliasDomain(domain, s.Cfg.API.Domains) {
-		return nil
+		return model.Alias{}, ErrPostInboundAlias
 	}
 
 	domains, err := s.Store.GetVerifiedDomains(ctx, alias.UserID)
 	if err != nil {
 		log.Printf("error fetching verified domains: %s", err.Error())
-		return nil
+		return model.Alias{}, ErrPostInboundAlias
 	}
 
 	if !isCustomDomainEnabled(domain, domains) {
-		return nil
+		return model.Alias{}, ErrPostInboundAlias
 	}
 
 	if !isCreateAliasEnabled(domain, domains) {
-		return nil
+		return model.Alias{}, ErrPostInboundAlias
 	}
 
 	count, err := s.Store.GetCreatedAliasesCount(ctx, alias.UserID)
 	if err != nil {
-		return nil
+		return model.Alias{}, ErrPostInboundAlias
 	}
 
 	if count >= s.Cfg.Service.MaxInboundAliasesPerHour {
 		log.Printf("user reached maximum number of inbound aliases per hour for domain: %s", domain)
-		return nil
+		return model.Alias{}, ErrPostInboundAlias
 	}
 
 	localPart := aliasLocalPart(alias.Name)
 	alias, err = s.PostAlias(ctx, alias, model.AliasFormatCustom, domain, localPart)
 	if err != nil {
 		log.Printf("error creating inbound alias: %s", err.Error())
-		return ErrPostAlias
+		return model.Alias{}, ErrPostInboundAlias
 	}
 
-	return nil
+	return alias, nil
 }
 
 func (s *Service) UpdateAlias(ctx context.Context, alias model.Alias) error {

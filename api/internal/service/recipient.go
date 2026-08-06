@@ -407,6 +407,7 @@ func (s *Service) resolveCatchAll(domainPart string, aliasName string) (bool, []
 			return true, nil, catchAllAlias, ErrNoRecipients
 		}
 		recipientEmail = settings.Recipient
+		catchAllAlias.Recipients = settings.Recipient
 	}
 
 	if recipientEmail == "" {

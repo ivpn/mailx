@@ -41,12 +41,13 @@
 cp api/.env.sample api/.env
 cp app/.env.sample app/.env
 cp mailserver/.env.sample mailserver/.env
-mkdir -p mailserver/docker-data/dms/config/rspamd/override.d
-cp mailserver/config/postfix-main.cf.sample mailserver/docker-data/dms/config/postfix-main.cf
-cp mailserver/config/postfix-relay-domains.cf.sample mailserver/docker-data/dms/config/postfix-relay-domains.cf
-cp mailserver/config/postfix-aliases.cf.sample mailserver/docker-data/dms/config/postfix-aliases.cf
-cp mailserver/config/user-patches.sh.sample mailserver/docker-data/dms/config/user-patches.sh
-cp mailserver/config/rspamd/override.d/milter_headers.conf.sample mailserver/docker-data/dms/config/rspamd/override.d/milter_headers.conf
+cd mailserver
+mkdir -p docker-data/dms/config/rspamd/override.d
+cp config/postfix-main.cf.sample docker-data/dms/config/postfix-main.cf
+cp config/postfix-relay-domains.cf.sample docker-data/dms/config/postfix-relay-domains.cf
+cp config/postfix-aliases.cf.sample docker-data/dms/config/postfix-aliases.cf
+cp config/user-patches.sh.sample docker-data/dms/config/user-patches.sh
+cp config/rspamd/override.d/milter_headers.conf.sample docker-data/dms/config/rspamd/override.d/milter_headers.conf
 ```
 
 > [!IMPORTANT]
@@ -54,7 +55,6 @@ cp mailserver/config/rspamd/override.d/milter_headers.conf.sample mailserver/doc
 > - api/.env
 > - app/src/env.json
 > - mailserver/.env
-> - mailserver/docker-data/dms/config/user-patches.sh: `-X POST {API_URL}`
 > - create and configure `config.json` (registry credentials for daemon): `cp config.json.sample config.json`
 
 > [!TIP]

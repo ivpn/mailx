@@ -61,7 +61,6 @@ func (s *Service) PostSubscription(ctx context.Context, userID string, preauth m
 	sub := model.Subscription{
 		UserID:      userID,
 		ActiveUntil: preauth.ActiveUntil,
-		IsActive:    preauth.IsActive,
 		Tier:        preauth.Tier,
 		TokenHash:   &preauth.TokenHash,
 	}
@@ -115,7 +114,6 @@ func (s *Service) UpdateSubscription(ctx context.Context, sub model.Subscription
 	}
 
 	sub.ActiveUntil = preauth.ActiveUntil
-	sub.IsActive = preauth.IsActive
 	sub.Tier = preauth.Tier
 	sub.TokenHash = &preauth.TokenHash
 	sub.Type = ""

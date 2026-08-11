@@ -20,6 +20,7 @@ type Domain struct {
 	OwnerVerifiedAt *time.Time `json:"owner_verified_at"` // nullable
 	MXVerifiedAt    *time.Time `json:"mx_verified_at"`    // nullable
 	SendVerifiedAt  *time.Time `json:"send_verified_at"`  // nullable
+	CatchAll        bool       `gorm:"default:false" json:"catch_all"`
 }
 
 type DNSConfig struct {

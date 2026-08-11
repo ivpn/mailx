@@ -8,6 +8,7 @@ import (
 	"mime"
 	"mime/multipart"
 	"net/mail"
+	"regexp"
 	"strings"
 
 	"ivpn.net/email/api/internal/utils"
@@ -15,6 +16,7 @@ import (
 
 var (
 	ErrExtractOriginalFrom = fmt.Errorf("error extracting original From from bounce")
+	replySubjectRE         = regexp.MustCompile(`(?i)^\s*(re|aw|antw|sv|rif|回复|回覆)\s*:\s*`)
 )
 
 type Msg struct {
@@ -90,6 +92,11 @@ func ParseMsg(data []byte) (Msg, error) {
 // isReply checks whether the given email is a reply.
 func isReply(m *mail.Message) bool {
 	if m.Header.Get("In-Reply-To") != "" || m.Header.Get("References") != "" {
+		return true
+	}
+
+	subject := m.Header.Get("Subject")
+	if replySubjectRE.MatchString(subject) {
 		return true
 	}
 

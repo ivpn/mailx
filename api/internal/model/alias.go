@@ -13,7 +13,7 @@ var (
 
 type Alias struct {
 	BaseModel
-	DeletedAt        gorm.DeletedAt `gorm:"index" json:"-"`
+	DeletedAt        gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 	Name             string         `gorm:"unique" json:"name"`
 	UserID           string         `json:"-"`
 	Enabled          bool           `json:"enabled"`

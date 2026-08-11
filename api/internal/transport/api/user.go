@@ -241,7 +241,9 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 	// Check max sessions limit
 	ok, err := h.Service.CheckSessionCount(c.Context(), user.ID)
 	if !ok || err != nil {
-		log.Printf("error login: %s", err.Error())
+		if err != nil {
+			log.Printf("error login: %s", err.Error())
+		}
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrTooManySessions,
 		})

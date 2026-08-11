@@ -38,7 +38,7 @@ type AliasReq struct {
 	Format            string `json:"format"`
 	Domain            string `json:"domain" validate:"required"`
 	WildcardLocalPart string `json:"wildcard_local_part" validate:"omitempty,alphanum,min=6,max=12"`
-	LocalPart         string `json:"local_part" validate:"omitempty,alphanum,min=1,max=64"`
+	LocalPart         string `json:"local_part" validate:"omitempty,emaillocalpart"`
 }
 
 type RecipientReq struct {
@@ -108,4 +108,5 @@ type UpdateDomainReq struct {
 	Recipient   string `json:"recipient"`
 	FromName    string `json:"from_name"`
 	Enabled     bool   `json:"enabled"`
+	CatchAll    bool   `json:"catch_all"`
 }

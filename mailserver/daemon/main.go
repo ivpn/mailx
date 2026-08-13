@@ -24,6 +24,10 @@ var mu sync.RWMutex
 var positiveTTL = 10 * time.Minute
 var negativeTTL = 2 * time.Minute
 
+const curlEmailLogPath = "/var/log/mail/curl-email.log"
+
+var logClearInterval = 24 * time.Hour
+
 var localDomains = map[string]bool{}
 
 var apiURL string
@@ -36,6 +40,8 @@ type domainCheckRequest struct {
 func main() {
 	loadConfig()
 	loadLocalDomains()
+
+	go runLogCleaner()
 
 	ln, err := net.Listen("tcp", ":10025")
 
@@ -70,6 +76,12 @@ func loadConfig() {
 			negativeTTL = d
 		}
 	}
+
+	if interval := os.Getenv("CURL_EMAIL_LOG_CLEAR_INTERVAL"); interval != "" {
+		if d, err := time.ParseDuration(interval); err == nil {
+			logClearInterval = d
+		}
+	}
 }
 
 func loadLocalDomains() {
@@ -85,6 +97,26 @@ func loadLocalDomains() {
 			localDomains[domain] = true
 		}
 	}
+}
+
+func runLogCleaner() {
+	ticker := time.NewTicker(logClearInterval)
+	defer ticker.Stop()
+
+	for range ticker.C {
+		clearCurlEmailLog()
+	}
+}
+
+func clearCurlEmailLog() {
+	// O_CREATE so this is resilient if the daemon starts before the mailserver has created the file
+	f, err := os.OpenFile(curlEmailLogPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+	if err != nil {
+		fmt.Println("failed to clear curl-email log:", err)
+		return
+	}
+
+	f.Close()
 }
 
 func handle(conn net.Conn) {

@@ -36,7 +36,7 @@
             </div>
         </td>
         <td>
-            <div class="hs-dropdown [--offset:0]">
+            <div class="hs-dropdown">
                 <button v-bind:id="'hs-dropdown-recipient-edit-' + recipient.id">
                     <i class="icon icon-secondary more text-lg"></i>
                 </button>
@@ -101,7 +101,7 @@
                     </div>
                 </div>
                 <div class="text-end">
-                    <div class="hs-dropdown [--offset:0]">
+                    <div class="hs-dropdown">
                         <button class="py-0" v-bind:id="'hs-dropdown-recipient-edit-' + recipient.id">
                             <i class="icon icon-secondary more text-lg"></i>
                         </button>

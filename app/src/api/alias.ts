@@ -8,4 +8,5 @@ export const aliasApi = {
     create: (data: any) => api.post('/alias', data),
     update: (id: string, data: any) => api.put('/alias/' + id, data),
     delete: (id: string) => api.delete('/alias/' + id),
+    restore: (id: string) => api.post('/alias/restore/' + id),
 }

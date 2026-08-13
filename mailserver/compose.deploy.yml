@@ -39,6 +39,7 @@ services:
       - DOMAIN=${DOMAIN}
       - SMTP_USER=${SMTP_USER}
       - SMTP_PASS=${SMTP_PASS}
+      - API_URL=${API_URL}
       - PSK=${PSK}
       - ENABLE_MTA_STS=1
     restart: always
@@ -57,6 +58,8 @@ services:
   daemon:
     image: ${IMAGE_REGISTRY}${DAEMON_IMAGE}:${IMAGE_TAG}
     container_name: daemon
+    volumes:
+      - ./docker-data/dms/mail-logs/:/var/log/mail/
     environment:
       - API_URL=${API_URL}
       - PSK=${PSK}

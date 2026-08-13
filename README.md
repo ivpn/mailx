@@ -41,12 +41,13 @@
 cp api/.env.sample api/.env
 cp app/.env.sample app/.env
 cp mailserver/.env.sample mailserver/.env
-mkdir -p mailserver/docker-data/dms/config/rspamd/override.d
-cp mailserver/config/postfix-main.cf.sample mailserver/docker-data/dms/config/postfix-main.cf
-cp mailserver/config/postfix-relay-domains.cf.sample mailserver/docker-data/dms/config/postfix-relay-domains.cf
-cp mailserver/config/postfix-aliases.cf.sample mailserver/docker-data/dms/config/postfix-aliases.cf
-cp mailserver/config/user-patches.sh.sample mailserver/docker-data/dms/config/user-patches.sh
-cp mailserver/config/rspamd/override.d/milter_headers.conf.sample mailserver/docker-data/dms/config/rspamd/override.d/milter_headers.conf
+cd mailserver
+mkdir -p docker-data/dms/config/rspamd/override.d
+cp config/postfix-main.cf.sample docker-data/dms/config/postfix-main.cf
+cp config/postfix-relay-domains.cf.sample docker-data/dms/config/postfix-relay-domains.cf
+cp config/postfix-aliases.cf.sample docker-data/dms/config/postfix-aliases.cf
+cp config/user-patches.sh.sample docker-data/dms/config/user-patches.sh
+cp config/rspamd/override.d/milter_headers.conf.sample docker-data/dms/config/rspamd/override.d/milter_headers.conf
 ```
 
 > [!IMPORTANT]
@@ -54,7 +55,6 @@ cp mailserver/config/rspamd/override.d/milter_headers.conf.sample mailserver/doc
 > - api/.env
 > - app/src/env.json
 > - mailserver/.env
-> - mailserver/docker-data/dms/config/user-patches.sh: `-X POST {API_URL}`
 > - create and configure `config.json` (registry credentials for daemon): `cp config.json.sample config.json`
 
 > [!TIP]
@@ -237,21 +237,41 @@ docker compose -f compose.deploy.yml up -d
 domain.com. . 14400 IN MX 10 mail.domain.com.
 mail.domain.com. . 14400 IN MX 10 MAIL_SERVER_IPV4
 ```
+Check:
+```bash
+dig MX domain.com +short
+dig MX mail.domain.com +short
+```
 
 #### SPF Records:
 ```
 domain.com. 3600 IN TXT "v=spf1 ip4:MAIL_SERVER_IPV4 -all"
 mail.domain.com. 3600 IN TXT "v=spf1 ip4:MAIL_SERVER_IPV4 -all"
 ```
+Check:
+```bash
+dig TXT domain.com +short
+dig TXT mail.domain.com +short
+```
 
 #### DMARC (TXT record):
 ```
-_dmarc.mail.domain.com. 3600 IN TXT v=DMARC1; p=quarantine
+_dmarc.domain.com. 3600 IN TXT "v=DMARC1; p=quarantine"
+_dmarc.mail.domain.com. 3600 IN TXT "v=DMARC1; p=quarantine"
+```
+Check:
+```bash
+dig TXT _dmarc.domain.com +short
+dig TXT _dmarc.mail.domain.com +short
 ```
 
 #### DKIM (TXT record):
 ```
 mail._domainkey.domain.com. 3600 IN TXT v=DKIM1;k=rsa;p=DKIM_PUBLIC_KEY
+```
+Check:
+```bash
+dig TXT mail._domainkey.domain.com +short
 ```
 
 ### API

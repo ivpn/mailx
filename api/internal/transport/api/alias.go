@@ -14,23 +14,25 @@ import (
 )
 
 var (
-	PostAliasSuccess   = "Alias created successfully."
-	UpdateAliasSuccess = "Alias updated successfully."
-	DeleteAliasSuccess = "Alias deleted successfully."
-	ErrInvalidDomain   = "Selected domain is invalid."
-	ErrUnverifiedRcp   = "The recipient address has not been verified."
-	ErrFailedImport    = "Failed to import aliases. Please check the format and try again."
-	AliasImportSuccess = "Aliases imported successfully."
+	PostAliasSuccess    = "Alias created successfully."
+	UpdateAliasSuccess  = "Alias updated successfully."
+	DeleteAliasSuccess  = "Alias deleted successfully."
+	ErrInvalidDomain    = "Selected domain is invalid."
+	ErrUnverifiedRcp    = "The recipient address has not been verified."
+	ErrFailedImport     = "Failed to import aliases. Please check the format and try again."
+	AliasImportSuccess  = "Aliases imported successfully."
+	RestoreAliasSuccess = "Alias restored successfully."
 )
 
 type AliasService interface {
 	GetAlias(context.Context, string, string) (model.Alias, error)
-	GetAliases(context.Context, string, int, int, string, string, string, string) (model.AliasList, error)
+	GetAliases(context.Context, string, int, int, string, string, string, string, string) (model.AliasList, error)
 	GetAllAliases(context.Context, string) ([]model.Alias, error)
 	PostAlias(context.Context, model.Alias, string, string, string) (model.Alias, error)
 	UpdateAlias(context.Context, model.Alias) error
 	DeleteAlias(context.Context, string, string) error
 	ImportAliases(context.Context, []model.AliasImportReq, string) ([]model.Alias, error)
+	RestoreAlias(context.Context, string, string) error
 }
 
 // @Summary Get alias
@@ -62,6 +64,7 @@ func (h *Handler) GetAlias(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
+// @Param status query string false "Filter by alias status" Enums(active, deleted, all)
 // @Success 200 {object} model.AliasList
 // @Failure 400 {object} ErrorRes
 // @Router /aliases [get]
@@ -83,6 +86,7 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 	sortOrder := strings.ToUpper(c.Query("sort_order"))
 	catchAll := c.Query("catch_all")
 	search := c.Query("search")
+	status := c.Query("status")
 
 	var allowSortBy = map[string]bool{
 		"created_at": true,
@@ -98,6 +102,12 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 		"false": true,
 		"":      true,
 	}
+	var allowStatus = map[string]bool{
+		"active":  true,
+		"deleted": true,
+		"all":     true,
+		"":        true,
+	}
 
 	if _, ok := allowSortBy[sortBy]; !ok {
 		sortBy = "created_at"
@@ -108,6 +118,12 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 	if _, ok := allowCatchAll[catchAll]; !ok {
 		catchAll = ""
 	}
+	if _, ok := allowStatus[status]; !ok {
+		status = ""
+	}
+	if status == "" {
+		status = "active"
+	}
 
 	err = h.Validator.Var(search, "omitempty,required,search")
 	if err != nil {
@@ -117,7 +133,7 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 		})
 	}
 
-	list, err := h.Service.GetAliases(c.Context(), userID, limit, page, sortBy, sortOrder, catchAll, search)
+	list, err := h.Service.GetAliases(c.Context(), userID, limit, page, sortBy, sortOrder, catchAll, search, status)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
@@ -419,5 +435,31 @@ func (h *Handler) DeleteAlias(c *fiber.Ctx) error {
 
 	return c.Status(200).JSON(fiber.Map{
 		"message": DeleteAliasSuccess,
+	})
+}
+
+// @Summary Restore alias
+// @Description Restore alias
+// @Tags alias
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path string true "Alias ID"
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /alias/restore/{id} [post]
+// @Router /api/alias/restore/{id} [post]
+func (h *Handler) RestoreAlias(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
+	id := c.Params("id")
+	err := h.Service.RestoreAlias(c.Context(), id, userID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": RestoreAliasSuccess,
 	})
 }

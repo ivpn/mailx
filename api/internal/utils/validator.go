@@ -35,6 +35,11 @@ func NewValidator() Validator {
 		log.Println("error registering search validation:", err)
 	}
 
+	err = v.RegisterValidation("emaillocalpart", emailLocalPartValidation)
+	if err != nil {
+		log.Println("error registering email local part validation:", err)
+	}
+
 	return v
 }
 
@@ -114,4 +119,33 @@ func searchValidation(fl validator.FieldLevel) bool {
 
 	re := regexp.MustCompile(`^[-a-zA-Z0-9 ._+@]+$`)
 	return re.MatchString(value)
+}
+
+func emailLocalPartValidation(fl validator.FieldLevel) bool {
+	localPart := fl.Field().String()
+
+	if len(localPart) < 1 || len(localPart) > 64 {
+		return false
+	}
+
+	// RFC 5321/5322 allow a broad set of characters in the local part.
+	// This covers the common, practical subset: letters, digits, and
+	// the typical unquoted special characters.
+	var validChars = regexp.MustCompile(`^[a-zA-Z0-9.!#$%&'*+/=?^_` + "`" + `{|}~-]+$`).MatchString
+
+	if !validChars(localPart) {
+		return false
+	}
+
+	// Local part must not start or end with a dot
+	if strings.HasPrefix(localPart, ".") || strings.HasSuffix(localPart, ".") {
+		return false
+	}
+
+	// No consecutive dots allowed
+	if strings.Contains(localPart, "..") {
+		return false
+	}
+
+	return true
 }

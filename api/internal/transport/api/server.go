@@ -45,6 +45,7 @@ func Start(cfg config.APIConfig, service Service, cache Cache) error {
 		EnableTrustedProxyCheck: true,
 		TrustedProxies:          cfg.ApiTrustedProxies,
 		ProxyHeader:             fiber.HeaderXForwardedFor,
+		BodyLimit:               cfg.ApiBodyLimit,
 	})
 
 	h := &Handler{

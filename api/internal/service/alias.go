@@ -250,7 +250,7 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 }
 
 func (s *Service) PostInboundAlias(ctx context.Context, alias model.Alias) (model.Alias, error) {
-	if alias.Origin != model.Inbound {
+	if alias.Origin != model.Inbound || alias.ID != "" {
 		return model.Alias{}, ErrPostInboundAlias
 	}
 

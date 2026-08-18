@@ -292,14 +292,9 @@ func (s *Service) DeleteRecipientByUserID(ctx context.Context, userID string) er
 }
 
 func (s *Service) FindRecipients(from string, to string, msgType model.MessageType) ([]model.Recipient, model.Alias, model.MessageType, error) {
-	log.Println("to:", to)
 	aliasName, replyTo := model.ParseReplyTo(to)
-	log.Println("aliasName:", aliasName)
-	log.Println("replyTo:", replyTo)
 
 	alias, err := s.GetAliasByName(aliasName)
-	log.Println("alias:", alias)
-	log.Println("err:", err)
 	if err != nil {
 		domainPart := aliasDomainPart(aliasName)
 		if isCustomAliasDomain(domainPart, s.Cfg.API.Domains) {

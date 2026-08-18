@@ -170,7 +170,7 @@ func (s *Service) ProcessMessage(data []byte) error {
 		}
 
 		// Handle Inbound Alias
-		if alias.Origin == model.Inbound {
+		if alias.Origin == model.Inbound && alias.ID == "" {
 			inboundAlias, err := s.PostInboundAlias(context.Background(), alias)
 			if err == nil {
 				alias.BaseModel = inboundAlias.BaseModel

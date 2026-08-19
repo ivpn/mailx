@@ -312,6 +312,10 @@ func (s *Service) FindRecipients(from string, to string, msgType model.MessageTy
 					return []model.Recipient{}, catchAllAlias, msgType, catchAllErr
 				}
 
+				if err = s.checkCustomDomain(catchAllAlias); err != nil {
+					return []model.Recipient{}, alias, 0, err
+				}
+
 				if utils.ValidateEmail(replyTo) == nil {
 					rcps, err := s.resolveReply(from, catchAllAlias, replyTo)
 					if err != nil {

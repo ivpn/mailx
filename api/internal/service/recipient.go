@@ -295,6 +295,15 @@ func (s *Service) FindRecipients(from string, to string, msgType model.MessageTy
 	aliasName, replyTo := model.ParseReplyTo(to)
 
 	alias, err := s.GetAliasByName(aliasName)
+	// Fall back to a Wildcard Alias match (e.g. "*+suffix@domain.com") before giving up.
+	if err != nil {
+		if wildcardName, ok := model.WildcardAlias(to); ok {
+			if wcAlias, wcErr := s.GetAliasByName(wildcardName); wcErr == nil {
+				alias, err = wcAlias, nil
+			}
+		}
+	}
+	// If we still don't have an alias, check for a catch-all domain.
 	if err != nil {
 		domainPart := aliasDomainPart(aliasName)
 		if isCustomAliasDomain(domainPart, s.Cfg.API.Domains) {

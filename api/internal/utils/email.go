@@ -46,15 +46,16 @@ func SelectTargets(to []string, deliveredTo string) []string {
 // multiple aliases only get one email instead of one per alias. encode embeds
 // each other alias into the primary one (e.g. model.GenerateReplyTo).
 func CombineForwardTo(primary string, all []string, encode func(alias, to string) string) string {
-	header := primary
+	var header strings.Builder
+	header.WriteString(primary)
 	for _, other := range all {
 		if strings.EqualFold(other, primary) {
 			continue
 		}
-		header += ", " + encode(primary, other)
+		header.WriteString(", " + encode(primary, other))
 	}
 
-	return header
+	return header.String()
 }
 
 func RemoveHtmlHeader(html string) string {

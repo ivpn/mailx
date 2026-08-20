@@ -180,7 +180,9 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 	return nil
 }
 
-func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data []byte, templateFile string, templateData any, settings model.Settings, alias model.Alias) error {
+// buildForwardMessage builds the outgoing forward message without dialing the network,
+// so the To: header logic can be unit tested in isolation.
+func (mailer Mailer) buildForwardMessage(from string, name string, to string, rcp model.Recipient, data []byte, templateFile string, templateData any, settings model.Settings, alias model.Alias) (*gomail.Message, string, error) {
 	// Preprocess email data to decode RFC 2047 encoded headers
 	processedData, err := utils.PreprocessEmailData(data)
 	if err != nil {
@@ -206,19 +208,19 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 	reader := bytes.NewReader(processedData)
 	email, err := parser.Parse(reader)
 	if err != nil {
-		return err
+		return nil, "", err
 	}
 
 	tmpl, err := template.New("email").ParseFS(templateFS, "templates/"+templateFile)
 	if err != nil {
-		return err
+		return nil, "", err
 	}
 
 	header := new(bytes.Buffer)
 	if !settings.RemoveHeader {
 		err = tmpl.ExecuteTemplate(header, "header", templateData)
 		if err != nil {
-			return err
+			return nil, "", err
 		}
 	}
 
@@ -226,7 +228,7 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 	if !settings.RemoveHeader {
 		err = tmpl.ExecuteTemplate(headerHtml, "headerHtml", templateData)
 		if err != nil {
-			return err
+			return nil, "", err
 		}
 	}
 
@@ -242,7 +244,7 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 
 	m := gomail.NewMessage()
 	m.SetAddressHeader("From", from, name)
-	m.SetHeader("To", rcp.Email)
+	m.SetHeader("To", to)
 	m.SetHeader("Subject", decodedSubject)
 	m.SetBody("text/plain", header.String()+email.Text)
 
@@ -297,7 +299,7 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 	if rcp.PGPEnabled && rcp.PGPKey != "" && rcp.PGPInline {
 		armored, err := utils.EncryptWithPGPInline(email.Text, rcp.PGPKey)
 		if err != nil {
-			return err
+			return nil, "", err
 		}
 		m.SetHeader("Content-Type", "text/plain")
 		m.SetBody("text/plain", armored)
@@ -329,26 +331,35 @@ func (mailer Mailer) Forward(from string, name string, rcp model.Recipient, data
 
 	// PGP/MIME encryption
 	if rcp.PGPEnabled && rcp.PGPKey != "" && !rcp.PGPInline {
-		em, err := utils.EncryptWithPGPMIME(m, from, name, decodedSubject, rcp.Email, rcp.PGPKey)
+		em, err := utils.EncryptWithPGPMIME(m, from, name, decodedSubject, to, rcp.PGPKey)
 		if err != nil {
-			return err
+			return nil, "", err
 		}
 
-		err = mailer.dialer.DialAndSend(em)
-		if err != nil {
-			return err
-		}
-
-		log.Printf("PGP/MIME email forward sent successfully, %s", email.Headers.MessageID)
-		return nil
+		return em, string(email.Headers.MessageID), nil
 	}
 
-	err = mailer.dialer.DialAndSend(m)
+	return m, string(email.Headers.MessageID), nil
+}
+
+func (mailer Mailer) Forward(from string, name string, to string, rcp model.Recipient, data []byte, templateFile string, templateData any, settings model.Settings, alias model.Alias) error {
+	m, messageID, err := mailer.buildForwardMessage(from, name, to, rcp, data, templateFile, templateData, settings, alias)
 	if err != nil {
 		return err
 	}
 
-	log.Printf("Email forward sent successfully, %s", email.Headers.MessageID)
+	sc, err := mailer.dialer.Dial()
+	if err != nil {
+		return err
+	}
+	defer sc.Close()
+
+	// Envelope recipient stays the real mailbox even though To: shows the alias.
+	if err := sc.Send(from, []string{rcp.Email}, m); err != nil {
+		return err
+	}
+
+	log.Printf("Email forward sent successfully, %s", messageID)
 	return nil
 }
 

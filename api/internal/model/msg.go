@@ -17,15 +17,17 @@ import (
 var (
 	ErrExtractOriginalFrom = fmt.Errorf("error extracting original From from bounce")
 	replySubjectRE         = regexp.MustCompile(`(?i)^\s*(re|aw|antw|sv|rif|回复|回覆)\s*:\s*`)
+	receivedForRE          = regexp.MustCompile(`(?i)\bfor\s+<?([^\s<>;,]+@[^\s<>;,]+)>?`)
 )
 
 type Msg struct {
-	From     string
-	FromName string
-	To       []string
-	Subject  string
-	Body     string
-	Type     MessageType
+	From              string
+	FromName          string
+	To                []string
+	Subject           string
+	Body              string
+	Type              MessageType
+	EnvelopeRecipient string
 }
 
 func ParseMsg(data []byte) (Msg, error) {
@@ -52,16 +54,39 @@ func ParseMsg(data []byte) (Msg, error) {
 		to = append(to, address.Address)
 	}
 
+	deliveredTo := ""
+	for _, h := range []string{"Delivered-To", "X-Original-To"} {
+		raw := strings.TrimSpace(msg.Header.Get(h))
+		if raw == "" {
+			continue
+		}
+
+		if addr, err := mail.ParseAddress(raw); err == nil {
+			deliveredTo = addr.Address
+		} else {
+			deliveredTo = raw
+		}
+		break
+	}
+	if deliveredTo == "" {
+		// Some pipe transports don't stamp Delivered-To/X-Original-To; fall back to
+		// the "for <address>" clause Postfix adds to its own (topmost) Received
+		// header when that hop had a single envelope recipient.
+		if m := receivedForRE.FindStringSubmatch(msg.Header.Get("Received")); len(m) == 2 {
+			deliveredTo = m[1]
+		}
+	}
+
 	from, err := mail.ParseAddress(utils.DecodeHeaderWithCharset(msg.Header.Get("From")))
 	if err != nil {
-		return Msg{To: to}, fmt.Errorf("error parsing From header: %w", err)
+		return Msg{To: to, EnvelopeRecipient: deliveredTo}, fmt.Errorf("error parsing From header: %w", err)
 	}
 	fromAddress := from.Address
 
 	buf := new(bytes.Buffer)
 	_, err = buf.ReadFrom(msg.Body)
 	if err != nil {
-		return Msg{To: to}, err
+		return Msg{To: to, EnvelopeRecipient: deliveredTo}, err
 	}
 	body := buf.String()
 	msgType := Send
@@ -75,17 +100,18 @@ func ParseMsg(data []byte) (Msg, error) {
 		fromAddress, err = ExtractOriginalFrom(processedData)
 		if err != nil {
 			log.Println("error extracting original From from bounce:", err)
-			return Msg{To: to}, ErrExtractOriginalFrom
+			return Msg{To: to, EnvelopeRecipient: deliveredTo}, ErrExtractOriginalFrom
 		}
 	}
 
 	return Msg{
-		From:     fromAddress,
-		FromName: from.Name,
-		To:       to,
-		Subject:  subject,
-		Body:     body,
-		Type:     msgType,
+		From:              fromAddress,
+		FromName:          from.Name,
+		To:                to,
+		Subject:           subject,
+		Body:              body,
+		Type:              msgType,
+		EnvelopeRecipient: deliveredTo,
 	}, nil
 }
 

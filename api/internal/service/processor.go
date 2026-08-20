@@ -19,7 +19,11 @@ var (
 )
 
 func (s *Service) ProcessMessage(data []byte) error {
+	log.Printf("DEBUG raw inbound email:\n%s", data)
 	msg, parseErr := model.ParseMsg(data)
+	if parseErr == nil {
+		log.Printf("DEBUG parsed message: To=%v DeliveredTo=%q", msg.To, msg.DeliveredTo)
+	}
 	if parseErr != nil {
 		if errors.Is(parseErr, model.ErrExtractOriginalFrom) {
 			// Fail silently so bounce messages are not kept in postfix queue

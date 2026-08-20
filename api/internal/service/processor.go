@@ -180,7 +180,7 @@ func (s *Service) ProcessMessage(data []byte) error {
 		for _, recipient := range recipients {
 			g.Go(func() error {
 				// Queue Message
-				err = s.QueueMessage(msg.From, msg.FromName, recipient, data, alias, relayType, settings)
+				err = s.QueueMessage(msg.From, msg.FromName, to, recipient, data, alias, relayType, settings)
 				if err != nil {
 					return err
 				}
@@ -202,17 +202,17 @@ func (s *Service) ProcessMessage(data []byte) error {
 	return g.Wait()
 }
 
-func (s *Service) QueueMessage(from string, fromName string, rcp model.Recipient, data []byte, alias model.Alias, msgType model.MessageType, settings model.Settings) error {
+func (s *Service) QueueMessage(from string, fromName string, to string, rcp model.Recipient, data []byte, alias model.Alias, msgType model.MessageType, settings model.Settings) error {
 	mailer := mailer.New(s.Cfg.SMTPClient)
 
 	// Queue Forward
 	if msgType == model.Forward {
 		templateData := map[string]any{
-			"alias": alias.Name,
+			"alias": to,
 			"from":  from,
 		}
 		generatedFrom := model.GenerateReplyTo(alias.Name, from)
-		err := mailer.Forward(generatedFrom, fromName, rcp, data, "header.tmpl", templateData, settings, alias)
+		err := mailer.Forward(generatedFrom, fromName, to, rcp, data, "header.tmpl", templateData, settings, alias)
 		if err != nil {
 			if settings.LogIssues {
 				err := s.ProcessDiagnosticLog(alias, from, rcp.Email, err.Error(), model.DeferredDelivery)

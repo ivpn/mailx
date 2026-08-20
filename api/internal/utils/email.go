@@ -59,7 +59,9 @@ func EncryptWithPGPInline(plainText string, recipientKey string) (string, error)
 	return string(armored), nil
 }
 
-func EncryptWithPGPMIME(orig *gomail.Message, fromAddr, fromName, subject, recipientEmail, recipientKey string) (*gomail.Message, error) {
+// toHeaderAddr is the address shown in the built message's To: header; it is not
+// necessarily the SMTP envelope recipient used for actual delivery.
+func EncryptWithPGPMIME(orig *gomail.Message, fromAddr, fromName, subject, toHeaderAddr, recipientKey string) (*gomail.Message, error) {
 	// --- 1) Serialize the original email ---
 	var buf bytes.Buffer
 	if _, err := orig.WriteTo(&buf); err != nil {
@@ -123,7 +125,7 @@ func EncryptWithPGPMIME(orig *gomail.Message, fromAddr, fromName, subject, recip
 	// of the correct =?UTF-8?Q?...?=.  Passing SetCharset("UTF-8") fixes this.
 	em := gomail.NewRawMessage(gomail.SetCharset("UTF-8"))
 	em.SetAddressHeader("From", fromAddr, fromName)
-	em.SetHeader("To", recipientEmail)
+	em.SetHeader("To", toHeaderAddr)
 	em.SetHeader("Subject", DecodeHeaderWithCharset(subject))
 	em.SetHeader("Date", time.Now().UTC().Format(time.RFC1123Z))
 	em.SetHeader("Content-Type", fmt.Sprintf("multipart/encrypted; protocol=\"application/pgp-encrypted\"; boundary=\"%s\"", boundary))

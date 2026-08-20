@@ -20,12 +20,13 @@ var (
 )
 
 type Msg struct {
-	From     string
-	FromName string
-	To       []string
-	Subject  string
-	Body     string
-	Type     MessageType
+	From        string
+	FromName    string
+	To          []string
+	Subject     string
+	Body        string
+	Type        MessageType
+	DeliveredTo string
 }
 
 func ParseMsg(data []byte) (Msg, error) {
@@ -52,16 +53,25 @@ func ParseMsg(data []byte) (Msg, error) {
 		to = append(to, address.Address)
 	}
 
+	deliveredTo := ""
+	if raw := strings.TrimSpace(msg.Header.Get("Delivered-To")); raw != "" {
+		if addr, err := mail.ParseAddress(raw); err == nil {
+			deliveredTo = addr.Address
+		} else {
+			deliveredTo = raw
+		}
+	}
+
 	from, err := mail.ParseAddress(utils.DecodeHeaderWithCharset(msg.Header.Get("From")))
 	if err != nil {
-		return Msg{To: to}, fmt.Errorf("error parsing From header: %w", err)
+		return Msg{To: to, DeliveredTo: deliveredTo}, fmt.Errorf("error parsing From header: %w", err)
 	}
 	fromAddress := from.Address
 
 	buf := new(bytes.Buffer)
 	_, err = buf.ReadFrom(msg.Body)
 	if err != nil {
-		return Msg{To: to}, err
+		return Msg{To: to, DeliveredTo: deliveredTo}, err
 	}
 	body := buf.String()
 	msgType := Send
@@ -75,17 +85,18 @@ func ParseMsg(data []byte) (Msg, error) {
 		fromAddress, err = ExtractOriginalFrom(processedData)
 		if err != nil {
 			log.Println("error extracting original From from bounce:", err)
-			return Msg{To: to}, ErrExtractOriginalFrom
+			return Msg{To: to, DeliveredTo: deliveredTo}, ErrExtractOriginalFrom
 		}
 	}
 
 	return Msg{
-		From:     fromAddress,
-		FromName: from.Name,
-		To:       to,
-		Subject:  subject,
-		Body:     body,
-		Type:     msgType,
+		From:        fromAddress,
+		FromName:    from.Name,
+		To:          to,
+		Subject:     subject,
+		Body:        body,
+		Type:        msgType,
+		DeliveredTo: deliveredTo,
 	}, nil
 }
 

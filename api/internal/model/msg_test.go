@@ -468,6 +468,30 @@ func TestParseMsg(t *testing.T) {
 				Subject:  "Жыр",
 				Body:     "Body",
 				Type:     Send,
+			}},
+		{
+			name: "Delivered-To header present is captured",
+			data: "Delivered-To: alias1@mailx.net\r\nFrom: sender@example.com\r\nTo: alias1@mailx.net, alias2@mailx.net\r\nSubject: Test\r\n\r\nBody",
+			want: Msg{
+				From:        "sender@example.com",
+				FromName:    "",
+				To:          []string{"alias1@mailx.net", "alias2@mailx.net"},
+				Subject:     "Test",
+				Body:        "Body",
+				Type:        Send,
+				DeliveredTo: "alias1@mailx.net",
+			}},
+		{
+			name: "Delivered-To header absent leaves DeliveredTo empty",
+			data: "From: sender@example.com\r\nTo: alias1@mailx.net\r\nSubject: Test\r\n\r\nBody",
+			want: Msg{
+				From:        "sender@example.com",
+				FromName:    "",
+				To:          []string{"alias1@mailx.net"},
+				Subject:     "Test",
+				Body:        "Body",
+				Type:        Send,
+				DeliveredTo: "",
 			}}}
 
 	for _, tt := range tests {
@@ -484,7 +508,7 @@ func TestParseMsg(t *testing.T) {
 }
 
 func compareMessages(a, b Msg) bool {
-	if a.From != b.From || a.FromName != b.FromName || a.Subject != b.Subject || a.Body != b.Body || a.Type != b.Type {
+	if a.From != b.From || a.FromName != b.FromName || a.Subject != b.Subject || a.Body != b.Body || a.Type != b.Type || a.DeliveredTo != b.DeliveredTo {
 		return false
 	}
 	if len(a.To) != len(b.To) {

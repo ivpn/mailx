@@ -17,6 +17,7 @@ var (
 	ErrDisabledAlias        = errors.New("alias disabled:")
 	ErrDisabledDomain       = errors.New("domain disabled:")
 	ErrPostAlias            = errors.New("Unable to create alias. Please try again.")
+	ErrPostInboundAlias     = errors.New("Unable to create inbound alias. Please try again.")
 	ErrPostAliasLimit       = errors.New("You’ve reached the maximum number of allowed aliases.")
 	ErrPostAliasInactiveSub = errors.New("Your subscription is not active. Please renew to create new aliases.")
 	ErrUpdateAlias          = errors.New("Unable to update alias. Please try again.")
@@ -31,6 +32,7 @@ type AliasStore interface {
 	GetAliasesByDomain(context.Context, string, string) ([]model.Alias, error)
 	GetAllAliases(context.Context, string) ([]model.Alias, error)
 	GetAliasCount(context.Context, string, string, string, string) (int, error)
+	GetCreatedAliasesCount(context.Context, string) (int, error)
 	GetAliasDailyCount(context.Context, string) (int, error)
 	GetAliasByName(string) (model.Alias, error)
 	PostAlias(context.Context, model.Alias) (model.Alias, error)
@@ -50,6 +52,15 @@ func aliasDomainPart(name string) string {
 	return ""
 }
 
+// aliasLocalPart returns the local portion of an alias name (e.g. "user@example.com" → "user").
+func aliasLocalPart(name string) string {
+	parts := strings.SplitN(name, "@", 2)
+	if len(parts) == 2 {
+		return parts[0]
+	}
+	return ""
+}
+
 // isCustomAliasDomain reports whether domainPart is not one of the predefined built-in domains.
 func isCustomAliasDomain(domainPart, predefinedDomains string) bool {
 	return !strings.Contains(predefinedDomains, domainPart)
@@ -60,6 +71,16 @@ func isCustomDomainEnabled(domainPart string, verifiedDomains []model.Domain) bo
 	for _, d := range verifiedDomains {
 		if d.Name == domainPart {
 			return d.Enabled
+		}
+	}
+	return false
+}
+
+// isCreateAliasEnabled checks if the given domainPart is in the list of verified domains and has CreateAlias enabled.
+func isCreateAliasEnabled(domainPart string, verifiedDomains []model.Domain) bool {
+	for _, d := range verifiedDomains {
+		if d.Name == domainPart {
+			return d.CreateAlias
 		}
 	}
 	return false
@@ -223,6 +244,51 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 			}
 		}
 		break
+	}
+
+	return alias, nil
+}
+
+func (s *Service) PostInboundAlias(ctx context.Context, alias model.Alias) (model.Alias, error) {
+	if alias.Origin != model.Inbound || alias.ID != "" {
+		return model.Alias{}, ErrPostInboundAlias
+	}
+
+	domain := aliasDomainPart(alias.Name)
+
+	if !isCustomAliasDomain(domain, s.Cfg.API.Domains) {
+		return model.Alias{}, ErrPostInboundAlias
+	}
+
+	domains, err := s.Store.GetVerifiedDomains(ctx, alias.UserID)
+	if err != nil {
+		log.Printf("error fetching verified domains: %s", err.Error())
+		return model.Alias{}, ErrPostInboundAlias
+	}
+
+	if !isCustomDomainEnabled(domain, domains) {
+		return model.Alias{}, ErrPostInboundAlias
+	}
+
+	if !isCreateAliasEnabled(domain, domains) {
+		return model.Alias{}, ErrPostInboundAlias
+	}
+
+	count, err := s.Store.GetCreatedAliasesCount(ctx, alias.UserID)
+	if err != nil {
+		return model.Alias{}, ErrPostInboundAlias
+	}
+
+	if count >= s.Cfg.Service.MaxInboundAliasesPerHour {
+		log.Printf("user reached maximum number of inbound aliases per hour for domain: %s", domain)
+		return model.Alias{}, ErrPostInboundAlias
+	}
+
+	localPart := aliasLocalPart(alias.Name)
+	alias, err = s.PostAlias(ctx, alias, model.AliasFormatCustom, domain, localPart)
+	if err != nil {
+		log.Printf("error creating inbound alias: %s", err.Error())
+		return model.Alias{}, ErrPostInboundAlias
 	}
 
 	return alias, nil

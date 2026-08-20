@@ -169,16 +169,29 @@ func (s *Service) ProcessMessage(data []byte) error {
 			continue
 		}
 
+		// Handle Inbound Alias
+		if alias.Origin == model.Inbound && alias.ID == "" {
+			inboundAlias, err := s.PostInboundAlias(context.Background(), alias)
+			if err == nil {
+				alias.BaseModel = inboundAlias.BaseModel
+			}
+		}
+
 		for _, recipient := range recipients {
 			g.Go(func() error {
+				// Queue Message
 				err = s.QueueMessage(msg.From, msg.FromName, recipient, data, alias, relayType, settings)
 				if err != nil {
 					return err
 				}
 
-				if err := s.SaveMessage(context.Background(), alias, relayType); err != nil {
-					log.Println("error saving message", err)
-				}
+				// Save Message for stats
+				go func() {
+					err = s.SaveMessage(context.Background(), alias, relayType)
+					if err != nil {
+						log.Println("error saving message", err)
+					}
+				}()
 
 				return nil
 			})

@@ -169,6 +169,7 @@ func (h *Handler) UpdateDomain(c *fiber.Ctx) error {
 	domain.FromName = req.FromName
 	domain.Enabled = req.Enabled
 	domain.CatchAll = req.CatchAll
+	domain.CreateAlias = req.CreateAlias
 
 	// Update domain
 	err = h.Service.UpdateDomain(c.Context(), domain)

@@ -30,7 +30,7 @@ func (s *Service) ProcessMessage(data []byte) error {
 			return nil
 		}
 
-		for _, to := range utils.SelectTargets(msg.To, msg.DeliveredTo) {
+		for _, to := range utils.SelectTargets(msg.To, msg.EnvelopeRecipient) {
 			_, alias, _, err := s.FindRecipients(msg.From, to, msg.Type)
 			if alias.UserID == "" {
 				continue
@@ -87,7 +87,7 @@ func (s *Service) ProcessMessage(data []byte) error {
 
 	var g errgroup.Group
 
-	for _, to := range utils.SelectTargets(msg.To, msg.DeliveredTo) {
+	for _, to := range utils.SelectTargets(msg.To, msg.EnvelopeRecipient) {
 		recipients, alias, relayType, err := s.FindRecipients(msg.From, to, msg.Type)
 		if err != nil {
 			log.Println("error processing message:", err, alias.Name)

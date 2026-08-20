@@ -18,19 +18,21 @@ var (
 	ErrInactiveRecipient    = errors.New("The recipient is inactive.")
 )
 
-func (s *Service) ProcessMessage(data []byte) error {
-	log.Printf("DEBUG raw inbound email:\n%s", data)
+func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 	msg, parseErr := model.ParseMsg(data)
-	if parseErr == nil {
-		log.Printf("DEBUG parsed message: To=%v DeliveredTo=%q", msg.To, msg.DeliveredTo)
+	if envelopeRecipient == "" {
+		// Caller didn't pass the actual envelope recipient (e.g. Postfix pipe not
+		// yet updated to pass it); fall back to guessing it from headers.
+		envelopeRecipient = msg.EnvelopeRecipient
 	}
+
 	if parseErr != nil {
 		if errors.Is(parseErr, model.ErrExtractOriginalFrom) {
 			// Fail silently so bounce messages are not kept in postfix queue
 			return nil
 		}
 
-		for _, to := range utils.SelectTargets(msg.To, msg.EnvelopeRecipient) {
+		for _, to := range utils.SelectTargets(msg.To, envelopeRecipient) {
 			_, alias, _, err := s.FindRecipients(msg.From, to, msg.Type)
 			if alias.UserID == "" {
 				continue
@@ -87,7 +89,7 @@ func (s *Service) ProcessMessage(data []byte) error {
 
 	var g errgroup.Group
 
-	for _, to := range utils.SelectTargets(msg.To, msg.EnvelopeRecipient) {
+	for _, to := range utils.SelectTargets(msg.To, envelopeRecipient) {
 		recipients, alias, relayType, err := s.FindRecipients(msg.From, to, msg.Type)
 		if err != nil {
 			log.Println("error processing message:", err, alias.Name)

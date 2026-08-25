@@ -214,11 +214,37 @@ func TestFindRecipients_UnmatchedPlusTagFallsThroughToDomainCatchAll(t *testing.
 	if alias.Name != "random@customdomain.com" {
 		t.Errorf("expected catch-all alias label random@customdomain.com, got %s", alias.Name)
 	}
+	if alias.Origin == model.Inbound {
+		t.Errorf("expected a tagged address not to be marked for auto-creation, got Origin %v", alias.Origin)
+	}
 	if msgType != model.Forward {
 		t.Errorf("expected msgType Forward, got %v", msgType)
 	}
 	if len(rcps) != 1 || rcps[0].Email != "catchall@example.com" {
 		t.Errorf("expected recipient catchall@example.com, got %+v", rcps)
+	}
+}
+
+// Reproduces the QA report: a plus-tagged address on a catch-all domain must
+// never be auto-created as a new alias under its tag-stripped base name.
+func TestFindRecipients_TaggedAddressOnCatchAllDomainNotAutoCreated(t *testing.T) {
+	store := newFakeStore()
+	store.domains["customdomain.com"] = model.Domain{
+		Name:      "customdomain.com",
+		UserID:    "user-6",
+		Enabled:   true,
+		CatchAll:  true,
+		Recipient: "catchall@example.com",
+	}
+	store.verifiedRecipients["user-6"] = []model.Recipient{{Email: "catchall@example.com", IsActive: true}}
+	s := newTestService(store)
+
+	_, alias, _, err := s.FindRecipients("sender@somewhere.com", "newalias+shop@customdomain.com", model.Send)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if alias.Origin == model.Inbound {
+		t.Errorf("expected Origin != Inbound so PostInboundAlias is never invoked, got %v", alias.Origin)
 	}
 }
 

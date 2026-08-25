@@ -145,7 +145,7 @@
                                         <template v-for="(mx_host, index) in config.mx_hosts" :key="mx_host">
                                             MX {{ 10 * (index + 1) }} {{ mx_host }}.<br>
                                         </template>
-                                        TXT @ v=spf1 include:spf.{{ config.domain }}. -all <br>
+                                        TXT @ v=spf1 include:spf.{{ config.domain }} -all <br>
                                         <template v-for="selector in config.dkim_selectors" :key="selector">
                                             CNAME {{ selector }}._domainkey {{ selector }}._domainkey.{{ config.domain }}. <br>
                                         </template>

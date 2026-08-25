@@ -1,5 +1,24 @@
 # Announcements
 
+## Web app outage on 23 August - 2026-08-24
+
+On Sunday 23 August the Mailx web app was unavailable between 08:00 and 21:30 UTC. Mailx has been running normally since, and no action is required from you.
+
+### What was affected
+- Web interface, including sign in, account creation, new alias creation from the web app, adding a custom domain.
+
+### What was unaffected
+- Email forwarding was not affected and no mail was lost - all messages sent to Mailx aliases during that window were forwarded and delivered as normal.
+- Browser extension, creating aliases from the extension was available.
+
+### What caused it
+The cause was one of our servers failing. Failover should have moved traffic over automatically, but a configuration error meant it did not, and the web app stayed down until a manual fix. Delays in detection were caused by our monitoring setup, which checks servers only and not the availability of the web app.
+
+### What we are changing
+We apologise for the downtime, it's not acceptable for a service like Mailx. We are changing two things to reduce the chance of it happening again:
+1. Fixing the failover configuration that caused this and reviewing the rest of our failover setup for the same class of error.
+2. Adding independent availability checks against both the servers and the web app, so we are alerted quickly rather than hours in.
+
 ## Catch-all domains and alias restore added - 2026-07-29
 
 ### Catch-all for custom domains

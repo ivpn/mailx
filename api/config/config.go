@@ -14,6 +14,7 @@ type APIConfig struct {
 	ApiAllowOrigin     string
 	ApiTrustedProxies  []string
 	ApiAllowIPs        []string
+	ApiBodyLimit       int
 	TokenSecret        string
 	TokenExpiration    time.Duration
 	ApiTokenExpiration time.Duration
@@ -143,6 +144,14 @@ func New() (Config, error) {
 	apiTrustedProxies := strings.Split(os.Getenv("API_TRUSTED_PROXIES"), ",")
 	apiAllowIPs := strings.Split(os.Getenv("API_ALLOW_IPS"), ",")
 
+	apiBodyLimitMB := 10
+	if v := os.Getenv("API_BODY_LIMIT_MB"); v != "" {
+		apiBodyLimitMB, err = strconv.Atoi(v)
+		if err != nil {
+			return Config{}, err
+		}
+	}
+
 	preauthTTLStr := os.Getenv("PREAUTH_TTL")
 	preauthTTL, err := time.ParseDuration(preauthTTLStr)
 	if err != nil {
@@ -157,6 +166,7 @@ func New() (Config, error) {
 			ApiAllowOrigin:     os.Getenv("API_ALLOW_ORIGIN"),
 			ApiTrustedProxies:  apiTrustedProxies,
 			ApiAllowIPs:        apiAllowIPs,
+			ApiBodyLimit:       apiBodyLimitMB * 1024 * 1024,
 			TokenSecret:        os.Getenv("TOKEN_SECRET"),
 			TokenExpiration:    tokenExp,
 			ApiTokenExpiration: apiTokenExp,

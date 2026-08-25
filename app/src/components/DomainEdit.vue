@@ -50,7 +50,7 @@
                         <div class="mb-5">
                             <h4>Create alias when receiving Catch-All emails</h4>
                             <p>
-                                When enabled, a new alias will be created for every email received by the catch-all recipient. This allows you to track which emails are sent to your domain and manage them individually.
+                                When enabled, a new alias will be created for every email received by the catch-all recipient. This allows you to track which emails are sent to your domain and manage them individually. Plus-tagged wildcard aliases do not auto-create a new alias.
                             </p>
                             <div class="mb-6">
                                 <label v-bind:for="'create_alias_' + domain.id">

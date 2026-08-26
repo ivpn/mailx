@@ -188,7 +188,7 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 		return model.Alias{}, ErrPostAliasInactiveSub
 	}
 
-	// Catch-all alias
+	// Wildcard alias
 	if format == model.AliasFormatCatchAll {
 		userAliases, err := s.Store.GetAliases(ctx, alias.UserID, 0, 0, "created_at", "DESC", "true", "", "active")
 		if err != nil {

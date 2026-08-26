@@ -32,10 +32,8 @@ type AliasStore interface {
 	GetAliasesByDomain(context.Context, string, string) ([]model.Alias, error)
 	GetAllAliases(context.Context, string) ([]model.Alias, error)
 	GetAliasCount(context.Context, string, string, string, string) (int, error)
-	GetCreatedAliasesCount(context.Context, string) (int, error)
-	GetAliasDailyCount(context.Context, string) (int, error)
 	GetAliasByName(string) (model.Alias, error)
-	PostAlias(context.Context, model.Alias) (model.Alias, error)
+	PostAlias(context.Context, model.Alias, int, int) (model.Alias, error)
 	UpdateAlias(context.Context, model.Alias) error
 	DeleteAlias(context.Context, string, string) error
 	DeleteAliasByUserID(context.Context, string) error
@@ -190,16 +188,6 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 		return model.Alias{}, ErrPostAliasInactiveSub
 	}
 
-	count, err := s.Store.GetAliasDailyCount(ctx, alias.UserID)
-	if err != nil {
-		log.Printf("error creating alias: %s", err.Error())
-		return model.Alias{}, ErrPostAlias
-	}
-
-	if count >= s.Cfg.Service.MaxDailyAliases {
-		return model.Alias{}, ErrPostAliasLimit
-	}
-
 	// Catch-all alias
 	if format == model.AliasFormatCatchAll {
 		userAliases, err := s.Store.GetAliases(ctx, alias.UserID, 0, 0, "created_at", "DESC", "true", "", "active")
@@ -221,8 +209,11 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 
 		alias.Name = model.GenerateAlias(format, localPart) + "@" + domain
 		alias.CatchAll = true
-		alias, err = s.Store.PostAlias(ctx, alias)
+		alias, err = s.Store.PostAlias(ctx, alias, s.Cfg.Service.MaxDailyAliases, s.Cfg.Service.MaxInboundAliasesPerHour)
 		if err != nil {
+			if errors.Is(err, model.ErrDailyAliasLimit) {
+				return model.Alias{}, ErrPostAliasLimit
+			}
 			log.Printf("error creating catch-all alias: %s", err.Error())
 			return model.Alias{}, ErrPostAlias
 		}
@@ -233,15 +224,20 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 	// Standard alias
 	for range 5 {
 		alias.Name = model.GenerateAlias(format, localPart) + "@" + domain
-		alias, err = s.Store.PostAlias(ctx, alias)
+		alias, err = s.Store.PostAlias(ctx, alias, s.Cfg.Service.MaxDailyAliases, s.Cfg.Service.MaxInboundAliasesPerHour)
 		if err != nil {
-			log.Printf("error creating standard alias: %s", err.Error())
+			if errors.Is(err, model.ErrDailyAliasLimit) {
+				return model.Alias{}, ErrPostAliasLimit
+			}
+			if errors.Is(err, model.ErrInboundHourlyLimit) {
+				return model.Alias{}, ErrPostInboundAlias
+			}
 			var mysqlErr *mysql.MySQLError
 			if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
 				continue
-			} else {
-				return model.Alias{}, ErrPostAlias
 			}
+			log.Printf("error creating standard alias: %s", err.Error())
+			return model.Alias{}, ErrPostAlias
 		}
 		break
 	}
@@ -271,16 +267,6 @@ func (s *Service) PostInboundAlias(ctx context.Context, alias model.Alias) (mode
 	}
 
 	if !isCreateAliasEnabled(domain, domains) {
-		return model.Alias{}, ErrPostInboundAlias
-	}
-
-	count, err := s.Store.GetCreatedAliasesCount(ctx, alias.UserID)
-	if err != nil {
-		return model.Alias{}, ErrPostInboundAlias
-	}
-
-	if count >= s.Cfg.Service.MaxInboundAliasesPerHour {
-		log.Printf("user reached maximum number of inbound aliases per hour for domain: %s", domain)
 		return model.Alias{}, ErrPostInboundAlias
 	}
 

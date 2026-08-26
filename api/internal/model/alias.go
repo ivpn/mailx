@@ -10,6 +10,8 @@ import (
 var (
 	ErrDuplicateAlias       = errors.New("alias already exists")
 	ErrDuplicateAliasDomain = errors.New("wildcard aliases limit reached for this domain")
+	ErrDailyAliasLimit      = errors.New("daily alias limit reached")
+	ErrInboundHourlyLimit   = errors.New("hourly inbound alias limit reached")
 )
 
 type AliasOrigin int

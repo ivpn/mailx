@@ -24,6 +24,8 @@ type fakeStore struct {
 	verifiedRecipients map[string][]model.Recipient
 	recipients         map[string][]model.Recipient
 	postedMessages     []model.Message
+	subscription       model.Subscription
+	postAliasErr       error
 }
 
 func newFakeStore() *fakeStore {
@@ -76,6 +78,17 @@ func (f *fakeStore) GetRecipients(ctx context.Context, userID string) ([]model.R
 func (f *fakeStore) PostMessage(ctx context.Context, message model.Message) error {
 	f.postedMessages = append(f.postedMessages, message)
 	return nil
+}
+
+func (f *fakeStore) GetSubscription(ctx context.Context, userID string) (model.Subscription, error) {
+	return f.subscription, nil
+}
+
+func (f *fakeStore) PostAlias(ctx context.Context, alias model.Alias, maxDaily int, maxInboundHourly int) (model.Alias, error) {
+	if f.postAliasErr != nil {
+		return model.Alias{}, f.postAliasErr
+	}
+	return alias, nil
 }
 
 func newTestService(store *fakeStore) *Service {

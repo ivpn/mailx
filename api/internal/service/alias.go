@@ -226,6 +226,12 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 		alias.Name = model.GenerateAlias(format, localPart) + "@" + domain
 		alias, err = s.Store.PostAlias(ctx, alias, s.Cfg.Service.MaxDailyAliases, s.Cfg.Service.MaxInboundAliasesPerHour)
 		if err != nil {
+			if errors.Is(err, model.ErrDailyAliasLimit) {
+				return model.Alias{}, ErrPostAliasLimit
+			}
+			if errors.Is(err, model.ErrInboundHourlyLimit) {
+				return model.Alias{}, ErrPostInboundAlias
+			}
 			log.Printf("error creating custom alias: %s", err.Error())
 			return model.Alias{}, ErrPostAlias
 		}

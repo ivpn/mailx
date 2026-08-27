@@ -158,7 +158,7 @@ func (d *Database) PostAlias(ctx context.Context, alias model.Alias, maxDaily in
 
 		if alias.Origin == model.Inbound {
 			var hourly int64
-			if err := tx.Model(&model.Alias{}).
+			if err := tx.Unscoped().Model(&model.Alias{}).
 				Where("user_id = ? AND origin = ? AND created_at > NOW() - INTERVAL 1 HOUR", alias.UserID, model.Inbound).
 				Count(&hourly).Error; err != nil {
 				return err
@@ -169,7 +169,7 @@ func (d *Database) PostAlias(ctx context.Context, alias model.Alias, maxDaily in
 		}
 
 		var daily int64
-		if err := tx.Model(&model.Alias{}).
+		if err := tx.Unscoped().Model(&model.Alias{}).
 			Where("user_id = ? AND created_at > NOW() - INTERVAL 1 DAY", alias.UserID).
 			Count(&daily).Error; err != nil {
 			return err

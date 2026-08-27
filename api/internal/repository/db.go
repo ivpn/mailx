@@ -52,7 +52,7 @@ func connect(cfg config.DBConfig) (*gorm.DB, error) {
 		host_main = cfg.Hosts[0]
 	}
 
-	dsn_main := cfg.User + ":" + cfg.Password + "@tcp(" + host_main + ":" + cfg.Port + ")/" + cfg.Name + "?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn_main := cfg.User + ":" + cfg.Password + "@tcp(" + host_main + ":" + cfg.Port + ")/" + cfg.Name + "?charset=utf8mb4&parseTime=True&loc=UTC&time_zone=%27%2B00%3A00%27"
 
 	db, err := gorm.Open(mysql.Open(dsn_main), config)
 	if err != nil {
@@ -71,7 +71,7 @@ func connect(cfg config.DBConfig) (*gorm.DB, error) {
 				continue
 			}
 
-			replicas = append(replicas, mysql.Open(cfg.User+":"+cfg.Password+"@tcp("+host+":"+cfg.Port+")/"+cfg.Name+"?charset=utf8mb4&parseTime=True&loc=Local"))
+			replicas = append(replicas, mysql.Open(cfg.User+":"+cfg.Password+"@tcp("+host+":"+cfg.Port+")/"+cfg.Name+"?charset=utf8mb4&parseTime=True&loc=UTC&time_zone=%27%2B00%3A00%27"))
 		}
 
 		if len(replicas) > 0 {

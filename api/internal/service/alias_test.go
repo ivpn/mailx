@@ -1,7 +1,10 @@
 package service
 
 import (
+	"context"
+	"errors"
 	"testing"
+	"time"
 
 	"ivpn.net/email/api/internal/model"
 )
@@ -165,5 +168,45 @@ func TestIsCreateAliasEnabled(t *testing.T) {
 				t.Errorf("isCreateAliasEnabled(%q, ...) = %v, want %v", tt.domainPart, got, tt.expected)
 			}
 		})
+	}
+}
+
+func TestPostAlias_CustomDomainClassifiesStoreErrors(t *testing.T) {
+	tests := []struct {
+		name        string
+		storeErr    error
+		expectedErr error
+	}{
+		{name: "hourly inbound limit reached", storeErr: model.ErrInboundHourlyLimit, expectedErr: ErrPostInboundAlias},
+		{name: "daily alias limit reached", storeErr: model.ErrDailyAliasLimit, expectedErr: ErrPostAliasLimit},
+		{name: "generic store error", storeErr: errNotFound, expectedErr: ErrPostAlias},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			store := newFakeStore()
+			store.subscription = model.Subscription{ActiveUntil: time.Now().Add(time.Hour)}
+			store.postAliasErr = tt.storeErr
+			s := newTestService(store)
+
+			_, err := s.PostAlias(context.Background(), model.Alias{UserID: "user-1", Origin: model.Inbound}, model.AliasFormatCustom, "customdomain.com", "newalias")
+			if !errors.Is(err, tt.expectedErr) {
+				t.Errorf("expected error %v, got %v", tt.expectedErr, err)
+			}
+		})
+	}
+}
+
+func TestPostAlias_CustomDomainSucceeds(t *testing.T) {
+	store := newFakeStore()
+	store.subscription = model.Subscription{ActiveUntil: time.Now().Add(time.Hour)}
+	s := newTestService(store)
+
+	alias, err := s.PostAlias(context.Background(), model.Alias{UserID: "user-1", Origin: model.Inbound}, model.AliasFormatCustom, "customdomain.com", "newalias")
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if alias.Name != "newalias@customdomain.com" {
+		t.Errorf("expected alias name newalias@customdomain.com, got %s", alias.Name)
 	}
 }

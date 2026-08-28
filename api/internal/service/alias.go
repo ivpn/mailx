@@ -198,7 +198,7 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 			return model.Alias{}, ErrPostAlias
 		}
 
-		// Count how many catch-all aliases the user already has for this domain
+		// Count how many Wildcard aliases the user already has for this domain
 		domainAliasCount := 0
 		for _, userAlias := range userAliases {
 			if strings.Contains(userAlias.Name, domain) {
@@ -216,7 +216,7 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 			if errors.Is(err, model.ErrDailyAliasLimit) {
 				return model.Alias{}, ErrPostAliasLimit
 			}
-			log.Printf("error creating catch-all alias: %s", err.Error())
+			log.Printf("error creating Wildcard alias: %s", err.Error())
 			return model.Alias{}, ErrPostAlias
 		}
 

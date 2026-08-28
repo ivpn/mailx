@@ -2,7 +2,7 @@
     <div class="mb-5">
         <h2>Alias Import</h2>
         <p>
-            Import a list of your aliases from a CSV file. Only aliases with your verified domain will be imported.
+            Import a list of your aliases from a CSV file. Only aliases with your verified domain will be imported. Import is limited to 500 aliases per file.
         </p>
         <p>
             CSV file format:

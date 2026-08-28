@@ -88,7 +88,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 
 	v1.Get("/alias/:id", h.GetAlias)
 	v1.Get("/aliases", h.GetAliases)
-	v1.Post("/aliases/import", h.ImportAliases)
+	v1.Post("/aliases/import", limit.New(5, 24*time.Hour), h.ImportAliases)
 	v1.Get("/aliases/export", h.ExportAliases)
 	v1.Post("/alias", h.PostAlias) // removed limiter.New() for staging env
 	v1.Put("/alias/:id", h.UpdateAlias)

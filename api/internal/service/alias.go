@@ -386,6 +386,7 @@ func (s *Service) ImportAliases(ctx context.Context, aliases []model.AliasImport
 			Enabled:     req.Enabled,
 			Recipients:  model.GetEmails(rcps),
 			FromName:    req.FromName,
+			Origin:      model.Import,
 		}
 
 		importedAlias, err := s.PostAlias(ctx, alias, req.Format, req.Domain, req.LocalPart)

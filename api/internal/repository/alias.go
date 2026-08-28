@@ -156,6 +156,7 @@ func (d *Database) PostAlias(ctx context.Context, alias model.Alias, maxDaily in
 			return err
 		}
 
+		// Inbound alias hourly limit check
 		if alias.Origin == model.Inbound {
 			var hourly int64
 			if err := tx.Unscoped().Model(&model.Alias{}).
@@ -168,14 +169,17 @@ func (d *Database) PostAlias(ctx context.Context, alias model.Alias, maxDaily in
 			}
 		}
 
-		var daily int64
-		if err := tx.Unscoped().Model(&model.Alias{}).
-			Where("user_id = ? AND created_at > NOW() - INTERVAL 1 DAY", alias.UserID).
-			Count(&daily).Error; err != nil {
-			return err
-		}
-		if int(daily) >= maxDaily {
-			return model.ErrDailyAliasLimit
+		// Daily alias limit for non-imported aliases check
+		if alias.Origin != model.Import {
+			var daily int64
+			if err := tx.Unscoped().Model(&model.Alias{}).
+				Where("user_id = ? AND created_at > NOW() - INTERVAL 1 DAY", alias.UserID).
+				Count(&daily).Error; err != nil {
+				return err
+			}
+			if int(daily) >= maxDaily {
+				return model.ErrDailyAliasLimit
+			}
 		}
 
 		return tx.Create(&alias).Error

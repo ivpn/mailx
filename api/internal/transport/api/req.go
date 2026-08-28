@@ -109,4 +109,5 @@ type UpdateDomainReq struct {
 	FromName    string `json:"from_name"`
 	Enabled     bool   `json:"enabled"`
 	CatchAll    bool   `json:"catch_all"`
+	CreateAlias bool   `json:"create_alias"`
 }

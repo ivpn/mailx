@@ -5,7 +5,7 @@ import (
 )
 
 type ProcessorService interface {
-	ProcessMessage([]byte) error
+	ProcessMessage(data []byte, envelopeRecipient string) error
 }
 
 // @Summary Email handler
@@ -14,10 +14,11 @@ type ProcessorService interface {
 // @Accept json
 // @Produce json
 // @Param email body string true "Email body"
+// @Param recipient query string false "Envelope recipient for this specific delivery (Postfix ${recipient})"
 // @Success 200 {string} string "OK"
 // @Router /email [post]
 func (h *Handler) HandleEmail(c *fiber.Ctx) error {
-	err := h.Service.ProcessMessage(c.Body())
+	err := h.Service.ProcessMessage(c.Body(), c.Query("recipient"))
 	if err != nil {
 		// TEMPORARY failure → Postfix should retry
 		return c.Status(fiber.StatusServiceUnavailable).SendString("temporary failure")

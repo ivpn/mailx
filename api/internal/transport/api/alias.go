@@ -253,6 +253,7 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 		Enabled:     req.Enabled,
 		Recipients:  model.GetEmails(rcps),
 		FromName:    req.FromName,
+		Origin:      model.Manual,
 	}
 
 	localPart := req.LocalPart

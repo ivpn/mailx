@@ -468,6 +468,58 @@ func TestParseMsg(t *testing.T) {
 				Subject:  "Жыр",
 				Body:     "Body",
 				Type:     Send,
+			}},
+		{
+			name: "Delivered-To header present is captured",
+			data: "Delivered-To: alias1@mailx.net\r\nFrom: sender@example.com\r\nTo: alias1@mailx.net, alias2@mailx.net\r\nSubject: Test\r\n\r\nBody",
+			want: Msg{
+				From:              "sender@example.com",
+				FromName:          "",
+				To:                []string{"alias1@mailx.net", "alias2@mailx.net"},
+				Subject:           "Test",
+				Body:              "Body",
+				Type:              Send,
+				EnvelopeRecipient: "alias1@mailx.net",
+			}},
+		{
+			name: "X-Original-To header used when Delivered-To is absent",
+			data: "X-Original-To: alias2@mailx.net\r\nFrom: sender@example.com\r\nTo: alias1@mailx.net, alias2@mailx.net\r\nSubject: Test\r\n\r\nBody",
+			want: Msg{
+				From:              "sender@example.com",
+				FromName:          "",
+				To:                []string{"alias1@mailx.net", "alias2@mailx.net"},
+				Subject:           "Test",
+				Body:              "Body",
+				Type:              Send,
+				EnvelopeRecipient: "alias2@mailx.net",
+			}},
+		{
+			// Regression: some pipe transports don't stamp Delivered-To/X-Original-To
+			// (observed in production); fall back to the "for <address>" clause on
+			// the topmost Received header, which Postfix adds when that hop had a
+			// single envelope recipient.
+			name: "Received header 'for' clause used as fallback",
+			data: "Received: from mail-ej1-f48.google.com by mail.irelay.app (Postfix) with ESMTPS id 4CD3F2C88B for <alias1@mailx.net>; Thu, 20 Aug 2026 14:55:06 +0200 (CEST)\r\nFrom: sender@example.com\r\nTo: alias1@mailx.net, alias2@mailx.net\r\nSubject: Test\r\n\r\nBody",
+			want: Msg{
+				From:              "sender@example.com",
+				FromName:          "",
+				To:                []string{"alias1@mailx.net", "alias2@mailx.net"},
+				Subject:           "Test",
+				Body:              "Body",
+				Type:              Send,
+				EnvelopeRecipient: "alias1@mailx.net",
+			}},
+		{
+			name: "Delivered-To, X-Original-To and Received headers all absent leaves EnvelopeRecipient empty",
+			data: "From: sender@example.com\r\nTo: alias1@mailx.net\r\nSubject: Test\r\n\r\nBody",
+			want: Msg{
+				From:              "sender@example.com",
+				FromName:          "",
+				To:                []string{"alias1@mailx.net"},
+				Subject:           "Test",
+				Body:              "Body",
+				Type:              Send,
+				EnvelopeRecipient: "",
 			}}}
 
 	for _, tt := range tests {
@@ -484,7 +536,7 @@ func TestParseMsg(t *testing.T) {
 }
 
 func compareMessages(a, b Msg) bool {
-	if a.From != b.From || a.FromName != b.FromName || a.Subject != b.Subject || a.Body != b.Body || a.Type != b.Type {
+	if a.From != b.From || a.FromName != b.FromName || a.Subject != b.Subject || a.Body != b.Body || a.Type != b.Type || a.EnvelopeRecipient != b.EnvelopeRecipient {
 		return false
 	}
 	if len(a.To) != len(b.To) {

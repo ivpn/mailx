@@ -64,6 +64,7 @@ func (d *Database) UpdateDomain(ctx context.Context, domain model.Domain) error 
 		"mx_verified_at":    domain.MXVerifiedAt,
 		"send_verified_at":  domain.SendVerifiedAt,
 		"catch_all":         domain.CatchAll,
+		"create_alias":      domain.CreateAlias,
 	}).Error
 }
 

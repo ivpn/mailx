@@ -21,6 +21,7 @@ type Domain struct {
 	MXVerifiedAt    *time.Time `json:"mx_verified_at"`    // nullable
 	SendVerifiedAt  *time.Time `json:"send_verified_at"`  // nullable
 	CatchAll        bool       `gorm:"default:false" json:"catch_all"`
+	CreateAlias     bool       `gorm:"default:false" json:"create_alias"`
 }
 
 type DNSConfig struct {

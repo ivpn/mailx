@@ -14,9 +14,12 @@ cat > /usr/local/bin/curl-email.sh <<EOF
 # Enable temporary debug logs:
 # echo "\$(date -Iseconds) SCRIPT STARTED sender=\$1 recipient=\$2" >> /var/log/mail/curl-email.log
 body=\$(mktemp /tmp/curl-email.XXXXXX)
+# Percent-encode '+' so the API's query parser doesn't decode it back to a
+# space (aliases commonly use '+', e.g. plus-tagged/reply-encoded addresses).
+encoded_recipient=\$(printf '%s' "\$2" | sed 's/+/%2B/g')
 http_code=\$(curl --silent --data-binary @- \\
   -H "Authorization: Bearer $PSK" \\
-  -X POST $API_URL/v1/email \\
+  -X POST "$API_URL/v1/email?recipient=\$encoded_recipient" \\
   -o "\$body" -w "%{http_code}")
 resp_body=\$(cat "\$body")
 rm -f "\$body"

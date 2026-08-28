@@ -62,12 +62,31 @@ func ParseReplyTo(email string) (string, string) {
 		return alias, rcp
 	}
 
-	// If there is "+" in the email, convert alias to catch-all format
-	if rcp != "" && strings.Contains(email, "+") {
-		alias = "*" + email[strings.Index(email, "+"):]
+	// Plain sub-address tag (e.g. "alias+tag@domain.com"): resolve against the base alias.
+	if rcp != "" {
+		alias = email[:plusIndex] + email[strings.Index(email, "@"):]
 	}
 
 	return alias, ""
+}
+
+// WildcardAlias returns the wildcard-suffix form of a plus-tagged address
+// (e.g. "anything+suffix@domain.com" -> "*+suffix@domain.com"), used to
+// match Wildcard Aliases when no exact alias exists for the tagged address.
+// ok is false when email has no plain "+" tag (none, or a reply-encoded one).
+func WildcardAlias(email string) (string, bool) {
+	atIndex := strings.Index(email, "@")
+	plusIndex := strings.Index(email, "+")
+	if plusIndex == -1 || atIndex == -1 || plusIndex > atIndex {
+		return "", false
+	}
+
+	rcp := email[plusIndex+1 : atIndex]
+	if rcp == "" || strings.Contains(rcp, "=") {
+		return "", false
+	}
+
+	return "*" + email[plusIndex:], true
 }
 
 func GenerateReplyTo(alias string, to string) string {

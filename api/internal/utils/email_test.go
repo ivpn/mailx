@@ -396,3 +396,106 @@ func TestRawMessageWithUTF8Charset_CyrillicHeaders(t *testing.T) {
 		}
 	}
 }
+
+func TestSelectTargets(t *testing.T) {
+	tests := []struct {
+		name        string
+		to          []string
+		deliveredTo string
+		want        []string
+	}{
+		{
+			name:        "no Delivered-To returns all To entries",
+			to:          []string{"alias1@example.com", "alias2@example.com"},
+			deliveredTo: "",
+			want:        []string{"alias1@example.com", "alias2@example.com"},
+		},
+		{
+			name:        "Delivered-To matches one of several To entries",
+			to:          []string{"alias1@example.com", "alias2@example.com"},
+			deliveredTo: "alias2@example.com",
+			want:        []string{"alias2@example.com"},
+		},
+		{
+			name:        "Delivered-To match is case-insensitive",
+			to:          []string{"Alias1@example.com", "alias2@example.com"},
+			deliveredTo: "alias1@example.com",
+			want:        []string{"Alias1@example.com"},
+		},
+		{
+			name:        "Delivered-To not found in To falls back to all entries",
+			to:          []string{"alias1@example.com", "alias2@example.com"},
+			deliveredTo: "unrelated@example.com",
+			want:        []string{"alias1@example.com", "alias2@example.com"},
+		},
+		{
+			name:        "single To entry unaffected by Delivered-To",
+			to:          []string{"alias1@example.com"},
+			deliveredTo: "alias1@example.com",
+			want:        []string{"alias1@example.com"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := SelectTargets(tt.to, tt.deliveredTo)
+			if len(got) != len(tt.want) {
+				t.Fatalf("SelectTargets() = %v, want %v", got, tt.want)
+			}
+			for i := range got {
+				if got[i] != tt.want[i] {
+					t.Errorf("SelectTargets() = %v, want %v", got, tt.want)
+				}
+			}
+		})
+	}
+}
+
+func TestCombineForwardTo(t *testing.T) {
+	// Mirrors model.GenerateReplyTo without importing the model package (which
+	// itself imports utils, so importing model here would create a cycle).
+	generateReplyTo := func(alias string, to string) string {
+		replaced := strings.Replace(to, "@", "=", 1)
+		return strings.Replace(alias, "@", "+"+replaced+"@", 1)
+	}
+
+	tests := []struct {
+		name    string
+		primary string
+		all     []string
+		want    string
+	}{
+		{
+			name:    "no other aliases leaves header unchanged",
+			primary: "alias1@example.com",
+			all:     []string{"alias1@example.com"},
+			want:    "alias1@example.com",
+		},
+		{
+			name:    "other alias sharing the same domain is reply-encoded",
+			primary: "alias1@example.com",
+			all:     []string{"alias1@example.com", "alias2@example.com"},
+			want:    "alias1@example.com, alias1+alias2=example.com@example.com",
+		},
+		{
+			name:    "primary alias2 mirrors the encoding symmetrically",
+			primary: "alias2@example.com",
+			all:     []string{"alias1@example.com", "alias2@example.com"},
+			want:    "alias2@example.com, alias2+alias1=example.com@example.com",
+		},
+		{
+			name:    "multiple other aliases are all appended",
+			primary: "alias1@example.com",
+			all:     []string{"alias1@example.com", "alias2@example.com", "alias3@example.com"},
+			want:    "alias1@example.com, alias1+alias2=example.com@example.com, alias1+alias3=example.com@example.com",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := CombineForwardTo(tt.primary, tt.all, generateReplyTo); got != tt.want {
+				t.Errorf("CombineForwardTo() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}

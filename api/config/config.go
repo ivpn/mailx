@@ -67,14 +67,15 @@ type SMTPClientConfig struct {
 }
 
 type ServiceConfig struct {
-	OTPExpiration       time.Duration
-	MaxCredentials      int
-	MaxRecipients       int
-	MaxDailyAliases     int
-	MaxDailySendReply   int
-	MaxSessions         int
-	IdLimiterMax        int
-	IdLimiterExpiration time.Duration
+	OTPExpiration            time.Duration
+	MaxCredentials           int
+	MaxRecipients            int
+	MaxDailyAliases          int
+	MaxDailySendReply        int
+	MaxSessions              int
+	IdLimiterMax             int
+	IdLimiterExpiration      time.Duration
+	MaxInboundAliasesPerHour int
 }
 
 type Config struct {
@@ -135,6 +136,11 @@ func New() (Config, error) {
 	}
 
 	maxSessions, err := strconv.Atoi(os.Getenv("MAX_SESSIONS"))
+	if err != nil {
+		return Config{}, err
+	}
+
+	maxInboundAliasesPerHour, err := strconv.Atoi(os.Getenv("MAX_INBOUND_ALIASES_PER_HOUR"))
 	if err != nil {
 		return Config{}, err
 	}
@@ -216,14 +222,15 @@ func New() (Config, error) {
 		},
 
 		Service: ServiceConfig{
-			OTPExpiration:       otpExp,
-			MaxCredentials:      maxCredentials,
-			MaxRecipients:       maxRecipients,
-			MaxDailyAliases:     maxDailyAliases,
-			MaxDailySendReply:   maxDailySendReply,
-			MaxSessions:         maxSessions,
-			IdLimiterMax:        idLimiterMax,
-			IdLimiterExpiration: idLimiterExpiration,
+			OTPExpiration:            otpExp,
+			MaxCredentials:           maxCredentials,
+			MaxRecipients:            maxRecipients,
+			MaxDailyAliases:          maxDailyAliases,
+			MaxDailySendReply:        maxDailySendReply,
+			MaxSessions:              maxSessions,
+			MaxInboundAliasesPerHour: maxInboundAliasesPerHour,
+			IdLimiterMax:             idLimiterMax,
+			IdLimiterExpiration:      idLimiterExpiration,
 		},
 	}, nil
 }

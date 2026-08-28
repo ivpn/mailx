@@ -23,6 +23,41 @@ func RemoveHeader(text string) string {
 	return re.ReplaceAllString(text, "")
 }
 
+// SelectTargets scopes processing to the single To address matching this
+// invocation's envelope recipient (Postfix pipes one copy per recipient), so
+// the same message doesn't get reprocessed for every address in To. Falls
+// back to all of to when deliveredTo is empty or doesn't match any of them.
+func SelectTargets(to []string, deliveredTo string) []string {
+	if deliveredTo == "" {
+		return to
+	}
+
+	for _, addr := range to {
+		if strings.EqualFold(addr, deliveredTo) {
+			return []string{addr}
+		}
+	}
+
+	return to
+}
+
+// CombineForwardTo builds the forwarded message's To header, noting any other
+// aliases the original message was also addressed to so recipients shared by
+// multiple aliases only get one email instead of one per alias. encode embeds
+// each other alias into the primary one (e.g. model.GenerateReplyTo).
+func CombineForwardTo(primary string, all []string, encode func(alias, to string) string) string {
+	var header strings.Builder
+	header.WriteString(primary)
+	for _, other := range all {
+		if strings.EqualFold(other, primary) {
+			continue
+		}
+		header.WriteString(", " + encode(primary, other))
+	}
+
+	return header.String()
+}
+
 func RemoveHtmlHeader(html string) string {
 	// Relaxed regex: match any <table> containing "This email was sent to" and ending at </table>
 	re := regexp.MustCompile(`(?is)<table[^>]*>.*?This email was sent to.*?</table>`)
@@ -59,7 +94,9 @@ func EncryptWithPGPInline(plainText string, recipientKey string) (string, error)
 	return string(armored), nil
 }
 
-func EncryptWithPGPMIME(orig *gomail.Message, fromAddr, fromName, subject, recipientEmail, recipientKey string) (*gomail.Message, error) {
+// toHeaderAddr is the address shown in the built message's To: header; it is not
+// necessarily the SMTP envelope recipient used for actual delivery.
+func EncryptWithPGPMIME(orig *gomail.Message, fromAddr, fromName, subject, toHeaderAddr, recipientKey string) (*gomail.Message, error) {
 	// --- 1) Serialize the original email ---
 	var buf bytes.Buffer
 	if _, err := orig.WriteTo(&buf); err != nil {
@@ -123,7 +160,7 @@ func EncryptWithPGPMIME(orig *gomail.Message, fromAddr, fromName, subject, recip
 	// of the correct =?UTF-8?Q?...?=.  Passing SetCharset("UTF-8") fixes this.
 	em := gomail.NewRawMessage(gomail.SetCharset("UTF-8"))
 	em.SetAddressHeader("From", fromAddr, fromName)
-	em.SetHeader("To", recipientEmail)
+	em.SetHeader("To", toHeaderAddr)
 	em.SetHeader("Subject", DecodeHeaderWithCharset(subject))
 	em.SetHeader("Date", time.Now().UTC().Format(time.RFC1123Z))
 	em.SetHeader("Content-Type", fmt.Sprintf("multipart/encrypted; protocol=\"application/pgp-encrypted\"; boundary=\"%s\"", boundary))

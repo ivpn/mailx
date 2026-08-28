@@ -35,6 +35,7 @@
                         {{ copyText }}: {{ alias.name }}
                     </span>
                 </p>
+                <p v-if="isCreatedByCatchAll" class="text-xs text-tertiary mt-1">Created by Catch-All</p>
             </div>
         </td>
         <td>
@@ -126,6 +127,7 @@
                                     {{ copyText }}: {{ alias.name }}
                                 </span>
                             </p>
+                            <p v-if="isCreatedByCatchAll" class="text-xs text-tertiary mt-1">Created by Catch-All</p>
                         </div>
                     </div>
                     <div class="flex items-center hs-tooltip">
@@ -234,6 +236,7 @@ const alias = ref(props.alias)
 const recipients = ref(props.recipients)
 const isDomainUnverified = computed(() => alias.value.is_custom_domain === true && (alias.value.is_domain_verified === false || alias.value.is_domain_enabled === false))
 const isAliasDeleted = computed(() => alias.value.deleted_at !== null)
+const isCreatedByCatchAll = computed(() => alias.value.origin === 1)
 const truncatedDescription = computed(() => {
     const desc = alias.value.description
     if (!desc) return ''

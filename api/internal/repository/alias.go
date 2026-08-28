@@ -4,6 +4,8 @@ import (
 	"context"
 	"strconv"
 
+	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 	"ivpn.net/email/api/internal/model"
 )
 
@@ -88,7 +90,7 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 	for rows.Next() {
 		var alias model.Alias
 		var forwards, blocks, replies, sends int
-		if err := rows.Scan(&alias.ID, &alias.CreatedAt, &alias.UpdatedAt, &alias.DeletedAt, &alias.Name, &alias.UserID, &alias.Enabled, &alias.Description, &alias.Recipients, &alias.FromName, &alias.CatchAll, &forwards, &blocks, &replies, &sends); err != nil {
+		if err := rows.Scan(&alias.ID, &alias.CreatedAt, &alias.UpdatedAt, &alias.DeletedAt, &alias.Name, &alias.UserID, &alias.Enabled, &alias.Description, &alias.Recipients, &alias.FromName, &alias.CatchAll, &alias.Origin, &forwards, &blocks, &replies, &sends); err != nil {
 			return nil, err
 		}
 		alias.Stats = model.AliasStats{
@@ -141,20 +143,45 @@ func (d *Database) GetAliasCount(ctx context.Context, userID string, catchAll st
 	return int(count), err
 }
 
-func (d *Database) GetAliasDailyCount(ctx context.Context, userID string) (int, error) {
-	var count int64
-	err := d.Client.Model(&model.Alias{}).Where("user_id = ? AND created_at > NOW() - INTERVAL 1 DAY", userID).Count(&count).Error
-	return int(count), err
-}
-
 func (d *Database) GetAliasByName(name string) (model.Alias, error) {
 	var alias model.Alias
 	err := d.Client.Where("name = ?", name).First(&alias).Error
 	return alias, err
 }
 
-func (d *Database) PostAlias(ctx context.Context, alias model.Alias) (model.Alias, error) {
-	return alias, d.Client.Create(&alias).Error
+func (d *Database) PostAlias(ctx context.Context, alias model.Alias, maxDaily int, maxInboundHourly int) (model.Alias, error) {
+	err := d.Client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		var lockedUser model.User
+		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).Where("id = ?", alias.UserID).First(&lockedUser).Error; err != nil {
+			return err
+		}
+
+		if alias.Origin == model.Inbound {
+			var hourly int64
+			if err := tx.Unscoped().Model(&model.Alias{}).
+				Where("user_id = ? AND origin = ? AND created_at > NOW() - INTERVAL 1 HOUR", alias.UserID, model.Inbound).
+				Count(&hourly).Error; err != nil {
+				return err
+			}
+			if int(hourly) >= maxInboundHourly {
+				return model.ErrInboundHourlyLimit
+			}
+		}
+
+		var daily int64
+		if err := tx.Unscoped().Model(&model.Alias{}).
+			Where("user_id = ? AND created_at > NOW() - INTERVAL 1 DAY", alias.UserID).
+			Count(&daily).Error; err != nil {
+			return err
+		}
+		if int(daily) >= maxDaily {
+			return model.ErrDailyAliasLimit
+		}
+
+		return tx.Create(&alias).Error
+	})
+
+	return alias, err
 }
 
 func (d *Database) UpdateAlias(ctx context.Context, alias model.Alias) error {

@@ -87,7 +87,7 @@ func TestParseReplyTo(t *testing.T) {
 		},
 		{
 			email:         "user+reply@domain.com",
-			expectedAlias: "*+reply@domain.com",
+			expectedAlias: "user@domain.com",
 			expectedRcp:   "",
 		},
 		{
@@ -97,7 +97,7 @@ func TestParseReplyTo(t *testing.T) {
 		},
 		{
 			email:         "user+catchall@domain.com",
-			expectedAlias: "*+catchall@domain.com",
+			expectedAlias: "user@domain.com",
 			expectedRcp:   "",
 		},
 	}
@@ -110,6 +110,42 @@ func TestParseReplyTo(t *testing.T) {
 			}
 			if rcp != tt.expectedRcp {
 				t.Errorf("expected rcp %s, got %s", tt.expectedRcp, rcp)
+			}
+		})
+	}
+}
+
+func TestWildcardAlias(t *testing.T) {
+	tests := []struct {
+		email         string
+		expectedAlias string
+		expectedOk    bool
+	}{
+		{
+			email:         "anything+shop@domain.com",
+			expectedAlias: "*+shop@domain.com",
+			expectedOk:    true,
+		},
+		{
+			email:         "user@domain.com",
+			expectedAlias: "",
+			expectedOk:    false,
+		},
+		{
+			email:         "user+reply=example.com@domain.com",
+			expectedAlias: "",
+			expectedOk:    false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.email, func(t *testing.T) {
+			alias, ok := WildcardAlias(tt.email)
+			if alias != tt.expectedAlias {
+				t.Errorf("expected alias %s, got %s", tt.expectedAlias, alias)
+			}
+			if ok != tt.expectedOk {
+				t.Errorf("expected ok %v, got %v", tt.expectedOk, ok)
 			}
 		})
 	}

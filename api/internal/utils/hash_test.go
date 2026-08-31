@@ -98,3 +98,28 @@ func TestHashPGPKey(t *testing.T) {
 		t.Fatalf("expected %v, got %v", expectedEmptyHashString, emptyHash)
 	}
 }
+
+func TestTimingSafeEqual(t *testing.T) {
+	tests := []struct {
+		name     string
+		a        string
+		b        string
+		expected bool
+	}{
+		{name: "equal strings", a: "mysecret", b: "mysecret", expected: true},
+		{name: "different strings, same length", a: "mysecretA", b: "mysecretB", expected: false},
+		{name: "different lengths", a: "short", b: "muchlongersecret", expected: false},
+		{name: "empty vs empty", a: "", b: "", expected: true},
+		{name: "empty vs non-empty", a: "", b: "mysecret", expected: false},
+		{name: "case-sensitive mismatch", a: "MySecret", b: "mysecret", expected: false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := TimingSafeEqual(tt.a, tt.b)
+			if result != tt.expected {
+				t.Errorf("TimingSafeEqual(%q, %q) = %v, want %v", tt.a, tt.b, result, tt.expected)
+			}
+		})
+	}
+}

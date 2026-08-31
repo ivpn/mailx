@@ -13,6 +13,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"ivpn.net/email/api/config"
 	"ivpn.net/email/api/internal/model"
+	"ivpn.net/email/api/internal/utils"
 )
 
 var (
@@ -71,7 +72,8 @@ func NewIPFilter(allowedIPs []string) fiber.Handler {
 func NewPSK(psk string) fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
-		if GetAuthToken(c) == psk {
+		// reject unconfigured PSK too: constant-time compare of two empty strings is a false "match"
+		if psk != "" && utils.TimingSafeEqual(GetAuthToken(c), psk) {
 			return c.Next()
 		}
 

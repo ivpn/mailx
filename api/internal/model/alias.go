@@ -64,3 +64,18 @@ type AliasList struct {
 	Aliases []Alias `json:"aliases"`
 	Total   int     `json:"total"`
 }
+
+// AliasSortColumns is the single source of truth for GetAliases sort_by values, enforced
+// independently by both the API handler and the repository query builder.
+var AliasSortColumns = map[string]bool{
+	"created_at": true,
+	"updated_at": true,
+	"name":       true,
+}
+
+// AliasSortOrders is the single source of truth for GetAliases sort_order values, enforced
+// independently by both the API handler and the repository query builder.
+var AliasSortOrders = map[string]bool{
+	"ASC":  true,
+	"DESC": true,
+}

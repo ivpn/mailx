@@ -8,27 +8,30 @@ import (
 )
 
 type APIConfig struct {
-	FQDN               string
-	Name               string
-	Port               string
-	ApiAllowOrigin     string
-	ApiTrustedProxies  []string
-	ApiAllowIPs        []string
-	ApiBodyLimit       int
-	TokenSecret        string
-	TokenExpiration    time.Duration
-	ApiTokenExpiration time.Duration
-	PSK                string
-	Domains            string
-	LogFile            string
-	BasicAuthUser      string
-	BasicAuthPassword  string
-	SignupWebhookURL   string
-	SignupWebhookPSK   string
-	PreauthURL         string
-	PreauthPSK         string
-	PreauthTTL         time.Duration
-	AnnouncementsURL   string
+	FQDN                      string
+	Name                      string
+	Port                      string
+	ApiAllowOrigin            string
+	ApiTrustedProxies         []string
+	ApiAllowIPs               []string
+	ApiBodyLimit              int
+	TokenSecret               string
+	TokenExpiration           time.Duration
+	ApiTokenExpiration        time.Duration
+	PSK                       string
+	Domains                   string
+	TrustedRelayDomains       []string
+	DisableEmailAuthAlignment bool
+	LogEmailAuthMismatch      bool
+	LogFile                   string
+	BasicAuthUser             string
+	BasicAuthPassword         string
+	SignupWebhookURL          string
+	SignupWebhookPSK          string
+	PreauthURL                string
+	PreauthPSK                string
+	PreauthTTL                time.Duration
+	AnnouncementsURL          string
 }
 
 type DBConfig struct {
@@ -149,6 +152,7 @@ func New() (Config, error) {
 	redisAddrs := strings.Split(os.Getenv("REDIS_ADDRESSES"), ",")
 	apiTrustedProxies := strings.Split(os.Getenv("API_TRUSTED_PROXIES"), ",")
 	apiAllowIPs := strings.Split(os.Getenv("API_ALLOW_IPS"), ",")
+	trustedRelayDomains := strings.Split(os.Getenv("TRUSTED_RELAY_DOMAINS"), ",")
 
 	apiBodyLimitMB := 10
 	if v := os.Getenv("API_BODY_LIMIT_MB"); v != "" {
@@ -166,27 +170,30 @@ func New() (Config, error) {
 
 	return Config{
 		API: APIConfig{
-			FQDN:               os.Getenv("FQDN"),
-			Name:               os.Getenv("API_NAME"),
-			Port:               os.Getenv("API_PORT"),
-			ApiAllowOrigin:     os.Getenv("API_ALLOW_ORIGIN"),
-			ApiTrustedProxies:  apiTrustedProxies,
-			ApiAllowIPs:        apiAllowIPs,
-			ApiBodyLimit:       apiBodyLimitMB * 1024 * 1024,
-			TokenSecret:        os.Getenv("TOKEN_SECRET"),
-			TokenExpiration:    tokenExp,
-			ApiTokenExpiration: apiTokenExp,
-			PSK:                os.Getenv("PSK"),
-			Domains:            os.Getenv("DOMAINS"),
-			LogFile:            os.Getenv("LOG_FILE"),
-			BasicAuthUser:      os.Getenv("BASIC_AUTH_USER"),
-			BasicAuthPassword:  os.Getenv("BASIC_AUTH_PASSWORD"),
-			SignupWebhookURL:   os.Getenv("SIGNUP_WEBHOOK_URL"),
-			SignupWebhookPSK:   os.Getenv("SIGNUP_WEBHOOK_PSK"),
-			PreauthURL:         os.Getenv("PREAUTH_URL"),
-			PreauthPSK:         os.Getenv("PREAUTH_PSK"),
-			PreauthTTL:         preauthTTL,
-			AnnouncementsURL:   os.Getenv("ANNOUNCEMENTS_URL"),
+			FQDN:                      os.Getenv("FQDN"),
+			Name:                      os.Getenv("API_NAME"),
+			Port:                      os.Getenv("API_PORT"),
+			ApiAllowOrigin:            os.Getenv("API_ALLOW_ORIGIN"),
+			ApiTrustedProxies:         apiTrustedProxies,
+			ApiAllowIPs:               apiAllowIPs,
+			ApiBodyLimit:              apiBodyLimitMB * 1024 * 1024,
+			TokenSecret:               os.Getenv("TOKEN_SECRET"),
+			TokenExpiration:           tokenExp,
+			ApiTokenExpiration:        apiTokenExp,
+			PSK:                       os.Getenv("PSK"),
+			Domains:                   os.Getenv("DOMAINS"),
+			TrustedRelayDomains:       trustedRelayDomains,
+			DisableEmailAuthAlignment: os.Getenv("DISABLE_EMAIL_AUTH_ALIGNMENT") == "true",
+			LogEmailAuthMismatch:      os.Getenv("LOG_EMAIL_AUTH_MISMATCH") == "true",
+			LogFile:                   os.Getenv("LOG_FILE"),
+			BasicAuthUser:             os.Getenv("BASIC_AUTH_USER"),
+			BasicAuthPassword:         os.Getenv("BASIC_AUTH_PASSWORD"),
+			SignupWebhookURL:          os.Getenv("SIGNUP_WEBHOOK_URL"),
+			SignupWebhookPSK:          os.Getenv("SIGNUP_WEBHOOK_PSK"),
+			PreauthURL:                os.Getenv("PREAUTH_URL"),
+			PreauthPSK:                os.Getenv("PREAUTH_PSK"),
+			PreauthTTL:                preauthTTL,
+			AnnouncementsURL:          os.Getenv("ANNOUNCEMENTS_URL"),
 		},
 		DB: DBConfig{
 			Hosts:    dbHosts,

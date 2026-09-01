@@ -155,7 +155,7 @@ func (s *Service) PostUser(ctx context.Context, user model.User, subID string, s
 		return ErrInvalidSubscription
 	}
 
-	if preauth.TokenHash != tokenHashStr {
+	if !utils.TimingSafeEqual(preauth.TokenHash, tokenHashStr) {
 		log.Printf("error creating user: Token hash does not match")
 		return ErrTokenHashMismatch
 	}
@@ -316,7 +316,7 @@ func (s *Service) DeleteUser(ctx context.Context, userID string, OTP string) err
 		return ErrIncorrectOTP
 	}
 
-	if otp != OTP {
+	if !utils.TimingSafeEqual(otp, OTP) {
 		log.Printf("error deleting user: OTP does not match")
 		return ErrIncorrectOTP
 	}

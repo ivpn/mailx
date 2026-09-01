@@ -151,6 +151,22 @@ func NewCookiePASession(id string) *fiber.Cookie {
 	}
 }
 
+// ClearCookies clears cookies by setting them to expire in the past.
+// Flags must match the original cookie attributes for the browser to clear them.
+// Workaround for clearing cookies: https://github.com/gofiber/fiber/issues/1127
+func ClearCookies(c *fiber.Ctx, key ...string) {
+	for i := range key {
+		c.Cookie(&fiber.Cookie{
+			Name:     key[i],
+			Expires:  time.Now().Add(-time.Hour * 24),
+			Value:    "",
+			HTTPOnly: true,
+			Secure:   true,
+			SameSite: fiber.CookieSameSiteLaxMode,
+		})
+	}
+}
+
 func NewWebAuthn(cfg config.APIConfig) *webauthn.WebAuthn {
 	var webAuthn *webauthn.WebAuthn
 	config := &webauthn.Config{

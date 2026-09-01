@@ -196,7 +196,7 @@ func (h *Handler) FinishRegistration(c *fiber.Ctx) error {
 	}
 
 	// Clear cookie
-	c.ClearCookie(auth.AUTHN_TEMP_COOKIE)
+	auth.ClearCookies(c, auth.AUTHN_TEMP_COOKIE)
 
 	// Save the session
 	exp := time.Now().Add(h.Cfg.TokenExpiration)
@@ -333,7 +333,7 @@ func (h *Handler) FinishAddPasskey(c *fiber.Ctx) error {
 	}
 
 	// Clear cookie
-	c.ClearCookie(auth.AUTHN_TEMP_COOKIE)
+	auth.ClearCookies(c, auth.AUTHN_TEMP_COOKIE)
 
 	// Save the session
 	exp := time.Now().Add(h.Cfg.TokenExpiration)
@@ -502,7 +502,7 @@ func (h *Handler) FinishLogin(c *fiber.Ctx) error {
 	}
 
 	// Clear cookie
-	c.ClearCookie(auth.AUTHN_TEMP_COOKIE)
+	auth.ClearCookies(c, auth.AUTHN_TEMP_COOKIE)
 
 	// Save the session
 	exp := time.Now().Add(h.Cfg.TokenExpiration)

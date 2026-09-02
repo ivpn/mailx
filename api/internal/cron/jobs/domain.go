@@ -3,6 +3,7 @@ package jobs
 import (
 	"context"
 	"log"
+	"strings"
 	"time"
 
 	"gorm.io/gorm"
@@ -69,7 +70,15 @@ func VerifyDomainsJob(cfg config.Config, db *gorm.DB) {
 			}
 
 			// Send records check (SPF, DKIM, DMARC)
-			if err := svc.VerifyDomainSend(ctx, domain.Name, domain.UserID); err != nil {
+			if checks, err := svc.VerifyDomainSend(ctx, domain.Name, domain.UserID); err != nil {
+				var failedChecks []string
+				for _, c := range checks {
+					if !c.Passed {
+						failedChecks = append(failedChecks, c.Name)
+					}
+				}
+				log.Printf("VerifyDomainsJob: send verification failed for domain %s: %s", domain.Name, strings.Join(failedChecks, ", "))
+
 				if dbErr := db.Model(&model.Domain{}).Where("id = ?", domain.ID).Updates(map[string]any{
 					"send_verified_at": nil,
 				}).Error; dbErr != nil {

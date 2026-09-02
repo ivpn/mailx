@@ -103,7 +103,7 @@ func validSPFRecord(record, requiredMechanism string) bool {
 // p=quarantine or p=reject policy tag, regardless of tag order.
 func validDMARCRecord(record string) bool {
 	values := make(map[string]string)
-	for _, tag := range strings.Split(record, ";") {
+	for tag := range strings.SplitSeq(record, ";") {
 		tag = strings.TrimSpace(tag)
 		key, value, ok := strings.Cut(tag, "=")
 		if !ok {

@@ -3,7 +3,7 @@ package api
 type UserReq struct {
 	Email    string `json:"email" validate:"required,emailx"`
 	Password string `json:"password" validate:"password"`
-	OTP      string `json:"otp" validate:"min=0,max=8"`
+	OTP      string `json:"otp" validate:"min=0,max=10"`
 }
 
 type AuthReq struct {
@@ -80,7 +80,7 @@ type ActivateReq struct {
 }
 
 type TotpReq struct {
-	OTP string `json:"otp" validate:"required,min=6,max=8"`
+	OTP string `json:"otp" validate:"required,min=6,max=10"`
 }
 
 type PASessionReq struct {

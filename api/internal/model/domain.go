@@ -30,3 +30,9 @@ type DNSConfig struct {
 	DKIM   []string `json:"dkim_selectors"`
 	Hosts  []string `json:"mx_hosts"`
 }
+
+type RecordCheck struct {
+	Name   string `json:"name"`
+	Passed bool   `json:"passed"`
+	Error  string `json:"error,omitempty"`
+}

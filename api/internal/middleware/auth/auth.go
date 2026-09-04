@@ -129,14 +129,17 @@ func NewCookieAuthn(token string, path string, cfg config.APIConfig) *fiber.Cook
 	}
 }
 
+// WebAuthnCeremonyExpiration bounds a begin->finish WebAuthn ceremony, independent of the main session's TokenExpiration.
+const WebAuthnCeremonyExpiration = 5 * time.Minute
+
 func NewCookieTempAuthn(token string, path string, cfg config.APIConfig) *fiber.Cookie {
 	return &fiber.Cookie{
 		Name:     AUTHN_TEMP_COOKIE,
 		Value:    token,
 		HTTPOnly: true,
 		Secure:   true,
-		MaxAge:   int(cfg.TokenExpiration.Seconds()),
-		Expires:  time.Now().Add(time.Duration(cfg.TokenExpiration)),
+		MaxAge:   int(WebAuthnCeremonyExpiration.Seconds()),
+		Expires:  time.Now().Add(WebAuthnCeremonyExpiration),
 	}
 }
 

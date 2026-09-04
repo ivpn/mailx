@@ -3,9 +3,11 @@ package auth
 import (
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/valyala/fasthttp"
+	"ivpn.net/email/api/config"
 )
 
 func TestGetUserID(t *testing.T) {
@@ -234,6 +236,43 @@ func TestNewPSK(t *testing.T) {
 
 			if resp.StatusCode != tt.expectedStatus {
 				t.Errorf("expected status %d, got %d", tt.expectedStatus, resp.StatusCode)
+			}
+		})
+	}
+}
+
+func TestNewCookieTempAuthn(t *testing.T) {
+	tests := []struct {
+		name            string
+		tokenExpiration time.Duration
+	}{
+		{name: "short TokenExpiration", tokenExpiration: time.Second},
+		{name: "long TokenExpiration", tokenExpiration: 168 * time.Hour},
+	}
+
+	wantMaxAge := int(WebAuthnCeremonyExpiration.Seconds())
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cfg := config.APIConfig{TokenExpiration: tt.tokenExpiration}
+
+			before := time.Now()
+			cookie := NewCookieTempAuthn("sometoken", "/some/path", cfg)
+			after := time.Now()
+
+			if cookie.Name != AUTHN_TEMP_COOKIE {
+				t.Errorf("expected cookie name %q, got %q", AUTHN_TEMP_COOKIE, cookie.Name)
+			}
+
+			// regression: MaxAge must stay pinned to the ceremony window regardless of TokenExpiration
+			if cookie.MaxAge != wantMaxAge {
+				t.Errorf("expected MaxAge %d, got %d", wantMaxAge, cookie.MaxAge)
+			}
+
+			minExpires := before.Add(WebAuthnCeremonyExpiration)
+			maxExpires := after.Add(WebAuthnCeremonyExpiration)
+			if cookie.Expires.Before(minExpires) || cookie.Expires.After(maxExpires) {
+				t.Errorf("expected Expires within [%v, %v], got %v", minExpires, maxExpires, cookie.Expires)
 			}
 		})
 	}

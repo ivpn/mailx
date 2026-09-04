@@ -99,7 +99,7 @@ import events from '../events.ts'
 
 const accessKey = ref({
     name: '',
-    expires_at: '',
+    expires_at: '365d',
     token: '',
 })
 const error = ref('')
@@ -156,7 +156,7 @@ const parseExpiry = (value: string) => {
 const close = () => {
     accessKey.value = {
         name: '',
-        expires_at: '',
+        expires_at: '365d',
         token: '',
     }
     error.value = ''

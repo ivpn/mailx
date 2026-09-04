@@ -645,7 +645,7 @@ func (s *Service) TotpDisable(ctx context.Context, userID string, otp string) er
 func (s *Service) VerifyTotp(ctx context.Context, userID string, otp string) (bool, error) {
 	isValid, err := s.TotpUseBackup(ctx, userID, otp)
 	if err != nil {
-		log.Printf("error disabling TOTP: %s", err.Error())
+		log.Printf("error verifying TOTP: %s", err.Error())
 		return false, err
 	}
 

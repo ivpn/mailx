@@ -13,6 +13,7 @@ env:
   APP_IMAGE: email/app
   DAEMON_IMAGE: mailserver/daemon
   TAG: latest
+  VERSION_TAG: ${{ github.ref_name }}
   REGISTRY: ${{ secrets.REGISTRY_NAME }}
 
 jobs:
@@ -39,13 +40,13 @@ jobs:
           echo "VITE_PRICING_URL=${{ secrets.PROD_VITE_PRICING_URL }}" >> app/.env
 
       - name: Build api image
-        run: docker build -t $REGISTRY/$API_IMAGE:$TAG api/.
+        run: docker build -t $REGISTRY/$API_IMAGE:$TAG -t $REGISTRY/$API_IMAGE:$VERSION_TAG api/.
 
       - name: Build app image
-        run: docker build -t $REGISTRY/$APP_IMAGE:$TAG app/.
+        run: docker build -t $REGISTRY/$APP_IMAGE:$TAG -t $REGISTRY/$APP_IMAGE:$VERSION_TAG app/.
       
       - name: Build daemon image
-        run: docker build -t $REGISTRY/$DAEMON_IMAGE:$TAG mailserver/daemon/.
+        run: docker build -t $REGISTRY/$DAEMON_IMAGE:$TAG -t $REGISTRY/$DAEMON_IMAGE:$VERSION_TAG mailserver/daemon/.
 
       - name: Log in to registry
         run: echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login ${{ secrets.REGISTRY_NAME }} -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
@@ -53,8 +54,17 @@ jobs:
       - name: Push api:${{ env.TAG }}
         run: docker push $REGISTRY/$API_IMAGE:$TAG
 
+      - name: Push api:${{ env.VERSION_TAG }}
+        run: docker push $REGISTRY/$API_IMAGE:$VERSION_TAG
+
       - name: Push app:${{ env.TAG }}
         run: docker push $REGISTRY/$APP_IMAGE:$TAG
 
+      - name: Push app:${{ env.VERSION_TAG }}
+        run: docker push $REGISTRY/$APP_IMAGE:$VERSION_TAG
+
       - name: Push daemon:${{ env.TAG }}
         run: docker push $REGISTRY/$DAEMON_IMAGE:$TAG
+
+      - name: Push daemon:${{ env.VERSION_TAG }}
+        run: docker push $REGISTRY/$DAEMON_IMAGE:$VERSION_TAG

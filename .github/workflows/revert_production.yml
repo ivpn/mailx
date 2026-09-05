@@ -1,0 +1,47 @@
+name: Revert Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Git tag of the version to redeploy (e.g. v1.4.2)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  API_IMAGE: email/api
+  APP_IMAGE: email/app
+  DAEMON_IMAGE: mailserver/daemon
+  REGISTRY: ${{ secrets.REGISTRY_NAME }}
+  VERSION: ${{ inputs.version }}
+
+jobs:
+  revert_production:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Log in to registry
+        run: echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login ${{ secrets.REGISTRY_NAME }} -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
+
+      # fails the step if $VERSION was never pushed as a tag
+      - name: Pull target version images
+        run: |
+          docker pull $REGISTRY/$API_IMAGE:$VERSION
+          docker pull $REGISTRY/$APP_IMAGE:$VERSION
+          docker pull $REGISTRY/$DAEMON_IMAGE:$VERSION
+
+      - name: Re-tag target version as latest
+        run: |
+          docker tag $REGISTRY/$API_IMAGE:$VERSION $REGISTRY/$API_IMAGE:latest
+          docker tag $REGISTRY/$APP_IMAGE:$VERSION $REGISTRY/$APP_IMAGE:latest
+          docker tag $REGISTRY/$DAEMON_IMAGE:$VERSION $REGISTRY/$DAEMON_IMAGE:latest
+
+      # watchtower picks up the new latest digest and redeploys it
+      - name: Push latest
+        run: |
+          docker push $REGISTRY/$API_IMAGE:latest
+          docker push $REGISTRY/$APP_IMAGE:latest
+          docker push $REGISTRY/$DAEMON_IMAGE:latest

@@ -1,0 +1,67 @@
+name: Prune Production Images
+
+on:
+  schedule:
+    - cron: '0 3 * * 0' # weekly, Sunday 03:00 UTC
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'List tags that would be deleted without deleting them'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+env:
+  API_IMAGE: email/api
+  APP_IMAGE: email/app
+  DAEMON_IMAGE: mailserver/daemon
+  REGISTRY: ${{ secrets.REGISTRY_NAME }}
+  REGISTRY_USER: ${{ secrets.REGISTRY_USERNAME }}
+  REGISTRY_PASS: ${{ secrets.REGISTRY_PASSWORD }}
+  KEEP: 10
+  # scheduled runs always delete for real; manual runs default to a dry-run preview
+  DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
+
+jobs:
+  prune:
+    runs-on: ubuntu-latest
+    steps:
+      # requires the registry to be started with REGISTRY_STORAGE_DELETE_ENABLED=true
+      - name: Prune old version tags
+        run: |
+          set -euo pipefail
+
+          prune_image() {
+            local image="$1"
+            local tags to_delete tag digest
+
+            tags=$(curl -fsSL -u "$REGISTRY_USER:$REGISTRY_PASS" "https://$REGISTRY/v2/$image/tags/list" \
+              | jq -r '.tags[]?' | grep -v -E '^(latest|staging)$' | sort -rV)
+            to_delete=$(echo "$tags" | tail -n +$((KEEP + 1)))
+
+            if [ -z "$to_delete" ]; then
+              echo "$image: nothing to prune"
+              return
+            fi
+
+            for tag in $to_delete; do
+              digest=$(curl -fsSL -u "$REGISTRY_USER:$REGISTRY_PASS" \
+                -H 'Accept: application/vnd.docker.distribution.manifest.v2+json,application/vnd.oci.image.manifest.v1+json,application/vnd.docker.distribution.manifest.list.v2+json,application/vnd.oci.image.index.v1+json' \
+                -I "https://$REGISTRY/v2/$image/manifests/$tag" | grep -i '^docker-content-digest:' | tr -d '\r' | awk '{print $2}')
+
+              if [ "$DRY_RUN" = "true" ]; then
+                echo "[dry-run] would delete $image:$tag ($digest)"
+              else
+                echo "deleting $image:$tag ($digest)"
+                curl -fsSL -u "$REGISTRY_USER:$REGISTRY_PASS" -X DELETE "https://$REGISTRY/v2/$image/manifests/$digest"
+              fi
+            done
+          }
+
+          prune_image "$API_IMAGE"
+          prune_image "$APP_IMAGE"
+          prune_image "$DAEMON_IMAGE"
+
+          # deleting manifests only unlinks tags; run 'registry garbage-collect' on the registry host to reclaim blob storage

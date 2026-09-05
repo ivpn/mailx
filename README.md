@@ -330,6 +330,30 @@ docker stop restore && docker rm restore
 docker compose up -d
 ```
 
+## Revert Production Deployment
+
+Production images are pushed with both a `latest` tag (watched by watchtower for auto-deploy) and the git tag of the release, e.g. `v1.4.2` (see [ci_production.yml](.github/workflows/ci_production.yml)). Reverting re-publishes an older version's images as `latest` via the `Revert Production` GitHub Action, so watchtower redeploys them on its next poll.
+
+### Trigger via GitHub UI
+1. Go to **Actions** → **Revert Production** → **Run workflow**.
+2. Enter `version` with the git tag to roll back to (e.g. `v1.4.2`).
+3. Run the workflow and watch the logs; an unknown/never-released version fails fast.
+
+### Trigger via GitHub CLI
+```bash
+gh workflow run revert_production.yml -f version=v1.4.2
+gh run watch
+```
+
+> [!TIP]
+> List available version tags for an image directly from the registry:
+> ```bash
+> curl -u "$REGISTRY_USERNAME:$REGISTRY_PASSWORD" https://<registry>/v2/email/api/tags/list
+> ```
+
+> [!WARNING]
+> Only releases built after version tagging was added have a version tag to revert to. The API also runs GORM auto-migration on startup, so reverting across a release with schema changes may leave the DB incompatible with the older API version.
+
 ## Test
 Run API tests:  
 ```bash

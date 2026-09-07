@@ -330,6 +330,21 @@ docker stop restore && docker rm restore
 docker compose up -d
 ```
 
+## Staging Deployment
+
+Pushing to the `staging` branch automatically builds and deploys images tagged `staging` via the `CI Staging` GitHub Action (see [ci_staging.yml](.github/workflows/ci_staging.yml)). It can also be triggered manually to deploy any branch onto the staging environment, still publishing under the `staging` tag.
+
+### Trigger via GitHub UI
+1. Go to **Actions** → **CI Staging** → **Run workflow**.
+2. Optionally enter a `branch` to deploy (defaults to `staging`).
+3. Run the workflow and watch the logs.
+
+### Trigger via GitHub CLI
+```bash
+gh workflow run ci_staging.yml -f branch=my-branch
+gh run watch
+```
+
 ## Revert Production Deployment
 
 Production images are pushed with both a `latest` tag (watched by watchtower for auto-deploy) and the git tag of the release, e.g. `v1.4.2` (see [ci_production.yml](.github/workflows/ci_production.yml)). Reverting re-publishes an older version's images as `latest` via the `Revert Production` GitHub Action, so watchtower redeploys them on its next poll.

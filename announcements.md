@@ -1,5 +1,16 @@
 # Announcements
 
+## Catch-all aliases, custom alias names, and a forwarding privacy fix - 2026-09-01
+
+### Create aliases from catch-all mail (custom domains)
+Turn on "Create alias" for a verified domain and Mailx creates a real alias the first time an address receives mail. Those addresses now appear in your Aliases list, so you can disable or delete one without turning off catch-all. Capped at 10 new aliases per hour.
+
+### Wider character set for custom aliases
+Custom alias names used with custom domains are no longer limited to letters and numbers. They can now include dots, hyphens, plus signs and the other characters an email address allows.
+
+### Forwarded mail no longer carries your real address
+The To header of a forwarded message now shows the alias the sender wrote to, not your real address. Previously it carried your real address, which some mail clients exposed in the quoted text when you replied.
+
 ## Web app outage on 23 August - 2026-08-24
 
 On Sunday 23 August the Mailx web app was unavailable between 08:00 and 21:30 UTC. Mailx has been running normally since, and no action is required from you.

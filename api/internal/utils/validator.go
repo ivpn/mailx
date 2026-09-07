@@ -48,6 +48,11 @@ func ValidateEmail(email string) error {
 	return validator.Var(email, "required,emailx")
 }
 
+func ValidatePassword(password string) error {
+	validator := NewValidator()
+	return validator.Var(password, "required,password")
+}
+
 func passwordValidation(fl validator.FieldLevel) bool {
 	password := fl.Field().String()
 

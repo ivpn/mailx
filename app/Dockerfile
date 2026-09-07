@@ -19,6 +19,9 @@ ENV VITE_API_URL=$VITE_API_URL \
     VITE_RESYNC_URL=$VITE_RESYNC_URL \
     VITE_PRICING_URL=$VITE_PRICING_URL
 
+# fail loudly instead of silently baking an empty API URL into the bundle
+RUN test -n "$VITE_API_URL" || (echo "ERROR: --build-arg VITE_API_URL is required" >&2; exit 1)
+
 RUN yarn build
 
 # production stage - nginx-unprivileged already runs as a non-root user by design

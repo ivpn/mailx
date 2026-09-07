@@ -65,7 +65,7 @@ func (d *Database) DeleteCredential(ctx context.Context, credential webauthn.Cre
 	// Find the credential to delete
 	for _, c := range credentials {
 		if bytes.Equal(c.Cred.ID, credential.ID) {
-			return d.Client.Where("id = ? AND user_id = ?", c.ID, userID).Delete(&model.Alias{}).Error
+			return d.Client.Where("id = ? AND user_id = ?", c.ID, userID).Delete(&model.Credential{}).Error
 		}
 	}
 

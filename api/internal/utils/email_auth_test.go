@@ -39,8 +39,26 @@ func TestRelaxedMatch(t *testing.T) {
 		{
 			fromDomain: "test@example.com",
 			authDomain: "example.com",
+			expected:   false,
+			name:       "email address is not a bare domain",
+		},
+		{
+			fromDomain: "notexample.com",
+			authDomain: "example.com",
+			expected:   false,
+			name:       "lookalike domain without label boundary must not match",
+		},
+		{
+			fromDomain: "example.com.evil.com",
+			authDomain: "example.com",
+			expected:   false,
+			name:       "victim domain used as prefix must not match",
+		},
+		{
+			fromDomain: "Sub.EXAMPLE.com",
+			authDomain: "example.COM",
 			expected:   true,
-			name:       "email like from domain",
+			name:       "case-insensitive subdomain match",
 		},
 		{
 			fromDomain: "",
@@ -333,10 +351,13 @@ func TestParseAuthResults(t *testing.T) {
 
 func TestVerifyEmailAuth(t *testing.T) {
 	tests := []struct {
-		name     string
-		emailRaw string
-		want     bool
-		wantErr  bool
+		name                string
+		emailRaw            string
+		trustedRelayDomains []string
+		disableAlignment    bool
+		logMismatch         bool
+		want                bool
+		wantErr             bool
 	}{
 		{
 			name: "valid email with DMARC pass",
@@ -374,18 +395,31 @@ This is a test email.`,
 			want:    true,
 			wantErr: false,
 		},
-		// 		{
-		// 			name: "valid email with DMARC pass but domain mismatch",
-		// 			emailRaw: `From: sender@example.com
-		// To: recipient@example.net
-		// Subject: Test Email
-		// Date: Thu, 22 Aug 2023 12:00:00 -0700
-		// Authentication-Results: mx.example.net; dmarc=pass header.from=different.org
+		{
+			name: "valid email with DMARC pass but domain mismatch",
+			emailRaw: `From: sender@example.com
+To: recipient@example.net
+Subject: Test Email
+Date: Thu, 22 Aug 2023 12:00:00 -0700
+Authentication-Results: mx.example.net; dmarc=pass header.from=different.org
 
-		// This is a test email.`,
-		// 			want:    false,
-		// 			wantErr: true,
-		// 		},
+This is a test email.`,
+			want:    false,
+			wantErr: true,
+		},
+		{
+			name: "DMARC pass with domain mismatch but signing domain is a trusted relay",
+			emailRaw: `From: sender@example.com
+To: recipient@example.net
+Subject: Test Email
+Date: Thu, 22 Aug 2023 12:00:00 -0700
+Authentication-Results: mx.example.net; dmarc=pass header.from=relay.example
+
+This is a test email.`,
+			trustedRelayDomains: []string{"relay.example"},
+			want:                true,
+			wantErr:             false,
+		},
 		{
 			name: "valid email with all auth passes",
 			emailRaw: `From: sender@example.com
@@ -398,30 +432,97 @@ This is a test email.`,
 			want:    true,
 			wantErr: false,
 		},
-		// 		{
-		// 			name: "valid email with DKIM pass but domain mismatch",
-		// 			emailRaw: `From: sender@example.com
-		// To: recipient@example.net
-		// Subject: Test Email
-		// Date: Thu, 22 Aug 2023 12:00:00 -0700
-		// Authentication-Results: mx.example.net; dkim=pass header.d=different.org
+		{
+			name: "valid email with DKIM pass but domain mismatch",
+			emailRaw: `From: sender@example.com
+To: recipient@example.net
+Subject: Test Email
+Date: Thu, 22 Aug 2023 12:00:00 -0700
+Authentication-Results: mx.example.net; dkim=pass header.d=different.org
 
-		// This is a test email.`,
-		// 			want:    false,
-		// 			wantErr: true,
-		// 		},
-		// 		{
-		// 			name: "valid email with SPF pass but domain mismatch",
-		// 			emailRaw: `From: sender@example.com
-		// To: recipient@example.net
-		// Subject: Test Email
-		// Date: Thu, 22 Aug 2023 12:00:00 -0700
-		// Authentication-Results: mx.example.net; spf=pass smtp.mailfrom=different.org
+This is a test email.`,
+			want:    false,
+			wantErr: true,
+		},
+		{
+			name: "valid email with SPF pass but domain mismatch",
+			emailRaw: `From: sender@example.com
+To: recipient@example.net
+Subject: Test Email
+Date: Thu, 22 Aug 2023 12:00:00 -0700
+Authentication-Results: mx.example.net; spf=pass smtp.mailfrom=different.org
 
-		// This is a test email.`,
-		// 			want:    false,
-		// 			wantErr: true,
-		// 		},
+This is a test email.`,
+			want:    false,
+			wantErr: true,
+		},
+		{
+			name: "DKIM pass with domain mismatch but signing domain is a trusted relay",
+			emailRaw: `From: sender@example.com
+To: recipient@example.net
+Subject: Test Email
+Date: Thu, 22 Aug 2023 12:00:00 -0700
+Authentication-Results: mx.example.net; dkim=pass header.d=relay.example
+
+This is a test email.`,
+			trustedRelayDomains: []string{"other.example", "relay.example"},
+			want:                true,
+			wantErr:             false,
+		},
+		{
+			name: "DKIM pass with domain mismatch and signing domain not on the trusted relay allow-list",
+			emailRaw: `From: sender@example.com
+To: recipient@example.net
+Subject: Test Email
+Date: Thu, 22 Aug 2023 12:00:00 -0700
+Authentication-Results: mx.example.net; dkim=pass header.d=different.org
+
+This is a test email.`,
+			trustedRelayDomains: []string{"relay.example"},
+			want:                false,
+			wantErr:             true,
+		},
+		{
+			name: "DKIM pass with domain mismatch bypassed by DisableAlignment (staging)",
+			emailRaw: `From: sender@example.com
+To: recipient@example.net
+Subject: Test Email
+Date: Thu, 22 Aug 2023 12:00:00 -0700
+Authentication-Results: mx.example.net; dkim=pass header.d=different.org
+
+This is a test email.`,
+			disableAlignment: true,
+			want:             true,
+			wantErr:          false,
+		},
+		{
+			name: "DKIM pass with domain mismatch bypassed by DisableAlignment but still logged",
+			emailRaw: `From: sender@example.com
+To: recipient@example.net
+Subject: Test Email
+Date: Thu, 22 Aug 2023 12:00:00 -0700
+Authentication-Results: mx.example.net; dkim=pass header.d=different.org
+
+This is a test email.`,
+			disableAlignment: true,
+			logMismatch:      true,
+			want:             true,
+			wantErr:          true,
+		},
+		{
+			name: "DKIM pass with domain mismatch bypassed by trusted relay but still logged",
+			emailRaw: `From: sender@example.com
+To: recipient@example.net
+Subject: Test Email
+Date: Thu, 22 Aug 2023 12:00:00 -0700
+Authentication-Results: mx.example.net; dkim=pass header.d=relay.example
+
+This is a test email.`,
+			trustedRelayDomains: []string{"relay.example"},
+			logMismatch:         true,
+			want:                true,
+			wantErr:             true,
+		},
 		{
 			name: "valid email with all auth fails",
 			emailRaw: `From: sender@example.com
@@ -457,17 +558,17 @@ This is a test email.`,
 			want:    false,
 			wantErr: true,
 		},
-		// 		{
-		// 			name: "invalid email with no From header",
-		// 			emailRaw: `To: recipient@example.net
-		// Subject: Test Email
-		// Date: Thu, 22 Aug 2023 12:00:00 -0700
-		// Authentication-Results: mx.example.net; dkim=pass header.d=example.com
+		{
+			name: "invalid email with no From header",
+			emailRaw: `To: recipient@example.net
+Subject: Test Email
+Date: Thu, 22 Aug 2023 12:00:00 -0700
+Authentication-Results: mx.example.net; dkim=pass header.d=example.com
 
-		// This is a test email.`,
-		// 			want:    false,
-		// 			wantErr: true,
-		// 		},
+This is a test email.`,
+			want:    false,
+			wantErr: true,
+		},
 		{
 			name: "invalid email format",
 			emailRaw: `This is not a valid email format
@@ -539,18 +640,18 @@ This is a test email.`,
 			want:    true,
 			wantErr: false,
 		},
-		// 		{
-		// 			name: "malformed From address",
-		// 			emailRaw: `From: invalid-email
-		// To: recipient@example.net
-		// Subject: Test Email
-		// Date: Thu, 22 Aug 2023 12:00:00 -0700
-		// Authentication-Results: mx.example.net; dkim=pass header.d=example.com
+		{
+			name: "malformed From address",
+			emailRaw: `From: invalid-email
+To: recipient@example.net
+Subject: Test Email
+Date: Thu, 22 Aug 2023 12:00:00 -0700
+Authentication-Results: mx.example.net; dkim=pass header.d=example.com
 
-		// This is a test email.`,
-		// 			want:    false,
-		// 			wantErr: true,
-		// 		},
+This is a test email.`,
+			want:    false,
+			wantErr: true,
+		},
 		{
 			name: "email with Authentication-Results without dkim/spf/dmarc",
 			emailRaw: `From: sender@example.com
@@ -594,7 +695,12 @@ This is a test email.`,
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := VerifyEmailAuth([]byte(tt.emailRaw))
+			cfg := EmailAuthConfig{
+				TrustedRelayDomains: tt.trustedRelayDomains,
+				DisableAlignment:    tt.disableAlignment,
+				LogMismatch:         tt.logMismatch,
+			}
+			got, err := VerifyEmailAuth([]byte(tt.emailRaw), cfg)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("VerifyEmailAuth() error = %v, wantErr %v", err, tt.wantErr)
 				return

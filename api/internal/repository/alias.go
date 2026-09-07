@@ -35,20 +35,46 @@ func (d *Database) GetAlias(ctx context.Context, ID string, userID string) (mode
 	return alias, nil
 }
 
-func (d *Database) GetAliases(ctx context.Context, userID string, limit int, offset int, sortBy string, sortOrder string, catchAll string, search string, status string) ([]model.Alias, error) {
-	sortBy = "a." + sortBy
+// sanitizeAliasSort independently re-checks sort inputs against the shared allow-list
+// (model.AliasSortColumns/AliasSortOrders) so the query builder is safe even if a future
+// caller skips the handler-level check, and returns the fully-qualified column to sort by.
+func sanitizeAliasSort(sortBy string, sortOrder string) (string, string) {
+	if !model.AliasSortColumns[sortBy] {
+		sortBy = "created_at"
+	}
+	if !model.AliasSortOrders[sortOrder] {
+		sortOrder = "DESC"
+	}
+	return "a." + sortBy, sortOrder
+}
 
-	if catchAll == "true" {
-		catchAll = "AND a.catch_all = true"
-	} else if catchAll == "false" {
-		catchAll = "AND a.catch_all = false"
-	} else {
-		catchAll = ""
+// aliasSearchFilter builds the catch-all/search WHERE fragment using bound parameters instead
+// of concatenating untrusted input into the query text. columnPrefix is always a fixed literal
+// ("a." or "") supplied by the call site, never derived from request input.
+func aliasSearchFilter(columnPrefix string, catchAll string, search string) (string, []any) {
+	var filter string
+	var args []any
+
+	switch catchAll {
+	case "true":
+		filter += " AND " + columnPrefix + "catch_all = ?"
+		args = append(args, true)
+	case "false":
+		filter += " AND " + columnPrefix + "catch_all = ?"
+		args = append(args, false)
 	}
 
 	if search != "" {
-		search = "AND (a.name LIKE '%" + search + "%' OR a.description LIKE '%" + search + "%')"
+		filter += " AND (" + columnPrefix + "name LIKE ? OR " + columnPrefix + "description LIKE ?)"
+		like := "%" + search + "%"
+		args = append(args, like, like)
 	}
+
+	return filter, args
+}
+
+func (d *Database) GetAliases(ctx context.Context, userID string, limit int, offset int, sortBy string, sortOrder string, catchAll string, search string, status string) ([]model.Alias, error) {
+	sortBy, sortOrder = sanitizeAliasSort(sortBy, sortOrder)
 
 	var statusFilter string
 	if status == "deleted" {
@@ -58,6 +84,8 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 	} else {
 		statusFilter = "AND a.deleted_at IS NULL"
 	}
+
+	filter, filterArgs := aliasSearchFilter("a.", catchAll, search)
 
 	aliases := []model.Alias{}
 	query := `
@@ -69,7 +97,7 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 		FROM aliases a
 		LEFT JOIN messages m
 		ON a.id = m.alias_id
-		WHERE a.user_id = ? ` + statusFilter + " " + catchAll + " " + search + `
+		WHERE a.user_id = ? ` + statusFilter + filter + `
 		GROUP BY a.id
 		ORDER BY ` + sortBy + " " + sortOrder
 
@@ -81,7 +109,10 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 		query += "\nOFFSET " + strconv.Itoa(offset)
 	}
 
-	rows, err := d.Client.Raw(query, model.Forward, model.Block, model.Reply, model.Send, userID).Rows()
+	args := []any{model.Forward, model.Block, model.Reply, model.Send, userID}
+	args = append(args, filterArgs...)
+
+	rows, err := d.Client.Raw(query, args...).Rows()
 	if err != nil {
 		return nil, err
 	}
@@ -118,26 +149,17 @@ func (d *Database) GetAllAliases(ctx context.Context, userID string) ([]model.Al
 }
 
 func (d *Database) GetAliasCount(ctx context.Context, userID string, catchAll string, search string, status string) (int, error) {
-	if catchAll == "true" {
-		catchAll = " AND catch_all = true"
-	} else if catchAll == "false" {
-		catchAll = " AND catch_all = false"
-	} else {
-		catchAll = ""
-	}
-
-	if search != "" {
-		search = " AND (name LIKE '%" + search + "%' OR description LIKE '%" + search + "%')"
-	}
+	filter, filterArgs := aliasSearchFilter("", catchAll, search)
+	args := append([]any{userID}, filterArgs...)
 
 	var count int64
 	q := d.Client.Model(&model.Alias{})
 	if status == "deleted" {
-		q = q.Unscoped().Where("user_id = ? AND deleted_at IS NOT NULL"+catchAll+search, userID)
+		q = q.Unscoped().Where("user_id = ? AND deleted_at IS NOT NULL"+filter, args...)
 	} else if status == "all" {
-		q = q.Unscoped().Where("user_id = ?"+catchAll+search, userID)
+		q = q.Unscoped().Where("user_id = ?"+filter, args...)
 	} else {
-		q = q.Where("user_id = ?"+catchAll+search, userID)
+		q = q.Where("user_id = ?"+filter, args...)
 	}
 	err := q.Count(&count).Error
 	return int(count), err

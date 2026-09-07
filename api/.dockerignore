@@ -5,3 +5,8 @@ Dockerfile
 .github
 .gitignore
 /.DS_Store
+.env
+.env.*
+node_modules
+.vscode
+bin

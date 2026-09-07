@@ -307,8 +307,7 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 // @Failure 400 {object} ErrorRes
 // @Router /user/logout [post]
 func (h *Handler) Logout(c *fiber.Ctx) error {
-	c.ClearCookie(auth.AUTHN_COOKIE)
-	c.ClearCookie(auth.AUTHN_TEMP_COOKIE)
+	auth.ClearCookies(c, auth.AUTHN_COOKIE, auth.AUTHN_TEMP_COOKIE)
 
 	authnToken := auth.GetAuthnCookie(c)
 

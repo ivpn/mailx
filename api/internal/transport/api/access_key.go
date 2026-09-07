@@ -94,7 +94,7 @@ func (h *Handler) PostAccessKey(c *fiber.Ctx) error {
 		UserId:     userId,
 		TokenPlain: &token,
 		Name:       req.Name,
-		ExpiresAt:  model.NeverExpires(),
+		ExpiresAt:  model.DefaultAccessKeyExpiry(),
 	}
 
 	// Set expiration if provided

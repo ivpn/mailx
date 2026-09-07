@@ -4,6 +4,21 @@ WORKDIR /app
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
 COPY . .
+
+# VITE_* build args are embedded into the compiled JS by `vite build` - app/.env
+# is excluded from the build context (.dockerignore), so these must come in via
+# --build-arg rather than a copied .env file.
+ARG VITE_API_URL
+ARG VITE_DOMAINS
+ARG VITE_APP_NAME
+ARG VITE_RESYNC_URL
+ARG VITE_PRICING_URL
+ENV VITE_API_URL=$VITE_API_URL \
+    VITE_DOMAINS=$VITE_DOMAINS \
+    VITE_APP_NAME=$VITE_APP_NAME \
+    VITE_RESYNC_URL=$VITE_RESYNC_URL \
+    VITE_PRICING_URL=$VITE_PRICING_URL
+
 RUN yarn build
 
 # production stage - nginx-unprivileged already runs as a non-root user by design

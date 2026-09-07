@@ -28,19 +28,18 @@ jobs:
       - name: Pull changes from branch
         run: git pull origin staging
 
-      - name: create app/.env file
-        run: |
-          echo "VITE_API_URL=${{ secrets.STAGING_VITE_API_URL }}" >> app/.env
-          echo "VITE_DOMAINS=${{ secrets.STAGING_VITE_DOMAINS }}" >> app/.env
-          echo "VITE_APP_NAME=${{ secrets.STAGING_VITE_APP_NAME }}" >> app/.env
-          echo "VITE_RESYNC_URL=${{ secrets.STAGING_VITE_RESYNC_URL }}" >> app/.env
-          echo "VITE_PRICING_URL=${{ secrets.STAGING_VITE_PRICING_URL }}" >> app/.env
-
       - name: Build api image
         run: docker build -t $REGISTRY/$API_IMAGE:$TAG api/.
 
       - name: Build app image
-        run: docker build -t $REGISTRY/$APP_IMAGE:$TAG app/.
+        run: |
+          docker build \
+            --build-arg VITE_API_URL=${{ secrets.STAGING_VITE_API_URL }} \
+            --build-arg VITE_DOMAINS=${{ secrets.STAGING_VITE_DOMAINS }} \
+            --build-arg VITE_APP_NAME=${{ secrets.STAGING_VITE_APP_NAME }} \
+            --build-arg VITE_RESYNC_URL=${{ secrets.STAGING_VITE_RESYNC_URL }} \
+            --build-arg VITE_PRICING_URL=${{ secrets.STAGING_VITE_PRICING_URL }} \
+            -t $REGISTRY/$APP_IMAGE:$TAG app/.
       
       - name: Build daemon image
         run: docker build -t $REGISTRY/$DAEMON_IMAGE:$TAG mailserver/daemon/.

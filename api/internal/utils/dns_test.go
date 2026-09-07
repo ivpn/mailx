@@ -129,6 +129,99 @@ func TestLookupMX_TrailingDot(t *testing.T) {
 	}
 }
 
+// validSPFRecord tests
+
+func TestValidSPFRecord(t *testing.T) {
+	tests := []struct {
+		name              string
+		record            string
+		requiredMechanism string
+		want              bool
+	}{
+		{"exact match", "v=spf1 include:spf.mailx.net -all", "spf.mailx.net", true},
+		{"softfail all", "v=spf1 include:spf.mailx.net ~all", "spf.mailx.net", true},
+		{"extra includes and reordered", "v=spf1 include:_spf.google.com include:spf.mailx.net ~all", "spf.mailx.net", true},
+		{"mx mechanism instead of include", "v=spf1 mx -all", "spf.mailx.net", true},
+		{"case-insensitive version and mechanism", "V=SPF1 INCLUDE:SPF.MAILX.NET -ALL", "spf.mailx.net", true},
+		{"missing required mechanism", "v=spf1 include:spf.other.net -all", "spf.mailx.net", false},
+		{"missing all mechanism", "v=spf1 include:spf.mailx.net", "spf.mailx.net", false},
+		{"neutral all not accepted", "v=spf1 include:spf.mailx.net ?all", "spf.mailx.net", false},
+		{"not an spf record", "some other txt record", "spf.mailx.net", false},
+		{"wrong spf version", "v=spf2 include:spf.mailx.net -all", "spf.mailx.net", false},
+		{"empty record", "", "spf.mailx.net", false},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got := validSPFRecord(tc.record, tc.requiredMechanism)
+			if got != tc.want {
+				t.Errorf("validSPFRecord(%q, %q) = %v, want %v", tc.record, tc.requiredMechanism, got, tc.want)
+			}
+		})
+	}
+}
+
+// validDMARCRecord tests
+
+func TestValidDMARCRecord(t *testing.T) {
+	tests := []struct {
+		name   string
+		record string
+		want   bool
+	}{
+		{"quarantine", "v=DMARC1; p=quarantine; adkim=s", true},
+		{"reject", "v=DMARC1; p=reject", true},
+		{"reordered tags", "adkim=s; p=reject; v=DMARC1", true},
+		{"case-insensitive", "V=DMARC1; P=Reject", true},
+		{"none policy rejected", "v=DMARC1; p=none", false},
+		{"missing version tag", "p=reject", false},
+		{"missing policy tag", "v=DMARC1; adkim=s", false},
+		{"empty record", "", false},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got := validDMARCRecord(tc.record)
+			if got != tc.want {
+				t.Errorf("validDMARCRecord(%q) = %v, want %v", tc.record, got, tc.want)
+			}
+		})
+	}
+}
+
+// LookupSPF tests
+
+func TestLookupSPF_NotFound(t *testing.T) {
+	found, err := LookupSPF("nonexistent.invalid", "spf.example.net")
+	if err != nil {
+		t.Fatalf("expected nil error for non-existent domain, got: %v", err)
+	}
+	if found {
+		t.Fatal("expected false for non-existent domain")
+	}
+}
+
+func TestLookupSPF_Mismatch(t *testing.T) {
+	// gmail.com publishes an SPF record but never includes this mechanism.
+	found, err := LookupSPF("gmail.com", "spf.this-will-never-exist.example")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if found {
+		t.Fatal("expected false for mismatched SPF mechanism")
+	}
+}
+
+// LookupDMARC tests
+
+func TestLookupDMARC_NotFound(t *testing.T) {
+	found, err := LookupDMARC("_dmarc.nonexistent.invalid")
+	if err != nil {
+		t.Fatalf("expected nil error for non-existent domain, got: %v", err)
+	}
+	if found {
+		t.Fatal("expected false for non-existent domain")
+	}
+}
+
 // LookupCNAME tests
 
 func TestLookupCNAME_NotFound(t *testing.T) {

@@ -29,6 +29,7 @@ var (
 	ErrDNSLookupDKIM         = errors.New("Unable to verify domain DNS records. Please ensure the correct DKIM records are set or try again later.")
 	ErrDNSLookupDMARC        = errors.New("Unable to verify domain DNS records. Please ensure the correct DMARC record is set or try again later.")
 	ErrDNSLookupMX           = errors.New("Unable to verify domain DNS records. Please ensure the correct MX records are set or try again later.")
+	ErrDNSLookupSend         = errors.New("Unable to verify domain DNS records. Please review the individual record results.")
 )
 
 type DomainStore interface {
@@ -298,11 +299,11 @@ func (s *Service) VerifyOwnerExistingDomain(ctx context.Context, domainId string
 	return nil
 }
 
-func (s *Service) VerifyDomainDNSRecords(ctx context.Context, domainId string, userID string) error {
+func (s *Service) VerifyDomainDNSRecords(ctx context.Context, domainId string, userID string) ([]model.RecordCheck, error) {
 	domain, err := s.GetDomain(ctx, domainId, userID)
 	if err != nil {
 		log.Printf("error getting domain for DNS record verification: %s", err.Error())
-		return ErrGetDomain
+		return nil, ErrGetDomain
 	}
 
 	// verify, err := s.GetOwnerVerifyRecordExistingDomain(ctx, domainId, userID)
@@ -328,22 +329,26 @@ func (s *Service) VerifyDomainDNSRecords(ctx context.Context, domainId string, u
 	// 	return ErrDNSLookupOwner
 	// }
 
+	mxCheck := model.RecordCheck{Name: "mx", Passed: true}
 	err = s.VerifyDomainMX(ctx, domain.Name, userID)
 	if err != nil {
+		mxCheck.Passed = false
+		mxCheck.Error = err.Error()
 		domain.MXVerifiedAt = nil
 		if updateErr := s.UpdateDomain(ctx, domain); updateErr != nil {
 			log.Printf("error nulling mx_verified_at for domain %s: %s", domain.Name, updateErr.Error())
 		}
-		return err
+		return []model.RecordCheck{mxCheck}, err
 	}
 
-	err = s.VerifyDomainSend(ctx, domain.Name, userID)
+	checks, err := s.VerifyDomainSend(ctx, domain.Name, userID)
+	checks = append([]model.RecordCheck{mxCheck}, checks...)
 	if err != nil {
 		domain.SendVerifiedAt = nil
 		if updateErr := s.UpdateDomain(ctx, domain); updateErr != nil {
 			log.Printf("error nulling send_verified_at for domain %s: %s", domain.Name, updateErr.Error())
 		}
-		return err
+		return checks, err
 	}
 
 	now := time.Now()
@@ -354,10 +359,10 @@ func (s *Service) VerifyDomainDNSRecords(ctx context.Context, domainId string, u
 	err = s.UpdateDomain(ctx, domain)
 	if err != nil {
 		log.Printf("error updating domain verification timestamps: %s", err.Error())
-		return ErrUpdateDomain
+		return checks, ErrUpdateDomain
 	}
 
-	return nil
+	return checks, nil
 }
 
 func (s *Service) VerifyDomainMX(ctx context.Context, domain string, userID string) error {
@@ -383,49 +388,71 @@ func (s *Service) VerifyDomainMX(ctx context.Context, domain string, userID stri
 	return nil
 }
 
-func (s *Service) VerifyDomainSend(ctx context.Context, domain string, userID string) error {
+func (s *Service) VerifyDomainSend(ctx context.Context, domain string, userID string) ([]model.RecordCheck, error) {
 	dnsConfig, err := s.GetDNSConfig(ctx, userID)
 	if err != nil {
 		log.Printf("error getting DNS config for domain MX verification: %s", err.Error())
-		return ErrGetDNSConfig
+		return nil, ErrGetDNSConfig
 	}
+
+	var checks []model.RecordCheck
+	failed := false
 
 	// SPF record
-	ok, err := utils.LookupTXTContains(domain, "v=spf1 include:spf."+dnsConfig.Domain+" -all")
+	spfCheck := model.RecordCheck{Name: "spf"}
+	ok, err := utils.LookupSPF(domain, "spf."+dnsConfig.Domain)
 	if err != nil {
 		log.Printf("error looking up TXT record for domain SPF verification: %s", err.Error())
-		return ErrDNSLookupSPF
+		spfCheck.Error = ErrDNSLookupSPF.Error()
+	} else if !ok {
+		spfCheck.Error = ErrDNSLookupSPF.Error()
+	} else {
+		spfCheck.Passed = true
 	}
-
-	if !ok {
-		return ErrDNSLookupSPF
+	if !spfCheck.Passed {
+		failed = true
 	}
+	checks = append(checks, spfCheck)
 
 	// DKIM records
 	for _, selector := range dnsConfig.DKIM {
+		dkimCheck := model.RecordCheck{Name: "dkim:" + selector}
 		ok, err := utils.LookupCNAME(selector+"._domainkey."+domain, selector+"._domainkey."+dnsConfig.Domain)
 		if err != nil {
 			log.Printf("error looking up CNAME record for selector %s in domain DKIM verification: %s", selector, err.Error())
-			return ErrDNSLookupDKIM
-		}
-
-		if !ok {
+			dkimCheck.Error = ErrDNSLookupDKIM.Error()
+		} else if !ok {
 			log.Printf("DKIM record not found for selector %s in domain DKIM verification", selector)
-			return ErrDNSLookupDKIM
+			dkimCheck.Error = ErrDNSLookupDKIM.Error()
+		} else {
+			dkimCheck.Passed = true
 		}
+		if !dkimCheck.Passed {
+			failed = true
+		}
+		checks = append(checks, dkimCheck)
 	}
 
 	// DMARC record
-	ok, err = utils.LookupTXTContains("_dmarc."+domain, "v=DMARC1; p=quarantine; adkim=s")
+	dmarcCheck := model.RecordCheck{Name: "dmarc"}
+	ok, err = utils.LookupDMARC("_dmarc." + domain)
 	if err != nil {
 		log.Printf("error looking up TXT record for domain DMARC verification: %s", err.Error())
-		return ErrDNSLookupDMARC
-	}
-
-	if !ok {
+		dmarcCheck.Error = ErrDNSLookupDMARC.Error()
+	} else if !ok {
 		log.Printf("DMARC record not found for domain DMARC verification")
-		return ErrDNSLookupDMARC
+		dmarcCheck.Error = ErrDNSLookupDMARC.Error()
+	} else {
+		dmarcCheck.Passed = true
+	}
+	if !dmarcCheck.Passed {
+		failed = true
+	}
+	checks = append(checks, dmarcCheck)
+
+	if failed {
+		return checks, ErrDNSLookupSend
 	}
 
-	return nil
+	return checks, nil
 }

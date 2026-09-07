@@ -64,6 +64,14 @@ func main() {
 		return
 	}
 
+	if len(os.Args) > 1 && os.Args[1] == "create-test-user" {
+		if err := runCreateTestUser(os.Args[2:]); err != nil {
+			log.Println(err)
+			os.Exit(1)
+		}
+		return
+	}
+
 	err := Run()
 	if err != nil {
 		log.Println(err)

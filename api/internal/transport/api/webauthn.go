@@ -551,6 +551,10 @@ func (h *Handler) FinishLogin(c *fiber.Ctx) error {
 // @Failure 400 {object} ErrorRes
 // @Router /login/passkey/begin [post]
 func (h *Handler) BeginPasskeyLogin(c *fiber.Ctx) error {
+	// Parse the request; body is optional since this flow collects no other fields
+	req := RememberReq{}
+	_ = c.BodyParser(&req)
+
 	// No user lookup: the credential returned by the authenticator identifies the user
 	options, sessionData, err := h.WebAuthn.BeginDiscoverableLogin()
 	if err != nil {
@@ -569,7 +573,7 @@ func (h *Handler) BeginPasskeyLogin(c *fiber.Ctx) error {
 		})
 	}
 	sessionData.Expires = exp
-	err = h.Service.SaveSession(c.Context(), *sessionData, token, "", exp)
+	err = h.Service.SaveSession(c.Context(), *sessionData, token, "", exp, req.Remember)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrSaveSession,
@@ -663,7 +667,11 @@ func (h *Handler) FinishPasskeyLogin(c *fiber.Ctx) error {
 	auth.ClearCookies(c, auth.AUTHN_TEMP_COOKIE)
 
 	// Save the session
-	exp := time.Now().Add(h.Cfg.TokenExpiration)
+	ttl := h.Cfg.TokenExpiration
+	if session.Remember {
+		ttl = h.Cfg.TokenExpirationExtended
+	}
+	exp := time.Now().Add(ttl)
 	newSessionData := webauthn.SessionData{
 		UserID:  loggedInUser.WebAuthnID(),
 		Expires: exp,
@@ -674,7 +682,7 @@ func (h *Handler) FinishPasskeyLogin(c *fiber.Ctx) error {
 			"error": ErrSaveSession,
 		})
 	}
-	err = h.Service.SaveSession(c.Context(), newSessionData, token, loggedInUser.ID, exp)
+	err = h.Service.SaveSession(c.Context(), newSessionData, token, loggedInUser.ID, exp, session.Remember)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrSaveSession,
@@ -682,7 +690,7 @@ func (h *Handler) FinishPasskeyLogin(c *fiber.Ctx) error {
 	}
 
 	// Set token in cookie
-	c.Cookie(auth.NewCookieAuthn(token, "/", h.Cfg))
+	c.Cookie(auth.NewCookieAuthn(token, "/", exp))
 
 	// Email is returned because the client never collected it for this flow
 	return c.Status(200).JSON(fiber.Map{

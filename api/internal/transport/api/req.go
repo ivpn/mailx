@@ -16,6 +16,10 @@ type EmailReq struct {
 	Remember bool   `json:"remember"`
 }
 
+type RememberReq struct {
+	Remember bool `json:"remember"`
+}
+
 type SignupUserReq struct {
 	Email    string `json:"email" validate:"required,emailx"`
 	Password string `json:"password" validate:"password"`

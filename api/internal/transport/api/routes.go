@@ -36,6 +36,8 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	h.Server.Post("/v1/register/finish", limiter.New(), h.FinishRegistration)
 	h.Server.Post("/v1/login/begin", limiter.New(), h.BeginLogin)
 	h.Server.Post("/v1/login/finish", limiter.New(), h.FinishLogin)
+	h.Server.Post("/v1/login/passkey/begin", limiter.New(), h.BeginPasskeyLogin)
+	h.Server.Post("/v1/login/passkey/finish", limiter.New(), h.FinishPasskeyLogin)
 
 	session := h.Server.Group("/v1/pasession")
 	session.Use(auth.NewIPFilter(cfg.ApiAllowIPs))

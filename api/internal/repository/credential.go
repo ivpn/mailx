@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/go-webauthn/webauthn/webauthn"
 	"ivpn.net/email/api/internal/model"
@@ -51,7 +52,25 @@ func (d *Database) UpdateCredential(ctx context.Context, credential webauthn.Cre
 		return err
 	}
 
-	return d.Client.Model(&model.Credential{}).Where("user_id = ?", userID).Update("data", data).Error
+	// Scope the update to the specific credential row: a blanket "user_id = ?" update would
+	// overwrite every other passkey belonging to this user with this credential's data.
+	var credentials []model.Credential
+	err = d.Client.Where("user_id = ?", userID).Find(&credentials).Error
+	if err != nil {
+		return err
+	}
+
+	for _, c := range credentials {
+		if err := c.Unmarshal(); err != nil {
+			continue
+		}
+
+		if bytes.Equal(c.Cred.ID, credential.ID) {
+			return d.Client.Model(&model.Credential{}).Where("id = ? AND user_id = ?", c.ID, userID).Update("data", data).Error
+		}
+	}
+
+	return fmt.Errorf("credential not found for user")
 }
 
 func (d *Database) DeleteCredential(ctx context.Context, credential webauthn.Credential, userID string) error {

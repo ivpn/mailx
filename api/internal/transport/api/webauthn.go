@@ -538,6 +538,155 @@ func (h *Handler) FinishLogin(c *fiber.Ctx) error {
 	})
 }
 
+// @Summary Begin passkey login
+// @Description Begin usernameless login process using a discoverable passkey
+// @Tags webauthn
+// @Accept json
+// @Produce json
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /login/passkey/begin [post]
+func (h *Handler) BeginPasskeyLogin(c *fiber.Ctx) error {
+	// No user lookup: the credential returned by the authenticator identifies the user
+	options, sessionData, err := h.WebAuthn.BeginDiscoverableLogin()
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+			"code":  70002,
+		})
+	}
+
+	// Save the session
+	exp := time.Now().Add(auth.WebAuthnCeremonyExpiration)
+	token, err := model.GenSessionToken()
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrSaveSession,
+		})
+	}
+	sessionData.Expires = exp
+	err = h.Service.SaveSession(c.Context(), *sessionData, token, "", exp)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrSaveSession,
+		})
+	}
+
+	// Set token in cookie
+	c.Cookie(auth.NewCookieTempAuthn(token, c.Path(), h.Cfg))
+
+	return c.Status(200).JSON(options)
+}
+
+// @Summary Finish passkey login
+// @Description Finish usernameless login process using a discoverable passkey
+// @Tags webauthn
+// @Accept json
+// @Produce json
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /login/passkey/finish [post]
+func (h *Handler) FinishPasskeyLogin(c *fiber.Ctx) error {
+	// Get cookie token
+	token := c.Cookies(auth.AUTHN_TEMP_COOKIE)
+
+	// Get session
+	session, ok, err := h.Service.GetSession(c.Context(), token)
+	if err != nil || !ok {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrGetSession,
+		})
+	}
+
+	r, err := adaptor.ConvertRequest(c, true)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrFinishLogin,
+		})
+	}
+
+	// The credential's user handle identifies the user; captured here since BeginPasskeyLogin didn't know it
+	var loggedInUser model.User
+	identifyUser := func(rawID, userHandle []byte) (webauthn.User, error) {
+		user, err := h.Service.GetUser(c.Context(), string(userHandle))
+		if err != nil {
+			return nil, err
+		}
+
+		loggedInUser = user
+
+		return user, nil
+	}
+
+	credential, err := h.WebAuthn.FinishDiscoverableLogin(identifyUser, session.SessionData, r)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	if credential.Authenticator.CloneWarning {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrFinishLogin,
+		})
+	}
+
+	// Max sessions limit is checked here, now that the credential has identified the user
+	ok, err = h.Service.CheckSessionCount(c.Context(), loggedInUser.ID)
+	if !ok || err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrTooManySessions,
+		})
+	}
+
+	// Update user credential
+	err = h.Service.UpdateCredential(c.Context(), *credential, loggedInUser.ID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	// Delete session
+	err = h.Service.DeleteSession(c.Context(), token)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrDeleteSession,
+		})
+	}
+
+	// Clear cookie
+	auth.ClearCookies(c, auth.AUTHN_TEMP_COOKIE)
+
+	// Save the session
+	exp := time.Now().Add(h.Cfg.TokenExpiration)
+	newSessionData := webauthn.SessionData{
+		UserID:  loggedInUser.WebAuthnID(),
+		Expires: exp,
+	}
+	token, err = model.GenSessionToken()
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrSaveSession,
+		})
+	}
+	err = h.Service.SaveSession(c.Context(), newSessionData, token, loggedInUser.ID, exp)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrSaveSession,
+		})
+	}
+
+	// Set token in cookie
+	c.Cookie(auth.NewCookieAuthn(token, "/", h.Cfg))
+
+	// Email is returned because the client never collected it for this flow
+	return c.Status(200).JSON(fiber.Map{
+		"message": FinishLoginSuccess,
+		"email":   loggedInUser.Email,
+	})
+}
+
 // @Summary Get credentials
 // @Description Get user credentials
 // @Tags webauthn

@@ -90,6 +90,7 @@
                     v-model="includeHeader"
                     id="remove-header"
                     type="checkbox"
+                    class="checkbox-switch"
                 >
             </div>
             <hr>
@@ -107,6 +108,7 @@
                     v-model="req.log_issues"
                     id="log-issues"
                     type="checkbox"
+                    class="checkbox-switch"
                 >
             </div>
             <div class="mb-8">

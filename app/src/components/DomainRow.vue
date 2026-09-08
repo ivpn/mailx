@@ -22,6 +22,7 @@
                     v-bind:checked="domain.enabled && dnsRecordsVerified()"
                     v-bind:disabled="!dnsRecordsVerified()"
                     type="checkbox"
+                    class="checkbox-switch"
                 >
             </div>
         </td>
@@ -31,6 +32,7 @@
                     @change="updateCatchAll"
                     v-bind:checked="domain.catch_all"
                     type="checkbox"
+                    class="checkbox-switch"
                 >
             </div>
         </td>
@@ -87,6 +89,7 @@
                                 v-bind:checked="domain.enabled && dnsRecordsVerified()"
                                 v-bind:disabled="!dnsRecordsVerified()"
                                 type="checkbox"
+                                class="checkbox-switch"
                             >
                         </p>
                     </div>
@@ -97,6 +100,7 @@
                                 @change="updateCatchAll"
                                 v-bind:checked="domain.catch_all"
                                 type="checkbox"
+                                class="checkbox-switch"
                             >
                         </p>
                     </div>

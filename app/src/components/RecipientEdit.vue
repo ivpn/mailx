@@ -26,6 +26,7 @@
                                 v-bind:checked="pgp_inline"
                                 v-bind:disabled="!recipient.pgp_key"
                                 type="checkbox"
+                                class="checkbox-switch"
                             >
                         </div>
                     </article>

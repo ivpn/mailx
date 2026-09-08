@@ -118,14 +118,14 @@ func NewAPIAuth(cfg config.APIConfig, service Service) fiber.Handler {
 	}
 }
 
-func NewCookieAuthn(token string, path string, cfg config.APIConfig) *fiber.Cookie {
+func NewCookieAuthn(token string, path string, exp time.Time) *fiber.Cookie {
 	return &fiber.Cookie{
 		Name:     AUTHN_COOKIE,
 		Value:    token,
 		HTTPOnly: true,
 		Secure:   true,
-		MaxAge:   int(cfg.TokenExpiration.Seconds()),
-		Expires:  time.Now().Add(time.Duration(cfg.TokenExpiration)),
+		MaxAge:   int(time.Until(exp).Seconds()),
+		Expires:  exp,
 	}
 }
 

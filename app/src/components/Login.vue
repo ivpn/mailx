@@ -23,6 +23,17 @@
                                 >
                                 <p v-if="emailAuthnError" class="error">Required</p>
                             </div>
+                            <div class="mb-7 flex items-center gap-2">
+                                <input
+                                    v-model="stayLoggedIn"
+                                    id="stay-logged-in-authn"
+                                    type="checkbox"
+                                    class="checkbox-plain"
+                                >
+                                <label for="stay-logged-in-authn" class="mb-0 text-sm font-normal">
+                                    Stay logged in
+                                </label>
+                            </div>
                             <div class="flex items-center w-full">
                                 <button :disabled="isLoading" @click="loginWithPasskey" class="cta full">
                                     Log in with Passkey
@@ -81,6 +92,17 @@
                                 >
                                 <p v-if="otpError" class="error">Required</p>
                             </div>
+                            <div class="mb-7 flex items-center gap-2">
+                                <input
+                                    v-model="stayLoggedIn"
+                                    id="stay-logged-in"
+                                    type="checkbox"
+                                    class="checkbox-plain"
+                                >
+                                <label for="stay-logged-in" class="mb-0 text-sm font-normal">
+                                    Stay logged in
+                                </label>
+                            </div>
                             <div class="flex items-center w-full" v-bind:class="{ 'mb-6': !passkeySupported }">
                                 <button :disabled="isLoading" @click="login" class="cta full">
                                     Log in
@@ -135,6 +157,7 @@ const email = ref('')
 const emailAuthn = ref('')
 const password = ref('')
 const otp = ref('')
+const stayLoggedIn = ref(false)
 const emailError = ref(false)
 const emailAuthnError = ref(false)
 const passwordError = ref(false)
@@ -190,7 +213,8 @@ const login = async () => {
     const data = {
         email: email.value,
         password: password.value,
-        otp: otp.value
+        otp: otp.value,
+        remember: stayLoggedIn.value
     }
 
     try {
@@ -225,7 +249,8 @@ const loginWithPasskey = async () => {
     isLoading.value = true // Start loading
 
     const data = {
-        email: emailAuthn.value
+        email: emailAuthn.value,
+        remember: stayLoggedIn.value
     }
 
     try {

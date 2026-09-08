@@ -17,6 +17,7 @@ type APIConfig struct {
 	ApiBodyLimit              int
 	TokenSecret               string
 	TokenExpiration           time.Duration
+	TokenExpirationExtended   time.Duration
 	ApiTokenExpiration        time.Duration
 	PSK                       string
 	Domains                   string
@@ -92,6 +93,12 @@ type Config struct {
 func New() (Config, error) {
 	tokenExpStr := os.Getenv("TOKEN_EXPIRATION")
 	tokenExp, err := time.ParseDuration(tokenExpStr)
+	if err != nil {
+		return Config{}, err
+	}
+
+	tokenExpExtendedStr := os.Getenv("TOKEN_EXPIRATION_EXTENDED")
+	tokenExpExtended, err := time.ParseDuration(tokenExpExtendedStr)
 	if err != nil {
 		return Config{}, err
 	}
@@ -179,6 +186,7 @@ func New() (Config, error) {
 			ApiBodyLimit:              apiBodyLimitMB * 1024 * 1024,
 			TokenSecret:               os.Getenv("TOKEN_SECRET"),
 			TokenExpiration:           tokenExp,
+			TokenExpirationExtended:   tokenExpExtended,
 			ApiTokenExpiration:        apiTokenExp,
 			PSK:                       os.Getenv("PSK"),
 			Domains:                   os.Getenv("DOMAINS"),

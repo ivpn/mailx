@@ -4,6 +4,13 @@ on:
   push:
     branches:
       - staging
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Git branch to deploy to staging'
+        required: false
+        default: 'staging'
+        type: string
 
 permissions:
   contents: read
@@ -13,6 +20,7 @@ env:
   APP_IMAGE: email/app
   DAEMON_IMAGE: mailserver/daemon
   TAG: staging
+  BRANCH: ${{ inputs.branch || 'staging' }}
   REGISTRY: ${{ secrets.REGISTRY_NAME }}
 
 jobs:
@@ -20,13 +28,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout PR branch
+      - name: Checkout branch
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
-          ref: 'staging'
+          ref: ${{ env.BRANCH }}
 
       - name: Pull changes from branch
-        run: git pull origin staging
+        run: git pull origin "$BRANCH"
 
       - name: create app/.env file
         run: |

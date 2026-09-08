@@ -216,7 +216,7 @@ func (h *Handler) Authenticate(c *fiber.Ctx) error {
 			"error": ErrSaveSession,
 		})
 	}
-	err = h.Service.SaveSession(c.Context(), sessionData, token, user.ID, exp)
+	err = h.Service.SaveSession(c.Context(), sessionData, token, user.ID, exp, false)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrSaveSession,

@@ -4,6 +4,7 @@ type UserReq struct {
 	Email    string `json:"email" validate:"required,emailx"`
 	Password string `json:"password" validate:"password"`
 	OTP      string `json:"otp" validate:"min=0,max=10"`
+	Remember bool   `json:"remember"`
 }
 
 type AuthReq struct {
@@ -11,7 +12,8 @@ type AuthReq struct {
 }
 
 type EmailReq struct {
-	Email string `json:"email" validate:"required,emailx"`
+	Email    string `json:"email" validate:"required,emailx"`
+	Remember bool   `json:"remember"`
 }
 
 type SignupUserReq struct {

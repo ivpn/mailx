@@ -18,7 +18,7 @@ var (
 type SessionStore interface {
 	GetSession(context.Context, string) (model.Session, bool, error)
 	GetSessionCount(context.Context, string) (int, error)
-	SaveSession(context.Context, webauthn.SessionData, string, string, time.Time) error
+	SaveSession(context.Context, webauthn.SessionData, string, string, time.Time, bool) error
 	DeleteSession(context.Context, string) error
 	DeleteSessionByUserID(context.Context, string) error
 }
@@ -54,8 +54,8 @@ func (s *Service) CheckSessionCount(ctx context.Context, userID string) (bool, e
 	return true, nil
 }
 
-func (s *Service) SaveSession(ctx context.Context, session webauthn.SessionData, token string, userID string, exp time.Time) error {
-	err := s.Store.SaveSession(ctx, session, token, userID, exp)
+func (s *Service) SaveSession(ctx context.Context, session webauthn.SessionData, token string, userID string, exp time.Time, remember bool) error {
+	err := s.Store.SaveSession(ctx, session, token, userID, exp, remember)
 	if err != nil {
 		return ErrSaveSession
 	}

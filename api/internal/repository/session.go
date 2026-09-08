@@ -32,7 +32,7 @@ func (d *Database) GetSessionCount(ctx context.Context, userID string) (int, err
 	return int(count), err
 }
 
-func (d *Database) SaveSession(ctx context.Context, sessionData webauthn.SessionData, token string, userID string, exp time.Time) error {
+func (d *Database) SaveSession(ctx context.Context, sessionData webauthn.SessionData, token string, userID string, exp time.Time, remember bool) error {
 	data, err := json.Marshal(sessionData)
 	if err != nil {
 		return err
@@ -43,6 +43,7 @@ func (d *Database) SaveSession(ctx context.Context, sessionData webauthn.Session
 		Token:     token,
 		Data:      data,
 		ExpiresAt: exp,
+		Remember:  remember,
 	}).Error
 }
 

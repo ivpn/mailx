@@ -7,6 +7,7 @@
                     v-bind:checked="alias.enabled && !isDomainUnverified && !isAliasDeleted"
                     v-bind:disabled="!alias.recipients.length || isDomainUnverified || isAliasDeleted"
                     type="checkbox"
+                    class="checkbox-switch"
                 >
                 <span v-if="isAliasDeleted" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                     Alias deleted. Address is not forwarding mail.
@@ -136,6 +137,7 @@
                             v-bind:checked="alias.enabled && !isDomainUnverified && !isAliasDeleted"
                             v-bind:disabled="!alias.recipients.length || isDomainUnverified || isAliasDeleted"
                             type="checkbox"
+                            class="checkbox-switch"
                         >
                         <span v-if="isAliasDeleted" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                             Alias deleted. Address is not forwarding mail.

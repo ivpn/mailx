@@ -28,7 +28,7 @@
                     v-bind:checked="recipient.pgp_enabled"
                     v-bind:disabled="!recipient.pgp_key"
                     type="checkbox"
-                    class="mr-4"
+                    class="checkbox-switch mr-4"
                 >
                 <span v-if="!recipient.pgp_key" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                     Add PGP key to enable encryption
@@ -93,7 +93,7 @@
                             v-bind:checked="recipient.pgp_enabled"
                             v-bind:disabled="!recipient.pgp_key"
                             type="checkbox"
-                            class="mr-4"
+                            class="checkbox-switch mr-4"
                         >
                         <span v-if="!recipient.pgp_key" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                             Add PGP key to enable encryption

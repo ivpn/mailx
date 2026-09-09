@@ -7,7 +7,7 @@
             </button>
         </p>
         <h1>Mailx FAQ</h1>
-        <p class="text-sm">Last updated: 20 June 2025</p>
+        <p class="text-sm">Last updated: 9 September 2026</p>
 
         <h2>Aliases: How do I add an email alias?</h2>
         <p>Click the 'Aliases' tab on the left side of the page.</p>
@@ -20,9 +20,9 @@
         <p>A 'Wildcard Alias' offers a way to use one address to receive mail for virtually infinite aliases.  If access to the Internet is not available and an alias is required, remember the Wildcard suffix and add an on-the-fly prefix to create a valid email alias.</p>
         <p>Note: The 'Wildcard Alias' limit per domain is two.</p>
         <p>To create a 'Wildcard Alias', navigate to the 'Wildcard' page, and click the 'New Wildcard' button.</p>
-        <p>Choose an easy to remember suffix, an add an optional 'Description' and optional 'From name'.  Select one or more 'Recipient(s)', and choose the 'Domain'.</p>
+        <p>Choose an 'Alias separator' - 'Period (.)' (default) or 'Plus (+)' - and an easy to remember suffix, and add an optional 'Description' and optional 'From name'.  Select one or more 'Recipient(s)', and choose the 'Domain'.</p>
         <p>Click the 'Create and copy to clipboard' button to add the alias to your account.</p>
-        <p>To make use of the 'Wildcard Alias', add a prefix to your alias.  For example, use 'dentist' plus your 'Wildcard Alias' address for an instant alias: dentist+remember_this@domain</p>
+        <p>To make use of the 'Wildcard Alias', add a prefix to your alias using the separator you chose.  For example, with the 'Period (.)' separator, use 'dentist' plus your 'Wildcard Alias' address for an instant alias: dentist.remember_this@domain. With the 'Plus (+)' separator, use: dentist+remember_this@domain</p>
 
         <h2>Aliases: How do I send a message using as email alias?</h2>
         <p>On the 'Aliases' page, choose an alias, and click the ellipsis menu button under the 'Actions' column on the right side.  Click the 'Send' option.</p>

@@ -16,6 +16,38 @@ const (
 	AliasFormatCustom      = "custom"
 )
 
+const (
+	WildcardDelimiterPlus = "+"
+	WildcardDelimiterDot  = "."
+	// DefaultWildcardDelimiter is used when a request doesn't specify one (e.g. older API clients).
+	DefaultWildcardDelimiter = WildcardDelimiterPlus
+	// MaxWildcardAliasesPerDomain is the per-user cap on Wildcard Aliases for a single domain.
+	MaxWildcardAliasesPerDomain = 2
+)
+
+// WildcardDelimiters lists the supported Wildcard Alias suffix delimiters, "+" first to
+// preserve historic match priority.
+var WildcardDelimiters = []string{WildcardDelimiterPlus, WildcardDelimiterDot}
+
+func IsValidWildcardDelimiter(d string) bool {
+	return d == WildcardDelimiterPlus || d == WildcardDelimiterDot
+}
+
+// GenerateWildcardAlias returns the wildcard-suffix local part for the given delimiter
+// (e.g. "*+news" or "*.news").
+func GenerateWildcardAlias(localPart string, delimiter string) string {
+	return "*" + delimiter + localPart
+}
+
+// WildcardAliasDelimiter returns the delimiter character used by a Wildcard Alias name
+// (e.g. "*+news@domain.com" -> "+"), or "" if name isn't shaped like a Wildcard Alias.
+func WildcardAliasDelimiter(name string) string {
+	if len(name) < 2 || name[0] != '*' {
+		return ""
+	}
+	return name[1:2]
+}
+
 var (
 	Adjectives = []string{
 		"autumn", "hidden", "bitter", "misty", "silent", "empty", "dry", "dark", "summer", "icy", "quiet", "white", "spring", "winter", "patient", "twilight", "crimson", "wispy", "weathered", "blue", "billowing", "broken", "cold", "damp", "falling", "frosty", "green", "long", "late", "lingering", "little", "muddy", "old", "red", "rough", "still", "small", "sparkling", "shy", "wandering", "withered", "wild", "black", "young", "solitary", "aged", "snowy", "floral", "restless", "ancient", "purple", "nameless", "able", "active", "actual", "adept", "admiral", "adoring", "adroit", "affable", "agile", "airy", "alert", "alive", "amazing", "ample", "amused", "angelic", "apt", "arch", "artful", "artsy", "ashamed", "aspire", "astute", "austere", "avid", "awake", "aware", "awesome", "balanced", "bald", "basic", "beaming", "beloved", "best", "big", "blessed", "blissful", "blithe", "bold", "bossy", "brainy", "brave", "brief", "bright", "brisk", "broad", "bubbly", "buoyant", "calm", "canny", "capable", "caring", "casual", "charmed", "cheerful", "chic", "chilled", "choice", "civil", "classy", "clean", "clear", "clever", "close", "cloudy", "coarse", "coherent", "cold", "coltish", "comfy", "compact", "cool", "cozy", "crisp", "cute", "dandy", "dapper", "daring", "dauntless", "dear", "decent", "deep", "deft", "dense", "devout", "diligent", "diplomat", "divine", "droll", "drunk", "dry", "due", "dulcet", "dumb", "durable", "eager", "early", "earnest", "easy", "eclectic", "edgy", "elite", "elvish", "embossed", "eminent", "endless", "enough", "euphoric", "even", "exalted", "exact", "expert", "exposed", "fair", "famous", "fancy", "fast", "fearless", "fecund", "feral", "fiery", "fit", "flashy", "flat", "flawless", "fleet", "fluid", "flush", "foamy", "fond", "forlorn", "formal", "forte", "frank", "free", "fresh", "frisky", "funny", "fussy", "future", "fuzzy", "gallant", "game", "gentle", "genuine", "giving", "glad", "glossy", "glum", "gold", "good", "goofy", "graceful", "grand", "grave", "great", "grim", "gruff", "guarded", "guiltless", "handy", "hard", "hasty", "hazy", "heavy", "hefty", "heroic", "high", "hollow", "holy", "homey", "hot", "hushed", "ideal", "idyllic", "immune", "immense", "inspired", "intact", "intense", "inviting", "irate", "itchy", "jolly", "joyful", "juicy", "just", "keen", "kind", "knowing", "lanky", "large", "last", "late", "lawful", "lean", "left", "legal", "light", "lithe", "little", "live", "lively", "local", "logical", "lone", "long", "loose", "lost", "loud", "loyal", "lucid", "lucky", "lush", "luxe", "mad", "magical", "main", "major", "manic", "marked", "married", "massive", "mealy", "meek", "mellow", "merry", "mighty", "mild", "modern", "modest", "moot", "moral", "mute", "muted", "naive", "narrow", "nasty", "natural", "neat", "new", "nice", "nifty", "nimble", "noble", "noisy", "noted", "novel", "numb", "nutty", "obese", "odd", "old", "open", "opulent", "optimal", "patient", "peppy", "perky", "petite", "petty", "polished", "polite", "poor", "posh", "potent", "practical", "precise", "pretty", "prime", "prior", "private", "prized", "prone", "proper", "proud", "prudent", "pumped", "pure", "purple", "quick", "quiet", "rapid", "rare", "rational", "ready", "real", "regal", "rich", "right", "robust", "romantic", "rosy", "rough", "round", "routine", "rude", "sad", "safe", "sage", "saintly", "salty", "sane", "sassy", "savvy", "secure", "selfish", "serene", "severe", "sharp", "shiny", "short", "shy", "silent", "silky", "silly", "simple", "single", "sleek", "slim", "slimy", "slow", "small", "smart", "smiling", "snappy", "snug", "solid", "somber", "sonic", "sordid", "sound", "spare", "sparse", "spicy", "splendid", "spry", "stable", "staid", "stale", "starry", "stark", "staunch", "steady", "steep", "stiff", "stony", "strange", "strong", "sturdy", "suave", "subtle", "sunny", "super", "sure", "sweet", "swift", "tall", "tame", "tart", "tasty", "taut", "tepid", "terse", "tidy", "tight", "timely", "tiny", "top", "torn", "tough", "tranquil", "trendy", "true", "trusted", "typical", "ultimate", "unbiased", "uncommon", "unique", "upbeat", "upright", "urban", "useful", "vague", "vain", "valid", "vapid", "vast", "vibrant", "victor", "vigilant", "vigorous", "virtuous", "vital", "vivid", "vocal", "wacky", "waggish", "wary", "warm", "wary", "wealthy", "wee", "weird", "well", "wet", "whole", "wicked", "wily", "witty", "wise", "wobbly", "wooded", "woody", "worthy", "young", "youthful", "zany", "zesty", "zippy",
@@ -33,7 +65,7 @@ func GenerateAlias(format string, localPart string) string {
 	case AliasFormatUUID:
 		return uuid.New().String()
 	case AliasFormatWildcard:
-		return fmt.Sprintf("*+%s", localPart)
+		return GenerateWildcardAlias(localPart, WildcardDelimiterPlus)
 	case AliasFormatCustom:
 		return localPart
 	default:

@@ -60,6 +60,14 @@ type AliasStats struct {
 	Sends    int `json:"sends"`
 }
 
+// WildcardDomainInfo describes a user's existing Wildcard Aliases for a single domain, used
+// by the frontend to know whether/which delimiters can still be used for that domain.
+type WildcardDomainInfo struct {
+	Count          int      `json:"count"`
+	Limit          int      `json:"limit"`
+	DelimitersUsed []string `json:"delimiters_used"`
+}
+
 type AliasList struct {
 	Aliases []Alias `json:"aliases"`
 	Total   int     `json:"total"`

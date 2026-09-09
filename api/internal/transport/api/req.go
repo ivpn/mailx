@@ -44,6 +44,7 @@ type AliasReq struct {
 	Format            string `json:"format"`
 	Domain            string `json:"domain" validate:"required"`
 	WildcardLocalPart string `json:"wildcard_local_part" validate:"omitempty,alphanum,min=6,max=12"`
+	WildcardDelimiter string `json:"wildcard_delimiter" validate:"omitempty,oneof=+ ."`
 	LocalPart         string `json:"local_part" validate:"omitempty,emaillocalpart"`
 }
 

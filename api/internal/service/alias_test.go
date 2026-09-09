@@ -189,7 +189,7 @@ func TestPostAlias_CustomDomainClassifiesStoreErrors(t *testing.T) {
 			store.postAliasErr = tt.storeErr
 			s := newTestService(store)
 
-			_, err := s.PostAlias(context.Background(), model.Alias{UserID: "user-1", Origin: model.Inbound}, model.AliasFormatCustom, "customdomain.com", "newalias")
+			_, err := s.PostAlias(context.Background(), model.Alias{UserID: "user-1", Origin: model.Inbound}, model.AliasFormatCustom, "customdomain.com", "newalias", "")
 			if !errors.Is(err, tt.expectedErr) {
 				t.Errorf("expected error %v, got %v", tt.expectedErr, err)
 			}
@@ -202,11 +202,95 @@ func TestPostAlias_CustomDomainSucceeds(t *testing.T) {
 	store.subscription = model.Subscription{ActiveUntil: time.Now().Add(time.Hour)}
 	s := newTestService(store)
 
-	alias, err := s.PostAlias(context.Background(), model.Alias{UserID: "user-1", Origin: model.Inbound}, model.AliasFormatCustom, "customdomain.com", "newalias")
+	alias, err := s.PostAlias(context.Background(), model.Alias{UserID: "user-1", Origin: model.Inbound}, model.AliasFormatCustom, "customdomain.com", "newalias", "")
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
 	if alias.Name != "newalias@customdomain.com" {
 		t.Errorf("expected alias name newalias@customdomain.com, got %s", alias.Name)
+	}
+}
+
+func TestPostAlias_WildcardSucceedsWithDelimiter(t *testing.T) {
+	tests := []struct {
+		name      string
+		delimiter string
+		expected  string
+	}{
+		{name: "plus delimiter", delimiter: model.WildcardDelimiterPlus, expected: "*+news@customdomain.com"},
+		{name: "dot delimiter", delimiter: model.WildcardDelimiterDot, expected: "*.news@customdomain.com"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			store := newFakeStore()
+			store.subscription = model.Subscription{ActiveUntil: time.Now().Add(time.Hour)}
+			s := newTestService(store)
+
+			alias, err := s.PostAlias(context.Background(), model.Alias{UserID: "user-1"}, model.AliasFormatWildcard, "customdomain.com", "news", tt.delimiter)
+			if err != nil {
+				t.Fatalf("expected no error, got %v", err)
+			}
+			if alias.Name != tt.expected {
+				t.Errorf("expected alias name %s, got %s", tt.expected, alias.Name)
+			}
+			if !alias.Wildcard {
+				t.Error("expected alias.Wildcard to be true")
+			}
+		})
+	}
+}
+
+func TestPostAlias_WildcardDomainCapReachedRegardlessOfDelimiterMix(t *testing.T) {
+	store := newFakeStore()
+	store.subscription = model.Subscription{ActiveUntil: time.Now().Add(time.Hour)}
+	store.aliases["*+news@customdomain.com"] = model.Alias{Name: "*+news@customdomain.com", UserID: "user-1", Wildcard: true}
+	store.aliases["*.deals@customdomain.com"] = model.Alias{Name: "*.deals@customdomain.com", UserID: "user-1", Wildcard: true}
+	s := newTestService(store)
+
+	_, err := s.PostAlias(context.Background(), model.Alias{UserID: "user-1"}, model.AliasFormatWildcard, "customdomain.com", "third", model.WildcardDelimiterDot)
+	if !errors.Is(err, model.ErrDuplicateAliasDomain) {
+		t.Errorf("expected ErrDuplicateAliasDomain, got %v", err)
+	}
+}
+
+func TestPostAlias_WildcardInvalidDelimiterRejected(t *testing.T) {
+	store := newFakeStore()
+	store.subscription = model.Subscription{ActiveUntil: time.Now().Add(time.Hour)}
+	s := newTestService(store)
+
+	_, err := s.PostAlias(context.Background(), model.Alias{UserID: "user-1"}, model.AliasFormatWildcard, "customdomain.com", "news", "-")
+	if !errors.Is(err, ErrPostAlias) {
+		t.Errorf("expected ErrPostAlias for an invalid delimiter, got %v", err)
+	}
+}
+
+func TestGetWildcardDomainInfo(t *testing.T) {
+	store := newFakeStore()
+	store.aliases["*+news@customdomain.com"] = model.Alias{Name: "*+news@customdomain.com", UserID: "user-1", Wildcard: true}
+	store.aliases["*.deals@customdomain.com"] = model.Alias{Name: "*.deals@customdomain.com", UserID: "user-1", Wildcard: true}
+	store.aliases["*+other@otherdomain.com"] = model.Alias{Name: "*+other@otherdomain.com", UserID: "user-1", Wildcard: true}
+	store.aliases["*+news2@customdomain.com"] = model.Alias{Name: "*+news2@customdomain.com", UserID: "user-2", Wildcard: true}
+	s := newTestService(store)
+
+	info, err := s.GetWildcardDomainInfo(context.Background(), "user-1", "customdomain.com")
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if info.Count != 2 {
+		t.Errorf("expected count 2, got %d", info.Count)
+	}
+	if info.Limit != model.MaxWildcardAliasesPerDomain {
+		t.Errorf("expected limit %d, got %d", model.MaxWildcardAliasesPerDomain, info.Limit)
+	}
+	if len(info.DelimitersUsed) != 2 {
+		t.Fatalf("expected 2 delimiters used, got %+v", info.DelimitersUsed)
+	}
+	found := map[string]bool{}
+	for _, d := range info.DelimitersUsed {
+		found[d] = true
+	}
+	if !found["+"] || !found["."] {
+		t.Errorf("expected delimiters used to include both + and ., got %+v", info.DelimitersUsed)
 	}
 }

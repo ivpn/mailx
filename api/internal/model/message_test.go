@@ -150,3 +150,75 @@ func TestWildcardAlias(t *testing.T) {
 		})
 	}
 }
+
+func TestWildcardAliasForDelimiter(t *testing.T) {
+	tests := []struct {
+		name          string
+		email         string
+		delimiter     string
+		expectedAlias string
+		expectedOk    bool
+	}{
+		{
+			name:          "dot delimiter plain tag",
+			email:         "anything.shop@domain.com",
+			delimiter:     ".",
+			expectedAlias: "*.shop@domain.com",
+			expectedOk:    true,
+		},
+		{
+			name:          "plus delimiter still works unchanged",
+			email:         "anything+shop@domain.com",
+			delimiter:     "+",
+			expectedAlias: "*+shop@domain.com",
+			expectedOk:    true,
+		},
+		{
+			name:          "first dot wins when prefix itself contains dots",
+			email:         "sales.orders.tag@domain.com",
+			delimiter:     ".",
+			expectedAlias: "*.orders.tag@domain.com",
+			expectedOk:    true,
+		},
+		{
+			name:          "dots only in domain part are not a tag",
+			email:         "user@sub.domain.com",
+			delimiter:     ".",
+			expectedAlias: "",
+			expectedOk:    false,
+		},
+		{
+			name:          "no delimiter present",
+			email:         "user@domain.com",
+			delimiter:     ".",
+			expectedAlias: "",
+			expectedOk:    false,
+		},
+		{
+			name:          "empty suffix",
+			email:         "user.@domain.com",
+			delimiter:     ".",
+			expectedAlias: "",
+			expectedOk:    false,
+		},
+		{
+			name:          "reply-encoded looking suffix is rejected",
+			email:         "user.reply=example.com@domain.com",
+			delimiter:     ".",
+			expectedAlias: "",
+			expectedOk:    false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			alias, ok := WildcardAliasForDelimiter(tt.email, tt.delimiter)
+			if alias != tt.expectedAlias {
+				t.Errorf("expected alias %s, got %s", tt.expectedAlias, alias)
+			}
+			if ok != tt.expectedOk {
+				t.Errorf("expected ok %v, got %v", tt.expectedOk, ok)
+			}
+		})
+	}
+}

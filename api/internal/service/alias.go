@@ -179,7 +179,7 @@ func (s *Service) GetAliasByName(name string) (model.Alias, error) {
 	return alias, nil
 }
 
-func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format string, domain string, localPart string) (model.Alias, error) {
+func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format string, domain string, localPart string, delimiter string) (model.Alias, error) {
 	sub, err := s.GetSubscription(context.Background(), alias.UserID)
 	if err != nil {
 		log.Printf("error fetching subscription: %s", err.Error())
@@ -192,24 +192,28 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 
 	// Wildcard alias
 	if format == model.AliasFormatWildcard {
+		if !model.IsValidWildcardDelimiter(delimiter) {
+			return model.Alias{}, ErrPostAlias
+		}
+
 		userAliases, err := s.Store.GetAliases(ctx, alias.UserID, 0, 0, "created_at", "DESC", "true", "", "active")
 		if err != nil {
 			log.Printf("error fetching user aliases: %s", err.Error())
 			return model.Alias{}, ErrPostAlias
 		}
 
-		// Count how many Wildcard aliases the user already has for this domain
+		// Count how many Wildcard aliases the user already has for this domain, regardless of delimiter
 		domainAliasCount := 0
 		for _, userAlias := range userAliases {
 			if strings.Contains(userAlias.Name, domain) {
 				domainAliasCount++
-				if domainAliasCount >= 2 {
+				if domainAliasCount >= model.MaxWildcardAliasesPerDomain {
 					return model.Alias{}, model.ErrDuplicateAliasDomain
 				}
 			}
 		}
 
-		alias.Name = model.GenerateAlias(format, localPart) + "@" + domain
+		alias.Name = model.GenerateWildcardAlias(localPart, delimiter) + "@" + domain
 		alias.Wildcard = true
 		alias, err = s.Store.PostAlias(ctx, alias, s.Cfg.Service.MaxDailyAliases, s.Cfg.Service.MaxInboundAliasesPerHour)
 		if err != nil {
@@ -265,6 +269,30 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 	return alias, nil
 }
 
+// GetWildcardDomainInfo reports how many Wildcard Aliases the user already has for domain
+// and which delimiters they use, so callers can tell whether/which delimiters are still
+// available for that domain.
+func (s *Service) GetWildcardDomainInfo(ctx context.Context, userID string, domain string) (model.WildcardDomainInfo, error) {
+	userAliases, err := s.Store.GetAliases(ctx, userID, 0, 0, "created_at", "DESC", "true", "", "active")
+	if err != nil {
+		log.Printf("error fetching user aliases: %s", err.Error())
+		return model.WildcardDomainInfo{}, ErrGetAliases
+	}
+
+	info := model.WildcardDomainInfo{Limit: model.MaxWildcardAliasesPerDomain}
+	for _, userAlias := range userAliases {
+		if !strings.HasSuffix(userAlias.Name, "@"+domain) {
+			continue
+		}
+		info.Count++
+		if delim := model.WildcardAliasDelimiter(userAlias.Name); delim != "" {
+			info.DelimitersUsed = append(info.DelimitersUsed, delim)
+		}
+	}
+
+	return info, nil
+}
+
 func (s *Service) PostInboundAlias(ctx context.Context, alias model.Alias) (model.Alias, error) {
 	if alias.Origin != model.Inbound || alias.ID != "" {
 		return model.Alias{}, ErrPostInboundAlias
@@ -291,7 +319,7 @@ func (s *Service) PostInboundAlias(ctx context.Context, alias model.Alias) (mode
 	}
 
 	localPart := aliasLocalPart(alias.Name)
-	alias, err = s.PostAlias(ctx, alias, model.AliasFormatCustom, domain, localPart)
+	alias, err = s.PostAlias(ctx, alias, model.AliasFormatCustom, domain, localPart, "")
 	if err != nil {
 		log.Printf("error creating inbound alias: %s", err.Error())
 		return model.Alias{}, ErrPostInboundAlias
@@ -389,7 +417,7 @@ func (s *Service) ImportAliases(ctx context.Context, aliases []model.AliasImport
 			Origin:      model.Import,
 		}
 
-		importedAlias, err := s.PostAlias(ctx, alias, req.Format, req.Domain, req.LocalPart)
+		importedAlias, err := s.PostAlias(ctx, alias, req.Format, req.Domain, req.LocalPart, "")
 		if err != nil {
 			continue
 		}

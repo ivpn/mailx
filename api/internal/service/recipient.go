@@ -295,11 +295,17 @@ func (s *Service) FindRecipients(from string, to string, msgType model.MessageTy
 	aliasName, replyTo := model.ParseReplyTo(to)
 
 	alias, err := s.GetAliasByName(aliasName)
-	// Fall back to a Wildcard Alias match (e.g. "*+suffix@domain.com") before giving up.
+	// Fall back to a Wildcard Alias match (e.g. "*+suffix@domain.com" or "*.suffix@domain.com")
+	// before giving up, trying each supported delimiter in turn.
 	if err != nil {
-		if wildcardName, ok := model.WildcardAlias(to); ok {
+		for _, delimiter := range model.WildcardDelimiters {
+			wildcardName, ok := model.WildcardAliasForDelimiter(to, delimiter)
+			if !ok {
+				continue
+			}
 			if wcAlias, wcErr := s.GetAliasByName(wildcardName); wcErr == nil {
 				alias, err = wcAlias, nil
+				break
 			}
 		}
 	}
@@ -308,7 +314,7 @@ func (s *Service) FindRecipients(from string, to string, msgType model.MessageTy
 		domainPart := aliasDomainPart(aliasName)
 		if isCustomAliasDomain(domainPart, s.Cfg.API.Domains) {
 			// A tagged/reply-encoded address must never auto-provision a new alias.
-			hasTag := strings.Contains(to, "+")
+			hasTag := strings.ContainsAny(to, "+.")
 			if ok, rcps, catchAllAlias, catchAllErr := s.resolveCatchAll(domainPart, aliasName, hasTag); ok {
 				if catchAllErr != nil {
 					return []model.Recipient{}, catchAllAlias, msgType, catchAllErr

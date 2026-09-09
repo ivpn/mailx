@@ -70,23 +70,32 @@ func ParseReplyTo(email string) (string, string) {
 	return alias, ""
 }
 
+// WildcardAliasForDelimiter returns the wildcard-suffix form of a tagged address for the
+// given delimiter (e.g. "anything+suffix@domain.com" with "+" -> "*+suffix@domain.com"),
+// used to match Wildcard Aliases when no exact alias exists for the tagged address. ok is
+// false when email has no plain tag for that delimiter (none present, before "@", or one
+// that looks reply-encoded).
+func WildcardAliasForDelimiter(email string, delimiter string) (string, bool) {
+	atIndex := strings.Index(email, "@")
+	delimIndex := strings.Index(email, delimiter)
+	if delimIndex == -1 || atIndex == -1 || delimIndex > atIndex {
+		return "", false
+	}
+
+	suffix := email[delimIndex+len(delimiter) : atIndex]
+	if suffix == "" || strings.Contains(suffix, "=") {
+		return "", false
+	}
+
+	return "*" + email[delimIndex:], true
+}
+
 // WildcardAlias returns the wildcard-suffix form of a plus-tagged address
 // (e.g. "anything+suffix@domain.com" -> "*+suffix@domain.com"), used to
 // match Wildcard Aliases when no exact alias exists for the tagged address.
 // ok is false when email has no plain "+" tag (none, or a reply-encoded one).
 func WildcardAlias(email string) (string, bool) {
-	atIndex := strings.Index(email, "@")
-	plusIndex := strings.Index(email, "+")
-	if plusIndex == -1 || atIndex == -1 || plusIndex > atIndex {
-		return "", false
-	}
-
-	rcp := email[plusIndex+1 : atIndex]
-	if rcp == "" || strings.Contains(rcp, "=") {
-		return "", false
-	}
-
-	return "*" + email[plusIndex:], true
+	return WildcardAliasForDelimiter(email, WildcardDelimiterPlus)
 }
 
 func GenerateReplyTo(alias string, to string) string {

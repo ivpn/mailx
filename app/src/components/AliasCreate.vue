@@ -18,6 +18,18 @@
                     <article>
                         <div v-if="props.wildcard">
                             <div class="mb-3">
+                                <label for="alias_wildcard_delimiter">
+                                    Alias separator
+                                </label>
+                                <select id="alias_wildcard_delimiter" :disabled="wildcardAtLimit">
+                                    <option v-for="(delimiter, index) in delimiters" v-bind:value="delimiter"
+                                        :selected="delimiter == alias.wildcard_delimiter || index === 0" :key="delimiter">
+                                        {{ delimiterTitles[delimiter] }}
+                                    </option>
+                                </select>
+                                <p v-if="wildcardAtLimit" class="error">Wildcard alias limit reached for this domain ({{ wildcardDomainInfo.limit }} max)</p>
+                            </div>
+                            <div class="mb-3">
                                 <label for="alias_wildcard_suffix">
                                     Alias suffix (6-12 alphanumeric chars.):
                                 </label>
@@ -29,7 +41,7 @@
                                 >
                                 <p v-if="errorLocalPart" class="error">Wildcard suffix must be between 6 and 12 characters</p>
                                 <p class="text-primary mb-1">
-                                    *+{{ alias.local_part }}@{{ alias.domain }}
+                                    *{{ alias.wildcard_delimiter }}{{ alias.local_part }}@{{ wildcardPreviewDomain }}
                                 </p>
                             </div>
                         </div>
@@ -146,7 +158,7 @@
                     <footer>
                         <nav>
                             <button
-                                v-bind:disabled="errorRecipients.length > 0"
+                                v-bind:disabled="errorRecipients.length > 0 || (props.wildcard && wildcardAtLimit)"
                                 @click="postAlias"
                                 class="cta">
                                 Create and copy to clipboard
@@ -164,7 +176,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import overlay from '@preline/overlay'
 import select from '@preline/select'
 import axios from 'axios'
@@ -183,13 +195,22 @@ const alias = ref({
     recipients: '',
     domain: envDomains[0],
     wildcard: props.wildcard ? 'true' : 'false',
-    local_part: ''
+    local_part: '',
+    wildcard_delimiter: '.'
 })
 const recipients = ref(props.recipients)
 const settings = ref(props.settings)
 const selectRecipients = ref([settings.value.recipient ? settings.value.recipient : props.recipients[0]])
 const domains = ref(envDomains)
 const customDomains = ref(props.settings.custom_domains || [])
+const delimiters = ['.', '+']
+const delimiterTitles: Record<string, string> = {
+    '.': 'Period (.)',
+    '+': 'Plus (+)'
+}
+const wildcardPreviewDomain = ref(envDomains[0])
+const wildcardDomainInfo = ref({ count: 0, limit: 2, delimiters_used: [] })
+const wildcardAtLimit = computed(() => wildcardDomainInfo.value.count >= wildcardDomainInfo.value.limit)
 const formats = ref([{
     name: 'Words',
     value: 'words'
@@ -230,6 +251,7 @@ const postAlias = async () => {
 
     if (props.wildcard) {
         req.wildcard_local_part = req.local_part
+        req.wildcard_delimiter = alias.value.wildcard_delimiter
         delete req.local_part
     }
 
@@ -281,6 +303,7 @@ const addEvents = () => {
         document.addEventListener('keydown', handleKeydown)
         focusFirstInput()
         updateFormats()
+        updateWildcardDomainInfo()
     })
 
     const multiselect = select.getInstance('#create-alias-recipient' as any, true) as any
@@ -292,11 +315,17 @@ const addEvents = () => {
     if (domainSelect) {
         domainSelect.addEventListener('change', updateFormats)
         domainSelect.addEventListener('change', updateFormat)
+        domainSelect.addEventListener('change', updateWildcardDomainInfo)
     }
 
     const formatElement = document.getElementById('alias_format') as HTMLInputElement
     if (formatElement) {
         formatElement.addEventListener('change', updateFormat)
+    }
+
+    const delimiterElement = document.getElementById('alias_wildcard_delimiter') as HTMLInputElement
+    if (delimiterElement) {
+        delimiterElement.addEventListener('change', updateWildcardDelimiter)
     }
 }
 
@@ -368,6 +397,30 @@ const updateFormat = () => {
     alias.value.format = formatElement.value
 }
 
+const updateWildcardDelimiter = () => {
+    const delimiterElement = document.getElementById('alias_wildcard_delimiter') as HTMLInputElement
+    alias.value.wildcard_delimiter = delimiterElement.value
+}
+
+// Best-effort UX check only - the backend is the source of truth for the per-domain limit.
+const updateWildcardDomainInfo = async () => {
+    if (!props.wildcard) return
+
+    const select = document.getElementById('alias_domain') as HTMLSelectElement
+    const selectedOption = select.options[select.selectedIndex]
+    wildcardPreviewDomain.value = selectedOption?.textContent?.trim() || envDomains[0]
+
+    const domain = selectedOption.getAttribute('domain')
+    if (!domain) return
+
+    try {
+        const res = await aliasApi.getWildcardDomainInfo(domain)
+        wildcardDomainInfo.value = res.data
+    } catch {
+        wildcardDomainInfo.value = { count: 0, limit: 2, delimiters_used: [] }
+    }
+}
+
 const resetAlias = () => {
     alias.value = {
         description: '',
@@ -377,7 +430,8 @@ const resetAlias = () => {
         recipients: '',
         domain: props.settings.domain || envDomains[0],
         wildcard: props.wildcard ? 'true' : 'false',
-        local_part: ''
+        local_part: '',
+        wildcard_delimiter: '.'
     }
 }
 

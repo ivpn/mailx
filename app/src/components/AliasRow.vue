@@ -36,7 +36,7 @@
                         {{ copyText }}: {{ alias.name }}
                     </span>
                 </p>
-                <p v-if="isCreatedByCatchAll" class="text-xs text-tertiary mt-1">Created by Catch-All</p>
+                <p v-if="isCreatedByWildcard" class="text-xs text-tertiary mt-1">Created by Wildcard</p>
             </div>
         </td>
         <td>
@@ -83,7 +83,7 @@
                         v-if="!alias.deleted_at"
                         v-bind:disabled="!alias.recipients.length"
                         v-bind:data-hs-overlay="'#modal-send-alias' + alias.id"
-                        v-bind:class="{ 'hide': alias.catch_all }"
+                        v-bind:class="{ 'hide': alias.wildcard }"
                         >
                         <i class="icon icon-primary send text-xs"></i>
                         Send
@@ -128,7 +128,7 @@
                                     {{ copyText }}: {{ alias.name }}
                                 </span>
                             </p>
-                            <p v-if="isCreatedByCatchAll" class="text-xs text-tertiary mt-1">Created by Catch-All</p>
+                            <p v-if="isCreatedByWildcard" class="text-xs text-tertiary mt-1">Created by Wildcard</p>
                         </div>
                     </div>
                     <div class="flex items-center hs-tooltip">
@@ -163,7 +163,7 @@
                                 v-if="!alias.deleted_at"
                                 v-bind:disabled="!alias.recipients.length"
                                 v-bind:data-hs-overlay="'#modal-send-alias' + alias.id"
-                                v-bind:class="{ 'hide': alias.catch_all }"
+                                v-bind:class="{ 'hide': alias.wildcard }"
                                 >
                                 <i class="icon icon-primary send text-xs"></i>
                                 Send
@@ -233,12 +233,12 @@ import events from '../events.ts'
 import { formatDistanceToNow } from 'date-fns'
 import dropdown from '@preline/dropdown'
 
-const props = defineProps(['alias', 'recipients', 'catchAll'])
+const props = defineProps(['alias', 'recipients', 'wildcard'])
 const alias = ref(props.alias)
 const recipients = ref(props.recipients)
 const isDomainUnverified = computed(() => alias.value.is_custom_domain === true && (alias.value.is_domain_verified === false || alias.value.is_domain_enabled === false))
 const isAliasDeleted = computed(() => alias.value.deleted_at !== null)
-const isCreatedByCatchAll = computed(() => alias.value.origin === 1)
+const isCreatedByWildcard = computed(() => alias.value.origin === 1)
 const truncatedDescription = computed(() => {
     const desc = alias.value.description
     if (!desc) return ''
@@ -256,10 +256,10 @@ const updateAlias = async () => {
 }
 
 const deleteAlias = () => {
-    const errMessage = props.catchAll ? 'WARNING: You will not be able to create the same catch-all alias in the next 90 days. Are you sure you want to delete alias? ' : 'Are you sure you want to delete alias?'
+    const errMessage = props.wildcard ? 'WARNING: You will not be able to create the same wildcard alias in the next 90 days. Are you sure you want to delete alias? ' : 'Are you sure you want to delete alias?'
     if (!confirm(errMessage)) return
 
-    events.emit('alias.delete', { id: alias.value.id, catchAll: props.catchAll })
+    events.emit('alias.delete', { id: alias.value.id, wildcard: props.wildcard })
 }
 
 const restoreAlias = async () => {

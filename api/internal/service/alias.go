@@ -105,19 +105,19 @@ func (s *Service) GetAlias(ctx context.Context, ID string, userID string) (model
 	return alias, nil
 }
 
-func (s *Service) GetAliases(ctx context.Context, userID string, limit int, page int, sortBy string, sortOrder string, catchAll string, search string, status string) (model.AliasList, error) {
+func (s *Service) GetAliases(ctx context.Context, userID string, limit int, page int, sortBy string, sortOrder string, wildcard string, search string, status string) (model.AliasList, error) {
 	offset := (page - 1) * limit
 	if page < 1 {
 		offset = 0
 	}
 
-	aliases, err := s.Store.GetAliases(ctx, userID, limit, offset, sortBy, sortOrder, catchAll, search, status)
+	aliases, err := s.Store.GetAliases(ctx, userID, limit, offset, sortBy, sortOrder, wildcard, search, status)
 	if err != nil {
 		log.Printf("error fetching aliases: %s", err.Error())
 		return model.AliasList{}, ErrGetAliases
 	}
 
-	total, err := s.Store.GetAliasCount(ctx, userID, catchAll, search, status)
+	total, err := s.Store.GetAliasCount(ctx, userID, wildcard, search, status)
 	if err != nil {
 		log.Printf("error fetching alias count: %s", err.Error())
 		return model.AliasList{}, ErrGetAliases
@@ -191,7 +191,7 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 	}
 
 	// Wildcard alias
-	if format == model.AliasFormatCatchAll {
+	if format == model.AliasFormatWildcard {
 		userAliases, err := s.Store.GetAliases(ctx, alias.UserID, 0, 0, "created_at", "DESC", "true", "", "active")
 		if err != nil {
 			log.Printf("error fetching user aliases: %s", err.Error())
@@ -210,7 +210,7 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 		}
 
 		alias.Name = model.GenerateAlias(format, localPart) + "@" + domain
-		alias.CatchAll = true
+		alias.Wildcard = true
 		alias, err = s.Store.PostAlias(ctx, alias, s.Cfg.Service.MaxDailyAliases, s.Cfg.Service.MaxInboundAliasesPerHour)
 		if err != nil {
 			if errors.Is(err, model.ErrDailyAliasLimit) {

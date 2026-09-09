@@ -11,7 +11,7 @@
             </button>
             <button data-hs-overlay="#modal-create-alias-true">
                 <i class="icon scan icon-accent text-sm"></i>
-                Catch-all Alias
+                Wildcard Alias
             </button>
         </div>
     </div>

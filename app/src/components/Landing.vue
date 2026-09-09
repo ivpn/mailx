@@ -23,7 +23,7 @@ const heroFeatures = [
     'Forward emails through isolated aliases with Mailx.',
     'Send and reply without exposing your primary email address.',
     'Supports PGP encryption, domain choice, multiple',
-    'recipients, and catch-all aliases.',
+    'recipients, and wildcard aliases.',
 ]
 
 // --- How It Works -----------------------------------------------------------

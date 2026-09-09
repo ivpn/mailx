@@ -52,7 +52,7 @@ func TestAliasSearchFilter(t *testing.T) {
 		}
 	})
 
-	t.Run("catchAll true binds a parameter", func(t *testing.T) {
+	t.Run("wildcard true binds a parameter", func(t *testing.T) {
 		filter, args := aliasSearchFilter("a.", "true", "")
 		if !strings.Contains(filter, "a.catch_all = ?") {
 			t.Errorf("expected bound catch_all clause, got %q", filter)
@@ -62,7 +62,7 @@ func TestAliasSearchFilter(t *testing.T) {
 		}
 	})
 
-	t.Run("catchAll false binds a parameter", func(t *testing.T) {
+	t.Run("wildcard false binds a parameter", func(t *testing.T) {
 		filter, args := aliasSearchFilter("", "false", "")
 		if !strings.Contains(filter, "catch_all = ?") {
 			t.Errorf("expected bound catch_all clause, got %q", filter)
@@ -72,9 +72,9 @@ func TestAliasSearchFilter(t *testing.T) {
 		}
 	})
 
-	invalidCatchAll := []string{"TRUE", "1", "true OR 1=1", "false; DROP TABLE aliases;--", " true"}
-	for _, v := range invalidCatchAll {
-		t.Run("invalid catchAll is ignored: "+v, func(t *testing.T) {
+	invalidWildcard := []string{"TRUE", "1", "true OR 1=1", "false; DROP TABLE aliases;--", " true"}
+	for _, v := range invalidWildcard {
+		t.Run("invalid wildcard is ignored: "+v, func(t *testing.T) {
 			filter, args := aliasSearchFilter("a.", v, "")
 			if filter != "" || len(args) != 0 {
 				t.Errorf("aliasSearchFilter(%q) = (%q, %v), want empty filter/args", v, filter, args)

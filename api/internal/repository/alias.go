@@ -48,14 +48,15 @@ func sanitizeAliasSort(sortBy string, sortOrder string) (string, string) {
 	return "a." + sortBy, sortOrder
 }
 
-// aliasSearchFilter builds the catch-all/search WHERE fragment using bound parameters instead
+// aliasSearchFilter builds the wildcard/search WHERE fragment using bound parameters instead
 // of concatenating untrusted input into the query text. columnPrefix is always a fixed literal
-// ("a." or "") supplied by the call site, never derived from request input.
-func aliasSearchFilter(columnPrefix string, catchAll string, search string) (string, []any) {
+// ("a." or "") supplied by the call site, never derived from request input. The wildcard flag
+// is stored in the catch_all column (kept as-is to avoid a schema migration).
+func aliasSearchFilter(columnPrefix string, wildcard string, search string) (string, []any) {
 	var filter string
 	var args []any
 
-	switch catchAll {
+	switch wildcard {
 	case "true":
 		filter += " AND " + columnPrefix + "catch_all = ?"
 		args = append(args, true)
@@ -73,7 +74,7 @@ func aliasSearchFilter(columnPrefix string, catchAll string, search string) (str
 	return filter, args
 }
 
-func (d *Database) GetAliases(ctx context.Context, userID string, limit int, offset int, sortBy string, sortOrder string, catchAll string, search string, status string) ([]model.Alias, error) {
+func (d *Database) GetAliases(ctx context.Context, userID string, limit int, offset int, sortBy string, sortOrder string, wildcard string, search string, status string) ([]model.Alias, error) {
 	sortBy, sortOrder = sanitizeAliasSort(sortBy, sortOrder)
 
 	var statusFilter string
@@ -85,7 +86,7 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 		statusFilter = "AND a.deleted_at IS NULL"
 	}
 
-	filter, filterArgs := aliasSearchFilter("a.", catchAll, search)
+	filter, filterArgs := aliasSearchFilter("a.", wildcard, search)
 
 	aliases := []model.Alias{}
 	query := `
@@ -121,7 +122,7 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 	for rows.Next() {
 		var alias model.Alias
 		var forwards, blocks, replies, sends int
-		if err := rows.Scan(&alias.ID, &alias.CreatedAt, &alias.UpdatedAt, &alias.DeletedAt, &alias.Name, &alias.UserID, &alias.Enabled, &alias.Description, &alias.Recipients, &alias.FromName, &alias.CatchAll, &alias.Origin, &forwards, &blocks, &replies, &sends); err != nil {
+		if err := rows.Scan(&alias.ID, &alias.CreatedAt, &alias.UpdatedAt, &alias.DeletedAt, &alias.Name, &alias.UserID, &alias.Enabled, &alias.Description, &alias.Recipients, &alias.FromName, &alias.Wildcard, &alias.Origin, &forwards, &blocks, &replies, &sends); err != nil {
 			return nil, err
 		}
 		alias.Stats = model.AliasStats{
@@ -148,8 +149,8 @@ func (d *Database) GetAllAliases(ctx context.Context, userID string) ([]model.Al
 	return aliases, err
 }
 
-func (d *Database) GetAliasCount(ctx context.Context, userID string, catchAll string, search string, status string) (int, error) {
-	filter, filterArgs := aliasSearchFilter("", catchAll, search)
+func (d *Database) GetAliasCount(ctx context.Context, userID string, wildcard string, search string, status string) (int, error) {
+	filter, filterArgs := aliasSearchFilter("", wildcard, search)
 	args := append([]any{userID}, filterArgs...)
 
 	var count int64

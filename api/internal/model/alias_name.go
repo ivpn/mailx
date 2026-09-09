@@ -12,7 +12,7 @@ const (
 	AliasFormatRandomWords = "words"
 	AliasFormatRandomChars = "random"
 	AliasFormatUUID        = "uuid"
-	AliasFormatCatchAll    = "catch_all"
+	AliasFormatWildcard    = "wildcard"
 	AliasFormatCustom      = "custom"
 )
 
@@ -32,7 +32,7 @@ func GenerateAlias(format string, localPart string) string {
 		return generateRandomChars()
 	case AliasFormatUUID:
 		return uuid.New().String()
-	case AliasFormatCatchAll:
+	case AliasFormatWildcard:
 		return fmt.Sprintf("*+%s", localPart)
 	case AliasFormatCustom:
 		return localPart

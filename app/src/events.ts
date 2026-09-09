@@ -5,7 +5,7 @@ type Events = {
     'user.update': { email: string }
     'alias.create': {}
     'alias.update': {}
-    'alias.delete': { id: string, catchAll: boolean }
+    'alias.delete': { id: string, wildcard: boolean }
     'totp.enable': {}
     'totp.disable': {}
     'recipient.create': {}

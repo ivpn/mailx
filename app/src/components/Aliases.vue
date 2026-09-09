@@ -129,7 +129,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <AliasRow v-for="alias in list" :alias="alias" :key="rowKey" :recipients.sync="recipients" :catchAll=false />
+                            <AliasRow v-for="alias in list" :alias="alias" :key="rowKey" :recipients.sync="recipients" :wildcard=false />
                         </tbody>
                     </table>
                 </div>
@@ -138,7 +138,7 @@
             </div>
         </div>
     </div>
-    <AliasCreate v-if="recipients.length && settings.id && loaded" :recipients.sync="recipients" :settings.sync="settings" :catchAll=false :label="'New Alias'" />
+    <AliasCreate v-if="recipients.length && settings.id && loaded" :recipients.sync="recipients" :settings.sync="settings" :wildcard=false :label="'New Alias'" />
 </template>
 
 <script setup lang="ts">
@@ -211,7 +211,7 @@ const getList = async () => {
             page: page.value,
             sort_by: sortBy.value,
             sort_order: sortOrder.value,
-            catch_all: false,
+            wildcard: false,
             search: searchQuery.value,
             status: status.value
         })
@@ -263,7 +263,7 @@ const onUpdatePage = (obj: any) => {
     getList()
 }
 
-const onDeleteAlias = (payload: { id: string, catchAll: boolean }) => {
+const onDeleteAlias = (payload: { id: string, wildcard: boolean }) => {
     deleteAlias(payload)
 }
 

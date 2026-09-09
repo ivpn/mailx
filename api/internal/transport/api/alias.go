@@ -84,11 +84,11 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 
 	sortBy := c.Query("sort_by")
 	sortOrder := strings.ToUpper(c.Query("sort_order"))
-	catchAll := c.Query("catch_all")
+	wildcard := c.Query("wildcard")
 	search := c.Query("search")
 	status := c.Query("status")
 
-	var allowCatchAll = map[string]bool{
+	var allowWildcard = map[string]bool{
 		"true":  true,
 		"false": true,
 		"":      true,
@@ -106,8 +106,8 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 	if _, ok := model.AliasSortOrders[sortOrder]; !ok {
 		sortOrder = "DESC"
 	}
-	if _, ok := allowCatchAll[catchAll]; !ok {
-		catchAll = ""
+	if _, ok := allowWildcard[wildcard]; !ok {
+		wildcard = ""
 	}
 	if _, ok := allowStatus[status]; !ok {
 		status = ""
@@ -124,7 +124,7 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 		})
 	}
 
-	list, err := h.Service.GetAliases(c.Context(), userID, limit, page, sortBy, sortOrder, catchAll, search, status)
+	list, err := h.Service.GetAliases(c.Context(), userID, limit, page, sortBy, sortOrder, wildcard, search, status)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
@@ -308,8 +308,8 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 		})
 	}
 
-	// Validate catch-all suffix
-	if req.Format == model.AliasFormatCatchAll && req.WildcardLocalPart == "" {
+	// Validate wildcard suffix
+	if req.Format == model.AliasFormatWildcard && req.WildcardLocalPart == "" {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidRequest,
 		})
@@ -338,7 +338,7 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 	}
 
 	localPart := req.LocalPart
-	if req.Format == model.AliasFormatCatchAll {
+	if req.Format == model.AliasFormatWildcard {
 		localPart = req.WildcardLocalPart
 	}
 	alias, err = h.Service.PostAlias(c.Context(), alias, req.Format, domain, localPart)

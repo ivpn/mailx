@@ -14,7 +14,7 @@ func TestGenerateAlias(t *testing.T) {
 	}{
 		{AliasFormatRandomChars, ""},
 		{AliasFormatUUID, ""},
-		{AliasFormatCatchAll, "test"},
+		{AliasFormatWildcard, "test"},
 		{AliasFormatRandomWords, ""},
 	}
 
@@ -30,7 +30,7 @@ func TestGenerateAlias(t *testing.T) {
 				if _, err := uuid.Parse(alias); err != nil {
 					t.Errorf("expected valid UUID, got %s", alias)
 				}
-			case AliasFormatCatchAll:
+			case AliasFormatWildcard:
 				expected := "*+" + tt.suffix
 				if alias != expected {
 					t.Errorf("expected %s, got %s", expected, alias)

@@ -49,7 +49,7 @@ func TestBuildForwardMessage_ToHeaderUsesLiteralTaggedAddress(t *testing.T) {
 	m := Mailer{}
 	rcp := model.Recipient{Email: "real.recipient@domain.com"}
 	// alias.Name is the canonical, tag-stripped alias; it can even be a literal
-	// wildcard pattern (e.g. "*+news@customdomain.com") for wildcard/catch-all
+	// wildcard pattern (e.g. "*+news@customdomain.com") for wildcard
 	// aliases, so the To: header must use the concrete address the sender used
 	// instead ("to"), not alias.Name.
 	alias := model.Alias{BaseModel: model.BaseModel{ID: "alias-1"}, Name: "myalias@mailx.net"}

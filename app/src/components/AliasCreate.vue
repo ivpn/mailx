@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-bind:id="'modal-create-alias-' + props.catchAll" class="hs-overlay hidden">
+        <div v-bind:id="'modal-create-alias-' + props.wildcard" class="hs-overlay hidden">
             <div>
                 <div>
                     <header>
@@ -10,21 +10,21 @@
                         <h4 class="uppercase">
                             {{ props.label }}
                         </h4>
-                        <div v-if="props.catchAll" class="hs-tooltip [--strategy:absolute]">
+                        <div v-if="props.wildcard" class="hs-tooltip [--strategy:absolute]">
                             <i class="icon info icon-primary hs-tooltip-toggle"></i>
                             <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">Limited to 2 wildcard aliases per domain</span>
                         </div>
                     </header>
                     <article>
-                        <div v-if="props.catchAll">
+                        <div v-if="props.wildcard">
                             <div class="mb-3">
-                                <label for="alias_catch_all_suffix">
+                                <label for="alias_wildcard_suffix">
                                     Alias suffix (6-12 alphanumeric chars.):
                                 </label>
                                 <input 
                                     v-model="alias.local_part"
                                     v-bind:class="{ 'error': errorLocalPart }"
-                                    id="alias_catch_all_suffix"
+                                    id="alias_wildcard_suffix"
                                     type="text"
                                 >
                                 <p v-if="errorLocalPart" class="error">Wildcard suffix must be between 6 and 12 characters</p>
@@ -98,7 +98,7 @@
                                         Custom settings
                                     </button>
                                     <div id="alias-accordion-collapse-one" class="hs-accordion-content hidden overflow-hidden transition-[height] duration-300" role="region" aria-labelledby="alias-accordion-one">
-                                        <div v-if="!props.catchAll" class="pb-3">
+                                        <div v-if="!props.wildcard" class="pb-3">
                                             <label for="alias_format">
                                                 Format
                                             </label>
@@ -174,7 +174,7 @@ import tooltip from '@preline/tooltip'
 import accordion from '@preline/accordion'
 
 const envDomains = import.meta.env.VITE_DOMAINS.split(',')
-const props = defineProps(['recipients', 'settings', 'catchAll', 'label'])
+const props = defineProps(['recipients', 'settings', 'wildcard', 'label'])
 const alias = ref({
     description: '',
     enabled: true,
@@ -182,7 +182,7 @@ const alias = ref({
     from_name: '',
     recipients: '',
     domain: envDomains[0],
-    catch_all: props.catchAll ? 'true' : 'false',
+    wildcard: props.wildcard ? 'true' : 'false',
     local_part: ''
 })
 const recipients = ref(props.recipients)
@@ -216,8 +216,8 @@ const postAlias = async () => {
     const domain = selectedOption.getAttribute('domain')
     alias.value.enabled = true
     
-    if (props.catchAll) {
-        alias.value.format = 'catch_all'
+    if (props.wildcard) {
+        alias.value.format = 'wildcard'
     } else {
         const formatElement = document.getElementById('alias_format') as HTMLInputElement;
         if (formatElement) {
@@ -228,7 +228,7 @@ const postAlias = async () => {
     let req: any = { ...alias.value }
     req.domain = domain
 
-    if (props.catchAll) {
+    if (props.wildcard) {
         req.wildcard_local_part = req.local_part
         delete req.local_part
     }
@@ -265,7 +265,7 @@ const close = () => {
         accordionInstance.element.hide()
     }
 
-    const modal = document.querySelector('#modal-create-alias-' + props.catchAll) as any
+    const modal = document.querySelector('#modal-create-alias-' + props.wildcard) as any
     overlay.close(modal)
 
     const multiselect = select.getInstance('#create-alias-recipient' as any, true) as any
@@ -273,7 +273,7 @@ const close = () => {
 }
 
 const addEvents = () => {
-    const modal = overlay.getInstance('#modal-create-alias-' + props.catchAll as any, true) as any
+    const modal = overlay.getInstance('#modal-create-alias-' + props.wildcard as any, true) as any
     modal.element.on('close', () => {
         close()
     })
@@ -308,7 +308,7 @@ const handleKeydown = (event: KeyboardEvent) => {
 }
 
 const focusFirstInput = () => {
-    const input = props.catchAll ? document.getElementById('alias_catch_all_suffix') : document.getElementById('alias_description')
+    const input = props.wildcard ? document.getElementById('alias_wildcard_suffix') : document.getElementById('alias_description')
     input?.focus()
 }
 
@@ -320,7 +320,7 @@ const validate = (rcps: string) => {
 
     if (alias.value.format === 'custom') {
         errorLocalPart.value = alias.value.local_part.length < 1 || alias.value.local_part.length > 64
-    } else if (props.catchAll) {
+    } else if (props.wildcard) {
         errorLocalPart.value = alias.value.local_part.length < 6 || alias.value.local_part.length > 12
     } else {
         errorLocalPart.value = false
@@ -376,7 +376,7 @@ const resetAlias = () => {
         from_name: '',
         recipients: '',
         domain: props.settings.domain || envDomains[0],
-        catch_all: props.catchAll ? 'true' : 'false',
+        wildcard: props.wildcard ? 'true' : 'false',
         local_part: ''
     }
 }

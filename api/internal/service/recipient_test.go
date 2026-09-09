@@ -136,7 +136,7 @@ func TestFindRecipients_WildcardAliasFallbackWhenBaseAliasMissing(t *testing.T) 
 		Name:       "*+news@customdomain.com",
 		UserID:     "user-2",
 		Enabled:    true,
-		CatchAll:   true,
+		Wildcard:   true,
 		Recipients: "rcpt@example.com",
 	}
 	store.domains["customdomain.com"] = model.Domain{Name: "customdomain.com", UserID: "user-2", Enabled: true}

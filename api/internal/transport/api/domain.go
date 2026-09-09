@@ -31,7 +31,7 @@ type DomainService interface {
 	PostDomain(context.Context, model.Domain) (model.Domain, error)
 	UpdateDomain(context.Context, model.Domain) error
 	DeleteDomain(context.Context, string, string) error
-	VerifyDomainDNSRecords(context.Context, string, string) error
+	VerifyDomainDNSRecords(context.Context, string, string) ([]model.RecordCheck, error)
 }
 
 // @Summary Get custom domains
@@ -217,22 +217,24 @@ func (h *Handler) DeleteDomain(c *fiber.Ctx) error {
 // @Produce json
 // @Security ApiKeyAuth
 // @Param id path string true "Domain ID"
-// @Success 200 {object} map[string]string "message"
-// @Failure 400 {object} ErrorRes
+// @Success 200 {object} map[string]interface{} "message, checks"
+// @Failure 400 {object} map[string]interface{} "error, checks"
 // @Router /domains/{id}/verify-dns [post]
 func (h *Handler) VerifyDomainDNSRecords(c *fiber.Ctx) error {
 	userID := auth.GetUserID(c)
 	domainID := c.Params("id")
 
-	err := h.Service.VerifyDomainDNSRecords(c.Context(), domainID, userID)
+	checks, err := h.Service.VerifyDomainDNSRecords(c.Context(), domainID, userID)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
-			"error": err.Error(),
+			"error":  err.Error(),
+			"checks": checks,
 		})
 	}
 
 	return c.JSON(fiber.Map{
 		"message": DNSRecordVerificationSuccess,
+		"checks":  checks,
 	})
 }
 

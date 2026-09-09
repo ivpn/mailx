@@ -255,6 +255,16 @@
                                         </p>
                                     </div>
                                 </div>
+                                <div class="mb-5" v-if="checks.length">
+                                    <h5 class="text-sm">Verification Results:</h5>
+                                    <div class="flex flex-col gap-2">
+                                        <div v-for="row in checkRows" :key="row.key" class="flex items-center gap-2 text-sm">
+                                            <i v-if="row.passed === true" class="icon check icon-success text-sm"></i>
+                                            <i v-if="row.passed === false" class="icon close icon-error text-sm"></i>
+                                            <span v-bind:class="{ 'text-tertiary': row.passed === null }">{{ row.label }}</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </article>
                         <footer>
@@ -263,9 +273,10 @@
                                     Verify DNS Records
                                 </button>
                                 <button @click="close" class="cancel">
-                                    Cancel
+                                    {{ verified ? 'Done' : 'Cancel' }}
                                 </button>
                             </nav>
+                            <p v-if="message" class="success px-5">{{ message }}</p>
                             <p v-if="step2Error" class="error px-5">Error: {{ error || step2Error }}</p>
                         </footer>
                     </template>
@@ -276,12 +287,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, getCurrentInstance } from 'vue'
+import { ref, computed, onMounted, getCurrentInstance } from 'vue'
 import overlay from '@preline/overlay'
 import axios from 'axios'
 import { domainApi } from '../api/domain.ts'
 import events from '../events.ts'
 import tooltip from '@preline/tooltip'
+
+interface DnsCheck {
+    name: string
+    passed: boolean
+    error?: string
+}
 
 const modalId = 'modal-create-domain-' + getCurrentInstance()!.uid
 
@@ -300,7 +317,23 @@ const createdDomain = ref({ id: '' })
 const error = ref('')
 const step2Error = ref('')
 const nameError = ref(false)
+const verified = ref(false)
+const message = ref('')
+const checks = ref<DnsCheck[]>([])
 const copyText = ref('Click to copy')
+
+const checkRows = computed(() => {
+    const rows = [
+        { key: 'mx', label: 'MX' },
+        { key: 'spf', label: 'SPF' },
+        ...config.value.dkim_selectors.map((selector) => ({ key: 'dkim:' + selector, label: 'DKIM (' + selector + ')' })),
+        { key: 'dmarc', label: 'DMARC' },
+    ]
+    return rows.map((row) => {
+        const check = checks.value.find((c) => c.name === row.key)
+        return { ...row, passed: check ? check.passed : null }
+    })
+})
 
 const validateName = () => {
     nameError.value = !domain.value.name
@@ -354,12 +387,17 @@ const postDomain = async () => {
 
 const verifyDns = async () => {
     try {
-        await domainApi.verifyDns(createdDomain.value.id)
+        const res = await domainApi.verifyDns(createdDomain.value.id)
         step2Error.value = ''
-        close()
+        message.value = res.data.message
+        checks.value = res.data.checks || []
+        verified.value = true
     } catch (err) {
+        verified.value = false
+        message.value = ''
         if (axios.isAxiosError(err)) {
             step2Error.value = err.response?.data.error || err.message
+            checks.value = err.response?.data.checks || []
         }
     }
 }
@@ -368,6 +406,9 @@ const close = () => {
     domain.value = { name: '' }
     error.value = ''
     step2Error.value = ''
+    message.value = ''
+    checks.value = []
+    verified.value = false
     nameError.value = false
     step.value = 1
     ownershipPending.value = false

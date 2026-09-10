@@ -333,6 +333,30 @@ func TestFindRecipients_DottedAddressOnCatchAllDomainNotAutoCreated(t *testing.T
 	}
 }
 
+// Regression: hasTag must only look at the local part. The domain itself always contains a
+// ".", so a plain address (no "+" or "." in the local part) must still be eligible for
+// catch-all auto-creation, even though the full address contains dots from the domain.
+func TestFindRecipients_PlainAddressOnCatchAllDomainIsAutoCreated(t *testing.T) {
+	store := newFakeStore()
+	store.domains["domain.net"] = model.Domain{
+		Name:      "domain.net",
+		UserID:    "user-6c",
+		Enabled:   true,
+		CatchAll:  true,
+		Recipient: "catchall@example.com",
+	}
+	store.verifiedRecipients["user-6c"] = []model.Recipient{{Email: "catchall@example.com", IsActive: true}}
+	s := newTestService(store)
+
+	_, alias, _, err := s.FindRecipients("sender@somewhere.com", "catchalldomainnew@domain.net", model.Send)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if alias.Origin != model.Inbound {
+		t.Errorf("expected Origin == Inbound so PostInboundAlias auto-creates the alias, got %v", alias.Origin)
+	}
+}
+
 func TestFindRecipients_NoAliasNoCatchAllReturnsError(t *testing.T) {
 	store := newFakeStore()
 	s := newTestService(store)

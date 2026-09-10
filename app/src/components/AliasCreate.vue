@@ -40,7 +40,7 @@
                                     type="text"
                                 >
                                 <p v-if="errorLocalPart" class="error">Wildcard suffix must be between 6 and 12 characters</p>
-                                <p class="text-primary mb-1">
+                                <p class="text-primary mb-1 break-all">
                                     *{{ alias.wildcard_delimiter }}{{ alias.local_part }}@{{ wildcardPreviewDomain }}
                                 </p>
                             </div>

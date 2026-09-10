@@ -313,8 +313,9 @@ func (s *Service) FindRecipients(from string, to string, msgType model.MessageTy
 	if err != nil {
 		domainPart := aliasDomainPart(aliasName)
 		if isCustomAliasDomain(domainPart, s.Cfg.API.Domains) {
-			// A tagged/reply-encoded address must never auto-provision a new alias.
-			hasTag := strings.ContainsAny(to, "+.")
+			// A tagged/reply-encoded address must never auto-provision a new alias. Only the
+			// local part is checked - the domain always contains a "." and must not count.
+			hasTag := strings.ContainsAny(aliasLocalPart(to), "+.")
 			if ok, rcps, catchAllAlias, catchAllErr := s.resolveCatchAll(domainPart, aliasName, hasTag); ok {
 				if catchAllErr != nil {
 					return []model.Recipient{}, catchAllAlias, msgType, catchAllErr

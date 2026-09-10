@@ -23,6 +23,7 @@ type Service interface {
 	LogService
 	AccessKeyService
 	DomainService
+	StepUpService
 }
 
 type Handler struct {

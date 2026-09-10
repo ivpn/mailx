@@ -11,6 +11,10 @@ type AuthReq struct {
 	AccessKey string `json:"access_key" validate:"required,min=85,max=85"`
 }
 
+type StepUpPasswordReq struct {
+	Password string `json:"password" validate:"password"`
+}
+
 type EmailReq struct {
 	Email    string `json:"email" validate:"required,emailx"`
 	Remember bool   `json:"remember"`

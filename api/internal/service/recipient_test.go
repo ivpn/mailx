@@ -309,10 +309,10 @@ func TestFindRecipients_TaggedAddressOnCatchAllDomainNotAutoCreated(t *testing.T
 	}
 }
 
-// A dot is also treated as a deliberate tag (Wildcard Aliases can use "." as their
-// delimiter too), so a dotted address on a catch-all domain must likewise never be
-// auto-created as a new alias under its tag-stripped base name.
-func TestFindRecipients_DottedAddressOnCatchAllDomainNotAutoCreated(t *testing.T) {
+// A "." only blocks catch-all auto-creation when it actually resolves to an existing
+// Wildcard Alias (handled by the fallback above, before this point is ever reached);
+// otherwise a dotted address is a normal address and may still be auto-created.
+func TestFindRecipients_DottedAddressWithoutMatchingWildcardIsAutoCreated(t *testing.T) {
 	store := newFakeStore()
 	store.domains["customdomain.com"] = model.Domain{
 		Name:      "customdomain.com",
@@ -328,8 +328,39 @@ func TestFindRecipients_DottedAddressOnCatchAllDomainNotAutoCreated(t *testing.T
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
-	if alias.Origin == model.Inbound {
-		t.Errorf("expected Origin != Inbound so PostInboundAlias is never invoked, got %v", alias.Origin)
+	if alias.Origin != model.Inbound {
+		t.Errorf("expected Origin == Inbound so PostInboundAlias auto-creates the alias, got %v", alias.Origin)
+	}
+}
+
+// When a "." Wildcard Alias actually exists for the suffix, the address must resolve to
+// that alias (via the fallback earlier in FindRecipients) rather than the domain catch-all.
+func TestFindRecipients_DottedAddressWithMatchingWildcardRidesWildcardNotCatchAll(t *testing.T) {
+	store := newFakeStore()
+	store.aliases["*.shop@customdomain.com"] = model.Alias{
+		BaseModel:  model.BaseModel{ID: "alias-7"},
+		Name:       "*.shop@customdomain.com",
+		UserID:     "user-6d",
+		Enabled:    true,
+		Wildcard:   true,
+		Recipients: "rcpt@example.com",
+	}
+	store.domains["customdomain.com"] = model.Domain{
+		Name:      "customdomain.com",
+		UserID:    "user-6d",
+		Enabled:   true,
+		CatchAll:  true,
+		Recipient: "catchall@example.com",
+	}
+	store.recipients["user-6d"] = []model.Recipient{{Email: "rcpt@example.com"}}
+	s := newTestService(store)
+
+	_, alias, _, err := s.FindRecipients("sender@somewhere.com", "newalias.shop@customdomain.com", model.Send)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if alias.Name != "*.shop@customdomain.com" {
+		t.Errorf("expected the dot Wildcard Alias to be used, got %s", alias.Name)
 	}
 }
 

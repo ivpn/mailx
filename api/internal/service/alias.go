@@ -329,6 +329,7 @@ func (s *Service) PostInboundAlias(ctx context.Context, alias model.Alias) (mode
 		return model.Alias{}, ErrPostInboundAlias
 	}
 
+	log.Printf("created inbound alias %s (id=%s)", alias.Name, alias.ID)
 	return alias, nil
 }
 

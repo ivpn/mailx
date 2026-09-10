@@ -23,6 +23,7 @@ type User struct {
 	TotpBackup     string                `json:"-"`
 	TotpBackupUsed string                `json:"-"`
 	TotpEnabled    bool                  `gorm:"-" json:"totp_enabled"`
+	HasPassword    bool                  `gorm:"-" json:"has_password"`
 	Creds          []webauthn.Credential `gorm:"-" json:"-"`
 }
 

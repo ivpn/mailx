@@ -29,6 +29,7 @@ var (
 	ErrInvalidTotpCode           = "The 2FA code you entered is invalid."
 	ErrGetUser                   = "We couldn’t retrieve your user details."
 	ErrTooManySessions           = "You have too many active sessions. Please log out from other devices or try again later."
+	ErrIncorrectCurrentPassword  = "Your current password is incorrect."
 )
 
 type UserService interface {
@@ -468,6 +469,23 @@ func (h *Handler) ChangePassword(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidRequest,
 		})
+	}
+
+	// If the user already has a password, the current one must be verified first
+	user, err := h.Service.GetUser(c.Context(), ID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	if user.PasswordHash != "" {
+		_, err = h.Service.GetUserByPassword(c.Context(), ID, req.OldPassword)
+		if err != nil {
+			return c.Status(400).JSON(fiber.Map{
+				"error": ErrIncorrectCurrentPassword,
+			})
+		}
 	}
 
 	// Change the password

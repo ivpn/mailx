@@ -22,6 +22,8 @@ api.interceptors.response.use(
                 error.config._stepUpRetried = true
                 return api(error.config)
             } catch {
+                // Components read response.data.error, not the backend's original step-up message
+                error.response.data.error = error.response.data.cancel_message
                 return Promise.reject(error)
             }
         }

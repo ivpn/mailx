@@ -9,7 +9,10 @@ import (
 
 const StepUpRequiredCode = 80001
 
-var ErrStepUpRequired = "Additional verification is required to continue."
+var (
+	ErrStepUpRequired  = "Additional verification is required to continue."
+	ErrStepUpCancelled = "Verification was cancelled."
+)
 
 type StepUpService interface {
 	GetUser(context.Context, string) (model.User, error)
@@ -32,8 +35,9 @@ func NewStepUp(service StepUpService) fiber.Handler {
 		}
 
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": ErrStepUpRequired,
-			"code":    StepUpRequiredCode,
+			"message":        ErrStepUpRequired,
+			"code":           StepUpRequiredCode,
+			"cancel_message": ErrStepUpCancelled,
 			"methods": fiber.Map{
 				"password": user.PasswordHash != "",
 				"passkey":  len(user.Creds) > 0,

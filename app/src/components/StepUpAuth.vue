@@ -1,7 +1,9 @@
 <template>
     <!-- No visible trigger: this overlay is opened programmatically, but Preline only registers
-         an instance for elements with a data-hs-overlay trigger, so a hidden one is required -->
-    <button type="button" data-hs-overlay="#modal-stepup-auth" class="hidden" aria-hidden="true" tabindex="-1"></button>
+         an instance for elements with a data-hs-overlay trigger, so a hidden one is required.
+         isClosePrev is disabled so opening this on top of another open modal (e.g. Delete Account)
+         doesn't auto-close it, which would hide that modal's own cancellation error message -->
+    <button type="button" data-hs-overlay="#modal-stepup-auth" data-hs-overlay-options='{"isClosePrev": false}' class="hidden" aria-hidden="true" tabindex="-1"></button>
     <div id="modal-stepup-auth" class="hs-overlay hidden">
         <div>
             <div>
@@ -14,7 +16,7 @@
                 <article>
                     <div class="mb-5">
                         <p>
-                            For your security, please confirm your identity to continue.
+                            Please confirm your identity to continue:
                         </p>
                     </div>
                     <div v-if="stepUpMethods.passkey && passkeySupported" class="mb-5">
@@ -24,7 +26,7 @@
                     </div>
                     <div v-if="stepUpMethods.password" class="mb-7">
                         <label for="stepup-password">
-                            Password:
+                            Use Password:
                         </label>
                         <input
                             v-model="password"

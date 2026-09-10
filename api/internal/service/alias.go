@@ -295,12 +295,14 @@ func (s *Service) GetWildcardDomainInfo(ctx context.Context, userID string, doma
 
 func (s *Service) PostInboundAlias(ctx context.Context, alias model.Alias) (model.Alias, error) {
 	if alias.Origin != model.Inbound || alias.ID != "" {
+		log.Printf("skip inbound alias for %s: origin=%v id=%q", alias.Name, alias.Origin, alias.ID)
 		return model.Alias{}, ErrPostInboundAlias
 	}
 
 	domain := aliasDomainPart(alias.Name)
 
 	if !isCustomAliasDomain(domain, s.Cfg.API.Domains) {
+		log.Printf("skip inbound alias for %s: %s is not a custom domain", alias.Name, domain)
 		return model.Alias{}, ErrPostInboundAlias
 	}
 
@@ -311,10 +313,12 @@ func (s *Service) PostInboundAlias(ctx context.Context, alias model.Alias) (mode
 	}
 
 	if !isCustomDomainEnabled(domain, domains) {
+		log.Printf("skip inbound alias for %s: domain %s not verified/enabled for user %s", alias.Name, domain, alias.UserID)
 		return model.Alias{}, ErrPostInboundAlias
 	}
 
 	if !isCreateAliasEnabled(domain, domains) {
+		log.Printf("skip inbound alias for %s: create_alias disabled for domain %s", alias.Name, domain)
 		return model.Alias{}, ErrPostInboundAlias
 	}
 

@@ -78,7 +78,8 @@ type DeleteUserReq struct {
 }
 
 type ChangePasswordReq struct {
-	Password string `json:"password" validate:"password"`
+	OldPassword string `json:"old_password"`
+	Password    string `json:"password" validate:"password"`
 }
 
 type ResetPasswordReq struct {

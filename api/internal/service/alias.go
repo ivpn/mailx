@@ -353,6 +353,16 @@ func (s *Service) FindAlias(email string) (model.Alias, error) {
 func (s *Service) ImportAliases(ctx context.Context, aliases []model.AliasImportReq, userID string) ([]model.Alias, error) {
 	var importedAliases []model.Alias
 
+	sub, err := s.GetSubscription(ctx, userID)
+	if err != nil {
+		log.Printf("error fetching subscription: %s", err.Error())
+		return nil, ErrPostAlias
+	}
+
+	if !sub.ActiveStatus() {
+		return nil, ErrPostAliasInactiveSub
+	}
+
 	domains, err := s.GetDomains(ctx, userID)
 	if err != nil {
 		return nil, ErrFailedImport

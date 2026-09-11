@@ -187,6 +187,13 @@ func (h *Handler) ImportAliases(c *fiber.Ctx) error {
 			})
 		}
 
+		// A row with a missing column would otherwise panic on the index access below
+		if len(record) < 4 {
+			return c.Status(400).JSON(fiber.Map{
+				"error": ErrFailedImport,
+			})
+		}
+
 		// record[0] = alias, record[1] = description, record[2] = enabled, record[3] = recipients
 		fullAlias := record[0]
 		parts := strings.Split(fullAlias, "@")

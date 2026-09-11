@@ -210,3 +210,41 @@ func TestPostAlias_CustomDomainSucceeds(t *testing.T) {
 		t.Errorf("expected alias name newalias@customdomain.com, got %s", alias.Name)
 	}
 }
+
+func TestImportAliases_InactiveSubscriptionFailsFast(t *testing.T) {
+	store := newFakeStore()
+	store.subscription = model.Subscription{ActiveUntil: time.Now().Add(-time.Hour)}
+	s := newTestService(store)
+
+	reqs := []model.AliasImportReq{
+		{Domain: "customdomain.com", LocalPart: "newalias", Recipients: "rcpt@example.com", Format: model.AliasFormatCustom},
+	}
+
+	aliases, err := s.ImportAliases(context.Background(), reqs, "user-1")
+	if !errors.Is(err, ErrPostAliasInactiveSub) {
+		t.Errorf("expected error %v, got %v", ErrPostAliasInactiveSub, err)
+	}
+	if len(aliases) != 0 {
+		t.Errorf("expected no aliases imported, got %d", len(aliases))
+	}
+}
+
+func TestImportAliases_ActiveSubscriptionImportsValidRows(t *testing.T) {
+	store := newFakeStore()
+	store.subscription = model.Subscription{ActiveUntil: time.Now().Add(time.Hour)}
+	store.domains["customdomain.com"] = model.Domain{Name: "customdomain.com", UserID: "user-1", Enabled: true}
+	store.verifiedRecipients["user-1"] = []model.Recipient{{Email: "rcpt@example.com"}}
+	s := newTestService(store)
+
+	reqs := []model.AliasImportReq{
+		{Domain: "customdomain.com", LocalPart: "newalias", Recipients: "rcpt@example.com", Format: model.AliasFormatCustom},
+	}
+
+	aliases, err := s.ImportAliases(context.Background(), reqs, "user-1")
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if len(aliases) != 1 || aliases[0].Name != "newalias@customdomain.com" {
+		t.Errorf("expected 1 imported alias newalias@customdomain.com, got %+v", aliases)
+	}
+}

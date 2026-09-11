@@ -256,7 +256,7 @@ const updateAlias = async () => {
 }
 
 const deleteAlias = () => {
-    const errMessage = props.wildcard ? 'WARNING: You will not be able to create the same wildcard alias in the next 90 days. Are you sure you want to delete alias? ' : 'Are you sure you want to delete alias?'
+    const errMessage = props.wildcard ? 'WARNING: You will not be able to create the same wildcard alias in the next 90 days. Are you sure you want to delete alias? ' : 'Are you sure you want to delete alias? A deleted email alias can be restored within 90 days.'
     if (!confirm(errMessage)) return
 
     events.emit('alias.delete', { id: alias.value.id, wildcard: props.wildcard })

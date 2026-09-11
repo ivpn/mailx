@@ -36,7 +36,7 @@
                         {{ copyText }}: {{ alias.name }}
                     </span>
                 </p>
-                <p v-if="isCreatedByWildcard" class="text-xs text-tertiary mt-1">Created by Wildcard</p>
+                <p v-if="isCreatedByWildcard" class="text-xs text-tertiary mt-1">Created by Catch-All</p>
             </div>
         </td>
         <td>

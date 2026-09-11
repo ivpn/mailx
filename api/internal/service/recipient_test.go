@@ -254,7 +254,10 @@ func TestFindRecipients_DisabledAliasStillBlockedAfterPlusTagStripped(t *testing
 	}
 }
 
-func TestFindRecipients_UnmatchedPlusTagFallsThroughToDomainCatchAll(t *testing.T) {
+// A "+" tag that doesn't match any existing Wildcard Alias is just an ordinary address:
+// it must still be eligible for catch-all auto-creation, using the full address (including
+// the tag) as the new alias name, not a tag-stripped base.
+func TestFindRecipients_UnmatchedPlusTagIsAutoCreatedWithFullAddress(t *testing.T) {
 	store := newFakeStore()
 	store.domains["customdomain.com"] = model.Domain{
 		Name:      "customdomain.com",
@@ -270,13 +273,11 @@ func TestFindRecipients_UnmatchedPlusTagFallsThroughToDomainCatchAll(t *testing.
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
-	// No real alias or Wildcard Alias matches, so the base (tag-stripped) name is
-	// used purely as a label on the domain-wide catch-all result.
-	if alias.Name != "random@customdomain.com" {
-		t.Errorf("expected catch-all alias label random@customdomain.com, got %s", alias.Name)
+	if alias.Name != "random+tag@customdomain.com" {
+		t.Errorf("expected the full address random+tag@customdomain.com to become the new alias, got %s", alias.Name)
 	}
-	if alias.Origin == model.Inbound {
-		t.Errorf("expected a tagged address not to be marked for auto-creation, got Origin %v", alias.Origin)
+	if alias.Origin != model.Inbound {
+		t.Errorf("expected Origin == Inbound so PostInboundAlias auto-creates the alias, got %v", alias.Origin)
 	}
 	if msgType != model.Forward {
 		t.Errorf("expected msgType Forward, got %v", msgType)
@@ -286,10 +287,18 @@ func TestFindRecipients_UnmatchedPlusTagFallsThroughToDomainCatchAll(t *testing.
 	}
 }
 
-// Reproduces the QA report: a plus-tagged address on a catch-all domain must
-// never be auto-created as a new alias under its tag-stripped base name.
-func TestFindRecipients_TaggedAddressOnCatchAllDomainNotAutoCreated(t *testing.T) {
+// When a "+" Wildcard Alias actually exists for the suffix, the address must resolve to
+// that alias (via the fallback earlier in FindRecipients) rather than the domain catch-all.
+func TestFindRecipients_PlusTagWithMatchingWildcardRidesWildcardNotCatchAll(t *testing.T) {
 	store := newFakeStore()
+	store.aliases["*+shop@customdomain.com"] = model.Alias{
+		BaseModel:  model.BaseModel{ID: "alias-6"},
+		Name:       "*+shop@customdomain.com",
+		UserID:     "user-6",
+		Enabled:    true,
+		Wildcard:   true,
+		Recipients: "rcpt@example.com",
+	}
 	store.domains["customdomain.com"] = model.Domain{
 		Name:      "customdomain.com",
 		UserID:    "user-6",
@@ -297,10 +306,36 @@ func TestFindRecipients_TaggedAddressOnCatchAllDomainNotAutoCreated(t *testing.T
 		CatchAll:  true,
 		Recipient: "catchall@example.com",
 	}
-	store.verifiedRecipients["user-6"] = []model.Recipient{{Email: "catchall@example.com", IsActive: true}}
+	store.recipients["user-6"] = []model.Recipient{{Email: "rcpt@example.com"}}
 	s := newTestService(store)
 
 	_, alias, _, err := s.FindRecipients("sender@somewhere.com", "newalias+shop@customdomain.com", model.Send)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if alias.Name != "*+shop@customdomain.com" {
+		t.Errorf("expected the plus Wildcard Alias to be used, got %s", alias.Name)
+	}
+}
+
+// A reply-encoded address that doesn't resolve to a real alias must never auto-provision
+// one - unlike a plain tag, there's no sensible "full address" to create an alias from.
+func TestFindRecipients_ReplyEncodedAddressWithoutMatchingAliasNotAutoCreated(t *testing.T) {
+	store := newFakeStore()
+	store.domains["customdomain.com"] = model.Domain{
+		Name:      "customdomain.com",
+		UserID:    "user-6e",
+		Enabled:   true,
+		CatchAll:  true,
+		Recipient: "catchall@example.com",
+	}
+	store.verifiedRecipients["user-6e"] = []model.Recipient{
+		{Email: "catchall@example.com", IsActive: true},
+		{Email: "sender@somewhere.com", IsActive: true},
+	}
+	s := newTestService(store)
+
+	_, alias, _, err := s.FindRecipients("sender@somewhere.com", "noalias+contact=external.com@customdomain.com", model.Send)
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}

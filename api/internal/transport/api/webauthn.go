@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/go-webauthn/webauthn/protocol"
 	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
@@ -40,6 +41,19 @@ type CredentialService interface {
 	UpdateCredential(context.Context, webauthn.Credential, string) error
 	DeleteCredential(context.Context, webauthn.Credential, string) error
 	DeleteCredentialByID(context.Context, string, string) error
+}
+
+// excludeCredentials lists a user's existing credentials so the authenticator can refuse to
+// register another one, instead of silently replacing one of them (some platform authenticators,
+// e.g. iCloud Keychain, only keep one resident credential per RP+user and will otherwise overwrite
+// it, orphaning the old credential ID from the stored one).
+func excludeCredentials(creds []webauthn.Credential) []protocol.CredentialDescriptor {
+	exclude := make([]protocol.CredentialDescriptor, len(creds))
+	for i, c := range creds {
+		exclude[i] = c.Descriptor()
+	}
+
+	return exclude
 }
 
 // @Summary Begin registration
@@ -100,7 +114,7 @@ func (h *Handler) BeginRegistration(c *fiber.Ctx) error {
 	}
 
 	// Begin registration
-	options, sessionData, err := h.WebAuthn.BeginRegistration(user)
+	options, sessionData, err := h.WebAuthn.BeginRegistration(user, webauthn.WithExclusions(excludeCredentials(user.Creds)))
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
@@ -245,7 +259,7 @@ func (h *Handler) AddPasskey(c *fiber.Ctx) error {
 	}
 
 	// Begin registration
-	options, sessionData, err := h.WebAuthn.BeginRegistration(user)
+	options, sessionData, err := h.WebAuthn.BeginRegistration(user, webauthn.WithExclusions(excludeCredentials(user.Creds)))
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),

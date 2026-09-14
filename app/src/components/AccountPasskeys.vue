@@ -135,7 +135,7 @@ const startAddPasskey = async (res: any) => {
             }
         } else if (err?.name === 'InvalidStateError') {
             // Thrown when the authenticator already holds one of the account's existing passkeys
-            error.value = 'This device or passkey manager already has a passkey registered for this account.'
+            error.value = 'This device already has a passkey registered for this account.'
         } else {
             error.value = 'The operation was aborted or failed.'
         }

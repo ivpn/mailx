@@ -74,18 +74,29 @@ func aliasSearchFilter(columnPrefix string, wildcard string, search string) (str
 	return filter, args
 }
 
+// aliasStatusFilter builds the deleted_at/enabled WHERE fragment (with bound parameters, so no
+// untrusted input reaches the query text) for the given status value. unscoped reports whether
+// the caller must bypass GORM's automatic soft-delete scope (only relevant to GetAliasCount's
+// query-builder path; GetAliases runs raw SQL, which is never auto-scoped).
+func aliasStatusFilter(columnPrefix string, status string) (filter string, args []any, unscoped bool) {
+	switch status {
+	case "deleted":
+		return "AND " + columnPrefix + "deleted_at IS NOT NULL", nil, true
+	case "all":
+		return "", nil, true
+	case "active":
+		return "AND " + columnPrefix + "deleted_at IS NULL AND " + columnPrefix + "enabled = ?", []any{true}, false
+	case "inactive":
+		return "AND " + columnPrefix + "deleted_at IS NULL AND " + columnPrefix + "enabled = ?", []any{false}, false
+	default: // "active_inactive" and any unrecognized value fall back to the broadest non-deleted view
+		return "AND " + columnPrefix + "deleted_at IS NULL", nil, false
+	}
+}
+
 func (d *Database) GetAliases(ctx context.Context, userID string, limit int, offset int, sortBy string, sortOrder string, wildcard string, search string, status string) ([]model.Alias, error) {
 	sortBy, sortOrder = sanitizeAliasSort(sortBy, sortOrder)
 
-	var statusFilter string
-	if status == "deleted" {
-		statusFilter = "AND a.deleted_at IS NOT NULL"
-	} else if status == "all" {
-		statusFilter = ""
-	} else {
-		statusFilter = "AND a.deleted_at IS NULL"
-	}
-
+	statusFilter, statusArgs, _ := aliasStatusFilter("a.", status)
 	filter, filterArgs := aliasSearchFilter("a.", wildcard, search)
 
 	aliases := []model.Alias{}
@@ -111,6 +122,7 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 	}
 
 	args := []any{model.Forward, model.Block, model.Reply, model.Send, userID}
+	args = append(args, statusArgs...)
 	args = append(args, filterArgs...)
 
 	rows, err := d.Client.Raw(query, args...).Rows()
@@ -150,18 +162,20 @@ func (d *Database) GetAllAliases(ctx context.Context, userID string) ([]model.Al
 }
 
 func (d *Database) GetAliasCount(ctx context.Context, userID string, wildcard string, search string, status string) (int, error) {
+	statusFilter, statusArgs, unscoped := aliasStatusFilter("", status)
 	filter, filterArgs := aliasSearchFilter("", wildcard, search)
-	args := append([]any{userID}, filterArgs...)
+
+	args := []any{userID}
+	args = append(args, statusArgs...)
+	args = append(args, filterArgs...)
+
+	q := d.Client.Model(&model.Alias{})
+	if unscoped {
+		q = q.Unscoped()
+	}
+	q = q.Where("user_id = ? "+statusFilter+filter, args...)
 
 	var count int64
-	q := d.Client.Model(&model.Alias{})
-	if status == "deleted" {
-		q = q.Unscoped().Where("user_id = ? AND deleted_at IS NOT NULL"+filter, args...)
-	} else if status == "all" {
-		q = q.Unscoped().Where("user_id = ?"+filter, args...)
-	} else {
-		q = q.Where("user_id = ?"+filter, args...)
-	}
 	err := q.Count(&count).Error
 	return int(count), err
 }

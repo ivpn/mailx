@@ -80,6 +80,7 @@ const getUser = async () => {
 const validatePassword = () => {
     success.value = ''
     passwordError.value = ''
+    error.value = ''
 
     if (res.value.has_password && !oldPassword.value) {
         passwordError.value = 'Please fill required fields'

@@ -65,7 +65,7 @@ func (h *Handler) GetAlias(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Param status query string false "Filter by alias status" Enums(active, deleted, all)
+// @Param status query string false "Filter by alias status" Enums(active_inactive, active, inactive, deleted, all)
 // @Success 200 {object} model.AliasList
 // @Failure 400 {object} ErrorRes
 // @Router /aliases [get]
@@ -95,10 +95,12 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 		"":      true,
 	}
 	var allowStatus = map[string]bool{
-		"active":  true,
-		"deleted": true,
-		"all":     true,
-		"":        true,
+		"active_inactive": true,
+		"active":          true,
+		"inactive":        true,
+		"deleted":         true,
+		"all":             true,
+		"":                true,
 	}
 
 	if _, ok := model.AliasSortColumns[sortBy]; !ok {
@@ -114,7 +116,7 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 		status = ""
 	}
 	if status == "" {
-		status = "active"
+		status = "active_inactive"
 	}
 
 	err = h.Validator.Var(search, "omitempty,required,search")

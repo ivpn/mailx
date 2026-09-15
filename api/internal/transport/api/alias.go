@@ -518,7 +518,7 @@ func (h *Handler) RestoreAlias(c *fiber.Ctx) error {
 }
 
 // @Summary Forget alias
-// @Description Permanently delete a soft-deleted custom-domain alias, bypassing the restore window
+// @Description Permanently delete a custom-domain alias, bypassing the soft-delete step entirely
 // @Tags alias
 // @Accept json
 // @Produce json

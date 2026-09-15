@@ -27,7 +27,7 @@ func TestForgetAlias(t *testing.T) {
 		}
 	})
 
-	t.Run("rejects alias that is not deleted yet", func(t *testing.T) {
+	t.Run("permanently removes an active custom-domain alias", func(t *testing.T) {
 		store := newFakeStore()
 		store.aliases["custom@example.com"] = model.Alias{
 			BaseModel: model.BaseModel{ID: "alias-2"},
@@ -37,8 +37,11 @@ func TestForgetAlias(t *testing.T) {
 		svc := newTestService(store)
 
 		err := svc.ForgetAlias(context.Background(), "alias-2", "user-1")
-		if !errors.Is(err, ErrForgetAliasNotDeleted) {
-			t.Errorf("expected ErrForgetAliasNotDeleted, got %v", err)
+		if err != nil {
+			t.Errorf("expected no error, got %v", err)
+		}
+		if _, ok := store.aliases["custom@example.com"]; ok {
+			t.Errorf("expected alias to be removed from store")
 		}
 	})
 

@@ -22,6 +22,7 @@ var (
 	ErrFailedImport     = "Failed to import aliases. Please check the format and try again."
 	AliasImportSuccess  = "Aliases imported successfully."
 	RestoreAliasSuccess = "Alias restored successfully."
+	ForgetAliasSuccess  = "Alias permanently deleted."
 )
 
 type AliasService interface {
@@ -34,6 +35,7 @@ type AliasService interface {
 	DeleteAlias(context.Context, string, string) error
 	ImportAliases(context.Context, []model.AliasImportReq, string) ([]model.Alias, error)
 	RestoreAlias(context.Context, string, string) error
+	ForgetAlias(context.Context, string, string) error
 }
 
 // @Summary Get alias
@@ -512,5 +514,31 @@ func (h *Handler) RestoreAlias(c *fiber.Ctx) error {
 
 	return c.Status(200).JSON(fiber.Map{
 		"message": RestoreAliasSuccess,
+	})
+}
+
+// @Summary Forget alias
+// @Description Permanently delete a soft-deleted custom-domain alias, bypassing the restore window
+// @Tags alias
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path string true "Alias ID"
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /alias/forget/{id} [delete]
+// @Router /api/alias/forget/{id} [delete]
+func (h *Handler) ForgetAlias(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
+	id := c.Params("id")
+	err := h.Service.ForgetAlias(c.Context(), id, userID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": ForgetAliasSuccess,
 	})
 }

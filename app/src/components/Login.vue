@@ -5,9 +5,11 @@
             <article>
                 <div>
                     <div v-if="passkeySupported" v-bind:class="{ 'hidden': signupSuccess }" id="tabs-with-underline-1" role="tabpanel" aria-labelledby="tabs-with-underline-item-1">
-                        <h1 class="flex justify-center text-accent mb-8">
-                            <span class="logo"></span>
-                        </h1>
+                        <router-link to="/" class="p-0">
+                            <h1 class="flex justify-center text-accent mb-8">
+                                <span class="logo"></span>
+                            </h1>
+                        </router-link>
                         <h4 class="text-center mb-8">Log in with Passkey</h4>
                         <div v-if="!showEmailFallback">
                             <div class="mb-6 flex items-center gap-3">
@@ -69,9 +71,11 @@
                     <div id="tabs-with-underline-2" v-bind:class="{ 'hidden': passkeySupported && !signupSuccess }" role="tabpanel"
                         aria-labelledby="tabs-with-underline-item-2">
                         <div>
-                            <h1 class="flex justify-center text-accent mb-8">
-                                <span class="logo"></span>
-                            </h1>
+                            <router-link to="/" class="p-0">
+                                <h1 class="flex justify-center text-accent mb-8">
+                                    <span class="logo"></span>
+                                </h1>
+                            </router-link>
                             <h4 class="text-center mb-8">Log in with email and password</h4>
                             <div class="mb-6">
                                 <input

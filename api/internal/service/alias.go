@@ -29,7 +29,6 @@ var (
 
 	ErrForgetAlias                = errors.New("Unable to permanently delete alias. Please try again.")
 	ErrForgetAliasNotCustomDomain = errors.New("Only custom domain aliases can be permanently deleted.")
-	ErrForgetAliasNotDeleted      = errors.New("Alias must be deleted before it can be permanently deleted.")
 )
 
 type AliasStore interface {
@@ -459,8 +458,8 @@ func (s *Service) RestoreAlias(ctx context.Context, ID string, userID string) er
 	return nil
 }
 
-// ForgetAlias permanently deletes an already soft-deleted custom-domain alias, freeing up its
-// (unique) address for reuse immediately instead of waiting for the 90-day cleanup job.
+// ForgetAlias permanently deletes a custom-domain alias, bypassing the soft-delete step
+// entirely so the (unique) address is freed up for reuse immediately.
 func (s *Service) ForgetAlias(ctx context.Context, ID string, userID string) error {
 	alias, err := s.Store.GetAliasUnscoped(ctx, ID, userID)
 	if err != nil {
@@ -471,10 +470,6 @@ func (s *Service) ForgetAlias(ctx context.Context, ID string, userID string) err
 	domainPart := aliasDomainPart(alias.Name)
 	if !isCustomAliasDomain(domainPart, s.Cfg.API.Domains) {
 		return ErrForgetAliasNotCustomDomain
-	}
-
-	if !alias.DeletedAt.Valid {
-		return ErrForgetAliasNotDeleted
 	}
 
 	err = s.Store.ForgetAlias(ctx, ID, userID)

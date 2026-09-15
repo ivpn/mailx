@@ -1,7 +1,7 @@
 <template>
     <header class="bg-secondary flex flex-col justify-between h-full">
         <nav>
-            <router-link to="/account" class="p-0">
+            <router-link to="/" class="p-0">
                 <h1 class="pl-6 pr-5 m-0 text-accent head flex items-center justify-between">
                     <span class="logo"></span>
                 </h1>

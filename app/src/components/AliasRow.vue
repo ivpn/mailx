@@ -107,7 +107,7 @@
                         Delete
                     </button>
                     <button
-                        v-if="!alias.deleted_at &&alias.is_custom_domain"
+                        v-if="alias.is_custom_domain"
                         @click.stop="forgetAlias" class="delete">
                         <i class="icon icon-error trash text-xs"></i>
                         Forget
@@ -193,7 +193,7 @@
                                 Delete
                             </button>
                             <button
-                                v-if="!alias.deleted_at && alias.is_custom_domain"
+                                v-if="alias.is_custom_domain"
                                 @click.stop="forgetAlias" class="delete">
                                 <i class="icon icon-error trash text-xs"></i>
                                 Forget

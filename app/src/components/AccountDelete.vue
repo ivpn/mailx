@@ -6,6 +6,7 @@
             class="cta delete mb-4">
             Delete Account
         </button>
+        <p v-if="stepUpError" class="error mb-4">Error: {{ stepUpError }}</p>
         <div v-bind:id="'modal-delete-account'" class="hs-overlay hidden">
             <div>
                 <div>
@@ -68,6 +69,7 @@ const req = ref({ otp: '' })
 const otp = ref('')
 const otpError = ref(false)
 const error = ref('')
+const stepUpError = ref('')
 
 const validateOtp = () => {
     otpError.value = !req.value.otp
@@ -97,11 +99,19 @@ const deleteAccount = async () => {
 }
 
 const deleteAccountRequest = async () => {
+    stepUpError.value = ''
     try {
         const res = await userApi.deleteRequest()
         otp.value = res.data.otp
     } catch (err) {
         if (axios.isAxiosError(err)) {
+            // Step-up failed/cancelled: close the modal, surface the message on the page instead
+            if (err.response?.data?.code === 80001) {
+                close()
+                stepUpError.value = err.response?.data.error || err.message
+                return
+            }
+
             error.value = err.response?.data.error || err.message
 
             if (err.response?.status === 429) {

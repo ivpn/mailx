@@ -71,7 +71,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Put("/user/changeemail", auth.NewStepUp(h.Service), limit.New(5, 10*time.Minute), h.ChangeEmail)
 	v1.Put("/user/totp/enable", limit.New(5, 10*time.Minute), h.TotpEnable)
 	v1.Put("/user/totp/enable/confirm", limit.New(5, 10*time.Minute), h.TotpEnableConfirm)
-	v1.Put("/user/totp/disable", auth.NewStepUp(h.Service), limit.New(5, 10*time.Minute), h.TotpDisable)
+	v1.Put("/user/totp/disable", limit.New(5, 10*time.Minute), h.TotpDisable)
 
 	v1.Post("/user/stepup/password", limit.New(5, 10*time.Minute), h.StepUpPassword)
 	v1.Post("/user/stepup/passkey/begin", limiter.New(), h.StepUpPasskeyBegin)

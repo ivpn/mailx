@@ -2,11 +2,13 @@
     <div class="mb-5">
         <h2>Delete Account</h2>
         <button
-            v-bind:data-hs-overlay="'#modal-delete-account'"
+            @click="deleteAccountRequest"
             class="cta delete mb-4">
             Delete Account
         </button>
-        <p v-if="stepUpError" class="error mb-4">Error: {{ stepUpError }}</p>
+        <p v-if="requestError" class="error mb-4">Error: {{ requestError }}</p>
+        <!-- Hidden trigger so Preline registers an instance for the modal, which is now opened programmatically -->
+        <button type="button" data-hs-overlay="#modal-delete-account" class="hidden" aria-hidden="true" tabindex="-1"></button>
         <div v-bind:id="'modal-delete-account'" class="hs-overlay hidden">
             <div>
                 <div>
@@ -69,7 +71,7 @@ const req = ref({ otp: '' })
 const otp = ref('')
 const otpError = ref(false)
 const error = ref('')
-const stepUpError = ref('')
+const requestError = ref('')
 
 const validateOtp = () => {
     otpError.value = !req.value.otp
@@ -99,23 +101,17 @@ const deleteAccount = async () => {
 }
 
 const deleteAccountRequest = async () => {
-    stepUpError.value = ''
+    requestError.value = ''
     try {
         const res = await userApi.deleteRequest()
         otp.value = res.data.otp
+        overlay.open(document.querySelector('#modal-delete-account') as any)
     } catch (err) {
         if (axios.isAxiosError(err)) {
-            // Step-up failed/cancelled: close the modal, surface the message on the page instead
-            if (err.response?.data?.code === 80001) {
-                close()
-                stepUpError.value = err.response?.data.error || err.message
-                return
-            }
-
-            error.value = err.response?.data.error || err.message
+            requestError.value = err.response?.data.error || err.message
 
             if (err.response?.status === 429) {
-                error.value = 'Too many requests, please try again later.'
+                requestError.value = 'Too many requests, please try again later.'
             }
         }
     }
@@ -134,9 +130,6 @@ const addEvents = () => {
     const modal = overlay.getInstance('#modal-delete-account' as any, true) as any
     modal.element.on('close', () => {
         close()
-    })
-    modal.element.on('open', () => {
-        deleteAccountRequest()
     })
 }
 

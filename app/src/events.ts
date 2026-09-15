@@ -6,6 +6,7 @@ type Events = {
     'alias.create': {}
     'alias.update': {}
     'alias.delete': { id: string, wildcard: boolean }
+    'alias.forget': { id: string }
     'totp.enable': {}
     'totp.disable': {}
     'recipient.create': {}

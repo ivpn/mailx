@@ -106,6 +106,12 @@
                         <i class="icon icon-error trash text-xs"></i>
                         Delete
                     </button>
+                    <button
+                        v-if="!alias.deleted_at &&alias.is_custom_domain"
+                        @click.stop="forgetAlias" class="delete">
+                        <i class="icon icon-error trash text-xs"></i>
+                        Forget
+                    </button>
                 </div>
             </div>
         </td>
@@ -185,6 +191,12 @@
                                 @click.stop="deleteAlias" class="delete">
                                 <i class="icon icon-error trash text-xs"></i>
                                 Delete
+                            </button>
+                            <button
+                                v-if="!alias.deleted_at && alias.is_custom_domain"
+                                @click.stop="forgetAlias" class="delete">
+                                <i class="icon icon-error trash text-xs"></i>
+                                Forget
                             </button>
                         </div>
                     </div>
@@ -267,6 +279,13 @@ const restoreAlias = async () => {
         await aliasApi.restore(alias.value.id)
         events.emit('alias.update', {})
     } catch {}
+}
+
+const forgetAlias = () => {
+    const errMessage = 'WARNING: This operation cannot be undone. You will not be able to restore this alias. Are you sure you want to delete alias?'
+    if (!confirm(errMessage)) return
+
+    events.emit('alias.forget', { id: alias.value.id })
 }
 
 const copyAlias = (alias: string) => {

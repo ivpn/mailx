@@ -259,6 +259,18 @@ const deleteAlias = async (payload: any) => {
     }
 }
 
+const forgetAlias = async (payload: any) => {
+    try {
+        await aliasApi.forget(payload.id)
+        error.value = ''
+        getList()
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.message
+        }
+    }
+}
+
 const renderRow = () => {
     rowKey.value++
 }
@@ -271,6 +283,10 @@ const onUpdatePage = (obj: any) => {
 
 const onDeleteAlias = (payload: { id: string, wildcard: boolean }) => {
     deleteAlias(payload)
+}
+
+const onForgetAlias = (payload: { id: string }) => {
+    forgetAlias(payload)
 }
 
 const sort = (e: any) => {
@@ -323,6 +339,7 @@ onMounted(async () => {
     events.on('alias.create', getList)
     events.on('alias.update', getList)
     events.on('alias.delete', onDeleteAlias)
+    events.on('alias.forget', onForgetAlias)
     document.addEventListener('keydown', handleKeydown)
 })
 

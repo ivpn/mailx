@@ -6,8 +6,77 @@ import (
 	"testing"
 	"time"
 
+	"gorm.io/gorm"
 	"ivpn.net/email/api/internal/model"
 )
+
+func TestForgetAlias(t *testing.T) {
+	t.Run("rejects alias on a built-in domain", func(t *testing.T) {
+		store := newFakeStore()
+		store.aliases["random@mailx.net"] = model.Alias{
+			BaseModel: model.BaseModel{ID: "alias-1"},
+			Name:      "random@mailx.net",
+			UserID:    "user-1",
+			DeletedAt: gorm.DeletedAt{Time: time.Now(), Valid: true},
+		}
+		svc := newTestService(store)
+
+		err := svc.ForgetAlias(context.Background(), "alias-1", "user-1")
+		if !errors.Is(err, ErrForgetAliasNotCustomDomain) {
+			t.Errorf("expected ErrForgetAliasNotCustomDomain, got %v", err)
+		}
+	})
+
+	t.Run("rejects alias that is not deleted yet", func(t *testing.T) {
+		store := newFakeStore()
+		store.aliases["custom@example.com"] = model.Alias{
+			BaseModel: model.BaseModel{ID: "alias-2"},
+			Name:      "custom@example.com",
+			UserID:    "user-1",
+		}
+		svc := newTestService(store)
+
+		err := svc.ForgetAlias(context.Background(), "alias-2", "user-1")
+		if !errors.Is(err, ErrForgetAliasNotDeleted) {
+			t.Errorf("expected ErrForgetAliasNotDeleted, got %v", err)
+		}
+	})
+
+	t.Run("permanently removes a deleted custom-domain alias", func(t *testing.T) {
+		store := newFakeStore()
+		store.aliases["custom@example.com"] = model.Alias{
+			BaseModel: model.BaseModel{ID: "alias-3"},
+			Name:      "custom@example.com",
+			UserID:    "user-1",
+			DeletedAt: gorm.DeletedAt{Time: time.Now(), Valid: true},
+		}
+		svc := newTestService(store)
+
+		err := svc.ForgetAlias(context.Background(), "alias-3", "user-1")
+		if err != nil {
+			t.Errorf("expected no error, got %v", err)
+		}
+		if _, ok := store.aliases["custom@example.com"]; ok {
+			t.Errorf("expected alias to be removed from store")
+		}
+	})
+
+	t.Run("rejects alias belonging to a different user", func(t *testing.T) {
+		store := newFakeStore()
+		store.aliases["custom@example.com"] = model.Alias{
+			BaseModel: model.BaseModel{ID: "alias-4"},
+			Name:      "custom@example.com",
+			UserID:    "user-1",
+			DeletedAt: gorm.DeletedAt{Time: time.Now(), Valid: true},
+		}
+		svc := newTestService(store)
+
+		err := svc.ForgetAlias(context.Background(), "alias-4", "user-2")
+		if !errors.Is(err, ErrGetAlias) {
+			t.Errorf("expected ErrGetAlias, got %v", err)
+		}
+	})
+}
 
 func TestAliasDomainPart(t *testing.T) {
 	tests := []struct {

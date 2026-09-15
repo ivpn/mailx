@@ -3,9 +3,11 @@
         <div></div>
         <form class="card-tertiary center" @submit.prevent="initiatePasswordReset">
             <article>
-                <h1 class="flex justify-center text-accent mb-8">
-                    <span class="logo"></span>
-                </h1>
+                <router-link to="/" class="p-0">
+                    <h1 class="flex justify-center text-accent mb-8">
+                        <span class="logo"></span>
+                    </h1>
+                </router-link>
                 <h4 class="text-center mb-8">Reset password</h4>
                 <div v-if="!apiSuccess">
                     <div class="mb-3">

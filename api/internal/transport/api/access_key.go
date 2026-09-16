@@ -201,6 +201,14 @@ func (h *Handler) Authenticate(c *fiber.Ctx) error {
 		})
 	}
 
+	customDomains, err := h.Service.GetVerifiedDomains(c.Context(), user.ID)
+	if err != nil {
+		log.Printf("error authenticate: %s", err.Error())
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
 	// Save the session
 	exp := time.Now().Add(h.Cfg.ApiTokenExpiration)
 	if accessKey.ExpiresAt != nil && exp.After(*accessKey.ExpiresAt) {
@@ -225,12 +233,13 @@ func (h *Handler) Authenticate(c *fiber.Ctx) error {
 
 	// Return token
 	return c.Status(200).JSON(fiber.Map{
-		"token":        token,
-		"domain":       settings.Domain,
-		"domains":      strings.Split(h.Cfg.Domains, ","),
-		"recipient":    settings.Recipient,
-		"recipients":   rcps,
-		"alias_format": settings.AliasFormat,
+		"token":          token,
+		"domain":         settings.Domain,
+		"domains":        strings.Split(h.Cfg.Domains, ","),
+		"custom_domains": customDomains,
+		"recipient":      settings.Recipient,
+		"recipients":     rcps,
+		"alias_format":   settings.AliasFormat,
 	})
 }
 

@@ -116,6 +116,10 @@
         &.question {
             mask-image: url("../../assets/icons/icon-question.svg");
         }
+
+        &.pin {
+            mask-image: url("../../assets/icons/icon-pin.svg");
+        }
     }
 
     .logo {

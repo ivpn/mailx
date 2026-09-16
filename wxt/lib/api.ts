@@ -89,6 +89,22 @@ async function deleteAlias(apiToken: string, aliasId: string) {
     return body
 }
 
+async function pinAlias(apiToken: string, aliasId: string, pinned: boolean) {
+    const res = await fetch(`${BASE_URL}/v1/api/alias/${aliasId}/pin`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${apiToken}`,
+        },
+        body: JSON.stringify({ pinned }),
+    })
+
+    const body = await parseBody(res)
+    if (res.status === 401) { clearSession(); throw new Error(body.error ?? 'Unauthorized') }
+    if (!res.ok) throw new Error(body.error ?? 'Failed to update alias pin status')
+    return body
+}
+
 async function fetchDefaults(apiToken: string) {
     const res = await fetch(`${BASE_URL}/v1/api/defaults`, {
         headers: { Authorization: `Bearer ${apiToken}` },
@@ -121,6 +137,7 @@ export const api = {
     createAlias,
     updateAlias,
     deleteAlias,
+    pinAlias,
     fetchDefaults,
     logout,
     clearSession,

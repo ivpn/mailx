@@ -197,7 +197,6 @@ const postAlias = async () => {
     try {
         loading.value = true
         const res = await api.createAlias(props.apiToken, req)
-        console.log('Created alias:', res)
         copyAlias(res.alias.name)
         error.value = ''
         events.emit('alias.create', { alias: res.alias})

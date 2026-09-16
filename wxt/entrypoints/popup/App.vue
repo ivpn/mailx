@@ -48,12 +48,10 @@ onMounted(async () => {
   preferences.value = await store.getPreferences()
 
   store.onApiTokenChange((newToken) => {
-    console.log('API token changed:', newToken)
     apiToken.value = newToken
   })
 
   store.onDefaultsChange((newDefaults) => {
-    console.log('Defaults changed:', newDefaults)
     defaults.value = newDefaults
   })
 

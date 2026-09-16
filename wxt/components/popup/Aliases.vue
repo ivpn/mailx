@@ -21,7 +21,7 @@
             <div v-else>
                 <div v-for="(alias, index) in list" :key="alias.id" class="min-h-[63.3px] flex items-center gap-x-4" :class="{ 'border-t border-secondary': index > 0 }">
                     <div class="flex items-center">
-                        <input @change="updateAlias(alias)" v-bind:checked="alias.enabled" type="checkbox" class="xs">
+                        <input @change="updateAlias(alias)" v-bind:checked="alias.enabled" type="checkbox" class="checkbox-switch xs">
                     </div>
                     <div class="grow min-w-24 break-all">
                         <p class="m-0 min-width-0 text-primary font-medium text-base text-nowrap overflow-hidden text-ellipsis">{{ alias.name }}</p>
@@ -88,7 +88,6 @@ const fetchAliases = async () => {
         isLoading.value = true
         const res = await api.fetchAliases(props.apiToken, searchQuery.value)
         list.value = res.aliases
-        console.log('Fetched aliases:', res.aliases)
     } catch (err) {
         error.value = err instanceof Error ? err.message : 'An unexpected error occurred'
         console.error('Fetch aliases error:', err)
@@ -107,7 +106,6 @@ const updateAlias = async (alias: Alias) => {
     alias.enabled = !alias.enabled
     try {
         await api.updateAlias(props.apiToken, alias.id, alias)
-        console.log('Updated alias:', alias)
     } catch (err) {
         console.error('Update alias error:', err)
     }
@@ -119,7 +117,6 @@ const togglePin = async (alias: Alias) => {
         await api.pinAlias(props.apiToken, alias.id, pinned)
         alias.pinned = pinned
         list.value.sort((a, b) => Number(b.pinned) - Number(a.pinned))
-        console.log('Updated alias pin status:', alias)
     } catch (err) {
         console.error('Pin alias error:', err)
     }
@@ -131,7 +128,6 @@ const deleteAlias = async (aliasId: string) => {
     try {
         await api.deleteAlias(props.apiToken, aliasId)
         list.value = list.value.filter(alias => alias.id !== aliasId)
-        console.log('Deleted alias with ID:', aliasId)
     } catch (err) {
         console.error('Delete alias error:', err)
     }
@@ -147,7 +143,6 @@ const copyAlias = (alias: string) => {
 
 const onCreateAlias = (event: { alias: Alias }) => {
     if (!event.alias) return
-    console.log('Alias created event received:', event.alias)
     list.value.unshift(event.alias)
 }
 

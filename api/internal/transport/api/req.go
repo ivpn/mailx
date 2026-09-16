@@ -59,6 +59,10 @@ type RecipientReq struct {
 	PGPInline  bool   `json:"pgp_inline"`
 }
 
+type AliasPinReq struct {
+	Pinned bool `json:"pinned"`
+}
+
 type DeleteRecipientReq struct {
 	Recipients string `json:"recipients"`
 }

@@ -111,7 +111,7 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 		ON a.id = m.alias_id
 		WHERE a.user_id = ? ` + statusFilter + filter + `
 		GROUP BY a.id
-		ORDER BY ` + sortBy + " " + sortOrder
+		ORDER BY a.pinned DESC, ` + sortBy + " " + sortOrder
 
 	if limit > 0 {
 		query += "\nLIMIT " + strconv.Itoa(limit)
@@ -134,7 +134,7 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 	for rows.Next() {
 		var alias model.Alias
 		var forwards, blocks, replies, sends int
-		if err := rows.Scan(&alias.ID, &alias.CreatedAt, &alias.UpdatedAt, &alias.DeletedAt, &alias.Name, &alias.UserID, &alias.Enabled, &alias.Description, &alias.Recipients, &alias.FromName, &alias.Wildcard, &alias.Origin, &forwards, &blocks, &replies, &sends); err != nil {
+		if err := rows.Scan(&alias.ID, &alias.CreatedAt, &alias.UpdatedAt, &alias.DeletedAt, &alias.Name, &alias.UserID, &alias.Enabled, &alias.Description, &alias.Recipients, &alias.FromName, &alias.Wildcard, &alias.Origin, &alias.Pinned, &forwards, &blocks, &replies, &sends); err != nil {
 			return nil, err
 		}
 		alias.Stats = model.AliasStats{
@@ -236,6 +236,13 @@ func (d *Database) UpdateAlias(ctx context.Context, alias model.Alias) error {
 
 func (d *Database) DeleteAlias(ctx context.Context, ID string, userID string) error {
 	return d.Client.Where("id = ? AND user_id = ?", ID, userID).Delete(&model.Alias{}).Error
+}
+
+// UpdateAliasPinned sets pinned in isolation (no recipients/description involved), so pinning
+// never depends on the alias's recipients being resolvable/verified. GORM's automatic
+// soft-delete scope already excludes deleted_at rows here, same as UpdateAlias/DeleteAlias.
+func (d *Database) UpdateAliasPinned(ctx context.Context, ID string, userID string, pinned bool) error {
+	return d.Client.Model(&model.Alias{}).Where("id = ? AND user_id = ?", ID, userID).Update("pinned", pinned).Error
 }
 
 func (d *Database) DeleteAliasByUserID(ctx context.Context, userID string) error {

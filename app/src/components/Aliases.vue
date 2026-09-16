@@ -166,6 +166,7 @@ const alias = {
     description: '',
     recipients: '',
     from_name: '',
+    pinned: false,
     stats: {
         forwards: 0,
         blocks: 0,

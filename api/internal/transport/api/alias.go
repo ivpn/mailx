@@ -32,6 +32,7 @@ type AliasService interface {
 	PostAlias(context.Context, model.Alias, string, string, string, string) (model.Alias, error)
 	GetWildcardDomainInfo(context.Context, string, string) (model.WildcardDomainInfo, error)
 	UpdateAlias(context.Context, model.Alias) error
+	UpdateAliasPinned(context.Context, string, string, bool) error
 	DeleteAlias(context.Context, string, string) error
 	ImportAliases(context.Context, []model.AliasImportReq, string) ([]model.Alias, error)
 	RestoreAlias(context.Context, string, string) error
@@ -488,6 +489,41 @@ func (h *Handler) DeleteAlias(c *fiber.Ctx) error {
 
 	return c.Status(200).JSON(fiber.Map{
 		"message": DeleteAliasSuccess,
+	})
+}
+
+// @Summary Pin or unpin alias
+// @Description Set alias pinned status; pinned aliases are always sorted first in the list
+// @Tags alias
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path string true "Alias ID"
+// @Param body body AliasPinReq true "Pin request"
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /alias/{id}/pin [put]
+// @Router /api/alias/{id}/pin [put]
+func (h *Handler) UpdateAliasPinned(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
+	id := c.Params("id")
+	req := AliasPinReq{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	err = h.Service.UpdateAliasPinned(c.Context(), id, userID, req.Pinned)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": UpdateAliasSuccess,
 	})
 }
 

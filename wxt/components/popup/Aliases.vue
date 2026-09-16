@@ -28,6 +28,15 @@
                         <p class="m-0">{{ truncatedDescription(alias) }}</p>
                     </div>
                     <div class="hs-tooltip">
+                        <button class="hs-tooltip-toggle plain" @click="togglePin(alias)">
+                            <i class="icon pin text-xs" :class="alias.pinned ? 'icon-accent' : 'icon-secondary'"></i>
+                            <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0"
+                                role="tooltip">
+                                {{ alias.pinned ? 'Unpin' : 'Pin' }}
+                            </span>
+                        </button>
+                    </div>
+                    <div class="hs-tooltip">
                         <button class="hs-tooltip-toggle plain" @click="copyAlias(alias.name)">
                             <i class="icon icon-secondary copy text-xs"></i>
                             <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0"
@@ -101,6 +110,18 @@ const updateAlias = async (alias: Alias) => {
         console.log('Updated alias:', alias)
     } catch (err) {
         console.error('Update alias error:', err)
+    }
+}
+
+const togglePin = async (alias: Alias) => {
+    const pinned = !alias.pinned
+    try {
+        await api.pinAlias(props.apiToken, alias.id, pinned)
+        alias.pinned = pinned
+        list.value.sort((a, b) => Number(b.pinned) - Number(a.pinned))
+        console.log('Updated alias pin status:', alias)
+    } catch (err) {
+        console.error('Pin alias error:', err)
     }
 }
 

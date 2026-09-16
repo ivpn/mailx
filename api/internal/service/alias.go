@@ -40,6 +40,7 @@ type AliasStore interface {
 	GetAliasByName(string) (model.Alias, error)
 	PostAlias(context.Context, model.Alias, int, int) (model.Alias, error)
 	UpdateAlias(context.Context, model.Alias) error
+	UpdateAliasPinned(context.Context, string, string, bool) error
 	DeleteAlias(context.Context, string, string) error
 	DeleteAliasByUserID(context.Context, string) error
 	DeleteAliasByDomain(context.Context, string, string) error
@@ -342,6 +343,16 @@ func (s *Service) UpdateAlias(ctx context.Context, alias model.Alias) error {
 	err := s.Store.UpdateAlias(ctx, alias)
 	if err != nil {
 		log.Printf("error updating alias: %s", err.Error())
+		return ErrUpdateAlias
+	}
+
+	return nil
+}
+
+func (s *Service) UpdateAliasPinned(ctx context.Context, ID string, userID string, pinned bool) error {
+	err := s.Store.UpdateAliasPinned(ctx, ID, userID, pinned)
+	if err != nil {
+		log.Printf("error updating alias pinned status: %s", err.Error())
 		return ErrUpdateAlias
 	}
 

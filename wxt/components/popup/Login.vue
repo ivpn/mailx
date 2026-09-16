@@ -57,7 +57,6 @@ const loginWithAccessKey = async () => {
         isLoading.value = true
         const res = await api.authenticate(accessKey.value)
         processResponse(res)
-        console.log('Login successful:', res)
     } catch (err) {
         error.value = err instanceof Error ? err.message : 'An unexpected error occurred'
         console.error('Login error:', err)
@@ -70,7 +69,7 @@ const processResponse = (res: any) => {
     const defaults = {
         domain: res.domain,
         domains: res.domains,
-        custom_domains: res.custom_domains,
+        custom_domains: res.custom_domains ?? [],
         recipient: res.recipient,
         recipients: res.recipients,
         alias_format: res.alias_format,

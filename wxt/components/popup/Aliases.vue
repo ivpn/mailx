@@ -16,7 +16,7 @@
                     </button>
                 </div>
             </header>
-            <p v-if="isLoading" class="text-secondary py-4">Loading...</p>
+            <p v-if="isLoading && !hasLoadedOnce" class="text-secondary py-4">Loading...</p>
             <p v-else-if="error" class="error py-4">Error: {{ error }}</p>
             <div v-else>
                 <div v-for="(alias, index) in list" :key="alias.id" class="min-h-[63.3px] flex items-center gap-x-4" :class="{ 'border-t border-secondary': index > 0 }">
@@ -69,6 +69,7 @@ const props = defineProps<{
 }>()
 const list = ref([] as Alias[])
 const isLoading = ref(false)
+const hasLoadedOnce = ref(false)
 const error = ref<string | null>(null)
 const copyText = ref('Click to copy')
 const search = ref('')
@@ -93,6 +94,7 @@ const fetchAliases = async () => {
         console.error('Fetch aliases error:', err)
     } finally {
         isLoading.value = false
+        hasLoadedOnce.value = true
     }
 }
 
@@ -115,8 +117,8 @@ const togglePin = async (alias: Alias) => {
     const pinned = !alias.pinned
     try {
         await api.pinAlias(props.apiToken, alias.id, pinned)
-        alias.pinned = pinned
-        list.value.sort((a, b) => Number(b.pinned) - Number(a.pinned))
+        // re-sync with the server's pinned+secondary sort instead of guessing the unpinned position locally
+        await fetchAliases()
     } catch (err) {
         console.error('Pin alias error:', err)
     }

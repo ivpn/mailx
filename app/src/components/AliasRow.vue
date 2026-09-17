@@ -30,7 +30,7 @@
             <div class="hs-tooltip inline-block">
                 <p class="hs-tooltip-toggle m-0 break-all">
                     <button class="plain text-wrap text-start text-sm p-0 flex items-center" @click="copyAlias(alias.name)">
-                        <i v-if="alias.pinned" class="icon pin icon-accent text-xs mr-1"></i>{{ alias.name }}
+                        <i v-if="alias.pinned" class="icon pin icon-accent text-xs mr-1 shrink-0"></i>{{ alias.name }}
                     </button>
                     <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                         {{ copyText }}: {{ alias.name }}
@@ -134,7 +134,7 @@
                             <p class="hs-tooltip-toggle mb-0">
                                 <button class="plain truncate text-sm p-0 text-wrap text-start" @click="copyAlias(alias.name)">
                                     <span v-if="alias.description" class="block break-words">{{ truncatedDescription }}</span>
-                                    <span class="text-sm break-all flex items-center"><i v-if="alias.pinned" class="icon pin icon-accent text-xs mr-1"></i>{{ alias.name }}</span>
+                                    <span class="text-sm break-all flex items-center"><i v-if="alias.pinned" class="icon pin icon-accent text-xs mr-1 shrink-0"></i>{{ alias.name }}</span>
                                 </button>
                                 <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                                     {{ copyText }}: {{ alias.name }}

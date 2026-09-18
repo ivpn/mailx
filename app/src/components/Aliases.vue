@@ -67,7 +67,7 @@
                     <table>
                         <thead class="desktop-lg">
                             <tr>
-                                <th>
+                                <th class="w-10 py-6">
                                     <input
                                         type="checkbox"
                                         class="checkbox-plain"
@@ -142,7 +142,7 @@
                                     <th>Actions</th>
                                 </template>
                                 <th v-else colspan="6">
-                                    <div class="flex items-center gap-3 flex-wrap">
+                                    <div class="flex items-center gap-3 flex-nowrap">
                                         <button v-bind:disabled="!canActivate || bulkLoading" @click="bulkActivate">Activate</button>
                                         <button v-bind:disabled="!canDeactivate || bulkLoading" @click="bulkDeactivate">Deactivate</button>
                                         <button v-bind:disabled="!canPin || bulkLoading" @click="bulkPin">Pin</button>

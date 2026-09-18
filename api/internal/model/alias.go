@@ -12,6 +12,7 @@ var (
 	ErrDuplicateAliasDomain = errors.New("wildcard aliases limit reached for this domain")
 	ErrDailyAliasLimit      = errors.New("daily alias limit reached")
 	ErrInboundHourlyLimit   = errors.New("hourly inbound alias limit reached")
+	ErrBulkAliasNotEligible = errors.New("one or more selected aliases are not eligible for this action")
 )
 
 type AliasOrigin int

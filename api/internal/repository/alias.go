@@ -270,3 +270,60 @@ func (d *Database) GetAliasUnscoped(ctx context.Context, ID string, userID strin
 func (d *Database) ForgetAlias(ctx context.Context, ID string, userID string) error {
 	return d.Client.Unscoped().Where("id = ? AND user_id = ?", ID, userID).Delete(&model.Alias{}).Error
 }
+
+// BulkUpdateAliasEnabled sets enabled for all given IDs unconditionally (no eligibility check -
+// GORM's automatic soft-delete scope already excludes deleted_at rows, same as UpdateAlias).
+func (d *Database) BulkUpdateAliasEnabled(ctx context.Context, ids []string, userID string, enabled bool) error {
+	return d.Client.WithContext(ctx).Model(&model.Alias{}).Where("id IN (?) AND user_id = ?", ids, userID).Update("enabled", enabled).Error
+}
+
+// BulkUpdateAliasPinned sets pinned for all given IDs unconditionally, mirroring UpdateAliasPinned.
+func (d *Database) BulkUpdateAliasPinned(ctx context.Context, ids []string, userID string, pinned bool) error {
+	return d.Client.WithContext(ctx).Model(&model.Alias{}).Where("id IN (?) AND user_id = ?", ids, userID).Update("pinned", pinned).Error
+}
+
+// BulkDeleteAlias soft-deletes all given IDs, but only if every one of them is currently
+// non-deleted - otherwise the whole batch is rolled back via ErrBulkAliasNotEligible.
+func (d *Database) BulkDeleteAlias(ctx context.Context, ids []string, userID string) error {
+	return d.Client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		var count int64
+		if err := tx.Model(&model.Alias{}).Where("id IN (?) AND user_id = ?", ids, userID).Count(&count).Error; err != nil {
+			return err
+		}
+		if count != int64(len(ids)) {
+			return model.ErrBulkAliasNotEligible
+		}
+
+		return tx.Where("id IN (?) AND user_id = ?", ids, userID).Delete(&model.Alias{}).Error
+	})
+}
+
+// BulkRestoreAlias restores all given IDs, but only if every one of them is currently
+// soft-deleted - otherwise the whole batch is rolled back via ErrBulkAliasNotEligible.
+func (d *Database) BulkRestoreAlias(ctx context.Context, ids []string, userID string) error {
+	return d.Client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		var count int64
+		if err := tx.Unscoped().Model(&model.Alias{}).Where("id IN (?) AND user_id = ? AND deleted_at IS NOT NULL", ids, userID).Count(&count).Error; err != nil {
+			return err
+		}
+		if count != int64(len(ids)) {
+			return model.ErrBulkAliasNotEligible
+		}
+
+		return tx.Unscoped().Model(&model.Alias{}).Where("id IN (?) AND user_id = ?", ids, userID).Update("deleted_at", nil).Error
+	})
+}
+
+// GetAliasesUnscopedByIDs fetches aliases regardless of soft-delete state, used by
+// BulkForgetAlias to verify ownership/domain before permanently removing the aliases.
+func (d *Database) GetAliasesUnscopedByIDs(ctx context.Context, ids []string, userID string) ([]model.Alias, error) {
+	var aliases []model.Alias
+	err := d.Client.WithContext(ctx).Unscoped().Where("id IN (?) AND user_id = ?", ids, userID).Find(&aliases).Error
+	return aliases, err
+}
+
+// BulkForgetAlias permanently removes the given alias rows, regardless of soft-delete state.
+// Eligibility (custom-domain-only) is validated by the service layer before this is called.
+func (d *Database) BulkForgetAlias(ctx context.Context, ids []string, userID string) error {
+	return d.Client.WithContext(ctx).Unscoped().Where("id IN (?) AND user_id = ?", ids, userID).Delete(&model.Alias{}).Error
+}

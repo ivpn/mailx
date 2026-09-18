@@ -1,12 +1,14 @@
 <template>
     <tr class="desktop-lg">
-        <td v-if="selectable">
-            <input
-                type="checkbox"
-                class="checkbox-plain"
-                v-bind:checked="selected"
-                @change="$emit('onToggleSelect', alias.id)"
-            >
+        <td v-if="selectable" class="w-10">
+            <div class="flex items-center">
+                <input
+                    type="checkbox"
+                    class="checkbox-plain"
+                    v-bind:checked="selected"
+                    @change="$emit('onToggleSelect', alias.id)"
+                >
+            </div>
         </td>
         <td>
             <div class="flex items-center hs-tooltip">

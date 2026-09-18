@@ -1,5 +1,13 @@
 <template>
     <tr class="desktop-lg">
+        <td v-if="selectable">
+            <input
+                type="checkbox"
+                class="checkbox-plain"
+                v-bind:checked="selected"
+                @change="$emit('onToggleSelect', alias.id)"
+            >
+        </td>
         <td>
             <div class="flex items-center hs-tooltip">
                 <input
@@ -257,7 +265,8 @@ import events from '../events.ts'
 import { formatDistanceToNow } from 'date-fns'
 import dropdown from '@preline/dropdown'
 
-const props = defineProps(['alias', 'recipients', 'wildcard'])
+const props = defineProps(['alias', 'recipients', 'wildcard', 'selectable', 'selected'])
+defineEmits(['onToggleSelect'])
 const alias = ref(props.alias)
 const recipients = ref(props.recipients)
 const isDomainUnverified = computed(() => alias.value.is_custom_domain === true && (alias.value.is_domain_verified === false || alias.value.is_domain_enabled === false))

@@ -68,73 +68,106 @@
                         <thead class="desktop-lg">
                             <tr>
                                 <th>
-                                    <div class="hs-dropdown [--placement:bottom-left]">
-                                        <button id="hs-dropdown-alias-status" class="sort">
-                                            <span class="flex mr-1">Show:</span>
-                                            <span class="text-accent flex items-center">
-                                                {{ statusLabel }}
-                                            </span>
-                                        </button>
-                                        <div
-                                            class="hs-dropdown-menu hs-dropdown-open:opacity-100 hidden"
-                                            aria-labelledby="hs-dropdown-alias-status"
-                                        >
-                                            <button @click="setStatus('active_inactive')">Active/Inactive</button>
-                                            <button @click="setStatus('active')">Active</button>
-                                            <button @click="setStatus('inactive')">Inactive</button>
-                                            <button @click="setStatus('deleted')">Deleted</button>
-                                            <button @click="setStatus('all')">All</button>
+                                    <input
+                                        type="checkbox"
+                                        class="checkbox-plain"
+                                        ref="selectAllCheckbox"
+                                        v-bind:checked="allSelected"
+                                        @change="toggleSelectAll"
+                                    >
+                                </th>
+                                <template v-if="selectedCount === 0">
+                                    <th>
+                                        <div class="hs-dropdown [--placement:bottom-left]">
+                                            <button id="hs-dropdown-alias-status" class="sort">
+                                                <span class="flex mr-1">Show:</span>
+                                                <span class="text-accent flex items-center">
+                                                    {{ statusLabel }}
+                                                </span>
+                                            </button>
+                                            <div
+                                                class="hs-dropdown-menu hs-dropdown-open:opacity-100 hidden"
+                                                aria-labelledby="hs-dropdown-alias-status"
+                                            >
+                                                <button @click="setStatus('active_inactive')">Active/Inactive</button>
+                                                <button @click="setStatus('active')">Active</button>
+                                                <button @click="setStatus('inactive')">Inactive</button>
+                                                <button @click="setStatus('deleted')">Deleted</button>
+                                                <button @click="setStatus('all')">All</button>
+                                            </div>
                                         </div>
+                                    </th>
+                                    <th>Description</th>
+                                    <th>
+                                        <button
+                                        @click="sort"
+                                        data-sort="name"
+                                        class="sort">
+                                            Alias
+                                            <i
+                                                data-sort="name"
+                                                v-if="sortBy !== 'name'"
+                                                v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'name' }"
+                                                class="icon arrow-down text-xl icon-tertiary"
+                                            ></i>
+                                            <i
+                                                data-sort="name"
+                                                v-if="sortBy === 'name'"
+                                                v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'name' }"
+                                                class="icon arrow-down text-xl icon-accent"
+                                            ></i>
+                                        </button>
+                                    </th>
+                                    <th>Count</th>
+                                    <th>
+                                        <button
+                                        @click="sort"
+                                        data-sort="created_at"
+                                        class="sort">
+                                            Created
+                                            <i
+                                                data-sort="created_at"
+                                                v-if="sortBy !== 'created_at'"
+                                                v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
+                                                class="icon arrow-down text-xl icon-tertiary"
+                                            ></i>
+                                            <i
+                                                data-sort="created_at"
+                                                v-if="sortBy === 'created_at'"
+                                                v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
+                                                class="icon arrow-down text-xl icon-accent"
+                                            ></i>
+                                        </button>
+                                    </th>
+                                    <th>Actions</th>
+                                </template>
+                                <th v-else colspan="6">
+                                    <div class="flex items-center gap-3 flex-wrap">
+                                        <button v-bind:disabled="!canActivate || bulkLoading" @click="bulkActivate">Activate</button>
+                                        <button v-bind:disabled="!canDeactivate || bulkLoading" @click="bulkDeactivate">Deactivate</button>
+                                        <button v-bind:disabled="!canPin || bulkLoading" @click="bulkPin">Pin</button>
+                                        <button v-bind:disabled="!canUnpin || bulkLoading" @click="bulkUnpin">Unpin</button>
+                                        <button v-bind:disabled="!canDelete || bulkLoading" @click="bulkDelete" class="delete">Delete</button>
+                                        <button v-bind:disabled="!canForget || bulkLoading" @click="bulkForget" class="delete">Forget</button>
+                                        <button v-bind:disabled="!canRestore || bulkLoading" @click="bulkRestore">Restore</button>
+                                        <span class="text-tertiary text-sm ml-auto">{{ selectedCount }} selected</span>
                                     </div>
                                 </th>
-                                <th>Description</th>
-                                <th>
-                                    <button
-                                    @click="sort"
-                                    data-sort="name"
-                                    class="sort">
-                                        Alias
-                                        <i
-                                            data-sort="name"
-                                            v-if="sortBy !== 'name'"
-                                            v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'name' }"
-                                            class="icon arrow-down text-xl icon-tertiary"
-                                        ></i>
-                                        <i
-                                            data-sort="name"
-                                            v-if="sortBy === 'name'"
-                                            v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'name' }"
-                                            class="icon arrow-down text-xl icon-accent"
-                                        ></i>
-                                    </button>
-                                </th>
-                                <th>Count</th>
-                                <th>
-                                    <button
-                                    @click="sort"
-                                    data-sort="created_at"
-                                    class="sort">
-                                        Created
-                                        <i
-                                            data-sort="created_at"
-                                            v-if="sortBy !== 'created_at'"
-                                            v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
-                                            class="icon arrow-down text-xl icon-tertiary"
-                                        ></i>
-                                        <i
-                                            data-sort="created_at"
-                                            v-if="sortBy === 'created_at'"
-                                            v-bind:class="{'rotate-180': sortOrder === 'ASC' && sortBy === 'created_at' }"
-                                            class="icon arrow-down text-xl icon-accent"
-                                        ></i>
-                                    </button>
-                                </th>
-                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <AliasRow v-for="alias in list" :alias="alias" :key="rowKey" :recipients.sync="recipients" :wildcard=false />
+                            <AliasRow
+                                v-for="alias in list"
+                                :alias="alias"
+                                :key="rowKey"
+                                :recipients.sync="recipients"
+                                :wildcard=false
+                                :selectable="true"
+                                :selected="selectedIds.has(alias.id)"
+                                @onToggleSelect="toggleSelectOne"
+                            />
                         </tbody>
+
                     </table>
                 </div>
                 <p v-if="error" class="error">Error: {{ error }}</p>
@@ -146,7 +179,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, computed } from 'vue'
+import { onMounted, onUnmounted, ref, computed, watch, watchEffect, nextTick } from 'vue'
 import axios from 'axios'
 import { aliasApi } from '../api/alias'
 import { settingsApi } from '../api/settings.ts'
@@ -167,6 +200,7 @@ const alias = {
     recipients: '',
     from_name: '',
     pinned: false,
+    is_custom_domain: false,
     stats: {
         forwards: 0,
         blocks: 0,
@@ -205,8 +239,39 @@ const statusLabel = computed(() => {
     return 'Active/Inactive'
 })
 
+const selectedIds = ref(new Set<string>())
+const selectAllCheckbox = ref<HTMLInputElement | null>(null)
+const bulkLoading = ref(false)
+
+const selectedAliases = computed(() => list.value.filter(a => selectedIds.value.has(a.id)))
+const selectedCount = computed(() => selectedAliases.value.length)
+const allSelected = computed(() => list.value.length > 0 && selectedIds.value.size === list.value.length)
+const someSelected = computed(() => selectedIds.value.size > 0 && !allSelected.value)
+
+const canActivate = computed(() => selectedAliases.value.some(a => !a.enabled))
+const canDeactivate = computed(() => selectedAliases.value.some(a => a.enabled))
+const canPin = computed(() => selectedAliases.value.some(a => !a.pinned))
+const canUnpin = computed(() => selectedAliases.value.some(a => a.pinned))
+const canDelete = computed(() => selectedCount.value > 0 && selectedAliases.value.every(a => !a.deleted_at))
+const canRestore = computed(() => selectedCount.value > 0 && selectedAliases.value.every(a => !!a.deleted_at))
+const canForget = computed(() => selectedCount.value > 0 && selectedAliases.value.every(a => a.is_custom_domain))
+
+// HTML has no declarative attribute for the indeterminate checkbox state.
+watchEffect(() => {
+    if (selectAllCheckbox.value) {
+        selectAllCheckbox.value.indeterminate = someSelected.value
+    }
+})
+
+// The status dropdown <th> is destroyed/recreated when the bulk toolbar toggles, so
+// Preline's dropdown widget (bound at autoInit() time) needs to be re-bound for it to work.
+watch(selectedCount, () => {
+    nextTick(() => dropdown.autoInit())
+})
+
 const getList = async () => {
     loading.value = true
+    selectedIds.value = new Set()
     searchQuery.value = search.value.trim()
     if (searchQuery.value) {
         page.value = 1 // Reset to first page on search
@@ -330,6 +395,100 @@ const handleKeydown = (event: KeyboardEvent) => {
         event.preventDefault()
         const modalTrigger = document.querySelector('[data-hs-overlay="#modal-create-alias-false"]') as HTMLElement
         modalTrigger?.click()
+    }
+}
+
+const toggleSelectAll = () => {
+    selectedIds.value = allSelected.value ? new Set() : new Set(list.value.map(a => a.id))
+}
+
+const toggleSelectOne = (id: string) => {
+    const next = new Set(selectedIds.value)
+    if (next.has(id)) {
+        next.delete(id)
+    } else {
+        next.add(id)
+    }
+    selectedIds.value = next
+}
+
+const bulkActionError = (err: unknown) => {
+    if (axios.isAxiosError(err)) {
+        error.value = err.response?.data?.error || err.message
+    }
+}
+
+const bulkUpdateEnabled = async (enabled: boolean) => {
+    bulkLoading.value = true
+    try {
+        await aliasApi.bulkEnabled(Array.from(selectedIds.value), enabled)
+        error.value = ''
+        getList()
+    } catch (err) {
+        bulkActionError(err)
+    } finally {
+        bulkLoading.value = false
+    }
+}
+
+const bulkUpdatePinned = async (pinned: boolean) => {
+    bulkLoading.value = true
+    try {
+        await aliasApi.bulkPinned(Array.from(selectedIds.value), pinned)
+        error.value = ''
+        getList()
+    } catch (err) {
+        bulkActionError(err)
+    } finally {
+        bulkLoading.value = false
+    }
+}
+
+const bulkActivate = () => bulkUpdateEnabled(true)
+const bulkDeactivate = () => bulkUpdateEnabled(false)
+const bulkPin = () => bulkUpdatePinned(true)
+const bulkUnpin = () => bulkUpdatePinned(false)
+
+const bulkDelete = async () => {
+    if (!confirm(`Are you sure you want to delete ${selectedCount.value} alias(es)? A deleted email alias can be restored within 90 days.`)) return
+
+    bulkLoading.value = true
+    try {
+        await aliasApi.bulkDelete(Array.from(selectedIds.value))
+        error.value = ''
+        getList()
+    } catch (err) {
+        bulkActionError(err)
+    } finally {
+        bulkLoading.value = false
+    }
+}
+
+const bulkRestore = async () => {
+    bulkLoading.value = true
+    try {
+        await aliasApi.bulkRestore(Array.from(selectedIds.value))
+        error.value = ''
+        getList()
+    } catch (err) {
+        bulkActionError(err)
+    } finally {
+        bulkLoading.value = false
+    }
+}
+
+const bulkForget = async () => {
+    if (!confirm(`WARNING: This operation cannot be undone. You will not be able to restore these ${selectedCount.value} alias(es). Are you sure you want to delete?`)) return
+
+    bulkLoading.value = true
+    try {
+        await aliasApi.bulkForget(Array.from(selectedIds.value))
+        error.value = ''
+        getList()
+    } catch (err) {
+        bulkActionError(err)
+    } finally {
+        bulkLoading.value = false
     }
 }
 

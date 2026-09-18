@@ -29,6 +29,13 @@ var (
 
 	ErrForgetAlias                = errors.New("Unable to permanently delete alias. Please try again.")
 	ErrForgetAliasNotCustomDomain = errors.New("Only custom domain aliases can be permanently deleted.")
+
+	ErrBulkUpdateAlias             = errors.New("Unable to update aliases. Please try again.")
+	ErrBulkDeleteAlias             = errors.New("Unable to delete aliases. Please try again.")
+	ErrBulkDeleteAliasNotEligible  = errors.New("Only non-deleted aliases can be bulk deleted.")
+	ErrBulkRestoreAlias            = errors.New("Unable to restore aliases. Please try again.")
+	ErrBulkRestoreAliasNotEligible = errors.New("Only deleted aliases can be restored.")
+	ErrBulkForgetAlias             = errors.New("Unable to permanently delete aliases. Please try again.")
 )
 
 type AliasStore interface {
@@ -47,6 +54,12 @@ type AliasStore interface {
 	RestoreAlias(context.Context, string, string) error
 	GetAliasUnscoped(context.Context, string, string) (model.Alias, error)
 	ForgetAlias(context.Context, string, string) error
+	BulkUpdateAliasEnabled(context.Context, []string, string, bool) error
+	BulkUpdateAliasPinned(context.Context, []string, string, bool) error
+	BulkDeleteAlias(context.Context, []string, string) error
+	BulkRestoreAlias(context.Context, []string, string) error
+	GetAliasesUnscopedByIDs(context.Context, []string, string) ([]model.Alias, error)
+	BulkForgetAlias(context.Context, []string, string) error
 }
 
 // aliasDomainPart returns the domain portion of an alias name (e.g. "user@example.com" → "example.com").
@@ -487,6 +500,100 @@ func (s *Service) ForgetAlias(ctx context.Context, ID string, userID string) err
 	if err != nil {
 		log.Printf("error forgetting alias: %s", err.Error())
 		return ErrForgetAlias
+	}
+
+	return nil
+}
+
+// dedupeAliasIDs removes duplicate IDs so bulk eligibility checks (which compare a fetched/
+// matched count against the requested ID count) aren't falsely tripped by client-submitted
+// duplicates.
+func dedupeAliasIDs(ids []string) []string {
+	seen := make(map[string]bool, len(ids))
+	deduped := make([]string, 0, len(ids))
+	for _, id := range ids {
+		if seen[id] {
+			continue
+		}
+		seen[id] = true
+		deduped = append(deduped, id)
+	}
+
+	return deduped
+}
+
+func (s *Service) BulkUpdateAliasEnabled(ctx context.Context, ids []string, userID string, enabled bool) error {
+	err := s.Store.BulkUpdateAliasEnabled(ctx, dedupeAliasIDs(ids), userID, enabled)
+	if err != nil {
+		log.Printf("error bulk updating alias enabled: %s", err.Error())
+		return ErrBulkUpdateAlias
+	}
+
+	return nil
+}
+
+func (s *Service) BulkUpdateAliasPinned(ctx context.Context, ids []string, userID string, pinned bool) error {
+	err := s.Store.BulkUpdateAliasPinned(ctx, dedupeAliasIDs(ids), userID, pinned)
+	if err != nil {
+		log.Printf("error bulk updating alias pinned status: %s", err.Error())
+		return ErrBulkUpdateAlias
+	}
+
+	return nil
+}
+
+func (s *Service) BulkDeleteAlias(ctx context.Context, ids []string, userID string) error {
+	err := s.Store.BulkDeleteAlias(ctx, dedupeAliasIDs(ids), userID)
+	if err != nil {
+		if errors.Is(err, model.ErrBulkAliasNotEligible) {
+			return ErrBulkDeleteAliasNotEligible
+		}
+		log.Printf("error bulk deleting aliases: %s", err.Error())
+		return ErrBulkDeleteAlias
+	}
+
+	return nil
+}
+
+func (s *Service) BulkRestoreAlias(ctx context.Context, ids []string, userID string) error {
+	err := s.Store.BulkRestoreAlias(ctx, dedupeAliasIDs(ids), userID)
+	if err != nil {
+		if errors.Is(err, model.ErrBulkAliasNotEligible) {
+			return ErrBulkRestoreAliasNotEligible
+		}
+		log.Printf("error bulk restoring aliases: %s", err.Error())
+		return ErrBulkRestoreAlias
+	}
+
+	return nil
+}
+
+// BulkForgetAlias permanently deletes custom-domain aliases only, bypassing the soft-delete
+// step entirely - generalizes ForgetAlias's fetch-then-check logic to N items, rejecting the
+// whole batch if any requested ID doesn't exist/isn't owned by userID or isn't a custom domain.
+func (s *Service) BulkForgetAlias(ctx context.Context, ids []string, userID string) error {
+	deduped := dedupeAliasIDs(ids)
+
+	aliases, err := s.Store.GetAliasesUnscopedByIDs(ctx, deduped, userID)
+	if err != nil {
+		log.Printf("error fetching aliases for bulk forget: %s", err.Error())
+		return ErrBulkForgetAlias
+	}
+	if len(aliases) != len(deduped) {
+		return ErrBulkForgetAlias
+	}
+
+	for _, alias := range aliases {
+		domainPart := aliasDomainPart(alias.Name)
+		if !isCustomAliasDomain(domainPart, s.Cfg.API.Domains) {
+			return ErrForgetAliasNotCustomDomain
+		}
+	}
+
+	err = s.Store.BulkForgetAlias(ctx, deduped, userID)
+	if err != nil {
+		log.Printf("error bulk forgetting aliases: %s", err.Error())
+		return ErrBulkForgetAlias
 	}
 
 	return nil

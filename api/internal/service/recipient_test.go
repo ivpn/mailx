@@ -5,7 +5,9 @@ import (
 	"errors"
 	"strings"
 	"testing"
+	"time"
 
+	"gorm.io/gorm"
 	"ivpn.net/email/api/config"
 	"ivpn.net/email/api/internal/model"
 )
@@ -137,6 +139,99 @@ func (f *fakeStore) ForgetAlias(ctx context.Context, ID string, userID string) e
 		}
 	}
 	return errNotFound
+}
+
+func (f *fakeStore) BulkUpdateAliasEnabled(ctx context.Context, ids []string, userID string, enabled bool) error {
+	idSet := aliasIDSet(ids)
+	for name, a := range f.aliases {
+		if idSet[a.ID] && a.UserID == userID {
+			a.Enabled = enabled
+			f.aliases[name] = a
+		}
+	}
+	return nil
+}
+
+func (f *fakeStore) BulkUpdateAliasPinned(ctx context.Context, ids []string, userID string, pinned bool) error {
+	idSet := aliasIDSet(ids)
+	for name, a := range f.aliases {
+		if idSet[a.ID] && a.UserID == userID {
+			a.Pinned = pinned
+			f.aliases[name] = a
+		}
+	}
+	return nil
+}
+
+func (f *fakeStore) BulkDeleteAlias(ctx context.Context, ids []string, userID string) error {
+	idSet := aliasIDSet(ids)
+	matched := 0
+	for _, a := range f.aliases {
+		if idSet[a.ID] && a.UserID == userID && !a.DeletedAt.Valid {
+			matched++
+		}
+	}
+	if matched != len(idSet) {
+		return model.ErrBulkAliasNotEligible
+	}
+
+	for name, a := range f.aliases {
+		if idSet[a.ID] && a.UserID == userID {
+			a.DeletedAt = gorm.DeletedAt{Time: time.Now(), Valid: true}
+			f.aliases[name] = a
+		}
+	}
+	return nil
+}
+
+func (f *fakeStore) BulkRestoreAlias(ctx context.Context, ids []string, userID string) error {
+	idSet := aliasIDSet(ids)
+	matched := 0
+	for _, a := range f.aliases {
+		if idSet[a.ID] && a.UserID == userID && a.DeletedAt.Valid {
+			matched++
+		}
+	}
+	if matched != len(idSet) {
+		return model.ErrBulkAliasNotEligible
+	}
+
+	for name, a := range f.aliases {
+		if idSet[a.ID] && a.UserID == userID {
+			a.DeletedAt = gorm.DeletedAt{}
+			f.aliases[name] = a
+		}
+	}
+	return nil
+}
+
+func (f *fakeStore) GetAliasesUnscopedByIDs(ctx context.Context, ids []string, userID string) ([]model.Alias, error) {
+	idSet := aliasIDSet(ids)
+	var result []model.Alias
+	for _, a := range f.aliases {
+		if idSet[a.ID] && a.UserID == userID {
+			result = append(result, a)
+		}
+	}
+	return result, nil
+}
+
+func (f *fakeStore) BulkForgetAlias(ctx context.Context, ids []string, userID string) error {
+	idSet := aliasIDSet(ids)
+	for name, a := range f.aliases {
+		if idSet[a.ID] && a.UserID == userID {
+			delete(f.aliases, name)
+		}
+	}
+	return nil
+}
+
+func aliasIDSet(ids []string) map[string]bool {
+	set := make(map[string]bool, len(ids))
+	for _, id := range ids {
+		set[id] = true
+	}
+	return set
 }
 
 func newTestService(store *fakeStore) *Service {

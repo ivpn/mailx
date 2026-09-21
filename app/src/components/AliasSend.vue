@@ -1,6 +1,7 @@
 <template>
     <div>
-        <div v-bind:id="'modal-send-alias' + alias.id" class="hs-overlay hidden">
+        <button ref="trigger" type="button" class="hidden" data-hs-overlay="#modal-send-alias"></button>
+        <div id="modal-send-alias" class="hs-overlay hidden">
             <div>
                 <div>
                     <header>
@@ -16,21 +17,21 @@
                             </p>
                         </div>
                         <div class="mb-7">
-                            <label v-bind:for="'from_alias_' + alias.id">
+                            <label for="alias_send_from">
                                 From alias:
                             </label>
                             <input
-                                v-bind:id="'from_alias_' + alias.id"
-                                v-bind:value="alias.name" disabled
+                                id="alias_send_from"
+                                v-bind:value="alias?.name" disabled
                                 type="text"
                             >
                         </div>
                         <div class="mb-7">
-                            <label v-bind:for="'to_email_' + alias.id">
+                            <label for="alias_send_to">
                                 To email:
                             </label>
                             <input
-                                v-bind:id="'to_email_' + alias.id"
+                                id="alias_send_to"
                                 v-bind:class="{ 'error': emailError }"
                                 v-model="toEmail"
                                 type="text"
@@ -69,12 +70,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import overlay from '@preline/overlay'
-import tooltip from '@preline/tooltip'
+import { initOverlays, initTooltips } from '../lib/preline.ts'
 
-const props = defineProps(['alias'])
-const alias = ref(props.alias)
+// One instance is shared by every row; the alias is set by open() rather than passed as a prop.
+const alias = ref<any>(null)
+const trigger = ref<HTMLButtonElement | null>(null)
 const toEmail = ref('')
 const generatedEmail = ref('')
 const emailError = ref(false)
@@ -91,7 +93,7 @@ const validateEmail = () => {
 }
 
 const showAddress = () => {
-    if (!validateEmail()) {
+    if (!alias.value || !validateEmail()) {
         generatedEmail.value = ''
         return
     }
@@ -99,12 +101,21 @@ const showAddress = () => {
     generatedEmail.value = alias.value.name.replace('@', `+${toEmail.value.replace('@', '=')}@`)
 }
 
-const close = () => {
+const reset = () => {
     toEmail.value = ''
     generatedEmail.value = ''
     emailError.value = false
-    const modal = document.querySelector('#modal-send-alias' + alias.value.id) as any
-    overlay.close(modal)
+}
+
+const open = async (target: any) => {
+    alias.value = target
+    reset()
+    await nextTick()
+    trigger.value?.click()
+}
+
+const close = () => {
+    overlay.close(document.querySelector('#modal-send-alias') as any)
 }
 
 const copy = (text: string) => {
@@ -116,9 +127,9 @@ const copy = (text: string) => {
 }
 
 const addEvents = () => {
-    const modal = overlay.getInstance('#modal-send-alias' + alias.value.id as any, true) as any
+    const modal = overlay.getInstance('#modal-send-alias' as any, true) as any
     modal.element.on('close', () => {
-        close()
+        reset()
     })
     modal.element.on('open', () => {
         focusFirstInput()
@@ -126,13 +137,15 @@ const addEvents = () => {
 }
 
 const focusFirstInput = () => {
-    const input = document.getElementById('to_email_' + alias.value.id) as HTMLInputElement
+    const input = document.getElementById('alias_send_to') as HTMLInputElement
     input?.focus()
 }
 
+defineExpose({ open })
+
 onMounted(() => {
-    overlay.autoInit()
-    tooltip.autoInit()
+    initOverlays()
+    initTooltips()
     addEvents()
 })
 </script>

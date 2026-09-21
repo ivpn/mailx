@@ -112,29 +112,33 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <AliasRow v-for="alias in list" :alias="alias" :key="rowKey" :recipients.sync="recipients" :wildcard=true />
+                            <AliasRow v-for="alias in list" :alias="alias" :key="alias.id" :recipients.sync="recipients" :wildcard=true @onEdit="onEditAlias" @onSend="onSendAlias" />
                         </tbody>
                     </table>
                 </div>
                 <p v-if="error" class="error">Error: {{ error }}</p>
-                <Pagination v-if="list.length" :list.sync="list" :limit="limit" :page="page" :total="total" :key="rowKey" @onUpdatePage="onUpdatePage" />
+                <Pagination v-if="list.length" :list.sync="list" :limit="limit" :page="page" :total="total" :key="limit + '-' + page + '-' + total" @onUpdatePage="onUpdatePage" />
             </div>
         </div>
     </div>
     <AliasCreate v-if="recipients.length && settings.id && loaded" :recipients.sync="recipients" :settings.sync="settings" :wildcard=true :label="'New Wildcard Alias'" />
+    <AliasEdit v-if="recipients.length" ref="editModal" :recipients="recipients" :key="recipients.join(',')" />
+    <AliasSend ref="sendModal" />
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, computed, nextTick } from 'vue'
 import axios from 'axios'
 import { aliasApi } from '../api/alias'
 import { settingsApi } from '../api/settings.ts'
 import AliasRow from './AliasRow.vue'
 import AliasCreate from './AliasCreate.vue'
+import AliasEdit from './AliasEdit.vue'
+import AliasSend from './AliasSend.vue'
 import Pagination from './Pagination.vue'
 import events from '../events.ts'
 import { RouterLink } from 'vue-router'
-import dropdown from '@preline/dropdown'
+import { initDropdowns, initOverlays, initTooltips } from '../lib/preline.ts'
 
 const alias = {
     id: '',
@@ -166,13 +170,14 @@ const settings = ref({
 })
 const error = ref('')
 const loaded = ref(false)
-const rowKey = ref(0)
 const limit = ref(25)
 const page = ref(1)
 const total = ref(0)
 const sortBy = ref('created_at')
 const sortOrder = ref('DESC')
 const status = ref('active_inactive')
+const editModal = ref<InstanceType<typeof AliasEdit> | null>(null)
+const sendModal = ref<InstanceType<typeof AliasSend> | null>(null)
 const statusLabel = computed(() => {
     if (status.value === 'active') return 'Active'
     if (status.value === 'inactive') return 'Inactive'
@@ -195,7 +200,8 @@ const getList = async () => {
         total.value = res.data.total
         loaded.value = true
         error.value = ''
-        renderRow()
+        await nextTick()
+        bindPreline()
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.message
@@ -228,8 +234,11 @@ const deleteAlias = async (payload: any) => {
     }
 }
 
-const renderRow = () => {
-    rowKey.value++
+// Bound once per list render; the row components deliberately do not init Preline themselves.
+const bindPreline = () => {
+    initTooltips()
+    initDropdowns()
+    initOverlays()
 }
 
 const onUpdatePage = (obj: any) => {
@@ -240,6 +249,14 @@ const onUpdatePage = (obj: any) => {
 
 const onDeleteAlias = (payload: { id: string, wildcard: boolean }) => {
     deleteAlias(payload)
+}
+
+const onEditAlias = (alias: any) => {
+    editModal.value?.open(alias)
+}
+
+const onSendAlias = (alias: any) => {
+    sendModal.value?.open(alias)
 }
 
 const setStatus = (value: string) => {
@@ -267,7 +284,7 @@ const fetch = () => {
 onMounted(async () => {
     await getSettings()
     fetch()
-    dropdown.autoInit()
+    initDropdowns()
     events.on('alias.create', fetch)
     events.on('alias.update', fetch)
     events.on('alias.delete', onDeleteAlias)

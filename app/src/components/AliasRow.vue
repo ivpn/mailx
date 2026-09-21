@@ -1,5 +1,5 @@
 <template>
-    <tr class="desktop-lg">
+    <tr v-if="isDesktop" class="desktop-lg">
         <td v-if="selectable" class="w-10">
             <div class="flex items-center">
                 <input
@@ -92,7 +92,7 @@
                     <button
                         v-if="!alias.deleted_at"
                         v-bind:disabled="!alias.recipients.length"
-                        v-bind:data-hs-overlay="'#modal-send-alias' + alias.id"
+                        @click="$emit('onSend', alias)"
                         v-bind:class="{ 'hide': alias.wildcard }"
                         >
                         <i class="icon icon-primary send text-xs"></i>
@@ -100,7 +100,7 @@
                     </button>
                     <button
                         v-if="!alias.deleted_at"
-                        v-bind:data-hs-overlay="'#modal-alias-edit' + alias.id">
+                        @click="$emit('onEdit', alias)">
                         <i class="icon icon-primary edit text-xs"></i>
                         Edit
                     </button>
@@ -132,7 +132,7 @@
             </div>
         </td>
     </tr>
-    <tr class="tablet-lg">
+    <tr v-else class="tablet-lg">
         <td>
             <div class="flex gap-2 justify-between">
                 <div class="text-start">
@@ -184,7 +184,7 @@
                             <button
                                 v-if="!alias.deleted_at"
                                 v-bind:disabled="!alias.recipients.length"
-                                v-bind:data-hs-overlay="'#modal-send-alias' + alias.id"
+                                @click="$emit('onSend', alias)"
                                 v-bind:class="{ 'hide': alias.wildcard }"
                                 >
                                 <i class="icon icon-primary send text-xs"></i>
@@ -192,7 +192,7 @@
                             </button>
                             <button
                                 v-if="!alias.deleted_at"
-                                v-bind:data-hs-overlay="'#modal-alias-edit' + alias.id">
+                                @click="$emit('onEdit', alias)">
                                 <i class="icon icon-primary edit text-xs"></i>
                                 Edit
                             </button>
@@ -253,24 +253,22 @@
             <hr>
         </td>
     </tr>
-    <AliasSend :alias="alias" v-if="!alias.deleted_at" />
-    <AliasEdit :alias="alias" :recipients="recipients" :key="rowKey" v-if="!alias.deleted_at" />
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import tooltip from '@preline/tooltip'
-import AliasEdit from './AliasEdit.vue'
-import AliasSend from './AliasSend.vue'
+import { computed, ref } from 'vue'
 import { aliasApi } from '../api/alias.ts'
 import events from '../events.ts'
 import { formatDistanceToNow } from 'date-fns'
-import dropdown from '@preline/dropdown'
+import { closeDropdowns } from '../lib/preline.ts'
+import { useBreakpoint } from '../lib/useBreakpoint.ts'
 
 const props = defineProps(['alias', 'recipients', 'wildcard', 'selectable', 'selected'])
-defineEmits(['onToggleSelect'])
-const alias = ref(props.alias)
-const recipients = ref(props.recipients)
+defineEmits(['onToggleSelect', 'onEdit', 'onSend'])
+const { isDesktop } = useBreakpoint()
+// Computed, not ref(props.alias): rows are keyed by alias id and survive list refreshes, so the
+// row has to track the replacement object rather than the one captured at mount.
+const alias = computed(() => props.alias)
 const isDomainUnverified = computed(() => alias.value.is_custom_domain === true && (alias.value.is_domain_verified === false || alias.value.is_domain_enabled === false))
 const isAliasDeleted = computed(() => alias.value.deleted_at !== null)
 const isCreatedByWildcard = computed(() => alias.value.origin === 1)
@@ -280,17 +278,16 @@ const truncatedDescription = computed(() => {
     return desc.length > 45 ? desc.slice(0, 45) + '...' : desc
 })
 const copyText = ref('Click to copy')
-const rowKey = ref(0)
 
 const updateAlias = async () => {
     alias.value.enabled = !alias.value.enabled
     try {
         await aliasApi.update(alias.value.id, alias.value)
-        renderRow()
     } catch {}
 }
 
 const togglePin = async () => {
+    closeDropdowns()
     const pinned = !alias.value.pinned
     try {
         await aliasApi.pin(alias.value.id, pinned)
@@ -299,6 +296,7 @@ const togglePin = async () => {
 }
 
 const deleteAlias = () => {
+    closeDropdowns()
     const errMessage = props.wildcard ? 'WARNING: You will not be able to create the same wildcard alias in the next 90 days. Are you sure you want to delete alias? ' : 'Are you sure you want to delete alias? A deleted email alias can be restored within 90 days.'
     if (!confirm(errMessage)) return
 
@@ -306,6 +304,7 @@ const deleteAlias = () => {
 }
 
 const restoreAlias = async () => {
+    closeDropdowns()
     try {
         await aliasApi.restore(alias.value.id)
         events.emit('alias.update', {})
@@ -313,6 +312,7 @@ const restoreAlias = async () => {
 }
 
 const forgetAlias = () => {
+    closeDropdowns()
     const errMessage = 'WARNING: This operation cannot be undone. You will not be able to restore this alias. Are you sure you want to delete alias?'
     if (!confirm(errMessage)) return
 
@@ -332,13 +332,4 @@ const copyAlias = (alias: string) => {
         }, 2000)
     })
 }
-
-const renderRow = () => {
-    tooltip.autoInit()
-}
-
-onMounted(() => {
-    tooltip.autoInit()
-    dropdown.autoInit()
-})
 </script>

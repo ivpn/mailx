@@ -159,23 +159,27 @@
                             <AliasRow
                                 v-for="alias in list"
                                 :alias="alias"
-                                :key="rowKey"
+                                :key="alias.id"
                                 :recipients.sync="recipients"
                                 :wildcard=false
                                 :selectable="true"
                                 :selected="selectedIds.has(alias.id)"
                                 @onToggleSelect="toggleSelectOne"
+                                @onEdit="onEditAlias"
+                                @onSend="onSendAlias"
                             />
                         </tbody>
 
                     </table>
                 </div>
                 <p v-if="error" class="error">Error: {{ error }}</p>
-                <Pagination v-if="list.length" :list.sync="list" :limit="limit" :page="page" :total="total" :key="rowKey" @onUpdatePage="onUpdatePage" />
+                <Pagination v-if="list.length" :list.sync="list" :limit="limit" :page="page" :total="total" :key="limit + '-' + page + '-' + total" @onUpdatePage="onUpdatePage" />
             </div>
         </div>
     </div>
     <AliasCreate v-if="recipients.length && settings.id && loaded" :recipients.sync="recipients" :settings.sync="settings" :wildcard=false :label="'New Alias'" />
+    <AliasEdit v-if="recipients.length" ref="editModal" :recipients="recipients" :key="recipients.join(',')" />
+    <AliasSend ref="sendModal" />
 </template>
 
 <script setup lang="ts">
@@ -185,10 +189,12 @@ import { aliasApi } from '../api/alias'
 import { settingsApi } from '../api/settings.ts'
 import AliasRow from './AliasRow.vue'
 import AliasCreate from './AliasCreate.vue'
+import AliasEdit from './AliasEdit.vue'
+import AliasSend from './AliasSend.vue'
 import Pagination from './Pagination.vue'
 import events from '../events.ts'
 import { RouterLink } from 'vue-router'
-import dropdown from '@preline/dropdown'
+import { initDropdowns, initOverlays, initTooltips } from '../lib/preline.ts'
 
 const alias = {
     id: '',
@@ -222,7 +228,6 @@ const settings = ref({
 const error = ref('')
 const loaded = ref(false)
 const loading = ref(false)
-const rowKey = ref(0)
 const limit = ref(25)
 const page = ref(1)
 const total = ref(0)
@@ -242,6 +247,8 @@ const statusLabel = computed(() => {
 const selectedIds = ref(new Set<string>())
 const selectAllCheckbox = ref<HTMLInputElement | null>(null)
 const bulkLoading = ref(false)
+const editModal = ref<InstanceType<typeof AliasEdit> | null>(null)
+const sendModal = ref<InstanceType<typeof AliasSend> | null>(null)
 
 const selectedAliases = computed(() => list.value.filter(a => selectedIds.value.has(a.id)))
 const selectedCount = computed(() => selectedAliases.value.length)
@@ -266,7 +273,7 @@ watchEffect(() => {
 // The status dropdown <th> is destroyed/recreated when the bulk toolbar toggles, so
 // Preline's dropdown widget (bound at autoInit() time) needs to be re-bound for it to work.
 watch(selectedCount, () => {
-    nextTick(() => dropdown.autoInit())
+    nextTick(() => initDropdowns())
 })
 
 const getList = async () => {
@@ -292,7 +299,8 @@ const getList = async () => {
         loaded.value = true
         loading.value = false
         error.value = ''
-        renderRow()
+        await nextTick()
+        bindPreline()
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.message
@@ -337,8 +345,11 @@ const forgetAlias = async (payload: any) => {
     }
 }
 
-const renderRow = () => {
-    rowKey.value++
+// Bound once per list render; the row components deliberately do not init Preline themselves.
+const bindPreline = () => {
+    initTooltips()
+    initDropdowns()
+    initOverlays()
 }
 
 const onUpdatePage = (obj: any) => {
@@ -353,6 +364,14 @@ const onDeleteAlias = (payload: { id: string, wildcard: boolean }) => {
 
 const onForgetAlias = (payload: { id: string }) => {
     forgetAlias(payload)
+}
+
+const onEditAlias = (alias: any) => {
+    editModal.value?.open(alias)
+}
+
+const onSendAlias = (alias: any) => {
+    sendModal.value?.open(alias)
 }
 
 const sort = (e: any) => {
@@ -495,7 +514,7 @@ const bulkForget = async () => {
 onMounted(async () => {
     await getSettings()
     getList()
-    dropdown.autoInit()
+    initDropdowns()
     events.on('alias.create', getList)
     events.on('alias.update', getList)
     events.on('alias.delete', onDeleteAlias)

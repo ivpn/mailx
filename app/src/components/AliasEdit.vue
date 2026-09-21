@@ -1,6 +1,7 @@
 <template>
     <div>
-        <div v-bind:id="'modal-alias-edit' + alias.id" class="hs-overlay hidden">
+        <button ref="trigger" type="button" class="hidden" data-hs-overlay="#modal-alias-edit"></button>
+        <div id="modal-alias-edit" class="hs-overlay hidden">
             <div>
                 <div>
                     <header>
@@ -10,34 +11,34 @@
                         <h4>EDIT ALIAS</h4>
                     </header>
                     <article>
-                        <h3 class="break-all">{{ alias.name }}</h3>
+                        <h3 class="break-all">{{ alias?.name }}</h3>
                         <div class="mb-7">
-                            <label v-bind:for="'description_' + alias.id">
+                            <label for="alias_edit_description">
                                 Description:
                             </label>
                             <input
-                                v-bind:id="'description_' + alias.id"
-                                v-model="alias.description"
+                                id="alias_edit_description"
+                                v-model="description"
                                 type="text"
                             >
                         </div>
                         <div class="mb-7">
-                            <label v-bind:for="'from_' + alias.id">
+                            <label for="alias_edit_from_name">
                                 From name:
                             </label>
                             <input
-                                v-bind:id="'from_' + alias.id"
-                                v-model="alias.from_name"
+                                id="alias_edit_from_name"
+                                v-model="fromName"
                                 type="text"
                             >
                         </div>
                         <div class="mb-6">
-                            <label v-bind:for="'recipient_' + alias.id">
+                            <label for="alias_edit_recipient">
                                 Recipient(s):
                             </label>
                             <select
                                 v-model="selectRecipients"
-                                v-bind:id="'recipient_' + alias.id"
+                                id="alias_edit_recipient"
                                 :disabled="!recipients.length"
                                 :multiple="true"
                                 data-hs-select='{
@@ -51,7 +52,6 @@
                                 }' class="hidden">
                                 <option v-for="recipient in recipients"
                                     v-bind:value=recipient
-                                    :selected="alias.recipients.includes(recipient)"
                                     :key="recipient">
                                     {{ recipient }}
                                 </option>
@@ -81,22 +81,58 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import overlay from '@preline/overlay'
 import select from '@preline/select'
 import axios from 'axios'
 import { aliasApi } from '../api/alias.ts'
 import events from '../events.ts'
+import { initOverlays, initSelects } from '../lib/preline.ts'
 
-const props = defineProps(['alias', 'recipients'])
-let alias = ref(Object.assign({}, props.alias))
+const props = defineProps(['recipients'])
 const recipients = ref(props.recipients)
-const selectRecipients = ref(props.alias.recipients)
+// One instance is shared by every row, so the alias being edited is set by open() rather than
+// passed as a prop; the Preline select is bound once at mount and must not be torn down.
+const source = ref<any>(null)
+const alias = ref<any>(null)
+const description = ref('')
+const fromName = ref('')
+const selectRecipients = ref<any>([])
+const trigger = ref<HTMLButtonElement | null>(null)
 const success = ref('')
 const error = ref('')
 const errorRecipients = ref('')
 
+const setSelectValue = (value: string) => {
+    const multiselect = select.getInstance('#alias_edit_recipient' as any, true) as any
+    multiselect?.element?.setValue(value ? value.split(',') : [])
+}
+
+const reset = () => {
+    if (!source.value) return
+
+    alias.value = Object.assign({}, source.value)
+    description.value = source.value.description
+    fromName.value = source.value.from_name
+    selectRecipients.value = source.value.recipients
+    success.value = ''
+    error.value = ''
+    errorRecipients.value = ''
+    setSelectValue(source.value.recipients)
+}
+
+const open = async (target: any) => {
+    source.value = target
+    reset()
+    await nextTick()
+    trigger.value?.click()
+}
+
 const updateAlias = async () => {
+    if (!alias.value) return
+
+    alias.value.description = description.value
+    alias.value.from_name = fromName.value
     alias.value.recipients = selectRecipients.value.toString()
 
     if (!validate(alias.value.recipients)) return
@@ -125,42 +161,34 @@ const validate = (rcps: string) => {
 }
 
 const close = () => {
-    alias.value.description = props.alias.description
-    alias.value.from_name = props.alias.from_name
-    alias.value.recipients = props.alias.recipients
-    selectRecipients.value = props.alias.recipients
-    success.value = ''
-    error.value = ''
-    const modal = document.querySelector('#modal-alias-edit' + alias.value.id) as any
-    overlay.close(modal)
-
-    const multiselect = select.getInstance('#recipient_' + alias.value.id as any, true) as any
-    multiselect.element.setValue(props.alias.recipients.split(','))
+    overlay.close(document.querySelector('#modal-alias-edit') as any)
 }
 
 const addEvents = () => {
-    const modal = overlay.getInstance('#modal-alias-edit' + alias.value.id as any, true) as any
+    const modal = overlay.getInstance('#modal-alias-edit' as any, true) as any
     modal.element.on('close', () => {
-        close()
+        reset()
     })
     modal.element.on('open', () => {
         focusFirstInput()
     })
 
-    const multiselect = select.getInstance('#recipient_' + alias.value.id as any, true) as any
+    const multiselect = select.getInstance('#alias_edit_recipient' as any, true) as any
     multiselect.element.on('change', (val: any) => {
         errorRecipients.value = val.length === 0 ? 'Select one or more recipients' : ''
     })
 }
 
 const focusFirstInput = () => {
-    const input = document.getElementById('description_' + alias.value.id) as HTMLInputElement
+    const input = document.getElementById('alias_edit_description') as HTMLInputElement
     input?.focus()
 }
 
+defineExpose({ open })
+
 onMounted(() => {
-    overlay.autoInit()
-    select.autoInit()
+    initOverlays()
+    initSelects()
     addEvents()
 })
 </script>

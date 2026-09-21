@@ -1,24 +1,32 @@
 <template>
-    <div class="mb-5">
-        <h2>Account</h2>
-        <p v-if="sub.id && !syncing" class="text-sm">
-            <span v-if="isActive()" class="badge success">Active</span>
-            <span v-if="!isActive()" class="badge">Inactive</span>
-        </p>
-        <p v-if="syncing" class="text-sm">
-            <span v-if="isActive()" class="badge progress">Syncing...</span>
-        </p>
-        <div class="mb-3">
-            <h4>Account email:</h4>
-            <p class="mb-3">
-                {{ email }}
-            </p>
-        </div>
-        <div v-if="isActive()" class="mb-3">
-            <h4>Subscription active until:</h4>
-            <p class="mb-3">
-                {{ activeUntilDate() }}
-            </p>
+    <div class="mt-3 mb-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="">
+                <h2>Subscription</h2>
+                <p class="mb-0">Status:</p>
+                <p v-if="sub.id && !syncing">
+                    <span v-if="isActive()" class="badge success">Active</span>
+                    <span v-if="!isActive()" class="badge">Inactive</span>
+                </p>
+                <p v-if="syncing" class="text-sm">
+                    <span v-if="isActive()" class="badge progress">Syncing...</span>
+                </p>
+                <p class="mb-0">Subscription active until:</p>
+                <div v-if="isActive()" class="mb-3">
+                    <p class="mb-3 text-primary">
+                        {{ activeUntilDate() }}
+                    </p>
+                </div>
+            </div>
+            <div class="border-r border-transparent">
+                <h2>Account Info</h2>
+                <div class="mb-3">
+                    <p class="mb-0">Mailx ID:</p>
+                    <p class="mb-3 text-primary">
+                        {{ email }}
+                    </p>
+                </div>
+            </div>
         </div>
         <div v-if="isManaged()" class="card-tertiary">
             <footer>

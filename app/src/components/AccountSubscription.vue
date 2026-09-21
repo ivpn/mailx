@@ -26,6 +26,13 @@
                         {{ email }}
                     </p>
                 </div>
+                <div class="mb-3">
+                    <p class="mb-0">Email status:</p>
+                    <p class="mb-3">
+                        <span v-if="user.is_active" class="badge success">Verified</span>
+                        <span v-if="!user.is_active" class="badge">Not verified</span>
+                    </p>
+                </div>
             </div>
         </div>
         <div v-if="isManaged()" class="card-tertiary">
@@ -90,6 +97,7 @@ import { useRoute } from 'vue-router'
 import tooltip from '@preline/tooltip'
 import axios from 'axios'
 import { subscriptionApi } from '../api/subscription.ts'
+import { userApi } from '../api/user.ts'
 import events from '../events.ts'
 
 const sub = ref({
@@ -99,6 +107,10 @@ const sub = ref({
     status: '',
     outage: false,
     type: '',
+})
+const user = ref({
+    id: '',
+    is_active: true
 })
 const error = ref('')
 const success = ref('')
@@ -114,6 +126,17 @@ const getSubscription = async () => {
     try {
         const res = await subscriptionApi.get()
         sub.value = res.data
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.response?.data.error || err.message
+        }
+    }
+}
+
+const getUser = async () => {
+    try {
+        const response = await userApi.get()
+        user.value = response.data
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.response?.data.error || err.message
@@ -188,6 +211,7 @@ const updatedAtDate = () => {
 
 const onUpdateEmail = (event: any) => {
     email.value = event.email
+    getUser()
 }
 
 const isOutage = () => {
@@ -210,6 +234,7 @@ const parseParams = () => {
 
 onMounted(() => {
     getSubscription()
+    getUser()
     tooltip.autoInit()
     events.on('user.update', onUpdateEmail)
 })

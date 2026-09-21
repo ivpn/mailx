@@ -39,9 +39,9 @@ func (a *AliasOrigin) Scan(src any) error {
 
 type Alias struct {
 	BaseModel
-	DeletedAt        gorm.DeletedAt `gorm:"index" json:"deleted_at"`
+	DeletedAt        gorm.DeletedAt `gorm:"index;index:idx_aliases_user_id_deleted_at,priority:2" json:"deleted_at"`
 	Name             string         `gorm:"unique" json:"name"`
-	UserID           string         `json:"-"`
+	UserID           string         `json:"-" gorm:"index:idx_aliases_user_id_deleted_at,priority:1"`
 	Enabled          bool           `json:"enabled"`
 	Description      string         `gorm:"default:''" json:"description"`
 	Recipients       string         `gorm:"default:''" json:"recipients"`

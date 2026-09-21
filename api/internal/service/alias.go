@@ -41,6 +41,7 @@ var (
 type AliasStore interface {
 	GetAlias(context.Context, string, string) (model.Alias, error)
 	GetAliases(context.Context, string, int, int, string, string, string, string, string) ([]model.Alias, error)
+	GetAliasesNoStats(context.Context, string, int, int, string, string, string, string, string) ([]model.Alias, error)
 	GetAliasesByDomain(context.Context, string, string) ([]model.Alias, error)
 	GetAllAliases(context.Context, string) ([]model.Alias, error)
 	GetAliasCount(context.Context, string, string, string, string) (int, error)
@@ -215,7 +216,7 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 			return model.Alias{}, ErrPostAlias
 		}
 
-		userAliases, err := s.Store.GetAliases(ctx, alias.UserID, 0, 0, "created_at", "DESC", "true", "", "active")
+		userAliases, err := s.Store.GetAliasesNoStats(ctx, alias.UserID, 0, 0, "created_at", "DESC", "true", "", "active")
 		if err != nil {
 			log.Printf("error fetching user aliases: %s", err.Error())
 			return model.Alias{}, ErrPostAlias
@@ -292,7 +293,7 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 // and which delimiters they use, so callers can tell whether/which delimiters are still
 // available for that domain.
 func (s *Service) GetWildcardDomainInfo(ctx context.Context, userID string, domain string) (model.WildcardDomainInfo, error) {
-	userAliases, err := s.Store.GetAliases(ctx, userID, 0, 0, "created_at", "DESC", "true", "", "active")
+	userAliases, err := s.Store.GetAliasesNoStats(ctx, userID, 0, 0, "created_at", "DESC", "true", "", "active")
 	if err != nil {
 		log.Printf("error fetching user aliases: %s", err.Error())
 		return model.WildcardDomainInfo{}, ErrGetAliases

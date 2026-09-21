@@ -30,6 +30,10 @@ var (
 	BulkForgetAliasSuccess  = "Aliases permanently deleted."
 )
 
+// maxAliasLimit caps the page size so an absent or oversized limit query param cannot ask the
+// database for an unbounded result set. Callers can detect truncation via AliasList.Total.
+const maxAliasLimit = 1000
+
 type AliasService interface {
 	GetAlias(context.Context, string, string) (model.Alias, error)
 	GetAliases(context.Context, string, int, int, string, string, string, string, string) (model.AliasList, error)
@@ -87,8 +91,8 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 	userID := auth.GetUserID(c)
 
 	limit, err := strconv.Atoi(c.Query("limit"))
-	if err != nil {
-		limit = 0
+	if err != nil || limit <= 0 || limit > maxAliasLimit {
+		limit = maxAliasLimit
 	}
 
 	page, err := strconv.Atoi(c.Query("page"))

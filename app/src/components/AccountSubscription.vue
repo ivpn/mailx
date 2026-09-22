@@ -5,8 +5,8 @@
                 <h2>Subscription</h2>
                 <p class="mb-0">Status:</p>
                 <p v-if="sub.id && !syncing">
-                    <span v-if="isActive()" class="badge success">Active</span>
-                    <span v-if="!isActive()" class="badge">Inactive</span>
+                    <span v-if="isActive() && sub.id" class="badge success">Active</span>
+                    <span v-if="!isActive() && sub.id" class="badge">Inactive</span>
                 </p>
                 <p v-if="syncing" class="text-sm">
                     <span v-if="isActive()" class="badge progress">Syncing...</span>
@@ -29,8 +29,8 @@
                 <div class="mb-3">
                     <p class="mb-0">Email status:</p>
                     <p class="mb-3">
-                        <span v-if="user.is_active" class="badge success">Verified</span>
-                        <span v-if="!user.is_active" class="badge">Not verified</span>
+                        <span v-if="user.is_active && user.id" class="badge success">Verified</span>
+                        <span v-if="!user.is_active && user.id" class="badge">Not verified</span>
                     </p>
                 </div>
             </div>
@@ -110,7 +110,7 @@ const sub = ref({
 })
 const user = ref({
     id: '',
-    is_active: true
+    is_active: false
 })
 const error = ref('')
 const success = ref('')

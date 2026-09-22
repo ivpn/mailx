@@ -58,4 +58,7 @@ export const initSelects = guard('[data-hs-select]', collections.select, () => s
 export const initTooltips = guard('.hs-tooltip', collections.tooltip, () => tooltip.autoInit())
 
 // Needed by handlers that use @click.stop, which suppresses Preline's own window-level close.
-export const closeDropdowns = () => dropdown.closeCurrentlyOpened()
+// Preline only clears its internal `animationInProcess` flag from the menu's transitionend
+// handler, so a menu that gets display:none'd mid-transition leaves the dropdown permanently
+// stuck. Callers that hide the dropdown's container must pass withTransition = false.
+export const closeDropdowns = (withTransition = true) => dropdown.closeCurrentlyOpened(null, withTransition)

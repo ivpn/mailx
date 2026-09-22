@@ -283,6 +283,8 @@ const updateAlias = async () => {
     alias.value.enabled = !alias.value.enabled
     try {
         await aliasApi.update(alias.value.id, alias.value)
+        // The row may no longer belong in the list the parent is showing.
+        events.emit('alias.enabled', { id: alias.value.id, enabled: alias.value.enabled })
     } catch {}
 }
 

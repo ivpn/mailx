@@ -8,7 +8,7 @@
                 </button>
             </div>
         </header>
-        <div v-if="!list.length && loaded && status === 'active_inactive'" class="card-empty">
+        <div v-if="showEmptyCard" class="card-empty">
             <span class="bg-secondary rounded flex items-center justify-center p-2 mb-5">
                 <i class="icon at icon-accent text-2xl"></i>
             </span>
@@ -20,7 +20,7 @@
                 New Wildcard
             </button>
         </div>
-        <div v-bind:class="{ 'hidden': (!list.length && status === 'active_inactive') || !loaded }">
+        <div v-bind:class="{ 'hidden': showEmptyCard || !loaded }">
             <div class="tablet-lg">
                 <div class="hs-dropdown [--placement:bottom-left] mb-2">
                     <button id="hs-dropdown-wildcard-status-mobile" class="sort">
@@ -113,6 +113,11 @@
                         </thead>
                         <tbody>
                             <AliasRow v-for="alias in list" :alias="alias" :key="alias.id" :recipients.sync="recipients" :wildcard=true @onEdit="onEditAlias" @onSend="onSendAlias" />
+                            <!-- Also keeps <tbody> from collapsing to its bare divide-y border, which
+                                 Chrome reads as a 1px overflow and answers with a stray scrollbar. -->
+                            <tr v-if="!list.length && loaded">
+                                <td colspan="6" class="text-center text-tertiary py-10">No wildcards found</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -127,7 +132,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed, nextTick } from 'vue'
+import { onMounted, onUnmounted, ref, computed, nextTick } from 'vue'
 import axios from 'axios'
 import { aliasApi } from '../api/alias'
 import { settingsApi } from '../api/settings.ts'
@@ -138,7 +143,7 @@ import AliasSend from './AliasSend.vue'
 import Pagination from './Pagination.vue'
 import events from '../events.ts'
 import { RouterLink } from 'vue-router'
-import { initDropdowns, initOverlays, initTooltips } from '../lib/preline.ts'
+import { closeDropdowns, initDropdowns, initOverlays, initTooltips } from '../lib/preline.ts'
 
 const alias = {
     id: '',
@@ -170,6 +175,7 @@ const settings = ref({
 })
 const error = ref('')
 const loaded = ref(false)
+const loading = ref(false)
 const limit = ref(25)
 const page = ref(1)
 const total = ref(0)
@@ -186,7 +192,13 @@ const statusLabel = computed(() => {
     return 'Active/Inactive'
 })
 
+// Only the default filter gets the full-page empty card; every other filter keeps the table (and
+// with it the status dropdown) on screen so the user can pick their way back out of it. Holding
+// off while a fetch is in flight stops the card from flashing over a list that is about to fill.
+const showEmptyCard = computed(() => loaded.value && !loading.value && !list.value.length && status.value === 'active_inactive')
+
 const getList = async () => {
+    loading.value = true
     try {
         const res = await aliasApi.getList({
             limit: limit.value,
@@ -200,9 +212,17 @@ const getList = async () => {
         total.value = res.data.total
         loaded.value = true
         error.value = ''
+        // Removing the last row of a page (by filtering it out, deleting it, ...) would otherwise
+        // strand the user on an empty page, with the pagination they'd leave it by hidden too.
+        if (!list.value.length && page.value > 1) {
+            page.value = 1
+            return getList()
+        }
+        loading.value = false
         await nextTick()
         bindPreline()
     } catch (err) {
+        loading.value = false
         if (axios.isAxiosError(err)) {
             error.value = err.message
         }
@@ -251,6 +271,14 @@ const onDeleteAlias = (payload: { id: string, wildcard: boolean }) => {
     deleteAlias(payload)
 }
 
+// Flipping a row's switch changes which aliases belong in the list, but only while the list is
+// filtered on that state.
+const onAliasEnabled = () => {
+    if (status.value === 'active' || status.value === 'inactive') {
+        getList()
+    }
+}
+
 const onEditAlias = (alias: any) => {
     editModal.value?.open(alias)
 }
@@ -260,6 +288,10 @@ const onSendAlias = (alias: any) => {
 }
 
 const setStatus = (value: string) => {
+    if (value === status.value) return
+    // The dropdown sits inside the block the new status may hide, and Preline jams for good if
+    // its menu is hidden before the closing transition ends, so close it outright first.
+    closeDropdowns(false)
     status.value = value
     page.value = 1
     getList()
@@ -287,6 +319,14 @@ onMounted(async () => {
     initDropdowns()
     events.on('alias.create', fetch)
     events.on('alias.update', fetch)
+    events.on('alias.enabled', onAliasEnabled)
     events.on('alias.delete', onDeleteAlias)
+})
+
+onUnmounted(() => {
+    events.off('alias.create', fetch)
+    events.off('alias.update', fetch)
+    events.off('alias.enabled', onAliasEnabled)
+    events.off('alias.delete', onDeleteAlias)
 })
 </script>

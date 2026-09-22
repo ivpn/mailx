@@ -68,13 +68,15 @@
                         <thead class="desktop-lg">
                             <tr>
                                 <th class="w-10 py-6">
-                                    <input
-                                        type="checkbox"
-                                        class="checkbox-plain"
-                                        ref="selectAllCheckbox"
-                                        v-bind:checked="allSelected"
-                                        @change="toggleSelectAll"
-                                    >
+                                    <div class="flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            class="checkbox-plain"
+                                            ref="selectAllCheckbox"
+                                            v-bind:checked="allSelected"
+                                            @change="toggleSelectAll"
+                                        >
+                                    </div>
                                 </th>
                                 <template v-if="selectedCount === 0">
                                     <th>
@@ -142,7 +144,7 @@
                                     <th>Actions</th>
                                 </template>
                                 <th v-else colspan="6">
-                                    <div class="flex items-center gap-3 flex-nowrap">
+                                    <div class="flex items-center gap-3 flex-nowrap min-h-[43px]">
                                         <button v-bind:disabled="!canActivate || bulkLoading" @click="bulkActivate">Activate</button>
                                         <button v-bind:disabled="!canDeactivate || bulkLoading" @click="bulkDeactivate">Deactivate</button>
                                         <button v-bind:disabled="!canPin || bulkLoading" @click="bulkPin">Pin</button>

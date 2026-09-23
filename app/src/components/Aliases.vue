@@ -26,22 +26,22 @@
                 </button>
             </div>
         </div>
-        <div v-if="!list.length && loaded && status === 'active_inactive'" class="card-empty">
+        <div v-if="showEmptyCard" class="card-empty">
             <span class="bg-secondary rounded flex items-center justify-center p-2 mb-5">
                 <i class="icon at icon-accent text-2xl"></i>
             </span>
             <h4 class="mb-6">
-                <span v-if="!searchQuery && !loading">You have no aliases yet</span>
-                <span v-if="searchQuery || loading">No aliases found</span>
+                <span v-if="!searchQuery">You have no aliases yet</span>
+                <span v-else>No aliases found</span>
             </h4>
             <p v-if="!recipients.length" class="text-tertiary mb-6">
                 To get started, first <router-link to="/account/profile">verify</router-link> your primary email address.
             </p>
-            <button v-if="!searchQuery && !loading && recipients.length" class="cta" data-hs-overlay="#modal-create-alias-false">
+            <button v-if="!searchQuery && recipients.length" class="cta" data-hs-overlay="#modal-create-alias-false">
                 New Alias
             </button>
         </div>
-        <div v-bind:class="{ 'hidden': (!list.length && status === 'active_inactive') || !loaded }">
+        <div v-bind:class="{ 'hidden': showEmptyCard || !loaded }">
             <div class="tablet-lg">
                 <div class="hs-dropdown [--placement:bottom-left] mb-2">
                     <button id="hs-dropdown-alias-status-mobile" class="sort">
@@ -68,13 +68,15 @@
                         <thead class="desktop-lg">
                             <tr>
                                 <th class="w-10 py-6">
-                                    <input
-                                        type="checkbox"
-                                        class="checkbox-plain"
-                                        ref="selectAllCheckbox"
-                                        v-bind:checked="allSelected"
-                                        @change="toggleSelectAll"
-                                    >
+                                    <div class="flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            class="checkbox-plain"
+                                            ref="selectAllCheckbox"
+                                            v-bind:checked="allSelected"
+                                            @change="toggleSelectAll"
+                                        >
+                                    </div>
                                 </th>
                                 <template v-if="selectedCount === 0">
                                     <th>
@@ -142,7 +144,7 @@
                                     <th>Actions</th>
                                 </template>
                                 <th v-else colspan="6">
-                                    <div class="flex items-center gap-3 flex-nowrap">
+                                    <div class="flex items-center gap-3 flex-nowrap min-h-[43px]">
                                         <button v-bind:disabled="!canActivate || bulkLoading" @click="bulkActivate">Activate</button>
                                         <button v-bind:disabled="!canDeactivate || bulkLoading" @click="bulkDeactivate">Deactivate</button>
                                         <button v-bind:disabled="!canPin || bulkLoading" @click="bulkPin">Pin</button>
@@ -168,6 +170,11 @@
                                 @onEdit="onEditAlias"
                                 @onSend="onSendAlias"
                             />
+                            <!-- Also keeps <tbody> from collapsing to its bare divide-y border, which
+                                 Chrome reads as a 1px overflow and answers with a stray scrollbar. -->
+                            <tr v-if="!list.length && loaded">
+                                <td colspan="7" class="text-center text-tertiary py-10">No aliases found</td>
+                            </tr>
                         </tbody>
 
                     </table>
@@ -194,7 +201,7 @@ import AliasSend from './AliasSend.vue'
 import Pagination from './Pagination.vue'
 import events from '../events.ts'
 import { RouterLink } from 'vue-router'
-import { initDropdowns, initOverlays, initTooltips } from '../lib/preline.ts'
+import { closeDropdowns, initDropdowns, initOverlays, initTooltips } from '../lib/preline.ts'
 
 const alias = {
     id: '',
@@ -207,6 +214,8 @@ const alias = {
     from_name: '',
     pinned: false,
     is_custom_domain: false,
+    is_domain_verified: null as boolean | null,
+    is_domain_enabled: false,
     stats: {
         forwards: 0,
         blocks: 0,
@@ -244,6 +253,11 @@ const statusLabel = computed(() => {
     return 'Active/Inactive'
 })
 
+// Only the default filter gets the full-page empty card; every other filter keeps the table (and
+// with it the status dropdown) on screen so the user can pick their way back out of it. Holding
+// off while a fetch is in flight stops the card from flashing over a list that is about to fill.
+const showEmptyCard = computed(() => loaded.value && !loading.value && !list.value.length && status.value === 'active_inactive')
+
 const selectedIds = ref(new Set<string>())
 const selectAllCheckbox = ref<HTMLInputElement | null>(null)
 const bulkLoading = ref(false)
@@ -255,10 +269,24 @@ const selectedCount = computed(() => selectedAliases.value.length)
 const allSelected = computed(() => list.value.length > 0 && selectedIds.value.size === list.value.length)
 const someSelected = computed(() => selectedIds.value.size > 0 && !allSelected.value)
 
-const canActivate = computed(() => selectedAliases.value.some(a => !a.enabled))
-const canDeactivate = computed(() => selectedAliases.value.some(a => a.enabled))
-const canPin = computed(() => selectedAliases.value.some(a => !a.pinned))
-const canUnpin = computed(() => selectedAliases.value.some(a => a.pinned))
+// Mirrors the per-row toggle in AliasRow: a deleted alias, an alias left without a recipient
+// (its last recipient was removed) or one on an unverified/disabled domain isn't forwarding
+// mail and its enabled flag can't be changed, so it's left out of the bulk action instead of
+// flipping a flag the alias doesn't act on.
+const isTogglable = (a: typeof alias) => !a.deleted_at
+    && a.recipients.length > 0
+    && !(a.is_custom_domain === true && (a.is_domain_verified === false || a.is_domain_enabled === false))
+
+// Deleted aliases are excluded from the pinned update server-side, so don't offer it for them.
+const isPinnable = (a: typeof alias) => !a.deleted_at
+
+const togglableAliases = computed(() => selectedAliases.value.filter(isTogglable))
+const pinnableAliases = computed(() => selectedAliases.value.filter(isPinnable))
+
+const canActivate = computed(() => togglableAliases.value.some(a => !a.enabled))
+const canDeactivate = computed(() => togglableAliases.value.some(a => a.enabled))
+const canPin = computed(() => pinnableAliases.value.some(a => !a.pinned))
+const canUnpin = computed(() => pinnableAliases.value.some(a => a.pinned))
 const canDelete = computed(() => selectedCount.value > 0 && selectedAliases.value.every(a => !a.deleted_at))
 const canRestore = computed(() => selectedCount.value > 0 && selectedAliases.value.every(a => !!a.deleted_at))
 const canForget = computed(() => selectedCount.value > 0 && selectedAliases.value.every(a => a.is_custom_domain))
@@ -297,11 +325,18 @@ const getList = async () => {
         list.value = res.data.aliases
         total.value = res.data.total
         loaded.value = true
-        loading.value = false
         error.value = ''
+        // Removing the last row of a page (by filtering it out, deleting it, ...) would otherwise
+        // strand the user on an empty page, with the pagination they'd leave it by hidden too.
+        if (!list.value.length && page.value > 1) {
+            page.value = 1
+            return getList()
+        }
+        loading.value = false
         await nextTick()
         bindPreline()
     } catch (err) {
+        loading.value = false
         if (axios.isAxiosError(err)) {
             error.value = err.message
         }
@@ -366,6 +401,14 @@ const onForgetAlias = (payload: { id: string }) => {
     forgetAlias(payload)
 }
 
+// Flipping a row's switch changes which aliases belong in the list, but only while the list is
+// filtered on that state. Refetching unconditionally would drop the user's row selection.
+const onAliasEnabled = () => {
+    if (status.value === 'active' || status.value === 'inactive') {
+        getList()
+    }
+}
+
 const onEditAlias = (alias: any) => {
     editModal.value?.open(alias)
 }
@@ -393,6 +436,10 @@ const clearSearch = () => {
 }
 
 const setStatus = (value: string) => {
+    if (value === status.value) return
+    // The dropdown sits inside the block the new status may hide, and Preline jams for good if
+    // its menu is hidden before the closing transition ends, so close it outright first.
+    closeDropdowns(false)
     status.value = value
     page.value = 1
     getList()
@@ -438,9 +485,12 @@ const bulkActionError = (err: unknown) => {
 }
 
 const bulkUpdateEnabled = async (enabled: boolean) => {
+    const ids = togglableAliases.value.map(a => a.id)
+    if (!ids.length) return
+
     bulkLoading.value = true
     try {
-        await aliasApi.bulkEnabled(Array.from(selectedIds.value), enabled)
+        await aliasApi.bulkEnabled(ids, enabled)
         error.value = ''
         getList()
     } catch (err) {
@@ -451,9 +501,12 @@ const bulkUpdateEnabled = async (enabled: boolean) => {
 }
 
 const bulkUpdatePinned = async (pinned: boolean) => {
+    const ids = pinnableAliases.value.map(a => a.id)
+    if (!ids.length) return
+
     bulkLoading.value = true
     try {
-        await aliasApi.bulkPinned(Array.from(selectedIds.value), pinned)
+        await aliasApi.bulkPinned(ids, pinned)
         error.value = ''
         getList()
     } catch (err) {
@@ -517,12 +570,18 @@ onMounted(async () => {
     initDropdowns()
     events.on('alias.create', getList)
     events.on('alias.update', getList)
+    events.on('alias.enabled', onAliasEnabled)
     events.on('alias.delete', onDeleteAlias)
     events.on('alias.forget', onForgetAlias)
     document.addEventListener('keydown', handleKeydown)
 })
 
 onUnmounted(() => {
+    events.off('alias.create', getList)
+    events.off('alias.update', getList)
+    events.off('alias.enabled', onAliasEnabled)
+    events.off('alias.delete', onDeleteAlias)
+    events.off('alias.forget', onForgetAlias)
     document.removeEventListener('keydown', handleKeydown)
 })
 </script>

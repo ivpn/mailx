@@ -80,6 +80,7 @@ const confirmEmail = async () => {
         const response = await userApi.activate(req)
         confirmSuccess.value = response.data.message
         error.value = ''
+        events.emit('user.update', { email: '' })
     } catch (err) {
         if (axios.isAxiosError(err)) {
             confirmSuccess.value = ''

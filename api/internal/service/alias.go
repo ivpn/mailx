@@ -31,6 +31,7 @@ var (
 	ErrForgetAliasNotCustomDomain = errors.New("Only custom domain aliases can be permanently deleted.")
 
 	ErrBulkUpdateAlias             = errors.New("Unable to update aliases. Please try again.")
+	ErrBulkUpdateAliasNotEligible  = errors.New("None of the selected aliases can be updated.")
 	ErrBulkDeleteAlias             = errors.New("Unable to delete aliases. Please try again.")
 	ErrBulkDeleteAliasNotEligible  = errors.New("Only non-deleted aliases can be bulk deleted.")
 	ErrBulkRestoreAlias            = errors.New("Unable to restore aliases. Please try again.")
@@ -523,24 +524,72 @@ func dedupeAliasIDs(ids []string) []string {
 	return deduped
 }
 
-func (s *Service) BulkUpdateAliasEnabled(ctx context.Context, ids []string, userID string, enabled bool) error {
-	err := s.Store.BulkUpdateAliasEnabled(ctx, dedupeAliasIDs(ids), userID, enabled)
+// eligibleAliasIDs keeps only the requested IDs whose alias passes eligible, so the bulk
+// updates below skip aliases the store would silently leave untouched (deleted rows) or
+// would put into a state the single-alias endpoints reject (enabled without a recipient).
+func (s *Service) eligibleAliasIDs(ctx context.Context, ids []string, userID string, eligible func(model.Alias) bool) ([]string, error) {
+	aliases, err := s.Store.GetAliasesUnscopedByIDs(ctx, ids, userID)
 	if err != nil {
-		log.Printf("error bulk updating alias enabled: %s", err.Error())
-		return ErrBulkUpdateAlias
+		return nil, err
 	}
 
-	return nil
+	filtered := make([]string, 0, len(aliases))
+	for _, alias := range aliases {
+		if eligible(alias) {
+			filtered = append(filtered, alias.ID)
+		}
+	}
+
+	return filtered, nil
 }
 
-func (s *Service) BulkUpdateAliasPinned(ctx context.Context, ids []string, userID string, pinned bool) error {
-	err := s.Store.BulkUpdateAliasPinned(ctx, dedupeAliasIDs(ids), userID, pinned)
+// BulkUpdateAliasEnabled activates/deactivates aliases, skipping the ones whose enabled flag
+// has no effect: deleted aliases (the store keeps them out of the update anyway) and aliases
+// left without a recipient, which can't forward mail - UpdateAlias rejects that same state.
+// Returns the number of aliases the update was applied to.
+func (s *Service) BulkUpdateAliasEnabled(ctx context.Context, ids []string, userID string, enabled bool) (int, error) {
+	eligible, err := s.eligibleAliasIDs(ctx, dedupeAliasIDs(ids), userID, func(alias model.Alias) bool {
+		return !alias.DeletedAt.Valid && alias.Recipients != ""
+	})
 	if err != nil {
-		log.Printf("error bulk updating alias pinned status: %s", err.Error())
-		return ErrBulkUpdateAlias
+		log.Printf("error fetching aliases for bulk enabled update: %s", err.Error())
+		return 0, ErrBulkUpdateAlias
+	}
+	if len(eligible) == 0 {
+		return 0, ErrBulkUpdateAliasNotEligible
 	}
 
-	return nil
+	err = s.Store.BulkUpdateAliasEnabled(ctx, eligible, userID, enabled)
+	if err != nil {
+		log.Printf("error bulk updating alias enabled: %s", err.Error())
+		return 0, ErrBulkUpdateAlias
+	}
+
+	return len(eligible), nil
+}
+
+// BulkUpdateAliasPinned pins/unpins aliases, skipping deleted ones - they're excluded from the
+// store update and aren't pinnable through the single-alias endpoint either.
+// Returns the number of aliases the update was applied to.
+func (s *Service) BulkUpdateAliasPinned(ctx context.Context, ids []string, userID string, pinned bool) (int, error) {
+	eligible, err := s.eligibleAliasIDs(ctx, dedupeAliasIDs(ids), userID, func(alias model.Alias) bool {
+		return !alias.DeletedAt.Valid
+	})
+	if err != nil {
+		log.Printf("error fetching aliases for bulk pinned update: %s", err.Error())
+		return 0, ErrBulkUpdateAlias
+	}
+	if len(eligible) == 0 {
+		return 0, ErrBulkUpdateAliasNotEligible
+	}
+
+	err = s.Store.BulkUpdateAliasPinned(ctx, eligible, userID, pinned)
+	if err != nil {
+		log.Printf("error bulk updating alias pinned status: %s", err.Error())
+		return 0, ErrBulkUpdateAlias
+	}
+
+	return len(eligible), nil
 }
 
 func (s *Service) BulkDeleteAlias(ctx context.Context, ids []string, userID string) error {

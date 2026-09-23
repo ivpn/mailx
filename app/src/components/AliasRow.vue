@@ -14,7 +14,7 @@
             <div class="flex items-center hs-tooltip">
                 <input
                     @change="updateAlias"
-                    v-bind:checked="alias.enabled && !isDomainUnverified && !isAliasDeleted"
+                    v-bind:checked="alias.enabled && alias.recipients.length > 0 && !isDomainUnverified && !isAliasDeleted"
                     v-bind:disabled="!alias.recipients.length || isDomainUnverified || isAliasDeleted"
                     type="checkbox"
                     class="checkbox-switch"
@@ -156,7 +156,7 @@
                     <div class="flex items-center hs-tooltip">
                         <input
                             @change="updateAlias"
-                            v-bind:checked="alias.enabled && !isDomainUnverified && !isAliasDeleted"
+                            v-bind:checked="alias.enabled && alias.recipients.length > 0 && !isDomainUnverified && !isAliasDeleted"
                             v-bind:disabled="!alias.recipients.length || isDomainUnverified || isAliasDeleted"
                             type="checkbox"
                             class="checkbox-switch"
@@ -283,6 +283,8 @@ const updateAlias = async () => {
     alias.value.enabled = !alias.value.enabled
     try {
         await aliasApi.update(alias.value.id, alias.value)
+        // The row may no longer belong in the list the parent is showing.
+        events.emit('alias.enabled', { id: alias.value.id, enabled: alias.value.enabled })
     } catch {}
 }
 

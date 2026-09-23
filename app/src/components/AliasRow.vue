@@ -314,8 +314,7 @@ const restoreAlias = async () => {
 }
 
 const forgetAlias = () => {
-    closeDropdowns()
-    const errMessage = 'WARNING: This operation cannot be undone. You will not be able to restore this alias. Are you sure you want to delete alias?'
+    const errMessage = 'WARNING: This operation cannot be undone. You will not be able to restore this alias. Are you sure you want to permanently delete alias?'
     if (!confirm(errMessage)) return
 
     events.emit('alias.forget', { id: alias.value.id })

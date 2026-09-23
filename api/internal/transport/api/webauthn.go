@@ -22,6 +22,7 @@ var (
 	ErrFinishRegistration     = "Unable to complete registration. Please try again."
 	ErrBeginLogin             = "Unable to start login. Please try again."
 	ErrFinishLogin            = "Unable to complete login. Please try again."
+	ErrPasskeyNotRecognized   = "This passkey isn’t recognized. Please try again or use another sign-in method."
 	ErrGetSession             = "Unable to retrieve session. Please try again."
 	ErrSaveSession            = "Unable to save session. Please try again."
 	ErrDeleteSession          = "Unable to delete session. Please try again."
@@ -629,9 +630,14 @@ func (h *Handler) FinishPasskeyLogin(c *fiber.Ctx) error {
 
 	// The credential's user handle identifies the user; captured here since BeginPasskeyLogin didn't know it
 	var loggedInUser model.User
+	// The library only formats a lookup failure into its own message, so it's kept here to tell an
+	// unknown passkey apart from the other ways the ceremony can fail
+	var lookupErr error
 	identifyUser := func(rawID, userHandle []byte) (webauthn.User, error) {
 		user, err := h.Service.GetUser(c.Context(), string(userHandle))
 		if err != nil {
+			lookupErr = err
+
 			return nil, err
 		}
 
@@ -642,6 +648,12 @@ func (h *Handler) FinishPasskeyLogin(c *fiber.Ctx) error {
 
 	credential, err := h.WebAuthn.FinishDiscoverableLogin(identifyUser, session.SessionData, r)
 	if err != nil {
+		if lookupErr != nil {
+			return c.Status(400).JSON(fiber.Map{
+				"error": ErrPasskeyNotRecognized,
+			})
+		}
+
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
 		})

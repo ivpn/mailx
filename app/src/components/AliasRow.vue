@@ -14,7 +14,7 @@
             <div class="flex items-center hs-tooltip">
                 <input
                     @change="updateAlias"
-                    v-bind:checked="alias.enabled && !isDomainUnverified && !isAliasDeleted"
+                    v-bind:checked="alias.enabled && alias.recipients.length > 0 && !isDomainUnverified && !isAliasDeleted"
                     v-bind:disabled="!alias.recipients.length || isDomainUnverified || isAliasDeleted"
                     type="checkbox"
                     class="checkbox-switch"
@@ -156,7 +156,7 @@
                     <div class="flex items-center hs-tooltip">
                         <input
                             @change="updateAlias"
-                            v-bind:checked="alias.enabled && !isDomainUnverified && !isAliasDeleted"
+                            v-bind:checked="alias.enabled && alias.recipients.length > 0 && !isDomainUnverified && !isAliasDeleted"
                             v-bind:disabled="!alias.recipients.length || isDomainUnverified || isAliasDeleted"
                             type="checkbox"
                             class="checkbox-switch"

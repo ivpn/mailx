@@ -201,6 +201,8 @@ const alias = {
     from_name: '',
     pinned: false,
     is_custom_domain: false,
+    is_domain_verified: null as boolean | null,
+    is_domain_enabled: false,
     stats: {
         forwards: 0,
         blocks: 0,
@@ -248,10 +250,24 @@ const selectedCount = computed(() => selectedAliases.value.length)
 const allSelected = computed(() => list.value.length > 0 && selectedIds.value.size === list.value.length)
 const someSelected = computed(() => selectedIds.value.size > 0 && !allSelected.value)
 
-const canActivate = computed(() => selectedAliases.value.some(a => !a.enabled))
-const canDeactivate = computed(() => selectedAliases.value.some(a => a.enabled))
-const canPin = computed(() => selectedAliases.value.some(a => !a.pinned))
-const canUnpin = computed(() => selectedAliases.value.some(a => a.pinned))
+// Mirrors the per-row toggle in AliasRow: a deleted alias, an alias left without a recipient
+// (its last recipient was removed) or one on an unverified/disabled domain isn't forwarding
+// mail and its enabled flag can't be changed, so it's left out of the bulk action instead of
+// flipping a flag the alias doesn't act on.
+const isTogglable = (a: typeof alias) => !a.deleted_at
+    && a.recipients.length > 0
+    && !(a.is_custom_domain === true && (a.is_domain_verified === false || a.is_domain_enabled === false))
+
+// Deleted aliases are excluded from the pinned update server-side, so don't offer it for them.
+const isPinnable = (a: typeof alias) => !a.deleted_at
+
+const togglableAliases = computed(() => selectedAliases.value.filter(isTogglable))
+const pinnableAliases = computed(() => selectedAliases.value.filter(isPinnable))
+
+const canActivate = computed(() => togglableAliases.value.some(a => !a.enabled))
+const canDeactivate = computed(() => togglableAliases.value.some(a => a.enabled))
+const canPin = computed(() => pinnableAliases.value.some(a => !a.pinned))
+const canUnpin = computed(() => pinnableAliases.value.some(a => a.pinned))
 const canDelete = computed(() => selectedCount.value > 0 && selectedAliases.value.every(a => !a.deleted_at))
 const canRestore = computed(() => selectedCount.value > 0 && selectedAliases.value.every(a => !!a.deleted_at))
 const canForget = computed(() => selectedCount.value > 0 && selectedAliases.value.every(a => a.is_custom_domain))
@@ -419,9 +435,12 @@ const bulkActionError = (err: unknown) => {
 }
 
 const bulkUpdateEnabled = async (enabled: boolean) => {
+    const ids = togglableAliases.value.map(a => a.id)
+    if (!ids.length) return
+
     bulkLoading.value = true
     try {
-        await aliasApi.bulkEnabled(Array.from(selectedIds.value), enabled)
+        await aliasApi.bulkEnabled(ids, enabled)
         error.value = ''
         getList()
     } catch (err) {
@@ -432,9 +451,12 @@ const bulkUpdateEnabled = async (enabled: boolean) => {
 }
 
 const bulkUpdatePinned = async (pinned: boolean) => {
+    const ids = pinnableAliases.value.map(a => a.id)
+    if (!ids.length) return
+
     bulkLoading.value = true
     try {
-        await aliasApi.bulkPinned(Array.from(selectedIds.value), pinned)
+        await aliasApi.bulkPinned(ids, pinned)
         error.value = ''
         getList()
     } catch (err) {

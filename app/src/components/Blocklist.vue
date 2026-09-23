@@ -8,8 +8,8 @@
             <p>
                 Emails from blocked senders are discarded before they reach your recipients. Blocking a domain also blocks its subdomains. With email delivery diagnostics enabled in <router-link to="/account/settings">Settings</router-link>, blocked emails are listed in <router-link to="/account/diagnostics">Diagnostics</router-link>.
             </p>
-            <form @submit.prevent="addItem" autocomplete="off" class="flex flex-col md:flex-row gap-3">
-                <select v-model="req.type" class="md:w-40 md:shrink-0 mb-0" aria-label="Type">
+            <form @submit.prevent="addItem" autocomplete="off" class="flex flex-col lg:flex-row gap-3">
+                <select v-model="req.type" class="lg:w-40 lg:shrink-0 mb-0" aria-label="Type">
                     <option value="email">Email</option>
                     <option value="domain">Domain</option>
                 </select>

@@ -33,11 +33,10 @@
                         class="hs-dropdown-menu hs-dropdown-open:opacity-100 hidden"
                         aria-labelledby="hs-dropdown-wildcard-status-mobile"
                     >
-                        <button @click="setStatus('active_inactive')">Active/Inactive</button>
-                        <button @click="setStatus('active')">Active</button>
-                        <button @click="setStatus('inactive')">Inactive</button>
+                        <button @click="setStatus('active_inactive')">All</button>
+                        <button @click="setStatus('active')">Enabled</button>
+                        <button @click="setStatus('inactive')">Disabled</button>
                         <button @click="setStatus('deleted')">Deleted</button>
-                        <button @click="setStatus('all')">All</button>
                     </div>
                 </div>
             </div>
@@ -58,11 +57,10 @@
                                             class="hs-dropdown-menu hs-dropdown-open:opacity-100 hidden"
                                             aria-labelledby="hs-dropdown-wildcard-status"
                                         >
-                                            <button @click="setStatus('active_inactive')">Active/Inactive</button>
-                                            <button @click="setStatus('active')">Active</button>
-                                            <button @click="setStatus('inactive')">Inactive</button>
+                                            <button @click="setStatus('active_inactive')">All</button>
+                                            <button @click="setStatus('active')">Enabled</button>
+                                            <button @click="setStatus('inactive')">Disabled</button>
                                             <button @click="setStatus('deleted')">Deleted</button>
-                                            <button @click="setStatus('all')">All</button>
                                         </div>
                                     </div>
                                 </th>
@@ -174,11 +172,10 @@ const sortBy = ref('created_at')
 const sortOrder = ref('DESC')
 const status = ref('active_inactive')
 const statusLabel = computed(() => {
-    if (status.value === 'active') return 'Active'
-    if (status.value === 'inactive') return 'Inactive'
+    if (status.value === 'active') return 'Enabled'
+    if (status.value === 'inactive') return 'Disabled'
     if (status.value === 'deleted') return 'Deleted'
-    if (status.value === 'all') return 'All'
-    return 'Active/Inactive'
+    return 'All'
 })
 
 const getList = async () => {

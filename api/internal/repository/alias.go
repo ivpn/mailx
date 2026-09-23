@@ -271,13 +271,15 @@ func (d *Database) ForgetAlias(ctx context.Context, ID string, userID string) er
 	return d.Client.Unscoped().Where("id = ? AND user_id = ?", ID, userID).Delete(&model.Alias{}).Error
 }
 
-// BulkUpdateAliasEnabled sets enabled for all given IDs unconditionally (no eligibility check -
-// GORM's automatic soft-delete scope already excludes deleted_at rows, same as UpdateAlias).
+// BulkUpdateAliasEnabled sets enabled for all given IDs (GORM's automatic soft-delete scope
+// already excludes deleted_at rows, same as UpdateAlias). The service filters the IDs down to
+// the aliases the flag actually applies to before calling this.
 func (d *Database) BulkUpdateAliasEnabled(ctx context.Context, ids []string, userID string, enabled bool) error {
 	return d.Client.WithContext(ctx).Model(&model.Alias{}).Where("id IN (?) AND user_id = ?", ids, userID).Update("enabled", enabled).Error
 }
 
-// BulkUpdateAliasPinned sets pinned for all given IDs unconditionally, mirroring UpdateAliasPinned.
+// BulkUpdateAliasPinned sets pinned for all given IDs, mirroring UpdateAliasPinned (deleted_at
+// rows are excluded by the soft-delete scope; the service filters them out beforehand too).
 func (d *Database) BulkUpdateAliasPinned(ctx context.Context, ids []string, userID string, pinned bool) error {
 	return d.Client.WithContext(ctx).Model(&model.Alias{}).Where("id IN (?) AND user_id = ?", ids, userID).Update("pinned", pinned).Error
 }

@@ -431,6 +431,137 @@ func TestDedupeAliasIDs(t *testing.T) {
 	}
 }
 
+func TestBulkUpdateAliasEnabled(t *testing.T) {
+	t.Run("skips aliases left without a recipient", func(t *testing.T) {
+		store := newFakeStore()
+		store.aliases["one@mailx.net"] = model.Alias{
+			BaseModel: model.BaseModel{ID: "alias-1"}, Name: "one@mailx.net", UserID: "user-1",
+			Recipients: "user@example.com",
+		}
+		store.aliases["two@mailx.net"] = model.Alias{
+			BaseModel: model.BaseModel{ID: "alias-2"}, Name: "two@mailx.net", UserID: "user-1",
+		}
+		s := newTestService(store)
+
+		count, err := s.BulkUpdateAliasEnabled(context.Background(), []string{"alias-1", "alias-2"}, "user-1", true)
+		if err != nil {
+			t.Fatalf("expected no error, got %v", err)
+		}
+		if count != 1 {
+			t.Errorf("expected 1 alias updated, got %d", count)
+		}
+		if !store.aliases["one@mailx.net"].Enabled {
+			t.Errorf("expected alias-1 to be activated")
+		}
+		if store.aliases["two@mailx.net"].Enabled {
+			t.Errorf("expected alias-2 without a recipient to stay disabled")
+		}
+	})
+
+	t.Run("skips deleted aliases", func(t *testing.T) {
+		store := newFakeStore()
+		store.aliases["one@mailx.net"] = model.Alias{
+			BaseModel: model.BaseModel{ID: "alias-1"}, Name: "one@mailx.net", UserID: "user-1",
+			Recipients: "user@example.com",
+		}
+		store.aliases["two@mailx.net"] = model.Alias{
+			BaseModel: model.BaseModel{ID: "alias-2"}, Name: "two@mailx.net", UserID: "user-1",
+			Recipients: "user@example.com",
+			DeletedAt:  gorm.DeletedAt{Time: time.Now(), Valid: true},
+		}
+		s := newTestService(store)
+
+		count, err := s.BulkUpdateAliasEnabled(context.Background(), []string{"alias-1", "alias-2"}, "user-1", true)
+		if err != nil {
+			t.Fatalf("expected no error, got %v", err)
+		}
+		if count != 1 {
+			t.Errorf("expected 1 alias updated, got %d", count)
+		}
+		if store.aliases["two@mailx.net"].Enabled {
+			t.Errorf("expected deleted alias-2 to stay disabled")
+		}
+	})
+
+	t.Run("rejects the request when no alias is eligible", func(t *testing.T) {
+		store := newFakeStore()
+		store.aliases["one@mailx.net"] = model.Alias{
+			BaseModel: model.BaseModel{ID: "alias-1"}, Name: "one@mailx.net", UserID: "user-1",
+			Recipients: "user@example.com",
+			DeletedAt:  gorm.DeletedAt{Time: time.Now(), Valid: true},
+		}
+		s := newTestService(store)
+
+		count, err := s.BulkUpdateAliasEnabled(context.Background(), []string{"alias-1"}, "user-1", true)
+		if !errors.Is(err, ErrBulkUpdateAliasNotEligible) {
+			t.Errorf("expected ErrBulkUpdateAliasNotEligible, got %v", err)
+		}
+		if count != 0 {
+			t.Errorf("expected 0 aliases updated, got %d", count)
+		}
+	})
+
+	t.Run("ignores aliases owned by another user", func(t *testing.T) {
+		store := newFakeStore()
+		store.aliases["one@mailx.net"] = model.Alias{
+			BaseModel: model.BaseModel{ID: "alias-1"}, Name: "one@mailx.net", UserID: "user-2",
+			Recipients: "user@example.com",
+		}
+		s := newTestService(store)
+
+		_, err := s.BulkUpdateAliasEnabled(context.Background(), []string{"alias-1"}, "user-1", true)
+		if !errors.Is(err, ErrBulkUpdateAliasNotEligible) {
+			t.Errorf("expected ErrBulkUpdateAliasNotEligible, got %v", err)
+		}
+		if store.aliases["one@mailx.net"].Enabled {
+			t.Errorf("expected another user's alias to stay untouched")
+		}
+	})
+}
+
+func TestBulkUpdateAliasPinned(t *testing.T) {
+	t.Run("skips deleted aliases", func(t *testing.T) {
+		store := newFakeStore()
+		store.aliases["one@mailx.net"] = model.Alias{BaseModel: model.BaseModel{ID: "alias-1"}, Name: "one@mailx.net", UserID: "user-1"}
+		store.aliases["two@mailx.net"] = model.Alias{
+			BaseModel: model.BaseModel{ID: "alias-2"}, Name: "two@mailx.net", UserID: "user-1",
+			DeletedAt: gorm.DeletedAt{Time: time.Now(), Valid: true},
+		}
+		s := newTestService(store)
+
+		count, err := s.BulkUpdateAliasPinned(context.Background(), []string{"alias-1", "alias-2"}, "user-1", true)
+		if err != nil {
+			t.Fatalf("expected no error, got %v", err)
+		}
+		if count != 1 {
+			t.Errorf("expected 1 alias updated, got %d", count)
+		}
+		if !store.aliases["one@mailx.net"].Pinned {
+			t.Errorf("expected alias-1 to be pinned")
+		}
+		if store.aliases["two@mailx.net"].Pinned {
+			t.Errorf("expected deleted alias-2 to stay unpinned")
+		}
+	})
+
+	t.Run("rejects the request when every alias is deleted", func(t *testing.T) {
+		store := newFakeStore()
+		store.aliases["one@mailx.net"] = model.Alias{
+			BaseModel: model.BaseModel{ID: "alias-1"}, Name: "one@mailx.net", UserID: "user-1",
+			DeletedAt: gorm.DeletedAt{Time: time.Now(), Valid: true},
+		}
+		s := newTestService(store)
+
+		count, err := s.BulkUpdateAliasPinned(context.Background(), []string{"alias-1"}, "user-1", true)
+		if !errors.Is(err, ErrBulkUpdateAliasNotEligible) {
+			t.Errorf("expected ErrBulkUpdateAliasNotEligible, got %v", err)
+		}
+		if count != 0 {
+			t.Errorf("expected 0 aliases updated, got %d", count)
+		}
+	})
+}
+
 func TestBulkDeleteAlias(t *testing.T) {
 	t.Run("soft-deletes all non-deleted owned aliases", func(t *testing.T) {
 		store := newFakeStore()

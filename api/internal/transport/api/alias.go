@@ -46,8 +46,8 @@ type AliasService interface {
 	ImportAliases(context.Context, []model.AliasImportReq, string) ([]model.Alias, error)
 	RestoreAlias(context.Context, string, string) error
 	ForgetAlias(context.Context, string, string) error
-	BulkUpdateAliasEnabled(context.Context, []string, string, bool) error
-	BulkUpdateAliasPinned(context.Context, []string, string, bool) error
+	BulkUpdateAliasEnabled(context.Context, []string, string, bool) (int, error)
+	BulkUpdateAliasPinned(context.Context, []string, string, bool) (int, error)
 	BulkDeleteAlias(context.Context, []string, string) error
 	BulkRestoreAlias(context.Context, []string, string) error
 	BulkForgetAlias(context.Context, []string, string) error
@@ -594,7 +594,7 @@ func (h *Handler) ForgetAlias(c *fiber.Ctx) error {
 }
 
 // @Summary Bulk activate/deactivate aliases
-// @Description Set enabled status for multiple aliases at once
+// @Description Set enabled status for multiple aliases at once; deleted aliases and aliases left without a recipient are skipped
 // @Tags alias
 // @Accept json
 // @Produce json
@@ -620,7 +620,7 @@ func (h *Handler) BulkUpdateAliasEnabled(c *fiber.Ctx) error {
 		})
 	}
 
-	err = h.Service.BulkUpdateAliasEnabled(c.Context(), req.IDs, userID, req.Enabled)
+	count, err := h.Service.BulkUpdateAliasEnabled(c.Context(), req.IDs, userID, req.Enabled)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
@@ -629,12 +629,12 @@ func (h *Handler) BulkUpdateAliasEnabled(c *fiber.Ctx) error {
 
 	return c.Status(200).JSON(fiber.Map{
 		"message": BulkUpdateAliasSuccess,
-		"count":   len(req.IDs),
+		"count":   count,
 	})
 }
 
 // @Summary Bulk pin/unpin aliases
-// @Description Set pinned status for multiple aliases at once; pinned aliases are always sorted first in the list
+// @Description Set pinned status for multiple aliases at once; pinned aliases are always sorted first in the list, deleted aliases are skipped
 // @Tags alias
 // @Accept json
 // @Produce json
@@ -660,7 +660,7 @@ func (h *Handler) BulkUpdateAliasPinned(c *fiber.Ctx) error {
 		})
 	}
 
-	err = h.Service.BulkUpdateAliasPinned(c.Context(), req.IDs, userID, req.Pinned)
+	count, err := h.Service.BulkUpdateAliasPinned(c.Context(), req.IDs, userID, req.Pinned)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
@@ -669,7 +669,7 @@ func (h *Handler) BulkUpdateAliasPinned(c *fiber.Ctx) error {
 
 	return c.Status(200).JSON(fiber.Map{
 		"message": BulkUpdateAliasSuccess,
-		"count":   len(req.IDs),
+		"count":   count,
 	})
 }
 

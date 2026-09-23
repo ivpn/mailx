@@ -125,6 +125,10 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Delete("/domain/:id", h.DeleteDomain)
 	v1.Post("/domain/:id/verify-dns", h.VerifyDomainDNSRecords)
 
+	v1.Get("/blocklist", h.GetBlocklist)
+	v1.Post("/blocklist", h.PostBlocklistItem)
+	v1.Delete("/blocklist/:id", h.DeleteBlocklistItem)
+
 	docs := h.Server.Group("/docs")
 	docs.Use(auth.NewBasicAuth(cfg))
 	docs.Get("/*", swagger.HandlerDefault)

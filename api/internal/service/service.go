@@ -20,6 +20,7 @@ type Store interface {
 	LogStore
 	AccessKeyStore
 	DomainStore
+	BlocklistStore
 }
 
 type Cache interface {

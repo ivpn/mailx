@@ -149,6 +149,15 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 			continue
 		}
 
+		// Blocklist - checked before the inbound alias below so a blocked sender can't provision
+		// catch-all aliases. Replies/sends come from the user's own recipients, so only forwards apply.
+		if relayType == model.Forward {
+			if item, blocked := s.FindBlocklistMatch(context.Background(), alias.UserID, msg.From); blocked {
+				s.BlockMessage(alias, msg.From, to, item)
+				continue
+			}
+		}
+
 		sub, err := s.GetSubscription(context.Background(), alias.UserID)
 		if err != nil {
 			log.Println("error getting subscription", err)

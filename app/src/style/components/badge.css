@@ -38,6 +38,10 @@
             @apply bg-red-500 dark:bg-red-700 text-white font-semibold;
         }
 
+        &.blocked_sender {
+            @apply bg-slate-600 dark:bg-slate-700 text-white font-semibold;
+        }
+
         &.small {
             @apply py-0.5 px-1.5 text-xs;
         }

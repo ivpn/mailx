@@ -23,6 +23,10 @@
                     <i class="icon global icon-primary"></i>
                     Domains
                 </router-link>
+                <router-link v-bind:class="{ 'active': route == '/account/blocklist' }" to="/account/blocklist">
+                    <i class="icon block icon-primary"></i>
+                    Blocklist
+                </router-link>
                 <router-link v-bind:class="{ 'active': route == '/account/stats' }" to="/account/stats">
                     <i class="icon chart icon-primary"></i>
                     Stats
@@ -43,7 +47,7 @@
         </nav>
         <div>
             <nav class="footer">
-                <div class="[@media(max-height:715px)]:hidden">
+                <div class="[@media(max-height:767px)]:hidden">
                     <router-link to="/announcements">
                         <i class="icon megaphone icon-primary"></i>
                         Announcements

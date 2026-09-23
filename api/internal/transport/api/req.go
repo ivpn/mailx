@@ -132,6 +132,11 @@ type DomainReq struct {
 	Name string `json:"name" validate:"required,fqdn"`
 }
 
+type BlocklistReq struct {
+	Type  string `json:"type" validate:"required,oneof=email domain"`
+	Value string `json:"value" validate:"required,max=255"`
+}
+
 type UpdateDomainReq struct {
 	ID          string `json:"id" validate:"required,uuid"`
 	Description string `json:"description"`

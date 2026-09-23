@@ -12,6 +12,7 @@ const (
 	DisabledDomain       LogType = "disabled_domain"
 	UnauthorisedSend     LogType = "unauthorised_send"
 	InactiveSubscription LogType = "inactive_subscription"
+	BlockedSender        LogType = "blocked_sender"
 )
 
 type Log struct {

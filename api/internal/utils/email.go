@@ -59,14 +59,11 @@ func CombineForwardTo(primary string, all []string, encode func(alias, to string
 }
 
 func RemoveHtmlHeader(html string) string {
-	// Relaxed regex: match any <table> containing "This email was sent to" and ending at </table>
-	re := regexp.MustCompile(`(?is)<table[^>]*>.*?This email was sent to.*?</table>`)
-	cleaned := re.ReplaceAllString(html, "")
-
-	// Optionally clean up one or more immediate trailing <br> tags or empty <div><br></div>
-	cleaned = regexp.MustCompile(`(?i)(\s*<br\s*/?>\s*|<div[^>]*>\s*(<br\s*/?>)?\s*</div>)+`).ReplaceAllString(cleaned, "")
-
-	return cleaned
+	// Relaxed regex: match any <table> containing "This email was sent to" and ending at </table>,
+	// plus any <br> tags or empty <div><br></div> spacers immediately following it.
+	// Spacers elsewhere in the message are the sender's own line breaks and must be kept.
+	re := regexp.MustCompile(`(?is)<table[^>]*>.*?This email was sent to.*?</table>(\s*<br\s*/?>|\s*<div[^>]*>\s*(<br\s*/?>)?\s*</div>)*\s*`)
+	return re.ReplaceAllString(html, "")
 }
 
 func EncryptWithPGPInline(plainText string, recipientKey string) (string, error) {

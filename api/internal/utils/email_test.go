@@ -122,9 +122,76 @@ func TestRemoveHtmlHeader(t *testing.T) {
 `,
 		},
 		{
-			name:     "HTML header in middle of content",
+			name:     "reply keeps sender line breaks around quoted HTML header",
 			input:    `<div dir="auto">Looks good.</div><div dir="auto"><br></div><div dir="auto">-- <br></div><div dir="auto"> Secured with Mail Provider: <br></div><div dir="auto"> <a href="" rel="noopener noreferrer" target="_blank"></a><br></div><div dir="auto"><br></div><div dir="auto"><br></div><div dir="auto">28 Jul 2025 at 12:49 by sender@example.com:<br></div><blockquote class="quote" style="border-left: 1px solid #93A3B8; padding-left: 10px; margin-left: 5px;"><table style="width: 100%;"><tbody><tr><td><div style="padding: 15px; background: no-repeat rgb(241, 245, 249); color: rgb(75, 85, 99); font-size: 13px; text-align: center; font-family: Arial, Helvetica, sans-serif;">This email was sent to <a style="color: rgb(59 130 246);text-decoration: none;" href="mailto:recipient@example.com" rel="noopener noreferrer" target="_blank">recipient@example.com</a> from <a style="color: rgb(59 130 246);text-decoration: none;" href="mailto:sender@example.com" rel="noopener noreferrer" target="_blank">sender@example.com</a><br></div><div dir="auto"><br></div></td></tr></tbody></table><div dir="auto"><br></div><div style="font-family: Arial, sans-serif; font-size: 14px;">Hello<br></div><div style="font-family: Arial, sans-serif; font-size: 14px;"><br></div><div style="font-family: Arial, sans-serif; font-size: 14px;"><p style="margin:0.0px 0.0px 0.0px 0.0px;font:13.0px 'Helvetica Neue'">您好<br></p><p style="margin:0.0px 0.0px 0.0px 0.0px;font:13.0px 'Helvetica Neue'">这是一次测试。<br></p><p style="margin:0.0px 0.0px 0.0px 0.0px;font:13.0px 'PingFang SC'">此致。<br></p></div><div style="font-family: Arial, sans-serif; font-size: 14px;"><br></div><div style="font-family: Arial, sans-serif; font-size: 14px;" class=""><div class=""><br></div><div class="">Sent with <a href="" target="_blank" rel="noopener noreferrer">Mail</a> secure email.<br></div></div></blockquote>`,
-			expected: `<div dir="auto">Looks good.</div><div dir="auto">--</div><div dir="auto"> Secured with Mail Provider:</div><div dir="auto"> <a href="" rel="noopener noreferrer" target="_blank"></a></div><div dir="auto">28 Jul 2025 at 12:49 by sender@example.com:</div><blockquote class="quote" style="border-left: 1px solid #93A3B8; padding-left: 10px; margin-left: 5px;"><div style="font-family: Arial, sans-serif; font-size: 14px;">Hello</div><div style="font-family: Arial, sans-serif; font-size: 14px;"><p style="margin:0.0px 0.0px 0.0px 0.0px;font:13.0px 'Helvetica Neue'">您好</p><p style="margin:0.0px 0.0px 0.0px 0.0px;font:13.0px 'Helvetica Neue'">这是一次测试。</p><p style="margin:0.0px 0.0px 0.0px 0.0px;font:13.0px 'PingFang SC'">此致。</p></div><div style="font-family: Arial, sans-serif; font-size: 14px;" class=""><div class="">Sent with <a href="" target="_blank" rel="noopener noreferrer">Mail</a> secure email.</div></div></blockquote>`,
+			expected: `<div dir="auto">Looks good.</div><div dir="auto"><br></div><div dir="auto">-- <br></div><div dir="auto"> Secured with Mail Provider: <br></div><div dir="auto"> <a href="" rel="noopener noreferrer" target="_blank"></a><br></div><div dir="auto"><br></div><div dir="auto"><br></div><div dir="auto">28 Jul 2025 at 12:49 by sender@example.com:<br></div><blockquote class="quote" style="border-left: 1px solid #93A3B8; padding-left: 10px; margin-left: 5px;"><div style="font-family: Arial, sans-serif; font-size: 14px;">Hello<br></div><div style="font-family: Arial, sans-serif; font-size: 14px;"><br></div><div style="font-family: Arial, sans-serif; font-size: 14px;"><p style="margin:0.0px 0.0px 0.0px 0.0px;font:13.0px 'Helvetica Neue'">您好<br></p><p style="margin:0.0px 0.0px 0.0px 0.0px;font:13.0px 'Helvetica Neue'">这是一次测试。<br></p><p style="margin:0.0px 0.0px 0.0px 0.0px;font:13.0px 'PingFang SC'">此致。<br></p></div><div style="font-family: Arial, sans-serif; font-size: 14px;"><br></div><div style="font-family: Arial, sans-serif; font-size: 14px;" class=""><div class=""><br></div><div class="">Sent with <a href="" target="_blank" rel="noopener noreferrer">Mail</a> secure email.<br></div></div></blockquote>`,
+		},
+		{
+			// FairEmail wraps each line in an inline <span>, so the <br> tags are the only line breaks
+			name: "FairEmail message without header is unchanged",
+			input: `<html>
+ <body lang="en">
+  <div style="font-family: sans-serif;">
+   <span dir="ltr" style="margin-top:0; margin-bottom:0;">This is a test message</span>
+   <br>
+   <br>
+   <span dir="ltr" style="margin-top:0; margin-bottom:0;">New line</span>
+   <br>
+   <span dir="ltr" style="margin-top:0; margin-bottom:0;">Line</span>
+   <br>
+  </div>
+ </body>
+</html>`,
+			expected: `<html>
+ <body lang="en">
+  <div style="font-family: sans-serif;">
+   <span dir="ltr" style="margin-top:0; margin-bottom:0;">This is a test message</span>
+   <br>
+   <br>
+   <span dir="ltr" style="margin-top:0; margin-bottom:0;">New line</span>
+   <br>
+   <span dir="ltr" style="margin-top:0; margin-bottom:0;">Line</span>
+   <br>
+  </div>
+ </body>
+</html>`,
+		},
+		{
+			name:     "empty div blank lines without header are unchanged",
+			input:    `<div dir="ltr"><div>Hello</div><div><br></div><div>Second paragraph</div><div><br /></div></div>`,
+			expected: `<div dir="ltr"><div>Hello</div><div><br></div><div>Second paragraph</div><div><br /></div></div>`,
+		},
+		{
+			name:     "br variants without header are unchanged",
+			input:    `<p>Line 1<br>Line 2<br/>Line 3<br />Line 4<BR>Line 5</p>`,
+			expected: `<p>Line 1<br>Line 2<br/>Line 3<br />Line 4<BR>Line 5</p>`,
+		},
+		{
+			name: "removes spacers after header but keeps line breaks in following content",
+			input: `<table style="width: 100%;"><tr><td><div>This email was sent to <a href="mailto:user@example.com">user@example.com</a> from <a href="mailto:sender@example.com">sender@example.com</a></div><br></td></tr></table>
+<br>
+<div><br></div>
+<p>Line 1<br>Line 2</p><div><br></div><p>Line 3</p>`,
+			expected: `<p>Line 1<br>Line 2</p><div><br></div><p>Line 3</p>`,
+		},
+		{
+			name: "reply above quoted header keeps its line breaks",
+			input: `<div>Thanks,<br>Alice</div><div><br></div><blockquote><table style="width: 100%;">
+    <tr>
+        <td>
+            <div style="padding: 15px;">
+                This email was sent to
+                <a href="mailto:alias@example.com">alias@example.com</a>
+                from
+                <a href="mailto:sender@example.com">sender@example.com</a>
+            </div>
+            <br>
+        </td>
+    </tr>
+</table>
+<br>
+<p>Original line 1<br>Original line 2</p></blockquote>`,
+			expected: `<div>Thanks,<br>Alice</div><div><br></div><blockquote><p>Original line 1<br>Original line 2</p></blockquote>`,
 		},
 	}
 

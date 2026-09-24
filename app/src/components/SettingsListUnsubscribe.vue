@@ -22,7 +22,7 @@
             </select>
         </div>
         <button type="submit" class="cta sm" :disabled="saving">
-            Update List-Unsubscribe Behaviour
+            Update List-Unsubscribe
         </button>
         <p v-if="error" id="list-unsubscribe-behaviour-error" class="error">Error: {{ error }}</p>
         <p v-if="success" class="success">{{ success }}</p>

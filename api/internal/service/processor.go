@@ -199,14 +199,16 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 		}
 
 		toHeader := to
+		listUnsubscribe := model.ListUnsubscribeHeaders{}
 		if relayType == model.Forward {
 			toHeader = utils.CombineForwardTo(to, msg.To, model.GenerateReplyTo)
+			listUnsubscribe = s.ListUnsubscribeHeaders(settings, alias, msg)
 		}
 
 		for _, recipient := range recipients {
 			g.Go(func() error {
 				// Queue Message
-				err = s.QueueMessage(msg.From, msg.FromName, to, toHeader, recipient, data, alias, relayType, settings)
+				err = s.QueueMessage(msg.From, msg.FromName, to, toHeader, recipient, data, alias, relayType, settings, listUnsubscribe)
 				if err != nil {
 					return err
 				}
@@ -228,7 +230,7 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 	return g.Wait()
 }
 
-func (s *Service) QueueMessage(from string, fromName string, to string, toHeader string, rcp model.Recipient, data []byte, alias model.Alias, msgType model.MessageType, settings model.Settings) error {
+func (s *Service) QueueMessage(from string, fromName string, to string, toHeader string, rcp model.Recipient, data []byte, alias model.Alias, msgType model.MessageType, settings model.Settings, listUnsubscribe model.ListUnsubscribeHeaders) error {
 	mailer := mailer.New(s.Cfg.SMTPClient)
 
 	// Queue Forward
@@ -238,7 +240,7 @@ func (s *Service) QueueMessage(from string, fromName string, to string, toHeader
 			"from":  from,
 		}
 		generatedFrom := model.GenerateReplyTo(alias.Name, from)
-		err := mailer.Forward(generatedFrom, fromName, toHeader, rcp, data, "header.tmpl", templateData, settings, alias)
+		err := mailer.Forward(generatedFrom, fromName, toHeader, rcp, data, "header.tmpl", templateData, settings, alias, listUnsubscribe)
 		if err != nil {
 			if settings.LogIssues {
 				err := s.ProcessDiagnosticLog(alias, from, rcp.Email, err.Error(), model.DeferredDelivery)

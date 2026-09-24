@@ -42,6 +42,15 @@ func NormalizeBlocklistValue(itemType BlocklistType, value string) string {
 	return value
 }
 
+// BlocklistValueRules returns the validator rules a normalized value of the given type must pass.
+func BlocklistValueRules(itemType BlocklistType) string {
+	if itemType == BlocklistEmail {
+		return "required,max=254,emailx"
+	}
+
+	return "required,max=253,fqdn"
+}
+
 // BlocklistCandidates returns the values a sender address can match: the address itself for
 // email items, and its domain plus every parent domain for domain items, so blocking
 // "example.com" also blocks "mail.example.com".

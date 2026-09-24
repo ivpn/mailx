@@ -94,6 +94,11 @@
                 >
             </div>
             <hr>
+            <SettingsListUnsubscribe
+                v-if="loaded"
+                :initial-behaviour="req.list_unsubscribe_behaviour"
+            />
+            <hr>
             <h4>Diagnostic Logs</h4>
             <p>
                 Track your failed email deliveries (bounces) and forwarding issues in <router-link to="/account/diagnostics">Diagnostics</router-link>. When enabled, diagnostic logs are recorded and stored for 7 days.
@@ -140,6 +145,7 @@ import axios from 'axios'
 import { settingsApi } from '../api/settings.ts'
 import { recipientApi } from '../api/recipient.ts'
 import { logApi } from '../api/log.ts'
+import SettingsListUnsubscribe from './SettingsListUnsubscribe.vue'
 
 const req = ref({
     id: '',
@@ -149,6 +155,7 @@ const req = ref({
     alias_format: '',
     log_issues: false,
     remove_header: false,
+    list_unsubscribe_behaviour: 0,
 })
 const envDomains = import.meta.env.VITE_DOMAINS.split(',')
 const domains = ref(envDomains)

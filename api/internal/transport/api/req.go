@@ -91,6 +91,10 @@ type SettingsReq struct {
 	RemoveHeader bool   `json:"remove_header"`
 }
 
+type ListUnsubscribeBehaviourReq struct {
+	Behaviour *int `json:"list_unsubscribe_behaviour"`
+}
+
 type DeleteUserReq struct {
 	OTP string `json:"otp" validate:"required,len=8"`
 }

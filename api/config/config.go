@@ -33,6 +33,8 @@ type APIConfig struct {
 	PreauthPSK                string
 	PreauthTTL                time.Duration
 	AnnouncementsURL          string
+	PublicURL                 string
+	UnsubscribeSecret         string
 }
 
 type DBConfig struct {
@@ -202,6 +204,8 @@ func New() (Config, error) {
 			PreauthPSK:                os.Getenv("PREAUTH_PSK"),
 			PreauthTTL:                preauthTTL,
 			AnnouncementsURL:          os.Getenv("ANNOUNCEMENTS_URL"),
+			PublicURL:                 strings.TrimSuffix(os.Getenv("API_PUBLIC_URL"), "/"),
+			UnsubscribeSecret:         os.Getenv("UNSUBSCRIBE_SIGNING_SECRET"),
 		},
 		DB: DBConfig{
 			Hosts:    dbHosts,

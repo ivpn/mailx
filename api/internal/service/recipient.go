@@ -431,6 +431,16 @@ func (s *Service) resolveCatchAll(domainPart string, candidateName string, isRep
 		return true, nil, catchAllAlias, ErrDisabledDomain
 	}
 
+	// A deleted alias keeps its address out of the catch-all, so deleting it (e.g. through a
+	// one-click unsubscribe) stops its mail instead of the catch-all forwarding it anyway.
+	deleted, err := s.Store.IsAliasNameDeleted(candidateName)
+	if err != nil {
+		log.Printf("error checking for deleted catch-all alias: %s", err.Error())
+	}
+	if deleted {
+		return true, nil, catchAllAlias, ErrDeletedAlias
+	}
+
 	recipientEmail := domain.Recipient
 	if recipientEmail == "" {
 		settings, err := s.GetSettings(context.Background(), domain.UserID)

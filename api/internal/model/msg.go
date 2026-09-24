@@ -21,13 +21,15 @@ var (
 )
 
 type Msg struct {
-	From              string
-	FromName          string
-	To                []string
-	Subject           string
-	Body              string
-	Type              MessageType
-	EnvelopeRecipient string
+	From                string
+	FromName            string
+	To                  []string
+	Subject             string
+	Body                string
+	Type                MessageType
+	EnvelopeRecipient   string
+	ListUnsubscribe     string
+	ListUnsubscribePost string
 }
 
 func ParseMsg(data []byte) (Msg, error) {
@@ -105,13 +107,15 @@ func ParseMsg(data []byte) (Msg, error) {
 	}
 
 	return Msg{
-		From:              fromAddress,
-		FromName:          from.Name,
-		To:                to,
-		Subject:           subject,
-		Body:              body,
-		Type:              msgType,
-		EnvelopeRecipient: deliveredTo,
+		From:                fromAddress,
+		FromName:            from.Name,
+		To:                  to,
+		Subject:             subject,
+		Body:                body,
+		Type:                msgType,
+		EnvelopeRecipient:   deliveredTo,
+		ListUnsubscribe:     strings.TrimSpace(msg.Header.Get("List-Unsubscribe")),
+		ListUnsubscribePost: strings.TrimSpace(msg.Header.Get("List-Unsubscribe-Post")),
 	}, nil
 }
 

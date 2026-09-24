@@ -57,6 +57,16 @@ func (c *totpTestCache) Get(ctx context.Context, key string) (string, error) {
 	return v, nil
 }
 
+func (c *totpTestCache) SetNX(ctx context.Context, key string, value any, exp time.Duration) (bool, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if _, ok := c.data[key]; ok {
+		return false, nil
+	}
+	c.data[key] = fmt.Sprintf("%v", value)
+	return true, nil
+}
+
 func (c *totpTestCache) Del(ctx context.Context, key string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()

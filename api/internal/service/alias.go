@@ -15,6 +15,7 @@ var (
 	ErrGetAliases           = errors.New("Unable to retrieve aliases.")
 	ErrGetAliasByName       = errors.New("alias not found:")
 	ErrDisabledAlias        = errors.New("alias disabled:")
+	ErrDeletedAlias         = errors.New("alias deleted:")
 	ErrDisabledDomain       = errors.New("domain disabled:")
 	ErrPostAlias            = errors.New("Unable to create alias. Please try again.")
 	ErrPostInboundAlias     = errors.New("Unable to create inbound alias. Please try again.")
@@ -55,6 +56,8 @@ type AliasStore interface {
 	DeleteAliasByDomain(context.Context, string, string) error
 	RestoreAlias(context.Context, string, string) error
 	GetAliasUnscoped(context.Context, string, string) (model.Alias, error)
+	GetAliasByIDUnscoped(context.Context, string) (model.Alias, error)
+	IsAliasNameDeleted(string) (bool, error)
 	ForgetAlias(context.Context, string, string) error
 	BulkUpdateAliasEnabled(context.Context, []string, string, bool) error
 	BulkUpdateAliasPinned(context.Context, []string, string, bool) error

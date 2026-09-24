@@ -312,6 +312,21 @@ func (d *Database) GetAliasUnscoped(ctx context.Context, ID string, userID strin
 	return alias, err
 }
 
+// GetAliasByIDUnscoped fetches an alias by ID alone, regardless of soft-delete state, for
+// requests that are authorised by a signed URL instead of a user session.
+func (d *Database) GetAliasByIDUnscoped(ctx context.Context, ID string) (model.Alias, error) {
+	var alias model.Alias
+	err := d.Client.WithContext(ctx).Unscoped().Where("id = ?", ID).First(&alias).Error
+	return alias, err
+}
+
+// IsAliasNameDeleted reports whether a soft-deleted alias holds the given name.
+func (d *Database) IsAliasNameDeleted(name string) (bool, error) {
+	var count int64
+	err := d.Client.Unscoped().Model(&model.Alias{}).Where("name = ? AND deleted_at IS NOT NULL", name).Count(&count).Error
+	return count > 0, err
+}
+
 // ForgetAlias permanently removes an alias row, regardless of its soft-delete state - the
 // same effect as the automatic 90-day cleanup job, but triggered immediately by the user.
 func (d *Database) ForgetAlias(ctx context.Context, ID string, userID string) error {

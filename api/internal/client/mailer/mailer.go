@@ -182,7 +182,7 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 
 // buildForwardMessage builds the outgoing forward message without dialing the network,
 // so the To: header logic can be unit tested in isolation.
-func (mailer Mailer) buildForwardMessage(from string, name string, to string, rcp model.Recipient, data []byte, templateFile string, templateData any, settings model.Settings, alias model.Alias) (*gomail.Message, string, error) {
+func (mailer Mailer) buildForwardMessage(from string, name string, to string, rcp model.Recipient, data []byte, templateFile string, templateData any, settings model.Settings, alias model.Alias, listUnsubscribe model.ListUnsubscribeHeaders) (*gomail.Message, string, error) {
 	// Preprocess email data to decode RFC 2047 encoded headers
 	processedData, err := utils.PreprocessEmailData(data)
 	if err != nil {
@@ -294,6 +294,7 @@ func (mailer Mailer) buildForwardMessage(from string, name string, to string, rc
 	m.SetHeader("X-Report-Abuse", mailer.cfg.Report)
 	m.SetHeader("X-Report-Abuse-To", mailer.cfg.Report)
 	m.SetHeader("Feedback-ID", fmt.Sprintf("mailx:%x:forward", sha256.Sum256([]byte(mailer.cfg.TokenSecret+alias.ID))))
+	setListUnsubscribe(m, listUnsubscribe)
 
 	// PGP/Inline encryption
 	if rcp.PGPEnabled && rcp.PGPKey != "" && rcp.PGPInline {
@@ -335,6 +336,8 @@ func (mailer Mailer) buildForwardMessage(from string, name string, to string, rc
 		if err != nil {
 			return nil, "", err
 		}
+		// Kept on the outer message so mail clients can still offer unsubscribe
+		setListUnsubscribe(em, listUnsubscribe)
 
 		return em, string(email.Headers.MessageID), nil
 	}
@@ -342,8 +345,21 @@ func (mailer Mailer) buildForwardMessage(from string, name string, to string, rc
 	return m, string(email.Headers.MessageID), nil
 }
 
-func (mailer Mailer) Forward(from string, name string, to string, rcp model.Recipient, data []byte, templateFile string, templateData any, settings model.Settings, alias model.Alias) error {
-	m, messageID, err := mailer.buildForwardMessage(from, name, to, rcp, data, templateFile, templateData, settings, alias)
+// setListUnsubscribe sets the List-Unsubscribe headers built for the forward. The original
+// message's headers are never copied over, so they can't appear twice.
+func setListUnsubscribe(m *gomail.Message, listUnsubscribe model.ListUnsubscribeHeaders) {
+	if listUnsubscribe.Value == "" {
+		return
+	}
+
+	m.SetHeader("List-Unsubscribe", listUnsubscribe.Value)
+	if listUnsubscribe.Post != "" {
+		m.SetHeader("List-Unsubscribe-Post", listUnsubscribe.Post)
+	}
+}
+
+func (mailer Mailer) Forward(from string, name string, to string, rcp model.Recipient, data []byte, templateFile string, templateData any, settings model.Settings, alias model.Alias, listUnsubscribe model.ListUnsubscribeHeaders) error {
+	m, messageID, err := mailer.buildForwardMessage(from, name, to, rcp, data, templateFile, templateData, settings, alias, listUnsubscribe)
 	if err != nil {
 		return err
 	}

@@ -3,6 +3,7 @@ package api
 import (
 	"time"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/healthcheck"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
@@ -11,6 +12,7 @@ import (
 	_ "ivpn.net/email/api/docs"
 	"ivpn.net/email/api/internal/middleware/auth"
 	"ivpn.net/email/api/internal/middleware/limit"
+	"ivpn.net/email/api/internal/model"
 )
 
 func (h *Handler) SetupRoutes(cfg config.APIConfig) {
@@ -38,6 +40,21 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	h.Server.Post("/v1/login/finish", limiter.New(), h.FinishLogin)
 	h.Server.Post("/v1/login/passkey/begin", limiter.New(), h.BeginPasskeyLogin)
 	h.Server.Post("/v1/login/passkey/finish", limiter.New(), h.FinishPasskeyLogin)
+
+	// One-click unsubscribe (RFC 8058), called by the user's mail provider with a signed URL.
+	// A GET (link scanners, prefetchers) must never trigger the action.
+	oneClickLimit := limit.New(6, time.Minute)
+	oneClickSigned := auth.NewSignedURL(h.Service.OneClickSigner())
+	oneClickRoutes := map[string]fiber.Handler{
+		model.OneClickDeactivatePath + ":alias":  h.DeactivateOneClick,
+		model.OneClickDeletePath + ":alias":      h.DeleteOneClick,
+		model.OneClickBlockEmailPath + ":alias":  h.BlockEmailOneClick,
+		model.OneClickBlockDomainPath + ":alias": h.BlockDomainOneClick,
+	}
+	for path, handler := range oneClickRoutes {
+		h.Server.Post(path, oneClickLimit, oneClickSigned, handler)
+		h.Server.Get(path, h.MethodNotAllowedOneClick)
+	}
 
 	session := h.Server.Group("/v1/pasession")
 	session.Use(auth.NewIPFilter(cfg.ApiAllowIPs))
@@ -84,6 +101,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Get("/settings", h.GetSettings)
 	v1.Get("/defaults", h.GetDefaults)
 	v1.Put("/settings", h.UpdateSettings)
+	v1.Put("/settings/list-unsubscribe-behaviour", h.UpdateListUnsubscribeBehaviour)
 
 	v1.Get("/recipient/:id", h.GetRecipient)
 	v1.Get("/recipients", h.GetRecipients)

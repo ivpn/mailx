@@ -25,6 +25,7 @@ type Service interface {
 	DomainService
 	BlocklistService
 	StepUpService
+	OneClickService
 }
 
 type Handler struct {

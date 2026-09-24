@@ -21,6 +21,7 @@ type fakeStore struct {
 	Store
 
 	aliases            map[string]model.Alias
+	deletedAliasNames  map[string]bool
 	domains            map[string]model.Domain
 	settingsByUser     map[string]model.Settings
 	verifiedRecipients map[string][]model.Recipient
@@ -46,6 +47,10 @@ func (f *fakeStore) GetAliasByName(name string) (model.Alias, error) {
 		return model.Alias{}, errNotFound
 	}
 	return alias, nil
+}
+
+func (f *fakeStore) IsAliasNameDeleted(name string) (bool, error) {
+	return f.deletedAliasNames[name], nil
 }
 
 func (f *fakeStore) GetVerifiedDomainByName(ctx context.Context, name string) (model.Domain, error) {
@@ -548,6 +553,28 @@ func TestFindRecipients_PlainAddressOnCatchAllDomainIsAutoCreated(t *testing.T) 
 	}
 	if alias.Origin != model.Inbound {
 		t.Errorf("expected Origin == Inbound so PostInboundAlias auto-creates the alias, got %v", alias.Origin)
+	}
+}
+
+func TestFindRecipients_DeletedAliasOnCatchAllDomainIsNotForwarded(t *testing.T) {
+	store := newFakeStore()
+	store.domains["domain.net"] = model.Domain{
+		Name:      "domain.net",
+		UserID:    "user-6d",
+		Enabled:   true,
+		CatchAll:  true,
+		Recipient: "catchall@example.com",
+	}
+	store.verifiedRecipients["user-6d"] = []model.Recipient{{Email: "catchall@example.com", IsActive: true}}
+	store.deletedAliasNames = map[string]bool{"deleted@domain.net": true}
+	s := newTestService(store)
+
+	rcps, _, _, err := s.FindRecipients("sender@somewhere.com", "deleted@domain.net", model.Send)
+	if !errors.Is(err, ErrDeletedAlias) {
+		t.Fatalf("expected ErrDeletedAlias, got %v", err)
+	}
+	if len(rcps) != 0 {
+		t.Errorf("expected no recipients for a deleted alias, got %+v", rcps)
 	}
 }
 

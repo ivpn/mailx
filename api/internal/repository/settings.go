@@ -32,6 +32,18 @@ func (d *Database) UpdateSettings(ctx context.Context, settings model.Settings) 
 	}).Error
 }
 
+func (d *Database) UpdateListUnsubscribeBehaviour(ctx context.Context, userID string, behaviour model.ListUnsubscribeBehaviour) error {
+	q := d.Client.Model(&model.Settings{}).Where("user_id = ?", userID).Update("list_unsubscribe_behaviour", behaviour)
+	if q.Error != nil {
+		return q.Error
+	}
+	if q.RowsAffected == 0 {
+		return fmt.Errorf("could not find settings by user ID")
+	}
+
+	return nil
+}
+
 func (d *Database) DeleteSettings(ctx context.Context, userID string) error {
 	return d.Client.Where("user_id = ?", userID).Delete(&model.Settings{}).Error
 }

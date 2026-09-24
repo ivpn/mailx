@@ -18,6 +18,7 @@ type SettingsStore interface {
 	GetSettings(context.Context, string) (model.Settings, error)
 	PostSettings(context.Context, model.Settings) error
 	UpdateSettings(context.Context, model.Settings) error
+	UpdateListUnsubscribeBehaviour(context.Context, string, model.ListUnsubscribeBehaviour) error
 	DeleteSettings(context.Context, string) error
 }
 

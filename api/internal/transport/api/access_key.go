@@ -294,15 +294,16 @@ func (h *Handler) GetDefaults(c *fiber.Ctx) error {
 	}
 
 	return c.Status(200).JSON(fiber.Map{
-		"id":             settings.ID,
-		"domain":         settings.Domain,
-		"domains":        strings.Split(h.Cfg.Domains, ","),
-		"custom_domains": customDomains,
-		"recipient":      settings.Recipient,
-		"recipients":     rcps,
-		"alias_format":   settings.AliasFormat,
-		"from_name":      settings.FromName,
-		"log_issues":     settings.LogIssues,
-		"remove_header":  settings.RemoveHeader,
+		"id":                         settings.ID,
+		"domain":                     settings.Domain,
+		"domains":                    strings.Split(h.Cfg.Domains, ","),
+		"custom_domains":             customDomains,
+		"recipient":                  settings.Recipient,
+		"recipients":                 rcps,
+		"alias_format":               settings.AliasFormat,
+		"from_name":                  settings.FromName,
+		"log_issues":                 settings.LogIssues,
+		"remove_header":              settings.RemoveHeader,
+		"list_unsubscribe_behaviour": settings.ListUnsubscribeBehaviour,
 	})
 }

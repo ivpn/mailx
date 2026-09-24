@@ -92,18 +92,14 @@ func (h *Handler) PostBlocklistItem(c *fiber.Ctx) error {
 	// Validate the value against its type, in the form it's stored and matched in
 	itemType := model.BlocklistType(req.Type)
 	value := model.NormalizeBlocklistValue(itemType, req.Value)
-	if itemType == model.BlocklistEmail {
-		if err := h.Validator.Var(value, "required,max=254,emailx"); err != nil {
-			return c.Status(400).JSON(fiber.Map{
-				"error": ErrInvalidBlocklistEmail,
-			})
+	if err := h.Validator.Var(value, model.BlocklistValueRules(itemType)); err != nil {
+		errMsg := ErrInvalidBlocklistDomain
+		if itemType == model.BlocklistEmail {
+			errMsg = ErrInvalidBlocklistEmail
 		}
-	} else {
-		if err := h.Validator.Var(value, "required,max=253,fqdn"); err != nil {
-			return c.Status(400).JSON(fiber.Map{
-				"error": ErrInvalidBlocklistDomain,
-			})
-		}
+		return c.Status(400).JSON(fiber.Map{
+			"error": errMsg,
+		})
 	}
 
 	// Post blocklist item

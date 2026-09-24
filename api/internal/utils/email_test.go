@@ -193,6 +193,32 @@ func TestRemoveHtmlHeader(t *testing.T) {
 <p>Original line 1<br>Original line 2</p></blockquote>`,
 			expected: `<div>Thanks,<br>Alice</div><div><br></div><blockquote><p>Original line 1<br>Original line 2</p></blockquote>`,
 		},
+		{
+			name: "keeps signature table above quoted header",
+			input: `<div>Thanks</div><table class="signature"><tr><td>Alice Smith<br>ACME Corp</td></tr></table><div>Sent from Outlook</div><blockquote><table style="width: 100%;"><tr><td><div>This email was sent to <a href="mailto:alias@example.com">alias@example.com</a> from <a href="mailto:sender@example.com">sender@example.com</a></div><br></td></tr></table><br>
+<p>Original</p></blockquote>`,
+			expected: `<div>Thanks</div><table class="signature"><tr><td>Alice Smith<br>ACME Corp</td></tr></table><div>Sent from Outlook</div><blockquote><p>Original</p></blockquote>`,
+		},
+		{
+			name:     "keeps layout table wrapping the quoted header",
+			input:    `<table class="layout"><tr><td><p>Reply</p><blockquote><table style="width: 100%;"><tr><td><div>This email was sent to <a href="mailto:alias@example.com">alias@example.com</a> from <a href="mailto:sender@example.com">sender@example.com</a></div><br></td></tr></table><br><p>Original</p></blockquote></td></tr></table>`,
+			expected: `<table class="layout"><tr><td><p>Reply</p><blockquote><p>Original</p></blockquote></td></tr></table>`,
+		},
+		{
+			name:     "keeps table in original message after quoted header",
+			input:    `<table style="width: 100%;"><tr><td><div>This email was sent to <a href="mailto:alias@example.com">alias@example.com</a> from <a href="mailto:sender@example.com">sender@example.com</a></div><br></td></tr></table><br><table class="invoice"><tr><td>Total</td><td>10 EUR</td></tr></table>`,
+			expected: `<table class="invoice"><tr><td>Total</td><td>10 EUR</td></tr></table>`,
+		},
+		{
+			name:     "keeps content when header text is not inside a table",
+			input:    `<table class="signature"><tr><td>Alice Smith</td></tr></table><div>This email was sent to <a href="mailto:alias@example.com">alias@example.com</a> from <a href="mailto:sender@example.com">sender@example.com</a></div><table class="invoice"><tr><td>Total</td></tr></table>`,
+			expected: `<table class="signature"><tr><td>Alice Smith</td></tr></table><div>This email was sent to <a href="mailto:alias@example.com">alias@example.com</a> from <a href="mailto:sender@example.com">sender@example.com</a></div><table class="invoice"><tr><td>Total</td></tr></table>`,
+		},
+		{
+			name:     "uppercase table tags",
+			input:    `<p>Reply</p><TABLE WIDTH="100%"><TR><TD><DIV>This email was sent to <A HREF="mailto:alias@example.com">alias@example.com</A> from <A HREF="mailto:sender@example.com">sender@example.com</A></DIV></TD></TR></TABLE><BR><p>Original</p>`,
+			expected: `<p>Reply</p><p>Original</p>`,
+		},
 	}
 
 	for _, tt := range tests {

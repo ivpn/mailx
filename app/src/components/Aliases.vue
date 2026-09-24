@@ -148,7 +148,7 @@
                                         <button v-bind:disabled="!canPin || bulkLoading" @click="bulkPin">Pin</button>
                                         <button v-bind:disabled="!canUnpin || bulkLoading" @click="bulkUnpin">Unpin</button>
                                         <button v-bind:disabled="!canDelete || bulkLoading" @click="bulkDelete" class="delete">Delete</button>
-                                        <button v-bind:disabled="!canForget || bulkLoading" @click="bulkForget" class="delete">Forget</button>
+                                        <button v-if="canForget" v-bind:disabled="bulkLoading" @click="bulkForget" class="delete">Forget</button>
                                         <button v-bind:disabled="!canRestore || bulkLoading" @click="bulkRestore">Restore</button>
                                         <span class="text-tertiary text-sm ml-auto">{{ selectedCount }} selected</span>
                                     </div>

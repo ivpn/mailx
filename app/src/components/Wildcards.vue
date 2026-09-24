@@ -130,7 +130,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, computed, nextTick } from 'vue'
+import { onMounted, onUnmounted, ref, computed, watch, nextTick } from 'vue'
 import axios from 'axios'
 import { aliasApi } from '../api/alias'
 import { settingsApi } from '../api/settings.ts'
@@ -142,6 +142,7 @@ import Pagination from './Pagination.vue'
 import events from '../events.ts'
 import { RouterLink } from 'vue-router'
 import { closeDropdowns, initDropdowns, initOverlays, initTooltips } from '../lib/preline.ts'
+import { useBreakpoint } from '../lib/useBreakpoint.ts'
 
 const alias = {
     id: '',
@@ -257,6 +258,13 @@ const bindPreline = () => {
     initDropdowns()
     initOverlays()
 }
+
+// Crossing the breakpoint swaps every AliasRow between its desktop and tablet <tr>, so the row
+// dropdowns are brand-new elements Preline has never bound.
+const { isDesktop } = useBreakpoint()
+watch(isDesktop, () => {
+    nextTick(() => initDropdowns())
+})
 
 const onUpdatePage = (obj: any) => {
     limit.value = obj.limit

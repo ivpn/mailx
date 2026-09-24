@@ -200,6 +200,7 @@ import Pagination from './Pagination.vue'
 import events from '../events.ts'
 import { RouterLink } from 'vue-router'
 import { closeDropdowns, initDropdowns, initOverlays, initTooltips } from '../lib/preline.ts'
+import { useBreakpoint } from '../lib/useBreakpoint.ts'
 
 const alias = {
     id: '',
@@ -298,6 +299,13 @@ watchEffect(() => {
 // The status dropdown <th> is destroyed/recreated when the bulk toolbar toggles, so
 // Preline's dropdown widget (bound at autoInit() time) needs to be re-bound for it to work.
 watch(selectedCount, () => {
+    nextTick(() => initDropdowns())
+})
+
+// Crossing the breakpoint swaps every AliasRow between its desktop and tablet <tr>, so the row
+// dropdowns are brand-new elements Preline has never bound.
+const { isDesktop } = useBreakpoint()
+watch(isDesktop, () => {
     nextTick(() => initDropdowns())
 })
 

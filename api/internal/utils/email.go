@@ -58,15 +58,49 @@ func CombineForwardTo(primary string, all []string, encode func(alias, to string
 	return header.String()
 }
 
+var (
+	htmlHeaderMarkerRe  = regexp.MustCompile(`(?i)This email was sent to`)
+	htmlTableOpenRe     = regexp.MustCompile(`(?i)<table\b[^>]*>`)
+	htmlTableCloseRe    = regexp.MustCompile(`(?i)</table\s*>`)
+	htmlHeaderSpacersRe = regexp.MustCompile(`(?i)^(\s*<br\s*/?>|\s*<div[^>]*>\s*(<br\s*/?>)?\s*</div>)*\s*`)
+)
+
+// RemoveHtmlHeader removes the quoted HTML header (the <table> containing
+// "This email was sent to") plus any <br> tags or empty <div><br></div> spacers
+// immediately following it. Spacers elsewhere in the message are the sender's
+// own line breaks and are kept.
 func RemoveHtmlHeader(html string) string {
-	// Relaxed regex: match any <table> containing "This email was sent to" and ending at </table>
-	re := regexp.MustCompile(`(?is)<table[^>]*>.*?This email was sent to.*?</table>`)
-	cleaned := re.ReplaceAllString(html, "")
+	var out strings.Builder
+	rest := html
 
-	// Optionally clean up one or more immediate trailing <br> tags or empty <div><br></div>
-	cleaned = regexp.MustCompile(`(?i)(\s*<br\s*/?>\s*|<div[^>]*>\s*(<br\s*/?>)?\s*</div>)+`).ReplaceAllString(cleaned, "")
+	for {
+		marker := htmlHeaderMarkerRe.FindStringIndex(rest)
+		if marker == nil {
+			break
+		}
 
-	return cleaned
+		// The header starts at the <table> nearest to the marker. Matching from an
+		// earlier <table> would also remove the sender's own tables above the quote
+		// (e.g. an HTML signature) and everything between them and the header.
+		opens := htmlTableOpenRe.FindAllStringIndex(rest[:marker[0]], -1)
+		closing := htmlTableCloseRe.FindStringIndex(rest[marker[1]:])
+		if len(opens) == 0 || closing == nil || htmlTableCloseRe.MatchString(rest[opens[len(opens)-1][1]:marker[0]]) {
+			// Marker is not inside a table, so it is not the header
+			out.WriteString(rest[:marker[1]])
+			rest = rest[marker[1]:]
+			continue
+		}
+
+		start := opens[len(opens)-1][0]
+		end := marker[1] + closing[1]
+		end += len(htmlHeaderSpacersRe.FindString(rest[end:]))
+
+		out.WriteString(rest[:start])
+		rest = rest[end:]
+	}
+
+	out.WriteString(rest)
+	return out.String()
 }
 
 func EncryptWithPGPInline(plainText string, recipientKey string) (string, error) {

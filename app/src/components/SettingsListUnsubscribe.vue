@@ -39,9 +39,9 @@ const props = defineProps({
 })
 
 const options = [
-    { value: 0, label: 'Use original List-Unsubscribe, fallback to one-click deactivate' },
-    { value: 1, label: 'Use one-click deactivate' },
-    { value: 2, label: 'Use one-click delete' },
+    { value: 0, label: 'Use original List-Unsubscribe, fallback to one-click deactivate alias' },
+    { value: 1, label: 'Use one-click deactivate alias' },
+    { value: 2, label: 'Use one-click delete alias' },
     { value: 3, label: 'Use one-click block sender email' },
     { value: 4, label: 'Use one-click block sender domain' },
 ]

@@ -294,7 +294,12 @@ func (s *Service) DeleteRecipientByUserID(ctx context.Context, userID string) er
 func (s *Service) FindRecipients(from string, to string, msgType model.MessageType) ([]model.Recipient, model.Alias, model.MessageType, error) {
 	aliasName, replyTo := model.ParseReplyTo(to)
 
-	alias, err := s.GetAliasByName(aliasName)
+	// An alias whose name itself contains "+" (e.g. a Custom or catch-all created alias) must
+	// match verbatim before falling back to the base alias with the "+tag" stripped.
+	alias, err := s.GetAliasByName(to)
+	if err != nil && aliasName != to {
+		alias, err = s.GetAliasByName(aliasName)
+	}
 	// Fall back to a Wildcard Alias match (e.g. "*+suffix@domain.com" or "*.suffix@domain.com")
 	// before giving up, trying each supported delimiter in turn.
 	if err != nil {

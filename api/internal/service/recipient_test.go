@@ -177,6 +177,68 @@ func TestFindRecipients_PlusTagResolvesExistingAlias(t *testing.T) {
 	}
 }
 
+// An alias whose name itself contains "+" (Custom or catch-all created) must resolve
+// verbatim, not be stripped to its base and routed to the catch-all.
+func TestFindRecipients_AliasWithPlusInNameResolvesVerbatim(t *testing.T) {
+	store := newFakeStore()
+	store.aliases["a+b-c_d897611@customdomain.com"] = model.Alias{
+		BaseModel:  model.BaseModel{ID: "alias-1b"},
+		Name:       "a+b-c_d897611@customdomain.com",
+		UserID:     "user-1b",
+		Enabled:    true,
+		Recipients: "rcpt@example.com",
+	}
+	store.domains["customdomain.com"] = model.Domain{
+		Name:     "customdomain.com",
+		UserID:   "user-1b",
+		Enabled:  true,
+		CatchAll: true,
+	}
+	store.recipients["user-1b"] = []model.Recipient{{Email: "rcpt@example.com"}}
+	s := newTestService(store)
+
+	rcps, alias, msgType, err := s.FindRecipients("sender@somewhere.com", "a+b-c_d897611@customdomain.com", model.Send)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if alias.ID != "alias-1b" {
+		t.Errorf("expected existing alias alias-1b, got %+v", alias)
+	}
+	if msgType != model.Forward {
+		t.Errorf("expected msgType Forward, got %v", msgType)
+	}
+	if len(rcps) != 1 || rcps[0].Email != "rcpt@example.com" {
+		t.Errorf("expected recipient rcpt@example.com, got %+v", rcps)
+	}
+}
+
+// When both the base alias and a "+"-named alias exist, the exact match wins.
+func TestFindRecipients_ExactPlusAliasPreferredOverBaseAlias(t *testing.T) {
+	store := newFakeStore()
+	store.aliases["myalias@mailx.net"] = model.Alias{
+		BaseModel: model.BaseModel{ID: "alias-base"},
+		Name:      "myalias@mailx.net",
+		UserID:    "user-1c",
+		Enabled:   true,
+	}
+	store.aliases["myalias+shop@mailx.net"] = model.Alias{
+		BaseModel: model.BaseModel{ID: "alias-exact"},
+		Name:      "myalias+shop@mailx.net",
+		UserID:    "user-1c",
+		Enabled:   true,
+	}
+	store.recipients["user-1c"] = []model.Recipient{{Email: "rcpt@example.com"}}
+	s := newTestService(store)
+
+	_, alias, _, err := s.FindRecipients("sender@somewhere.com", "myalias+shop@mailx.net", model.Send)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if alias.ID != "alias-exact" {
+		t.Errorf("expected exact alias alias-exact, got %s", alias.ID)
+	}
+}
+
 func TestFindRecipients_WildcardAliasFallbackWhenBaseAliasMissing(t *testing.T) {
 	store := newFakeStore()
 	store.aliases["*+news@customdomain.com"] = model.Alias{

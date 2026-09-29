@@ -9,7 +9,15 @@
                             <span class="logo"></span>
                         </h1>
                         <h4 class="text-center mb-8">Log in with Passkey</h4>
-                        <div>
+                        <div v-if="!showEmailFallback">
+                            <div class="flex items-center w-full">
+                                <button :disabled="isLoading" @click="loginWithPasskeyDiscoverable" class="cta full">
+                                    Log in with Passkey
+                                </button>
+                            </div>
+                            <p v-if="error" class="error mt-6">Error: {{ error }}</p>
+                        </div>
+                        <div v-else>
                             <div class="mb-7">
                                 <input
                                     v-model="emailAuthn"
@@ -30,6 +38,11 @@
                             </div>
                             <p v-if="error" class="error mt-6">Error: {{ error }}</p>
                         </div>
+                        <p class="text-center mt-6">
+                            <button type="button" class="plain-alt" @click="toggleEmailFallback">
+                                {{ showEmailFallback ? 'Use passkey picker instead' : 'Trouble logging in? Use email instead' }}
+                            </button>
+                        </p>
                     </div>
                     <div id="tabs-with-underline-2" v-bind:class="{ 'hidden': passkeySupported && !signupSuccess }" role="tabpanel"
                         aria-labelledby="tabs-with-underline-item-2">
@@ -144,6 +157,7 @@ const error = ref('')
 const isLoading = ref(false)
 const passkeySupported = ref(false)
 const signupSuccess = ref('')
+const showEmailFallback = ref(false)
 const route = useRoute()
 
 const redirectAfterLogin = () => {
@@ -269,6 +283,55 @@ const startAuth = async (data: any, res: any) => {
     }
 }
 
+const loginWithPasskeyDiscoverable = async () => {
+    isLoading.value = true // Start loading
+
+    try {
+        var res = await userApi.loginPasskeyBegin()
+        startDiscoverableAuth(res)
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.response?.data.error || err.message
+
+            if (err.response?.status === 429) {
+                error.value = 'Too many requests, please try again later.'
+            }
+        }
+    } finally {
+        isLoading.value = false // End loading
+    }
+}
+
+const startDiscoverableAuth = async (res: any) => {
+    try {
+        const creds = await startAuthentication({ optionsJSON: res.data['publicKey'] })
+        res = await userApi.loginPasskeyFinish(creds)
+        error.value = ''
+        if (res.status === 200) {
+            // Email comes from the response since this flow never collects it client-side
+            localStorage.setItem('email', res.data.email)
+            redirectAfterLogin()
+        }
+    } catch (err: Error) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.response?.data.error || err.message
+
+            if (err.response?.status === 429) {
+                error.value = 'Too many requests, please try again later.'
+            }
+        } else {
+            error.value = 'The operation was aborted or failed.'
+        }
+    } finally {
+        isLoading.value = false // End loading
+    }
+}
+
+const toggleEmailFallback = () => {
+    showEmailFallback.value = !showEmailFallback.value
+    error.value = ''
+}
+
 const isLoggedIn = (): boolean => {
     const email = localStorage.getItem('email')
     return email !== null && email.trim() !== ''
@@ -276,6 +339,7 @@ const isLoggedIn = (): boolean => {
 
 const onTabChange = () => {
     otpRequired.value = false
+    showEmailFallback.value = false
 }
 
 onMounted(() => {

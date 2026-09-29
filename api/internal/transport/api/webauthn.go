@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/go-webauthn/webauthn/protocol"
 	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
@@ -21,6 +22,7 @@ var (
 	ErrFinishRegistration     = "Unable to complete registration. Please try again."
 	ErrBeginLogin             = "Unable to start login. Please try again."
 	ErrFinishLogin            = "Unable to complete login. Please try again."
+	ErrPasskeyNotRecognized   = "This passkey isn’t recognized. Please try again or use another sign-in method."
 	ErrGetSession             = "Unable to retrieve session. Please try again."
 	ErrSaveSession            = "Unable to save session. Please try again."
 	ErrDeleteSession          = "Unable to delete session. Please try again."
@@ -40,6 +42,19 @@ type CredentialService interface {
 	UpdateCredential(context.Context, webauthn.Credential, string) error
 	DeleteCredential(context.Context, webauthn.Credential, string) error
 	DeleteCredentialByID(context.Context, string, string) error
+}
+
+// excludeCredentials lists a user's existing credentials so the authenticator can refuse to
+// register another one, instead of silently replacing one of them (some platform authenticators,
+// e.g. iCloud Keychain, only keep one resident credential per RP+user and will otherwise overwrite
+// it, orphaning the old credential ID from the stored one).
+func excludeCredentials(creds []webauthn.Credential) []protocol.CredentialDescriptor {
+	exclude := make([]protocol.CredentialDescriptor, len(creds))
+	for i, c := range creds {
+		exclude[i] = c.Descriptor()
+	}
+
+	return exclude
 }
 
 // @Summary Begin registration
@@ -100,7 +115,7 @@ func (h *Handler) BeginRegistration(c *fiber.Ctx) error {
 	}
 
 	// Begin registration
-	options, sessionData, err := h.WebAuthn.BeginRegistration(user)
+	options, sessionData, err := h.WebAuthn.BeginRegistration(user, webauthn.WithExclusions(excludeCredentials(user.Creds)))
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
@@ -245,7 +260,7 @@ func (h *Handler) AddPasskey(c *fiber.Ctx) error {
 	}
 
 	// Begin registration
-	options, sessionData, err := h.WebAuthn.BeginRegistration(user)
+	options, sessionData, err := h.WebAuthn.BeginRegistration(user, webauthn.WithExclusions(excludeCredentials(user.Creds)))
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
@@ -535,6 +550,166 @@ func (h *Handler) FinishLogin(c *fiber.Ctx) error {
 
 	return c.Status(200).JSON(fiber.Map{
 		"message": FinishLoginSuccess,
+	})
+}
+
+// @Summary Begin passkey login
+// @Description Begin usernameless login process using a discoverable passkey
+// @Tags webauthn
+// @Accept json
+// @Produce json
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /login/passkey/begin [post]
+func (h *Handler) BeginPasskeyLogin(c *fiber.Ctx) error {
+	// No user lookup: the credential returned by the authenticator identifies the user
+	options, sessionData, err := h.WebAuthn.BeginDiscoverableLogin()
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+			"code":  70002,
+		})
+	}
+
+	// Save the session
+	exp := time.Now().Add(auth.WebAuthnCeremonyExpiration)
+	token, err := model.GenSessionToken()
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrSaveSession,
+		})
+	}
+	sessionData.Expires = exp
+	err = h.Service.SaveSession(c.Context(), *sessionData, token, "", exp)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrSaveSession,
+		})
+	}
+
+	// Set token in cookie
+	c.Cookie(auth.NewCookieTempAuthn(token, c.Path(), h.Cfg))
+
+	return c.Status(200).JSON(options)
+}
+
+// @Summary Finish passkey login
+// @Description Finish usernameless login process using a discoverable passkey
+// @Tags webauthn
+// @Accept json
+// @Produce json
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /login/passkey/finish [post]
+func (h *Handler) FinishPasskeyLogin(c *fiber.Ctx) error {
+	// Get cookie token
+	token := c.Cookies(auth.AUTHN_TEMP_COOKIE)
+
+	// Get session
+	session, ok, err := h.Service.GetSession(c.Context(), token)
+	if err != nil || !ok {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrGetSession,
+		})
+	}
+
+	r, err := adaptor.ConvertRequest(c, true)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrFinishLogin,
+		})
+	}
+
+	// The credential's user handle identifies the user; captured here since BeginPasskeyLogin didn't know it
+	var loggedInUser model.User
+	// The library only formats a lookup failure into its own message, so it's kept here to tell an
+	// unknown passkey apart from the other ways the ceremony can fail
+	var lookupErr error
+	identifyUser := func(rawID, userHandle []byte) (webauthn.User, error) {
+		user, err := h.Service.GetUser(c.Context(), string(userHandle))
+		if err != nil {
+			lookupErr = err
+
+			return nil, err
+		}
+
+		loggedInUser = user
+
+		return user, nil
+	}
+
+	credential, err := h.WebAuthn.FinishDiscoverableLogin(identifyUser, session.SessionData, r)
+	if err != nil {
+		if lookupErr != nil {
+			return c.Status(400).JSON(fiber.Map{
+				"error": ErrPasskeyNotRecognized,
+			})
+		}
+
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	if credential.Authenticator.CloneWarning {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrFinishLogin,
+		})
+	}
+
+	// Max sessions limit is checked here, now that the credential has identified the user
+	ok, err = h.Service.CheckSessionCount(c.Context(), loggedInUser.ID)
+	if !ok || err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrTooManySessions,
+		})
+	}
+
+	// Update user credential
+	err = h.Service.UpdateCredential(c.Context(), *credential, loggedInUser.ID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	// Delete session
+	err = h.Service.DeleteSession(c.Context(), token)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrDeleteSession,
+		})
+	}
+
+	// Clear cookie
+	auth.ClearCookies(c, auth.AUTHN_TEMP_COOKIE)
+
+	// Save the session
+	exp := time.Now().Add(h.Cfg.TokenExpiration)
+	newSessionData := webauthn.SessionData{
+		UserID:  loggedInUser.WebAuthnID(),
+		Expires: exp,
+	}
+	token, err = model.GenSessionToken()
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrSaveSession,
+		})
+	}
+	err = h.Service.SaveSession(c.Context(), newSessionData, token, loggedInUser.ID, exp)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrSaveSession,
+		})
+	}
+
+	// Set token in cookie
+	c.Cookie(auth.NewCookieAuthn(token, "/", h.Cfg))
+
+	// Email is returned because the client never collected it for this flow
+	return c.Status(200).JSON(fiber.Map{
+		"message": FinishLoginSuccess,
+		"email":   loggedInUser.Email,
 	})
 }
 

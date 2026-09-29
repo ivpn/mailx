@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-webauthn/webauthn/protocol"
 	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
@@ -176,6 +177,12 @@ func NewWebAuthn(cfg config.APIConfig) *webauthn.WebAuthn {
 		RPDisplayName: cfg.Name,                               // Display Name for your site
 		RPID:          cfg.FQDN,                               // Generally the FQDN for your site
 		RPOrigins:     strings.Split(cfg.ApiAllowOrigin, ","), // The origin URLs allowed for WebAuthn requests
+		AuthenticatorSelection: protocol.AuthenticatorSelection{
+			// Preferred (not Required): nudges new passkeys to be discoverable for usernameless login
+			// without rejecting authenticators that can't create resident keys.
+			ResidentKey:      protocol.ResidentKeyRequirementPreferred,
+			UserVerification: protocol.VerificationPreferred,
+		},
 	}
 
 	webAuthn, err := webauthn.New(config)

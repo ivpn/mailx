@@ -133,6 +133,9 @@ const startAddPasskey = async (res: any) => {
             if (err.response?.status === 429) {
                 error.value = 'Too many requests, please try again later.'
             }
+        } else if (err?.name === 'InvalidStateError') {
+            // Thrown when the authenticator already holds one of the account's existing passkeys
+            error.value = 'This device or passkey manager already has a passkey registered for this account.'
         } else {
             error.value = 'The operation was aborted or failed.'
         }

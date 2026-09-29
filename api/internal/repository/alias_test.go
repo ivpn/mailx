@@ -8,34 +8,38 @@ import (
 func TestSanitizeAliasSort(t *testing.T) {
 	tests := []struct {
 		name          string
+		columnPrefix  string
 		sortBy        string
 		sortOrder     string
 		expectedBy    string
 		expectedOrder string
 	}{
-		{name: "valid name/ASC", sortBy: "name", sortOrder: "ASC", expectedBy: "a.name", expectedOrder: "ASC"},
-		{name: "valid created_at/DESC", sortBy: "created_at", sortOrder: "DESC", expectedBy: "a.created_at", expectedOrder: "DESC"},
-		{name: "valid updated_at/ASC", sortBy: "updated_at", sortOrder: "ASC", expectedBy: "a.updated_at", expectedOrder: "ASC"},
-		{name: "empty sortBy defaults", sortBy: "", sortOrder: "ASC", expectedBy: "a.created_at", expectedOrder: "ASC"},
-		{name: "empty sortOrder defaults", sortBy: "name", sortOrder: "", expectedBy: "a.name", expectedOrder: "DESC"},
-		{name: "both empty default", sortBy: "", sortOrder: "", expectedBy: "a.created_at", expectedOrder: "DESC"},
-		{name: "lowercase sortOrder rejected", sortBy: "name", sortOrder: "asc", expectedBy: "a.name", expectedOrder: "DESC"},
-		{name: "unknown column falls back", sortBy: "password", sortOrder: "ASC", expectedBy: "a.created_at", expectedOrder: "ASC"},
-		{name: "SQL injection via sortBy stacked query", sortBy: "created_at; DROP TABLE aliases;--", sortOrder: "DESC", expectedBy: "a.created_at", expectedOrder: "DESC"},
-		{name: "SQL injection via sortBy subquery", sortBy: "(SELECT password FROM users)", sortOrder: "DESC", expectedBy: "a.created_at", expectedOrder: "DESC"},
-		{name: "SQL injection via sortBy comma expression", sortBy: "name, (SELECT password FROM users)", sortOrder: "DESC", expectedBy: "a.created_at", expectedOrder: "DESC"},
-		{name: "SQL injection via sortOrder stacked query", sortBy: "name", sortOrder: "ASC; DROP TABLE aliases;--", expectedBy: "a.name", expectedOrder: "DESC"},
-		{name: "case-mismatched column rejected", sortBy: "Name", sortOrder: "DESC", expectedBy: "a.created_at", expectedOrder: "DESC"},
+		{name: "valid name/ASC", columnPrefix: "a.", sortBy: "name", sortOrder: "ASC", expectedBy: "a.name", expectedOrder: "ASC"},
+		{name: "valid created_at/DESC", columnPrefix: "a.", sortBy: "created_at", sortOrder: "DESC", expectedBy: "a.created_at", expectedOrder: "DESC"},
+		{name: "valid updated_at/ASC", columnPrefix: "a.", sortBy: "updated_at", sortOrder: "ASC", expectedBy: "a.updated_at", expectedOrder: "ASC"},
+		{name: "empty sortBy defaults", columnPrefix: "a.", sortBy: "", sortOrder: "ASC", expectedBy: "a.created_at", expectedOrder: "ASC"},
+		{name: "empty sortOrder defaults", columnPrefix: "a.", sortBy: "name", sortOrder: "", expectedBy: "a.name", expectedOrder: "DESC"},
+		{name: "both empty default", columnPrefix: "a.", sortBy: "", sortOrder: "", expectedBy: "a.created_at", expectedOrder: "DESC"},
+		{name: "lowercase sortOrder rejected", columnPrefix: "a.", sortBy: "name", sortOrder: "asc", expectedBy: "a.name", expectedOrder: "DESC"},
+		{name: "unknown column falls back", columnPrefix: "a.", sortBy: "password", sortOrder: "ASC", expectedBy: "a.created_at", expectedOrder: "ASC"},
+		{name: "SQL injection via sortBy stacked query", columnPrefix: "a.", sortBy: "created_at; DROP TABLE aliases;--", sortOrder: "DESC", expectedBy: "a.created_at", expectedOrder: "DESC"},
+		{name: "SQL injection via sortBy subquery", columnPrefix: "a.", sortBy: "(SELECT password FROM users)", sortOrder: "DESC", expectedBy: "a.created_at", expectedOrder: "DESC"},
+		{name: "SQL injection via sortBy comma expression", columnPrefix: "a.", sortBy: "name, (SELECT password FROM users)", sortOrder: "DESC", expectedBy: "a.created_at", expectedOrder: "DESC"},
+		{name: "SQL injection via sortOrder stacked query", columnPrefix: "a.", sortBy: "name", sortOrder: "ASC; DROP TABLE aliases;--", expectedBy: "a.name", expectedOrder: "DESC"},
+		{name: "case-mismatched column rejected", columnPrefix: "a.", sortBy: "Name", sortOrder: "DESC", expectedBy: "a.created_at", expectedOrder: "DESC"},
+		{name: "no prefix valid column", columnPrefix: "", sortBy: "name", sortOrder: "ASC", expectedBy: "name", expectedOrder: "ASC"},
+		{name: "no prefix falls back", columnPrefix: "", sortBy: "password", sortOrder: "DESC", expectedBy: "created_at", expectedOrder: "DESC"},
+		{name: "no prefix SQL injection via sortBy", columnPrefix: "", sortBy: "created_at; DROP TABLE aliases;--", sortOrder: "DESC", expectedBy: "created_at", expectedOrder: "DESC"},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotBy, gotOrder := sanitizeAliasSort(tt.sortBy, tt.sortOrder)
+			gotBy, gotOrder := sanitizeAliasSort(tt.columnPrefix, tt.sortBy, tt.sortOrder)
 			if gotBy != tt.expectedBy {
-				t.Errorf("sanitizeAliasSort(%q, %q) sortBy = %q, want %q", tt.sortBy, tt.sortOrder, gotBy, tt.expectedBy)
+				t.Errorf("sanitizeAliasSort(%q, %q, %q) sortBy = %q, want %q", tt.columnPrefix, tt.sortBy, tt.sortOrder, gotBy, tt.expectedBy)
 			}
 			if gotOrder != tt.expectedOrder {
-				t.Errorf("sanitizeAliasSort(%q, %q) sortOrder = %q, want %q", tt.sortBy, tt.sortOrder, gotOrder, tt.expectedOrder)
+				t.Errorf("sanitizeAliasSort(%q, %q, %q) sortOrder = %q, want %q", tt.columnPrefix, tt.sortBy, tt.sortOrder, gotOrder, tt.expectedOrder)
 			}
 		})
 	}

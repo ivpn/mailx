@@ -20,8 +20,8 @@ type Message struct {
 	ID        uint        `json:"-" gorm:"primaryKey"`
 	CreatedAt time.Time   `json:"created_at"`
 	UserID    string      `json:"-"`
-	AliasID   string      `json:"-"`
-	Type      MessageType `json:"type"`
+	AliasID   string      `json:"-" gorm:"index:idx_messages_alias_id_type,priority:1"`
+	Type      MessageType `json:"type" gorm:"index:idx_messages_alias_id_type,priority:2"`
 }
 
 func ParseReplyTo(email string) (string, string) {

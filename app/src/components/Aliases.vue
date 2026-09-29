@@ -26,22 +26,22 @@
                 </button>
             </div>
         </div>
-        <div v-if="!list.length && loaded && status === 'active_inactive'" class="card-empty">
+        <div v-if="showEmptyCard" class="card-empty">
             <span class="bg-secondary rounded flex items-center justify-center p-2 mb-5">
                 <i class="icon at icon-accent text-2xl"></i>
             </span>
             <h4 class="mb-6">
-                <span v-if="!searchQuery && !loading">You have no aliases yet</span>
-                <span v-if="searchQuery || loading">No aliases found</span>
+                <span v-if="!searchQuery">You have no aliases yet</span>
+                <span v-else>No aliases found</span>
             </h4>
             <p v-if="!recipients.length" class="text-tertiary mb-6">
                 To get started, first <router-link to="/account/profile">verify</router-link> your primary email address.
             </p>
-            <button v-if="!searchQuery && !loading && recipients.length" class="cta" data-hs-overlay="#modal-create-alias-false">
+            <button v-if="!searchQuery && recipients.length" class="cta" data-hs-overlay="#modal-create-alias-false">
                 New Alias
             </button>
         </div>
-        <div v-bind:class="{ 'hidden': (!list.length && status === 'active_inactive') || !loaded }">
+        <div v-bind:class="{ 'hidden': showEmptyCard || !loaded }">
             <div class="tablet-lg">
                 <div class="hs-dropdown [--placement:bottom-left] mb-2">
                     <button id="hs-dropdown-alias-status-mobile" class="sort">
@@ -67,13 +67,15 @@
                         <thead class="desktop-lg">
                             <tr>
                                 <th class="w-10 py-6">
-                                    <input
-                                        type="checkbox"
-                                        class="checkbox-plain"
-                                        ref="selectAllCheckbox"
-                                        v-bind:checked="allSelected"
-                                        @change="toggleSelectAll"
-                                    >
+                                    <div class="flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            class="checkbox-plain"
+                                            ref="selectAllCheckbox"
+                                            v-bind:checked="allSelected"
+                                            @change="toggleSelectAll"
+                                        >
+                                    </div>
                                 </th>
                                 <template v-if="selectedCount === 0">
                                     <th>
@@ -140,7 +142,7 @@
                                     <th>Actions</th>
                                 </template>
                                 <th v-else colspan="6">
-                                    <div class="flex items-center gap-3 flex-nowrap">
+                                    <div class="flex items-center gap-3 flex-nowrap min-h-[43px]">
                                         <button v-bind:disabled="!canActivate || bulkLoading" @click="bulkActivate">Activate</button>
                                         <button v-bind:disabled="!canDeactivate || bulkLoading" @click="bulkDeactivate">Deactivate</button>
                                         <button v-bind:disabled="!canPin || bulkLoading" @click="bulkPin">Pin</button>
@@ -157,23 +159,32 @@
                             <AliasRow
                                 v-for="alias in list"
                                 :alias="alias"
-                                :key="rowKey"
+                                :key="alias.id"
                                 :recipients.sync="recipients"
                                 :wildcard=false
                                 :selectable="true"
                                 :selected="selectedIds.has(alias.id)"
                                 @onToggleSelect="toggleSelectOne"
+                                @onEdit="onEditAlias"
+                                @onSend="onSendAlias"
                             />
+                            <!-- Also keeps <tbody> from collapsing to its bare divide-y border, which
+                                 Chrome reads as a 1px overflow and answers with a stray scrollbar. -->
+                            <tr v-if="!list.length && loaded">
+                                <td colspan="7" class="text-center text-tertiary py-10">No aliases found</td>
+                            </tr>
                         </tbody>
 
                     </table>
                 </div>
                 <p v-if="error" class="error">Error: {{ error }}</p>
-                <Pagination v-if="list.length" :list.sync="list" :limit="limit" :page="page" :total="total" :key="rowKey" @onUpdatePage="onUpdatePage" />
+                <Pagination v-if="list.length" :list.sync="list" :limit="limit" :page="page" :total="total" :key="limit + '-' + page + '-' + total" @onUpdatePage="onUpdatePage" />
             </div>
         </div>
     </div>
     <AliasCreate v-if="recipients.length && settings.id && loaded" :recipients.sync="recipients" :settings.sync="settings" :wildcard=false :label="'New Alias'" />
+    <AliasEdit v-if="recipients.length" ref="editModal" :recipients="recipients" :key="recipients.join(',')" />
+    <AliasSend ref="sendModal" />
 </template>
 
 <script setup lang="ts">
@@ -183,10 +194,13 @@ import { aliasApi } from '../api/alias'
 import { settingsApi } from '../api/settings.ts'
 import AliasRow from './AliasRow.vue'
 import AliasCreate from './AliasCreate.vue'
+import AliasEdit from './AliasEdit.vue'
+import AliasSend from './AliasSend.vue'
 import Pagination from './Pagination.vue'
 import events from '../events.ts'
 import { RouterLink } from 'vue-router'
-import dropdown from '@preline/dropdown'
+import { closeDropdowns, initDropdowns, initOverlays, initTooltips } from '../lib/preline.ts'
+import { useBreakpoint } from '../lib/useBreakpoint.ts'
 
 const alias = {
     id: '',
@@ -222,7 +236,6 @@ const settings = ref({
 const error = ref('')
 const loaded = ref(false)
 const loading = ref(false)
-const rowKey = ref(0)
 const limit = ref(25)
 const page = ref(1)
 const total = ref(0)
@@ -238,9 +251,16 @@ const statusLabel = computed(() => {
     return 'All'
 })
 
+// Only the default filter gets the full-page empty card; every other filter keeps the table (and
+// with it the status dropdown) on screen so the user can pick their way back out of it. Holding
+// off while a fetch is in flight stops the card from flashing over a list that is about to fill.
+const showEmptyCard = computed(() => loaded.value && !loading.value && !list.value.length && status.value === 'active_inactive')
+
 const selectedIds = ref(new Set<string>())
 const selectAllCheckbox = ref<HTMLInputElement | null>(null)
 const bulkLoading = ref(false)
+const editModal = ref<InstanceType<typeof AliasEdit> | null>(null)
+const sendModal = ref<InstanceType<typeof AliasSend> | null>(null)
 
 const selectedAliases = computed(() => list.value.filter(a => selectedIds.value.has(a.id)))
 const selectedCount = computed(() => selectedAliases.value.length)
@@ -279,7 +299,14 @@ watchEffect(() => {
 // The status dropdown <th> is destroyed/recreated when the bulk toolbar toggles, so
 // Preline's dropdown widget (bound at autoInit() time) needs to be re-bound for it to work.
 watch(selectedCount, () => {
-    nextTick(() => dropdown.autoInit())
+    nextTick(() => initDropdowns())
+})
+
+// Crossing the breakpoint swaps every AliasRow between its desktop and tablet <tr>, so the row
+// dropdowns are brand-new elements Preline has never bound.
+const { isDesktop } = useBreakpoint()
+watch(isDesktop, () => {
+    nextTick(() => initDropdowns())
 })
 
 const getList = async () => {
@@ -303,10 +330,18 @@ const getList = async () => {
         list.value = res.data.aliases
         total.value = res.data.total
         loaded.value = true
-        loading.value = false
         error.value = ''
-        renderRow()
+        // Removing the last row of a page (by filtering it out, deleting it, ...) would otherwise
+        // strand the user on an empty page, with the pagination they'd leave it by hidden too.
+        if (!list.value.length && page.value > 1) {
+            page.value = 1
+            return getList()
+        }
+        loading.value = false
+        await nextTick()
+        bindPreline()
     } catch (err) {
+        loading.value = false
         if (axios.isAxiosError(err)) {
             error.value = err.message
         }
@@ -350,8 +385,11 @@ const forgetAlias = async (payload: any) => {
     }
 }
 
-const renderRow = () => {
-    rowKey.value++
+// Bound once per list render; the row components deliberately do not init Preline themselves.
+const bindPreline = () => {
+    initTooltips()
+    initDropdowns()
+    initOverlays()
 }
 
 const onUpdatePage = (obj: any) => {
@@ -366,6 +404,22 @@ const onDeleteAlias = (payload: { id: string, wildcard: boolean }) => {
 
 const onForgetAlias = (payload: { id: string }) => {
     forgetAlias(payload)
+}
+
+// Flipping a row's switch changes which aliases belong in the list, but only while the list is
+// filtered on that state. Refetching unconditionally would drop the user's row selection.
+const onAliasEnabled = () => {
+    if (status.value === 'active' || status.value === 'inactive') {
+        getList()
+    }
+}
+
+const onEditAlias = (alias: any) => {
+    editModal.value?.open(alias)
+}
+
+const onSendAlias = (alias: any) => {
+    sendModal.value?.open(alias)
 }
 
 const sort = (e: any) => {
@@ -387,6 +441,10 @@ const clearSearch = () => {
 }
 
 const setStatus = (value: string) => {
+    if (value === status.value) return
+    // The dropdown sits inside the block the new status may hide, and Preline jams for good if
+    // its menu is hidden before the closing transition ends, so close it outright first.
+    closeDropdowns(false)
     status.value = value
     page.value = 1
     getList()
@@ -514,15 +572,21 @@ const bulkForget = async () => {
 onMounted(async () => {
     await getSettings()
     getList()
-    dropdown.autoInit()
+    initDropdowns()
     events.on('alias.create', getList)
     events.on('alias.update', getList)
+    events.on('alias.enabled', onAliasEnabled)
     events.on('alias.delete', onDeleteAlias)
     events.on('alias.forget', onForgetAlias)
     document.addEventListener('keydown', handleKeydown)
 })
 
 onUnmounted(() => {
+    events.off('alias.create', getList)
+    events.off('alias.update', getList)
+    events.off('alias.enabled', onAliasEnabled)
+    events.off('alias.delete', onDeleteAlias)
+    events.off('alias.forget', onForgetAlias)
     document.removeEventListener('keydown', handleKeydown)
 })
 </script>

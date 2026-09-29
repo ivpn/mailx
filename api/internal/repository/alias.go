@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"strconv"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -38,14 +37,15 @@ func (d *Database) GetAlias(ctx context.Context, ID string, userID string) (mode
 // sanitizeAliasSort independently re-checks sort inputs against the shared allow-list
 // (model.AliasSortColumns/AliasSortOrders) so the query builder is safe even if a future
 // caller skips the handler-level check, and returns the fully-qualified column to sort by.
-func sanitizeAliasSort(sortBy string, sortOrder string) (string, string) {
+// columnPrefix is always a fixed literal supplied by the call site, never request input.
+func sanitizeAliasSort(columnPrefix string, sortBy string, sortOrder string) (string, string) {
 	if !model.AliasSortColumns[sortBy] {
 		sortBy = "created_at"
 	}
 	if !model.AliasSortOrders[sortOrder] {
 		sortOrder = "DESC"
 	}
-	return "a." + sortBy, sortOrder
+	return columnPrefix + sortBy, sortOrder
 }
 
 // aliasSearchFilter builds the wildcard/search WHERE fragment using bound parameters instead
@@ -93,60 +93,107 @@ func aliasStatusFilter(columnPrefix string, status string) (filter string, args 
 	}
 }
 
-func (d *Database) GetAliases(ctx context.Context, userID string, limit int, offset int, sortBy string, sortOrder string, wildcard string, search string, status string) ([]model.Alias, error) {
-	sortBy, sortOrder = sanitizeAliasSort(sortBy, sortOrder)
+// findAliases returns one page of aliases without touching the messages table, so its cost
+// scales with the page size rather than with the user's message history.
+func (d *Database) findAliases(ctx context.Context, userID string, limit int, offset int, sortBy string, sortOrder string, wildcard string, search string, status string) ([]model.Alias, error) {
+	sortBy, sortOrder = sanitizeAliasSort("", sortBy, sortOrder)
 
-	statusFilter, statusArgs, _ := aliasStatusFilter("a.", status)
-	filter, filterArgs := aliasSearchFilter("a.", wildcard, search)
+	statusFilter, statusArgs, unscoped := aliasStatusFilter("", status)
+	filter, filterArgs := aliasSearchFilter("", wildcard, search)
 
-	aliases := []model.Alias{}
-	query := `
-		SELECT a.*,
-			COALESCE(SUM(CASE WHEN m.type = ? THEN 1 ELSE 0 END), 0) AS forwards,
-			COALESCE(SUM(CASE WHEN m.type = ? THEN 1 ELSE 0 END), 0) AS blocks,
-			COALESCE(SUM(CASE WHEN m.type = ? THEN 1 ELSE 0 END), 0) AS replies,
-			COALESCE(SUM(CASE WHEN m.type = ? THEN 1 ELSE 0 END), 0) AS sends
-		FROM aliases a
-		LEFT JOIN messages m
-		ON a.id = m.alias_id
-		WHERE a.user_id = ? ` + statusFilter + filter + `
-		GROUP BY a.id
-		ORDER BY a.pinned DESC, ` + sortBy + " " + sortOrder
-
-	if limit > 0 {
-		query += "\nLIMIT " + strconv.Itoa(limit)
-	}
-
-	if offset > 0 {
-		query += "\nOFFSET " + strconv.Itoa(offset)
-	}
-
-	args := []any{model.Forward, model.Block, model.Reply, model.Send, userID}
+	args := []any{userID}
 	args = append(args, statusArgs...)
 	args = append(args, filterArgs...)
 
-	rows, err := d.Client.Raw(query, args...).Rows()
+	q := d.Client.WithContext(ctx).Model(&model.Alias{})
+	if unscoped {
+		q = q.Unscoped()
+	}
+	q = q.Where("user_id = ? "+statusFilter+filter, args...).
+		Order("pinned DESC").
+		Order(sortBy + " " + sortOrder)
+
+	if limit > 0 {
+		q = q.Limit(limit)
+	}
+	if offset > 0 {
+		q = q.Offset(offset)
+	}
+
+	aliases := []model.Alias{}
+	err := q.Find(&aliases).Error
+	return aliases, err
+}
+
+// attachAliasStats fills in per-alias message counts for a single page of aliases in one
+// query served by the (alias_id, type) index, instead of aggregating the whole messages
+// table for every alias the user owns.
+func (d *Database) attachAliasStats(ctx context.Context, aliases []model.Alias) error {
+	if len(aliases) == 0 {
+		return nil
+	}
+
+	ids := make([]string, 0, len(aliases))
+	for i := range aliases {
+		ids = append(ids, aliases[i].ID)
+	}
+
+	var counts []struct {
+		AliasID string
+		Type    model.MessageType
+		Total   int
+	}
+	err := d.Client.WithContext(ctx).Model(&model.Message{}).
+		Select("alias_id, type, COUNT(*) AS total").
+		Where("alias_id IN (?)", ids).
+		Group("alias_id").Group("type").
+		Scan(&counts).Error
+	if err != nil {
+		return err
+	}
+
+	stats := make(map[string]*model.AliasStats, len(aliases))
+	for i := range aliases {
+		stats[aliases[i].ID] = &aliases[i].Stats
+	}
+
+	for _, c := range counts {
+		s, ok := stats[c.AliasID]
+		if !ok {
+			continue
+		}
+		switch c.Type {
+		case model.Forward:
+			s.Forwards = c.Total
+		case model.Block:
+			s.Blocks = c.Total
+		case model.Reply:
+			s.Replies = c.Total
+		case model.Send:
+			s.Sends = c.Total
+		}
+	}
+
+	return nil
+}
+
+func (d *Database) GetAliases(ctx context.Context, userID string, limit int, offset int, sortBy string, sortOrder string, wildcard string, search string, status string) ([]model.Alias, error) {
+	aliases, err := d.findAliases(ctx, userID, limit, offset, sortBy, sortOrder, wildcard, search, status)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
 
-	for rows.Next() {
-		var alias model.Alias
-		var forwards, blocks, replies, sends int
-		if err := rows.Scan(&alias.ID, &alias.CreatedAt, &alias.UpdatedAt, &alias.DeletedAt, &alias.Name, &alias.UserID, &alias.Enabled, &alias.Description, &alias.Recipients, &alias.FromName, &alias.Wildcard, &alias.Origin, &alias.Pinned, &forwards, &blocks, &replies, &sends); err != nil {
-			return nil, err
-		}
-		alias.Stats = model.AliasStats{
-			Forwards: forwards,
-			Blocks:   blocks,
-			Replies:  replies,
-			Sends:    sends,
-		}
-		aliases = append(aliases, alias)
+	if err := d.attachAliasStats(ctx, aliases); err != nil {
+		return nil, err
 	}
 
 	return aliases, nil
+}
+
+// GetAliasesNoStats serves callers that only read alias rows, letting them skip the
+// per-alias message aggregation entirely.
+func (d *Database) GetAliasesNoStats(ctx context.Context, userID string, limit int, offset int, sortBy string, sortOrder string, wildcard string, search string, status string) ([]model.Alias, error) {
+	return d.findAliases(ctx, userID, limit, offset, sortBy, sortOrder, wildcard, search, status)
 }
 
 func (d *Database) GetAliasesByDomain(ctx context.Context, domain string, userId string) ([]model.Alias, error) {

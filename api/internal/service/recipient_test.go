@@ -122,6 +122,10 @@ func (f *fakeStore) GetAliases(ctx context.Context, userID string, limit int, of
 	return result, nil
 }
 
+func (f *fakeStore) GetAliasesNoStats(ctx context.Context, userID string, limit int, offset int, sortBy string, sortOrder string, wildcard string, search string, status string) ([]model.Alias, error) {
+	return f.GetAliases(ctx, userID, limit, offset, sortBy, sortOrder, wildcard, search, status)
+}
+
 func (f *fakeStore) GetAliasUnscoped(ctx context.Context, ID string, userID string) (model.Alias, error) {
 	for _, a := range f.aliases {
 		if a.ID == ID && a.UserID == userID {

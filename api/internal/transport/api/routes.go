@@ -88,6 +88,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Post("/recipient/activate/:id", limit.New(5, 10*time.Minute), h.ActivateRecipient)
 	v1.Put("/recipient/delete/:id", h.DeleteRecipient)
 
+	v1.Get("/alias/wildcard-domain-info", h.GetWildcardDomainInfo)
 	v1.Get("/alias/:id", h.GetAlias)
 	v1.Get("/aliases", h.GetAliases)
 	v1.Post("/aliases/import", limit.New(5, 24*time.Hour), h.ImportAliases)

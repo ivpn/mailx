@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-bind:id="'modal-create-alias-' + props.catchAll" class="hs-overlay hidden">
+        <div v-bind:id="'modal-create-alias-' + props.wildcard" class="hs-overlay hidden">
             <div>
                 <div>
                     <header>
@@ -10,26 +10,38 @@
                         <h4 class="uppercase">
                             {{ props.label }}
                         </h4>
-                        <div v-if="props.catchAll" class="hs-tooltip [--strategy:absolute]">
+                        <div v-if="props.wildcard" class="hs-tooltip [--strategy:absolute]">
                             <i class="icon info icon-primary hs-tooltip-toggle"></i>
                             <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">Limited to 2 wildcard aliases per domain</span>
                         </div>
                     </header>
                     <article>
-                        <div v-if="props.catchAll">
+                        <div v-if="props.wildcard">
                             <div class="mb-3">
-                                <label for="alias_catch_all_suffix">
+                                <label for="alias_wildcard_delimiter">
+                                    Alias separator
+                                </label>
+                                <select id="alias_wildcard_delimiter" :disabled="wildcardAtLimit">
+                                    <option v-for="(delimiter, index) in delimiters" v-bind:value="delimiter"
+                                        :selected="delimiter == alias.wildcard_delimiter || index === 0" :key="delimiter">
+                                        {{ delimiterTitles[delimiter] }}
+                                    </option>
+                                </select>
+                                <p v-if="wildcardAtLimit" class="error">Wildcard alias limit reached for this domain ({{ wildcardDomainInfo.limit }} max)</p>
+                            </div>
+                            <div class="mb-3">
+                                <label for="alias_wildcard_suffix">
                                     Alias suffix (6-12 alphanumeric chars.):
                                 </label>
                                 <input 
                                     v-model="alias.local_part"
                                     v-bind:class="{ 'error': errorLocalPart }"
-                                    id="alias_catch_all_suffix"
+                                    id="alias_wildcard_suffix"
                                     type="text"
                                 >
                                 <p v-if="errorLocalPart" class="error">Wildcard suffix must be between 6 and 12 characters</p>
-                                <p class="text-primary mb-1">
-                                    *+{{ alias.local_part }}@{{ alias.domain }}
+                                <p class="text-primary mb-1 break-all">
+                                    *{{ alias.wildcard_delimiter }}{{ alias.local_part }}@{{ wildcardPreviewDomain }}
                                 </p>
                             </div>
                         </div>
@@ -98,7 +110,7 @@
                                         Custom settings
                                     </button>
                                     <div id="alias-accordion-collapse-one" class="hs-accordion-content hidden overflow-hidden transition-[height] duration-300" role="region" aria-labelledby="alias-accordion-one">
-                                        <div v-if="!props.catchAll" class="pb-3">
+                                        <div v-if="!props.wildcard" class="pb-3">
                                             <label for="alias_format">
                                                 Format
                                             </label>
@@ -146,7 +158,7 @@
                     <footer>
                         <nav>
                             <button
-                                v-bind:disabled="errorRecipients.length > 0"
+                                v-bind:disabled="errorRecipients.length > 0 || (props.wildcard && wildcardAtLimit)"
                                 @click="postAlias"
                                 class="cta">
                                 Create and copy to clipboard
@@ -164,7 +176,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import overlay from '@preline/overlay'
 import select from '@preline/select'
 import axios from 'axios'
@@ -174,7 +186,7 @@ import tooltip from '@preline/tooltip'
 import accordion from '@preline/accordion'
 
 const envDomains = import.meta.env.VITE_DOMAINS.split(',')
-const props = defineProps(['recipients', 'settings', 'catchAll', 'label'])
+const props = defineProps(['recipients', 'settings', 'wildcard', 'label'])
 const alias = ref({
     description: '',
     enabled: true,
@@ -182,14 +194,23 @@ const alias = ref({
     from_name: '',
     recipients: '',
     domain: envDomains[0],
-    catch_all: props.catchAll ? 'true' : 'false',
-    local_part: ''
+    wildcard: props.wildcard ? 'true' : 'false',
+    local_part: '',
+    wildcard_delimiter: '.'
 })
 const recipients = ref(props.recipients)
 const settings = ref(props.settings)
 const selectRecipients = ref([settings.value.recipient ? settings.value.recipient : props.recipients[0]])
 const domains = ref(envDomains)
 const customDomains = ref(props.settings.custom_domains || [])
+const delimiters = ['.', '+']
+const delimiterTitles: Record<string, string> = {
+    '.': 'Period (.)',
+    '+': 'Plus (+)'
+}
+const wildcardPreviewDomain = ref(envDomains[0])
+const wildcardDomainInfo = ref({ count: 0, limit: 2, delimiters_used: [] })
+const wildcardAtLimit = computed(() => wildcardDomainInfo.value.count >= wildcardDomainInfo.value.limit)
 const formats = ref([{
     name: 'Words',
     value: 'words'
@@ -216,8 +237,8 @@ const postAlias = async () => {
     const domain = selectedOption.getAttribute('domain')
     alias.value.enabled = true
     
-    if (props.catchAll) {
-        alias.value.format = 'catch_all'
+    if (props.wildcard) {
+        alias.value.format = 'wildcard'
     } else {
         const formatElement = document.getElementById('alias_format') as HTMLInputElement;
         if (formatElement) {
@@ -228,8 +249,9 @@ const postAlias = async () => {
     let req: any = { ...alias.value }
     req.domain = domain
 
-    if (props.catchAll) {
+    if (props.wildcard) {
         req.wildcard_local_part = req.local_part
+        req.wildcard_delimiter = alias.value.wildcard_delimiter
         delete req.local_part
     }
 
@@ -265,7 +287,7 @@ const close = () => {
         accordionInstance.element.hide()
     }
 
-    const modal = document.querySelector('#modal-create-alias-' + props.catchAll) as any
+    const modal = document.querySelector('#modal-create-alias-' + props.wildcard) as any
     overlay.close(modal)
 
     const multiselect = select.getInstance('#create-alias-recipient' as any, true) as any
@@ -273,7 +295,7 @@ const close = () => {
 }
 
 const addEvents = () => {
-    const modal = overlay.getInstance('#modal-create-alias-' + props.catchAll as any, true) as any
+    const modal = overlay.getInstance('#modal-create-alias-' + props.wildcard as any, true) as any
     modal.element.on('close', () => {
         close()
     })
@@ -281,6 +303,7 @@ const addEvents = () => {
         document.addEventListener('keydown', handleKeydown)
         focusFirstInput()
         updateFormats()
+        updateWildcardDomainInfo()
     })
 
     const multiselect = select.getInstance('#create-alias-recipient' as any, true) as any
@@ -292,11 +315,17 @@ const addEvents = () => {
     if (domainSelect) {
         domainSelect.addEventListener('change', updateFormats)
         domainSelect.addEventListener('change', updateFormat)
+        domainSelect.addEventListener('change', updateWildcardDomainInfo)
     }
 
     const formatElement = document.getElementById('alias_format') as HTMLInputElement
     if (formatElement) {
         formatElement.addEventListener('change', updateFormat)
+    }
+
+    const delimiterElement = document.getElementById('alias_wildcard_delimiter') as HTMLInputElement
+    if (delimiterElement) {
+        delimiterElement.addEventListener('change', updateWildcardDelimiter)
     }
 }
 
@@ -308,7 +337,7 @@ const handleKeydown = (event: KeyboardEvent) => {
 }
 
 const focusFirstInput = () => {
-    const input = props.catchAll ? document.getElementById('alias_catch_all_suffix') : document.getElementById('alias_description')
+    const input = props.wildcard ? document.getElementById('alias_wildcard_suffix') : document.getElementById('alias_description')
     input?.focus()
 }
 
@@ -320,7 +349,7 @@ const validate = (rcps: string) => {
 
     if (alias.value.format === 'custom') {
         errorLocalPart.value = alias.value.local_part.length < 1 || alias.value.local_part.length > 64
-    } else if (props.catchAll) {
+    } else if (props.wildcard) {
         errorLocalPart.value = alias.value.local_part.length < 6 || alias.value.local_part.length > 12
     } else {
         errorLocalPart.value = false
@@ -368,6 +397,30 @@ const updateFormat = () => {
     alias.value.format = formatElement.value
 }
 
+const updateWildcardDelimiter = () => {
+    const delimiterElement = document.getElementById('alias_wildcard_delimiter') as HTMLInputElement
+    alias.value.wildcard_delimiter = delimiterElement.value
+}
+
+// Best-effort UX check only - the backend is the source of truth for the per-domain limit.
+const updateWildcardDomainInfo = async () => {
+    if (!props.wildcard) return
+
+    const select = document.getElementById('alias_domain') as HTMLSelectElement
+    const selectedOption = select.options[select.selectedIndex]
+    wildcardPreviewDomain.value = selectedOption?.textContent?.trim() || envDomains[0]
+
+    const domain = selectedOption.getAttribute('domain')
+    if (!domain) return
+
+    try {
+        const res = await aliasApi.getWildcardDomainInfo(domain)
+        wildcardDomainInfo.value = res.data
+    } catch {
+        wildcardDomainInfo.value = { count: 0, limit: 2, delimiters_used: [] }
+    }
+}
+
 const resetAlias = () => {
     alias.value = {
         description: '',
@@ -376,8 +429,9 @@ const resetAlias = () => {
         from_name: '',
         recipients: '',
         domain: props.settings.domain || envDomains[0],
-        catch_all: props.catchAll ? 'true' : 'false',
-        local_part: ''
+        wildcard: props.wildcard ? 'true' : 'false',
+        local_part: '',
+        wildcard_delimiter: '.'
     }
 }
 

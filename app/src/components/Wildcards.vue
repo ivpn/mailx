@@ -72,7 +72,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <AliasRow v-for="alias in list" :alias="alias" :key="rowKey" :recipients.sync="recipients" :catchAll=false />
+                        <AliasRow v-for="alias in list" :alias="alias" :key="rowKey" :recipients.sync="recipients" :wildcard=false />
                     </tbody>
                 </table>
             </div>
@@ -80,7 +80,7 @@
             <Pagination v-if="list.length" :list.sync="list" :limit="limit" :page="page" :total="total" :key="rowKey" @onUpdatePage="onUpdatePage" />
         </div>
     </div>
-    <AliasCreate v-if="recipients.length && settings.id && loaded" :recipients.sync="recipients" :settings.sync="settings" :catchAll=true :label="'New Wildcard Alias'" />
+    <AliasCreate v-if="recipients.length && settings.id && loaded" :recipients.sync="recipients" :settings.sync="settings" :wildcard=true :label="'New Wildcard Alias'" />
 </template>
 
 <script setup lang="ts">
@@ -136,7 +136,7 @@ const getList = async () => {
             page: page.value,
             sort_by: sortBy.value,
             sort_order: sortOrder.value,
-            catch_all: true,
+            wildcard: true,
         })
         list.value = res.data.aliases
         total.value = res.data.total
@@ -185,7 +185,7 @@ const onUpdatePage = (obj: any) => {
     getList()
 }
 
-const onDeleteAlias = (payload: { id: string, catchAll: boolean }) => {
+const onDeleteAlias = (payload: { id: string, wildcard: boolean }) => {
     deleteAlias(payload)
 }
 

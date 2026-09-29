@@ -12,9 +12,41 @@ const (
 	AliasFormatRandomWords = "words"
 	AliasFormatRandomChars = "random"
 	AliasFormatUUID        = "uuid"
-	AliasFormatCatchAll    = "catch_all"
+	AliasFormatWildcard    = "wildcard"
 	AliasFormatCustom      = "custom"
 )
+
+const (
+	WildcardDelimiterPlus = "+"
+	WildcardDelimiterDot  = "."
+	// DefaultWildcardDelimiter is used when a request doesn't specify one (e.g. older API clients).
+	DefaultWildcardDelimiter = WildcardDelimiterPlus
+	// MaxWildcardAliasesPerDomain is the per-user cap on Wildcard Aliases for a single domain.
+	MaxWildcardAliasesPerDomain = 2
+)
+
+// WildcardDelimiters lists the supported Wildcard Alias suffix delimiters, "+" first to
+// preserve historic match priority.
+var WildcardDelimiters = []string{WildcardDelimiterPlus, WildcardDelimiterDot}
+
+func IsValidWildcardDelimiter(d string) bool {
+	return d == WildcardDelimiterPlus || d == WildcardDelimiterDot
+}
+
+// GenerateWildcardAlias returns the wildcard-suffix local part for the given delimiter
+// (e.g. "*+news" or "*.news").
+func GenerateWildcardAlias(localPart string, delimiter string) string {
+	return "*" + delimiter + localPart
+}
+
+// WildcardAliasDelimiter returns the delimiter character used by a Wildcard Alias name
+// (e.g. "*+news@domain.com" -> "+"), or "" if name isn't shaped like a Wildcard Alias.
+func WildcardAliasDelimiter(name string) string {
+	if len(name) < 2 || name[0] != '*' {
+		return ""
+	}
+	return name[1:2]
+}
 
 var (
 	Adjectives = []string{
@@ -32,8 +64,8 @@ func GenerateAlias(format string, localPart string) string {
 		return generateRandomChars()
 	case AliasFormatUUID:
 		return uuid.New().String()
-	case AliasFormatCatchAll:
-		return fmt.Sprintf("*+%s", localPart)
+	case AliasFormatWildcard:
+		return GenerateWildcardAlias(localPart, WildcardDelimiterPlus)
 	case AliasFormatCustom:
 		return localPart
 	default:

@@ -3,6 +3,7 @@ import { api } from './api'
 export const aliasApi = {
     get: (id: string) => api.get('/alias/' + id),
     getList: (data: any) => api.get('/aliases', { params: data }),
+    getWildcardDomainInfo: (domain: string) => api.get('/alias/wildcard-domain-info', { params: { domain } }),
     import: (data: any) => api.post('/aliases/import', data),
     export: () => api.get('/aliases/export'),
     create: (data: any) => api.post('/alias', data),

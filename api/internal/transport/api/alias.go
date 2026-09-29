@@ -28,7 +28,8 @@ type AliasService interface {
 	GetAlias(context.Context, string, string) (model.Alias, error)
 	GetAliases(context.Context, string, int, int, string, string, string, string, string) (model.AliasList, error)
 	GetAllAliases(context.Context, string) ([]model.Alias, error)
-	PostAlias(context.Context, model.Alias, string, string, string) (model.Alias, error)
+	PostAlias(context.Context, model.Alias, string, string, string, string) (model.Alias, error)
+	GetWildcardDomainInfo(context.Context, string, string) (model.WildcardDomainInfo, error)
 	UpdateAlias(context.Context, model.Alias) error
 	DeleteAlias(context.Context, string, string) error
 	ImportAliases(context.Context, []model.AliasImportReq, string) ([]model.Alias, error)
@@ -84,11 +85,11 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 
 	sortBy := c.Query("sort_by")
 	sortOrder := strings.ToUpper(c.Query("sort_order"))
-	catchAll := c.Query("catch_all")
+	wildcard := c.Query("wildcard")
 	search := c.Query("search")
 	status := c.Query("status")
 
-	var allowCatchAll = map[string]bool{
+	var allowWildcard = map[string]bool{
 		"true":  true,
 		"false": true,
 		"":      true,
@@ -106,8 +107,8 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 	if _, ok := model.AliasSortOrders[sortOrder]; !ok {
 		sortOrder = "DESC"
 	}
-	if _, ok := allowCatchAll[catchAll]; !ok {
-		catchAll = ""
+	if _, ok := allowWildcard[wildcard]; !ok {
+		wildcard = ""
 	}
 	if _, ok := allowStatus[status]; !ok {
 		status = ""
@@ -124,7 +125,7 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 		})
 	}
 
-	list, err := h.Service.GetAliases(c.Context(), userID, limit, page, sortBy, sortOrder, catchAll, search, status)
+	list, err := h.Service.GetAliases(c.Context(), userID, limit, page, sortBy, sortOrder, wildcard, search, status)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
@@ -259,6 +260,26 @@ func (h *Handler) ExportAliases(c *fiber.Ctx) error {
 	return c.SendString(b.String())
 }
 
+// resolveDomain resolves an AliasReq-style domain value - either a plain built-in domain
+// name or a custom domain's UUID - to its FQDN. ok is false if domainParam doesn't resolve
+// to a valid domain accessible to userID.
+func (h *Handler) resolveDomain(ctx context.Context, userID string, domainParam string) (domain string, isCustomDomain bool, ok bool) {
+	domain = domainParam
+	if _, err := uuid.Parse(domain); err == nil {
+		fqdn, err := h.Service.GetVerifiedDomain(ctx, domain, userID)
+		if err != nil {
+			return "", true, false
+		}
+		return fqdn.Name, true, true
+	}
+
+	if !strings.Contains(h.Cfg.Domains, domain) {
+		return "", false, false
+	}
+
+	return domain, false, true
+}
+
 // @Summary Create alias
 // @Description Create alias
 // @Tags alias
@@ -289,19 +310,8 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 	}
 
 	// Validate domain
-	domain := req.Domain
-	isCustomDomain := false
-	_, err = uuid.Parse(domain)
-	if err == nil {
-		isCustomDomain = true
-		fqdn, err := h.Service.GetVerifiedDomain(c.Context(), domain, userID)
-		if err != nil {
-			return c.Status(400).JSON(fiber.Map{
-				"error": ErrInvalidDomain,
-			})
-		}
-		domain = fqdn.Name
-	} else if !strings.Contains(h.Cfg.Domains, domain) {
+	domain, isCustomDomain, ok := h.resolveDomain(c.Context(), userID, req.Domain)
+	if !ok {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidDomain,
 		})
@@ -315,8 +325,18 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 		})
 	}
 
-	// Validate catch-all suffix
-	if req.Format == model.AliasFormatCatchAll && req.WildcardLocalPart == "" {
+	// Validate wildcard suffix
+	if req.Format == model.AliasFormatWildcard && req.WildcardLocalPart == "" {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	delimiter := req.WildcardDelimiter
+	if delimiter == "" {
+		delimiter = model.DefaultWildcardDelimiter
+	}
+	if req.Format == model.AliasFormatWildcard && !model.IsValidWildcardDelimiter(delimiter) {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidRequest,
 		})
@@ -345,10 +365,10 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 	}
 
 	localPart := req.LocalPart
-	if req.Format == model.AliasFormatCatchAll {
+	if req.Format == model.AliasFormatWildcard {
 		localPart = req.WildcardLocalPart
 	}
-	alias, err = h.Service.PostAlias(c.Context(), alias, req.Format, domain, localPart)
+	alias, err = h.Service.PostAlias(c.Context(), alias, req.Format, domain, localPart, delimiter)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
@@ -359,6 +379,36 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 		"message": PostAliasSuccess,
 		"alias":   alias,
 	})
+}
+
+// @Summary Get Wildcard Alias domain info
+// @Description Get how many Wildcard Aliases the user already has for a domain and which delimiters are used
+// @Tags alias
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param domain query string true "Domain name or custom domain ID"
+// @Success 200 {object} model.WildcardDomainInfo
+// @Failure 400 {object} ErrorRes
+// @Router /alias/wildcard-domain-info [get]
+func (h *Handler) GetWildcardDomainInfo(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
+
+	domain, _, ok := h.resolveDomain(c.Context(), userID, c.Query("domain"))
+	if !ok {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidDomain,
+		})
+	}
+
+	info, err := h.Service.GetWildcardDomainInfo(c.Context(), userID, domain)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(info)
 }
 
 // @Summary Update alias

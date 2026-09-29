@@ -1,5 +1,7 @@
 package utils
 
+import "strings"
+
 import "testing"
 
 // FuzzValidSPFRecord and FuzzValidDMARCRecord fuzz parsing of TXT record
@@ -35,11 +37,11 @@ func FuzzValidSPFRecord(f *testing.F) {
 }
 
 func repeatField(s string, n int) string {
-	out := ""
-	for i := 0; i < n; i++ {
-		out += s
+	var out strings.Builder
+	for range n {
+		out.WriteString(s)
 	}
-	return out
+	return out.String()
 }
 
 func FuzzValidDMARCRecord(f *testing.F) {

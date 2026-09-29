@@ -77,7 +77,7 @@ func FuzzLettersParseEmail(f *testing.F) {
 	for _, depth := range []int{50} {
 		leaf := "From: a@example.com\r\nTo: b@example.com\r\nSubject: leaf\r\n\r\nleaf body"
 		nested := leaf
-		for i := 0; i < depth; i++ {
+		for i := range depth {
 			boundary := fmt.Sprintf("B%d", i)
 			nested = fmt.Sprintf(
 				"Content-Type: multipart/mixed; boundary=%s\r\n\r\n--%s\r\n%s\r\n--%s--\r\n",

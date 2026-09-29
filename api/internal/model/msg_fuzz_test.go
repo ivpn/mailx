@@ -54,7 +54,7 @@ func FuzzParseMsg(f *testing.F) {
 	// Deeply nested multipart/report bounce, to probe recursive descent in
 	// ExtractOriginalFrom / multipart.Reader boundary handling.
 	nested := "From: original@example.com\r\nTo: a@example.com\r\nSubject: inner\r\n\r\nleaf"
-	for i := 0; i < 30; i++ {
+	for i := range 30 {
 		boundary := fmt.Sprintf("B%d", i)
 		nested = fmt.Sprintf("Content-Type: multipart/mixed; boundary=%s\r\n\r\n--%s\r\n%s\r\n--%s--\r\n", boundary, boundary, nested, boundary)
 	}

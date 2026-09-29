@@ -6,6 +6,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
+	"maps"
 	"net/url"
 	"strconv"
 	"time"
@@ -36,9 +37,7 @@ func New(secret string, baseURL string) *Signer {
 // every query param, so none of them can be changed without invalidating the URL.
 func (s *Signer) Sign(path string, params url.Values, ttl time.Duration) string {
 	q := url.Values{}
-	for k, v := range params {
-		q[k] = v
-	}
+	maps.Copy(q, params)
 	q.Set(paramExpires, strconv.FormatInt(s.now().Add(ttl).Unix(), 10))
 	q.Set(paramSignature, s.mac(path, q))
 

@@ -1,5 +1,7 @@
 package utils
 
+import "strings"
+
 import "testing"
 
 // FuzzPreprocessEmailData fuzzes the raw-bytes normalisation pass every
@@ -32,11 +34,11 @@ func FuzzPreprocessEmailData(f *testing.F) {
 }
 
 func repeatEW(n int) string {
-	s := ""
-	for i := 0; i < n; i++ {
-		s += "=??q?x?="
+	var s strings.Builder
+	for range n {
+		s.WriteString("=??q?x?=")
 	}
-	return s
+	return s.String()
 }
 
 // FuzzDecodeHeaderWithCharset fuzzes RFC 2047 decoding with an attacker

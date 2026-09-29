@@ -13,6 +13,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"ivpn.net/email/api/config"
 	"ivpn.net/email/api/internal/model"
+	"ivpn.net/email/api/internal/utils"
 )
 
 var (
@@ -71,7 +72,8 @@ func NewIPFilter(allowedIPs []string) fiber.Handler {
 func NewPSK(psk string) fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
-		if GetAuthToken(c) == psk {
+		// reject unconfigured PSK too: constant-time compare of two empty strings is a false "match"
+		if psk != "" && utils.TimingSafeEqual(GetAuthToken(c), psk) {
 			return c.Next()
 		}
 
@@ -127,14 +129,17 @@ func NewCookieAuthn(token string, path string, cfg config.APIConfig) *fiber.Cook
 	}
 }
 
+// WebAuthnCeremonyExpiration bounds a begin->finish WebAuthn ceremony, independent of the main session's TokenExpiration.
+const WebAuthnCeremonyExpiration = 5 * time.Minute
+
 func NewCookieTempAuthn(token string, path string, cfg config.APIConfig) *fiber.Cookie {
 	return &fiber.Cookie{
 		Name:     AUTHN_TEMP_COOKIE,
 		Value:    token,
 		HTTPOnly: true,
 		Secure:   true,
-		MaxAge:   int(cfg.TokenExpiration.Seconds()),
-		Expires:  time.Now().Add(time.Duration(cfg.TokenExpiration)),
+		MaxAge:   int(WebAuthnCeremonyExpiration.Seconds()),
+		Expires:  time.Now().Add(WebAuthnCeremonyExpiration),
 	}
 }
 
@@ -146,6 +151,22 @@ func NewCookiePASession(id string) *fiber.Cookie {
 		Secure:   true,
 		MaxAge:   900, // 15 minutes
 		Expires:  time.Now().Add(15 * time.Minute),
+	}
+}
+
+// ClearCookies clears cookies by setting them to expire in the past.
+// Flags must match the original cookie attributes for the browser to clear them.
+// Workaround for clearing cookies: https://github.com/gofiber/fiber/issues/1127
+func ClearCookies(c *fiber.Ctx, key ...string) {
+	for i := range key {
+		c.Cookie(&fiber.Cookie{
+			Name:     key[i],
+			Expires:  time.Now().Add(-time.Hour * 24),
+			Value:    "",
+			HTTPOnly: true,
+			Secure:   true,
+			SameSite: fiber.CookieSameSiteLaxMode,
+		})
 	}
 }
 

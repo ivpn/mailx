@@ -42,6 +42,13 @@ func NeverExpires() *time.Time {
 	return nil
 }
 
+const DefaultAccessKeyTTL = 365 * 24 * time.Hour
+
+func DefaultAccessKeyExpiry() *time.Time {
+	expiresAt := time.Now().Add(DefaultAccessKeyTTL)
+	return &expiresAt
+}
+
 func (a *AccessKey) IsExpired() bool {
 	if a.ExpiresAt == nil {
 		return false // never expires

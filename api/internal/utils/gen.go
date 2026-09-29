@@ -2,6 +2,7 @@ package utils
 
 import (
 	"crypto/rand"
+	"encoding/base32"
 	"errors"
 	"io"
 	"math/big"
@@ -9,10 +10,9 @@ import (
 )
 
 const (
-	AlphaNumericUserFriendly          = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789"
-	AlphaNumericUserFriendlyUppercase = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
-	AlphaNumericLowerUpper            = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
-	AlphaLower                        = "abcdefghijkmnopqrstuvwxyz"
+	AlphaNumericUserFriendly = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789"
+	AlphaNumericLowerUpper   = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+	AlphaLower               = "abcdefghijkmnopqrstuvwxyz"
 )
 
 var (
@@ -47,4 +47,17 @@ func RandomString(n int, charset string) (string, error) {
 	}
 
 	return sb.String(), nil
+}
+
+func RandomBytesBase32(n int) (string, error) {
+	if n <= 0 {
+		return "", ErrInvalidLength
+	}
+
+	b := make([]byte, n)
+	if _, err := rand.Read(b); err != nil {
+		return "", err
+	}
+
+	return base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(b), nil
 }

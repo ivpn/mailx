@@ -19,13 +19,13 @@ var (
 	ErrPostAlias            = errors.New("Unable to create alias. Please try again.")
 	ErrPostInboundAlias     = errors.New("Unable to create inbound alias. Please try again.")
 	ErrPostAliasLimit       = errors.New("You’ve reached the maximum number of allowed aliases.")
-	ErrPostAliasInactiveSub = errors.New("Your subscription is not active. Please renew to create new aliases.")
 	ErrUpdateAlias          = errors.New("Unable to update alias. Please try again.")
 	ErrDeleteAlias          = errors.New("Unable to delete alias. Please try again.")
 	ErrDeleteAliasByUserID  = errors.New("Unable to delete aliases for this user.")
 	ErrDeleteAliasByDomain  = errors.New("Unable to delete aliases for this domain.")
 	ErrFailedImport         = errors.New("Failed to import aliases. Please check the format and try again.")
 	ErrFailedImportLimit    = errors.New("Failed to import aliases. You can only import up to 500 aliases at a time.")
+	ErrPostAliasInactiveSub = errors.New("Your subscription is not active. Please renew to create new aliases.")
 )
 
 type AliasStore interface {

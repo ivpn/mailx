@@ -1,10 +1,13 @@
 package auth
 
 import (
+	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/valyala/fasthttp"
+	"ivpn.net/email/api/config"
 )
 
 func TestGetUserID(t *testing.T) {
@@ -162,6 +165,114 @@ func TestGetAuthnCookie(t *testing.T) {
 			result := GetAuthnCookie(c)
 			if result != tt.expectedResult {
 				t.Errorf("expected %q, got %q", tt.expectedResult, result)
+			}
+		})
+	}
+}
+
+func TestNewPSK(t *testing.T) {
+	tests := []struct {
+		name           string
+		configuredPSK  string
+		authorization  string
+		expectedStatus int
+	}{
+		{
+			name:           "valid PSK",
+			configuredPSK:  "supersecretpsk",
+			authorization:  "Bearer supersecretpsk",
+			expectedStatus: fiber.StatusOK,
+		},
+		{
+			name:           "wrong PSK",
+			configuredPSK:  "supersecretpsk",
+			authorization:  "Bearer wrongpsk",
+			expectedStatus: fiber.StatusUnauthorized,
+		},
+		{
+			name:           "missing Authorization header",
+			configuredPSK:  "supersecretpsk",
+			authorization:  "",
+			expectedStatus: fiber.StatusUnauthorized,
+		},
+		{
+			// regression test: constant-time compare of "" == "" would otherwise report a match
+			name:           "empty configured PSK, no Authorization header",
+			configuredPSK:  "",
+			authorization:  "",
+			expectedStatus: fiber.StatusUnauthorized,
+		},
+		{
+			name:           "empty configured PSK, empty Bearer token",
+			configuredPSK:  "",
+			authorization:  "Bearer ",
+			expectedStatus: fiber.StatusUnauthorized,
+		},
+		{
+			name:           "case-sensitive mismatch",
+			configuredPSK:  "SuperSecretPSK",
+			authorization:  "Bearer supersecretpsk",
+			expectedStatus: fiber.StatusUnauthorized,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			app := fiber.New()
+			app.Use(NewPSK(tt.configuredPSK))
+			app.Get("/protected", func(c *fiber.Ctx) error {
+				return c.SendStatus(fiber.StatusOK)
+			})
+
+			req := httptest.NewRequest(fiber.MethodGet, "/protected", nil)
+			if tt.authorization != "" {
+				req.Header.Set("Authorization", tt.authorization)
+			}
+
+			resp, err := app.Test(req)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+
+			if resp.StatusCode != tt.expectedStatus {
+				t.Errorf("expected status %d, got %d", tt.expectedStatus, resp.StatusCode)
+			}
+		})
+	}
+}
+
+func TestNewCookieTempAuthn(t *testing.T) {
+	tests := []struct {
+		name            string
+		tokenExpiration time.Duration
+	}{
+		{name: "short TokenExpiration", tokenExpiration: time.Second},
+		{name: "long TokenExpiration", tokenExpiration: 168 * time.Hour},
+	}
+
+	wantMaxAge := int(WebAuthnCeremonyExpiration.Seconds())
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cfg := config.APIConfig{TokenExpiration: tt.tokenExpiration}
+
+			before := time.Now()
+			cookie := NewCookieTempAuthn("sometoken", "/some/path", cfg)
+			after := time.Now()
+
+			if cookie.Name != AUTHN_TEMP_COOKIE {
+				t.Errorf("expected cookie name %q, got %q", AUTHN_TEMP_COOKIE, cookie.Name)
+			}
+
+			// regression: MaxAge must stay pinned to the ceremony window regardless of TokenExpiration
+			if cookie.MaxAge != wantMaxAge {
+				t.Errorf("expected MaxAge %d, got %d", wantMaxAge, cookie.MaxAge)
+			}
+
+			minExpires := before.Add(WebAuthnCeremonyExpiration)
+			maxExpires := after.Add(WebAuthnCeremonyExpiration)
+			if cookie.Expires.Before(minExpires) || cookie.Expires.After(maxExpires) {
+				t.Errorf("expected Expires within [%v, %v], got %v", minExpires, maxExpires, cookie.Expires)
 			}
 		})
 	}

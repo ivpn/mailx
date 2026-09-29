@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"crypto/sha256"
-	"encoding/base32"
 	"encoding/base64"
 	"errors"
 	"log"
@@ -155,7 +154,7 @@ func (s *Service) PostUser(ctx context.Context, user model.User, subID string, s
 		return ErrInvalidSubscription
 	}
 
-	if preauth.TokenHash != tokenHashStr {
+	if !utils.TimingSafeEqual(preauth.TokenHash, tokenHashStr) {
 		log.Printf("error creating user: Token hash does not match")
 		return ErrTokenHashMismatch
 	}
@@ -316,7 +315,7 @@ func (s *Service) DeleteUser(ctx context.Context, userID string, OTP string) err
 		return ErrIncorrectOTP
 	}
 
-	if otp != OTP {
+	if !utils.TimingSafeEqual(otp, OTP) {
 		log.Printf("error deleting user: OTP does not match")
 		return ErrIncorrectOTP
 	}
@@ -549,15 +548,11 @@ func (s *Service) ResetPassword(ctx context.Context, otp string, password string
 }
 
 func (s *Service) TotpEnable(ctx context.Context, userID string) (model.TOTPNew, error) {
-	random, err := utils.RandomString(10, utils.AlphaNumericUserFriendlyUppercase)
+	totpSecret, err := utils.RandomBytesBase32(20)
 	if err != nil {
 		log.Printf("error enabling TOTP: %s", err.Error())
 		return model.TOTPNew{}, ErrCreateOTP
 	}
-
-	totpSecret := base32.StdEncoding.EncodeToString(
-		[]byte(random),
-	)
 
 	err = s.Cache.Set(ctx, "totp_"+userID, totpSecret, s.Cfg.Service.OTPExpiration)
 	if err != nil {
@@ -601,7 +596,7 @@ func (s *Service) TotpEnableConfirm(ctx context.Context, userID string, otp stri
 	backupCodes := []string{}
 
 	for range 8 {
-		random, err := utils.RandomString(8, utils.AlphaNumericUserFriendly)
+		random, err := utils.RandomString(10, utils.AlphaNumericUserFriendly)
 		if err != nil {
 			log.Printf("error enabling TOTP: %s", err.Error())
 			return model.TOTPBackup{}, ErrCreateOTP

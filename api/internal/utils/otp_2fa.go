@@ -21,7 +21,7 @@ const windowSize = 2
 // but does not silently ignore them (it forces a mismatch so the code will be rejected).
 func computeCode(secret string, value int64) (int, error) {
 
-	key, err := base32.StdEncoding.DecodeString(secret)
+	key, err := base32.StdEncoding.WithPadding(base32.NoPadding).DecodeString(secret)
 	if err != nil {
 		return -1, err
 	}

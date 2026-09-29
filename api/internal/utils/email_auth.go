@@ -16,7 +16,13 @@ type AuthResults struct {
 	DMARCDomain string
 }
 
-func VerifyEmailAuth(data []byte) (bool, error) {
+type EmailAuthConfig struct {
+	TrustedRelayDomains []string
+	DisableAlignment    bool
+	LogMismatch         bool
+}
+
+func VerifyEmailAuth(data []byte, cfg EmailAuthConfig) (bool, error) {
 	msg, err := mail.ReadMessage(bytes.NewReader(data))
 	if err != nil {
 		return false, err
@@ -40,37 +46,65 @@ func VerifyEmailAuth(data []byte) (bool, error) {
 
 	parsed := parseAuthResults(authResults)
 
-	// fromAddr, err := mail.ParseAddress(headers.Get("From"))
-	// if err != nil {
-	// 	return false, err
-	// }
-	// fromDomain := extractDomain(fromAddr.Address)
+	fromAddr, err := mail.ParseAddress(headers.Get("From"))
+	if err != nil {
+		return false, err
+	}
+	fromDomain := extractDomain(fromAddr.Address)
 
-	// Check for domain mismatches when authentication method is present
-	// TODO: Re-enable DKIM domain check if needed, this check prevents real case scenarios when 3rd party services sending email on behalf of some domain
-	// if parsed.DKIM != "" && !relaxedMatch(fromDomain, parsed.DKIMDomain) {
-	// 	return false, errors.New("DKIM domain mismatch, fromDomain: " + fromDomain + ", DKIM domain: " + parsed.DKIMDomain)
-	// }
+	reject, mismatchErr := checkAlignment(fromDomain, parsed, cfg)
+	if reject {
+		return false, mismatchErr
+	}
 
-	// if parsed.SPF != "" && !relaxedMatch(fromDomain, parsed.SPFDomain) {
-	// 	return false, errors.New("SPF domain mismatch, fromDomain: " + fromDomain + ", SPF domain: " + parsed.SPFDomain)
-	// }
-
-	// if parsed.DMARC != "" && !relaxedMatch(fromDomain, parsed.DMARCDomain) {
-	// 	return false, errors.New("DMARC domain mismatch, fromDomain: " + fromDomain + ", DMARC domain: " + parsed.DMARCDomain)
-	// }
-
-	// Continue with original verification checks
 	switch {
 	case parsed.DMARC == "pass":
-		return true, nil
+		return true, mismatchErr
 	case parsed.DKIM == "pass":
-		return true, nil
+		return true, mismatchErr
 	case parsed.SPF == "pass":
-		return true, nil
+		return true, mismatchErr
 	default:
-		return false, nil
+		return false, mismatchErr
 	}
+}
+
+// checkAlignment compares each present DKIM/SPF/DMARC result's authenticated domain against
+// fromDomain. It reports whether the message should be rejected under cfg's enforcement
+// settings, plus a diagnostic error describing any mismatch found (nil unless a mismatch
+// occurred and either it caused rejection or cfg.LogMismatch requested visibility into
+// mismatches that were bypassed via TrustedRelayDomains or cfg.DisableAlignment).
+func checkAlignment(fromDomain string, parsed AuthResults, cfg EmailAuthConfig) (bool, error) {
+	mechanisms := []struct {
+		name       string
+		result     string
+		authDomain string
+	}{
+		{"DKIM", parsed.DKIM, parsed.DKIMDomain},
+		{"SPF", parsed.SPF, parsed.SPFDomain},
+		{"DMARC", parsed.DMARC, parsed.DMARCDomain},
+	}
+
+	var reject bool
+	var errs []error
+
+	for _, m := range mechanisms {
+		if m.result == "" || relaxedMatch(fromDomain, m.authDomain) {
+			continue
+		}
+
+		trusted := isTrustedRelayDomain(m.authDomain, cfg.TrustedRelayDomains)
+		mechReject := !trusted && !cfg.DisableAlignment
+		if mechReject {
+			reject = true
+		}
+
+		if mechReject || cfg.LogMismatch {
+			errs = append(errs, errors.New(m.name+" domain mismatch, fromDomain: "+fromDomain+", "+m.name+" domain: "+m.authDomain))
+		}
+	}
+
+	return reject, errors.Join(errs...)
 }
 
 func parseAuthResults(headers []string) AuthResults {
@@ -133,5 +167,31 @@ func relaxedMatch(fromDomain, authDomain string) bool {
 		return false
 	}
 
-	return strings.HasSuffix(fromDomain, authDomain) || strings.HasSuffix(authDomain, fromDomain)
+	fromDomain = strings.ToLower(fromDomain)
+	authDomain = strings.ToLower(authDomain)
+
+	if fromDomain == authDomain {
+		return true
+	}
+
+	// Require a label boundary so e.g. "notexample.com" does not match "example.com".
+	return strings.HasSuffix(fromDomain, "."+authDomain) || strings.HasSuffix(authDomain, "."+fromDomain)
+}
+
+// isTrustedRelayDomain reports whether domain is (or is a subdomain of) one of the
+// operator-configured relay signing domains explicitly trusted to send authenticated
+// mail on behalf of other From: domains (e.g. transactional email providers).
+func isTrustedRelayDomain(domain string, trustedRelayDomains []string) bool {
+	if domain == "" {
+		return false
+	}
+
+	for _, trusted := range trustedRelayDomains {
+		trusted = strings.TrimSpace(trusted)
+		if trusted != "" && relaxedMatch(domain, trusted) {
+			return true
+		}
+	}
+
+	return false
 }

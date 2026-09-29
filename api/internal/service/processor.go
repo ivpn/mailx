@@ -78,7 +78,11 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 	}
 
 	// Verify Email Authentication
-	pass, err := utils.VerifyEmailAuth(data)
+	pass, err := utils.VerifyEmailAuth(data, utils.EmailAuthConfig{
+		TrustedRelayDomains: s.Cfg.API.TrustedRelayDomains,
+		DisableAlignment:    s.Cfg.API.DisableEmailAuthAlignment,
+		LogMismatch:         s.Cfg.API.LogEmailAuthMismatch,
+	})
 	if err != nil {
 		log.Println("email authentication failed:", err)
 	}

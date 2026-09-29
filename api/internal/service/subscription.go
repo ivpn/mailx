@@ -12,6 +12,7 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
 	"ivpn.net/email/api/internal/model"
+	"ivpn.net/email/api/internal/utils"
 )
 
 var (
@@ -108,7 +109,7 @@ func (s *Service) UpdateSubscription(ctx context.Context, sub model.Subscription
 		return ErrPANotFound
 	}
 
-	if preauth.TokenHash != tokenHashStr {
+	if !utils.TimingSafeEqual(preauth.TokenHash, tokenHashStr) {
 		log.Printf("error updating subscription: Token hash does not match")
 		return ErrTokenHashMismatch
 	}

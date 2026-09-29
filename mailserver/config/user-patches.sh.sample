@@ -8,6 +8,13 @@ echo $SMTP_PASS | saslpasswd2 -c -u "$DOMAIN" $SMTP_USER
 chown postfix:postfix /etc/sasldb2
 chmod 640 /etc/sasldb2
 
+# Keep the PSK out of the executable script below (readable, but at least not
+# dumped whenever someone cats/copies curl-email.sh for debugging).
+mkdir -p /etc/curl-email
+printf '%s' "$PSK" > /etc/curl-email/psk
+chown root:root /etc/curl-email/psk
+chmod 644 /etc/curl-email/psk
+
 # curl-email.sh script
 cat > /usr/local/bin/curl-email.sh <<EOF
 #!/bin/sh
@@ -18,7 +25,7 @@ body=\$(mktemp /tmp/curl-email.XXXXXX)
 # space (aliases commonly use '+', e.g. plus-tagged/reply-encoded addresses).
 encoded_recipient=\$(printf '%s' "\$2" | sed 's/+/%2B/g')
 http_code=\$(curl --silent --data-binary @- \\
-  -H "Authorization: Bearer $PSK" \\
+  -H "Authorization: Bearer \$(cat /etc/curl-email/psk)" \\
   -X POST "$API_URL/v1/email?recipient=\$encoded_recipient" \\
   -o "\$body" -w "%{http_code}")
 resp_body=\$(cat "\$body")

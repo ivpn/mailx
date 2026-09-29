@@ -20,7 +20,14 @@ services:
       - ${API_DNS_RESOLVER}
   
   app:
-    build: ../app
+    build:
+      context: ../app
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+        VITE_DOMAINS: ${VITE_DOMAINS}
+        VITE_APP_NAME: ${VITE_APP_NAME}
+        VITE_RESYNC_URL: ${VITE_RESYNC_URL}
+        VITE_PRICING_URL: ${VITE_PRICING_URL}
     container_name: email-app
     image: email-app
     restart: unless-stopped

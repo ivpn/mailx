@@ -108,7 +108,7 @@ func (h *Handler) BeginRegistration(c *fiber.Ctx) error {
 	}
 
 	// Save the session
-	exp := time.Now().Add(h.Cfg.TokenExpiration)
+	exp := time.Now().Add(auth.WebAuthnCeremonyExpiration)
 	token, err := model.GenSessionToken()
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -196,7 +196,7 @@ func (h *Handler) FinishRegistration(c *fiber.Ctx) error {
 	}
 
 	// Clear cookie
-	c.ClearCookie(auth.AUTHN_TEMP_COOKIE)
+	auth.ClearCookies(c, auth.AUTHN_TEMP_COOKIE)
 
 	// Save the session
 	exp := time.Now().Add(h.Cfg.TokenExpiration)
@@ -253,7 +253,7 @@ func (h *Handler) AddPasskey(c *fiber.Ctx) error {
 	}
 
 	// Save the session
-	exp := time.Now().Add(h.Cfg.TokenExpiration)
+	exp := time.Now().Add(auth.WebAuthnCeremonyExpiration)
 	token, err := model.GenSessionToken()
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -288,6 +288,13 @@ func (h *Handler) FinishAddPasskey(c *fiber.Ctx) error {
 	// Get session
 	session, ok, err := h.Service.GetSession(c.Context(), token)
 	if err != nil || !ok {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrGetSession,
+		})
+	}
+
+	// Ensure the caller's own session matches the ceremony's target user
+	if auth.GetUserID(c) != session.UserID {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrGetSession,
 		})
@@ -333,7 +340,7 @@ func (h *Handler) FinishAddPasskey(c *fiber.Ctx) error {
 	}
 
 	// Clear cookie
-	c.ClearCookie(auth.AUTHN_TEMP_COOKIE)
+	auth.ClearCookies(c, auth.AUTHN_TEMP_COOKIE)
 
 	// Save the session
 	exp := time.Now().Add(h.Cfg.TokenExpiration)
@@ -415,7 +422,7 @@ func (h *Handler) BeginLogin(c *fiber.Ctx) error {
 	}
 
 	// Save the session
-	exp := time.Now().Add(h.Cfg.TokenExpiration)
+	exp := time.Now().Add(auth.WebAuthnCeremonyExpiration)
 	token, err := model.GenSessionToken()
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -502,7 +509,7 @@ func (h *Handler) FinishLogin(c *fiber.Ctx) error {
 	}
 
 	// Clear cookie
-	c.ClearCookie(auth.AUTHN_TEMP_COOKIE)
+	auth.ClearCookies(c, auth.AUTHN_TEMP_COOKIE)
 
 	// Save the session
 	exp := time.Now().Add(h.Cfg.TokenExpiration)

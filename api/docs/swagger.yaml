@@ -15,12 +15,13 @@ definitions:
     required:
     - otp
     type: object
+  api.AliasPinReq:
+    properties:
+      pinned:
+        type: boolean
+    type: object
   api.AliasReq:
     properties:
-      catch_all_suffix:
-        maxLength: 12
-        minLength: 6
-        type: string
       description:
         type: string
       domain:
@@ -31,11 +32,31 @@ definitions:
         type: string
       from_name:
         type: string
+      local_part:
+        type: string
       recipients:
+        type: string
+      wildcard_delimiter:
+        enum:
+        - +
+        - .
+        type: string
+      wildcard_local_part:
+        maxLength: 12
+        minLength: 6
         type: string
     required:
     - domain
     - recipients
+    type: object
+  api.Announcement:
+    properties:
+      body:
+        type: string
+      link:
+        type: string
+      title:
+        type: string
     type: object
   api.AuthReq:
     properties:
@@ -46,8 +67,47 @@ definitions:
     required:
     - access_key
     type: object
+  api.BulkAliasEnabledReq:
+    properties:
+      enabled:
+        type: boolean
+      ids:
+        items:
+          type: string
+        maxItems: 500
+        minItems: 1
+        type: array
+    required:
+    - ids
+    type: object
+  api.BulkAliasIDsReq:
+    properties:
+      ids:
+        items:
+          type: string
+        maxItems: 500
+        minItems: 1
+        type: array
+    required:
+    - ids
+    type: object
+  api.BulkAliasPinReq:
+    properties:
+      ids:
+        items:
+          type: string
+        maxItems: 500
+        minItems: 1
+        type: array
+      pinned:
+        type: boolean
+    required:
+    - ids
+    type: object
   api.ChangePasswordReq:
     properties:
+      old_password:
+        type: string
       password:
         type: string
     type: object
@@ -74,6 +134,8 @@ definitions:
     properties:
       email:
         type: string
+      remember:
+        type: boolean
     required:
     - email
     type: object
@@ -165,6 +227,11 @@ definitions:
     - email
     - subid
     type: object
+  api.StepUpPasswordReq:
+    properties:
+      password:
+        type: string
+    type: object
   api.SubscriptionReq:
     properties:
       id:
@@ -173,7 +240,6 @@ definitions:
         type: string
     required:
     - id
-    - subid
     type: object
   api.SuccessRes:
     properties:
@@ -183,7 +249,7 @@ definitions:
   api.TotpReq:
     properties:
       otp:
-        maxLength: 8
+        maxLength: 10
         minLength: 6
         type: string
     required:
@@ -191,6 +257,10 @@ definitions:
     type: object
   api.UpdateDomainReq:
     properties:
+      catch_all:
+        type: boolean
+      create_alias:
+        type: boolean
       description:
         type: string
       enabled:
@@ -209,11 +279,13 @@ definitions:
       email:
         type: string
       otp:
-        maxLength: 8
+        maxLength: 10
         minLength: 0
         type: string
       password:
         type: string
+      remember:
+        type: boolean
     required:
     - email
     type: object
@@ -233,8 +305,6 @@ definitions:
     type: object
   model.Alias:
     properties:
-      catch_all:
-        type: boolean
       created_at:
         type: string
       description:
@@ -245,12 +315,24 @@ definitions:
         type: string
       id:
         type: string
+      is_custom_domain:
+        type: boolean
+      is_domain_enabled:
+        type: boolean
+      is_domain_verified:
+        type: boolean
       name:
         type: string
+      origin:
+        $ref: '#/definitions/model.AliasOrigin'
+      pinned:
+        type: boolean
       recipients:
         type: string
       stats:
         $ref: '#/definitions/model.AliasStats'
+      wildcard:
+        type: boolean
     type: object
   model.AliasList:
     properties:
@@ -261,6 +343,16 @@ definitions:
       total:
         type: integer
     type: object
+  model.AliasOrigin:
+    enum:
+    - 0
+    - 1
+    - 2
+    type: integer
+    x-enum-varnames:
+    - Manual
+    - Inbound
+    - Import
   model.AliasStats:
     properties:
       blocks:
@@ -298,6 +390,10 @@ definitions:
     type: object
   model.Domain:
     properties:
+      catch_all:
+        type: boolean
+      create_alias:
+        type: boolean
       created_at:
         type: string
       description:
@@ -346,13 +442,21 @@ definitions:
   model.LogType:
     enum:
     - bounce
+    - deferred_delivery
+    - failed_delivery
     - disabled_alias
+    - disabled_domain
     - unauthorised_send
+    - inactive_subscription
     type: string
     x-enum-varnames:
     - BounceMessage
+    - DeferredDelivery
+    - FailedDelivery
     - DisabledAlias
+    - DisabledDomain
     - UnauthorisedSend
+    - InactiveSubscription
   model.Recipient:
     properties:
       created_at:
@@ -401,7 +505,13 @@ definitions:
         type: boolean
       status:
         $ref: '#/definitions/model.SubscriptionStatus'
+      terminated:
+        type: boolean
+      terminated_at:
+        type: string
       tier:
+        type: string
+      type:
         type: string
       updated_at:
         type: string
@@ -438,6 +548,8 @@ definitions:
         type: string
       email:
         type: string
+      has_password:
+        type: boolean
       id:
         type: string
       is_active:
@@ -459,6 +571,17 @@ definitions:
       replies:
         type: integer
       sends:
+        type: integer
+    type: object
+  model.WildcardDomainInfo:
+    properties:
+      count:
+        type: integer
+      delimiters_used:
+        items:
+          type: string
+        type: array
+      limit:
         type: integer
     type: object
 info:
@@ -654,11 +777,139 @@ paths:
       summary: Update alias
       tags:
       - alias
+  /alias/{id}/pin:
+    put:
+      consumes:
+      - application/json
+      description: Set alias pinned status; pinned aliases are always sorted first
+        in the list
+      parameters:
+      - description: Alias ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Pin request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.AliasPinReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Pin or unpin alias
+      tags:
+      - alias
+  /alias/forget/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Permanently delete a custom-domain alias, bypassing the soft-delete
+        step entirely
+      parameters:
+      - description: Alias ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Forget alias
+      tags:
+      - alias
+  /alias/restore/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Restore alias
+      parameters:
+      - description: Alias ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Restore alias
+      tags:
+      - alias
+  /alias/wildcard-domain-info:
+    get:
+      consumes:
+      - application/json
+      description: Get how many Wildcard Aliases the user already has for a domain
+        and which delimiters are used
+      parameters:
+      - description: Domain name or custom domain ID
+        in: query
+        name: domain
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.WildcardDomainInfo'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Wildcard Alias domain info
+      tags:
+      - alias
   /aliases:
     get:
       consumes:
       - application/json
       description: Get all aliases
+      parameters:
+      - description: Filter by alias status
+        enum:
+        - active_inactive
+        - active
+        - inactive
+        - deleted
+        - all
+        in: query
+        name: status
+        type: string
       produces:
       - application/json
       responses:
@@ -673,6 +924,152 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Get aliases
+      tags:
+      - alias
+  /aliases/bulk/delete:
+    post:
+      consumes:
+      - application/json
+      description: Soft-delete multiple aliases at once; fails entirely if any selected
+        alias is already deleted
+      parameters:
+      - description: Bulk delete request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.BulkAliasIDsReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Bulk delete aliases
+      tags:
+      - alias
+  /aliases/bulk/enable:
+    post:
+      consumes:
+      - application/json
+      description: Set enabled status for multiple aliases at once; deleted aliases
+        and aliases left without a recipient are skipped
+      parameters:
+      - description: Bulk enable request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.BulkAliasEnabledReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Bulk activate/deactivate aliases
+      tags:
+      - alias
+  /aliases/bulk/forget:
+    post:
+      consumes:
+      - application/json
+      description: Permanently delete multiple custom-domain aliases at once, bypassing
+        the soft-delete step entirely; fails entirely if any selected alias isn't
+        a custom domain alias
+      parameters:
+      - description: Bulk forget request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.BulkAliasIDsReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Bulk forget aliases
+      tags:
+      - alias
+  /aliases/bulk/pin:
+    post:
+      consumes:
+      - application/json
+      description: Set pinned status for multiple aliases at once; pinned aliases
+        are always sorted first in the list, deleted aliases are skipped
+      parameters:
+      - description: Bulk pin request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.BulkAliasPinReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Bulk pin/unpin aliases
+      tags:
+      - alias
+  /aliases/bulk/restore:
+    post:
+      consumes:
+      - application/json
+      description: Restore multiple soft-deleted aliases at once; fails entirely if
+        any selected alias isn't deleted
+      parameters:
+      - description: Bulk restore request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.BulkAliasIDsReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Bulk restore aliases
       tags:
       - alias
   /aliases/export:
@@ -696,6 +1093,23 @@ paths:
       summary: Export aliases
       tags:
       - alias
+  /announcements:
+    get:
+      description: Get list of announcements from the public announcements file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/api.Announcement'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Get announcements
   /api/alias:
     post:
       consumes:
@@ -783,11 +1197,111 @@ paths:
       summary: Update alias
       tags:
       - alias
+  /api/alias/{id}/pin:
+    put:
+      consumes:
+      - application/json
+      description: Set alias pinned status; pinned aliases are always sorted first
+        in the list
+      parameters:
+      - description: Alias ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Pin request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.AliasPinReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Pin or unpin alias
+      tags:
+      - alias
+  /api/alias/forget/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Permanently delete a custom-domain alias, bypassing the soft-delete
+        step entirely
+      parameters:
+      - description: Alias ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Forget alias
+      tags:
+      - alias
+  /api/alias/restore/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Restore alias
+      parameters:
+      - description: Alias ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Restore alias
+      tags:
+      - alias
   /api/aliases:
     get:
       consumes:
       - application/json
       description: Get all aliases
+      parameters:
+      - description: Filter by alias status
+        enum:
+        - active_inactive
+        - active
+        - inactive
+        - deleted
+        - all
+        in: query
+        name: status
+        type: string
       produces:
       - application/json
       responses:
@@ -1004,15 +1518,15 @@ paths:
       - application/json
       responses:
         "200":
-          description: message
+          description: message, checks
           schema:
-            additionalProperties:
-              type: string
+            additionalProperties: true
             type: object
         "400":
-          description: Bad Request
+          description: error, checks
           schema:
-            $ref: '#/definitions/api.ErrorRes'
+            additionalProperties: true
+            type: object
       security:
       - ApiKeyAuth: []
       summary: Verify custom domain DNS records
@@ -1052,6 +1566,10 @@ paths:
         required: true
         schema:
           type: string
+      - description: Envelope recipient for this specific delivery (Postfix ${recipient})
+        in: query
+        name: recipient
+        type: string
       produces:
       - application/json
       responses:
@@ -1062,6 +1580,32 @@ paths:
       summary: Email handler
       tags:
       - email
+  /email/domain/check:
+    post:
+      consumes:
+      - application/json
+      description: Check if a custom domain exists for the authenticated user
+      parameters:
+      - description: Custom Domain Request
+        in: body
+        name: domain
+        required: true
+        schema:
+          $ref: '#/definitions/api.DomainReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Check custom domain
+      tags:
+      - domain
   /initiatepasswordreset:
     post:
       consumes:
@@ -1184,6 +1728,44 @@ paths:
           schema:
             $ref: '#/definitions/api.ErrorRes'
       summary: Finish login
+      tags:
+      - webauthn
+  /login/passkey/begin:
+    post:
+      consumes:
+      - application/json
+      description: Begin usernameless login process using a discoverable passkey
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Begin passkey login
+      tags:
+      - webauthn
+  /login/passkey/finish:
+    post:
+      consumes:
+      - application/json
+      description: Finish usernameless login process using a discoverable passkey
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      summary: Finish passkey login
       tags:
       - webauthn
   /logs:
@@ -1977,6 +2559,79 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Get user stats
+      tags:
+      - user
+  /user/stepup/passkey/begin:
+    post:
+      consumes:
+      - application/json
+      description: Begin a WebAuthn assertion ceremony to authorize a pending sensitive
+        action
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Begin step-up verification via passkey
+      tags:
+      - user
+  /user/stepup/passkey/finish:
+    post:
+      consumes:
+      - application/json
+      description: Finish a WebAuthn assertion ceremony to authorize a pending sensitive
+        action
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Finish step-up verification via passkey
+      tags:
+      - user
+  /user/stepup/password:
+    post:
+      consumes:
+      - application/json
+      description: Verify the current user's password to authorize a pending sensitive
+        action
+      parameters:
+      - description: Step-up password request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.StepUpPasswordReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Step-up verification via password
       tags:
       - user
   /user/totp/disable:

@@ -183,6 +183,135 @@ const docTemplate = `{
                 }
             }
         },
+        "/alias/forget/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Permanently delete a custom-domain alias, bypassing the soft-delete step entirely",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "alias"
+                ],
+                "summary": "Forget alias",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Alias ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/alias/restore/{id}": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Restore alias",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "alias"
+                ],
+                "summary": "Restore alias",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Alias ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/alias/wildcard-domain-info": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get how many Wildcard Aliases the user already has for a domain and which delimiters are used",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "alias"
+                ],
+                "summary": "Get Wildcard Alias domain info",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Domain name or custom domain ID",
+                        "name": "domain",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.WildcardDomainInfo"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
         "/alias/{id}": {
             "get": {
                 "security": [
@@ -317,6 +446,58 @@ const docTemplate = `{
                 }
             }
         },
+        "/alias/{id}/pin": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Set alias pinned status; pinned aliases are always sorted first in the list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "alias"
+                ],
+                "summary": "Pin or unpin alias",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Alias ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Pin request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.AliasPinReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
         "/aliases": {
             "get": {
                 "security": [
@@ -335,11 +516,251 @@ const docTemplate = `{
                     "alias"
                 ],
                 "summary": "Get aliases",
+                "parameters": [
+                    {
+                        "enum": [
+                            "active_inactive",
+                            "active",
+                            "inactive",
+                            "deleted",
+                            "all"
+                        ],
+                        "type": "string",
+                        "description": "Filter by alias status",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/model.AliasList"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/aliases/bulk/delete": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Soft-delete multiple aliases at once; fails entirely if any selected alias is already deleted",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "alias"
+                ],
+                "summary": "Bulk delete aliases",
+                "parameters": [
+                    {
+                        "description": "Bulk delete request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.BulkAliasIDsReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/aliases/bulk/enable": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Set enabled status for multiple aliases at once; deleted aliases and aliases left without a recipient are skipped",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "alias"
+                ],
+                "summary": "Bulk activate/deactivate aliases",
+                "parameters": [
+                    {
+                        "description": "Bulk enable request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.BulkAliasEnabledReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/aliases/bulk/forget": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Permanently delete multiple custom-domain aliases at once, bypassing the soft-delete step entirely; fails entirely if any selected alias isn't a custom domain alias",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "alias"
+                ],
+                "summary": "Bulk forget aliases",
+                "parameters": [
+                    {
+                        "description": "Bulk forget request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.BulkAliasIDsReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/aliases/bulk/pin": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Set pinned status for multiple aliases at once; pinned aliases are always sorted first in the list, deleted aliases are skipped",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "alias"
+                ],
+                "summary": "Bulk pin/unpin aliases",
+                "parameters": [
+                    {
+                        "description": "Bulk pin request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.BulkAliasPinReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/aliases/bulk/restore": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Restore multiple soft-deleted aliases at once; fails entirely if any selected alias isn't deleted",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "alias"
+                ],
+                "summary": "Bulk restore aliases",
+                "parameters": [
+                    {
+                        "description": "Bulk restore request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.BulkAliasIDsReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
                         }
                     },
                     "400": {
@@ -385,6 +806,32 @@ const docTemplate = `{
                 }
             }
         },
+        "/announcements": {
+            "get": {
+                "description": "Get list of announcements from the public announcements file",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get announcements",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/api.Announcement"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
         "/api/alias": {
             "post": {
                 "security": [
@@ -417,6 +864,92 @@ const docTemplate = `{
                 "responses": {
                     "201": {
                         "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/alias/forget/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Permanently delete a custom-domain alias, bypassing the soft-delete step entirely",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "alias"
+                ],
+                "summary": "Forget alias",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Alias ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/alias/restore/{id}": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Restore alias",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "alias"
+                ],
+                "summary": "Restore alias",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Alias ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/api.SuccessRes"
                         }
@@ -523,6 +1056,58 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/alias/{id}/pin": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Set alias pinned status; pinned aliases are always sorted first in the list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "alias"
+                ],
+                "summary": "Pin or unpin alias",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Alias ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Pin request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.AliasPinReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
         "/api/aliases": {
             "get": {
                 "security": [
@@ -541,6 +1126,21 @@ const docTemplate = `{
                     "alias"
                 ],
                 "summary": "Get aliases",
+                "parameters": [
+                    {
+                        "enum": [
+                            "active_inactive",
+                            "active",
+                            "inactive",
+                            "deleted",
+                            "all"
+                        ],
+                        "type": "string",
+                        "description": "Filter by alias status",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -910,18 +1510,17 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "message",
+                        "description": "message, checks",
                         "schema": {
                             "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "additionalProperties": true
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "error, checks",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorRes"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -949,6 +1548,12 @@ const docTemplate = `{
                         "schema": {
                             "type": "string"
                         }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Envelope recipient for this specific delivery (Postfix ${recipient})",
+                        "name": "recipient",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -956,6 +1561,46 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/email/domain/check": {
+            "post": {
+                "description": "Check if a custom domain exists for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "domain"
+                ],
+                "summary": "Check custom domain",
+                "parameters": [
+                    {
+                        "description": "Custom Domain Request",
+                        "name": "domain",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.DomainReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
                         }
                     }
                 }
@@ -1137,6 +1782,64 @@ const docTemplate = `{
                     "webauthn"
                 ],
                 "summary": "Finish login",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/login/passkey/begin": {
+            "post": {
+                "description": "Begin usernameless login process using a discoverable passkey",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "webauthn"
+                ],
+                "summary": "Begin passkey login",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/login/passkey/finish": {
+            "post": {
+                "description": "Finish usernameless login process using a discoverable passkey",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "webauthn"
+                ],
+                "summary": "Finish passkey login",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -2413,6 +3116,119 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/stepup/passkey/begin": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Begin a WebAuthn assertion ceremony to authorize a pending sensitive action",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Begin step-up verification via passkey",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/stepup/passkey/finish": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Finish a WebAuthn assertion ceremony to authorize a pending sensitive action",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Finish step-up verification via passkey",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/stepup/password": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Verify the current user's password to authorize a pending sensitive action",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Step-up verification via password",
+                "parameters": [
+                    {
+                        "description": "Step-up password request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.StepUpPasswordReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
         "/user/totp/disable": {
             "put": {
                 "security": [
@@ -2564,6 +3380,14 @@ const docTemplate = `{
                 }
             }
         },
+        "api.AliasPinReq": {
+            "type": "object",
+            "properties": {
+                "pinned": {
+                    "type": "boolean"
+                }
+            }
+        },
         "api.AliasReq": {
             "type": "object",
             "required": [
@@ -2571,11 +3395,6 @@ const docTemplate = `{
                 "recipients"
             ],
             "properties": {
-                "catch_all_suffix": {
-                    "type": "string",
-                    "maxLength": 12,
-                    "minLength": 6
-                },
                 "description": {
                     "type": "string"
                 },
@@ -2591,7 +3410,36 @@ const docTemplate = `{
                 "from_name": {
                     "type": "string"
                 },
+                "local_part": {
+                    "type": "string"
+                },
                 "recipients": {
+                    "type": "string"
+                },
+                "wildcard_delimiter": {
+                    "type": "string",
+                    "enum": [
+                        "+",
+                        "."
+                    ]
+                },
+                "wildcard_local_part": {
+                    "type": "string",
+                    "maxLength": 12,
+                    "minLength": 6
+                }
+            }
+        },
+        "api.Announcement": {
+            "type": "object",
+            "properties": {
+                "body": {
+                    "type": "string"
+                },
+                "link": {
+                    "type": "string"
+                },
+                "title": {
                     "type": "string"
                 }
             }
@@ -2609,9 +3457,66 @@ const docTemplate = `{
                 }
             }
         },
+        "api.BulkAliasEnabledReq": {
+            "type": "object",
+            "required": [
+                "ids"
+            ],
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "ids": {
+                    "type": "array",
+                    "maxItems": 500,
+                    "minItems": 1,
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "api.BulkAliasIDsReq": {
+            "type": "object",
+            "required": [
+                "ids"
+            ],
+            "properties": {
+                "ids": {
+                    "type": "array",
+                    "maxItems": 500,
+                    "minItems": 1,
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "api.BulkAliasPinReq": {
+            "type": "object",
+            "required": [
+                "ids"
+            ],
+            "properties": {
+                "ids": {
+                    "type": "array",
+                    "maxItems": 500,
+                    "minItems": 1,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "pinned": {
+                    "type": "boolean"
+                }
+            }
+        },
         "api.ChangePasswordReq": {
             "type": "object",
             "properties": {
+                "old_password": {
+                    "type": "string"
+                },
                 "password": {
                     "type": "string"
                 }
@@ -2655,6 +3560,9 @@ const docTemplate = `{
             "properties": {
                 "email": {
                     "type": "string"
+                },
+                "remember": {
+                    "type": "boolean"
                 }
             }
         },
@@ -2792,11 +3700,18 @@ const docTemplate = `{
                 }
             }
         },
+        "api.StepUpPasswordReq": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
         "api.SubscriptionReq": {
             "type": "object",
             "required": [
-                "id",
-                "subid"
+                "id"
             ],
             "properties": {
                 "id": {
@@ -2823,7 +3738,7 @@ const docTemplate = `{
             "properties": {
                 "otp": {
                     "type": "string",
-                    "maxLength": 8,
+                    "maxLength": 10,
                     "minLength": 6
                 }
             }
@@ -2834,6 +3749,12 @@ const docTemplate = `{
                 "id"
             ],
             "properties": {
+                "catch_all": {
+                    "type": "boolean"
+                },
+                "create_alias": {
+                    "type": "boolean"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -2862,11 +3783,14 @@ const docTemplate = `{
                 },
                 "otp": {
                     "type": "string",
-                    "maxLength": 8,
+                    "maxLength": 10,
                     "minLength": 0
                 },
                 "password": {
                     "type": "string"
+                },
+                "remember": {
+                    "type": "boolean"
                 }
             }
         },
@@ -2894,9 +3818,6 @@ const docTemplate = `{
         "model.Alias": {
             "type": "object",
             "properties": {
-                "catch_all": {
-                    "type": "boolean"
-                },
                 "created_at": {
                     "type": "string"
                 },
@@ -2912,14 +3833,32 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "is_custom_domain": {
+                    "type": "boolean"
+                },
+                "is_domain_enabled": {
+                    "type": "boolean"
+                },
+                "is_domain_verified": {
+                    "type": "boolean"
+                },
                 "name": {
                     "type": "string"
+                },
+                "origin": {
+                    "$ref": "#/definitions/model.AliasOrigin"
+                },
+                "pinned": {
+                    "type": "boolean"
                 },
                 "recipients": {
                     "type": "string"
                 },
                 "stats": {
                     "$ref": "#/definitions/model.AliasStats"
+                },
+                "wildcard": {
+                    "type": "boolean"
                 }
             }
         },
@@ -2936,6 +3875,19 @@ const docTemplate = `{
                     "type": "integer"
                 }
             }
+        },
+        "model.AliasOrigin": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2
+            ],
+            "x-enum-varnames": [
+                "Manual",
+                "Inbound",
+                "Import"
+            ]
         },
         "model.AliasStats": {
             "type": "object",
@@ -2994,6 +3946,12 @@ const docTemplate = `{
         "model.Domain": {
             "type": "object",
             "properties": {
+                "catch_all": {
+                    "type": "boolean"
+                },
+                "create_alias": {
+                    "type": "boolean"
+                },
                 "created_at": {
                     "type": "string"
                 },
@@ -3065,13 +4023,21 @@ const docTemplate = `{
             "type": "string",
             "enum": [
                 "bounce",
+                "deferred_delivery",
+                "failed_delivery",
                 "disabled_alias",
-                "unauthorised_send"
+                "disabled_domain",
+                "unauthorised_send",
+                "inactive_subscription"
             ],
             "x-enum-varnames": [
                 "BounceMessage",
+                "DeferredDelivery",
+                "FailedDelivery",
                 "DisabledAlias",
-                "UnauthorisedSend"
+                "DisabledDomain",
+                "UnauthorisedSend",
+                "InactiveSubscription"
             ]
         },
         "model.Recipient": {
@@ -3147,7 +4113,16 @@ const docTemplate = `{
                 "status": {
                     "$ref": "#/definitions/model.SubscriptionStatus"
                 },
+                "terminated": {
+                    "type": "boolean"
+                },
+                "terminated_at": {
+                    "type": "string"
+                },
                 "tier": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 },
                 "updated_at": {
@@ -3201,6 +4176,9 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
+                "has_password": {
+                    "type": "boolean"
+                },
                 "id": {
                     "type": "string"
                 },
@@ -3232,6 +4210,23 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "sends": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.WildcardDomainInfo": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "delimiters_used": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "limit": {
                     "type": "integer"
                 }
             }

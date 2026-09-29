@@ -10,6 +10,17 @@
                         </h1>
                         <h4 class="text-center mb-8">Log in with Passkey</h4>
                         <div v-if="!showEmailFallback">
+                            <div class="mb-6 flex items-center gap-3">
+                                <input
+                                    v-model="stayLoggedIn"
+                                    id="stay-logged-in-discoverable"
+                                    type="checkbox"
+                                    class="checkbox-plain"
+                                >
+                                <label for="stay-logged-in-discoverable" class="mb-0 text-sm font-normal">
+                                    Stay logged in
+                                </label>
+                            </div>
                             <div class="flex items-center w-full">
                                 <button :disabled="isLoading" @click="loginWithPasskeyDiscoverable" class="cta full">
                                     Log in with Passkey
@@ -18,7 +29,7 @@
                             <p v-if="error" class="error mt-6">Error: {{ error }}</p>
                         </div>
                         <div v-else>
-                            <div class="mb-7">
+                            <div class="mb-6">
                                 <input
                                     v-model="emailAuthn"
                                     v-bind:class="{ 'error': emailAuthnError }"
@@ -31,6 +42,17 @@
                                 >
                                 <p v-if="emailAuthnError" class="error">Required</p>
                             </div>
+                            <div class="mb-6 flex items-center gap-3">
+                                <input
+                                    v-model="stayLoggedIn"
+                                    id="stay-logged-in-authn"
+                                    type="checkbox"
+                                    class="checkbox-plain"
+                                >
+                                <label for="stay-logged-in-authn" class="mb-0 text-sm font-normal">
+                                    Stay logged in
+                                </label>
+                            </div>
                             <div class="flex items-center w-full">
                                 <button :disabled="isLoading" @click="loginWithPasskey" class="cta full">
                                     Log in with Passkey
@@ -38,7 +60,7 @@
                             </div>
                             <p v-if="error" class="error mt-6">Error: {{ error }}</p>
                         </div>
-                        <p class="text-center mt-6">
+                        <p class="text-center mt-4">
                             <button type="button" class="plain-alt" @click="toggleEmailFallback">
                                 {{ showEmailFallback ? 'Use passkey picker instead' : 'Trouble logging in? Use email instead' }}
                             </button>
@@ -51,7 +73,7 @@
                                 <span class="logo"></span>
                             </h1>
                             <h4 class="text-center mb-8">Log in with email and password</h4>
-                            <div class="mb-7">
+                            <div class="mb-6">
                                 <input
                                     v-model="email"
                                     v-bind:class="{ 'error': emailError }"
@@ -64,7 +86,7 @@
                                 >
                                 <p v-if="emailError" class="error">Required</p>
                             </div>
-                            <div class="mb-5">
+                            <div class="mb-6">
                                 <input
                                     v-model="password"
                                     v-bind:class="{ 'error': passwordError }"
@@ -76,11 +98,6 @@
                                     @keypress.enter.prevent
                                 >
                                 <p v-if="passwordError" class="error mb-2">Required</p>
-                                <p class="text-right">
-                                    <router-link to="/forgot-password">
-                                        <button class="plain-alt">Forgot password?</button>
-                                    </router-link>
-                                </p>
                             </div>
                             <div v-if="otpRequired" class="mb-7">
                                 <label for="password">
@@ -94,11 +111,27 @@
                                 >
                                 <p v-if="otpError" class="error">Required</p>
                             </div>
+                            <div class="mb-6 flex items-center gap-3">
+                                <input
+                                    v-model="stayLoggedIn"
+                                    id="stay-logged-in"
+                                    type="checkbox"
+                                    class="checkbox-plain"
+                                >
+                                <label for="stay-logged-in" class="mb-0 text-sm font-normal">
+                                    Stay logged in
+                                </label>
+                            </div>
                             <div class="flex items-center w-full" v-bind:class="{ 'mb-6': !passkeySupported }">
                                 <button :disabled="isLoading" @click="login" class="cta full">
                                     Log in
                                 </button>
                             </div>
+                            <p class="text-center mt-4">
+                                <router-link to="/forgot-password">
+                                    <button class="plain-alt">Forgot password?</button>
+                                </router-link>
+                            </p>
                             <p v-if="error" class="error mt-5">Error: {{ error }}</p>
                         </div>
                     </div>
@@ -148,6 +181,7 @@ const email = ref('')
 const emailAuthn = ref('')
 const password = ref('')
 const otp = ref('')
+const stayLoggedIn = ref(false)
 const emailError = ref(false)
 const emailAuthnError = ref(false)
 const passwordError = ref(false)
@@ -204,7 +238,8 @@ const login = async () => {
     const data = {
         email: email.value,
         password: password.value,
-        otp: otp.value
+        otp: otp.value,
+        remember: stayLoggedIn.value
     }
 
     try {
@@ -239,7 +274,8 @@ const loginWithPasskey = async () => {
     isLoading.value = true // Start loading
 
     const data = {
-        email: emailAuthn.value
+        email: emailAuthn.value,
+        remember: stayLoggedIn.value
     }
 
     try {
@@ -286,8 +322,12 @@ const startAuth = async (data: any, res: any) => {
 const loginWithPasskeyDiscoverable = async () => {
     isLoading.value = true // Start loading
 
+    const data = {
+        remember: stayLoggedIn.value
+    }
+
     try {
-        var res = await userApi.loginPasskeyBegin()
+        var res = await userApi.loginPasskeyBegin(data)
         startDiscoverableAuth(res)
     } catch (err) {
         if (axios.isAxiosError(err)) {

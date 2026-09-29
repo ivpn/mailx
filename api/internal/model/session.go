@@ -16,6 +16,7 @@ type Session struct {
 	Data        []byte               `gorm:"type:blob" json:"-"`
 	SessionData webauthn.SessionData `gorm:"-" json:"-"`
 	ExpiresAt   time.Time            `json:"expires_at"`
+	Remember    bool                 `json:"-"`
 }
 
 func GenSessionToken() (string, error) {

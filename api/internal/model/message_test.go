@@ -115,6 +115,27 @@ func TestParseReplyTo(t *testing.T) {
 	}
 }
 
+func TestReplyAliasName(t *testing.T) {
+	tests := []struct {
+		email    string
+		expected string
+	}{
+		{"a+b897611+reply=example.com@domain.com", "a+b897611@domain.com"},
+		{"user+reply=example.com@domain.com", "user@domain.com"},
+		{"*+shop+reply=example.com@domain.com", "*+shop@domain.com"},
+		{"user@domain.com", "user@domain.com"},
+		{"invalid", "invalid"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.email, func(t *testing.T) {
+			if got := ReplyAliasName(tt.email); got != tt.expected {
+				t.Errorf("expected %s, got %s", tt.expected, got)
+			}
+		})
+	}
+}
+
 func TestWildcardAlias(t *testing.T) {
 	tests := []struct {
 		email         string

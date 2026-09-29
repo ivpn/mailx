@@ -104,6 +104,23 @@ func GenerateReplyTo(alias string, to string) string {
 	return email
 }
 
+// ReplyAliasName returns the alias name a reply-encoded address was generated from, taken
+// verbatim up to the last "+" (e.g. "a+b+reply=example.com@domain.com" -> "a+b@domain.com").
+// ParseReplyTo reads the same address as a Wildcard Alias reply ("*+b@domain.com").
+func ReplyAliasName(email string) string {
+	atIndex := strings.Index(email, "@")
+	if atIndex == -1 {
+		return email
+	}
+
+	plusIndex := strings.LastIndex(email[:atIndex], "+")
+	if plusIndex == -1 {
+		return email
+	}
+
+	return email[:plusIndex] + email[atIndex:]
+}
+
 func PlainTextToHTML(text string) string {
 	escaped := html.EscapeString(text)
 	html := strings.ReplaceAll(escaped, "\n", "<br>")

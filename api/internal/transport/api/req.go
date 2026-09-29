@@ -63,6 +63,20 @@ type AliasPinReq struct {
 	Pinned bool `json:"pinned"`
 }
 
+type BulkAliasIDsReq struct {
+	IDs []string `json:"ids" validate:"required,min=1,max=500,dive,uuid"`
+}
+
+type BulkAliasEnabledReq struct {
+	IDs     []string `json:"ids" validate:"required,min=1,max=500,dive,uuid"`
+	Enabled bool     `json:"enabled"`
+}
+
+type BulkAliasPinReq struct {
+	IDs    []string `json:"ids" validate:"required,min=1,max=500,dive,uuid"`
+	Pinned bool     `json:"pinned"`
+}
+
 type DeleteRecipientReq struct {
 	Recipients string `json:"recipients"`
 }

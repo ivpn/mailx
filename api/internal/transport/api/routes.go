@@ -104,6 +104,11 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Delete("/alias/:id", h.DeleteAlias)
 	v1.Post("/alias/restore/:id", h.RestoreAlias)
 	v1.Delete("/alias/forget/:id", h.ForgetAlias)
+	v1.Post("/aliases/bulk/enable", h.BulkUpdateAliasEnabled)
+	v1.Post("/aliases/bulk/pin", h.BulkUpdateAliasPinned)
+	v1.Post("/aliases/bulk/delete", h.BulkDeleteAlias)
+	v1.Post("/aliases/bulk/restore", h.BulkRestoreAlias)
+	v1.Post("/aliases/bulk/forget", h.BulkForgetAlias)
 
 	v1.Get("/logs", h.GetLogs)
 	v1.Delete("/logs", h.DeleteLogs)

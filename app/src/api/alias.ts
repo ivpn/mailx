@@ -12,4 +12,9 @@ export const aliasApi = {
     restore: (id: string) => api.post('/alias/restore/' + id),
     forget: (id: string) => api.delete('/alias/forget/' + id),
     pin: (id: string, pinned: boolean) => api.put('/alias/' + id + '/pin', { pinned }),
+    bulkEnabled: (ids: string[], enabled: boolean) => api.post('/aliases/bulk/enable', { ids, enabled }),
+    bulkPinned: (ids: string[], pinned: boolean) => api.post('/aliases/bulk/pin', { ids, pinned }),
+    bulkDelete: (ids: string[]) => api.post('/aliases/bulk/delete', { ids }),
+    bulkRestore: (ids: string[]) => api.post('/aliases/bulk/restore', { ids }),
+    bulkForget: (ids: string[]) => api.post('/aliases/bulk/forget', { ids }),
 }

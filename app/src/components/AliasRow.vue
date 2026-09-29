@@ -1,10 +1,20 @@
 <template>
     <tr class="desktop-lg">
+        <td v-if="selectable" class="w-10">
+            <div class="flex items-center">
+                <input
+                    type="checkbox"
+                    class="checkbox-plain"
+                    v-bind:checked="selected"
+                    @change="$emit('onToggleSelect', alias.id)"
+                >
+            </div>
+        </td>
         <td>
             <div class="flex items-center hs-tooltip">
                 <input
                     @change="updateAlias"
-                    v-bind:checked="alias.enabled && !isDomainUnverified && !isAliasDeleted"
+                    v-bind:checked="alias.enabled && alias.recipients.length > 0 && !isDomainUnverified && !isAliasDeleted"
                     v-bind:disabled="!alias.recipients.length || isDomainUnverified || isAliasDeleted"
                     type="checkbox"
                     class="checkbox-switch"
@@ -146,7 +156,7 @@
                     <div class="flex items-center hs-tooltip">
                         <input
                             @change="updateAlias"
-                            v-bind:checked="alias.enabled && !isDomainUnverified && !isAliasDeleted"
+                            v-bind:checked="alias.enabled && alias.recipients.length > 0 && !isDomainUnverified && !isAliasDeleted"
                             v-bind:disabled="!alias.recipients.length || isDomainUnverified || isAliasDeleted"
                             type="checkbox"
                             class="checkbox-switch"
@@ -257,7 +267,8 @@ import events from '../events.ts'
 import { formatDistanceToNow } from 'date-fns'
 import dropdown from '@preline/dropdown'
 
-const props = defineProps(['alias', 'recipients', 'wildcard'])
+const props = defineProps(['alias', 'recipients', 'wildcard', 'selectable', 'selected'])
+defineEmits(['onToggleSelect'])
 const alias = ref(props.alias)
 const recipients = ref(props.recipients)
 const isDomainUnverified = computed(() => alias.value.is_custom_domain === true && (alias.value.is_domain_verified === false || alias.value.is_domain_enabled === false))
@@ -302,7 +313,7 @@ const restoreAlias = async () => {
 }
 
 const forgetAlias = () => {
-    const errMessage = 'WARNING: This operation cannot be undone. You will not be able to restore this alias. Are you sure you want to delete alias?'
+    const errMessage = 'WARNING: This operation cannot be undone. You will not be able to restore this alias. Are you sure you want to permanently delete alias?'
     if (!confirm(errMessage)) return
 
     events.emit('alias.forget', { id: alias.value.id })

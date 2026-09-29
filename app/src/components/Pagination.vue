@@ -4,7 +4,7 @@
             <select v-model="limit" @change="updateLimit" class="py-2 mb-0">
                 <option>25</option>
                 <option>50</option>
-                <option>75</option>
+                <option>100</option>
             </select>
             <p class="text-nowrap m-0 desktop text-sm">Showing {{ start }} to {{ end }} of {{ total }}</p>
         </div>

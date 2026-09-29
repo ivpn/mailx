@@ -22,17 +22,35 @@ var (
 	ErrFailedImport     = "Failed to import aliases. Please check the format and try again."
 	AliasImportSuccess  = "Aliases imported successfully."
 	RestoreAliasSuccess = "Alias restored successfully."
+	ForgetAliasSuccess  = "Alias permanently deleted."
+
+	BulkUpdateAliasSuccess  = "Aliases updated successfully."
+	BulkDeleteAliasSuccess  = "Aliases deleted successfully."
+	BulkRestoreAliasSuccess = "Aliases restored successfully."
+	BulkForgetAliasSuccess  = "Aliases permanently deleted."
 )
+
+// maxAliasLimit caps the page size so an absent or oversized limit query param cannot ask the
+// database for an unbounded result set. Callers can detect truncation via AliasList.Total.
+const maxAliasLimit = 1000
 
 type AliasService interface {
 	GetAlias(context.Context, string, string) (model.Alias, error)
 	GetAliases(context.Context, string, int, int, string, string, string, string, string) (model.AliasList, error)
 	GetAllAliases(context.Context, string) ([]model.Alias, error)
-	PostAlias(context.Context, model.Alias, string, string, string) (model.Alias, error)
+	PostAlias(context.Context, model.Alias, string, string, string, string) (model.Alias, error)
+	GetWildcardDomainInfo(context.Context, string, string) (model.WildcardDomainInfo, error)
 	UpdateAlias(context.Context, model.Alias) error
+	UpdateAliasPinned(context.Context, string, string, bool) error
 	DeleteAlias(context.Context, string, string) error
 	ImportAliases(context.Context, []model.AliasImportReq, string) ([]model.Alias, error)
 	RestoreAlias(context.Context, string, string) error
+	ForgetAlias(context.Context, string, string) error
+	BulkUpdateAliasEnabled(context.Context, []string, string, bool) (int, error)
+	BulkUpdateAliasPinned(context.Context, []string, string, bool) (int, error)
+	BulkDeleteAlias(context.Context, []string, string) error
+	BulkRestoreAlias(context.Context, []string, string) error
+	BulkForgetAlias(context.Context, []string, string) error
 }
 
 // @Summary Get alias
@@ -64,7 +82,7 @@ func (h *Handler) GetAlias(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Param status query string false "Filter by alias status" Enums(active, deleted, all)
+// @Param status query string false "Filter by alias status" Enums(active_inactive, active, inactive, deleted, all)
 // @Success 200 {object} model.AliasList
 // @Failure 400 {object} ErrorRes
 // @Router /aliases [get]
@@ -73,8 +91,8 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 	userID := auth.GetUserID(c)
 
 	limit, err := strconv.Atoi(c.Query("limit"))
-	if err != nil {
-		limit = 0
+	if err != nil || limit <= 0 || limit > maxAliasLimit {
+		limit = maxAliasLimit
 	}
 
 	page, err := strconv.Atoi(c.Query("page"))
@@ -84,20 +102,22 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 
 	sortBy := c.Query("sort_by")
 	sortOrder := strings.ToUpper(c.Query("sort_order"))
-	catchAll := c.Query("catch_all")
+	wildcard := c.Query("wildcard")
 	search := c.Query("search")
 	status := c.Query("status")
 
-	var allowCatchAll = map[string]bool{
+	var allowWildcard = map[string]bool{
 		"true":  true,
 		"false": true,
 		"":      true,
 	}
 	var allowStatus = map[string]bool{
-		"active":  true,
-		"deleted": true,
-		"all":     true,
-		"":        true,
+		"active_inactive": true,
+		"active":          true,
+		"inactive":        true,
+		"deleted":         true,
+		"all":             true,
+		"":                true,
 	}
 
 	if _, ok := model.AliasSortColumns[sortBy]; !ok {
@@ -106,14 +126,14 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 	if _, ok := model.AliasSortOrders[sortOrder]; !ok {
 		sortOrder = "DESC"
 	}
-	if _, ok := allowCatchAll[catchAll]; !ok {
-		catchAll = ""
+	if _, ok := allowWildcard[wildcard]; !ok {
+		wildcard = ""
 	}
 	if _, ok := allowStatus[status]; !ok {
 		status = ""
 	}
 	if status == "" {
-		status = "active"
+		status = "active_inactive"
 	}
 
 	err = h.Validator.Var(search, "omitempty,required,search")
@@ -124,7 +144,7 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 		})
 	}
 
-	list, err := h.Service.GetAliases(c.Context(), userID, limit, page, sortBy, sortOrder, catchAll, search, status)
+	list, err := h.Service.GetAliases(c.Context(), userID, limit, page, sortBy, sortOrder, wildcard, search, status)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
@@ -259,6 +279,26 @@ func (h *Handler) ExportAliases(c *fiber.Ctx) error {
 	return c.SendString(b.String())
 }
 
+// resolveDomain resolves an AliasReq-style domain value - either a plain built-in domain
+// name or a custom domain's UUID - to its FQDN. ok is false if domainParam doesn't resolve
+// to a valid domain accessible to userID.
+func (h *Handler) resolveDomain(ctx context.Context, userID string, domainParam string) (domain string, isCustomDomain bool, ok bool) {
+	domain = domainParam
+	if _, err := uuid.Parse(domain); err == nil {
+		fqdn, err := h.Service.GetVerifiedDomain(ctx, domain, userID)
+		if err != nil {
+			return "", true, false
+		}
+		return fqdn.Name, true, true
+	}
+
+	if !strings.Contains(h.Cfg.Domains, domain) {
+		return "", false, false
+	}
+
+	return domain, false, true
+}
+
 // @Summary Create alias
 // @Description Create alias
 // @Tags alias
@@ -289,19 +329,8 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 	}
 
 	// Validate domain
-	domain := req.Domain
-	isCustomDomain := false
-	_, err = uuid.Parse(domain)
-	if err == nil {
-		isCustomDomain = true
-		fqdn, err := h.Service.GetVerifiedDomain(c.Context(), domain, userID)
-		if err != nil {
-			return c.Status(400).JSON(fiber.Map{
-				"error": ErrInvalidDomain,
-			})
-		}
-		domain = fqdn.Name
-	} else if !strings.Contains(h.Cfg.Domains, domain) {
+	domain, isCustomDomain, ok := h.resolveDomain(c.Context(), userID, req.Domain)
+	if !ok {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidDomain,
 		})
@@ -315,8 +344,18 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 		})
 	}
 
-	// Validate catch-all suffix
-	if req.Format == model.AliasFormatCatchAll && req.WildcardLocalPart == "" {
+	// Validate wildcard suffix
+	if req.Format == model.AliasFormatWildcard && req.WildcardLocalPart == "" {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	delimiter := req.WildcardDelimiter
+	if delimiter == "" {
+		delimiter = model.DefaultWildcardDelimiter
+	}
+	if req.Format == model.AliasFormatWildcard && !model.IsValidWildcardDelimiter(delimiter) {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidRequest,
 		})
@@ -345,10 +384,10 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 	}
 
 	localPart := req.LocalPart
-	if req.Format == model.AliasFormatCatchAll {
+	if req.Format == model.AliasFormatWildcard {
 		localPart = req.WildcardLocalPart
 	}
-	alias, err = h.Service.PostAlias(c.Context(), alias, req.Format, domain, localPart)
+	alias, err = h.Service.PostAlias(c.Context(), alias, req.Format, domain, localPart, delimiter)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
@@ -359,6 +398,36 @@ func (h *Handler) PostAlias(c *fiber.Ctx) error {
 		"message": PostAliasSuccess,
 		"alias":   alias,
 	})
+}
+
+// @Summary Get Wildcard Alias domain info
+// @Description Get how many Wildcard Aliases the user already has for a domain and which delimiters are used
+// @Tags alias
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param domain query string true "Domain name or custom domain ID"
+// @Success 200 {object} model.WildcardDomainInfo
+// @Failure 400 {object} ErrorRes
+// @Router /alias/wildcard-domain-info [get]
+func (h *Handler) GetWildcardDomainInfo(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
+
+	domain, _, ok := h.resolveDomain(c.Context(), userID, c.Query("domain"))
+	if !ok {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidDomain,
+		})
+	}
+
+	info, err := h.Service.GetWildcardDomainInfo(c.Context(), userID, domain)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(info)
 }
 
 // @Summary Update alias
@@ -437,6 +506,41 @@ func (h *Handler) DeleteAlias(c *fiber.Ctx) error {
 	})
 }
 
+// @Summary Pin or unpin alias
+// @Description Set alias pinned status; pinned aliases are always sorted first in the list
+// @Tags alias
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path string true "Alias ID"
+// @Param body body AliasPinReq true "Pin request"
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /alias/{id}/pin [put]
+// @Router /api/alias/{id}/pin [put]
+func (h *Handler) UpdateAliasPinned(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
+	id := c.Params("id")
+	req := AliasPinReq{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	err = h.Service.UpdateAliasPinned(c.Context(), id, userID, req.Pinned)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": UpdateAliasSuccess,
+	})
+}
+
 // @Summary Restore alias
 // @Description Restore alias
 // @Tags alias
@@ -460,5 +564,231 @@ func (h *Handler) RestoreAlias(c *fiber.Ctx) error {
 
 	return c.Status(200).JSON(fiber.Map{
 		"message": RestoreAliasSuccess,
+	})
+}
+
+// @Summary Forget alias
+// @Description Permanently delete a custom-domain alias, bypassing the soft-delete step entirely
+// @Tags alias
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path string true "Alias ID"
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /alias/forget/{id} [delete]
+// @Router /api/alias/forget/{id} [delete]
+func (h *Handler) ForgetAlias(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
+	id := c.Params("id")
+	err := h.Service.ForgetAlias(c.Context(), id, userID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": ForgetAliasSuccess,
+	})
+}
+
+// @Summary Bulk activate/deactivate aliases
+// @Description Set enabled status for multiple aliases at once; deleted aliases and aliases left without a recipient are skipped
+// @Tags alias
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param body body BulkAliasEnabledReq true "Bulk enable request"
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /aliases/bulk/enable [post]
+func (h *Handler) BulkUpdateAliasEnabled(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
+	req := BulkAliasEnabledReq{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	count, err := h.Service.BulkUpdateAliasEnabled(c.Context(), req.IDs, userID, req.Enabled)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": BulkUpdateAliasSuccess,
+		"count":   count,
+	})
+}
+
+// @Summary Bulk pin/unpin aliases
+// @Description Set pinned status for multiple aliases at once; pinned aliases are always sorted first in the list, deleted aliases are skipped
+// @Tags alias
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param body body BulkAliasPinReq true "Bulk pin request"
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /aliases/bulk/pin [post]
+func (h *Handler) BulkUpdateAliasPinned(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
+	req := BulkAliasPinReq{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	count, err := h.Service.BulkUpdateAliasPinned(c.Context(), req.IDs, userID, req.Pinned)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": BulkUpdateAliasSuccess,
+		"count":   count,
+	})
+}
+
+// @Summary Bulk delete aliases
+// @Description Soft-delete multiple aliases at once; fails entirely if any selected alias is already deleted
+// @Tags alias
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param body body BulkAliasIDsReq true "Bulk delete request"
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /aliases/bulk/delete [post]
+func (h *Handler) BulkDeleteAlias(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
+	req := BulkAliasIDsReq{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	err = h.Service.BulkDeleteAlias(c.Context(), req.IDs, userID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": BulkDeleteAliasSuccess,
+		"count":   len(req.IDs),
+	})
+}
+
+// @Summary Bulk restore aliases
+// @Description Restore multiple soft-deleted aliases at once; fails entirely if any selected alias isn't deleted
+// @Tags alias
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param body body BulkAliasIDsReq true "Bulk restore request"
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /aliases/bulk/restore [post]
+func (h *Handler) BulkRestoreAlias(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
+	req := BulkAliasIDsReq{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	err = h.Service.BulkRestoreAlias(c.Context(), req.IDs, userID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": BulkRestoreAliasSuccess,
+		"count":   len(req.IDs),
+	})
+}
+
+// @Summary Bulk forget aliases
+// @Description Permanently delete multiple custom-domain aliases at once, bypassing the soft-delete step entirely; fails entirely if any selected alias isn't a custom domain alias
+// @Tags alias
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param body body BulkAliasIDsReq true "Bulk forget request"
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /aliases/bulk/forget [post]
+func (h *Handler) BulkForgetAlias(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
+	req := BulkAliasIDsReq{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	err = h.Service.BulkForgetAlias(c.Context(), req.IDs, userID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": BulkForgetAliasSuccess,
+		"count":   len(req.IDs),
 	})
 }

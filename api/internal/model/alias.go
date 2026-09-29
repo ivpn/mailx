@@ -12,6 +12,7 @@ var (
 	ErrDuplicateAliasDomain = errors.New("wildcard aliases limit reached for this domain")
 	ErrDailyAliasLimit      = errors.New("daily alias limit reached")
 	ErrInboundHourlyLimit   = errors.New("hourly inbound alias limit reached")
+	ErrBulkAliasNotEligible = errors.New("one or more selected aliases are not eligible for this action")
 )
 
 type AliasOrigin int
@@ -38,15 +39,16 @@ func (a *AliasOrigin) Scan(src any) error {
 
 type Alias struct {
 	BaseModel
-	DeletedAt        gorm.DeletedAt `gorm:"index" json:"deleted_at"`
+	DeletedAt        gorm.DeletedAt `gorm:"index;index:idx_aliases_user_id_deleted_at,priority:2" json:"deleted_at"`
 	Name             string         `gorm:"unique" json:"name"`
-	UserID           string         `json:"-"`
+	UserID           string         `json:"-" gorm:"index:idx_aliases_user_id_deleted_at,priority:1"`
 	Enabled          bool           `json:"enabled"`
 	Description      string         `gorm:"default:''" json:"description"`
 	Recipients       string         `gorm:"default:''" json:"recipients"`
 	FromName         string         `gorm:"default:''" json:"from_name"`
-	CatchAll         bool           `json:"catch_all"`
+	Wildcard         bool           `gorm:"column:catch_all" json:"wildcard"`
 	Origin           AliasOrigin    `json:"origin"`
+	Pinned           bool           `gorm:"default:false" json:"pinned"`
 	Stats            AliasStats     `gorm:"-" json:"stats"`
 	IsCustomDomain   bool           `gorm:"-" json:"is_custom_domain"`
 	IsDomainVerified *bool          `gorm:"-" json:"is_domain_verified"`
@@ -58,6 +60,14 @@ type AliasStats struct {
 	Blocks   int `json:"blocks"`
 	Replies  int `json:"replies"`
 	Sends    int `json:"sends"`
+}
+
+// WildcardDomainInfo describes a user's existing Wildcard Aliases for a single domain, used
+// by the frontend to know whether/which delimiters can still be used for that domain.
+type WildcardDomainInfo struct {
+	Count          int      `json:"count"`
+	Limit          int      `json:"limit"`
+	DelimitersUsed []string `json:"delimiters_used"`
 }
 
 type AliasList struct {

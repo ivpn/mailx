@@ -1,24 +1,39 @@
 <template>
-    <div class="mb-5">
-        <h2>Account</h2>
-        <p v-if="sub.id && !syncing" class="text-sm">
-            <span v-if="isActive()" class="badge success">Active</span>
-            <span v-if="!isActive()" class="badge">Inactive</span>
-        </p>
-        <p v-if="syncing" class="text-sm">
-            <span v-if="isActive()" class="badge progress">Syncing...</span>
-        </p>
-        <div class="mb-3">
-            <h4>Account email:</h4>
-            <p class="mb-3">
-                {{ email }}
-            </p>
-        </div>
-        <div v-if="isActive()" class="mb-3">
-            <h4>Subscription active until:</h4>
-            <p class="mb-3">
-                {{ activeUntilDate() }}
-            </p>
+    <div class="mt-3 mb-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="">
+                <h2>Subscription</h2>
+                <p class="mb-0">Status:</p>
+                <p v-if="sub.id && !syncing">
+                    <span v-if="isActive() && sub.id" class="badge success">Active</span>
+                    <span v-if="!isActive() && sub.id" class="badge">Inactive</span>
+                </p>
+                <p v-if="syncing" class="text-sm">
+                    <span v-if="isActive()" class="badge progress">Syncing...</span>
+                </p>
+                <p class="mb-0">Subscription active until:</p>
+                <div v-if="isActive()" class="mb-3">
+                    <p class="mb-3 text-primary">
+                        {{ activeUntilDate() }}
+                    </p>
+                </div>
+            </div>
+            <div class="border-r border-transparent">
+                <h2>Account Info</h2>
+                <div class="mb-3">
+                    <p class="mb-0">Mailx ID:</p>
+                    <p class="mb-3 text-primary">
+                        {{ email }}
+                    </p>
+                </div>
+                <div class="mb-3">
+                    <p class="mb-0">Email status:</p>
+                    <p class="mb-3">
+                        <span v-if="user.is_active && user.id" class="badge success">Verified</span>
+                        <span v-if="!user.is_active && user.id" class="badge">Not verified</span>
+                    </p>
+                </div>
+            </div>
         </div>
         <div v-if="isManaged()" class="card-tertiary">
             <footer>
@@ -82,6 +97,7 @@ import { useRoute } from 'vue-router'
 import tooltip from '@preline/tooltip'
 import axios from 'axios'
 import { subscriptionApi } from '../api/subscription.ts'
+import { userApi } from '../api/user.ts'
 import events from '../events.ts'
 
 const sub = ref({
@@ -91,6 +107,10 @@ const sub = ref({
     status: '',
     outage: false,
     type: '',
+})
+const user = ref({
+    id: '',
+    is_active: false
 })
 const error = ref('')
 const success = ref('')
@@ -106,6 +126,17 @@ const getSubscription = async () => {
     try {
         const res = await subscriptionApi.get()
         sub.value = res.data
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.response?.data.error || err.message
+        }
+    }
+}
+
+const getUser = async () => {
+    try {
+        const response = await userApi.get()
+        user.value = response.data
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.response?.data.error || err.message
@@ -180,6 +211,7 @@ const updatedAtDate = () => {
 
 const onUpdateEmail = (event: any) => {
     email.value = event.email
+    getUser()
 }
 
 const isOutage = () => {
@@ -202,6 +234,7 @@ const parseParams = () => {
 
 onMounted(() => {
     getSubscription()
+    getUser()
     tooltip.autoInit()
     events.on('user.update', onUpdateEmail)
 })

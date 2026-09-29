@@ -203,7 +203,7 @@ func (s *Service) DeleteRecipient(ctx context.Context, ID string, userID string,
 	}
 
 	// Get aliases
-	aliases, err := s.Store.GetAliases(ctx, userID, 0, 0, "created_at", "DESC", "", "", "active")
+	aliases, err := s.Store.GetAliasesNoStats(ctx, userID, 0, 0, "created_at", "DESC", "", "", "active")
 	if err != nil {
 		log.Printf("error deleting recipient, GetAliases: %s", err.Error())
 		return ErrDeleteRecipient
@@ -294,12 +294,29 @@ func (s *Service) DeleteRecipientByUserID(ctx context.Context, userID string) er
 func (s *Service) FindRecipients(from string, to string, msgType model.MessageType) ([]model.Recipient, model.Alias, model.MessageType, error) {
 	aliasName, replyTo := model.ParseReplyTo(to)
 
-	alias, err := s.GetAliasByName(aliasName)
-	// Fall back to a Wildcard Alias match (e.g. "*+suffix@domain.com") before giving up.
+	// An alias whose name itself contains "+" (e.g. a Custom or catch-all created alias) must
+	// match verbatim before falling back to the base alias with the "+tag" stripped. A reply
+	// from such an alias ("a+b+reply=example.com@domain.com") reads the same as a Wildcard
+	// Alias reply, which ParseReplyTo assumes ("*+b@domain.com"), so try "a+b@domain.com" first.
+	exactName := to
+	if replyTo != "" {
+		exactName = model.ReplyAliasName(to)
+	}
+	alias, err := s.GetAliasByName(exactName)
+	if err != nil && aliasName != exactName {
+		alias, err = s.GetAliasByName(aliasName)
+	}
+	// Fall back to a Wildcard Alias match (e.g. "*+suffix@domain.com" or "*.suffix@domain.com")
+	// before giving up, trying each supported delimiter in turn.
 	if err != nil {
-		if wildcardName, ok := model.WildcardAlias(to); ok {
+		for _, delimiter := range model.WildcardDelimiters {
+			wildcardName, ok := model.WildcardAliasForDelimiter(to, delimiter)
+			if !ok {
+				continue
+			}
 			if wcAlias, wcErr := s.GetAliasByName(wildcardName); wcErr == nil {
 				alias, err = wcAlias, nil
+				break
 			}
 		}
 	}
@@ -307,9 +324,15 @@ func (s *Service) FindRecipients(from string, to string, msgType model.MessageTy
 	if err != nil {
 		domainPart := aliasDomainPart(aliasName)
 		if isCustomAliasDomain(domainPart, s.Cfg.API.Domains) {
-			// A tagged/reply-encoded address must never auto-provision a new alias.
-			hasTag := strings.Contains(to, "+")
-			if ok, rcps, catchAllAlias, catchAllErr := s.resolveCatchAll(domainPart, aliasName, hasTag); ok {
+			// A reply-encoded address that doesn't resolve to a real alias must never
+			// auto-provision one. Otherwise (plain address, or a "+"/"." tag that didn't match
+			// a Wildcard Alias above) the full address becomes the new alias, verbatim.
+			isReplyEncoded := replyTo != ""
+			catchAllName := to
+			if isReplyEncoded {
+				catchAllName = aliasName
+			}
+			if ok, rcps, catchAllAlias, catchAllErr := s.resolveCatchAll(domainPart, catchAllName, isReplyEncoded); ok {
 				if catchAllErr != nil {
 					return []model.Recipient{}, catchAllAlias, msgType, catchAllErr
 				}
@@ -399,18 +422,18 @@ func (s *Service) resolveReply(from string, alias model.Alias, replyTo string) (
 	return []model.Recipient{{Email: replyTo}}, nil
 }
 
-func (s *Service) resolveCatchAll(domainPart string, aliasName string, hasTag bool) (bool, []model.Recipient, model.Alias, error) {
+func (s *Service) resolveCatchAll(domainPart string, candidateName string, isReplyEncoded bool) (bool, []model.Recipient, model.Alias, error) {
 	domain, err := s.GetVerifiedDomainByName(context.Background(), domainPart)
 	if err != nil || !domain.CatchAll {
 		return false, nil, model.Alias{}, nil
 	}
 
-	// Tagged addresses only ride the catch-all recipient; only untagged ones may become a real alias.
+	// A reply-encoded address that doesn't resolve to a real alias must never auto-provision one.
 	origin := model.Inbound
-	if hasTag {
+	if isReplyEncoded {
 		origin = model.Manual
 	}
-	catchAllAlias := model.Alias{Name: aliasName, UserID: domain.UserID, FromName: domain.FromName, Origin: origin, Enabled: true}
+	catchAllAlias := model.Alias{Name: candidateName, UserID: domain.UserID, FromName: domain.FromName, Origin: origin, Enabled: true}
 
 	if !domain.Enabled {
 		if err = s.SaveMessage(context.Background(), catchAllAlias, model.Block); err != nil {

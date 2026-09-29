@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-webauthn/webauthn/protocol"
 	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
@@ -118,14 +119,14 @@ func NewAPIAuth(cfg config.APIConfig, service Service) fiber.Handler {
 	}
 }
 
-func NewCookieAuthn(token string, path string, cfg config.APIConfig) *fiber.Cookie {
+func NewCookieAuthn(token string, path string, exp time.Time) *fiber.Cookie {
 	return &fiber.Cookie{
 		Name:     AUTHN_COOKIE,
 		Value:    token,
 		HTTPOnly: true,
 		Secure:   true,
-		MaxAge:   int(cfg.TokenExpiration.Seconds()),
-		Expires:  time.Now().Add(time.Duration(cfg.TokenExpiration)),
+		MaxAge:   int(time.Until(exp).Seconds()),
+		Expires:  exp,
 	}
 }
 
@@ -176,6 +177,12 @@ func NewWebAuthn(cfg config.APIConfig) *webauthn.WebAuthn {
 		RPDisplayName: cfg.Name,                               // Display Name for your site
 		RPID:          cfg.FQDN,                               // Generally the FQDN for your site
 		RPOrigins:     strings.Split(cfg.ApiAllowOrigin, ","), // The origin URLs allowed for WebAuthn requests
+		AuthenticatorSelection: protocol.AuthenticatorSelection{
+			// Preferred (not Required): nudges new passkeys to be discoverable for usernameless login
+			// without rejecting authenticators that can't create resident keys.
+			ResidentKey:      protocol.ResidentKeyRequirementPreferred,
+			UserVerification: protocol.VerificationPreferred,
+		},
 	}
 
 	webAuthn, err := webauthn.New(config)

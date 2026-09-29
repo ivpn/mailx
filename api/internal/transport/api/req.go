@@ -4,14 +4,24 @@ type UserReq struct {
 	Email    string `json:"email" validate:"required,emailx"`
 	Password string `json:"password" validate:"password"`
 	OTP      string `json:"otp" validate:"min=0,max=10"`
+	Remember bool   `json:"remember"`
 }
 
 type AuthReq struct {
 	AccessKey string `json:"access_key" validate:"required,min=85,max=85"`
 }
 
+type StepUpPasswordReq struct {
+	Password string `json:"password" validate:"password"`
+}
+
 type EmailReq struct {
-	Email string `json:"email" validate:"required,emailx"`
+	Email    string `json:"email" validate:"required,emailx"`
+	Remember bool   `json:"remember"`
+}
+
+type RememberReq struct {
+	Remember bool `json:"remember"`
 }
 
 type SignupUserReq struct {
@@ -38,6 +48,7 @@ type AliasReq struct {
 	Format            string `json:"format"`
 	Domain            string `json:"domain" validate:"required"`
 	WildcardLocalPart string `json:"wildcard_local_part" validate:"omitempty,alphanum,min=6,max=12"`
+	WildcardDelimiter string `json:"wildcard_delimiter" validate:"omitempty,oneof=+ ."`
 	LocalPart         string `json:"local_part" validate:"omitempty,emaillocalpart"`
 }
 
@@ -46,6 +57,24 @@ type RecipientReq struct {
 	PGPKey     string `json:"pgp_key" validate:"omitempty,pgp"`
 	PGPEnabled bool   `json:"pgp_enabled"`
 	PGPInline  bool   `json:"pgp_inline"`
+}
+
+type AliasPinReq struct {
+	Pinned bool `json:"pinned"`
+}
+
+type BulkAliasIDsReq struct {
+	IDs []string `json:"ids" validate:"required,min=1,max=500,dive,uuid"`
+}
+
+type BulkAliasEnabledReq struct {
+	IDs     []string `json:"ids" validate:"required,min=1,max=500,dive,uuid"`
+	Enabled bool     `json:"enabled"`
+}
+
+type BulkAliasPinReq struct {
+	IDs    []string `json:"ids" validate:"required,min=1,max=500,dive,uuid"`
+	Pinned bool     `json:"pinned"`
 }
 
 type DeleteRecipientReq struct {
@@ -67,7 +96,8 @@ type DeleteUserReq struct {
 }
 
 type ChangePasswordReq struct {
-	Password string `json:"password" validate:"password"`
+	OldPassword string `json:"old_password"`
+	Password    string `json:"password" validate:"password"`
 }
 
 type ResetPasswordReq struct {

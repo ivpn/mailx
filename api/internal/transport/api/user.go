@@ -29,6 +29,7 @@ var (
 	ErrInvalidTotpCode           = "The 2FA code you entered is invalid."
 	ErrGetUser                   = "We couldn’t retrieve your user details."
 	ErrTooManySessions           = "You have too many active sessions. Please log out from other devices or try again later."
+	ErrIncorrectCurrentPassword  = "Your current password is incorrect."
 )
 
 type UserService interface {
@@ -271,7 +272,11 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 	}
 
 	// Save the session
-	exp := time.Now().Add(h.Cfg.TokenExpiration)
+	ttl := h.Cfg.TokenExpiration
+	if req.Remember {
+		ttl = h.Cfg.TokenExpirationExtended
+	}
+	exp := time.Now().Add(ttl)
 	sessionData := webauthn.SessionData{
 		UserID:  user.WebAuthnID(),
 		Expires: exp,
@@ -282,7 +287,7 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 			"error": ErrSaveSession,
 		})
 	}
-	err = h.Service.SaveSession(c.Context(), sessionData, token, user.ID, exp)
+	err = h.Service.SaveSession(c.Context(), sessionData, token, user.ID, exp, req.Remember)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrSaveSession,
@@ -290,7 +295,7 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 	}
 
 	// Set token in cookie
-	c.Cookie(auth.NewCookieAuthn(token, "/", h.Cfg))
+	c.Cookie(auth.NewCookieAuthn(token, "/", exp))
 
 	return c.Status(200).JSON(fiber.Map{
 		"message": LoginSuccess,
@@ -464,6 +469,23 @@ func (h *Handler) ChangePassword(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidRequest,
 		})
+	}
+
+	// If the user already has a password, the current one must be verified first
+	user, err := h.Service.GetUser(c.Context(), ID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	if user.PasswordHash != "" {
+		_, err = h.Service.GetUserByPassword(c.Context(), ID, req.OldPassword)
+		if err != nil {
+			return c.Status(400).JSON(fiber.Map{
+				"error": ErrIncorrectCurrentPassword,
+			})
+		}
 	}
 
 	// Change the password

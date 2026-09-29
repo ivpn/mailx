@@ -5,7 +5,9 @@ import (
 	"errors"
 	"strings"
 	"testing"
+	"time"
 
+	"gorm.io/gorm"
 	"ivpn.net/email/api/config"
 	"ivpn.net/email/api/internal/model"
 )
@@ -101,6 +103,141 @@ func (f *fakeStore) PostAlias(ctx context.Context, alias model.Alias, maxDaily i
 	return alias, nil
 }
 
+// GetAliases is a minimal filter (userID + wildcard flag only) sufficient for the
+// wildcard-related PostAlias/GetWildcardDomainInfo tests that use it.
+func (f *fakeStore) GetAliases(ctx context.Context, userID string, limit int, offset int, sortBy string, sortOrder string, wildcard string, search string, status string) ([]model.Alias, error) {
+	var result []model.Alias
+	for _, a := range f.aliases {
+		if a.UserID != userID {
+			continue
+		}
+		if wildcard == "true" && !a.Wildcard {
+			continue
+		}
+		if wildcard == "false" && a.Wildcard {
+			continue
+		}
+		result = append(result, a)
+	}
+	return result, nil
+}
+
+func (f *fakeStore) GetAliasesNoStats(ctx context.Context, userID string, limit int, offset int, sortBy string, sortOrder string, wildcard string, search string, status string) ([]model.Alias, error) {
+	return f.GetAliases(ctx, userID, limit, offset, sortBy, sortOrder, wildcard, search, status)
+}
+
+func (f *fakeStore) GetAliasUnscoped(ctx context.Context, ID string, userID string) (model.Alias, error) {
+	for _, a := range f.aliases {
+		if a.ID == ID && a.UserID == userID {
+			return a, nil
+		}
+	}
+	return model.Alias{}, errNotFound
+}
+
+func (f *fakeStore) ForgetAlias(ctx context.Context, ID string, userID string) error {
+	for name, a := range f.aliases {
+		if a.ID == ID && a.UserID == userID {
+			delete(f.aliases, name)
+			return nil
+		}
+	}
+	return errNotFound
+}
+
+func (f *fakeStore) BulkUpdateAliasEnabled(ctx context.Context, ids []string, userID string, enabled bool) error {
+	idSet := aliasIDSet(ids)
+	for name, a := range f.aliases {
+		if idSet[a.ID] && a.UserID == userID {
+			a.Enabled = enabled
+			f.aliases[name] = a
+		}
+	}
+	return nil
+}
+
+func (f *fakeStore) BulkUpdateAliasPinned(ctx context.Context, ids []string, userID string, pinned bool) error {
+	idSet := aliasIDSet(ids)
+	for name, a := range f.aliases {
+		if idSet[a.ID] && a.UserID == userID {
+			a.Pinned = pinned
+			f.aliases[name] = a
+		}
+	}
+	return nil
+}
+
+func (f *fakeStore) BulkDeleteAlias(ctx context.Context, ids []string, userID string) error {
+	idSet := aliasIDSet(ids)
+	matched := 0
+	for _, a := range f.aliases {
+		if idSet[a.ID] && a.UserID == userID && !a.DeletedAt.Valid {
+			matched++
+		}
+	}
+	if matched != len(idSet) {
+		return model.ErrBulkAliasNotEligible
+	}
+
+	for name, a := range f.aliases {
+		if idSet[a.ID] && a.UserID == userID {
+			a.DeletedAt = gorm.DeletedAt{Time: time.Now(), Valid: true}
+			f.aliases[name] = a
+		}
+	}
+	return nil
+}
+
+func (f *fakeStore) BulkRestoreAlias(ctx context.Context, ids []string, userID string) error {
+	idSet := aliasIDSet(ids)
+	matched := 0
+	for _, a := range f.aliases {
+		if idSet[a.ID] && a.UserID == userID && a.DeletedAt.Valid {
+			matched++
+		}
+	}
+	if matched != len(idSet) {
+		return model.ErrBulkAliasNotEligible
+	}
+
+	for name, a := range f.aliases {
+		if idSet[a.ID] && a.UserID == userID {
+			a.DeletedAt = gorm.DeletedAt{}
+			f.aliases[name] = a
+		}
+	}
+	return nil
+}
+
+func (f *fakeStore) GetAliasesUnscopedByIDs(ctx context.Context, ids []string, userID string) ([]model.Alias, error) {
+	idSet := aliasIDSet(ids)
+	var result []model.Alias
+	for _, a := range f.aliases {
+		if idSet[a.ID] && a.UserID == userID {
+			result = append(result, a)
+		}
+	}
+	return result, nil
+}
+
+func (f *fakeStore) BulkForgetAlias(ctx context.Context, ids []string, userID string) error {
+	idSet := aliasIDSet(ids)
+	for name, a := range f.aliases {
+		if idSet[a.ID] && a.UserID == userID {
+			delete(f.aliases, name)
+		}
+	}
+	return nil
+}
+
+func aliasIDSet(ids []string) map[string]bool {
+	set := make(map[string]bool, len(ids))
+	for _, id := range ids {
+		set[id] = true
+	}
+	return set
+}
+
 func newTestService(store *fakeStore) *Service {
 	return &Service{
 		Cfg: config.Config{
@@ -139,6 +276,123 @@ func TestFindRecipients_PlusTagResolvesExistingAlias(t *testing.T) {
 	}
 }
 
+// An alias whose name itself contains "+" (Custom or catch-all created) must resolve
+// verbatim, not be stripped to its base and routed to the catch-all.
+func TestFindRecipients_AliasWithPlusInNameResolvesVerbatim(t *testing.T) {
+	store := newFakeStore()
+	store.aliases["a+b-c_d897611@customdomain.com"] = model.Alias{
+		BaseModel:  model.BaseModel{ID: "alias-1b"},
+		Name:       "a+b-c_d897611@customdomain.com",
+		UserID:     "user-1b",
+		Enabled:    true,
+		Recipients: "rcpt@example.com",
+	}
+	store.domains["customdomain.com"] = model.Domain{
+		Name:     "customdomain.com",
+		UserID:   "user-1b",
+		Enabled:  true,
+		CatchAll: true,
+	}
+	store.recipients["user-1b"] = []model.Recipient{{Email: "rcpt@example.com"}}
+	s := newTestService(store)
+
+	rcps, alias, msgType, err := s.FindRecipients("sender@somewhere.com", "a+b-c_d897611@customdomain.com", model.Send)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if alias.ID != "alias-1b" {
+		t.Errorf("expected existing alias alias-1b, got %+v", alias)
+	}
+	if msgType != model.Forward {
+		t.Errorf("expected msgType Forward, got %v", msgType)
+	}
+	if len(rcps) != 1 || rcps[0].Email != "rcpt@example.com" {
+		t.Errorf("expected recipient rcpt@example.com, got %+v", rcps)
+	}
+}
+
+// When both the base alias and a "+"-named alias exist, the exact match wins.
+func TestFindRecipients_ExactPlusAliasPreferredOverBaseAlias(t *testing.T) {
+	store := newFakeStore()
+	store.aliases["myalias@mailx.net"] = model.Alias{
+		BaseModel: model.BaseModel{ID: "alias-base"},
+		Name:      "myalias@mailx.net",
+		UserID:    "user-1c",
+		Enabled:   true,
+	}
+	store.aliases["myalias+shop@mailx.net"] = model.Alias{
+		BaseModel: model.BaseModel{ID: "alias-exact"},
+		Name:      "myalias+shop@mailx.net",
+		UserID:    "user-1c",
+		Enabled:   true,
+	}
+	store.recipients["user-1c"] = []model.Recipient{{Email: "rcpt@example.com"}}
+	s := newTestService(store)
+
+	_, alias, _, err := s.FindRecipients("sender@somewhere.com", "myalias+shop@mailx.net", model.Send)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if alias.ID != "alias-exact" {
+		t.Errorf("expected exact alias alias-exact, got %s", alias.ID)
+	}
+}
+
+// A reply from an alias with "+" in its name must resolve to that alias, not be read as a
+// Wildcard Alias reply ("*+b897611@...") and dropped.
+func TestFindRecipients_ReplyFromAliasWithPlusInName(t *testing.T) {
+	store := newFakeStore()
+	store.aliases["a+b897611@customdomain.com"] = model.Alias{
+		BaseModel: model.BaseModel{ID: "alias-1d"},
+		Name:      "a+b897611@customdomain.com",
+		UserID:    "user-1d",
+		Enabled:   true,
+	}
+	store.domains["customdomain.com"] = model.Domain{Name: "customdomain.com", UserID: "user-1d", Enabled: true}
+	store.verifiedRecipients["user-1d"] = []model.Recipient{{Email: "sender@somewhere.com", IsActive: true}}
+	s := newTestService(store)
+
+	rcps, alias, msgType, err := s.FindRecipients("sender@somewhere.com", "a+b897611+contact=external.com@customdomain.com", model.Reply)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if alias.ID != "alias-1d" {
+		t.Errorf("expected alias alias-1d, got %+v", alias)
+	}
+	if msgType != model.Reply {
+		t.Errorf("expected msgType Reply, got %v", msgType)
+	}
+	if len(rcps) != 1 || rcps[0].Email != "contact@external.com" {
+		t.Errorf("expected reply target contact@external.com, got %+v", rcps)
+	}
+}
+
+// Replies through a Wildcard Alias still resolve to it when no "+"-named alias matches.
+func TestFindRecipients_ReplyFromWildcardAlias(t *testing.T) {
+	store := newFakeStore()
+	store.aliases["*+shop@customdomain.com"] = model.Alias{
+		BaseModel: model.BaseModel{ID: "alias-1e"},
+		Name:      "*+shop@customdomain.com",
+		UserID:    "user-1e",
+		Enabled:   true,
+		Wildcard:  true,
+	}
+	store.domains["customdomain.com"] = model.Domain{Name: "customdomain.com", UserID: "user-1e", Enabled: true}
+	store.verifiedRecipients["user-1e"] = []model.Recipient{{Email: "sender@somewhere.com", IsActive: true}}
+	s := newTestService(store)
+
+	rcps, alias, _, err := s.FindRecipients("sender@somewhere.com", "anything+shop+contact=external.com@customdomain.com", model.Reply)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if alias.ID != "alias-1e" {
+		t.Errorf("expected wildcard alias alias-1e, got %+v", alias)
+	}
+	if len(rcps) != 1 || rcps[0].Email != "contact@external.com" {
+		t.Errorf("expected reply target contact@external.com, got %+v", rcps)
+	}
+}
+
 func TestFindRecipients_WildcardAliasFallbackWhenBaseAliasMissing(t *testing.T) {
 	store := newFakeStore()
 	store.aliases["*+news@customdomain.com"] = model.Alias{
@@ -146,7 +400,7 @@ func TestFindRecipients_WildcardAliasFallbackWhenBaseAliasMissing(t *testing.T) 
 		Name:       "*+news@customdomain.com",
 		UserID:     "user-2",
 		Enabled:    true,
-		CatchAll:   true,
+		Wildcard:   true,
 		Recipients: "rcpt@example.com",
 	}
 	store.domains["customdomain.com"] = model.Domain{Name: "customdomain.com", UserID: "user-2", Enabled: true}
@@ -159,6 +413,35 @@ func TestFindRecipients_WildcardAliasFallbackWhenBaseAliasMissing(t *testing.T) 
 	}
 	if alias.Name != "*+news@customdomain.com" {
 		t.Errorf("expected wildcard alias match, got %s", alias.Name)
+	}
+	if msgType != model.Forward {
+		t.Errorf("expected msgType Forward, got %v", msgType)
+	}
+	if len(rcps) != 1 || rcps[0].Email != "rcpt@example.com" {
+		t.Errorf("expected recipient rcpt@example.com, got %+v", rcps)
+	}
+}
+
+func TestFindRecipients_DotWildcardAliasFallbackWhenBaseAliasMissing(t *testing.T) {
+	store := newFakeStore()
+	store.aliases["*.news@customdomain.com"] = model.Alias{
+		BaseModel:  model.BaseModel{ID: "alias-2b"},
+		Name:       "*.news@customdomain.com",
+		UserID:     "user-2b",
+		Enabled:    true,
+		Wildcard:   true,
+		Recipients: "rcpt@example.com",
+	}
+	store.domains["customdomain.com"] = model.Domain{Name: "customdomain.com", UserID: "user-2b", Enabled: true}
+	store.recipients["user-2b"] = []model.Recipient{{Email: "rcpt@example.com"}}
+	s := newTestService(store)
+
+	rcps, alias, msgType, err := s.FindRecipients("sender@somewhere.com", "anything.news@customdomain.com", model.Send)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if alias.Name != "*.news@customdomain.com" {
+		t.Errorf("expected dot wildcard alias match, got %s", alias.Name)
 	}
 	if msgType != model.Forward {
 		t.Errorf("expected msgType Forward, got %v", msgType)
@@ -216,7 +499,10 @@ func TestFindRecipients_DisabledAliasStillBlockedAfterPlusTagStripped(t *testing
 	}
 }
 
-func TestFindRecipients_UnmatchedPlusTagFallsThroughToDomainCatchAll(t *testing.T) {
+// A "+" tag that doesn't match any existing Wildcard Alias is just an ordinary address:
+// it must still be eligible for catch-all auto-creation, using the full address (including
+// the tag) as the new alias name, not a tag-stripped base.
+func TestFindRecipients_UnmatchedPlusTagIsAutoCreatedWithFullAddress(t *testing.T) {
 	store := newFakeStore()
 	store.domains["customdomain.com"] = model.Domain{
 		Name:      "customdomain.com",
@@ -232,13 +518,11 @@ func TestFindRecipients_UnmatchedPlusTagFallsThroughToDomainCatchAll(t *testing.
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
-	// No real alias or Wildcard Alias matches, so the base (tag-stripped) name is
-	// used purely as a label on the domain-wide catch-all result.
-	if alias.Name != "random@customdomain.com" {
-		t.Errorf("expected catch-all alias label random@customdomain.com, got %s", alias.Name)
+	if alias.Name != "random+tag@customdomain.com" {
+		t.Errorf("expected the full address random+tag@customdomain.com to become the new alias, got %s", alias.Name)
 	}
-	if alias.Origin == model.Inbound {
-		t.Errorf("expected a tagged address not to be marked for auto-creation, got Origin %v", alias.Origin)
+	if alias.Origin != model.Inbound {
+		t.Errorf("expected Origin == Inbound so PostInboundAlias auto-creates the alias, got %v", alias.Origin)
 	}
 	if msgType != model.Forward {
 		t.Errorf("expected msgType Forward, got %v", msgType)
@@ -248,10 +532,18 @@ func TestFindRecipients_UnmatchedPlusTagFallsThroughToDomainCatchAll(t *testing.
 	}
 }
 
-// Reproduces the QA report: a plus-tagged address on a catch-all domain must
-// never be auto-created as a new alias under its tag-stripped base name.
-func TestFindRecipients_TaggedAddressOnCatchAllDomainNotAutoCreated(t *testing.T) {
+// When a "+" Wildcard Alias actually exists for the suffix, the address must resolve to
+// that alias (via the fallback earlier in FindRecipients) rather than the domain catch-all.
+func TestFindRecipients_PlusTagWithMatchingWildcardRidesWildcardNotCatchAll(t *testing.T) {
 	store := newFakeStore()
+	store.aliases["*+shop@customdomain.com"] = model.Alias{
+		BaseModel:  model.BaseModel{ID: "alias-6"},
+		Name:       "*+shop@customdomain.com",
+		UserID:     "user-6",
+		Enabled:    true,
+		Wildcard:   true,
+		Recipients: "rcpt@example.com",
+	}
 	store.domains["customdomain.com"] = model.Domain{
 		Name:      "customdomain.com",
 		UserID:    "user-6",
@@ -259,15 +551,120 @@ func TestFindRecipients_TaggedAddressOnCatchAllDomainNotAutoCreated(t *testing.T
 		CatchAll:  true,
 		Recipient: "catchall@example.com",
 	}
-	store.verifiedRecipients["user-6"] = []model.Recipient{{Email: "catchall@example.com", IsActive: true}}
+	store.recipients["user-6"] = []model.Recipient{{Email: "rcpt@example.com"}}
 	s := newTestService(store)
 
 	_, alias, _, err := s.FindRecipients("sender@somewhere.com", "newalias+shop@customdomain.com", model.Send)
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
+	if alias.Name != "*+shop@customdomain.com" {
+		t.Errorf("expected the plus Wildcard Alias to be used, got %s", alias.Name)
+	}
+}
+
+// A reply-encoded address that doesn't resolve to a real alias must never auto-provision
+// one - unlike a plain tag, there's no sensible "full address" to create an alias from.
+func TestFindRecipients_ReplyEncodedAddressWithoutMatchingAliasNotAutoCreated(t *testing.T) {
+	store := newFakeStore()
+	store.domains["customdomain.com"] = model.Domain{
+		Name:      "customdomain.com",
+		UserID:    "user-6e",
+		Enabled:   true,
+		CatchAll:  true,
+		Recipient: "catchall@example.com",
+	}
+	store.verifiedRecipients["user-6e"] = []model.Recipient{
+		{Email: "catchall@example.com", IsActive: true},
+		{Email: "sender@somewhere.com", IsActive: true},
+	}
+	s := newTestService(store)
+
+	_, alias, _, err := s.FindRecipients("sender@somewhere.com", "noalias+contact=external.com@customdomain.com", model.Send)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
 	if alias.Origin == model.Inbound {
 		t.Errorf("expected Origin != Inbound so PostInboundAlias is never invoked, got %v", alias.Origin)
+	}
+}
+
+// A "." only blocks catch-all auto-creation when it actually resolves to an existing
+// Wildcard Alias (handled by the fallback above, before this point is ever reached);
+// otherwise a dotted address is a normal address and may still be auto-created.
+func TestFindRecipients_DottedAddressWithoutMatchingWildcardIsAutoCreated(t *testing.T) {
+	store := newFakeStore()
+	store.domains["customdomain.com"] = model.Domain{
+		Name:      "customdomain.com",
+		UserID:    "user-6b",
+		Enabled:   true,
+		CatchAll:  true,
+		Recipient: "catchall@example.com",
+	}
+	store.verifiedRecipients["user-6b"] = []model.Recipient{{Email: "catchall@example.com", IsActive: true}}
+	s := newTestService(store)
+
+	_, alias, _, err := s.FindRecipients("sender@somewhere.com", "newalias.shop@customdomain.com", model.Send)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if alias.Origin != model.Inbound {
+		t.Errorf("expected Origin == Inbound so PostInboundAlias auto-creates the alias, got %v", alias.Origin)
+	}
+}
+
+// When a "." Wildcard Alias actually exists for the suffix, the address must resolve to
+// that alias (via the fallback earlier in FindRecipients) rather than the domain catch-all.
+func TestFindRecipients_DottedAddressWithMatchingWildcardRidesWildcardNotCatchAll(t *testing.T) {
+	store := newFakeStore()
+	store.aliases["*.shop@customdomain.com"] = model.Alias{
+		BaseModel:  model.BaseModel{ID: "alias-7"},
+		Name:       "*.shop@customdomain.com",
+		UserID:     "user-6d",
+		Enabled:    true,
+		Wildcard:   true,
+		Recipients: "rcpt@example.com",
+	}
+	store.domains["customdomain.com"] = model.Domain{
+		Name:      "customdomain.com",
+		UserID:    "user-6d",
+		Enabled:   true,
+		CatchAll:  true,
+		Recipient: "catchall@example.com",
+	}
+	store.recipients["user-6d"] = []model.Recipient{{Email: "rcpt@example.com"}}
+	s := newTestService(store)
+
+	_, alias, _, err := s.FindRecipients("sender@somewhere.com", "newalias.shop@customdomain.com", model.Send)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if alias.Name != "*.shop@customdomain.com" {
+		t.Errorf("expected the dot Wildcard Alias to be used, got %s", alias.Name)
+	}
+}
+
+// Regression: hasTag must only look at the local part. The domain itself always contains a
+// ".", so a plain address (no "+" or "." in the local part) must still be eligible for
+// catch-all auto-creation, even though the full address contains dots from the domain.
+func TestFindRecipients_PlainAddressOnCatchAllDomainIsAutoCreated(t *testing.T) {
+	store := newFakeStore()
+	store.domains["domain.net"] = model.Domain{
+		Name:      "domain.net",
+		UserID:    "user-6c",
+		Enabled:   true,
+		CatchAll:  true,
+		Recipient: "catchall@example.com",
+	}
+	store.verifiedRecipients["user-6c"] = []model.Recipient{{Email: "catchall@example.com", IsActive: true}}
+	s := newTestService(store)
+
+	_, alias, _, err := s.FindRecipients("sender@somewhere.com", "catchalldomainnew@domain.net", model.Send)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if alias.Origin != model.Inbound {
+		t.Errorf("expected Origin == Inbound so PostInboundAlias auto-creates the alias, got %v", alias.Origin)
 	}
 }
 

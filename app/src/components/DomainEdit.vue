@@ -56,6 +56,7 @@
                                 <label v-bind:for="'create_alias_' + domain.id">
                                     <input
                                         type="checkbox"
+                                        class="checkbox-switch"
                                         v-bind:id="'create_alias_' + domain.id"
                                         v-model="domain.create_alias"
                                     />

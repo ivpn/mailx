@@ -184,6 +184,8 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 			inboundAlias, err := s.PostInboundAlias(context.Background(), alias)
 			if err == nil {
 				alias.BaseModel = inboundAlias.BaseModel
+			} else {
+				log.Println("error auto-creating inbound alias:", err, alias.Name)
 			}
 		}
 

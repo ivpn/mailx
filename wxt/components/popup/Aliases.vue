@@ -16,16 +16,25 @@
                     </button>
                 </div>
             </header>
-            <p v-if="isLoading" class="text-secondary py-4">Loading...</p>
+            <p v-if="isLoading && !hasLoadedOnce" class="text-secondary py-4">Loading...</p>
             <p v-else-if="error" class="error py-4">Error: {{ error }}</p>
             <div v-else>
                 <div v-for="(alias, index) in list" :key="alias.id" class="min-h-[63.3px] flex items-center gap-x-4" :class="{ 'border-t border-secondary': index > 0 }">
                     <div class="flex items-center">
-                        <input @change="updateAlias(alias)" v-bind:checked="alias.enabled" type="checkbox" class="xs">
+                        <input @change="updateAlias(alias)" v-bind:checked="alias.enabled" type="checkbox" class="checkbox-switch xs">
                     </div>
                     <div class="grow min-w-24 break-all">
                         <p class="m-0 min-width-0 text-primary font-medium text-base text-nowrap overflow-hidden text-ellipsis">{{ alias.name }}</p>
                         <p class="m-0">{{ truncatedDescription(alias) }}</p>
+                    </div>
+                    <div class="hs-tooltip">
+                        <button class="hs-tooltip-toggle plain" @click="togglePin(alias)">
+                            <i class="icon pin text-xs" :class="alias.pinned ? 'icon-accent' : 'icon-secondary'"></i>
+                            <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0"
+                                role="tooltip">
+                                {{ alias.pinned ? 'Unpin' : 'Pin' }}
+                            </span>
+                        </button>
                     </div>
                     <div class="hs-tooltip">
                         <button class="hs-tooltip-toggle plain" @click="copyAlias(alias.name)">
@@ -60,6 +69,7 @@ const props = defineProps<{
 }>()
 const list = ref([] as Alias[])
 const isLoading = ref(false)
+const hasLoadedOnce = ref(false)
 const error = ref<string | null>(null)
 const copyText = ref('Click to copy')
 const search = ref('')
@@ -79,12 +89,12 @@ const fetchAliases = async () => {
         isLoading.value = true
         const res = await api.fetchAliases(props.apiToken, searchQuery.value)
         list.value = res.aliases
-        console.log('Fetched aliases:', res.aliases)
     } catch (err) {
         error.value = err instanceof Error ? err.message : 'An unexpected error occurred'
         console.error('Fetch aliases error:', err)
     } finally {
         isLoading.value = false
+        hasLoadedOnce.value = true
     }
 }
 
@@ -98,9 +108,19 @@ const updateAlias = async (alias: Alias) => {
     alias.enabled = !alias.enabled
     try {
         await api.updateAlias(props.apiToken, alias.id, alias)
-        console.log('Updated alias:', alias)
     } catch (err) {
         console.error('Update alias error:', err)
+    }
+}
+
+const togglePin = async (alias: Alias) => {
+    const pinned = !alias.pinned
+    try {
+        await api.pinAlias(props.apiToken, alias.id, pinned)
+        // re-sync with the server's pinned+secondary sort instead of guessing the unpinned position locally
+        await fetchAliases()
+    } catch (err) {
+        console.error('Pin alias error:', err)
     }
 }
 
@@ -110,7 +130,6 @@ const deleteAlias = async (aliasId: string) => {
     try {
         await api.deleteAlias(props.apiToken, aliasId)
         list.value = list.value.filter(alias => alias.id !== aliasId)
-        console.log('Deleted alias with ID:', aliasId)
     } catch (err) {
         console.error('Delete alias error:', err)
     }
@@ -126,7 +145,6 @@ const copyAlias = (alias: string) => {
 
 const onCreateAlias = (event: { alias: Alias }) => {
     if (!event.alias) return
-    console.log('Alias created event received:', event.alias)
     list.value.unshift(event.alias)
 }
 

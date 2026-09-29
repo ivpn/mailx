@@ -9,6 +9,8 @@ export const userApi = {
     login: (data: any) => api.post('/login', data),
     loginBegin: (data: any) => api.post('/login/begin', data),
     loginFinish: (data: any) => api.post('/login/finish', data),
+    loginPasskeyBegin: (data: any) => api.post('/login/passkey/begin', data),
+    loginPasskeyFinish: (data: any) => api.post('/login/passkey/finish', data),
     logout: () => api.post('/user/logout'),
     deleteRequest: () => api.post('/user/delete/request'),
     delete: (data: any) => api.post('/user/delete', data),
@@ -25,11 +27,14 @@ export const userApi = {
     totpEnable: () => api.put('/user/totp/enable'),
     totpEnableConfirm: (data: any) => api.put('/user/totp/enable/confirm', data),
     totpDisable: (data: any) => api.put('/user/totp/disable', data),
+    stepUpPassword: (data: any) => api.post('/user/stepup/password', data),
+    stepUpPasskeyBegin: () => api.post('/user/stepup/passkey/begin'),
+    stepUpPasskeyFinish: (data: any) => api.post('/user/stepup/passkey/finish', data),
     accessKeyList: () => api.get('/accesskeys'),
     accessKeyCreate: (data: any) => api.post('/accesskeys', data),
     accessKeyDelete: (id: string) => api.delete('/accesskeys/' + id),
     clearSession: () => {
         localStorage.removeItem('email')
-        window.location.href = '/'
+        window.location.href = '/login'
     },
 }

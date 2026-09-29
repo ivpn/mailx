@@ -295,9 +295,15 @@ func (s *Service) FindRecipients(from string, to string, msgType model.MessageTy
 	aliasName, replyTo := model.ParseReplyTo(to)
 
 	// An alias whose name itself contains "+" (e.g. a Custom or catch-all created alias) must
-	// match verbatim before falling back to the base alias with the "+tag" stripped.
-	alias, err := s.GetAliasByName(to)
-	if err != nil && aliasName != to {
+	// match verbatim before falling back to the base alias with the "+tag" stripped. A reply
+	// from such an alias ("a+b+reply=example.com@domain.com") reads the same as a Wildcard
+	// Alias reply, which ParseReplyTo assumes ("*+b@domain.com"), so try "a+b@domain.com" first.
+	exactName := to
+	if replyTo != "" {
+		exactName = model.ReplyAliasName(to)
+	}
+	alias, err := s.GetAliasByName(exactName)
+	if err != nil && aliasName != exactName {
 		alias, err = s.GetAliasByName(aliasName)
 	}
 	// Fall back to a Wildcard Alias match (e.g. "*+suffix@domain.com" or "*.suffix@domain.com")

@@ -34,6 +34,7 @@ func (d *Database) GetUser(ctx context.Context, ID string) (model.User, error) {
 	user.Creds = creds
 
 	user.TotpEnabled = user.TotpSecret != ""
+	user.HasPassword = user.PasswordHash != ""
 	return user, nil
 }
 
@@ -62,6 +63,7 @@ func (d *Database) GetUserByEmail(ctx context.Context, email string) (model.User
 	user.Creds = creds
 
 	user.TotpEnabled = user.TotpSecret != ""
+	user.HasPassword = user.PasswordHash != ""
 	return user, nil
 }
 

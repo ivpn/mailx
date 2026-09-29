@@ -74,18 +74,29 @@ func aliasSearchFilter(columnPrefix string, wildcard string, search string) (str
 	return filter, args
 }
 
+// aliasStatusFilter builds the deleted_at/enabled WHERE fragment (with bound parameters, so no
+// untrusted input reaches the query text) for the given status value. unscoped reports whether
+// the caller must bypass GORM's automatic soft-delete scope (only relevant to GetAliasCount's
+// query-builder path; GetAliases runs raw SQL, which is never auto-scoped).
+func aliasStatusFilter(columnPrefix string, status string) (filter string, args []any, unscoped bool) {
+	switch status {
+	case "deleted":
+		return "AND " + columnPrefix + "deleted_at IS NOT NULL", nil, true
+	case "all":
+		return "", nil, true
+	case "active":
+		return "AND " + columnPrefix + "deleted_at IS NULL AND " + columnPrefix + "enabled = ?", []any{true}, false
+	case "inactive":
+		return "AND " + columnPrefix + "deleted_at IS NULL AND " + columnPrefix + "enabled = ?", []any{false}, false
+	default: // "active_inactive" and any unrecognized value fall back to the broadest non-deleted view
+		return "AND " + columnPrefix + "deleted_at IS NULL", nil, false
+	}
+}
+
 func (d *Database) GetAliases(ctx context.Context, userID string, limit int, offset int, sortBy string, sortOrder string, wildcard string, search string, status string) ([]model.Alias, error) {
 	sortBy, sortOrder = sanitizeAliasSort(sortBy, sortOrder)
 
-	var statusFilter string
-	if status == "deleted" {
-		statusFilter = "AND a.deleted_at IS NOT NULL"
-	} else if status == "all" {
-		statusFilter = ""
-	} else {
-		statusFilter = "AND a.deleted_at IS NULL"
-	}
-
+	statusFilter, statusArgs, _ := aliasStatusFilter("a.", status)
 	filter, filterArgs := aliasSearchFilter("a.", wildcard, search)
 
 	aliases := []model.Alias{}
@@ -100,7 +111,7 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 		ON a.id = m.alias_id
 		WHERE a.user_id = ? ` + statusFilter + filter + `
 		GROUP BY a.id
-		ORDER BY ` + sortBy + " " + sortOrder
+		ORDER BY a.pinned DESC, ` + sortBy + " " + sortOrder
 
 	if limit > 0 {
 		query += "\nLIMIT " + strconv.Itoa(limit)
@@ -111,6 +122,7 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 	}
 
 	args := []any{model.Forward, model.Block, model.Reply, model.Send, userID}
+	args = append(args, statusArgs...)
 	args = append(args, filterArgs...)
 
 	rows, err := d.Client.Raw(query, args...).Rows()
@@ -122,7 +134,7 @@ func (d *Database) GetAliases(ctx context.Context, userID string, limit int, off
 	for rows.Next() {
 		var alias model.Alias
 		var forwards, blocks, replies, sends int
-		if err := rows.Scan(&alias.ID, &alias.CreatedAt, &alias.UpdatedAt, &alias.DeletedAt, &alias.Name, &alias.UserID, &alias.Enabled, &alias.Description, &alias.Recipients, &alias.FromName, &alias.Wildcard, &alias.Origin, &forwards, &blocks, &replies, &sends); err != nil {
+		if err := rows.Scan(&alias.ID, &alias.CreatedAt, &alias.UpdatedAt, &alias.DeletedAt, &alias.Name, &alias.UserID, &alias.Enabled, &alias.Description, &alias.Recipients, &alias.FromName, &alias.Wildcard, &alias.Origin, &alias.Pinned, &forwards, &blocks, &replies, &sends); err != nil {
 			return nil, err
 		}
 		alias.Stats = model.AliasStats{
@@ -150,18 +162,20 @@ func (d *Database) GetAllAliases(ctx context.Context, userID string) ([]model.Al
 }
 
 func (d *Database) GetAliasCount(ctx context.Context, userID string, wildcard string, search string, status string) (int, error) {
+	statusFilter, statusArgs, unscoped := aliasStatusFilter("", status)
 	filter, filterArgs := aliasSearchFilter("", wildcard, search)
-	args := append([]any{userID}, filterArgs...)
+
+	args := []any{userID}
+	args = append(args, statusArgs...)
+	args = append(args, filterArgs...)
+
+	q := d.Client.Model(&model.Alias{})
+	if unscoped {
+		q = q.Unscoped()
+	}
+	q = q.Where("user_id = ? "+statusFilter+filter, args...)
 
 	var count int64
-	q := d.Client.Model(&model.Alias{})
-	if status == "deleted" {
-		q = q.Unscoped().Where("user_id = ? AND deleted_at IS NOT NULL"+filter, args...)
-	} else if status == "all" {
-		q = q.Unscoped().Where("user_id = ?"+filter, args...)
-	} else {
-		q = q.Where("user_id = ?"+filter, args...)
-	}
 	err := q.Count(&count).Error
 	return int(count), err
 }
@@ -224,6 +238,13 @@ func (d *Database) DeleteAlias(ctx context.Context, ID string, userID string) er
 	return d.Client.Where("id = ? AND user_id = ?", ID, userID).Delete(&model.Alias{}).Error
 }
 
+// UpdateAliasPinned sets pinned in isolation (no recipients/description involved), so pinning
+// never depends on the alias's recipients being resolvable/verified. GORM's automatic
+// soft-delete scope already excludes deleted_at rows here, same as UpdateAlias/DeleteAlias.
+func (d *Database) UpdateAliasPinned(ctx context.Context, ID string, userID string, pinned bool) error {
+	return d.Client.Model(&model.Alias{}).Where("id = ? AND user_id = ?", ID, userID).Update("pinned", pinned).Error
+}
+
 func (d *Database) DeleteAliasByUserID(ctx context.Context, userID string) error {
 	return d.Client.Where("user_id = ?", userID).Delete(&model.Alias{}).Error
 }
@@ -234,4 +255,18 @@ func (d *Database) DeleteAliasByDomain(ctx context.Context, domain string, userI
 
 func (d *Database) RestoreAlias(ctx context.Context, ID string, userID string) error {
 	return d.Client.Model(&model.Alias{}).Unscoped().Where("id = ? AND user_id = ?", ID, userID).Update("deleted_at", nil).Error
+}
+
+// GetAliasUnscoped fetches an alias regardless of soft-delete state, used by ForgetAlias to
+// verify ownership/domain before permanently removing the alias.
+func (d *Database) GetAliasUnscoped(ctx context.Context, ID string, userID string) (model.Alias, error) {
+	var alias model.Alias
+	err := d.Client.Unscoped().Where("id = ? AND user_id = ?", ID, userID).First(&alias).Error
+	return alias, err
+}
+
+// ForgetAlias permanently removes an alias row, regardless of its soft-delete state - the
+// same effect as the automatic 90-day cleanup job, but triggered immediately by the user.
+func (d *Database) ForgetAlias(ctx context.Context, ID string, userID string) error {
+	return d.Client.Unscoped().Where("id = ? AND user_id = ?", ID, userID).Delete(&model.Alias{}).Error
 }

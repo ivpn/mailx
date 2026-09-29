@@ -26,7 +26,7 @@
                 </button>
             </div>
         </div>
-        <div v-if="!list.length && loaded && status === 'active'" class="card-empty">
+        <div v-if="!list.length && loaded && status === 'active_inactive'" class="card-empty">
             <span class="bg-secondary rounded flex items-center justify-center p-2 mb-5">
                 <i class="icon at icon-accent text-2xl"></i>
             </span>
@@ -41,7 +41,7 @@
                 New Alias
             </button>
         </div>
-        <div v-bind:class="{ 'hidden': (!list.length && status === 'active') || !loaded }">
+        <div v-bind:class="{ 'hidden': (!list.length && status === 'active_inactive') || !loaded }">
             <div class="tablet-lg">
                 <div class="hs-dropdown [--placement:bottom-left] mb-2">
                     <button id="hs-dropdown-alias-status-mobile" class="sort">
@@ -54,7 +54,9 @@
                         class="hs-dropdown-menu hs-dropdown-open:opacity-100 hidden"
                         aria-labelledby="hs-dropdown-alias-status-mobile"
                     >
-                        <button @click="setStatus('')">Active</button>
+                        <button @click="setStatus('active_inactive')">Active/Inactive</button>
+                        <button @click="setStatus('active')">Active</button>
+                        <button @click="setStatus('inactive')">Inactive</button>
                         <button @click="setStatus('deleted')">Deleted</button>
                         <button @click="setStatus('all')">All</button>
                     </div>
@@ -77,7 +79,9 @@
                                             class="hs-dropdown-menu hs-dropdown-open:opacity-100 hidden"
                                             aria-labelledby="hs-dropdown-alias-status"
                                         >
-                                            <button @click="setStatus('')">Active</button>
+                                            <button @click="setStatus('active_inactive')">Active/Inactive</button>
+                                            <button @click="setStatus('active')">Active</button>
+                                            <button @click="setStatus('inactive')">Inactive</button>
                                             <button @click="setStatus('deleted')">Deleted</button>
                                             <button @click="setStatus('all')">All</button>
                                         </div>
@@ -162,6 +166,7 @@ const alias = {
     description: '',
     recipients: '',
     from_name: '',
+    pinned: false,
     stats: {
         forwards: 0,
         blocks: 0,
@@ -191,11 +196,13 @@ const sortBy = ref('created_at')
 const sortOrder = ref('DESC')
 const search = ref('')
 const searchQuery = ref('')
-const status = ref('active')
+const status = ref('active_inactive')
 const statusLabel = computed(() => {
+    if (status.value === 'active') return 'Active'
+    if (status.value === 'inactive') return 'Inactive'
     if (status.value === 'deleted') return 'Deleted'
     if (status.value === 'all') return 'All'
-    return 'Active'
+    return 'Active/Inactive'
 })
 
 const getList = async () => {
@@ -253,6 +260,18 @@ const deleteAlias = async (payload: any) => {
     }
 }
 
+const forgetAlias = async (payload: any) => {
+    try {
+        await aliasApi.forget(payload.id)
+        error.value = ''
+        getList()
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.message
+        }
+    }
+}
+
 const renderRow = () => {
     rowKey.value++
 }
@@ -265,6 +284,10 @@ const onUpdatePage = (obj: any) => {
 
 const onDeleteAlias = (payload: { id: string, wildcard: boolean }) => {
     deleteAlias(payload)
+}
+
+const onForgetAlias = (payload: { id: string }) => {
+    forgetAlias(payload)
 }
 
 const sort = (e: any) => {
@@ -317,6 +340,7 @@ onMounted(async () => {
     events.on('alias.create', getList)
     events.on('alias.update', getList)
     events.on('alias.delete', onDeleteAlias)
+    events.on('alias.forget', onForgetAlias)
     document.addEventListener('keydown', handleKeydown)
 })
 

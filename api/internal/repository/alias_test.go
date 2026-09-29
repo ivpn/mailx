@@ -141,3 +141,48 @@ func TestAliasSearchFilter(t *testing.T) {
 		}
 	})
 }
+
+func TestAliasStatusFilter(t *testing.T) {
+	tests := []struct {
+		name           string
+		status         string
+		expectedFilter string
+		expectedArgs   []any
+		expectedUnscop bool
+	}{
+		{name: "active_inactive", status: "active_inactive", expectedFilter: "AND a.deleted_at IS NULL", expectedArgs: nil, expectedUnscop: false},
+		{name: "active", status: "active", expectedFilter: "AND a.deleted_at IS NULL AND a.enabled = ?", expectedArgs: []any{true}, expectedUnscop: false},
+		{name: "inactive", status: "inactive", expectedFilter: "AND a.deleted_at IS NULL AND a.enabled = ?", expectedArgs: []any{false}, expectedUnscop: false},
+		{name: "deleted", status: "deleted", expectedFilter: "AND a.deleted_at IS NOT NULL", expectedArgs: nil, expectedUnscop: true},
+		{name: "all", status: "all", expectedFilter: "", expectedArgs: nil, expectedUnscop: true},
+		{name: "empty falls back to active_inactive shape", status: "", expectedFilter: "AND a.deleted_at IS NULL", expectedArgs: nil, expectedUnscop: false},
+		{name: "unrecognized falls back to active_inactive shape", status: "bogus; DROP TABLE aliases;--", expectedFilter: "AND a.deleted_at IS NULL", expectedArgs: nil, expectedUnscop: false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			filter, args, unscoped := aliasStatusFilter("a.", tt.status)
+			if filter != tt.expectedFilter {
+				t.Errorf("aliasStatusFilter(%q) filter = %q, want %q", tt.status, filter, tt.expectedFilter)
+			}
+			if len(args) != len(tt.expectedArgs) {
+				t.Errorf("aliasStatusFilter(%q) args = %v, want %v", tt.status, args, tt.expectedArgs)
+			}
+			for i := range tt.expectedArgs {
+				if args[i] != tt.expectedArgs[i] {
+					t.Errorf("aliasStatusFilter(%q) args[%d] = %v, want %v", tt.status, i, args[i], tt.expectedArgs[i])
+				}
+			}
+			if unscoped != tt.expectedUnscop {
+				t.Errorf("aliasStatusFilter(%q) unscoped = %v, want %v", tt.status, unscoped, tt.expectedUnscop)
+			}
+		})
+	}
+
+	t.Run("columnPrefix empty leaves columns unqualified", func(t *testing.T) {
+		filter, _, _ := aliasStatusFilter("", "active")
+		if !strings.Contains(filter, "enabled = ?") || strings.Contains(filter, "a.enabled") {
+			t.Errorf("expected unqualified enabled column, got %q", filter)
+		}
+	})
+}

@@ -6,7 +6,7 @@
                 <option>50</option>
                 <option>75</option>
             </select>
-            <p class="text-nowrap m-0 desktop">per page</p>
+            <p class="text-nowrap m-0 desktop text-sm">Showing {{ start }} to {{ end }} of {{ total }}</p>
         </div>
         <nav class="flex items-center gap-x-2">
             <div class="flex items-center gap-x-3">
@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 const emit = defineEmits(['onUpdatePage'])
 const props = defineProps(['limit', 'page', 'total'])
@@ -36,6 +36,8 @@ const limit = ref(props.limit)
 const page = ref(props.page)
 const total = ref(props.total)
 const pages = ref(1)
+const start = computed(() => (total.value === 0 ? 0 : (page.value - 1) * limit.value + 1))
+const end = computed(() => Math.min(page.value * limit.value, total.value))
 
 const next = () => {
     if (page.value * props.limit >= total.value) return

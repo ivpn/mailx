@@ -9,6 +9,7 @@ export interface Alias {
   from_name: string
   wildcard: boolean
   local_part: string
+  pinned: boolean
 }
 
 export interface CustomDomain {

@@ -47,6 +47,7 @@ type Alias struct {
 	FromName         string         `gorm:"default:''" json:"from_name"`
 	Wildcard         bool           `gorm:"column:catch_all" json:"wildcard"`
 	Origin           AliasOrigin    `json:"origin"`
+	Pinned           bool           `gorm:"default:false" json:"pinned"`
 	Stats            AliasStats     `gorm:"-" json:"stats"`
 	IsCustomDomain   bool           `gorm:"-" json:"is_custom_domain"`
 	IsDomainVerified *bool          `gorm:"-" json:"is_domain_verified"`

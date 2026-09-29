@@ -35,6 +35,6 @@ export const userApi = {
     accessKeyDelete: (id: string) => api.delete('/accesskeys/' + id),
     clearSession: () => {
         localStorage.removeItem('email')
-        window.location.href = '/'
+        window.location.href = '/login'
     },
 }

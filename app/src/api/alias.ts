@@ -10,4 +10,6 @@ export const aliasApi = {
     update: (id: string, data: any) => api.put('/alias/' + id, data),
     delete: (id: string) => api.delete('/alias/' + id),
     restore: (id: string) => api.post('/alias/restore/' + id),
+    forget: (id: string) => api.delete('/alias/forget/' + id),
+    pin: (id: string, pinned: boolean) => api.put('/alias/' + id + '/pin', { pinned }),
 }

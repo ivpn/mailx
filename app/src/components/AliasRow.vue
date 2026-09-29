@@ -29,8 +29,8 @@
         <td>
             <div class="hs-tooltip inline-block">
                 <p class="hs-tooltip-toggle m-0 break-all">
-                    <button class="plain text-wrap text-start text-sm p-0" @click="copyAlias(alias.name)">
-                        {{ alias.name }}
+                    <button class="plain text-wrap text-start text-sm p-0 flex items-center" @click="copyAlias(alias.name)">
+                        <i v-if="alias.pinned" class="icon pin icon-accent text-xs mr-1 shrink-0"></i>{{ alias.name }}
                     </button>
                     <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                         {{ copyText }}: {{ alias.name }}
@@ -94,6 +94,12 @@
                         <i class="icon icon-primary edit text-xs"></i>
                         Edit
                     </button>
+                    <button
+                        v-if="!alias.deleted_at"
+                        @click.stop="togglePin">
+                        <i class="icon icon-primary pin text-xs"></i>
+                        {{ alias.pinned ? 'Unpin' : 'Pin' }}
+                    </button>
                     <button 
                         v-if="alias.deleted_at"
                         @click.stop="restoreAlias">
@@ -105,6 +111,12 @@
                         @click.stop="deleteAlias" class="delete">
                         <i class="icon icon-error trash text-xs"></i>
                         Delete
+                    </button>
+                    <button
+                        v-if="alias.is_custom_domain"
+                        @click.stop="forgetAlias" class="delete">
+                        <i class="icon icon-error trash text-xs"></i>
+                        Forget
                     </button>
                 </div>
             </div>
@@ -122,7 +134,7 @@
                             <p class="hs-tooltip-toggle mb-0">
                                 <button class="plain truncate text-sm p-0 text-wrap text-start" @click="copyAlias(alias.name)">
                                     <span v-if="alias.description" class="block break-words">{{ truncatedDescription }}</span>
-                                    <span class="block text-sm break-all">{{ alias.name }}</span>
+                                    <span class="text-sm break-all flex items-center"><i v-if="alias.pinned" class="icon pin icon-accent text-xs mr-1 shrink-0"></i>{{ alias.name }}</span>
                                 </button>
                                 <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">
                                     {{ copyText }}: {{ alias.name }}
@@ -175,6 +187,12 @@
                                 Edit
                             </button>
                             <button
+                                v-if="!alias.deleted_at"
+                                @click.stop="togglePin">
+                                <i class="icon icon-primary pin text-xs"></i>
+                                {{ alias.pinned ? 'Unpin' : 'Pin' }}
+                            </button>
+                            <button
                                 v-if="alias.deleted_at"
                                 @click.stop="restoreAlias">
                                 <i class="icon icon-primary reply text-xs"></i>
@@ -185,6 +203,12 @@
                                 @click.stop="deleteAlias" class="delete">
                                 <i class="icon icon-error trash text-xs"></i>
                                 Delete
+                            </button>
+                            <button
+                                v-if="alias.is_custom_domain"
+                                @click.stop="forgetAlias" class="delete">
+                                <i class="icon icon-error trash text-xs"></i>
+                                Forget
                             </button>
                         </div>
                     </div>
@@ -255,8 +279,16 @@ const updateAlias = async () => {
     } catch {}
 }
 
+const togglePin = async () => {
+    const pinned = !alias.value.pinned
+    try {
+        await aliasApi.pin(alias.value.id, pinned)
+        events.emit('alias.update', {})
+    } catch {}
+}
+
 const deleteAlias = () => {
-    const errMessage = props.wildcard ? 'WARNING: You will not be able to create the same wildcard alias in the next 90 days. Are you sure you want to delete alias? ' : 'Are you sure you want to delete alias?'
+    const errMessage = props.wildcard ? 'WARNING: You will not be able to create the same wildcard alias in the next 90 days. Are you sure you want to delete alias? ' : 'Are you sure you want to delete alias? A deleted email alias can be restored within 90 days.'
     if (!confirm(errMessage)) return
 
     events.emit('alias.delete', { id: alias.value.id, wildcard: props.wildcard })
@@ -267,6 +299,13 @@ const restoreAlias = async () => {
         await aliasApi.restore(alias.value.id)
         events.emit('alias.update', {})
     } catch {}
+}
+
+const forgetAlias = () => {
+    const errMessage = 'WARNING: This operation cannot be undone. You will not be able to restore this alias. Are you sure you want to delete alias?'
+    if (!confirm(errMessage)) return
+
+    events.emit('alias.forget', { id: alias.value.id })
 }
 
 const copyAlias = (alias: string) => {

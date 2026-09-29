@@ -22,6 +22,7 @@ var (
 	ErrFailedImport     = "Failed to import aliases. Please check the format and try again."
 	AliasImportSuccess  = "Aliases imported successfully."
 	RestoreAliasSuccess = "Alias restored successfully."
+	ForgetAliasSuccess  = "Alias permanently deleted."
 )
 
 type AliasService interface {
@@ -31,9 +32,11 @@ type AliasService interface {
 	PostAlias(context.Context, model.Alias, string, string, string, string) (model.Alias, error)
 	GetWildcardDomainInfo(context.Context, string, string) (model.WildcardDomainInfo, error)
 	UpdateAlias(context.Context, model.Alias) error
+	UpdateAliasPinned(context.Context, string, string, bool) error
 	DeleteAlias(context.Context, string, string) error
 	ImportAliases(context.Context, []model.AliasImportReq, string) ([]model.Alias, error)
 	RestoreAlias(context.Context, string, string) error
+	ForgetAlias(context.Context, string, string) error
 }
 
 // @Summary Get alias
@@ -65,7 +68,7 @@ func (h *Handler) GetAlias(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Param status query string false "Filter by alias status" Enums(active, deleted, all)
+// @Param status query string false "Filter by alias status" Enums(active_inactive, active, inactive, deleted, all)
 // @Success 200 {object} model.AliasList
 // @Failure 400 {object} ErrorRes
 // @Router /aliases [get]
@@ -95,10 +98,12 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 		"":      true,
 	}
 	var allowStatus = map[string]bool{
-		"active":  true,
-		"deleted": true,
-		"all":     true,
-		"":        true,
+		"active_inactive": true,
+		"active":          true,
+		"inactive":        true,
+		"deleted":         true,
+		"all":             true,
+		"":                true,
 	}
 
 	if _, ok := model.AliasSortColumns[sortBy]; !ok {
@@ -114,7 +119,7 @@ func (h *Handler) GetAliases(c *fiber.Ctx) error {
 		status = ""
 	}
 	if status == "" {
-		status = "active"
+		status = "active_inactive"
 	}
 
 	err = h.Validator.Var(search, "omitempty,required,search")
@@ -487,6 +492,41 @@ func (h *Handler) DeleteAlias(c *fiber.Ctx) error {
 	})
 }
 
+// @Summary Pin or unpin alias
+// @Description Set alias pinned status; pinned aliases are always sorted first in the list
+// @Tags alias
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path string true "Alias ID"
+// @Param body body AliasPinReq true "Pin request"
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /alias/{id}/pin [put]
+// @Router /api/alias/{id}/pin [put]
+func (h *Handler) UpdateAliasPinned(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
+	id := c.Params("id")
+	req := AliasPinReq{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	err = h.Service.UpdateAliasPinned(c.Context(), id, userID, req.Pinned)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": UpdateAliasSuccess,
+	})
+}
+
 // @Summary Restore alias
 // @Description Restore alias
 // @Tags alias
@@ -510,5 +550,31 @@ func (h *Handler) RestoreAlias(c *fiber.Ctx) error {
 
 	return c.Status(200).JSON(fiber.Map{
 		"message": RestoreAliasSuccess,
+	})
+}
+
+// @Summary Forget alias
+// @Description Permanently delete a custom-domain alias, bypassing the soft-delete step entirely
+// @Tags alias
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path string true "Alias ID"
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /alias/forget/{id} [delete]
+// @Router /api/alias/forget/{id} [delete]
+func (h *Handler) ForgetAlias(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
+	id := c.Params("id")
+	err := h.Service.ForgetAlias(c.Context(), id, userID)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": ForgetAliasSuccess,
 	})
 }

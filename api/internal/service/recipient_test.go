@@ -120,6 +120,25 @@ func (f *fakeStore) GetAliases(ctx context.Context, userID string, limit int, of
 	return result, nil
 }
 
+func (f *fakeStore) GetAliasUnscoped(ctx context.Context, ID string, userID string) (model.Alias, error) {
+	for _, a := range f.aliases {
+		if a.ID == ID && a.UserID == userID {
+			return a, nil
+		}
+	}
+	return model.Alias{}, errNotFound
+}
+
+func (f *fakeStore) ForgetAlias(ctx context.Context, ID string, userID string) error {
+	for name, a := range f.aliases {
+		if a.ID == ID && a.UserID == userID {
+			delete(f.aliases, name)
+			return nil
+		}
+	}
+	return errNotFound
+}
+
 func newTestService(store *fakeStore) *Service {
 	return &Service{
 		Cfg: config.Config{

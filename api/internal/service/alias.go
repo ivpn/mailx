@@ -26,6 +26,9 @@ var (
 	ErrFailedImport         = errors.New("Failed to import aliases. Please check the format and try again.")
 	ErrFailedImportLimit    = errors.New("Failed to import aliases. You can only import up to 500 aliases at a time.")
 	ErrPostAliasInactiveSub = errors.New("Your subscription is not active. Please renew to create new aliases.")
+
+	ErrForgetAlias                = errors.New("Unable to permanently delete alias. Please try again.")
+	ErrForgetAliasNotCustomDomain = errors.New("Only custom domain aliases can be permanently deleted.")
 )
 
 type AliasStore interface {
@@ -37,10 +40,13 @@ type AliasStore interface {
 	GetAliasByName(string) (model.Alias, error)
 	PostAlias(context.Context, model.Alias, int, int) (model.Alias, error)
 	UpdateAlias(context.Context, model.Alias) error
+	UpdateAliasPinned(context.Context, string, string, bool) error
 	DeleteAlias(context.Context, string, string) error
 	DeleteAliasByUserID(context.Context, string) error
 	DeleteAliasByDomain(context.Context, string, string) error
 	RestoreAlias(context.Context, string, string) error
+	GetAliasUnscoped(context.Context, string, string) (model.Alias, error)
+	ForgetAlias(context.Context, string, string) error
 }
 
 // aliasDomainPart returns the domain portion of an alias name (e.g. "user@example.com" → "example.com").
@@ -343,6 +349,16 @@ func (s *Service) UpdateAlias(ctx context.Context, alias model.Alias) error {
 	return nil
 }
 
+func (s *Service) UpdateAliasPinned(ctx context.Context, ID string, userID string, pinned bool) error {
+	err := s.Store.UpdateAliasPinned(ctx, ID, userID, pinned)
+	if err != nil {
+		log.Printf("error updating alias pinned status: %s", err.Error())
+		return ErrUpdateAlias
+	}
+
+	return nil
+}
+
 func (s *Service) DeleteAlias(ctx context.Context, ID string, userID string) error {
 	err := s.Store.DeleteAlias(ctx, ID, userID)
 	if err != nil {
@@ -448,6 +464,29 @@ func (s *Service) RestoreAlias(ctx context.Context, ID string, userID string) er
 	if err != nil {
 		log.Printf("error restoring alias: %s", err.Error())
 		return ErrGetAlias
+	}
+
+	return nil
+}
+
+// ForgetAlias permanently deletes a custom-domain alias, bypassing the soft-delete step
+// entirely so the (unique) address is freed up for reuse immediately.
+func (s *Service) ForgetAlias(ctx context.Context, ID string, userID string) error {
+	alias, err := s.Store.GetAliasUnscoped(ctx, ID, userID)
+	if err != nil {
+		log.Printf("error fetching alias for forget: %s", err.Error())
+		return ErrGetAlias
+	}
+
+	domainPart := aliasDomainPart(alias.Name)
+	if !isCustomAliasDomain(domainPart, s.Cfg.API.Domains) {
+		return ErrForgetAliasNotCustomDomain
+	}
+
+	err = s.Store.ForgetAlias(ctx, ID, userID)
+	if err != nil {
+		log.Printf("error forgetting alias: %s", err.Error())
+		return ErrForgetAlias
 	}
 
 	return nil

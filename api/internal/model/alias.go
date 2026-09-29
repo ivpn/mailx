@@ -65,6 +65,16 @@ type AliasList struct {
 	Total   int     `json:"total"`
 }
 
+type AliasImportReq struct {
+	Description string `json:"description"`
+	Enabled     bool   `json:"enabled"`
+	Recipients  string `json:"recipients" validate:"required"`
+	FromName    string `json:"from_name"`
+	Format      string `json:"format"`
+	Domain      string `json:"domain" validate:"required"`
+	LocalPart   string `json:"local_part" validate:"omitempty,min=6,max=24"`
+}
+
 // AliasSortColumns is the single source of truth for GetAliases sort_by values, enforced
 // independently by both the API handler and the repository query builder.
 var AliasSortColumns = map[string]bool{

@@ -54,6 +54,16 @@ func (f *fakeStore) GetVerifiedDomainByName(ctx context.Context, name string) (m
 	return domain, nil
 }
 
+func (f *fakeStore) GetDomains(ctx context.Context, userID string) ([]model.Domain, error) {
+	var result []model.Domain
+	for _, d := range f.domains {
+		if d.UserID == userID {
+			result = append(result, d)
+		}
+	}
+	return result, nil
+}
+
 func (f *fakeStore) GetSettings(ctx context.Context, userID string) (model.Settings, error) {
 	return f.settingsByUser[userID], nil
 }

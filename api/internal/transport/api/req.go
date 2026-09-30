@@ -99,6 +99,14 @@ type BlockTrackersReq struct {
 	BlockTrackers *bool `json:"block_trackers"`
 }
 
+type RemoveHeaderReq struct {
+	RemoveHeader *bool `json:"remove_header"`
+}
+
+type LogIssuesReq struct {
+	LogIssues *bool `json:"log_issues"`
+}
+
 type DeleteUserReq struct {
 	OTP string `json:"otp" validate:"required,len=8"`
 }

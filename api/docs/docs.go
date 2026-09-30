@@ -2801,6 +2801,108 @@ const docTemplate = `{
                 }
             }
         },
+        "/settings/log-issues": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Turn diagnostic logging of failed deliveries and forwarding issues on or off",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Update diagnostics",
+                "parameters": [
+                    {
+                        "description": "Enable diagnostics",
+                        "name": "settings",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.LogIssuesReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/settings/remove-header": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Turn the Mailx header in forwarded emails off (remove_header true) or on",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Update Mailx header",
+                "parameters": [
+                    {
+                        "description": "Remove Mailx header",
+                        "name": "settings",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.RemoveHeaderReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
         "/sub": {
             "get": {
                 "security": [
@@ -3849,6 +3951,14 @@ const docTemplate = `{
                 }
             }
         },
+        "api.LogIssuesReq": {
+            "type": "object",
+            "properties": {
+                "log_issues": {
+                    "type": "boolean"
+                }
+            }
+        },
         "api.PASessionReq": {
             "type": "object",
             "required": [
@@ -3885,6 +3995,14 @@ const docTemplate = `{
                 },
                 "pgp_key": {
                     "type": "string"
+                }
+            }
+        },
+        "api.RemoveHeaderReq": {
+            "type": "object",
+            "properties": {
+                "remove_header": {
+                    "type": "boolean"
                 }
             }
         },

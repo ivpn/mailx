@@ -85,13 +85,15 @@
                     Add Mailx header:
                 </label>
                 <input
-                    @change="saveSettings"
+                    @change="saveToggle('header')"
                     v-bind:checked="!req.remove_header"
                     v-model="includeHeader"
                     id="remove-header"
                     type="checkbox"
                     class="checkbox-switch"
                 >
+                <p v-if="error && savedToggle === 'header'" class="error">Error: {{ error }}</p>
+                <p v-if="success && savedToggle === 'header'" class="success">{{ success }}</p>
             </div>
             <hr>
             <SettingsBlockTrackers
@@ -113,13 +115,15 @@
                     Enable Diagnostics:
                 </label>
                 <input
-                    @change="saveSettings"
+                    @change="saveToggle('diagnostics')"
                     v-bind:checked="req.log_issues"
                     v-model="req.log_issues"
                     id="log-issues"
                     type="checkbox"
                     class="checkbox-switch"
                 >
+                <p v-if="error && savedToggle === 'diagnostics'" class="error">Error: {{ error }}</p>
+                <p v-if="success && savedToggle === 'diagnostics'" class="success">{{ success }}</p>
             </div>
             <div class="mb-8">
                 <label for="log-issues">
@@ -134,12 +138,12 @@
             </p>
             <hr>
             <div class="mb-6">
-                <button @click="saveSettings" class="cta">
+                <button @click="saveSettings()" class="cta">
                     Save Settings
                 </button>
             </div>
-            <p v-if="error" class="error">Error: {{ error }}</p>
-            <p v-if="success" class="success">{{ success }}</p>
+            <p v-if="error && !savedToggle" class="error">Error: {{ error }}</p>
+            <p v-if="success && !savedToggle" class="success">{{ success }}</p>
         </div>
     </div>
 </template>
@@ -172,6 +176,9 @@ const error = ref('')
 const aliasFormats = ref(['Words', 'Random', 'UUID'])
 const includeHeader = ref(true)
 const loaded = ref(false)
+// Toggles save on change and show the result right below themselves
+type Toggle = 'header' | 'diagnostics'
+const savedToggle = ref<Toggle | ''>('')
 
 const getSettings = async () => {
     try {
@@ -190,7 +197,34 @@ const getSettings = async () => {
     }
 }
 
+const saveToggle = async (toggle: Toggle) => {
+    savedToggle.value = toggle
+    success.value = ''
+    error.value = ''
+
+    try {
+        const res = toggle === 'header'
+            ? await settingsApi.updateRemoveHeader(!includeHeader.value)
+            : await settingsApi.updateLogIssues(req.value.log_issues)
+        req.value.remove_header = !includeHeader.value
+        success.value = res.data.message
+    } catch (err) {
+        // Show the setting as it's still stored
+        if (toggle === 'header') {
+            includeHeader.value = !includeHeader.value
+        } else {
+            req.value.log_issues = !req.value.log_issues
+        }
+        if (axios.isAxiosError(err)) {
+            error.value = err.response?.data.error || err.message
+        } else {
+            error.value = 'Something went wrong'
+        }
+    }
+}
+
 const saveSettings = async () => {
+    savedToggle.value = ''
     req.value.domain = (document.getElementById('domain') as HTMLSelectElement).value
     req.value.recipient = (document.getElementById('recipient') as HTMLSelectElement).value
     req.value.alias_format = (document.getElementById('format') as HTMLSelectElement).value
@@ -226,6 +260,7 @@ const getRecipients = async () => {
 const deleteAllLogs = async () => {
     if (!confirm('Are you sure you want to delete all diagnostic logs? This action cannot be undone.')) return
 
+    savedToggle.value = ''
     try {
         const res = await logApi.deleteAll()
         error.value = ''

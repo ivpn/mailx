@@ -55,6 +55,43 @@ func TestBlockTrackers_DefaultAndUpdate(t *testing.T) {
 	}
 }
 
+func TestUpdateRemoveHeaderAndLogIssues(t *testing.T) {
+	d := newTestDB(t)
+	ctx := context.Background()
+
+	if err := d.PostSettings(ctx, model.Settings{UserID: "user-1"}); err != nil {
+		t.Fatalf("PostSettings() error = %v", err)
+	}
+
+	for _, want := range []bool{true, false} {
+		if err := d.UpdateRemoveHeader(ctx, "user-1", want); err != nil {
+			t.Fatalf("UpdateRemoveHeader() error = %v", err)
+		}
+		if err := d.UpdateLogIssues(ctx, "user-1", !want); err != nil {
+			t.Fatalf("UpdateLogIssues() error = %v", err)
+		}
+
+		settings, _ := d.GetSettings(ctx, "user-1")
+		if settings.RemoveHeader != want {
+			t.Errorf("remove_header = %v, want %v", settings.RemoveHeader, want)
+		}
+		if settings.LogIssues != !want {
+			t.Errorf("log_issues = %v, want %v", settings.LogIssues, !want)
+		}
+		// Each toggle only touches its own column
+		if !settings.BlockTrackers {
+			t.Error("block_trackers changed by another toggle")
+		}
+	}
+
+	if err := d.UpdateRemoveHeader(ctx, "missing", true); err == nil {
+		t.Error("UpdateRemoveHeader() for a user without settings should fail")
+	}
+	if err := d.UpdateLogIssues(ctx, "missing", true); err == nil {
+		t.Error("UpdateLogIssues() for a user without settings should fail")
+	}
+}
+
 func TestBlockTrackers_MigrationDefaultsExistingRowsToOn(t *testing.T) {
 	d := newTestDB(t)
 

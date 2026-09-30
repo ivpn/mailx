@@ -45,7 +45,19 @@ func (d *Database) UpdateListUnsubscribeBehaviour(ctx context.Context, userID st
 }
 
 func (d *Database) UpdateBlockTrackers(ctx context.Context, userID string, enabled bool) error {
-	q := d.Client.Model(&model.Settings{}).Where("user_id = ?", userID).Update("block_trackers", enabled)
+	return d.updateSettingsColumn(userID, "block_trackers", enabled)
+}
+
+func (d *Database) UpdateRemoveHeader(ctx context.Context, userID string, removeHeader bool) error {
+	return d.updateSettingsColumn(userID, "remove_header", removeHeader)
+}
+
+func (d *Database) UpdateLogIssues(ctx context.Context, userID string, enabled bool) error {
+	return d.updateSettingsColumn(userID, "log_issues", enabled)
+}
+
+func (d *Database) updateSettingsColumn(userID string, column string, value any) error {
+	q := d.Client.Model(&model.Settings{}).Where("user_id = ?", userID).Update(column, value)
 	if q.Error != nil {
 		return q.Error
 	}

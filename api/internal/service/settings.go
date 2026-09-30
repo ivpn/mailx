@@ -13,6 +13,8 @@ var (
 	ErrUpdateSettings      = errors.New("Unable to update settings.")
 	ErrDeleteSettings      = errors.New("Unable to delete settings.")
 	ErrUpdateBlockTrackers = errors.New("Unable to update block email trackers setting.")
+	ErrUpdateRemoveHeader  = errors.New("Unable to update Mailx header setting.")
+	ErrUpdateLogIssues     = errors.New("Unable to update diagnostics setting.")
 )
 
 type SettingsStore interface {
@@ -21,6 +23,8 @@ type SettingsStore interface {
 	UpdateSettings(context.Context, model.Settings) error
 	UpdateListUnsubscribeBehaviour(context.Context, string, model.ListUnsubscribeBehaviour) error
 	UpdateBlockTrackers(context.Context, string, bool) error
+	UpdateRemoveHeader(context.Context, string, bool) error
+	UpdateLogIssues(context.Context, string, bool) error
 	DeleteSettings(context.Context, string) error
 }
 
@@ -59,6 +63,24 @@ func (s *Service) UpdateBlockTrackers(ctx context.Context, userID string, enable
 	err := s.Store.UpdateBlockTrackers(ctx, userID, enabled)
 	if err != nil {
 		return ErrUpdateBlockTrackers
+	}
+
+	return nil
+}
+
+func (s *Service) UpdateRemoveHeader(ctx context.Context, userID string, removeHeader bool) error {
+	err := s.Store.UpdateRemoveHeader(ctx, userID, removeHeader)
+	if err != nil {
+		return ErrUpdateRemoveHeader
+	}
+
+	return nil
+}
+
+func (s *Service) UpdateLogIssues(ctx context.Context, userID string, enabled bool) error {
+	err := s.Store.UpdateLogIssues(ctx, userID, enabled)
+	if err != nil {
+		return ErrUpdateLogIssues
 	}
 
 	return nil

@@ -168,6 +168,11 @@ definitions:
       list_unsubscribe_behaviour:
         type: integer
     type: object
+  api.LogIssuesReq:
+    properties:
+      log_issues:
+        type: boolean
+    type: object
   api.PASessionReq:
     properties:
       id:
@@ -193,6 +198,11 @@ definitions:
         type: string
     required:
     - id
+    type: object
+  api.RemoveHeaderReq:
+    properties:
+      remove_header:
+        type: boolean
     type: object
   api.ResetPasswordReq:
     properties:
@@ -2441,6 +2451,72 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Update List-Unsubscribe behaviour
+      tags:
+      - settings
+  /settings/log-issues:
+    put:
+      consumes:
+      - application/json
+      description: Turn diagnostic logging of failed deliveries and forwarding issues
+        on or off
+      parameters:
+      - description: Enable diagnostics
+        in: body
+        name: settings
+        required: true
+        schema:
+          $ref: '#/definitions/api.LogIssuesReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update diagnostics
+      tags:
+      - settings
+  /settings/remove-header:
+    put:
+      consumes:
+      - application/json
+      description: Turn the Mailx header in forwarded emails off (remove_header true)
+        or on
+      parameters:
+      - description: Remove Mailx header
+        in: body
+        name: settings
+        required: true
+        schema:
+          $ref: '#/definitions/api.RemoveHeaderReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Mailx header
       tags:
       - settings
   /sub:

@@ -1272,6 +1272,143 @@ const docTemplate = `{
                 }
             }
         },
+        "/blocklist": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get a page of blocklist entries for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "blocklist"
+                ],
+                "summary": "Get blocklist",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page size (max 100)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.BlocklistList"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Block inbound email from a sender address or domain (including its subdomains)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "blocklist"
+                ],
+                "summary": "Add to blocklist",
+                "parameters": [
+                    {
+                        "description": "Blocklist Request",
+                        "name": "blocklist",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.BlocklistReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "id, message",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/blocklist/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Remove an entry from the authenticated user's blocklist",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "blocklist"
+                ],
+                "summary": "Delete blocklist entry",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Blocklist entry ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
         "/domains": {
             "get": {
                 "security": [
@@ -2562,6 +2699,108 @@ const docTemplate = `{
                 }
             }
         },
+        "/settings/block-trackers": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Turn removal of tracking pixels from forwarded emails on or off",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Update block email trackers",
+                "parameters": [
+                    {
+                        "description": "Block email trackers",
+                        "name": "settings",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.BlockTrackersReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/settings/list-unsubscribe-behaviour": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Set what a mail client's \"Unsubscribe\" button does on forwarded emails",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Update List-Unsubscribe behaviour",
+                "parameters": [
+                    {
+                        "description": "List-Unsubscribe behaviour",
+                        "name": "settings",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.ListUnsubscribeBehaviourReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
         "/sub": {
             "get": {
                 "security": [
@@ -3457,6 +3696,34 @@ const docTemplate = `{
                 }
             }
         },
+        "api.BlockTrackersReq": {
+            "type": "object",
+            "properties": {
+                "block_trackers": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "api.BlocklistReq": {
+            "type": "object",
+            "required": [
+                "type",
+                "value"
+            ],
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "email",
+                        "domain"
+                    ]
+                },
+                "value": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            }
+        },
         "api.BulkAliasEnabledReq": {
             "type": "object",
             "required": [
@@ -3571,6 +3838,14 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string"
+                }
+            }
+        },
+        "api.ListUnsubscribeBehaviourReq": {
+            "type": "object",
+            "properties": {
+                "list_unsubscribe_behaviour": {
+                    "type": "integer"
                 }
             }
         },
@@ -3906,6 +4181,51 @@ const docTemplate = `{
                 }
             }
         },
+        "model.BlocklistItem": {
+            "type": "object",
+            "properties": {
+                "blocked": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/model.BlocklistType"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.BlocklistList": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.BlocklistItem"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.BlocklistType": {
+            "type": "string",
+            "enum": [
+                "email",
+                "domain"
+            ],
+            "x-enum-varnames": [
+                "BlocklistEmail",
+                "BlocklistDomain"
+            ]
+        },
         "model.Credential": {
             "type": "object",
             "properties": {
@@ -3987,6 +4307,23 @@ const docTemplate = `{
                 }
             }
         },
+        "model.ListUnsubscribeBehaviour": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3,
+                4
+            ],
+            "x-enum-varnames": [
+                "ListUnsubscribeOriginalWithFallback",
+                "ListUnsubscribeDeactivate",
+                "ListUnsubscribeDelete",
+                "ListUnsubscribeBlockEmail",
+                "ListUnsubscribeBlockDomain"
+            ]
+        },
         "model.Log": {
             "type": "object",
             "properties": {
@@ -4028,7 +4365,8 @@ const docTemplate = `{
                 "disabled_alias",
                 "disabled_domain",
                 "unauthorised_send",
-                "inactive_subscription"
+                "inactive_subscription",
+                "blocked_sender"
             ],
             "x-enum-varnames": [
                 "BounceMessage",
@@ -4037,7 +4375,8 @@ const docTemplate = `{
                 "DisabledAlias",
                 "DisabledDomain",
                 "UnauthorisedSend",
-                "InactiveSubscription"
+                "InactiveSubscription",
+                "BlockedSender"
             ]
         },
         "model.Recipient": {
@@ -4072,6 +4411,9 @@ const docTemplate = `{
                 "alias_format": {
                     "type": "string"
                 },
+                "block_trackers": {
+                    "type": "boolean"
+                },
                 "created_at": {
                     "type": "string"
                 },
@@ -4083,6 +4425,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "string"
+                },
+                "list_unsubscribe_behaviour": {
+                    "$ref": "#/definitions/model.ListUnsubscribeBehaviour"
                 },
                 "log_issues": {
                     "type": "boolean"

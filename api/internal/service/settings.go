@@ -8,10 +8,11 @@ import (
 )
 
 var (
-	ErrGetSettings    = errors.New("Unable to retrieve settings by user ID.")
-	ErrPostSettings   = errors.New("Unable to create settings.")
-	ErrUpdateSettings = errors.New("Unable to update settings.")
-	ErrDeleteSettings = errors.New("Unable to delete settings.")
+	ErrGetSettings         = errors.New("Unable to retrieve settings by user ID.")
+	ErrPostSettings        = errors.New("Unable to create settings.")
+	ErrUpdateSettings      = errors.New("Unable to update settings.")
+	ErrDeleteSettings      = errors.New("Unable to delete settings.")
+	ErrUpdateBlockTrackers = errors.New("Unable to update block email trackers setting.")
 )
 
 type SettingsStore interface {
@@ -19,6 +20,7 @@ type SettingsStore interface {
 	PostSettings(context.Context, model.Settings) error
 	UpdateSettings(context.Context, model.Settings) error
 	UpdateListUnsubscribeBehaviour(context.Context, string, model.ListUnsubscribeBehaviour) error
+	UpdateBlockTrackers(context.Context, string, bool) error
 	DeleteSettings(context.Context, string) error
 }
 
@@ -48,6 +50,15 @@ func (s *Service) UpdateSettings(ctx context.Context, settings model.Settings) e
 	err := s.Store.UpdateSettings(ctx, settings)
 	if err != nil {
 		return ErrUpdateSettings
+	}
+
+	return nil
+}
+
+func (s *Service) UpdateBlockTrackers(ctx context.Context, userID string, enabled bool) error {
+	err := s.Store.UpdateBlockTrackers(ctx, userID, enabled)
+	if err != nil {
+		return ErrUpdateBlockTrackers
 	}
 
 	return nil

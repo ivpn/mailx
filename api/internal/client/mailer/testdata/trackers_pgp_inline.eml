@@ -1,0 +1,12 @@
+From: Friend <friend@example.com>
+To: myalias@mailx.net
+Subject: Secret
+Message-ID: <jkl012@example.com>
+MIME-Version: 1.0
+Content-Type: text/html; charset="utf-8"
+
+<pre>-----BEGIN PGP MESSAGE-----
+
+hQEMA0l1c2VyLWtleS1pZAEH/2dFbmNyeXB0ZWQtcGF5bG9hZA==
+=abcd
+-----END PGP MESSAGE-----</pre><img src="https://mailtrack.io/trace/mail/abc.png" width="1" height="1">

@@ -102,6 +102,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Get("/defaults", h.GetDefaults)
 	v1.Put("/settings", h.UpdateSettings)
 	v1.Put("/settings/list-unsubscribe-behaviour", h.UpdateListUnsubscribeBehaviour)
+	v1.Put("/settings/block-trackers", h.UpdateBlockTrackers)
 
 	v1.Get("/recipient/:id", h.GetRecipient)
 	v1.Get("/recipients", h.GetRecipients)

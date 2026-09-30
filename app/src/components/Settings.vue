@@ -94,6 +94,11 @@
                 >
             </div>
             <hr>
+            <SettingsBlockTrackers
+                v-if="loaded"
+                :initial-enabled="req.block_trackers"
+            />
+            <hr>
             <SettingsListUnsubscribe
                 v-if="loaded"
                 :initial-behaviour="req.list_unsubscribe_behaviour"
@@ -146,6 +151,7 @@ import { settingsApi } from '../api/settings.ts'
 import { recipientApi } from '../api/recipient.ts'
 import { logApi } from '../api/log.ts'
 import SettingsListUnsubscribe from './SettingsListUnsubscribe.vue'
+import SettingsBlockTrackers from './SettingsBlockTrackers.vue'
 
 const req = ref({
     id: '',
@@ -156,6 +162,7 @@ const req = ref({
     log_issues: false,
     remove_header: false,
     list_unsubscribe_behaviour: 0,
+    block_trackers: true,
 })
 const envDomains = import.meta.env.VITE_DOMAINS.split(',')
 const domains = ref(envDomains)

@@ -8,6 +8,7 @@ import (
 	"html/template"
 	"io"
 	"log"
+	"maps"
 	"net/mail"
 	"strconv"
 	"strings"
@@ -18,7 +19,11 @@ import (
 	"ivpn.net/email/api/internal/model"
 	"ivpn.net/email/api/internal/utils"
 	"ivpn.net/email/api/internal/utils/gomail.v2"
+	"ivpn.net/email/api/internal/utils/trackers"
 )
+
+// TrackersReportPath is the app page that renders the removed trackers encoded in its fragment.
+const TrackersReportPath = "/trackers-report"
 
 //go:embed templates/*
 var templateFS embed.FS
@@ -182,7 +187,7 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 
 // buildForwardMessage builds the outgoing forward message without dialing the network,
 // so the To: header logic can be unit tested in isolation.
-func (mailer Mailer) buildForwardMessage(from string, name string, to string, rcp model.Recipient, data []byte, templateFile string, templateData any, settings model.Settings, alias model.Alias, listUnsubscribe model.ListUnsubscribeHeaders) (*gomail.Message, string, error) {
+func (mailer Mailer) buildForwardMessage(from string, name string, to string, rcp model.Recipient, data []byte, templateFile string, templateData map[string]any, settings model.Settings, alias model.Alias, listUnsubscribe model.ListUnsubscribeHeaders) (*gomail.Message, string, error) {
 	// Preprocess email data to decode RFC 2047 encoded headers
 	processedData, err := utils.PreprocessEmailData(data)
 	if err != nil {
@@ -210,6 +215,9 @@ func (mailer Mailer) buildForwardMessage(from string, name string, to string, rc
 	if err != nil {
 		return nil, "", err
 	}
+
+	removedTrackers := removeTrackers(&email, settings, rcp)
+	templateData = mailer.withTrackersReport(templateData, removedTrackers)
 
 	tmpl, err := template.New("email").ParseFS(templateFS, "templates/"+templateFile)
 	if err != nil {
@@ -295,6 +303,7 @@ func (mailer Mailer) buildForwardMessage(from string, name string, to string, rc
 	m.SetHeader("X-Report-Abuse-To", mailer.cfg.Report)
 	m.SetHeader("Feedback-ID", fmt.Sprintf("mailx:%x:forward", sha256.Sum256([]byte(mailer.cfg.TokenSecret+alias.ID))))
 	setListUnsubscribe(m, listUnsubscribe)
+	setTrackersRemoved(m, removedTrackers)
 
 	// PGP/Inline encryption
 	if rcp.PGPEnabled && rcp.PGPKey != "" && rcp.PGPInline {
@@ -338,6 +347,7 @@ func (mailer Mailer) buildForwardMessage(from string, name string, to string, rc
 		}
 		// Kept on the outer message so mail clients can still offer unsubscribe
 		setListUnsubscribe(em, listUnsubscribe)
+		setTrackersRemoved(em, removedTrackers)
 
 		return em, string(email.Headers.MessageID), nil
 	}
@@ -358,7 +368,64 @@ func setListUnsubscribe(m *gomail.Message, listUnsubscribe model.ListUnsubscribe
 	}
 }
 
-func (mailer Mailer) Forward(from string, name string, to string, rcp model.Recipient, data []byte, templateFile string, templateData any, settings model.Settings, alias model.Alias, listUnsubscribe model.ListUnsubscribeHeaders) error {
+// removeTrackers strips tracking pixels from the HTML body in place when the user has tracker
+// blocking on, and returns what was removed. On failure the HTML is forwarded unchanged.
+func removeTrackers(email *letters.Email, settings model.Settings, rcp model.Recipient) []trackers.Tracker {
+	// PGP/Inline forwards only the text body
+	pgpInline := rcp.PGPEnabled && rcp.PGPKey != "" && rcp.PGPInline
+	if !settings.BlockTrackers || email.HTML == "" || pgpInline || isAlreadyEncrypted(*email) {
+		return nil
+	}
+
+	res, err := trackers.Remove(email.HTML)
+	if err != nil {
+		log.Printf("Warning: forwarding HTML without removing trackers: %v", err)
+		return nil
+	}
+	email.HTML = res.HTML
+
+	return res.Removed
+}
+
+// isAlreadyEncrypted reports whether the sender encrypted the message, so its body can't be changed.
+func isAlreadyEncrypted(email letters.Email) bool {
+	switch strings.ToLower(email.Headers.ContentType.ContentType) {
+	case "multipart/encrypted", "application/pkcs7-mime", "application/x-pkcs7-mime":
+		return true
+	}
+
+	const armor = "-----BEGIN PGP MESSAGE-----"
+	return strings.Contains(email.Text, armor) || strings.Contains(email.HTML, armor)
+}
+
+// withTrackersReport adds the removed tracker count and report link for the header template.
+func (mailer Mailer) withTrackersReport(templateData map[string]any, removed []trackers.Tracker) map[string]any {
+	if len(removed) == 0 {
+		return templateData
+	}
+
+	data := maps.Clone(templateData)
+	if data == nil {
+		data = map[string]any{}
+	}
+	data["trackersRemoved"] = len(removed)
+	if mailer.cfg.AppURL != "" {
+		// The fragment is never sent to the server, so the report stays in the email
+		data["trackersReportURL"] = mailer.cfg.AppURL + TrackersReportPath + "#" + trackers.EncodeReport(removed)
+	}
+
+	return data
+}
+
+func setTrackersRemoved(m *gomail.Message, removed []trackers.Tracker) {
+	if len(removed) == 0 {
+		return
+	}
+
+	m.SetHeader("X-Mailx-Trackers-Removed", strconv.Itoa(len(removed)))
+}
+
+func (mailer Mailer) Forward(from string, name string, to string, rcp model.Recipient, data []byte, templateFile string, templateData map[string]any, settings model.Settings, alias model.Alias, listUnsubscribe model.ListUnsubscribeHeaders) error {
 	m, messageID, err := mailer.buildForwardMessage(from, name, to, rcp, data, templateFile, templateData, settings, alias, listUnsubscribe)
 	if err != nil {
 		return err

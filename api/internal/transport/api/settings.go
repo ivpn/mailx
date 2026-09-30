@@ -9,12 +9,16 @@ import (
 )
 
 var (
-	UpdateSettingsSuccess = "Settings updated successfully."
+	UpdateSettingsSuccess      = "Settings updated successfully."
+	UpdateBlockTrackersSuccess = "Block email trackers setting updated successfully."
+	ErrBlockTrackersRequired   = "The block_trackers field is required."
+	ErrBlockTrackersInvalid    = "The block_trackers field must be true or false."
 )
 
 type SettingsService interface {
 	GetSettings(context.Context, string) (model.Settings, error)
 	UpdateSettings(context.Context, model.Settings) error
+	UpdateBlockTrackers(context.Context, string, bool) error
 }
 
 // @Summary Get settings
@@ -87,5 +91,43 @@ func (h *Handler) UpdateSettings(c *fiber.Ctx) error {
 
 	return c.Status(200).JSON(fiber.Map{
 		"message": UpdateSettingsSuccess,
+	})
+}
+
+// @Summary Update block email trackers
+// @Description Turn removal of tracking pixels from forwarded emails on or off
+// @Tags settings
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param settings body BlockTrackersReq true "Block email trackers"
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Failure 422 {object} ErrorRes
+// @Router /settings/block-trackers [put]
+func (h *Handler) UpdateBlockTrackers(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
+
+	req := BlockTrackersReq{}
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+			"error": ErrBlockTrackersInvalid,
+		})
+	}
+	if req.BlockTrackers == nil {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+			"error": ErrBlockTrackersRequired,
+		})
+	}
+
+	err := h.Service.UpdateBlockTrackers(c.Context(), userID, *req.BlockTrackers)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": UpdateBlockTrackersSuccess,
 	})
 }

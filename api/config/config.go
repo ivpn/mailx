@@ -70,6 +70,7 @@ type SMTPClientConfig struct {
 	DkimSelector string
 	Report       string
 	TokenSecret  string
+	AppURL       string
 }
 
 type ServiceConfig struct {
@@ -162,6 +163,7 @@ func New() (Config, error) {
 	apiTrustedProxies := strings.Split(os.Getenv("API_TRUSTED_PROXIES"), ",")
 	apiAllowIPs := strings.Split(os.Getenv("API_ALLOW_IPS"), ",")
 	trustedRelayDomains := strings.Split(os.Getenv("TRUSTED_RELAY_DOMAINS"), ",")
+	appURL, _, _ := strings.Cut(os.Getenv("API_ALLOW_ORIGIN"), ",")
 
 	apiBodyLimitMB := 10
 	if v := os.Getenv("API_BODY_LIMIT_MB"); v != "" {
@@ -238,6 +240,7 @@ func New() (Config, error) {
 			DkimSelector: os.Getenv("SMTP_CLIENT_DKIM_SELECTOR"),
 			Report:       os.Getenv("SMTP_CLIENT_REPORT"),
 			TokenSecret:  os.Getenv("TOKEN_SECRET"),
+			AppURL:       strings.TrimSuffix(strings.TrimSpace(appURL), "/"),
 		},
 
 		Service: ServiceConfig{

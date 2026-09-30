@@ -95,6 +95,10 @@ type ListUnsubscribeBehaviourReq struct {
 	Behaviour *int `json:"list_unsubscribe_behaviour"`
 }
 
+type BlockTrackersReq struct {
+	BlockTrackers *bool `json:"block_trackers"`
+}
+
 type DeleteUserReq struct {
 	OTP string `json:"otp" validate:"required,len=8"`
 }

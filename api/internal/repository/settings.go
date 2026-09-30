@@ -44,6 +44,18 @@ func (d *Database) UpdateListUnsubscribeBehaviour(ctx context.Context, userID st
 	return nil
 }
 
+func (d *Database) UpdateBlockTrackers(ctx context.Context, userID string, enabled bool) error {
+	q := d.Client.Model(&model.Settings{}).Where("user_id = ?", userID).Update("block_trackers", enabled)
+	if q.Error != nil {
+		return q.Error
+	}
+	if q.RowsAffected == 0 {
+		return fmt.Errorf("could not find settings by user ID")
+	}
+
+	return nil
+}
+
 func (d *Database) DeleteSettings(ctx context.Context, userID string) error {
 	return d.Client.Where("user_id = ?", userID).Delete(&model.Settings{}).Error
 }

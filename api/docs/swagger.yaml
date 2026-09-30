@@ -67,6 +67,25 @@ definitions:
     required:
     - access_key
     type: object
+  api.BlockTrackersReq:
+    properties:
+      block_trackers:
+        type: boolean
+    type: object
+  api.BlocklistReq:
+    properties:
+      type:
+        enum:
+        - email
+        - domain
+        type: string
+      value:
+        maxLength: 255
+        type: string
+    required:
+    - type
+    - value
+    type: object
   api.BulkAliasEnabledReq:
     properties:
       enabled:
@@ -143,6 +162,11 @@ definitions:
     properties:
       error:
         type: string
+    type: object
+  api.ListUnsubscribeBehaviourReq:
+    properties:
+      list_unsubscribe_behaviour:
+        type: integer
     type: object
   api.PASessionReq:
     properties:
@@ -364,6 +388,36 @@ definitions:
       sends:
         type: integer
     type: object
+  model.BlocklistItem:
+    properties:
+      blocked:
+        type: integer
+      created_at:
+        type: string
+      id:
+        type: string
+      type:
+        $ref: '#/definitions/model.BlocklistType'
+      value:
+        type: string
+    type: object
+  model.BlocklistList:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/model.BlocklistItem'
+        type: array
+      total:
+        type: integer
+    type: object
+  model.BlocklistType:
+    enum:
+    - email
+    - domain
+    type: string
+    x-enum-varnames:
+    - BlocklistEmail
+    - BlocklistDomain
   model.Credential:
     properties:
       created_at:
@@ -418,6 +472,20 @@ definitions:
         description: nullable
         type: string
     type: object
+  model.ListUnsubscribeBehaviour:
+    enum:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    type: integer
+    x-enum-varnames:
+    - ListUnsubscribeOriginalWithFallback
+    - ListUnsubscribeDeactivate
+    - ListUnsubscribeDelete
+    - ListUnsubscribeBlockEmail
+    - ListUnsubscribeBlockDomain
   model.Log:
     properties:
       attempted_at:
@@ -448,6 +516,7 @@ definitions:
     - disabled_domain
     - unauthorised_send
     - inactive_subscription
+    - blocked_sender
     type: string
     x-enum-varnames:
     - BounceMessage
@@ -457,6 +526,7 @@ definitions:
     - DisabledDomain
     - UnauthorisedSend
     - InactiveSubscription
+    - BlockedSender
   model.Recipient:
     properties:
       created_at:
@@ -478,6 +548,8 @@ definitions:
     properties:
       alias_format:
         type: string
+      block_trackers:
+        type: boolean
       created_at:
         type: string
       domain:
@@ -486,6 +558,8 @@ definitions:
         type: string
       id:
         type: string
+      list_unsubscribe_behaviour:
+        $ref: '#/definitions/model.ListUnsubscribeBehaviour'
       log_issues:
         type: boolean
       recipient:
@@ -1392,6 +1466,93 @@ paths:
       summary: Logout API user
       tags:
       - access_key
+  /blocklist:
+    get:
+      consumes:
+      - application/json
+      description: Get a page of blocklist entries for the authenticated user
+      parameters:
+      - description: Page size (max 100)
+        in: query
+        name: limit
+        type: integer
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.BlocklistList'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get blocklist
+      tags:
+      - blocklist
+    post:
+      consumes:
+      - application/json
+      description: Block inbound email from a sender address or domain (including
+        its subdomains)
+      parameters:
+      - description: Blocklist Request
+        in: body
+        name: blocklist
+        required: true
+        schema:
+          $ref: '#/definitions/api.BlocklistReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: id, message
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Add to blocklist
+      tags:
+      - blocklist
+  /blocklist/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove an entry from the authenticated user's blocklist
+      parameters:
+      - description: Blocklist entry ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete blocklist entry
+      tags:
+      - blocklist
   /domains:
     get:
       consumes:
@@ -2215,6 +2376,71 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Update settings
+      tags:
+      - settings
+  /settings/block-trackers:
+    put:
+      consumes:
+      - application/json
+      description: Turn removal of tracking pixels from forwarded emails on or off
+      parameters:
+      - description: Block email trackers
+        in: body
+        name: settings
+        required: true
+        schema:
+          $ref: '#/definitions/api.BlockTrackersReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update block email trackers
+      tags:
+      - settings
+  /settings/list-unsubscribe-behaviour:
+    put:
+      consumes:
+      - application/json
+      description: Set what a mail client's "Unsubscribe" button does on forwarded
+        emails
+      parameters:
+      - description: List-Unsubscribe behaviour
+        in: body
+        name: settings
+        required: true
+        schema:
+          $ref: '#/definitions/api.ListUnsubscribeBehaviourReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update List-Unsubscribe behaviour
       tags:
       - settings
   /sub:

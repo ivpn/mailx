@@ -6,4 +6,6 @@ export const settingsApi = {
     update: (data: any) => api.put('/settings', data),
     updateListUnsubscribeBehaviour: (behaviour: number) =>
         api.put('/settings/list-unsubscribe-behaviour', { list_unsubscribe_behaviour: behaviour }),
+    updateBlockTrackers: (enabled: boolean) =>
+        api.put('/settings/block-trackers', { block_trackers: enabled }),
 }

@@ -1,0 +1,31 @@
+Return-Path: <bounce-mc.us1_123.456-news=example.com@mail123.atl11.rsgsv.net>
+From: Example Shop <news@shop.example>
+To: myalias@mailx.net
+Subject: Our autumn sale
+Message-ID: <abc123@mail123.atl11.rsgsv.net>
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="_----------=_MCPart_1"
+
+This is a multi-part message in MIME format.
+
+--_----------=_MCPart_1
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Our autumn sale is here.
+
+--_----------=_MCPart_1
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+<!doctype html><html><head><meta charset=3D"UTF-8"><title>Our autumn sale</=
+title><style>.hero{background:#fff url(https://mcusercontent.com/bg.png) no=
+-repeat}</style></head><body style=3D"margin:0"><table width=3D"600" align=
+=3D"center"><tr><td class=3D"hero"><img src=3D"https://mcusercontent.com/12=
+3/images/logo.png" width=3D"200" height=3D"80" alt=3D"Example Shop"></td></=
+tr><tr><td><h1>Autumn sale</h1><p>Up to 50% off, 3 days only. Gr=C3=BC=C3=
+=9Fe!</p><img src=3D"cid:banner@shop.example" width=3D"600"></td></tr></tab=
+le><img src=3D"https://shop.us1.list-manage.com/track/open.php?u=3D123&amp;=
+id=3D456&amp;e=3D789" height=3D"1" width=3D"1" alt=3D""></body></html>
+
+--_----------=_MCPart_1--

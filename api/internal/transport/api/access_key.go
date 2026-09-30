@@ -305,5 +305,6 @@ func (h *Handler) GetDefaults(c *fiber.Ctx) error {
 		"log_issues":                 settings.LogIssues,
 		"remove_header":              settings.RemoveHeader,
 		"list_unsubscribe_behaviour": settings.ListUnsubscribeBehaviour,
+		"block_trackers":             settings.BlockTrackers,
 	})
 }

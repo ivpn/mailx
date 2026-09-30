@@ -10,6 +10,7 @@ type Settings struct {
 	LogIssues                bool                     `json:"log_issues"`
 	RemoveHeader             bool                     `json:"remove_header"`
 	ListUnsubscribeBehaviour ListUnsubscribeBehaviour `json:"list_unsubscribe_behaviour" gorm:"type:smallint;not null;default:0"`
+	BlockTrackers            bool                     `json:"block_trackers" gorm:"not null;default:true"`
 }
 
 // ListUnsubscribeBehaviour controls the List-Unsubscribe/List-Unsubscribe-Post headers set on

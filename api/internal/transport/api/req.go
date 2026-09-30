@@ -107,6 +107,22 @@ type LogIssuesReq struct {
 	LogIssues *bool `json:"log_issues"`
 }
 
+type DefaultDomainReq struct {
+	Domain *string `json:"domain"`
+}
+
+type DefaultRecipientReq struct {
+	Recipient *string `json:"recipient"`
+}
+
+type AliasFormatReq struct {
+	AliasFormat *string `json:"alias_format"`
+}
+
+type FromNameReq struct {
+	FromName *string `json:"from_name"`
+}
+
 type DeleteUserReq struct {
 	OTP string `json:"otp" validate:"required,len=8"`
 }

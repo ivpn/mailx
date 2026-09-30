@@ -92,6 +92,47 @@ func TestUpdateRemoveHeaderAndLogIssues(t *testing.T) {
 	}
 }
 
+func TestUpdateDefaults(t *testing.T) {
+	d := newTestDB(t)
+	ctx := context.Background()
+
+	if err := d.PostSettings(ctx, model.Settings{UserID: "user-1", LogIssues: true}); err != nil {
+		t.Fatalf("PostSettings() error = %v", err)
+	}
+
+	for name, err := range map[string]error{
+		"UpdateDefaultDomain":    d.UpdateDefaultDomain(ctx, "user-1", "mailx.net"),
+		"UpdateDefaultRecipient": d.UpdateDefaultRecipient(ctx, "user-1", "me@example.com"),
+		"UpdateAliasFormat":      d.UpdateAliasFormat(ctx, "user-1", "uuid"),
+		"UpdateFromName":         d.UpdateFromName(ctx, "user-1", "Jane"),
+	} {
+		if err != nil {
+			t.Fatalf("%s() error = %v", name, err)
+		}
+	}
+
+	settings, _ := d.GetSettings(ctx, "user-1")
+	if settings.Domain != "mailx.net" || settings.Recipient != "me@example.com" || settings.AliasFormat != "uuid" || settings.FromName != "Jane" {
+		t.Errorf("settings = %+v, want the updated defaults", settings)
+	}
+	if !settings.LogIssues || !settings.BlockTrackers {
+		t.Error("updating a default changed another setting")
+	}
+
+	// A From name can be cleared
+	if err := d.UpdateFromName(ctx, "user-1", ""); err != nil {
+		t.Fatalf("UpdateFromName() error = %v", err)
+	}
+	settings, _ = d.GetSettings(ctx, "user-1")
+	if settings.FromName != "" {
+		t.Errorf("from_name = %q, want it cleared", settings.FromName)
+	}
+
+	if err := d.UpdateDefaultDomain(ctx, "missing", "mailx.net"); err == nil {
+		t.Error("UpdateDefaultDomain() for a user without settings should fail")
+	}
+}
+
 func TestBlockTrackers_MigrationDefaultsExistingRowsToOn(t *testing.T) {
 	d := newTestDB(t)
 

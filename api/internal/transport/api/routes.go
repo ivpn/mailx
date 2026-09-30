@@ -105,6 +105,10 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Put("/settings/block-trackers", h.UpdateBlockTrackers)
 	v1.Put("/settings/remove-header", h.UpdateRemoveHeader)
 	v1.Put("/settings/log-issues", h.UpdateLogIssues)
+	v1.Put("/settings/domain", h.UpdateDefaultDomain)
+	v1.Put("/settings/recipient", h.UpdateDefaultRecipient)
+	v1.Put("/settings/alias-format", h.UpdateAliasFormat)
+	v1.Put("/settings/from-name", h.UpdateFromName)
 
 	v1.Get("/recipient/:id", h.GetRecipient)
 	v1.Get("/recipients", h.GetRecipients)

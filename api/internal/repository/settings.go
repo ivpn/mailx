@@ -56,6 +56,22 @@ func (d *Database) UpdateLogIssues(ctx context.Context, userID string, enabled b
 	return d.updateSettingsColumn(userID, "log_issues", enabled)
 }
 
+func (d *Database) UpdateDefaultDomain(ctx context.Context, userID string, domain string) error {
+	return d.updateSettingsColumn(userID, "domain", domain)
+}
+
+func (d *Database) UpdateDefaultRecipient(ctx context.Context, userID string, recipient string) error {
+	return d.updateSettingsColumn(userID, "recipient", recipient)
+}
+
+func (d *Database) UpdateAliasFormat(ctx context.Context, userID string, format string) error {
+	return d.updateSettingsColumn(userID, "alias_format", format)
+}
+
+func (d *Database) UpdateFromName(ctx context.Context, userID string, fromName string) error {
+	return d.updateSettingsColumn(userID, "from_name", fromName)
+}
+
 func (d *Database) updateSettingsColumn(userID string, column string, value any) error {
 	q := d.Client.Model(&model.Settings{}).Where("user_id = ?", userID).Update(column, value)
 	if q.Error != nil {

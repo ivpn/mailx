@@ -2699,6 +2699,57 @@ const docTemplate = `{
                 }
             }
         },
+        "/settings/alias-format": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Set the default alias format for new aliases: words, random or uuid",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Update default alias format",
+                "parameters": [
+                    {
+                        "description": "Default alias format",
+                        "name": "settings",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.AliasFormatReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
         "/settings/block-trackers": {
             "put": {
                 "security": [
@@ -2725,6 +2776,108 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/api.BlockTrackersReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/settings/domain": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Set the default alias domain for new aliases: a built-in domain or a verified custom domain name",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Update default domain",
+                "parameters": [
+                    {
+                        "description": "Default domain",
+                        "name": "settings",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.DefaultDomainReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/settings/from-name": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Set the From name used for replies and sends; an empty value uses the alias address",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Update from name",
+                "parameters": [
+                    {
+                        "description": "From name",
+                        "name": "settings",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.FromNameReq"
                         }
                     }
                 ],
@@ -2827,6 +2980,57 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/api.LogIssuesReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/settings/recipient": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Set the default recipient for new aliases; it must be one of the user's verified recipients",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Update default recipient",
+                "parameters": [
+                    {
+                        "description": "Default recipient",
+                        "name": "settings",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.DefaultRecipientReq"
                         }
                     }
                 ],
@@ -3721,6 +3925,14 @@ const docTemplate = `{
                 }
             }
         },
+        "api.AliasFormatReq": {
+            "type": "object",
+            "properties": {
+                "alias_format": {
+                    "type": "string"
+                }
+            }
+        },
         "api.AliasPinReq": {
             "type": "object",
             "properties": {
@@ -3891,6 +4103,22 @@ const docTemplate = `{
                 }
             }
         },
+        "api.DefaultDomainReq": {
+            "type": "object",
+            "properties": {
+                "domain": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.DefaultRecipientReq": {
+            "type": "object",
+            "properties": {
+                "recipient": {
+                    "type": "string"
+                }
+            }
+        },
         "api.DeleteRecipientReq": {
             "type": "object",
             "properties": {
@@ -3939,6 +4167,14 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.FromNameReq": {
+            "type": "object",
+            "properties": {
+                "from_name": {
                     "type": "string"
                 }
             }

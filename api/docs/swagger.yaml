@@ -15,6 +15,11 @@ definitions:
     required:
     - otp
     type: object
+  api.AliasFormatReq:
+    properties:
+      alias_format:
+        type: string
+    type: object
   api.AliasPinReq:
     properties:
       pinned:
@@ -130,6 +135,16 @@ definitions:
       password:
         type: string
     type: object
+  api.DefaultDomainReq:
+    properties:
+      domain:
+        type: string
+    type: object
+  api.DefaultRecipientReq:
+    properties:
+      recipient:
+        type: string
+    type: object
   api.DeleteRecipientReq:
     properties:
       recipients:
@@ -161,6 +176,11 @@ definitions:
   api.ErrorRes:
     properties:
       error:
+        type: string
+    type: object
+  api.FromNameReq:
+    properties:
+      from_name:
         type: string
     type: object
   api.ListUnsubscribeBehaviourReq:
@@ -2388,6 +2408,39 @@ paths:
       summary: Update settings
       tags:
       - settings
+  /settings/alias-format:
+    put:
+      consumes:
+      - application/json
+      description: 'Set the default alias format for new aliases: words, random or
+        uuid'
+      parameters:
+      - description: Default alias format
+        in: body
+        name: settings
+        required: true
+        schema:
+          $ref: '#/definitions/api.AliasFormatReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update default alias format
+      tags:
+      - settings
   /settings/block-trackers:
     put:
       consumes:
@@ -2418,6 +2471,72 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Update block email trackers
+      tags:
+      - settings
+  /settings/domain:
+    put:
+      consumes:
+      - application/json
+      description: 'Set the default alias domain for new aliases: a built-in domain
+        or a verified custom domain name'
+      parameters:
+      - description: Default domain
+        in: body
+        name: settings
+        required: true
+        schema:
+          $ref: '#/definitions/api.DefaultDomainReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update default domain
+      tags:
+      - settings
+  /settings/from-name:
+    put:
+      consumes:
+      - application/json
+      description: Set the From name used for replies and sends; an empty value uses
+        the alias address
+      parameters:
+      - description: From name
+        in: body
+        name: settings
+        required: true
+        schema:
+          $ref: '#/definitions/api.FromNameReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update from name
       tags:
       - settings
   /settings/list-unsubscribe-behaviour:
@@ -2484,6 +2603,39 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Update diagnostics
+      tags:
+      - settings
+  /settings/recipient:
+    put:
+      consumes:
+      - application/json
+      description: Set the default recipient for new aliases; it must be one of the
+        user's verified recipients
+      parameters:
+      - description: Default recipient
+        in: body
+        name: settings
+        required: true
+        schema:
+          $ref: '#/definitions/api.DefaultRecipientReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update default recipient
       tags:
       - settings
   /settings/remove-header:

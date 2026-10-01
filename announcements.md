@@ -1,5 +1,25 @@
 # Announcements
 
+## New in Mailx: passkey login without email, CSV import - 2026-10-01
+
+### Passkey login without email
+Logging in with a passkey no longer requires your email address: pick the passkey from your device or password manager. If an older passkey does not appear, use "Use email instead".
+
+### CSV import
+Import up to 500 aliases with "Alias Import" on the Account page, using the same columns as the Mailx export: alias, description, enabled, recipients. Import only works for aliases on your custom domains.
+
+### Bulk actions, pins and filters
+Select aliases on the Aliases page to activate, deactivate, pin, delete or restore them together. Pinned aliases stay at the top of the list, also in the browser extension. A "Show: All / Enabled / Disabled / Deleted" filter narrows the list.
+
+### Forget for custom domain aliases
+"Forget" permanently deletes an alias on your own domain and frees the address for reuse immediately. A regular delete still keeps an alias restorable for 90 days. Forget cannot be undone.
+
+### Other changes
+- Aliases list performance improvements, with up to 100 per page
+- "Stay logged in" option on the login screen
+- Status filter for wildcard aliases: Enabled, Disabled, Deleted
+- Period (.) or plus (+) separator for new wildcard aliases
+
 ## Catch-all aliases, custom alias names, and a forwarding privacy fix - 2026-09-01
 
 ### Create aliases from catch-all mail (custom domains)

@@ -10,7 +10,7 @@
                 v-bind:class="readOnly ? 'opacity-50 cursor-not-allowed' : 'cursor-grab'"
                 v-bind:data-rule-id="rule.id"
                 role="button"
-                class="rule-handle p-1 inline-flex"
+                class="rule-handle p-1 flex items-center w-fit"
                 aria-label="Reorder"
                 title="Drag, or use the arrow keys, to reorder"
             >
@@ -18,7 +18,7 @@
             </span>
         </td>
         <td>
-            <p>{{ new Date(rule.created_at).toDateString() }}</p>
+            <p class="m-0">{{ new Date(rule.created_at).toDateString() }}</p>
         </td>
         <td class="whitespace-normal">
             <div class="flex items-center gap-1">
@@ -91,7 +91,7 @@
                         </span>
                     </div>
                     <div class="min-w-0">
-                        <p class="mb-3">{{ new Date(rule.created_at).toDateString() }}</p>
+                        <p class="mb-3 mt-1">{{ new Date(rule.created_at).toDateString() }}</p>
                         <div class="break-all">
                             <p class="plain text-base text-primary text-wrap">
                                 <span class="text-sm text-secondary">Name:</span><br>

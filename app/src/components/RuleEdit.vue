@@ -25,7 +25,7 @@
                                     v-bind:aria-invalid="nameError"
                                     v-bind:maxlength="ruleLimits.name"
                                     id="rule_name"
-                                    placeholder="Newsletters"
+                                    placeholder="Enter rule name"
                                     type="text"
                                 >
                                 <p v-if="nameError" class="error">Required</p>

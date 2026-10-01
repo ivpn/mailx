@@ -292,6 +292,12 @@ func (d *Database) UpdateAliasPinned(ctx context.Context, ID string, userID stri
 	return d.Client.Model(&model.Alias{}).Where("id = ? AND user_id = ?", ID, userID).Update("pinned", pinned).Error
 }
 
+// UpdateAliasDescription sets the description in isolation, so a rule changing it in the mail
+// pipeline can't overwrite other fields the user edited in the meantime.
+func (d *Database) UpdateAliasDescription(ctx context.Context, ID string, userID string, description string) error {
+	return d.Client.Model(&model.Alias{}).Where("id = ? AND user_id = ?", ID, userID).Update("description", description).Error
+}
+
 func (d *Database) DeleteAliasByUserID(ctx context.Context, userID string) error {
 	return d.Client.Where("user_id = ?", userID).Delete(&model.Alias{}).Error
 }

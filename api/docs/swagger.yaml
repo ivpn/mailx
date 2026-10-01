@@ -240,6 +240,71 @@ definitions:
     required:
     - sessionid
     type: object
+  api.RuleActionReq:
+    properties:
+      type:
+        type: string
+      value:
+        type: string
+    required:
+    - type
+    type: object
+  api.RuleActiveReq:
+    properties:
+      active:
+        type: boolean
+    type: object
+  api.RuleConditionReq:
+    properties:
+      match:
+        type: string
+      type:
+        type: string
+      values:
+        items:
+          type: string
+        type: array
+    required:
+    - type
+    type: object
+  api.RuleOrderReq:
+    properties:
+      ids:
+        items:
+          type: string
+        type: array
+    required:
+    - ids
+    type: object
+  api.RuleReq:
+    properties:
+      actions:
+        items:
+          $ref: '#/definitions/api.RuleActionReq'
+        type: array
+      conditions:
+        items:
+          $ref: '#/definitions/api.RuleConditionReq'
+        type: array
+      forwards:
+        type: boolean
+      name:
+        type: string
+      operator:
+        enum:
+        - AND
+        - OR
+        type: string
+      replies:
+        type: boolean
+      sends:
+        type: boolean
+    required:
+    - actions
+    - conditions
+    - name
+    - operator
+    type: object
   api.SettingsReq:
     properties:
       alias_format:
@@ -547,6 +612,7 @@ definitions:
     - unauthorised_send
     - inactive_subscription
     - blocked_sender
+    - blocked_by_rule
     type: string
     x-enum-varnames:
     - BounceMessage
@@ -557,6 +623,7 @@ definitions:
     - UnauthorisedSend
     - InactiveSubscription
     - BlockedSender
+    - BlockedByRule
   model.Recipient:
     properties:
       created_at:
@@ -574,6 +641,150 @@ definitions:
       pgp_key:
         type: string
     type: object
+  model.Rule:
+    properties:
+      actions:
+        items:
+          $ref: '#/definitions/model.RuleAction'
+        type: array
+      active:
+        type: boolean
+      applied:
+        type: integer
+      conditions:
+        items:
+          $ref: '#/definitions/model.RuleCondition'
+        type: array
+      created_at:
+        type: string
+      forwards:
+        type: boolean
+      id:
+        type: string
+      invalid_recipients:
+        description: |-
+          InvalidRecipients is set when a forward_to action points at a recipient that has since
+          been deleted or deactivated.
+        type: boolean
+      last_applied_at:
+        type: string
+      name:
+        type: string
+      operator:
+        $ref: '#/definitions/model.RuleOperator'
+      order:
+        type: integer
+      replies:
+        type: boolean
+      sends:
+        type: boolean
+    type: object
+  model.RuleAction:
+    properties:
+      type:
+        $ref: '#/definitions/model.RuleActionType'
+      value:
+        description: empty for flag actions
+        type: string
+    type: object
+  model.RuleActionType:
+    enum:
+    - block
+    - blocklist_sender
+    - blocklist_domain
+    - replace_subject
+    - set_display_name
+    - forward_to
+    - disable_encryption
+    - hide_banner
+    - show_banner
+    - deactivate_alias
+    - set_alias_description
+    - remove_attachments
+    - stop
+    type: string
+    x-enum-varnames:
+    - RuleActionBlock
+    - RuleActionBlocklistSender
+    - RuleActionBlocklistDomain
+    - RuleActionReplaceSubject
+    - RuleActionSetDisplayName
+    - RuleActionForwardTo
+    - RuleActionDisableEncryption
+    - RuleActionHideBanner
+    - RuleActionShowBanner
+    - RuleActionDeactivateAlias
+    - RuleActionSetAliasDescription
+    - RuleActionRemoveAttachments
+    - RuleActionStop
+  model.RuleCondition:
+    properties:
+      match:
+        $ref: '#/definitions/model.RuleMatch'
+      type:
+        $ref: '#/definitions/model.RuleConditionType'
+      values:
+        description: ORed together; empty for boolean types
+        items:
+          type: string
+        type: array
+    type: object
+  model.RuleConditionType:
+    enum:
+    - sender
+    - sender_domain
+    - sender_name
+    - subject
+    - alias
+    - alias_description
+    - destination
+    - is_mailing_list
+    - has_attachments
+    - alias_is_wildcard
+    type: string
+    x-enum-varnames:
+    - RuleConditionSender
+    - RuleConditionSenderDomain
+    - RuleConditionSenderName
+    - RuleConditionSubject
+    - RuleConditionAlias
+    - RuleConditionAliasDescription
+    - RuleConditionDestination
+    - RuleConditionIsMailingList
+    - RuleConditionHasAttachments
+    - RuleConditionAliasIsWildcard
+  model.RuleMatch:
+    enum:
+    - is
+    - is_not
+    - contains
+    - not_contains
+    - starts_with
+    - not_starts_with
+    - ends_with
+    - not_ends_with
+    - regex
+    - not_regex
+    type: string
+    x-enum-varnames:
+    - RuleMatchIs
+    - RuleMatchIsNot
+    - RuleMatchContains
+    - RuleMatchNotContains
+    - RuleMatchStartsWith
+    - RuleMatchNotStartsWith
+    - RuleMatchEndsWith
+    - RuleMatchNotEndsWith
+    - RuleMatchRegex
+    - RuleMatchNotRegex
+  model.RuleOperator:
+    enum:
+    - AND
+    - OR
+    type: string
+    x-enum-varnames:
+    - RuleAnd
+    - RuleOr
   model.Settings:
     properties:
       alias_format:
@@ -2360,6 +2571,194 @@ paths:
       summary: Rotate pre-auth session ID
       tags:
       - subscription
+  /rule:
+    post:
+      consumes:
+      - application/json
+      description: Create a rule, applied after the user's existing rules
+      parameters:
+      - description: Rule request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.RuleReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message, rule
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Create rule
+      tags:
+      - rule
+  /rule/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a rule
+      parameters:
+      - description: Rule ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete rule
+      tags:
+      - rule
+    put:
+      consumes:
+      - application/json
+      description: Replace a rule's name, conditions, actions and email types. Its
+        order, active flag and Applied count are kept.
+      parameters:
+      - description: Rule ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Rule request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.RuleReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message, rule
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update rule
+      tags:
+      - rule
+  /rule/{id}/active:
+    put:
+      consumes:
+      - application/json
+      description: Turn a rule on or off
+      parameters:
+      - description: Rule ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Rule active request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.RuleActiveReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update rule active
+      tags:
+      - rule
+  /rules:
+    get:
+      consumes:
+      - application/json
+      description: Get all of the authenticated user's rules, in the order they're
+        applied
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Rule'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get rules
+      tags:
+      - rule
+  /rules/order:
+    put:
+      consumes:
+      - application/json
+      description: Set the order rules are applied in. ids must be exactly the user's
+        rule IDs.
+      parameters:
+      - description: Rule order request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.RuleOrderReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Reorder rules
+      tags:
+      - rule
   /settings:
     get:
       consumes:

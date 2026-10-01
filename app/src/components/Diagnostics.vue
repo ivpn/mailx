@@ -121,7 +121,8 @@ const formatDate = (date: string) => {
 
 const formatLogType = (item: typeof log) => {
     if (!item.log_type) return ''
-    return item.log_type.replace('_', ' ').charAt(0).toUpperCase() + item.log_type.replace('_', ' ').slice(1)
+    const label = item.log_type.replace(/_/g, ' ')
+    return label.charAt(0).toUpperCase() + label.slice(1)
 }
 
 onMounted(async () => {

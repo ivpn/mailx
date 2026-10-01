@@ -51,6 +51,7 @@ type AliasStore interface {
 	PostAlias(context.Context, model.Alias, int, int) (model.Alias, error)
 	UpdateAlias(context.Context, model.Alias) error
 	UpdateAliasPinned(context.Context, string, string, bool) error
+	UpdateAliasDescription(context.Context, string, string, string) error
 	DeleteAlias(context.Context, string, string) error
 	DeleteAliasByUserID(context.Context, string) error
 	DeleteAliasByDomain(context.Context, string, string) error

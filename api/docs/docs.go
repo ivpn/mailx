@@ -2622,6 +2622,298 @@ const docTemplate = `{
                 }
             }
         },
+        "/rule": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create a rule, applied after the user's existing rules",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rule"
+                ],
+                "summary": "Create rule",
+                "parameters": [
+                    {
+                        "description": "Rule request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.RuleReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "message, rule",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/rule/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Replace a rule's name, conditions, actions and email types. Its order, active flag and Applied count are kept.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rule"
+                ],
+                "summary": "Update rule",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Rule ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Rule request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.RuleReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message, rule",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete a rule",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rule"
+                ],
+                "summary": "Delete rule",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Rule ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/rule/{id}/active": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Turn a rule on or off",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rule"
+                ],
+                "summary": "Update rule active",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Rule ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Rule active request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.RuleActiveReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/rules": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all of the authenticated user's rules, in the order they're applied",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rule"
+                ],
+                "summary": "Get rules",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Rule"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/rules/order": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Set the order rules are applied in. ids must be exactly the user's rule IDs.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rule"
+                ],
+                "summary": "Reorder rules",
+                "parameters": [
+                    {
+                        "description": "Rule order request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.RuleOrderReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
         "/settings": {
             "get": {
                 "security": [
@@ -4267,6 +4559,104 @@ const docTemplate = `{
                 }
             }
         },
+        "api.RuleActionReq": {
+            "type": "object",
+            "required": [
+                "type"
+            ],
+            "properties": {
+                "type": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.RuleActiveReq": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "api.RuleConditionReq": {
+            "type": "object",
+            "required": [
+                "type"
+            ],
+            "properties": {
+                "match": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "values": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "api.RuleOrderReq": {
+            "type": "object",
+            "required": [
+                "ids"
+            ],
+            "properties": {
+                "ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "api.RuleReq": {
+            "type": "object",
+            "required": [
+                "actions",
+                "conditions",
+                "name",
+                "operator"
+            ],
+            "properties": {
+                "actions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/api.RuleActionReq"
+                    }
+                },
+                "conditions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/api.RuleConditionReq"
+                    }
+                },
+                "forwards": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "operator": {
+                    "type": "string",
+                    "enum": [
+                        "AND",
+                        "OR"
+                    ]
+                },
+                "replies": {
+                    "type": "boolean"
+                },
+                "sends": {
+                    "type": "boolean"
+                }
+            }
+        },
         "api.SettingsReq": {
             "type": "object",
             "required": [
@@ -4720,7 +5110,8 @@ const docTemplate = `{
                 "disabled_domain",
                 "unauthorised_send",
                 "inactive_subscription",
-                "blocked_sender"
+                "blocked_sender",
+                "blocked_by_rule"
             ],
             "x-enum-varnames": [
                 "BounceMessage",
@@ -4730,7 +5121,8 @@ const docTemplate = `{
                 "DisabledDomain",
                 "UnauthorisedSend",
                 "InactiveSubscription",
-                "BlockedSender"
+                "BlockedSender",
+                "BlockedByRule"
             ]
         },
         "model.Recipient": {
@@ -4758,6 +5150,188 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "model.Rule": {
+            "type": "object",
+            "properties": {
+                "actions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.RuleAction"
+                    }
+                },
+                "active": {
+                    "type": "boolean"
+                },
+                "applied": {
+                    "type": "integer"
+                },
+                "conditions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.RuleCondition"
+                    }
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "forwards": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "invalid_recipients": {
+                    "description": "InvalidRecipients is set when a forward_to action points at a recipient that has since\nbeen deleted or deactivated.",
+                    "type": "boolean"
+                },
+                "last_applied_at": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "operator": {
+                    "$ref": "#/definitions/model.RuleOperator"
+                },
+                "order": {
+                    "type": "integer"
+                },
+                "replies": {
+                    "type": "boolean"
+                },
+                "sends": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "model.RuleAction": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "$ref": "#/definitions/model.RuleActionType"
+                },
+                "value": {
+                    "description": "empty for flag actions",
+                    "type": "string"
+                }
+            }
+        },
+        "model.RuleActionType": {
+            "type": "string",
+            "enum": [
+                "block",
+                "blocklist_sender",
+                "blocklist_domain",
+                "replace_subject",
+                "set_display_name",
+                "forward_to",
+                "disable_encryption",
+                "hide_banner",
+                "show_banner",
+                "deactivate_alias",
+                "set_alias_description",
+                "remove_attachments",
+                "stop"
+            ],
+            "x-enum-varnames": [
+                "RuleActionBlock",
+                "RuleActionBlocklistSender",
+                "RuleActionBlocklistDomain",
+                "RuleActionReplaceSubject",
+                "RuleActionSetDisplayName",
+                "RuleActionForwardTo",
+                "RuleActionDisableEncryption",
+                "RuleActionHideBanner",
+                "RuleActionShowBanner",
+                "RuleActionDeactivateAlias",
+                "RuleActionSetAliasDescription",
+                "RuleActionRemoveAttachments",
+                "RuleActionStop"
+            ]
+        },
+        "model.RuleCondition": {
+            "type": "object",
+            "properties": {
+                "match": {
+                    "$ref": "#/definitions/model.RuleMatch"
+                },
+                "type": {
+                    "$ref": "#/definitions/model.RuleConditionType"
+                },
+                "values": {
+                    "description": "ORed together; empty for boolean types",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "model.RuleConditionType": {
+            "type": "string",
+            "enum": [
+                "sender",
+                "sender_domain",
+                "sender_name",
+                "subject",
+                "alias",
+                "alias_description",
+                "destination",
+                "is_mailing_list",
+                "has_attachments",
+                "alias_is_wildcard"
+            ],
+            "x-enum-varnames": [
+                "RuleConditionSender",
+                "RuleConditionSenderDomain",
+                "RuleConditionSenderName",
+                "RuleConditionSubject",
+                "RuleConditionAlias",
+                "RuleConditionAliasDescription",
+                "RuleConditionDestination",
+                "RuleConditionIsMailingList",
+                "RuleConditionHasAttachments",
+                "RuleConditionAliasIsWildcard"
+            ]
+        },
+        "model.RuleMatch": {
+            "type": "string",
+            "enum": [
+                "is",
+                "is_not",
+                "contains",
+                "not_contains",
+                "starts_with",
+                "not_starts_with",
+                "ends_with",
+                "not_ends_with",
+                "regex",
+                "not_regex"
+            ],
+            "x-enum-varnames": [
+                "RuleMatchIs",
+                "RuleMatchIsNot",
+                "RuleMatchContains",
+                "RuleMatchNotContains",
+                "RuleMatchStartsWith",
+                "RuleMatchNotStartsWith",
+                "RuleMatchEndsWith",
+                "RuleMatchNotEndsWith",
+                "RuleMatchRegex",
+                "RuleMatchNotRegex"
+            ]
+        },
+        "model.RuleOperator": {
+            "type": "string",
+            "enum": [
+                "AND",
+                "OR"
+            ],
+            "x-enum-varnames": [
+                "RuleAnd",
+                "RuleOr"
+            ]
         },
         "model.Settings": {
             "type": "object",

@@ -27,6 +27,10 @@
                     <i class="icon block icon-primary"></i>
                     Blocklist
                 </router-link>
+                <router-link v-bind:class="{ 'active': route == '/account/rules' }" to="/account/rules">
+                    <i class="icon filter icon-primary"></i>
+                    Rules
+                </router-link>
                 <router-link v-bind:class="{ 'active': route == '/account/stats' }" to="/account/stats">
                     <i class="icon chart icon-primary"></i>
                     Stats

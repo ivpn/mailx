@@ -16,6 +16,9 @@ var (
 	ErrNoRecipients         = errors.New("No recipients found.")
 	ErrNoVerifiedRecipients = errors.New("Sender is not a verified address.")
 	ErrInactiveRecipient    = errors.New("The recipient is inactive.")
+
+	// queueMessage hands an email to the mailer for one recipient; tests replace it.
+	queueMessage = (*Service).QueueMessage
 )
 
 func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
@@ -188,8 +191,12 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 			continue
 		}
 
+		// Rules - matched against the original email before the inbound alias below, so a rule
+		// that blocks the email also stops the alias from being created.
+		outcome := s.ApplyRules(context.Background(), alias, msg, relayType, to, data)
+
 		// Handle Inbound Alias
-		if alias.Origin == model.Inbound && alias.ID == "" {
+		if alias.Origin == model.Inbound && alias.ID == "" && !outcome.Block {
 			inboundAlias, err := s.PostInboundAlias(context.Background(), alias)
 			if err == nil {
 				alias.BaseModel = inboundAlias.BaseModel
@@ -197,6 +204,18 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 				log.Println("error auto-creating inbound alias:", err, alias.Name)
 			}
 		}
+
+		if outcome.Matched() {
+			s.ApplyRuleSideEffects(context.Background(), alias, msg.From, outcome)
+		}
+
+		if outcome.Block {
+			s.BlockMessageByRule(alias, msg.From, to, relayType, outcome)
+			continue
+		}
+
+		settings = outcome.Settings(settings)
+		recipients = s.RuleRecipients(context.Background(), alias, recipients, outcome)
 
 		toHeader := to
 		listUnsubscribe := model.ListUnsubscribeHeaders{}
@@ -208,14 +227,14 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 		for _, recipient := range recipients {
 			g.Go(func() error {
 				// Queue Message
-				err = s.QueueMessage(msg.From, msg.FromName, to, toHeader, recipient, data, alias, relayType, settings, listUnsubscribe)
+				err := queueMessage(s, msg.From, msg.FromName, to, toHeader, recipient, data, alias, relayType, settings, listUnsubscribe, outcome)
 				if err != nil {
 					return err
 				}
 
 				// Save Message for stats
 				go func() {
-					err = s.SaveMessage(context.Background(), alias, relayType)
+					err := s.SaveMessage(context.Background(), alias, relayType)
 					if err != nil {
 						log.Println("error saving message", err)
 					}
@@ -230,7 +249,7 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 	return g.Wait()
 }
 
-func (s *Service) QueueMessage(from string, fromName string, to string, toHeader string, rcp model.Recipient, data []byte, alias model.Alias, msgType model.MessageType, settings model.Settings, listUnsubscribe model.ListUnsubscribeHeaders) error {
+func (s *Service) QueueMessage(from string, fromName string, to string, toHeader string, rcp model.Recipient, data []byte, alias model.Alias, msgType model.MessageType, settings model.Settings, listUnsubscribe model.ListUnsubscribeHeaders, outcome model.RuleOutcome) error {
 	mailer := mailer.New(s.Cfg.SMTPClient)
 
 	// Queue Forward
@@ -239,8 +258,11 @@ func (s *Service) QueueMessage(from string, fromName string, to string, toHeader
 			"alias": to,
 			"from":  from,
 		}
+		if outcome.FromName != "" {
+			fromName = outcome.FromName
+		}
 		generatedFrom := model.GenerateReplyTo(alias.Name, from)
-		err := mailer.Forward(generatedFrom, fromName, toHeader, rcp, data, "header.tmpl", templateData, settings, alias, listUnsubscribe)
+		err := mailer.Forward(generatedFrom, fromName, toHeader, rcp, data, "header.tmpl", templateData, settings, alias, listUnsubscribe, outcome)
 		if err != nil {
 			if settings.LogIssues {
 				err := s.ProcessDiagnosticLog(alias, from, rcp.Email, err.Error(), model.DeferredDelivery)
@@ -260,12 +282,7 @@ func (s *Service) QueueMessage(from string, fromName string, to string, toHeader
 			return err
 		}
 
-		name := alias.FromName
-		if name == "" {
-			name = settings.FromName
-		}
-
-		err = mailer.Reply(alias.Name, name, rcp, data, alias)
+		err = mailer.Reply(alias.Name, replyFromName(alias, settings, outcome), rcp, data, alias, outcome)
 		if err != nil {
 			if settings.LogIssues {
 				err := s.ProcessDiagnosticLog(alias, from, rcp.Email, err.Error(), model.DeferredDelivery)
@@ -280,4 +297,17 @@ func (s *Service) QueueMessage(from string, fromName string, to string, toHeader
 	}
 
 	return nil
+}
+
+// replyFromName is the name a reply or send is shown to come from: a rule's sender name, else
+// the alias's, else the user's default.
+func replyFromName(alias model.Alias, settings model.Settings, outcome model.RuleOutcome) string {
+	if outcome.FromName != "" {
+		return outcome.FromName
+	}
+	if alias.FromName != "" {
+		return alias.FromName
+	}
+
+	return settings.FromName
 }

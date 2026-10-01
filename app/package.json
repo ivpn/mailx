@@ -29,6 +29,7 @@
     "qrious": "^4.0.2",
     "typescript-cookie": "^1.0.6",
     "vue": "^3.4.21",
+    "vue-draggable-plus": "^0.6.1",
     "vue-router": "4"
   },
   "devDependencies": {

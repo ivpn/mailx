@@ -17,6 +17,9 @@
                 <router-link v-bind:class="{ 'active': route == '/account/blocklist' }" to="/account/blocklist" title="Blocklist">
                     <i class="icon block icon-primary"></i>
                 </router-link>
+                <router-link v-bind:class="{ 'active': route == '/account/rules' }" to="/account/rules" title="Rules">
+                    <i class="icon filter icon-primary"></i>
+                </router-link>
                 <router-link v-bind:class="{ 'active': route == '/account/stats' }" to="/account/stats" title="Stats">
                     <i class="icon chart icon-primary"></i>
                 </router-link>

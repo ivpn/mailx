@@ -169,6 +169,37 @@ type BlocklistReq struct {
 	Value string `json:"value" validate:"required,max=255"`
 }
 
+// RuleReq carries a rule's definition. Limits and the combinations of conditions, actions and
+// email types are checked by model.Rule.Validate, which explains what's wrong.
+type RuleReq struct {
+	Name       string             `json:"name" validate:"required"`
+	Operator   string             `json:"operator" validate:"required,oneof=AND OR"`
+	Conditions []RuleConditionReq `json:"conditions" validate:"required,dive"`
+	Actions    []RuleActionReq    `json:"actions" validate:"required,dive"`
+	Forwards   bool               `json:"forwards"`
+	Replies    bool               `json:"replies"`
+	Sends      bool               `json:"sends"`
+}
+
+type RuleConditionReq struct {
+	Type   string   `json:"type" validate:"required"`
+	Match  string   `json:"match"`
+	Values []string `json:"values"`
+}
+
+type RuleActionReq struct {
+	Type  string `json:"type" validate:"required"`
+	Value string `json:"value"`
+}
+
+type RuleActiveReq struct {
+	Active *bool `json:"active"`
+}
+
+type RuleOrderReq struct {
+	IDs []string `json:"ids" validate:"required,dive,uuid"`
+}
+
 type UpdateDomainReq struct {
 	ID          string `json:"id" validate:"required,uuid"`
 	Description string `json:"description"`

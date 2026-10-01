@@ -30,6 +30,12 @@ type Msg struct {
 	EnvelopeRecipient   string
 	ListUnsubscribe     string
 	ListUnsubscribePost string
+	ListID              string
+}
+
+// IsMailingList reports whether the message came from a mailing list or newsletter.
+func (m Msg) IsMailingList() bool {
+	return m.ListUnsubscribe != "" || m.ListID != ""
 }
 
 func ParseMsg(data []byte) (Msg, error) {
@@ -116,6 +122,7 @@ func ParseMsg(data []byte) (Msg, error) {
 		EnvelopeRecipient:   deliveredTo,
 		ListUnsubscribe:     strings.TrimSpace(msg.Header.Get("List-Unsubscribe")),
 		ListUnsubscribePost: strings.TrimSpace(msg.Header.Get("List-Unsubscribe-Post")),
+		ListID:              strings.TrimSpace(msg.Header.Get("List-Id")),
 	}, nil
 }
 

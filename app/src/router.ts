@@ -4,6 +4,7 @@ import QuickActions from './components/QuickActions.vue'
 import Recipients from './components/Recipients.vue'
 import Domains from './components/Domains.vue'
 import Blocklist from './components/Blocklist.vue'
+import Rules from './components/Rules.vue'
 import Wildcards from './components/Wildcards.vue'
 import Stats from './components/Stats.vue'
 import Diagnostics from './components/Diagnostics.vue'
@@ -57,6 +58,11 @@ const dashboardChildren: RouteRecordRaw[] = [
         path: 'blocklist',
         name: `${AppName}: Blocklist`,
         component: Blocklist,
+    },
+    {
+        path: 'rules',
+        name: `${AppName}: Rules`,
+        component: Rules,
     },
     {
         path: 'stats',

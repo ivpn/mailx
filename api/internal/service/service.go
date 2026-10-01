@@ -21,6 +21,7 @@ type Store interface {
 	AccessKeyStore
 	DomainStore
 	BlocklistStore
+	RuleStore
 }
 
 type Cache interface {

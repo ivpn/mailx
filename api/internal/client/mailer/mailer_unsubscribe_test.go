@@ -32,7 +32,7 @@ func buildTestForward(t *testing.T, rcp model.Recipient, listUnsubscribe model.L
 
 	msg, _, err := m.buildForwardMessage(
 		"myalias+sender=example.com@mailx.net", "Sender", alias.Name, rcp,
-		[]byte(testListUnsubscribeRawEmail), "header.tmpl", templateData, model.Settings{}, alias, listUnsubscribe,
+		[]byte(testListUnsubscribeRawEmail), "header.tmpl", templateData, model.Settings{}, alias, listUnsubscribe, model.RuleOutcome{},
 	)
 	if err != nil {
 		t.Fatalf("buildForwardMessage() error = %v", err)

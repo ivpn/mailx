@@ -24,6 +24,7 @@ type Service interface {
 	AccessKeyService
 	DomainService
 	BlocklistService
+	RuleService
 	StepUpService
 	OneClickService
 }

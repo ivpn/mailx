@@ -58,7 +58,7 @@ func forwardFixture(t *testing.T, name string, settings model.Settings, rcp mode
 
 	msg, _, err := m.buildForwardMessage(
 		"myalias+news=shop.example@mailx.net", "Sender", alias.Name, rcp,
-		readFixture(t, name), "header.tmpl", templateData, settings, alias, model.ListUnsubscribeHeaders{},
+		readFixture(t, name), "header.tmpl", templateData, settings, alias, model.ListUnsubscribeHeaders{}, model.RuleOutcome{},
 	)
 	if err != nil {
 		t.Fatalf("buildForwardMessage() error = %v", err)

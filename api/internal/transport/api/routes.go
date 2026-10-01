@@ -154,6 +154,13 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Post("/blocklist", h.PostBlocklistItem)
 	v1.Delete("/blocklist/:id", h.DeleteBlocklistItem)
 
+	v1.Get("/rules", h.GetRules)
+	v1.Put("/rules/order", h.ReorderRules)
+	v1.Post("/rule", h.PostRule)
+	v1.Put("/rule/:id", h.UpdateRule)
+	v1.Put("/rule/:id/active", h.UpdateRuleActive)
+	v1.Delete("/rule/:id", h.DeleteRule)
+
 	docs := h.Server.Group("/docs")
 	docs.Use(auth.NewBasicAuth(cfg))
 	docs.Get("/*", swagger.HandlerDefault)

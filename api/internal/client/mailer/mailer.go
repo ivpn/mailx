@@ -4,15 +4,18 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"embed"
+	"encoding/base64"
 	"fmt"
 	"html/template"
 	"io"
 	"log"
 	"maps"
+	"mime"
 	"net/mail"
 	"strconv"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/mnako/letters"
 	"ivpn.net/email/api/config"
@@ -95,7 +98,25 @@ func (mailer Mailer) Send(to string, subject string, body string) error {
 	return nil
 }
 
-func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data []byte, alias model.Alias) error {
+func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data []byte, alias model.Alias, outcome model.RuleOutcome) error {
+	m, messageID, err := mailer.buildReplyMessage(from, name, rcp, data, alias, outcome)
+	if err != nil {
+		return err
+	}
+
+	err = mailer.dialer.DialAndSend(m)
+	if err != nil {
+		return err
+	}
+
+	log.Printf("Email reply sent successfully, %s", messageID)
+
+	return nil
+}
+
+// buildReplyMessage builds the outgoing reply/send message without dialing the network, so it
+// can be unit tested in isolation.
+func (mailer Mailer) buildReplyMessage(from string, name string, rcp model.Recipient, data []byte, alias model.Alias, outcome model.RuleOutcome) (*gomail.Message, string, error) {
 	// Preprocess email data to decode RFC 2047 encoded headers
 	processedData, err := utils.PreprocessEmailData(data)
 	if err != nil {
@@ -121,7 +142,7 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 	reader := bytes.NewReader(processedData)
 	email, err := parser.Parse(reader)
 	if err != nil {
-		return err
+		return nil, "", err
 	}
 
 	email.Text = utils.RemoveHeader(email.Text)
@@ -135,7 +156,7 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 	// it cannot look up the charset (e.g. an empty-charset encoded-word that
 	// slipped through preprocessing).  DecodeHeaderWithCharset is a no-op when
 	// the subject is already plain text.
-	decodedSubject := utils.DecodeHeaderWithCharset(email.Headers.Subject)
+	decodedSubject := outcome.Subject(utils.DecodeHeaderWithCharset(email.Headers.Subject))
 
 	m := gomail.NewMessage()
 	m.SetAddressHeader("From", from, name)
@@ -175,19 +196,16 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 		)
 	}
 
-	err = mailer.dialer.DialAndSend(m)
-	if err != nil {
-		return err
-	}
-
-	log.Printf("Email reply sent successfully, %s", email.Headers.MessageID)
-
-	return nil
+	return m, string(email.Headers.MessageID), nil
 }
 
 // buildForwardMessage builds the outgoing forward message without dialing the network,
 // so the To: header logic can be unit tested in isolation.
-func (mailer Mailer) buildForwardMessage(from string, name string, to string, rcp model.Recipient, data []byte, templateFile string, templateData map[string]any, settings model.Settings, alias model.Alias, listUnsubscribe model.ListUnsubscribeHeaders) (*gomail.Message, string, error) {
+func (mailer Mailer) buildForwardMessage(from string, name string, to string, rcp model.Recipient, data []byte, templateFile string, templateData map[string]any, settings model.Settings, alias model.Alias, listUnsubscribe model.ListUnsubscribeHeaders, outcome model.RuleOutcome) (*gomail.Message, string, error) {
+	if outcome.DisableEncryption {
+		rcp.PGPEnabled = false
+	}
+
 	// Preprocess email data to decode RFC 2047 encoded headers
 	processedData, err := utils.PreprocessEmailData(data)
 	if err != nil {
@@ -214,6 +232,11 @@ func (mailer Mailer) buildForwardMessage(from string, name string, to string, rc
 	email, err := parser.Parse(reader)
 	if err != nil {
 		return nil, "", err
+	}
+
+	// The body of an email the sender encrypted can't be changed
+	if outcome.RemoveAttachments && !isAlreadyEncrypted(email) {
+		email.AttachedFiles = nil
 	}
 
 	removedTrackers := removeTrackers(&email, settings, rcp)
@@ -248,7 +271,7 @@ func (mailer Mailer) buildForwardMessage(from string, name string, to string, rc
 	// it cannot look up the charset (e.g. an empty-charset encoded-word that
 	// slipped through preprocessing).  DecodeHeaderWithCharset is a no-op when
 	// the subject is already plain text.
-	decodedSubject := utils.DecodeHeaderWithCharset(email.Headers.Subject)
+	decodedSubject := outcome.Subject(utils.DecodeHeaderWithCharset(email.Headers.Subject))
 
 	m := gomail.NewMessage()
 	m.SetAddressHeader("From", from, name)
@@ -304,6 +327,7 @@ func (mailer Mailer) buildForwardMessage(from string, name string, to string, rc
 	m.SetHeader("Feedback-ID", fmt.Sprintf("mailx:%x:forward", sha256.Sum256([]byte(mailer.cfg.TokenSecret+alias.ID))))
 	setListUnsubscribe(m, listUnsubscribe)
 	setTrackersRemoved(m, removedTrackers)
+	setRulesApplied(m, outcome.MatchedNames)
 
 	// PGP/Inline encryption
 	if rcp.PGPEnabled && rcp.PGPKey != "" && rcp.PGPInline {
@@ -348,6 +372,7 @@ func (mailer Mailer) buildForwardMessage(from string, name string, to string, rc
 		// Kept on the outer message so mail clients can still offer unsubscribe
 		setListUnsubscribe(em, listUnsubscribe)
 		setTrackersRemoved(em, removedTrackers)
+		setRulesApplied(em, outcome.MatchedNames)
 
 		return em, string(email.Headers.MessageID), nil
 	}
@@ -425,8 +450,56 @@ func setTrackersRemoved(m *gomail.Message, removed []trackers.Tracker) {
 	m.SetHeader("X-Mailx-Trackers-Removed", strconv.Itoa(len(removed)))
 }
 
-func (mailer Mailer) Forward(from string, name string, to string, rcp model.Recipient, data []byte, templateFile string, templateData map[string]any, settings model.Settings, alias model.Alias, listUnsubscribe model.ListUnsubscribeHeaders) error {
-	m, messageID, err := mailer.buildForwardMessage(from, name, to, rcp, data, templateFile, templateData, settings, alias, listUnsubscribe)
+// setRulesApplied lists the rules that matched a forward, so users can filter on them in their
+// mail client. It's never set on replies or sends, which go to third parties.
+func setRulesApplied(m *gomail.Message, names []string) {
+	if len(names) == 0 {
+		return
+	}
+
+	encoded := make([]string, len(names))
+	for i, name := range names {
+		encoded[i] = encodeRuleName(name)
+	}
+
+	// Each value is joined with ", " and folded by the writer
+	m.SetHeader("X-Mailx-Rules-Applied", encoded...)
+}
+
+// ruleNameSpecials are characters that are encoded in a rule name, so a name can't read as
+// several names, or as markup, to a mail client.
+const ruleNameSpecials = `,;<>"'()[]\=?`
+
+// encodeRuleName RFC 2047-encodes a rule name that has non-ASCII text or ruleNameSpecials, as
+// base64 encoded-words of at most 75 characters split on rune boundaries. Other names are used
+// as they are.
+func encodeRuleName(name string) string {
+	if !strings.ContainsAny(name, ruleNameSpecials) && mime.QEncoding.Encode("UTF-8", name) == name {
+		return name
+	}
+
+	// "=?UTF-8?b?" + "?=" leaves 63 characters, which is 45 bytes of base64 input
+	const maxChunk = 45
+
+	var words []string
+	for len(name) > 0 {
+		n := 0
+		for n < len(name) {
+			_, size := utf8.DecodeRuneInString(name[n:])
+			if n > 0 && n+size > maxChunk {
+				break
+			}
+			n += size
+		}
+		words = append(words, "=?UTF-8?b?"+base64.StdEncoding.EncodeToString([]byte(name[:n]))+"?=")
+		name = name[n:]
+	}
+
+	return strings.Join(words, " ")
+}
+
+func (mailer Mailer) Forward(from string, name string, to string, rcp model.Recipient, data []byte, templateFile string, templateData map[string]any, settings model.Settings, alias model.Alias, listUnsubscribe model.ListUnsubscribeHeaders, outcome model.RuleOutcome) error {
+	m, messageID, err := mailer.buildForwardMessage(from, name, to, rcp, data, templateFile, templateData, settings, alias, listUnsubscribe, outcome)
 	if err != nil {
 		return err
 	}

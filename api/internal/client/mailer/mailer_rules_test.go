@@ -6,6 +6,7 @@ import (
 	"mime"
 	"mime/multipart"
 	"net/mail"
+	"slices"
 	"strings"
 	"testing"
 
@@ -107,12 +108,7 @@ func collectParts(t *testing.T, contentType string, body io.Reader) []mimePart {
 }
 
 func (b builtMessage) hasPart(match func(mimePart) bool) bool {
-	for _, p := range b.parts {
-		if match(p) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(b.parts, match)
 }
 
 func decodedHeader(t *testing.T, h mail.Header, key string) string {

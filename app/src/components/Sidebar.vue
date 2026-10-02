@@ -51,7 +51,7 @@
         </nav>
         <div>
             <nav class="footer">
-                <div class="[@media(max-height:767px)]:hidden">
+                <div class="[@media(max-height:716px)]:hidden">
                     <router-link to="/announcements">
                         <i class="icon megaphone icon-primary"></i>
                         Announcements

@@ -132,6 +132,10 @@
         &.reorder {
             mask-image: url("../../assets/icons/icon-reorder.svg");
         }
+
+        &.menu {
+            mask-image: url("../../assets/icons/icon-menu.svg");
+        }
     }
 
     .logo {

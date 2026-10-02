@@ -55,6 +55,8 @@
                     <router-link to="/announcements">
                         <i class="icon megaphone icon-primary"></i>
                         Announcements
+                        <span v-if="hasUnread" class="w-1.5 h-1.5 rounded-full bg-yellow-500" aria-hidden="true"></span>
+                        <span v-if="hasUnread" class="sr-only">New announcements</span>
                     </router-link>
                     <router-link to="/faq">
                         <i class="icon question icon-primary"></i>
@@ -86,11 +88,13 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { userApi } from '../api/user.ts'
 import events from '../events.ts'
+import { useAnnouncements } from '../lib/announcements.ts'
 import ThemeSwitch from './ThemeSwitch.vue'
 
 const route = ref('/')
 const currentRoute = useRoute()
 const email = ref(localStorage.getItem('email'))
+const { hasUnread, refresh: refreshAnnouncements } = useAnnouncements()
 
 const logout = async () => {
     if (!confirm('Do you want to proceed with the logout?')) return
@@ -107,6 +111,7 @@ const onUpdateEmail = (event: any) => {
 
 onMounted(() => {
     events.on('user.update', onUpdateEmail)
+    refreshAnnouncements()
 })
 
 watch(currentRoute, (newRoute) => {

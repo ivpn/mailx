@@ -39,6 +39,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import { announcementsApi } from '../api/announcements.ts'
+import { useAnnouncements } from '../lib/announcements.ts'
 
 interface Announcement {
     title: string
@@ -52,6 +53,7 @@ const goBack = () => router.back()
 const list = ref<Announcement[]>([])
 const error = ref('')
 const loaded = ref(false)
+const { markSeen } = useAnnouncements()
 
 onMounted(() => {
     getList()
@@ -61,6 +63,7 @@ const getList = async () => {
     try {
         const response = await announcementsApi.getList()
         list.value = response.data
+        markSeen(response.data)
         loaded.value = true
         error.value = ''
     } catch (err) {

@@ -20,8 +20,10 @@
                 <router-link v-bind:class="{ 'active': route == '/account/profile' }" to="/account/profile" title="Account">
                     <i class="icon user icon-primary"></i>
                 </router-link>
-                <a v-bind:class="{ 'active': moreActive }" @click.stop="openMenu" title="More" aria-haspopup="dialog" :aria-expanded="menuOpen">
+                <a v-bind:class="{ 'active': moreActive }" class="relative" @click.stop="openMenu" title="More" aria-haspopup="dialog" :aria-expanded="menuOpen">
                     <i class="icon menu icon-primary"></i>
+                    <span v-if="hasUnread" class="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-yellow-500" aria-hidden="true"></span>
+                    <span v-if="hasUnread" class="sr-only">New announcements</span>
                 </a>
             </div>
         </nav>
@@ -85,6 +87,8 @@
                     <router-link to="/announcements">
                         <i class="icon megaphone icon-primary"></i>
                         Announcements
+                        <span v-if="hasUnread" class="w-1.5 h-1.5 rounded-full bg-yellow-500" aria-hidden="true"></span>
+                        <span v-if="hasUnread" class="sr-only">New announcements</span>
                     </router-link>
                     <router-link to="/faq">
                         <i class="icon question icon-primary"></i>
@@ -112,9 +116,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { userApi } from '../api/user.ts'
+import { useAnnouncements } from '../lib/announcements.ts'
 import ThemeSwitch from './ThemeSwitch.vue'
 
 const moreRoutes = [
@@ -126,6 +131,7 @@ const moreRoutes = [
 const route = ref('/')
 const currentRoute = useRoute()
 const menuOpen = ref(false)
+const { hasUnread, refresh: refreshAnnouncements } = useAnnouncements()
 
 const moreActive = computed(() => menuOpen.value || moreRoutes.includes(route.value))
 
@@ -163,6 +169,10 @@ watch(currentRoute, (newRoute) => {
     route.value = newRoute.path
     closeMenu()
 }, { immediate: true })
+
+onMounted(() => {
+    refreshAnnouncements()
+})
 
 onUnmounted(() => {
     document.body.style.overflow = ''

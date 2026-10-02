@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/go-sql-driver/mysql"
 	"ivpn.net/email/api/internal/model"
@@ -15,7 +16,8 @@ var (
 	ErrGetAliases           = errors.New("Unable to retrieve aliases.")
 	ErrGetAliasByName       = errors.New("alias not found:")
 	ErrDisabledAlias        = errors.New("alias disabled:")
-	ErrDeletedAlias         = errors.New("alias deleted:")
+	ErrPausedAlias          = errors.New("alias paused until:")
+	ErrDeletedAlias       = errors.New("alias deleted:")
 	ErrDisabledDomain       = errors.New("domain disabled:")
 	ErrPostAlias            = errors.New("Unable to create alias. Please try again.")
 	ErrPostInboundAlias     = errors.New("Unable to create inbound alias. Please try again.")
@@ -27,6 +29,10 @@ var (
 	ErrFailedImport         = errors.New("Failed to import aliases. Please check the format and try again.")
 	ErrFailedImportLimit    = errors.New("Failed to import aliases. You can only import up to 500 aliases at a time.")
 	ErrPostAliasInactiveSub = errors.New("Your subscription is not active. Please renew to create new aliases.")
+
+	ErrPauseAliasDuration      = errors.New("Choose a pause of 1 to 10 hours, days or weeks.")
+	ErrPauseAliasInactiveSub   = errors.New("Your subscription is not active. Please renew to pause aliases.")
+	ErrUnpauseAliasInactiveSub = errors.New("Your subscription is not active. Please renew to unpause aliases.")
 
 	ErrForgetAlias                = errors.New("Unable to permanently delete alias. Please try again.")
 	ErrForgetAliasNotCustomDomain = errors.New("Only custom domain aliases can be permanently deleted.")
@@ -51,6 +57,7 @@ type AliasStore interface {
 	PostAlias(context.Context, model.Alias, int, int) (model.Alias, error)
 	UpdateAlias(context.Context, model.Alias) error
 	UpdateAliasPinned(context.Context, string, string, bool) error
+	UpdateAliasPausedUntil(context.Context, string, string, *time.Time) error
 	UpdateAliasDescription(context.Context, string, string, string) error
 	DeleteAlias(context.Context, string, string) error
 	DeleteAliasByUserID(context.Context, string) error
@@ -118,6 +125,8 @@ func (s *Service) GetAlias(ctx context.Context, ID string, userID string) (model
 		return model.Alias{}, ErrGetAlias
 	}
 
+	alias.ClearExpiredPause(time.Now())
+
 	domainPart := aliasDomainPart(alias.Name)
 	alias.IsCustomDomain = isCustomAliasDomain(domainPart, s.Cfg.API.Domains)
 	if alias.IsCustomDomain {
@@ -159,7 +168,10 @@ func (s *Service) GetAliases(ctx context.Context, userID string, limit int, page
 		}
 	}
 
+	now := time.Now()
 	for i := range aliases {
+		aliases[i].ClearExpiredPause(now)
+
 		domainPart := aliasDomainPart(aliases[i].Name)
 		aliases[i].IsCustomDomain = isCustomAliasDomain(domainPart, s.Cfg.API.Domains)
 		if aliases[i].IsCustomDomain {
@@ -376,6 +388,78 @@ func (s *Service) UpdateAliasPinned(ctx context.Context, ID string, userID strin
 	}
 
 	return nil
+}
+
+// PauseAlias discards forwards to the alias for value units from now, replacing any pause that
+// is still running. The end time is worked out here, so a wrong client clock can't move it.
+func (s *Service) PauseAlias(ctx context.Context, ID string, userID string, value int, unit string) (time.Time, error) {
+	duration, err := model.PauseDuration(value, unit)
+	if err != nil {
+		return time.Time{}, ErrPauseAliasDuration
+	}
+
+	sub, err := s.GetSubscription(ctx, userID)
+	if err != nil {
+		log.Printf("error fetching subscription: %s", err.Error())
+		return time.Time{}, ErrUpdateAlias
+	}
+
+	if !sub.ActiveStatus() {
+		return time.Time{}, ErrPauseAliasInactiveSub
+	}
+
+	pausedUntil := time.Now().UTC().Truncate(time.Second).Add(duration)
+	err = s.Store.UpdateAliasPausedUntil(ctx, ID, userID, &pausedUntil)
+	if err != nil {
+		log.Printf("error pausing alias: %s", err.Error())
+		return time.Time{}, ErrUpdateAlias
+	}
+
+	return pausedUntil, nil
+}
+
+// UnpauseAlias ends a pause at once. It succeeds for an alias that isn't paused.
+func (s *Service) UnpauseAlias(ctx context.Context, ID string, userID string) error {
+	sub, err := s.GetSubscription(ctx, userID)
+	if err != nil {
+		log.Printf("error fetching subscription: %s", err.Error())
+		return ErrUpdateAlias
+	}
+
+	if !sub.ActiveStatus() {
+		return ErrUnpauseAliasInactiveSub
+	}
+
+	err = s.Store.UpdateAliasPausedUntil(ctx, ID, userID, nil)
+	if err != nil {
+		log.Printf("error unpausing alias: %s", err.Error())
+		return ErrUpdateAlias
+	}
+
+	return nil
+}
+
+// DiscardPausedMessage drops a forward to a paused alias the way a disabled alias does: the
+// alias records a block in its stats and, with diagnostics enabled, the discard is logged.
+func (s *Service) DiscardPausedMessage(alias model.Alias, from string, to string) {
+	ctx := context.Background()
+
+	if err := s.SaveMessage(ctx, alias, model.Block); err != nil {
+		log.Println("error saving message", err)
+	}
+
+	settings, err := s.GetSettings(ctx, alias.UserID)
+	if err != nil {
+		log.Println("error getting settings", err)
+		return
+	}
+
+	if settings.LogIssues && alias.PausedUntil != nil {
+		reason := ErrPausedAlias.Error() + " " + alias.PausedUntil.UTC().Format(time.RFC3339)
+		if err := s.ProcessDiagnosticLog(alias, from, to, reason, model.PausedAlias); err != nil {
+			log.Println("error processing diagnostic log", err)
+		}
+	}
 }
 
 func (s *Service) DeleteAlias(ctx context.Context, ID string, userID string) error {

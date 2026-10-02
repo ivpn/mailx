@@ -20,6 +20,30 @@ definitions:
       alias_format:
         type: string
     type: object
+  api.AliasPauseReq:
+    properties:
+      unit:
+        enum:
+        - hours
+        - days
+        - weeks
+        type: string
+      value:
+        maximum: 10
+        minimum: 1
+        type: integer
+    required:
+    - unit
+    - value
+    type: object
+  api.AliasPauseRes:
+    properties:
+      message:
+        type: string
+      paused_until:
+        example: "2026-10-15T08:00:00Z"
+        type: string
+    type: object
   api.AliasPinReq:
     properties:
       pinned:
@@ -444,6 +468,8 @@ definitions:
         type: string
       origin:
         $ref: '#/definitions/model.AliasOrigin'
+      paused_until:
+        type: string
       pinned:
         type: boolean
       recipients:
@@ -613,6 +639,7 @@ definitions:
     - inactive_subscription
     - blocked_sender
     - blocked_by_rule
+    - paused_alias
     type: string
     x-enum-varnames:
     - BounceMessage
@@ -624,6 +651,7 @@ definitions:
     - InactiveSubscription
     - BlockedSender
     - BlockedByRule
+    - PausedAlias
   model.Recipient:
     properties:
       created_at:
@@ -1090,6 +1118,68 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Update alias
+      tags:
+      - alias
+  /alias/{id}/pause:
+    delete:
+      consumes:
+      - application/json
+      description: End an alias's pause, so forwards are delivered again. Succeeds
+        for an alias that isn't paused.
+      parameters:
+      - description: Alias ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Unpause alias
+      tags:
+      - alias
+    put:
+      consumes:
+      - application/json
+      description: Discard forwards to the alias for 1-10 hours, days or weeks from
+        now. Replies and sends keep working. Pausing a paused alias replaces its end
+        time.
+      parameters:
+      - description: Alias ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Pause request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.AliasPauseReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.AliasPauseRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Pause alias
       tags:
       - alias
   /alias/{id}/pin:

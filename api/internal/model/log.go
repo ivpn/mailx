@@ -14,6 +14,7 @@ const (
 	InactiveSubscription LogType = "inactive_subscription"
 	BlockedSender        LogType = "blocked_sender"
 	BlockedByRule        LogType = "blocked_by_rule"
+	PausedAlias          LogType = "paused_alias"
 )
 
 type Log struct {

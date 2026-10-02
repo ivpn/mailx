@@ -126,6 +126,8 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	v1.Post("/alias", h.PostAlias) // removed limiter.New() for staging env
 	v1.Put("/alias/:id", h.UpdateAlias)
 	v1.Put("/alias/:id/pin", h.UpdateAliasPinned)
+	v1.Put("/alias/:id/pause", h.PauseAlias)
+	v1.Delete("/alias/:id/pause", h.UnpauseAlias)
 	v1.Delete("/alias/:id", h.DeleteAlias)
 	v1.Post("/alias/restore/:id", h.RestoreAlias)
 	v1.Delete("/alias/forget/:id", h.ForgetAlias)

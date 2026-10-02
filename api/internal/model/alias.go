@@ -3,6 +3,7 @@ package model
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -13,6 +14,7 @@ var (
 	ErrDailyAliasLimit      = errors.New("daily alias limit reached")
 	ErrInboundHourlyLimit   = errors.New("hourly inbound alias limit reached")
 	ErrBulkAliasNotEligible = errors.New("one or more selected aliases are not eligible for this action")
+	ErrInvalidPauseDuration = errors.New("invalid pause duration")
 )
 
 type AliasOrigin int
@@ -49,10 +51,56 @@ type Alias struct {
 	Wildcard         bool           `gorm:"column:catch_all" json:"wildcard"`
 	Origin           AliasOrigin    `json:"origin"`
 	Pinned           bool           `gorm:"default:false" json:"pinned"`
+	PausedUntil      *time.Time     `json:"paused_until"`
 	Stats            AliasStats     `gorm:"-" json:"stats"`
 	IsCustomDomain   bool           `gorm:"-" json:"is_custom_domain"`
 	IsDomainVerified *bool          `gorm:"-" json:"is_domain_verified"`
 	IsDomainEnabled  bool           `gorm:"-" json:"is_domain_enabled"`
+}
+
+// IsPaused reports whether forwards to the alias should be discarded at time now.
+func (a Alias) IsPaused(now time.Time) bool {
+	return a.PausedUntil != nil && a.PausedUntil.After(now)
+}
+
+// ClearExpiredPause drops a pause that has ended by now, so API clients only ever see a
+// future paused_until or null. Expired values are left in the database, where they count
+// as unpaused too.
+func (a *Alias) ClearExpiredPause(now time.Time) {
+	if !a.IsPaused(now) {
+		a.PausedUntil = nil
+	}
+}
+
+const (
+	MinPauseValue = 1
+	MaxPauseValue = 10
+)
+
+const (
+	PauseHours = "hours"
+	PauseDays  = "days"
+	PauseWeeks = "weeks"
+)
+
+// PauseDuration is the length of a pause of value units. Units are fixed lengths (a day is
+// 24h, a week 7 × 24h) rather than calendar-aware, so a DST change can shift the local end
+// time by an hour.
+func PauseDuration(value int, unit string) (time.Duration, error) {
+	if value < MinPauseValue || value > MaxPauseValue {
+		return 0, ErrInvalidPauseDuration
+	}
+
+	switch unit {
+	case PauseHours:
+		return time.Duration(value) * time.Hour, nil
+	case PauseDays:
+		return time.Duration(value) * 24 * time.Hour, nil
+	case PauseWeeks:
+		return time.Duration(value) * 7 * 24 * time.Hour, nil
+	default:
+		return 0, ErrInvalidPauseDuration
+	}
 }
 
 type AliasStats struct {

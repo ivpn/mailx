@@ -446,6 +446,99 @@ const docTemplate = `{
                 }
             }
         },
+        "/alias/{id}/pause": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Discard forwards to the alias for 1-10 hours, days or weeks from now. Replies and sends keep working. Pausing a paused alias replaces its end time.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "alias"
+                ],
+                "summary": "Pause alias",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Alias ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Pause request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.AliasPauseReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.AliasPauseRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "End an alias's pause, so forwards are delivered again. Succeeds for an alias that isn't paused.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "alias"
+                ],
+                "summary": "Unpause alias",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Alias ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
         "/alias/{id}/pin": {
             "put": {
                 "security": [
@@ -4225,6 +4318,40 @@ const docTemplate = `{
                 }
             }
         },
+        "api.AliasPauseReq": {
+            "type": "object",
+            "required": [
+                "unit",
+                "value"
+            ],
+            "properties": {
+                "unit": {
+                    "type": "string",
+                    "enum": [
+                        "hours",
+                        "days",
+                        "weeks"
+                    ]
+                },
+                "value": {
+                    "type": "integer",
+                    "maximum": 10,
+                    "minimum": 1
+                }
+            }
+        },
+        "api.AliasPauseRes": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "paused_until": {
+                    "type": "string",
+                    "example": "2026-10-15T08:00:00Z"
+                }
+            }
+        },
         "api.AliasPinReq": {
             "type": "object",
             "properties": {
@@ -4867,6 +4994,9 @@ const docTemplate = `{
                 "origin": {
                     "$ref": "#/definitions/model.AliasOrigin"
                 },
+                "paused_until": {
+                    "type": "string"
+                },
                 "pinned": {
                     "type": "boolean"
                 },
@@ -5111,7 +5241,8 @@ const docTemplate = `{
                 "unauthorised_send",
                 "inactive_subscription",
                 "blocked_sender",
-                "blocked_by_rule"
+                "blocked_by_rule",
+                "paused_alias"
             ],
             "x-enum-varnames": [
                 "BounceMessage",
@@ -5122,7 +5253,8 @@ const docTemplate = `{
                 "UnauthorisedSend",
                 "InactiveSubscription",
                 "BlockedSender",
-                "BlockedByRule"
+                "BlockedByRule",
+                "PausedAlias"
             ]
         },
         "model.Recipient": {

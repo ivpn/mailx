@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"time"
 
 	"golang.org/x/sync/errgroup"
 	"ivpn.net/email/api/internal/client/mailer"
@@ -149,6 +150,12 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 				}
 			}
 
+			continue
+		}
+
+		// Paused alias - forwards are discarded until paused_until. Replies/sends still work.
+		if relayType == model.Forward && alias.IsPaused(time.Now().UTC()) {
+			s.DiscardPausedMessage(alias, msg.From, to)
 			continue
 		}
 

@@ -150,6 +150,37 @@ func (f *fakeStore) ForgetAlias(ctx context.Context, ID string, userID string) e
 	return errNotFound
 }
 
+func (f *fakeStore) GetAlias(ctx context.Context, ID string, userID string) (model.Alias, error) {
+	for _, a := range f.aliases {
+		if a.ID == ID && a.UserID == userID && !a.DeletedAt.Valid {
+			return a, nil
+		}
+	}
+	return model.Alias{}, errNotFound
+}
+
+func (f *fakeStore) GetAliasCount(ctx context.Context, userID string, wildcard string, search string, status string) (int, error) {
+	aliases, _ := f.GetAliases(ctx, userID, 0, 0, "", "", wildcard, search, status)
+	return len(aliases), nil
+}
+
+func (f *fakeStore) GetVerifiedDomains(ctx context.Context, userID string) ([]model.Domain, error) {
+	return f.GetDomains(ctx, userID)
+}
+
+// UpdateAliasPausedUntil mirrors the repository: deleted aliases and other users' aliases are
+// not found.
+func (f *fakeStore) UpdateAliasPausedUntil(ctx context.Context, ID string, userID string, pausedUntil *time.Time) error {
+	for name, a := range f.aliases {
+		if a.ID == ID && a.UserID == userID && !a.DeletedAt.Valid {
+			a.PausedUntil = pausedUntil
+			f.aliases[name] = a
+			return nil
+		}
+	}
+	return errNotFound
+}
+
 func (f *fakeStore) BulkUpdateAliasEnabled(ctx context.Context, ids []string, userID string, enabled bool) error {
 	idSet := aliasIDSet(ids)
 	for name, a := range f.aliases {

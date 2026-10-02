@@ -6,6 +6,7 @@ import (
 	"io"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -42,6 +43,8 @@ type AliasService interface {
 	GetWildcardDomainInfo(context.Context, string, string) (model.WildcardDomainInfo, error)
 	UpdateAlias(context.Context, model.Alias) error
 	UpdateAliasPinned(context.Context, string, string, bool) error
+	PauseAlias(context.Context, string, string, int, string) (time.Time, error)
+	UnpauseAlias(context.Context, string, string) error
 	DeleteAlias(context.Context, string, string) error
 	ImportAliases(context.Context, []model.AliasImportReq, string) ([]model.Alias, error)
 	RestoreAlias(context.Context, string, string) error
@@ -530,6 +533,73 @@ func (h *Handler) UpdateAliasPinned(c *fiber.Ctx) error {
 	}
 
 	err = h.Service.UpdateAliasPinned(c.Context(), id, userID, req.Pinned)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": UpdateAliasSuccess,
+	})
+}
+
+// @Summary Pause alias
+// @Description Discard forwards to the alias for 1-10 hours, days or weeks from now. Replies and sends keep working. Pausing a paused alias replaces its end time.
+// @Tags alias
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path string true "Alias ID"
+// @Param body body AliasPauseReq true "Pause request"
+// @Success 200 {object} AliasPauseRes
+// @Failure 400 {object} ErrorRes
+// @Router /alias/{id}/pause [put]
+func (h *Handler) PauseAlias(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
+	id := c.Params("id")
+	req := AliasPauseReq{}
+	err := c.BodyParser(&req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	err = h.Validator.Struct(req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidRequest,
+		})
+	}
+
+	pausedUntil, err := h.Service.PauseAlias(c.Context(), id, userID, req.Value, req.Unit)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message":      UpdateAliasSuccess,
+		"paused_until": pausedUntil.UTC().Format(time.RFC3339),
+	})
+}
+
+// @Summary Unpause alias
+// @Description End an alias's pause, so forwards are delivered again. Succeeds for an alias that isn't paused.
+// @Tags alias
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path string true "Alias ID"
+// @Success 200 {object} SuccessRes
+// @Failure 400 {object} ErrorRes
+// @Router /alias/{id}/pause [delete]
+func (h *Handler) UnpauseAlias(c *fiber.Ctx) error {
+	userID := auth.GetUserID(c)
+	id := c.Params("id")
+	err := h.Service.UnpauseAlias(c.Context(), id, userID)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),

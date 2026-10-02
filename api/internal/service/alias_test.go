@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
@@ -682,4 +683,235 @@ func TestBulkForgetAlias(t *testing.T) {
 			t.Errorf("expected no aliases to be removed after a rejected batch, got %+v", store.aliases)
 		}
 	})
+}
+
+func gracePeriodSubscription() model.Subscription {
+	return model.Subscription{UpdatedAt: time.Now().Add(-60 * time.Hour), ActiveUntil: time.Now().Add(-time.Hour)}
+}
+
+func pendingDeleteSubscription() model.Subscription {
+	return model.Subscription{ActiveUntil: time.Now().Add(30 * 24 * time.Hour), Terminated: true}
+}
+
+func newPauseTestService(t *testing.T) (*Service, *fakeStore) {
+	t.Helper()
+
+	store := newFakeStore()
+	store.subscription = activeSubscription()
+	store.aliases["promo@mailx.net"] = model.Alias{BaseModel: model.BaseModel{ID: "alias-1"}, Name: "promo@mailx.net", UserID: "user-1", Enabled: true}
+	store.aliases["gone@mailx.net"] = model.Alias{
+		BaseModel: model.BaseModel{ID: "alias-deleted"}, Name: "gone@mailx.net", UserID: "user-1",
+		DeletedAt: gorm.DeletedAt{Time: time.Now(), Valid: true},
+	}
+	store.aliases["theirs@mailx.net"] = model.Alias{BaseModel: model.BaseModel{ID: "alias-other"}, Name: "theirs@mailx.net", UserID: "user-2", Enabled: true}
+
+	return newTestService(store), store
+}
+
+func TestPauseAlias(t *testing.T) {
+	tests := []struct {
+		value int
+		unit  string
+		want  time.Duration
+	}{
+		{value: 1, unit: "hours", want: time.Hour},
+		{value: 10, unit: "hours", want: 10 * time.Hour},
+		{value: 1, unit: "days", want: 24 * time.Hour},
+		{value: 10, unit: "days", want: 10 * 24 * time.Hour},
+		{value: 1, unit: "weeks", want: 7 * 24 * time.Hour},
+		{value: 10, unit: "weeks", want: 70 * 24 * time.Hour},
+	}
+
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%d %s", tt.value, tt.unit), func(t *testing.T) {
+			s, store := newPauseTestService(t)
+
+			before := time.Now().UTC().Truncate(time.Second)
+			got, err := s.PauseAlias(context.Background(), "alias-1", "user-1", tt.value, tt.unit)
+			after := time.Now().UTC()
+			if err != nil {
+				t.Fatalf("PauseAlias() error = %v", err)
+			}
+
+			if got.Location() != time.UTC {
+				t.Errorf("paused_until %v is not UTC", got)
+			}
+			if got.Before(before.Add(tt.want)) || got.After(after.Add(tt.want)) {
+				t.Errorf("paused_until = %v, want now + %v", got, tt.want)
+			}
+			if stored := store.aliases["promo@mailx.net"].PausedUntil; stored == nil || !stored.Equal(got) {
+				t.Errorf("stored paused_until = %v, want %v", stored, got)
+			}
+		})
+	}
+
+	t.Run("re-pausing replaces the end time", func(t *testing.T) {
+		s, store := newPauseTestService(t)
+
+		if _, err := s.PauseAlias(context.Background(), "alias-1", "user-1", 10, "weeks"); err != nil {
+			t.Fatalf("PauseAlias() error = %v", err)
+		}
+		got, err := s.PauseAlias(context.Background(), "alias-1", "user-1", 1, "hours")
+		if err != nil {
+			t.Fatalf("PauseAlias() error = %v", err)
+		}
+		if got.After(time.Now().Add(time.Hour)) {
+			t.Errorf("paused_until = %v, want the new 1 hour pause, not one added to the old pause", got)
+		}
+		if stored := store.aliases["promo@mailx.net"].PausedUntil; !stored.Equal(got) {
+			t.Errorf("stored paused_until = %v, want %v", stored, got)
+		}
+	})
+
+	t.Run("invalid durations are rejected", func(t *testing.T) {
+		s, store := newPauseTestService(t)
+
+		for _, tt := range []struct {
+			value int
+			unit  string
+		}{{0, "days"}, {11, "days"}, {1, "months"}} {
+			if _, err := s.PauseAlias(context.Background(), "alias-1", "user-1", tt.value, tt.unit); !errors.Is(err, ErrPauseAliasDuration) {
+				t.Errorf("PauseAlias(%d, %q) error = %v, want ErrPauseAliasDuration", tt.value, tt.unit, err)
+			}
+		}
+		if store.aliases["promo@mailx.net"].PausedUntil != nil {
+			t.Error("an invalid pause was stored")
+		}
+	})
+
+	for name, id := range map[string]string{
+		"another user's alias": "alias-other",
+		"a deleted alias":      "alias-deleted",
+		"an unknown ID":        "alias-missing",
+	} {
+		t.Run(name+" can't be paused", func(t *testing.T) {
+			s, store := newPauseTestService(t)
+
+			if _, err := s.PauseAlias(context.Background(), id, "user-1", 1, "days"); !errors.Is(err, ErrUpdateAlias) {
+				t.Errorf("PauseAlias() error = %v, want ErrUpdateAlias", err)
+			}
+			for _, a := range store.aliases {
+				if a.PausedUntil != nil {
+					t.Errorf("alias %s was paused", a.ID)
+				}
+			}
+		})
+	}
+}
+
+func TestUnpauseAlias(t *testing.T) {
+	t.Run("clears a running pause", func(t *testing.T) {
+		s, _ := newPauseTestService(t)
+		if _, err := s.PauseAlias(context.Background(), "alias-1", "user-1", 1, "days"); err != nil {
+			t.Fatalf("PauseAlias() error = %v", err)
+		}
+
+		if err := s.UnpauseAlias(context.Background(), "alias-1", "user-1"); err != nil {
+			t.Fatalf("UnpauseAlias() error = %v", err)
+		}
+		alias, err := s.GetAlias(context.Background(), "alias-1", "user-1")
+		if err != nil || alias.PausedUntil != nil {
+			t.Errorf("alias = %+v, %v, want paused_until nil", alias, err)
+		}
+	})
+
+	t.Run("succeeds for an alias that isn't paused", func(t *testing.T) {
+		s, _ := newPauseTestService(t)
+
+		if err := s.UnpauseAlias(context.Background(), "alias-1", "user-1"); err != nil {
+			t.Errorf("UnpauseAlias() error = %v", err)
+		}
+	})
+
+	for name, id := range map[string]string{
+		"another user's alias": "alias-other",
+		"a deleted alias":      "alias-deleted",
+		"an unknown ID":        "alias-missing",
+	} {
+		t.Run(name+" can't be unpaused", func(t *testing.T) {
+			s, _ := newPauseTestService(t)
+
+			if err := s.UnpauseAlias(context.Background(), id, "user-1"); !errors.Is(err, ErrUpdateAlias) {
+				t.Errorf("UnpauseAlias() error = %v, want ErrUpdateAlias", err)
+			}
+		})
+	}
+}
+
+func TestPauseAlias_Subscription(t *testing.T) {
+	inactive := map[string]model.Subscription{
+		"limited_access": {},
+		"pending_delete": pendingDeleteSubscription(),
+	}
+	for name, sub := range inactive {
+		t.Run(name+" rejects both and changes nothing", func(t *testing.T) {
+			s, store := newPauseTestService(t)
+			pausedUntil := time.Now().Add(time.Hour).UTC()
+			alias := store.aliases["promo@mailx.net"]
+			alias.PausedUntil = &pausedUntil
+			store.aliases["promo@mailx.net"] = alias
+			store.subscription = sub
+
+			if _, err := s.PauseAlias(context.Background(), "alias-1", "user-1", 10, "weeks"); !errors.Is(err, ErrPauseAliasInactiveSub) {
+				t.Errorf("PauseAlias() error = %v, want ErrPauseAliasInactiveSub", err)
+			}
+			if err := s.UnpauseAlias(context.Background(), "alias-1", "user-1"); !errors.Is(err, ErrUnpauseAliasInactiveSub) {
+				t.Errorf("UnpauseAlias() error = %v, want ErrUnpauseAliasInactiveSub", err)
+			}
+			if stored := store.aliases["promo@mailx.net"].PausedUntil; stored == nil || !stored.Equal(pausedUntil) {
+				t.Errorf("paused_until = %v, want the running pause kept", stored)
+			}
+		})
+	}
+
+	active := map[string]model.Subscription{
+		"active":       activeSubscription(),
+		"grace_period": gracePeriodSubscription(),
+	}
+	for name, sub := range active {
+		t.Run(name+" allows both", func(t *testing.T) {
+			s, store := newPauseTestService(t)
+			store.subscription = sub
+
+			if _, err := s.PauseAlias(context.Background(), "alias-1", "user-1", 1, "hours"); err != nil {
+				t.Errorf("PauseAlias() error = %v", err)
+			}
+			if err := s.UnpauseAlias(context.Background(), "alias-1", "user-1"); err != nil {
+				t.Errorf("UnpauseAlias() error = %v", err)
+			}
+		})
+	}
+}
+
+func TestGetAliases_ClearsExpiredPause(t *testing.T) {
+	s, store := newPauseTestService(t)
+	past := time.Now().Add(-time.Minute).UTC()
+	future := time.Now().Add(time.Hour).UTC()
+
+	expired := store.aliases["promo@mailx.net"]
+	expired.PausedUntil = &past
+	store.aliases["promo@mailx.net"] = expired
+	store.aliases["paused@mailx.net"] = model.Alias{BaseModel: model.BaseModel{ID: "alias-paused"}, Name: "paused@mailx.net", UserID: "user-1", PausedUntil: &future}
+
+	list, err := s.GetAliases(context.Background(), "user-1", 25, 1, "created_at", "DESC", "", "", "")
+	if err != nil {
+		t.Fatalf("GetAliases() error = %v", err)
+	}
+	for _, a := range list.Aliases {
+		switch a.ID {
+		case "alias-1":
+			if a.PausedUntil != nil {
+				t.Errorf("ended pause returned as %v, want nil", a.PausedUntil)
+			}
+		case "alias-paused":
+			if a.PausedUntil == nil || !a.PausedUntil.Equal(future) {
+				t.Errorf("running pause returned as %v, want %v", a.PausedUntil, future)
+			}
+		}
+	}
+
+	alias, err := s.GetAlias(context.Background(), "alias-1", "user-1")
+	if err != nil || alias.PausedUntil != nil {
+		t.Errorf("GetAlias() = %v, %v, want paused_until nil", alias.PausedUntil, err)
+	}
 }

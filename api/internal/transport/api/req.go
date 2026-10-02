@@ -63,6 +63,11 @@ type AliasPinReq struct {
 	Pinned bool `json:"pinned"`
 }
 
+type AliasPauseReq struct {
+	Value int    `json:"value" validate:"required,min=1,max=10"`
+	Unit  string `json:"unit" validate:"required,oneof=hours days weeks"`
+}
+
 type BulkAliasIDsReq struct {
 	IDs []string `json:"ids" validate:"required,min=1,max=500,dive,uuid"`
 }

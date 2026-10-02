@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -290,6 +291,31 @@ func (d *Database) DeleteAlias(ctx context.Context, ID string, userID string) er
 // soft-delete scope already excludes deleted_at rows here, same as UpdateAlias/DeleteAlias.
 func (d *Database) UpdateAliasPinned(ctx context.Context, ID string, userID string, pinned bool) error {
 	return d.Client.Model(&model.Alias{}).Where("id = ? AND user_id = ?", ID, userID).Update("pinned", pinned).Error
+}
+
+// UpdateAliasPausedUntil sets paused_until in isolation (nil unpauses), so pausing never touches
+// the fields the Edit modal saves. The soft-delete scope excludes deleted aliases, and an alias
+// that isn't found for userID is an error.
+func (d *Database) UpdateAliasPausedUntil(ctx context.Context, ID string, userID string, pausedUntil *time.Time) error {
+	q := d.Client.WithContext(ctx).Model(&model.Alias{}).Where("id = ? AND user_id = ?", ID, userID).Update("paused_until", pausedUntil)
+	if q.Error != nil {
+		return q.Error
+	}
+	if q.RowsAffected > 0 {
+		return nil
+	}
+
+	// MySQL reports 0 rows for a match whose values didn't change (e.g. unpausing an alias that
+	// isn't paused), so tell that apart from a missing alias.
+	var count int64
+	if err := d.Client.WithContext(ctx).Model(&model.Alias{}).Where("id = ? AND user_id = ?", ID, userID).Count(&count).Error; err != nil {
+		return err
+	}
+	if count == 0 {
+		return gorm.ErrRecordNotFound
+	}
+
+	return nil
 }
 
 // UpdateAliasDescription sets the description in isolation, so a rule changing it in the mail

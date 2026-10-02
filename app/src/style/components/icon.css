@@ -121,6 +121,10 @@
             mask-image: url("../../assets/icons/icon-pin.svg");
         }
 
+        &.pause {
+            mask-image: url("../../assets/icons/icon-pause.svg");
+        }
+
         &.filter {
             mask-image: url("../../assets/icons/icon-filter.svg");
         }

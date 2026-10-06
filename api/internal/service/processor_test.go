@@ -236,3 +236,15 @@ func TestProcessMessage_PauseOrderWithOtherChecks(t *testing.T) {
 		}
 	})
 }
+
+func TestProcessMessage_RecoversQueuePanic(t *testing.T) {
+	s, _, _ := newRuleTestService(t)
+	queueMessage = func(s *Service, from string, fromName string, to string, toHeader string, rcp model.Recipient, data []byte, alias model.Alias, msgType model.MessageType, settings model.Settings, listUnsubscribe model.ListUnsubscribeHeaders, outcome model.RuleOutcome) error {
+		panic("boom")
+	}
+
+	err := s.ProcessMessage(forwardEmail("Hello"), ruleAliasName)
+	if err == nil || !strings.Contains(err.Error(), "boom") {
+		t.Errorf("ProcessMessage() error = %v, want the panic as an error so Postfix retries", err)
+	}
+}

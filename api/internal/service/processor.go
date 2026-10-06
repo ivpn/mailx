@@ -3,7 +3,9 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
+	"runtime/debug"
 	"time"
 
 	"golang.org/x/sync/errgroup"
@@ -232,9 +234,18 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 		}
 
 		for _, recipient := range recipients {
-			g.Go(func() error {
+			g.Go(func() (err error) {
+				// The API's recover middleware can't catch a panic in this goroutine, and it would
+				// stop the server. As an error, Postfix retries the message instead.
+				defer func() {
+					if r := recover(); r != nil {
+						log.Printf("panic queueing message [alias: %s]: %v\n%s", alias.Name, r, debug.Stack())
+						err = fmt.Errorf("panic queueing message: %v", r)
+					}
+				}()
+
 				// Queue Message
-				err := queueMessage(s, msg.From, msg.FromName, to, toHeader, recipient, data, alias, relayType, settings, listUnsubscribe, outcome)
+				err = queueMessage(s, msg.From, msg.FromName, to, toHeader, recipient, data, alias, relayType, settings, listUnsubscribe, outcome)
 				if err != nil {
 					return err
 				}

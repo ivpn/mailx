@@ -11,7 +11,6 @@ import (
 	"log"
 	"maps"
 	"mime"
-	"net/mail"
 	"strconv"
 	"strings"
 	"time"
@@ -117,30 +116,7 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 // buildReplyMessage builds the outgoing reply/send message without dialing the network, so it
 // can be unit tested in isolation.
 func (mailer Mailer) buildReplyMessage(from string, name string, rcp model.Recipient, data []byte, alias model.Alias, outcome model.RuleOutcome) (*gomail.Message, string, error) {
-	// Preprocess email data to decode RFC 2047 encoded headers
-	processedData, err := utils.PreprocessEmailData(data)
-	if err != nil {
-		log.Printf("Warning: failed to preprocess email data: %v", err)
-		processedData = data // Fallback to original data
-	}
-
-	parser := letters.NewEmailParser(
-		// Malformed headers can cause the parser to fail,
-		// so we skip parsing of headers that are not needed for forwarding
-		letters.WithToHeaderParser(
-			func(header mail.Header, s string) ([]*mail.Address, error) {
-				return nil, nil
-			},
-		),
-		letters.WithReplyToHeaderParser(
-			func(header mail.Header, s string) ([]*mail.Address, error) {
-				return nil, nil
-			},
-		),
-	)
-
-	reader := bytes.NewReader(processedData)
-	email, err := parser.Parse(reader)
+	email, err := parseEmail(data)
 	if err != nil {
 		return nil, "", err
 	}
@@ -206,30 +182,7 @@ func (mailer Mailer) buildForwardMessage(from string, name string, to string, rc
 		rcp.PGPEnabled = false
 	}
 
-	// Preprocess email data to decode RFC 2047 encoded headers
-	processedData, err := utils.PreprocessEmailData(data)
-	if err != nil {
-		log.Printf("Warning: failed to preprocess email data: %v", err)
-		processedData = data // Fallback to original data
-	}
-
-	parser := letters.NewEmailParser(
-		// Malformed headers can cause the parser to fail,
-		// so we skip parsing of headers that are not needed for forwarding
-		letters.WithToHeaderParser(
-			func(header mail.Header, s string) ([]*mail.Address, error) {
-				return nil, nil
-			},
-		),
-		letters.WithReplyToHeaderParser(
-			func(header mail.Header, s string) ([]*mail.Address, error) {
-				return nil, nil
-			},
-		),
-	)
-
-	reader := bytes.NewReader(processedData)
-	email, err := parser.Parse(reader)
+	email, err := parseEmail(data)
 	if err != nil {
 		return nil, "", err
 	}

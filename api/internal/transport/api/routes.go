@@ -1,12 +1,15 @@
 package api
 
 import (
+	"log"
+	"runtime/debug"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/healthcheck"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/swagger"
 	"ivpn.net/email/api/config"
 	_ "ivpn.net/email/api/docs"
@@ -16,6 +19,14 @@ import (
 )
 
 func (h *Handler) SetupRoutes(cfg config.APIConfig) {
+	// First, so a panic in any handler fails only its request instead of stopping the server
+	h.Server.Use(recover.New(recover.Config{
+		EnableStackTrace: true,
+		StackTraceHandler: func(c *fiber.Ctx, e any) {
+			log.Printf("panic handling %s %s: %v\n%s", c.Method(), c.Path(), e, debug.Stack())
+		},
+	}))
+
 	email := h.Server.Group("/v1/email")
 	email.Use(auth.NewIPFilter(cfg.ApiAllowIPs))
 	email.Use(auth.NewPSK(cfg.PSK))

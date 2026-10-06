@@ -7,13 +7,13 @@ import { announcementsApi } from '../api/announcements.ts'
 // one the user saw on the Announcements page.
 const STORAGE_KEY = 'announcements.seen'
 
-// On a clean browser (nothing stored) only an announcement published in the last 48h
+// On a clean browser (nothing stored) only an announcement published in the last 2 weeks
 // counts as unread, so a fresh login doesn't light the dot for the whole backlog.
-const CLEAN_BROWSER_UNREAD_WINDOW_MS = 48 * 60 * 60 * 1000
+const CLEAN_BROWSER_UNREAD_WINDOW_MS = 14 * 24 * 60 * 60 * 1000
 
 // The nav stays mounted for the whole session, so re-check when the tab regains focus,
 // but no more often than this.
-const REFRESH_INTERVAL_MS = 5 * 60 * 1000
+const REFRESH_INTERVAL_MS = 30 * 60 * 1000
 
 const readSeen = (): string | null => {
     try {

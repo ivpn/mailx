@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/araddon/dateparse"
 	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/gofiber/fiber/v2"
 	"ivpn.net/email/api/internal/middleware/auth"
@@ -99,7 +98,7 @@ func (h *Handler) PostAccessKey(c *fiber.Ctx) error {
 
 	// Set expiration if provided
 	if req.ExpiresAt != "" {
-		expiresAt, err := dateparse.ParseAny(req.ExpiresAt)
+		expiresAt, err := parseExpiresAt(req.ExpiresAt)
 		if err != nil {
 			return c.Status(400).JSON(fiber.Map{
 				"error": ErrPostAccessKey,
@@ -307,4 +306,15 @@ func (h *Handler) GetDefaults(c *fiber.Ctx) error {
 		"list_unsubscribe_behaviour": settings.ListUnsubscribeBehaviour,
 		"block_trackers":             settings.BlockTrackers,
 	})
+}
+
+// parseExpiresAt accepts an RFC 3339 timestamp (what the app sends via
+// JSON-serialised Date, e.g. "2027-01-02T15:04:05.000Z") or a plain
+// YYYY-MM-DD date, interpreted as midnight UTC.
+func parseExpiresAt(s string) (time.Time, error) {
+	if t, err := time.Parse(time.RFC3339, s); err == nil {
+		return t, nil
+	}
+
+	return time.Parse(time.DateOnly, s)
 }

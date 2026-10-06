@@ -25,7 +25,7 @@
     "@tailwindcss/forms": "^0.5.10",
     "mitt": "^3.0.1",
     "preline": "^2.1.0",
-    "vue": "^3.5.21"
+    "vue": "^3.5.42"
   },
   "devDependencies": {
     "@wxt-dev/module-vue": "^1.0.2",
@@ -34,6 +34,13 @@
     "tailwindcss": "3",
     "typescript": "^5.9.2",
     "vue-tsc": "^3.0.6",
-    "wxt": "^0.20.6"
+    "wxt": "^0.20.27"
+  },
+  "resolutions": {
+    "publish-browser-extension": "^3.0.2",
+    "vite-node": "^5.3.0",
+    "vite": "^7.3.1",
+    "shell-quote": "~1.9.0",
+    "tmp": "^0.2.6"
   }
 }

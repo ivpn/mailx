@@ -87,7 +87,7 @@ import { ref, onMounted } from 'vue'
 import { userApi } from '../api/user.ts'
 import axios from 'axios'
 import overlay from '@preline/overlay'
-import QRious from 'qrious'
+import QRCode from 'qrcode'
 import events from '../events.ts'
 
 const req = ref({ otp: '' })
@@ -172,12 +172,20 @@ const totpEnableConfirm = async () => {
     }
 }
 
-const generateQRCode = (uri: string) => {
-    new QRious({
-        element: document.getElementById('totp_qr_code'),
-        value: uri,
-        size: 150,
-    })
+const generateQRCode = async (uri: string) => {
+    const canvas = document.getElementById('totp_qr_code') as HTMLCanvasElement | null
+    if (!canvas) return
+
+    try {
+        // Matches the previous qrious output: 150px, black on white, error correction level L.
+        await QRCode.toCanvas(canvas, uri, {
+            width: 150,
+            margin: 2,
+            errorCorrectionLevel: 'L',
+        })
+    } catch {
+        error.value = 'Failed to render QR code, please use the secret for manual setup.'
+    }
 }
 
 onMounted(() => {

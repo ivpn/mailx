@@ -55,6 +55,9 @@ func New(cfg config.SMTPClientConfig) Mailer {
 			dialer = &gomail.Dialer{Host: host, Port: port}
 		} else {
 			dialer = gomail.NewDialer(host, port, cfg.User, cfg.Password)
+			if cfg.StartTLS == "opportunistic" {
+				dialer.StartTLSPolicy = gomail.OpportunisticStartTLS
+			}
 		}
 
 		conn, err := dialer.Dial()

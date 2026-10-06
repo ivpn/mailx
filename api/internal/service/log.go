@@ -5,10 +5,10 @@ import (
 	"context"
 	"errors"
 	"log"
+	"net/mail"
 	"strings"
 	"time"
 
-	"github.com/araddon/dateparse"
 	"github.com/google/uuid"
 	"ivpn.net/email/api/internal/model"
 )
@@ -181,7 +181,7 @@ func (s *Service) ProcessBounceLog(userId string, aliasId string, data []byte, m
 			}
 		}
 		if after, ok := bytes.CutPrefix(line, []byte("Date:")); ok {
-			date, err = dateparse.ParseAny(string(bytes.TrimSpace(after)))
+			date, err = mail.ParseDate(string(bytes.TrimSpace(after)))
 			if err != nil {
 				log.Println("error parsing bounce date:", err.Error())
 			}

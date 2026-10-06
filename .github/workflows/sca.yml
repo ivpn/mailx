@@ -1,0 +1,62 @@
+name: Dependency vulnerability scan
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    # Weekly, so new advisories against unchanged code are caught too.
+    - cron: '0 6 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  govulncheck:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        dir: [api, mailserver/daemon]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      # Scan with the exact toolchain the production image is built with, so
+      # stdlib findings match what ships.
+      - name: Read Go version from Dockerfile
+        id: go
+        env:
+          DIR: ${{ matrix.dir }}
+        run: |
+          version=$(grep -oP '^FROM golang:\K[0-9.]+' "$DIR/Dockerfile")
+          test -n "$version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - name: Set up Go
+        uses: actions/setup-go@7b8cf10d4e4a01d4992d18a89f4d7dc5a3e6d6f4 # v4
+        with:
+          go-version: ${{ steps.go.outputs.version }}
+          cache: false
+      - name: govulncheck
+        working-directory: ${{ matrix.dir }}
+        run: go run golang.org/x/vuln/cmd/govulncheck@v1.8.0 ./...
+
+  osv-scanner:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - name: Set up Go
+        uses: actions/setup-go@7b8cf10d4e4a01d4992d18a89f4d7dc5a3e6d6f4 # v4
+        with:
+          go-version: '1.27'
+          cache: false
+      - name: osv-scanner
+        run: >-
+          go run github.com/google/osv-scanner/v2/cmd/osv-scanner@v2.6.0 scan source
+          --config .github/osv-scanner.toml
+          -L api/go.mod
+          -L mailserver/daemon/go.mod
+          -L app/yarn.lock
+          -L wxt/yarn.lock

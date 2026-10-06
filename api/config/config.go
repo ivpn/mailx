@@ -71,6 +71,7 @@ type SMTPClientConfig struct {
 	Report       string
 	TokenSecret  string
 	AppURL       string
+	StartTLS     string // "opportunistic" allows plaintext when the server doesn't offer STARTTLS; anything else requires it
 }
 
 type ServiceConfig struct {
@@ -241,6 +242,7 @@ func New() (Config, error) {
 			Report:       os.Getenv("SMTP_CLIENT_REPORT"),
 			TokenSecret:  os.Getenv("TOKEN_SECRET"),
 			AppURL:       strings.TrimSuffix(strings.TrimSpace(appURL), "/"),
+			StartTLS:     os.Getenv("SMTP_CLIENT_STARTTLS"),
 		},
 
 		Service: ServiceConfig{

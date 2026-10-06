@@ -19,6 +19,8 @@ jobs:
             target: FuzzParseMsg
           - package: ./internal/utils
             target: FuzzVerifyEmailAuth
+          - package: ./internal/utils
+            target: FuzzEncryptWithPGPInline
           - package: ./internal/client/mailer
             target: FuzzLettersParseEmail
           - package: ./internal/client/mailer

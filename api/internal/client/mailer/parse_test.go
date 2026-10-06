@@ -73,8 +73,11 @@ func TestParseEmail(t *testing.T) {
 	})
 
 	t.Run("rejects deep nesting quickly", func(t *testing.T) {
+		// Built before timing, as building the message is itself slow
+		data := nestedEmail(5000)
+
 		start := time.Now()
-		_, err := parseEmail(nestedEmail(5000))
+		_, err := parseEmail(data)
 		if !errors.Is(err, ErrMIMETooDeep) {
 			t.Fatalf("parseEmail() error = %v, want ErrMIMETooDeep", err)
 		}

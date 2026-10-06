@@ -1,5 +1,5 @@
 # stage 1: building application binary file
-FROM golang:1.27.1@sha256:1e93e00a31255c07e9a34c4207f3006e1501730c5323697cee7dfb827fdae44c AS builder
+FROM golang:1.26.8@sha256:2dbae744204892730b7032501f5973360ce57cfe118a194b338a97b5aa2d40cc AS builder
 
 RUN mkdir /daemon
 ADD . /daemon

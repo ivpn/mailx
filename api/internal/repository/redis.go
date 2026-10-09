@@ -101,6 +101,22 @@ func (r *Redis) Get(ctx context.Context, key string) (string, error) {
 	return r.Client.Get(ctx, key).Result()
 }
 
+// GetDel atomically reads and deletes a key. It uses MULTI/EXEC rather than GETDEL so it works on
+// Redis versions older than 6.2.
+func (r *Redis) GetDel(ctx context.Context, key string) (string, error) {
+	var get *redis.StringCmd
+	_, err := r.Client.TxPipelined(ctx, func(pipe redis.Pipeliner) error {
+		get = pipe.Get(ctx, key)
+		pipe.Del(ctx, key)
+		return nil
+	})
+	if err != nil {
+		return "", err
+	}
+
+	return get.Val(), nil
+}
+
 func (r *Redis) Del(ctx context.Context, key string) error {
 	return r.Client.Del(ctx, key).Err()
 }

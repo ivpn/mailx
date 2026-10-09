@@ -25,6 +25,7 @@ type Store interface {
 type Cache interface {
 	Set(context.Context, string, any, time.Duration) error
 	Get(context.Context, string) (string, error)
+	GetDel(context.Context, string) (string, error)
 	Del(context.Context, string) error
 	Incr(context.Context, string, time.Duration) error
 }

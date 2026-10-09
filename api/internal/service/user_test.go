@@ -57,6 +57,17 @@ func (c *totpTestCache) Get(ctx context.Context, key string) (string, error) {
 	return v, nil
 }
 
+func (c *totpTestCache) GetDel(ctx context.Context, key string) (string, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	v, ok := c.data[key]
+	if !ok {
+		return "", errNotFound
+	}
+	delete(c.data, key)
+	return v, nil
+}
+
 func (c *totpTestCache) Del(ctx context.Context, key string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()

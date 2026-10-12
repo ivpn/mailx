@@ -13,7 +13,8 @@ import (
 
 func (d *Database) GetSession(ctx context.Context, token string) (model.Session, bool, error) {
 	var session model.Session
-	q := d.Client.Where("token = ?", token).Find(&session)
+	// Expired rows are only purged hourly by cron, so expiry is enforced here as well
+	q := d.Client.Where("token = ? AND expires_at > ?", token, time.Now()).Find(&session)
 	if q.RowsAffected == 0 {
 		return model.Session{}, false, fmt.Errorf("could not get session by token")
 	}

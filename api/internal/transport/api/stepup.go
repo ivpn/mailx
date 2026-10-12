@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 	"log"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
@@ -91,15 +90,7 @@ func (h *Handler) StepUpPasskeyBegin(c *fiber.Ctx) error {
 		})
 	}
 
-	exp := time.Now().Add(auth.WebAuthnCeremonyExpiration)
-	token, err := model.GenSessionToken()
-	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"error": ErrSaveSession,
-		})
-	}
-	sessionData.Expires = exp
-	err = h.Service.SaveSession(c.Context(), *sessionData, token, user.ID, exp, false)
+	token, err := h.Service.SaveCeremony(c.Context(), model.Ceremony{UserID: user.ID, SessionData: *sessionData}, auth.WebAuthnCeremonyExpiration)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrSaveSession,
@@ -121,23 +112,22 @@ func (h *Handler) StepUpPasskeyBegin(c *fiber.Ctx) error {
 // @Failure 400 {object} ErrorRes
 // @Router /user/stepup/passkey/finish [post]
 func (h *Handler) StepUpPasskeyFinish(c *fiber.Ctx) error {
-	token := c.Cookies(auth.AUTHN_TEMP_COOKIE)
-
-	session, ok, err := h.Service.GetSession(c.Context(), token)
-	if err != nil || !ok {
+	ceremony, err := h.Service.ConsumeCeremony(c.Context(), c.Cookies(auth.AUTHN_TEMP_COOKIE))
+	auth.ClearCookies(c, auth.AUTHN_TEMP_COOKIE)
+	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrGetSession,
 		})
 	}
 
 	// Ensure the ceremony belongs to the already-logged-in caller
-	if auth.GetUserID(c) != session.UserID {
+	if auth.GetUserID(c) != ceremony.UserID {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrGetSession,
 		})
 	}
 
-	user, err := h.Service.GetUser(c.Context(), session.UserID)
+	user, err := h.Service.GetUser(c.Context(), ceremony.UserID)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
@@ -151,7 +141,7 @@ func (h *Handler) StepUpPasskeyFinish(c *fiber.Ctx) error {
 		})
 	}
 
-	credential, err := h.WebAuthn.FinishLogin(user, session.SessionData, r)
+	credential, err := h.WebAuthn.FinishLogin(user, ceremony.SessionData, r)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
@@ -170,14 +160,6 @@ func (h *Handler) StepUpPasskeyFinish(c *fiber.Ctx) error {
 			"error": err.Error(),
 		})
 	}
-
-	err = h.Service.DeleteSession(c.Context(), token)
-	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"error": ErrDeleteSession,
-		})
-	}
-	auth.ClearCookies(c, auth.AUTHN_TEMP_COOKIE)
 
 	err = h.Service.SetStepUp(c.Context(), auth.GetAuthnCookie(c))
 	if err != nil {

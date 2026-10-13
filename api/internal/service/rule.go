@@ -433,7 +433,7 @@ func (s *Service) RuleRecipients(ctx context.Context, alias model.Alias, recipie
 	}
 
 	if len(result) == 0 {
-		log.Printf("rule recipients for alias %s are no longer available, using the alias's recipients", alias.Name)
+		log.Printf("rule recipients for alias %s are no longer available, using the alias's recipients", alias.ID)
 		return recipients
 	}
 

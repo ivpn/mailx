@@ -57,7 +57,7 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 				}
 			}
 
-			log.Println("error parsing message [alias:", alias.Name, "]:", parseErr)
+			log.Println("error parsing message [alias:", alias.ID, "]:", parseErr)
 		}
 
 		// Disable fallback logging to avoid cluttering
@@ -69,14 +69,14 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 	if msg.Type == model.FailBounce {
 		alias, err := s.FindAlias(msg.From)
 		if err != nil {
-			log.Println("error processing bounce:", err, alias.Name)
+			log.Println("error processing bounce:", err, alias.ID)
 			// Fail silently so bounce messages are not kept in postfix queue
 			return nil
 		}
 
 		err = s.ProcessBounceLog(alias.UserID, alias.ID, data, msg)
 		if err != nil {
-			log.Println("error processing bounce:", err, alias.Name)
+			log.Println("error processing bounce:", err, alias.ID)
 		}
 
 		// Fail silently so bounce messages are not kept in postfix queue
@@ -102,7 +102,7 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 	for _, to := range utils.SelectTargets(msg.To, envelopeRecipient) {
 		recipients, alias, relayType, err := s.FindRecipients(msg.From, to, msg.Type)
 		if err != nil {
-			log.Println("error processing message:", err, alias.Name)
+			log.Println("error processing message:", err, alias.ID)
 
 			// Handle ErrNoVerifiedRecipients
 			if errors.Is(err, ErrNoVerifiedRecipients) {
@@ -210,7 +210,7 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 			if err == nil {
 				alias.BaseModel = inboundAlias.BaseModel
 			} else {
-				log.Println("error auto-creating inbound alias:", err, alias.Name)
+				log.Println("error auto-creating inbound alias:", err)
 			}
 		}
 
@@ -239,7 +239,7 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 				// stop the server. As an error, Postfix retries the message instead.
 				defer func() {
 					if r := recover(); r != nil {
-						log.Printf("panic queueing message [alias: %s]: %v\n%s", alias.Name, r, debug.Stack())
+						log.Printf("panic queueing message [alias: %s]: %v\n%s", alias.ID, r, debug.Stack())
 						err = fmt.Errorf("panic queueing message: %v", r)
 					}
 				}()
@@ -268,7 +268,7 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 }
 
 func (s *Service) QueueMessage(from string, fromName string, to string, toHeader string, rcp model.Recipient, data []byte, alias model.Alias, msgType model.MessageType, settings model.Settings, listUnsubscribe model.ListUnsubscribeHeaders, outcome model.RuleOutcome) error {
-	mailer := mailer.New(s.Cfg.SMTPClient)
+	client := mailer.New(s.Cfg.SMTPClient)
 
 	// Queue Forward
 	if msgType == model.Forward {
@@ -280,7 +280,7 @@ func (s *Service) QueueMessage(from string, fromName string, to string, toHeader
 			fromName = outcome.FromName
 		}
 		generatedFrom := model.GenerateReplyTo(alias.Name, from)
-		err := mailer.Forward(generatedFrom, fromName, toHeader, rcp, data, "header.tmpl", templateData, settings, alias, listUnsubscribe, outcome)
+		err := client.Forward(generatedFrom, fromName, toHeader, rcp, data, "header.tmpl", templateData, settings, alias, listUnsubscribe, outcome)
 		if err != nil {
 			if settings.LogIssues {
 				err := s.ProcessDiagnosticLog(alias, from, rcp.Email, err.Error(), model.DeferredDelivery)
@@ -289,7 +289,7 @@ func (s *Service) QueueMessage(from string, fromName string, to string, toHeader
 				}
 			}
 
-			log.Println("error forwarding message [alias:", alias.Name, "]:", err)
+			log.Println("error forwarding message [alias:", alias.ID, "]:", mailer.ErrorClass(err))
 			return err
 		}
 	} else {
@@ -300,7 +300,7 @@ func (s *Service) QueueMessage(from string, fromName string, to string, toHeader
 			return err
 		}
 
-		err = mailer.Reply(alias.Name, replyFromName(alias, settings, outcome), rcp, data, alias, outcome)
+		err = client.Reply(alias.Name, replyFromName(alias, settings, outcome), rcp, data, alias, outcome)
 		if err != nil {
 			if settings.LogIssues {
 				err := s.ProcessDiagnosticLog(alias, from, rcp.Email, err.Error(), model.DeferredDelivery)
@@ -309,7 +309,7 @@ func (s *Service) QueueMessage(from string, fromName string, to string, toHeader
 				}
 			}
 
-			log.Println("error sending message [alias:", alias.Name, "]:", err)
+			log.Println("error sending message [alias:", alias.ID, "]:", mailer.ErrorClass(err))
 			return err
 		}
 	}

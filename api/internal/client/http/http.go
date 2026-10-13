@@ -40,7 +40,7 @@ func (h Http) SignupWebhook(subID string) error {
 	if status != http.StatusOK {
 		// Log response for debugging
 		log.Printf("Error calling signup webhook, status: %d", status)
-		log.Printf("Signup webhook response: %s", string(res))
+		// log.Printf("Signup webhook response: %s", string(res))
 		return errors.New("error response from signup webhook")
 	}
 

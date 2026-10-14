@@ -26,8 +26,7 @@ func ErrorClass(err error) string {
 		return ""
 	}
 
-	var tpErr *textproto.Error
-	if errors.As(err, &tpErr) {
+	if tpErr, ok := errors.AsType[*textproto.Error](err); ok {
 		if m := enhancedCode.FindStringSubmatch(tpErr.Msg); m != nil {
 			return fmt.Sprintf("smtp %03d %s", tpErr.Code, m[1])
 		}
@@ -47,8 +46,7 @@ func ErrorClass(err error) string {
 		return err.Error()
 	}
 
-	var netErr net.Error
-	if errors.As(err, &netErr) {
+	if netErr, ok := errors.AsType[net.Error](err); ok {
 		if netErr.Timeout() {
 			return "network timeout"
 		}

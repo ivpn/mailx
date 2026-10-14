@@ -49,6 +49,10 @@
         &.blocked_by_rule {
             @apply bg-indigo-500 dark:bg-indigo-700 text-white font-semibold;
         }
+        
+        &.no_recipients {
+            @apply bg-orange-500 dark:bg-orange-700 text-white font-semibold;
+        }
 
         &.small {
             @apply py-0.5 px-1.5 text-xs;

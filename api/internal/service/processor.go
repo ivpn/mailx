@@ -104,6 +104,10 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 
 	for _, to := range utils.SelectTargets(msg.To, envelopeRecipient) {
 		recipients, alias, relayType, err := s.FindRecipients(msg.From, to, msg.Type)
+		// No recipient means the email would be dropped silently, so log it as ErrNoRecipients
+		if err == nil && len(recipients) == 0 {
+			err = ErrNoRecipients
+		}
 		if err != nil {
 			log.Println("error processing message:", err, alias.ID)
 

@@ -79,6 +79,9 @@ func (s *Service) PostBlocklistItem(ctx context.Context, item model.BlocklistIte
 
 func (s *Service) DeleteBlocklistItem(ctx context.Context, ID string, userID string) error {
 	err := s.Store.DeleteBlocklistItem(ctx, ID, userID)
+	if errors.Is(err, model.ErrBlocklistItemNotFound) {
+		return err
+	}
 	if err != nil {
 		log.Printf("error deleting blocklist item: %s", err.Error())
 		return ErrDeleteBlocklistItem

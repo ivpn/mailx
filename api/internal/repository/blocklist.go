@@ -52,8 +52,18 @@ func (d *Database) IncrementBlocklistBlocked(ctx context.Context, ID string) err
 		UpdateColumn("blocked", gorm.Expr("blocked + ?", 1)).Error
 }
 
+// DeleteBlocklistItem returns ErrBlocklistItemNotFound when no row matched, so a missing ID and
+// another user's ID are reported the same way, without revealing whether the ID exists.
 func (d *Database) DeleteBlocklistItem(ctx context.Context, ID string, userID string) error {
-	return d.Client.WithContext(ctx).Where("id = ? AND user_id = ?", ID, userID).Delete(&model.BlocklistItem{}).Error
+	res := d.Client.WithContext(ctx).Where("id = ? AND user_id = ?", ID, userID).Delete(&model.BlocklistItem{})
+	if res.Error != nil {
+		return res.Error
+	}
+	if res.RowsAffected == 0 {
+		return model.ErrBlocklistItemNotFound
+	}
+
+	return nil
 }
 
 func (d *Database) DeleteBlocklistByUserID(ctx context.Context, userID string) error {

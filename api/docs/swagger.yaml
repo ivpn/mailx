@@ -640,6 +640,7 @@ definitions:
     - blocked_sender
     - blocked_by_rule
     - paused_alias
+    - no_recipients
     type: string
     x-enum-varnames:
     - BounceMessage
@@ -652,6 +653,7 @@ definitions:
     - BlockedSender
     - BlockedByRule
     - PausedAlias
+    - NoRecipients
   model.Recipient:
     properties:
       created_at:
@@ -1877,6 +1879,10 @@ paths:
             $ref: '#/definitions/api.SuccessRes'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/api.ErrorRes'
       security:

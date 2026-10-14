@@ -1498,6 +1498,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
                     }
                 }
             }
@@ -5242,7 +5248,8 @@ const docTemplate = `{
                 "inactive_subscription",
                 "blocked_sender",
                 "blocked_by_rule",
-                "paused_alias"
+                "paused_alias",
+                "no_recipients"
             ],
             "x-enum-varnames": [
                 "BounceMessage",
@@ -5254,7 +5261,8 @@ const docTemplate = `{
                 "InactiveSubscription",
                 "BlockedSender",
                 "BlockedByRule",
-                "PausedAlias"
+                "PausedAlias",
+                "NoRecipients"
             ]
         },
         "model.Recipient": {

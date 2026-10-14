@@ -1487,6 +1487,12 @@
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
                     }
                 }
             }
@@ -5231,7 +5237,8 @@
                 "inactive_subscription",
                 "blocked_sender",
                 "blocked_by_rule",
-                "paused_alias"
+                "paused_alias",
+                "no_recipients"
             ],
             "x-enum-varnames": [
                 "BounceMessage",
@@ -5243,7 +5250,8 @@
                 "InactiveSubscription",
                 "BlockedSender",
                 "BlockedByRule",
-                "PausedAlias"
+                "PausedAlias",
+                "NoRecipients"
             ]
         },
         "model.Recipient": {

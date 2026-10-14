@@ -14,10 +14,21 @@ import (
 type blocklistStore struct {
 	*fakeStore
 
-	items       []model.BlocklistItem
-	matchErr    error
-	incremented []string
-	logs        []model.Log
+	items         []model.BlocklistItem
+	matchErr      error
+	incremented   []string
+	logs          []model.Log
+	postedAliases []model.Alias
+}
+
+// PostAlias records auto-created (catch-all) aliases so tests can assert none were created.
+func (b *blocklistStore) PostAlias(ctx context.Context, alias model.Alias, maxDaily int, maxInboundHourly int) (model.Alias, error) {
+	b.postedAliases = append(b.postedAliases, alias)
+	return alias, nil
+}
+
+func (b *blocklistStore) GetVerifiedDomains(ctx context.Context, userID string) ([]model.Domain, error) {
+	return b.GetDomains(ctx, userID)
 }
 
 func (b *blocklistStore) FindBlocklistMatches(ctx context.Context, userID string, email string, domains []string) ([]model.BlocklistItem, error) {
@@ -143,4 +154,71 @@ func TestBlockMessage(t *testing.T) {
 			t.Errorf("expected no diagnostic log, got %+v", store.logs)
 		}
 	})
+}
+
+// blockedSenderMsg is an authenticated message from a sender on the blocked.com domain.
+func blockedSenderMsg(to string) []byte {
+	return []byte("Authentication-Results: mx.test; dkim=pass header.d=blocked.com\r\n" +
+		"From: Spammer <spammer@blocked.com>\r\n" +
+		"To: " + to + "\r\n" +
+		"Subject: hi\r\n" +
+		"Message-ID: <1@blocked.com>\r\n\r\nbody\r\n")
+}
+
+func logTypes(logs []model.Log) []model.LogType {
+	types := []model.LogType{}
+	for _, lg := range logs {
+		types = append(types, lg.Type)
+	}
+	return types
+}
+
+// A blocked sender on a catch-all domain is blocked, counted and logged before the catch-all
+// alias would be auto-created.
+func TestProcessMessage_BlockedSenderOnCatchAllDomain(t *testing.T) {
+	item := model.BlocklistItem{BaseModel: model.BaseModel{ID: "item-1"}, UserID: "user-1", Type: model.BlocklistDomain, Value: "blocked.com"}
+	s, store := newBlocklistTestService(item)
+	store.domains["customdomain.com"] = model.Domain{Name: "customdomain.com", UserID: "user-1", Enabled: true, CatchAll: true, CreateAlias: true, Recipient: "me@example.com"}
+	store.settingsByUser["user-1"] = model.Settings{LogIssues: true}
+	store.verifiedRecipients["user-1"] = []model.Recipient{{Email: "me@example.com", IsActive: true}}
+
+	if err := s.ProcessMessage(blockedSenderMsg("random@customdomain.com"), "random@customdomain.com"); err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+
+	if !slices.Equal(store.incremented, []string{"item-1"}) {
+		t.Errorf("expected item-1 blocked count to be incremented, got %v", store.incremented)
+	}
+	if !slices.Equal(logTypes(store.logs), []model.LogType{model.BlockedSender}) {
+		t.Errorf("expected a single blocked_sender log, got %v", logTypes(store.logs))
+	}
+	if len(store.postedMessages) != 1 || store.postedMessages[0].Type != model.Block || store.postedMessages[0].UserID != "user-1" {
+		t.Errorf("expected one account-level Block message, got %+v", store.postedMessages)
+	}
+	if len(store.postedAliases) != 0 {
+		t.Errorf("expected no catch-all alias to be created, got %+v", store.postedAliases)
+	}
+}
+
+// A disabled alias discards the message before the blocklist is consulted, so the email gets a
+// single reason: one disabled_alias log, one Block stat and no blocklist count.
+func TestProcessMessage_DisabledAliasTakesPrecedenceOverBlocklist(t *testing.T) {
+	item := model.BlocklistItem{BaseModel: model.BaseModel{ID: "item-1"}, UserID: "user-1", Type: model.BlocklistDomain, Value: "blocked.com"}
+	s, store := newBlocklistTestService(item)
+	store.aliases["myalias@mailx.net"] = model.Alias{BaseModel: model.BaseModel{ID: "alias-1"}, Name: "myalias@mailx.net", UserID: "user-1", Enabled: false, Recipients: "me@example.com"}
+	store.settingsByUser["user-1"] = model.Settings{LogIssues: true}
+
+	if err := s.ProcessMessage(blockedSenderMsg("myalias@mailx.net"), "myalias@mailx.net"); err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+
+	if len(store.incremented) != 0 {
+		t.Errorf("expected no blocklist count for a disabled alias, got %v", store.incremented)
+	}
+	if !slices.Equal(logTypes(store.logs), []model.LogType{model.DisabledAlias}) {
+		t.Errorf("expected a single disabled_alias log, got %v", logTypes(store.logs))
+	}
+	if len(store.postedMessages) != 1 {
+		t.Errorf("expected exactly one Block message, got %+v", store.postedMessages)
+	}
 }

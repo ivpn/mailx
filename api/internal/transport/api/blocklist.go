@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"errors"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -13,6 +14,7 @@ var (
 	ErrGetBlocklist            = "Unable to retrieve blocklist for this user."
 	ErrInvalidBlocklistEmail   = "Please enter a valid email address."
 	ErrInvalidBlocklistDomain  = "Please enter a valid domain."
+	ErrBlocklistItemNotFound   = "Blocklist entry not found."
 	PostBlocklistItemSuccess   = "Added to blocklist."
 	DeleteBlocklistItemSuccess = "Removed from blocklist."
 )
@@ -133,12 +135,18 @@ func (h *Handler) PostBlocklistItem(c *fiber.Ctx) error {
 // @Param id path string true "Blocklist entry ID"
 // @Success 200 {object} SuccessRes
 // @Failure 400 {object} ErrorRes
+// @Failure 404 {object} ErrorRes
 // @Router /blocklist/{id} [delete]
 func (h *Handler) DeleteBlocklistItem(c *fiber.Ctx) error {
 	userID := auth.GetUserID(c)
 	ID := c.Params("id")
 
 	err := h.Service.DeleteBlocklistItem(c.Context(), ID, userID)
+	if errors.Is(err, model.ErrBlocklistItemNotFound) {
+		return c.Status(404).JSON(fiber.Map{
+			"error": ErrBlocklistItemNotFound,
+		})
+	}
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),

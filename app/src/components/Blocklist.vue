@@ -147,6 +147,8 @@ const deleteItem = async (item: typeof blocklistItem) => {
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.response?.data.error || err.message
+            // Already gone (e.g. removed in another tab), so drop the stale row.
+            if (err.response?.status === 404) getList()
         }
     }
 }

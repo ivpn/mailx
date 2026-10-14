@@ -1,7 +1,12 @@
 package model
 
 import (
+	"errors"
 	"strings"
+)
+
+var (
+	ErrBlocklistItemNotFound = errors.New("blocklist item not found")
 )
 
 type BlocklistType string

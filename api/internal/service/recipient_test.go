@@ -329,7 +329,7 @@ func TestFindRecipients_PlusTagResolvesExistingAlias(t *testing.T) {
 		Enabled:    true,
 		Recipients: "rcpt@example.com",
 	}
-	store.recipients["user-1"] = []model.Recipient{{Email: "rcpt@example.com"}}
+	store.recipients["user-1"] = []model.Recipient{{Email: "rcpt@example.com", IsActive: true}}
 	s := newTestService(store)
 
 	rcps, alias, msgType, err := s.FindRecipients("sender@somewhere.com", "myalias+shop@mailx.net", model.Send)
@@ -364,7 +364,7 @@ func TestFindRecipients_AliasWithPlusInNameResolvesVerbatim(t *testing.T) {
 		Enabled:  true,
 		CatchAll: true,
 	}
-	store.recipients["user-1b"] = []model.Recipient{{Email: "rcpt@example.com"}}
+	store.recipients["user-1b"] = []model.Recipient{{Email: "rcpt@example.com", IsActive: true}}
 	s := newTestService(store)
 
 	rcps, alias, msgType, err := s.FindRecipients("sender@somewhere.com", "a+b-c_d897611@customdomain.com", model.Send)
@@ -386,18 +386,20 @@ func TestFindRecipients_AliasWithPlusInNameResolvesVerbatim(t *testing.T) {
 func TestFindRecipients_ExactPlusAliasPreferredOverBaseAlias(t *testing.T) {
 	store := newFakeStore()
 	store.aliases["myalias@mailx.net"] = model.Alias{
-		BaseModel: model.BaseModel{ID: "alias-base"},
-		Name:      "myalias@mailx.net",
-		UserID:    "user-1c",
-		Enabled:   true,
+		BaseModel:  model.BaseModel{ID: "alias-base"},
+		Name:       "myalias@mailx.net",
+		UserID:     "user-1c",
+		Enabled:    true,
+		Recipients: "rcpt@example.com",
 	}
 	store.aliases["myalias+shop@mailx.net"] = model.Alias{
-		BaseModel: model.BaseModel{ID: "alias-exact"},
-		Name:      "myalias+shop@mailx.net",
-		UserID:    "user-1c",
-		Enabled:   true,
+		BaseModel:  model.BaseModel{ID: "alias-exact"},
+		Name:       "myalias+shop@mailx.net",
+		UserID:     "user-1c",
+		Enabled:    true,
+		Recipients: "rcpt@example.com",
 	}
-	store.recipients["user-1c"] = []model.Recipient{{Email: "rcpt@example.com"}}
+	store.recipients["user-1c"] = []model.Recipient{{Email: "rcpt@example.com", IsActive: true}}
 	s := newTestService(store)
 
 	_, alias, _, err := s.FindRecipients("sender@somewhere.com", "myalias+shop@mailx.net", model.Send)
@@ -475,7 +477,7 @@ func TestFindRecipients_WildcardAliasFallbackWhenBaseAliasMissing(t *testing.T) 
 		Recipients: "rcpt@example.com",
 	}
 	store.domains["customdomain.com"] = model.Domain{Name: "customdomain.com", UserID: "user-2", Enabled: true}
-	store.recipients["user-2"] = []model.Recipient{{Email: "rcpt@example.com"}}
+	store.recipients["user-2"] = []model.Recipient{{Email: "rcpt@example.com", IsActive: true}}
 	s := newTestService(store)
 
 	rcps, alias, msgType, err := s.FindRecipients("sender@somewhere.com", "anything+news@customdomain.com", model.Send)
@@ -504,7 +506,7 @@ func TestFindRecipients_DotWildcardAliasFallbackWhenBaseAliasMissing(t *testing.
 		Recipients: "rcpt@example.com",
 	}
 	store.domains["customdomain.com"] = model.Domain{Name: "customdomain.com", UserID: "user-2b", Enabled: true}
-	store.recipients["user-2b"] = []model.Recipient{{Email: "rcpt@example.com"}}
+	store.recipients["user-2b"] = []model.Recipient{{Email: "rcpt@example.com", IsActive: true}}
 	s := newTestService(store)
 
 	rcps, alias, msgType, err := s.FindRecipients("sender@somewhere.com", "anything.news@customdomain.com", model.Send)
@@ -622,7 +624,7 @@ func TestFindRecipients_PlusTagWithMatchingWildcardRidesWildcardNotCatchAll(t *t
 		CatchAll:  true,
 		Recipient: "catchall@example.com",
 	}
-	store.recipients["user-6"] = []model.Recipient{{Email: "rcpt@example.com"}}
+	store.recipients["user-6"] = []model.Recipient{{Email: "rcpt@example.com", IsActive: true}}
 	s := newTestService(store)
 
 	_, alias, _, err := s.FindRecipients("sender@somewhere.com", "newalias+shop@customdomain.com", model.Send)
@@ -703,7 +705,7 @@ func TestFindRecipients_DottedAddressWithMatchingWildcardRidesWildcardNotCatchAl
 		CatchAll:  true,
 		Recipient: "catchall@example.com",
 	}
-	store.recipients["user-6d"] = []model.Recipient{{Email: "rcpt@example.com"}}
+	store.recipients["user-6d"] = []model.Recipient{{Email: "rcpt@example.com", IsActive: true}}
 	s := newTestService(store)
 
 	_, alias, _, err := s.FindRecipients("sender@somewhere.com", "newalias.shop@customdomain.com", model.Send)
@@ -777,17 +779,24 @@ func TestFindRecipients_NoAliasNoCatchAllReturnsError(t *testing.T) {
 func TestResolveForward(t *testing.T) {
 	store := newFakeStore()
 	store.recipients["user-1"] = []model.Recipient{
-		{Email: "a@example.com"},
-		{Email: "b@example.com"},
+		{Email: "a@example.com", IsActive: true},
+		{Email: "b@example.com", IsActive: true},
+		{Email: "pending@example.com"},
 	}
 	s := newTestService(store)
 
-	rcps, err := s.resolveForward(model.Alias{UserID: "user-1", Recipients: "a@example.com"})
+	rcps, err := s.resolveForward(model.Alias{UserID: "user-1", Recipients: "A@example.com,pending@example.com"})
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
 	if len(rcps) != 1 || rcps[0].Email != "a@example.com" {
 		t.Errorf("expected only a@example.com, got %+v", rcps)
+	}
+
+	for _, recipients := range []string{"gone@example.com", "pending@example.com", "ba@example.com", ""} {
+		if _, err := s.resolveForward(model.Alias{UserID: "user-1", Recipients: recipients}); err != ErrNoRecipients {
+			t.Errorf("resolveForward(%q) error = %v, want ErrNoRecipients", recipients, err)
+		}
 	}
 }
 
@@ -827,5 +836,35 @@ func TestDeleteRecipient_ClearsDomainRecipient(t *testing.T) {
 	}
 	if len(store.recipients["user-1"]) != 1 {
 		t.Errorf("expected recipient to be deleted, got %+v", store.recipients["user-1"])
+	}
+}
+
+func TestDeleteRecipient_UpdatesAliases(t *testing.T) {
+	store := newFakeStore()
+	store.recipients["user-1"] = []model.Recipient{
+		{BaseModel: model.BaseModel{ID: "rcp-1"}, Email: "a@example.com"},
+	}
+	store.aliases = map[string]model.Alias{
+		"only@mailx.net":     {UserID: "user-1", Name: "only@mailx.net", Enabled: true, Recipients: "a@example.com"},
+		"shared@mailx.net":   {UserID: "user-1", Name: "shared@mailx.net", Enabled: true, Recipients: "a@example.com,c@example.com"},
+		"disabled@mailx.net": {UserID: "user-1", Name: "disabled@mailx.net", Enabled: false, Recipients: "c@example.com,A@example.com"},
+		"similar@mailx.net":  {UserID: "user-1", Name: "similar@mailx.net", Enabled: true, Recipients: "ba@example.com,c@example.com"},
+	}
+	s := newTestService(store)
+
+	if err := s.DeleteRecipient(context.Background(), "rcp-1", "user-1", ""); err != nil {
+		t.Fatalf("DeleteRecipient() error = %v", err)
+	}
+
+	for name, want := range map[string]model.Alias{
+		"only@mailx.net":     {Enabled: false, Recipients: ""},
+		"shared@mailx.net":   {Enabled: true, Recipients: "c@example.com"},
+		"disabled@mailx.net": {Enabled: false, Recipients: "c@example.com"},
+		"similar@mailx.net":  {Enabled: true, Recipients: "ba@example.com,c@example.com"},
+	} {
+		got := store.aliases[name]
+		if got.Enabled != want.Enabled || got.Recipients != want.Recipients {
+			t.Errorf("%s = {enabled: %v, recipients: %q}, want {enabled: %v, recipients: %q}", name, got.Enabled, got.Recipients, want.Enabled, want.Recipients)
+		}
 	}
 }

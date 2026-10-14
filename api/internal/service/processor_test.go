@@ -279,3 +279,49 @@ func TestProcessMessage_NoRecipientsIsLogged(t *testing.T) {
 		})
 	}
 }
+
+func TestProcessMessage_NoValidRecipientLogsNoRecipients(t *testing.T) {
+	tests := []struct {
+		name       string
+		to         string
+		recipients string // alias recipients
+		catchAll   string // catch-all recipient, when to is on custom.example
+		wantAlias  string
+	}{
+		{name: "alias recipient was deleted", to: ruleAliasName, recipients: "gone@example.com", wantAlias: "alias-1"},
+		{name: "alias recipient is unverified", to: ruleAliasName, recipients: "pending@example.com", wantAlias: "alias-1"},
+		{name: "alias recipient only contains a verified address", to: ruleAliasName, recipients: "name@example.com", wantAlias: "alias-1"},
+		{name: "alias has no recipients", to: ruleAliasName, recipients: "", wantAlias: "alias-1"},
+		{name: "catch-all recipient is unverified", to: "new@custom.example", catchAll: "pending@example.com"},
+		{name: "catch-all recipient was deleted", to: "new@custom.example", catchAll: "gone@example.com"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s, store, queued := newRuleTestService(t)
+			store.settingsByUser[ruleUser] = model.Settings{LogIssues: true}
+			alias := store.aliases[ruleAliasName]
+			alias.Recipients = tt.recipients
+			store.aliases[ruleAliasName] = alias
+			store.domains["custom.example"] = model.Domain{Name: "custom.example", UserID: ruleUser, Enabled: true, CatchAll: true, CreateAlias: true, Recipient: tt.catchAll}
+
+			if err := s.ProcessMessage(forwardEmailTo(tt.to, "Hello"), tt.to); err != nil {
+				t.Fatalf("ProcessMessage() error = %v", err)
+			}
+
+			if got := queued(); len(got) != 0 {
+				t.Errorf("queued = %+v, want the email dropped", got)
+			}
+			if len(store.postedAlias) != 0 {
+				t.Errorf("created %+v, want no catch-all alias", store.postedAlias)
+			}
+			if len(store.logs) != 1 {
+				t.Fatalf("logs = %+v, want one", store.logs)
+			}
+			lg := store.logs[0]
+			if lg.Type != model.NoRecipients || lg.Message != noRecipientsReason || lg.UserID != ruleUser || lg.AliasID != tt.wantAlias || lg.Destination != tt.to {
+				t.Errorf("log = %+v, want a no_recipients log for %s", lg, tt.to)
+			}
+		})
+	}
+}

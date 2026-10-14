@@ -202,8 +202,8 @@ func (s *Service) DeleteRecipient(ctx context.Context, ID string, userID string,
 		return ErrDeleteRecipient
 	}
 
-	// Get aliases
-	aliases, err := s.Store.GetAliasesNoStats(ctx, userID, 0, 0, "created_at", "DESC", "", "", "active")
+	// Get aliases, disabled ones included so re-enabling one can't forward to a deleted recipient
+	aliases, err := s.Store.GetAliasesNoStats(ctx, userID, 0, 0, "created_at", "DESC", "", "", "active_inactive")
 	if err != nil {
 		log.Printf("error deleting recipient, GetAliases: %s", err.Error())
 		return ErrDeleteRecipient
@@ -212,13 +212,9 @@ func (s *Service) DeleteRecipient(ctx context.Context, ID string, userID string,
 	// Delete recipient from each alias
 	// Disable alias if no recipients left
 	for _, alias := range aliases {
-		if strings.Contains(alias.Recipients, recipient.Email) {
-			r := alias.Recipients
-			r = strings.Replace(r, recipient.Email+",", "", -1)
-			r = strings.Replace(r, ","+recipient.Email, "", -1)
-			r = strings.Replace(r, recipient.Email, "", -1)
+		if r, found := model.RemoveCommaSeparatedEmail(alias.Recipients, recipient.Email); found {
 			alias.Recipients = model.MergeCommaSeparatedEmails(r, newRecipients)
-			alias.Enabled = alias.Recipients != ""
+			alias.Enabled = alias.Enabled && alias.Recipients != ""
 
 			// Update alias
 			err = s.Store.UpdateAlias(ctx, alias)
@@ -506,9 +502,14 @@ func (s *Service) resolveForward(alias model.Alias) ([]model.Recipient, error) {
 
 	var recipients []model.Recipient
 	for _, rcp := range rcps {
-		if strings.Contains(alias.Recipients, rcp.Email) {
+		if rcp.IsActive && model.ContainsCommaSeparatedEmail(alias.Recipients, rcp.Email) {
 			recipients = append(recipients, rcp)
 		}
+	}
+
+	// None of the alias's recipients is still a verified recipient of the user
+	if len(recipients) == 0 {
+		return []model.Recipient{}, ErrNoRecipients
 	}
 
 	return recipients, nil

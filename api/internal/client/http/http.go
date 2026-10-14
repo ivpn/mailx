@@ -31,7 +31,7 @@ func (h Http) SignupWebhook(subID string) error {
 	// Log request for debugging
 	log.Printf("Signup webhook request: %+v", req)
 
-	status, res, err := req.Bytes()
+	status, _, err := req.Bytes()
 	if err != nil {
 		log.Printf("Error calling signup webhook: %v", err)
 		return errors.New("error calling signup webhook")

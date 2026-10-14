@@ -43,14 +43,6 @@ func assertPauseDiscarded(t *testing.T, store *ruleStore, queued func() []queued
 	}
 }
 
-func logTypes(logs []model.Log) []model.LogType {
-	types := make([]model.LogType, len(logs))
-	for i, lg := range logs {
-		types[i] = lg.Type
-	}
-	return types
-}
-
 func TestProcessMessage_PausedAliasDiscardsForwards(t *testing.T) {
 	s, store, queued := newRuleTestService(t)
 	store.settingsByUser[ruleUser] = model.Settings{LogIssues: true}

@@ -18,11 +18,30 @@
                 <table class="text-auto">
                     <thead>
                         <tr>
-                            <th class="start">Log</th>
+                            <th class="start">
+                                <div class="hs-dropdown [--placement:bottom-left]">
+                                    <button id="hs-dropdown-log-type" class="sort">
+                                        <span class="flex mr-1">Show:</span>
+                                        <span class="text-accent flex items-center">
+                                            {{ logTypeLabel }}
+                                        </span>
+                                    </button>
+                                    <div
+                                        class="hs-dropdown-menu hs-dropdown-open:opacity-100 hidden"
+                                        aria-labelledby="hs-dropdown-log-type"
+                                    >
+                                        <button @click="setLogType('')">All</button>
+                                        <button v-for="type in LOG_TYPES" :key="type" @click="setLogType(type)">{{ formatType(type) }}</button>
+                                    </div>
+                                </div>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="log in logs" :key="rowKey">
+                        <tr v-if="!filteredLogs.length">
+                            <td class="text-center text-tertiary py-10">No logs found</td>
+                        </tr>
+                        <tr v-for="log in filteredLogs" :key="log.id">
                             <td class="start text-wrap leading-6">
                                 <span class="text-tertiary">Type</span>: 
                                 <span class="badge small" v-bind="{class: log.log_type}">{{ formatLogType(log) }}</span><br>
@@ -34,7 +53,7 @@
                                 <span v-if="log.remote_mta"><span class="text-tertiary">Remote MTA</span>: {{ log.remote_mta }}<br></span>
                                 <span class="text-tertiary">Attempted At</span>: {{ attemptedAt(log) }}<br>
                                 <button v-if="log.log_type === 'bounce'" v-bind:data-hs-overlay="'#modal-delivery-log' + log.id" class="cta sm mt-3">Full log</button>
-                                <hr v-if="log.id !== logs[logs.length - 1]?.id" class="mt-8 mb-0">
+                                <hr v-if="log.id !== filteredLogs[filteredLogs.length - 1]?.id" class="mt-8 mb-0">
                             </td>
                             <FailedDeliveryLog v-if="log.log_type === 'bounce'" :log="log" />
                         </tr>
@@ -47,11 +66,27 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import axios from 'axios'
 import { settingsApi } from '../api/settings.ts'
 import { logApi } from '../api/log.ts'
 import FailedDeliveryLog from './FailedDeliveryLog.vue'
+import { closeDropdowns, initDropdowns } from '../lib/preline.ts'
+
+// Mirrors model.LogType in the API.
+const LOG_TYPES = [
+    'bounce',
+    'deferred_delivery',
+    'failed_delivery',
+    'disabled_alias',
+    'disabled_domain',
+    'paused_alias',
+    'no_recipients',
+    'unauthorised_send',
+    'inactive_subscription',
+    'blocked_sender',
+    'blocked_by_rule',
+]
 
 const log = {
     id: '',
@@ -75,7 +110,19 @@ const settings = ref({
 const logs = ref([] as typeof log[])
 const error = ref('')
 const loaded = ref(false)
-const rowKey = ref(0)
+const logType = ref('')
+const logTypeLabel = computed(() => logType.value ? formatType(logType.value) : 'All')
+
+// The API returns every log at once, so the type filter is applied client-side.
+const filteredLogs = computed(() => logType.value
+    ? logs.value.filter(l => l.log_type === logType.value)
+    : logs.value)
+
+const setLogType = (value: string) => {
+    if (value === logType.value) return
+    closeDropdowns(false)
+    logType.value = value
+}
 
 const getSettings = async () => {
     try {
@@ -95,6 +142,8 @@ const getLogs = async () => {
         logs.value = res.data
         loaded.value = true
         error.value = ''
+        await nextTick()
+        initDropdowns()
     } catch (err) {
         if (axios.isAxiosError(err)) {
             error.value = err.message
@@ -119,10 +168,14 @@ const formatDate = (date: string) => {
     return d.toLocaleString()
 }
 
+const formatType = (type: string) => {
+    const label = type.replace(/_/g, ' ')
+    return label.charAt(0).toUpperCase() + label.slice(1)
+}
+
 const formatLogType = (item: typeof log) => {
     if (!item.log_type) return ''
-    const label = item.log_type.replace(/_/g, ' ')
-    return label.charAt(0).toUpperCase() + label.slice(1)
+    return formatType(item.log_type)
 }
 
 onMounted(async () => {

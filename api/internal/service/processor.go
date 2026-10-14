@@ -16,6 +16,10 @@ var (
 	ErrNoRecipients         = errors.New("No recipients found.")
 	ErrNoVerifiedRecipients = errors.New("Sender is not a verified address.")
 	ErrInactiveRecipient    = errors.New("The recipient is inactive.")
+
+	// noRecipientsReason is the diagnostic shown when ErrNoRecipients drops a message, spelling
+	// out where a recipient can be set since the bare error doesn't say.
+	noRecipientsReason = "No verified recipient to forward to. Set a verified recipient on the alias, the domain's catch-all recipient, or the default recipient in Settings."
 )
 
 func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
@@ -140,6 +144,22 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 
 				if settings.LogIssues {
 					err := s.ProcessDiagnosticLog(alias, msg.From, to, ErrDisabledDomain.Error(), model.DisabledDomain)
+					if err != nil {
+						log.Println("error processing diagnostic log", err)
+					}
+				}
+			}
+
+			// Handle ErrNoRecipients
+			if errors.Is(err, ErrNoRecipients) {
+				settings, err := s.GetSettings(context.Background(), alias.UserID)
+				if err != nil {
+					log.Println("error getting settings", err)
+					continue
+				}
+
+				if settings.LogIssues {
+					err := s.ProcessDiagnosticLog(alias, msg.From, to, noRecipientsReason, model.NoRecipients)
 					if err != nil {
 						log.Println("error processing diagnostic log", err)
 					}

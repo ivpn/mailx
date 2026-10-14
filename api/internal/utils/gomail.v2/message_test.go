@@ -723,8 +723,8 @@ func BenchmarkFull(b *testing.B) {
 	})
 
 	m := NewMessage()
-	b.ResetTimer()
-	for n := 0; n < b.N; n++ {
+
+	for b.Loop() {
 		m.SetAddressHeader("From", "from@example.com", "Señor From")
 		m.SetHeaders(map[string][]string{
 			"To":      {"to@example.com"},

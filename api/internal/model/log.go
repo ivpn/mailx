@@ -13,6 +13,7 @@ const (
 	UnauthorisedSend     LogType = "unauthorised_send"
 	InactiveSubscription LogType = "inactive_subscription"
 	BlockedSender        LogType = "blocked_sender"
+	NoRecipients         LogType = "no_recipients"
 )
 
 type Log struct {

@@ -229,6 +229,28 @@ func (s *Service) DeleteRecipient(ctx context.Context, ID string, userID string,
 		}
 	}
 
+	// Get domains
+	domains, err := s.Store.GetDomains(ctx, userID)
+	if err != nil {
+		log.Printf("error deleting recipient, GetDomains: %s", err.Error())
+		return ErrDeleteRecipient
+	}
+
+	// Clear recipient from each custom domain
+	// Catch-all falls back to the default recipient in Settings
+	for _, domain := range domains {
+		if strings.EqualFold(domain.Recipient, recipient.Email) {
+			domain.Recipient = ""
+
+			// Update domain
+			err = s.Store.UpdateDomain(ctx, domain)
+			if err != nil {
+				log.Printf("error deleting recipient, UpdateDomain: %s", err.Error())
+				return ErrDeleteRecipient
+			}
+		}
+	}
+
 	err = s.Store.DeleteRecipient(ctx, ID, userID)
 	if err != nil {
 		log.Printf("error deleting recipient, DeleteRecipient: %s", err.Error())

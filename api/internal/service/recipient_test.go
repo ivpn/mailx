@@ -71,6 +71,41 @@ func (f *fakeStore) GetDomains(ctx context.Context, userID string) ([]model.Doma
 	return result, nil
 }
 
+func (f *fakeStore) UpdateDomain(ctx context.Context, domain model.Domain) error {
+	for name, d := range f.domains {
+		if d.ID == domain.ID && d.UserID == domain.UserID {
+			f.domains[name] = domain
+			return nil
+		}
+	}
+	return errNotFound
+}
+
+func (f *fakeStore) GetRecipient(ctx context.Context, ID string, userID string) (model.Recipient, error) {
+	for _, rcp := range f.recipients[userID] {
+		if rcp.ID == ID {
+			return rcp, nil
+		}
+	}
+	return model.Recipient{}, errNotFound
+}
+
+func (f *fakeStore) DeleteRecipient(ctx context.Context, ID string, userID string) error {
+	rcps := f.recipients[userID]
+	for i, rcp := range rcps {
+		if rcp.ID == ID {
+			f.recipients[userID] = append(rcps[:i:i], rcps[i+1:]...)
+			return nil
+		}
+	}
+	return errNotFound
+}
+
+func (f *fakeStore) UpdateAlias(ctx context.Context, alias model.Alias) error {
+	f.aliases[alias.Name] = alias
+	return nil
+}
+
 func (f *fakeStore) GetSettings(ctx context.Context, userID string) (model.Settings, error) {
 	return f.settingsByUser[userID], nil
 }
@@ -763,5 +798,34 @@ func TestResolveForward_NoRecipientsConfigured(t *testing.T) {
 	_, err := s.resolveForward(model.Alias{UserID: "user-1"})
 	if err != ErrNoRecipients {
 		t.Fatalf("expected ErrNoRecipients, got %v", err)
+	}
+}
+
+func TestDeleteRecipient_ClearsDomainRecipient(t *testing.T) {
+	store := newFakeStore()
+	store.recipients["user-1"] = []model.Recipient{
+		{BaseModel: model.BaseModel{ID: "rcp-1"}, Email: "a@example.com"},
+		{BaseModel: model.BaseModel{ID: "rcp-2"}, Email: "b@example.com"},
+	}
+	store.domains["one.example"] = model.Domain{BaseModel: model.BaseModel{ID: "dom-1"}, UserID: "user-1", Name: "one.example", Recipient: "A@example.com"}
+	store.domains["two.example"] = model.Domain{BaseModel: model.BaseModel{ID: "dom-2"}, UserID: "user-1", Name: "two.example", Recipient: "b@example.com"}
+	store.domains["other.example"] = model.Domain{BaseModel: model.BaseModel{ID: "dom-3"}, UserID: "user-2", Name: "other.example", Recipient: "a@example.com"}
+	s := newTestService(store)
+
+	if err := s.DeleteRecipient(context.Background(), "rcp-1", "user-1", ""); err != nil {
+		t.Fatalf("DeleteRecipient() error = %v", err)
+	}
+
+	for name, want := range map[string]string{
+		"one.example":   "",
+		"two.example":   "b@example.com",
+		"other.example": "a@example.com",
+	} {
+		if got := store.domains[name].Recipient; got != want {
+			t.Errorf("%s recipient = %q, want %q", name, got, want)
+		}
+	}
+	if len(store.recipients["user-1"]) != 1 {
+		t.Errorf("expected recipient to be deleted, got %+v", store.recipients["user-1"])
 	}
 }

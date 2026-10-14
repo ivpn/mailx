@@ -15,6 +15,7 @@ const (
 	BlockedSender        LogType = "blocked_sender"
 	BlockedByRule        LogType = "blocked_by_rule"
 	PausedAlias          LogType = "paused_alias"
+	NoRecipients         LogType = "no_recipients"
 )
 
 type Log struct {

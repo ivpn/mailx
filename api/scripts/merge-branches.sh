@@ -10,23 +10,35 @@
 #
 #   printf 'branch-a\nbranch-b\nbranch-c\n' | ./merge-branches.sh origin
 #
+#   ./merge-branches.sh    # prompts for remote and branches
+#
 # Branches are newline separated; blank lines and lines starting with # are ignored.
 # On merge conflicts the script pauses until the conflicts are resolved and the
 # merge is committed. Once all merges are done, every branch is pushed to the remote.
 
 set -euo pipefail
 
-if [[ $# -lt 1 || -z "$1" ]]; then
+remote="${1:-}"
+
+if [[ -z "$remote" ]]; then
+  read -r -p "Remote (e.g. origin): " remote < /dev/tty
+fi
+
+if [[ -z "$remote" ]]; then
   echo "Usage: $0 <remote> [branches]" >&2
   exit 1
 fi
 
-remote="$1"
-
 if [[ $# -gt 1 ]]; then
   input="$2"
-else
+elif [[ ! -t 0 ]]; then
   input="$(cat)"
+else
+  echo "Branches in merge order, one per line (empty line to finish):"
+  input=""
+  while IFS= read -r line < /dev/tty && [[ -n "$line" ]]; do
+    input+="$line"$'\n'
+  done
 fi
 
 if ! git remote get-url "$remote" > /dev/null 2>&1; then

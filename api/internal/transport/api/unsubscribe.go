@@ -89,11 +89,18 @@ func (h *Handler) BlockDomainOneClick(c *fiber.Ctx) error {
 	return oneClickResponse(c, err)
 }
 
-// MethodNotAllowedOneClick keeps GETs from link scanners and prefetchers away from the
-// one-click actions, which only run on POST.
+// MethodNotAllowedOneClick keeps GETs from link scanners and prefetchers, and any other
+// non-POST method, away from the one-click actions, which only run on POST.
 func (h *Handler) MethodNotAllowedOneClick(c *fiber.Ctx) error {
 	c.Set(fiber.HeaderAllow, fiber.MethodPost)
-	return c.SendStatus(fiber.StatusMethodNotAllowed)
+	c.Status(fiber.StatusMethodNotAllowed)
+	return nil
+}
+
+// TooManyRequestsOneClick answers a rate-limited one-click request with an empty body.
+func (h *Handler) TooManyRequestsOneClick(c *fiber.Ctx) error {
+	c.Status(fiber.StatusTooManyRequests)
+	return nil
 }
 
 func oneClickRequest(c *fiber.Ctx) model.OneClickRequest {

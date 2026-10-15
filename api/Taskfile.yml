@@ -30,3 +30,10 @@ tasks:
   docs:
     cmds:
       - swag init -g cmd/main.go
+  merge_branches:
+    desc: 'Merge a chain of branches and push them, e.g. task merge_branches REMOTE=origin BRANCHES="$(printf "branch-a\nbranch-b\nbranch-c")"'
+    interactive: true
+    requires:
+      vars: [REMOTE, BRANCHES]
+    cmds:
+      - ./scripts/merge-branches.sh "{{.REMOTE}}" "{{.BRANCHES}}"

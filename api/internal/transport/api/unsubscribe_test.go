@@ -146,8 +146,8 @@ func TestOneClick_InvalidSignature(t *testing.T) {
 			}
 
 			for name, target := range targets {
-				if status, _ := oneClickPost(t, app, target); status != http.StatusForbidden {
-					t.Errorf("%s: POST %s = %d, want 403", name, target, status)
+				if status, body := oneClickPost(t, app, target); status != http.StatusForbidden || body != "" {
+					t.Errorf("%s: POST %s = %d %q, want 403 with an empty body", name, target, status, body)
 				}
 			}
 			if len(service.calls) != 0 {
@@ -163,25 +163,44 @@ func TestOneClick_SigningNotConfigured(t *testing.T) {
 	app := newOneClickTestApp(service)
 
 	target := signedTarget(t, signer, model.OneClickDeactivatePath+"alias-1", nil, time.Hour)
-	if status, _ := oneClickPost(t, app, target); status != http.StatusForbidden {
-		t.Errorf("POST = %d, want 403", status)
+	if status, body := oneClickPost(t, app, target); status != http.StatusForbidden || body != "" {
+		t.Errorf("POST = %d %q, want 403 with an empty body", status, body)
 	}
 }
 
-func TestOneClick_GetNotAllowed(t *testing.T) {
+func TestOneClick_MethodNotAllowed(t *testing.T) {
 	signer := signedurl.New("test-secret", "https://api.mailx.net")
+	methods := []string{
+		http.MethodGet,
+		http.MethodHead,
+		http.MethodPut,
+		http.MethodPatch,
+		http.MethodDelete,
+		http.MethodOptions,
+	}
 
 	for _, route := range oneClickRoutes {
 		t.Run(route.name, func(t *testing.T) {
 			service := &fakeOneClickService{signer: signer}
 			app := newOneClickTestApp(service)
+			target := signedTarget(t, signer, route.path, route.params, time.Hour)
 
-			req := httptest.NewRequest(http.MethodGet, signedTarget(t, signer, route.path, route.params, time.Hour), nil)
-			if status, _ := doRequest(t, app, req); status != http.StatusMethodNotAllowed {
-				t.Errorf("GET = %d, want 405", status)
+			// Non-POST methods must not fall through to the authenticated /v1 group (401)
+			for _, method := range methods {
+				res, err := app.Test(httptest.NewRequest(method, target, nil))
+				if err != nil {
+					t.Fatalf("app.Test() error = %v", err)
+				}
+				body, _ := io.ReadAll(res.Body)
+				if res.StatusCode != http.StatusMethodNotAllowed || len(body) != 0 {
+					t.Errorf("%s = %d %q, want 405 with an empty body", method, res.StatusCode, body)
+				}
+				if allow := res.Header.Get(fiber.HeaderAllow); allow != fiber.MethodPost {
+					t.Errorf("%s Allow = %q, want %q", method, allow, fiber.MethodPost)
+				}
 			}
 			if len(service.calls) != 0 {
-				t.Errorf("calls = %v, want no action on GET", service.calls)
+				t.Errorf("calls = %v, want no action on a non-POST method", service.calls)
 			}
 		})
 	}
@@ -224,8 +243,8 @@ func TestOneClick_RateLimited(t *testing.T) {
 	}
 
 	target := signedTarget(t, signer, model.OneClickDeactivatePath+"alias-1", nil, time.Hour)
-	if status, _ := oneClickPost(t, app, target); status != http.StatusTooManyRequests {
-		t.Errorf("7th request = %d, want 429", status)
+	if status, body := oneClickPost(t, app, target); status != http.StatusTooManyRequests || body != "" {
+		t.Errorf("7th request = %d %q, want 429 with an empty body", status, body)
 	}
 }
 

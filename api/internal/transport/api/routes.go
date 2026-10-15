@@ -42,8 +42,14 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	h.Server.Post("/v1/login/passkey/finish", limiter.New(), h.FinishPasskeyLogin)
 
 	// One-click unsubscribe (RFC 8058), called by the user's mail provider with a signed URL.
-	// A GET (link scanners, prefetchers) must never trigger the action.
-	oneClickLimit := limit.New(6, time.Minute)
+	// A GET (link scanners, prefetchers) must never trigger the action. Every response has an
+	// empty body, and any method other than POST gets 405 instead of falling through to the
+	// authenticated /v1 group below.
+	oneClickLimit := limiter.New(limiter.Config{
+		Max:          6,
+		Expiration:   time.Minute,
+		LimitReached: h.TooManyRequestsOneClick,
+	})
 	oneClickSigned := auth.NewSignedURL(h.Service.OneClickSigner())
 	oneClickRoutes := map[string]fiber.Handler{
 		model.OneClickDeactivatePath + ":alias":  h.DeactivateOneClick,
@@ -53,7 +59,7 @@ func (h *Handler) SetupRoutes(cfg config.APIConfig) {
 	}
 	for path, handler := range oneClickRoutes {
 		h.Server.Post(path, oneClickLimit, oneClickSigned, handler)
-		h.Server.Get(path, h.MethodNotAllowedOneClick)
+		h.Server.All(path, h.MethodNotAllowedOneClick)
 	}
 
 	session := h.Server.Group("/v1/pasession")

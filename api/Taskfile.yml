@@ -30,3 +30,8 @@ tasks:
   docs:
     cmds:
       - swag init -g cmd/main.go
+  merge_branches:
+    desc: Merge a chain of branches and push them (prompts for remote and branches)
+    interactive: true
+    cmds:
+      - ./scripts/merge-branches.sh

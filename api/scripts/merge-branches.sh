@@ -51,12 +51,10 @@ if [[ $# -gt 1 ]]; then
 elif [[ ! -t 0 ]]; then
   input="$(cat)"
 else
-  echo "Branches in merge order, one per line. Press Enter on an empty line to start."
+  echo "Branches in merge order, one per line (empty line to finish):"
   input=""
-  n=1
-  while IFS= read -r -p "  $n. " line < /dev/tty && [[ -n "$line" ]]; do
+  while IFS= read -r line < /dev/tty && [[ -n "$line" ]]; do
     input+="$line"$'\n'
-    n=$((n + 1))
   done
 fi
 

@@ -18,12 +18,29 @@
 
 set -euo pipefail
 
+# Colors only when writing to a terminal, and not when NO_COLOR is set.
+green="" reset="" red_err="" reset_err=""
+if [[ -z "${NO_COLOR:-}" ]]; then
+  if [[ -t 1 ]]; then
+    green=$'\033[32m'
+    reset=$'\033[0m'
+  fi
+  if [[ -t 2 ]]; then
+    red_err=$'\033[31m'
+    reset_err=$'\033[0m'
+  fi
+fi
+
 log() {
   echo "==> $*"
 }
 
+success() {
+  echo "${green}==> $*${reset}"
+}
+
 error() {
-  echo "==> ERROR: $*" >&2
+  echo "${red_err}==> ERROR: $*${reset_err}" >&2
 }
 
 fail() {
@@ -164,4 +181,4 @@ if [[ ${#failed_pushes[@]} -gt 0 ]]; then
   fail "Merged all branches, but failed to push: ${failed_pushes[*]}"
 fi
 
-log "Done. Merged and pushed: ${branches[*]}"
+success "Done. Merged and pushed: ${branches[*]}"

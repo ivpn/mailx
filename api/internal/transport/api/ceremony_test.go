@@ -41,6 +41,16 @@ func (c *memCache) Get(_ context.Context, key string) (string, error) {
 	return v, nil
 }
 
+func (c *memCache) SetNX(_ context.Context, key string, value any, _ time.Duration) (bool, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if _, ok := c.data[key]; ok {
+		return false, nil
+	}
+	c.data[key] = value.(string)
+	return true, nil
+}
+
 func (c *memCache) GetDel(ctx context.Context, key string) (string, error) {
 	v, err := c.Get(ctx, key)
 	if err == nil {

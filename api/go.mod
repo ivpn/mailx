@@ -17,7 +17,7 @@ require (
 	github.com/swaggo/swag v1.16.6
 	github.com/valyala/fasthttp v1.75.0
 	golang.org/x/crypto v0.57.0
-	golang.org/x/net v0.59.0
+	golang.org/x/net v0.60.0
 	golang.org/x/sync v0.23.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gorm.io/driver/mysql v1.5.7

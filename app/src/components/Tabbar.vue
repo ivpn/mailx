@@ -123,6 +123,7 @@ import { useAnnouncements } from '../lib/announcements.ts'
 import ThemeSwitch from './ThemeSwitch.vue'
 
 const moreRoutes = [
+    '/account/wildcard',
     '/account/domains',
     '/account/stats',
     '/account/diagnostics',

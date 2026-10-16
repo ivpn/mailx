@@ -24,6 +24,12 @@ func ceremonyCacheKey(token string) string {
 // SaveCeremony stores the ceremony under a new random token and returns the token. The WebAuthn
 // session data expiry is set to match the cache TTL, so the library enforces it on finish too.
 func (s *Service) SaveCeremony(ctx context.Context, ceremony model.Ceremony, ttl time.Duration) (string, error) {
+	// Untyped state could never be consumed, so fail at begin instead of at finish
+	if ceremony.Type == "" {
+		log.Println("error saving ceremony: missing type")
+		return "", ErrSaveCeremony
+	}
+
 	token, err := model.GenSessionToken()
 	if err != nil {
 		log.Printf("error generating ceremony token: %s", err.Error())
@@ -47,8 +53,9 @@ func (s *Service) SaveCeremony(ctx context.Context, ceremony model.Ceremony, ttl
 }
 
 // ConsumeCeremony is single-use: the ceremony is removed as it is read, so a challenge can't be
-// replayed, whether or not the finish step succeeds.
-func (s *Service) ConsumeCeremony(ctx context.Context, token string) (model.Ceremony, error) {
+// replayed, whether or not the finish step succeeds. It only returns state saved by the expected
+// ceremony type; a mismatched ceremony is still removed, so it can't be retried elsewhere.
+func (s *Service) ConsumeCeremony(ctx context.Context, token string, ceremonyType model.CeremonyType) (model.Ceremony, error) {
 	if token == "" {
 		return model.Ceremony{}, ErrGetCeremony
 	}
@@ -62,6 +69,11 @@ func (s *Service) ConsumeCeremony(ctx context.Context, token string) (model.Cere
 	err = json.Unmarshal([]byte(data), &ceremony)
 	if err != nil {
 		log.Printf("error unmarshalling ceremony: %s", err.Error())
+		return model.Ceremony{}, ErrGetCeremony
+	}
+
+	if ceremony.Type == "" || ceremony.Type != ceremonyType {
+		log.Printf("error consuming ceremony: type %q, expected %q", ceremony.Type, ceremonyType)
 		return model.Ceremony{}, ErrGetCeremony
 	}
 

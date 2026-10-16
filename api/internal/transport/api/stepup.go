@@ -90,7 +90,7 @@ func (h *Handler) StepUpPasskeyBegin(c *fiber.Ctx) error {
 		})
 	}
 
-	token, err := h.Service.SaveCeremony(c.Context(), model.Ceremony{UserID: user.ID, SessionData: *sessionData}, auth.WebAuthnCeremonyExpiration)
+	token, err := h.Service.SaveCeremony(c.Context(), model.Ceremony{Type: model.CeremonyStepUp, UserID: user.ID, SessionData: *sessionData}, auth.WebAuthnCeremonyExpiration)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrSaveSession,
@@ -112,7 +112,7 @@ func (h *Handler) StepUpPasskeyBegin(c *fiber.Ctx) error {
 // @Failure 400 {object} ErrorRes
 // @Router /user/stepup/passkey/finish [post]
 func (h *Handler) StepUpPasskeyFinish(c *fiber.Ctx) error {
-	ceremony, err := h.Service.ConsumeCeremony(c.Context(), c.Cookies(auth.AUTHN_TEMP_COOKIE))
+	ceremony, err := h.Service.ConsumeCeremony(c.Context(), c.Cookies(auth.AUTHN_TEMP_COOKIE), model.CeremonyStepUp)
 	auth.ClearCookies(c, auth.AUTHN_TEMP_COOKIE)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{

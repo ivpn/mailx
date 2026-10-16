@@ -141,6 +141,21 @@ func TestListUnsubscribeHeaders_Original(t *testing.T) {
 			want:     model.ListUnsubscribeHeaders{Value: "<mailto:myalias+unsub=list.example.com@mailx.net?subject=unsubscribe%20me>"},
 		},
 		{
+			name:     "mailto subject and body kept, other fields dropped",
+			original: "<mailto:unsub@list.example.com?to=x@evil.example&Subject=stop&cc=track@evil.example&BODY=a+b%20c&%62cc=hidden@evil.example&in-reply-to=%3Cid%3E>",
+			want:     model.ListUnsubscribeHeaders{Value: "<mailto:myalias+unsub=list.example.com@mailx.net?Subject=stop&BODY=a+b%20c>"},
+		},
+		{
+			name:     "mailto with only dropped fields has no query",
+			original: "<mailto:unsub@list.example.com?cc=track@evil.example&bcc=track@evil.example>",
+			want:     model.ListUnsubscribeHeaders{Value: "<mailto:myalias+unsub=list.example.com@mailx.net>"},
+		},
+		{
+			name:     "mailto field with an invalid escape dropped",
+			original: "<mailto:unsub@list.example.com?%zzsubject=stop&subject=go>",
+			want:     model.ListUnsubscribeHeaders{Value: "<mailto:myalias+unsub=list.example.com@mailx.net?subject=go>"},
+		},
+		{
 			name:         "https kept and one-click post passed through",
 			original:     "<https://list.example.com/unsub?id=1&t=2>",
 			originalPost: "List-Unsubscribe=One-Click",

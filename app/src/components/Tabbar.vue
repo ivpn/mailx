@@ -118,6 +118,7 @@ import { userApi } from '../api/user.ts'
 import ThemeSwitch from './ThemeSwitch.vue'
 
 const moreRoutes = [
+    '/account/wildcard',
     '/account/domains',
     '/account/stats',
     '/account/diagnostics',

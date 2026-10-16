@@ -170,11 +170,32 @@ func rewriteMailto(target string, aliasName string) (string, bool) {
 	}
 
 	mailto := "mailto:" + replyTo
-	if query != "" {
+	if query = mailtoKeptQuery(query); query != "" {
 		mailto += "?" + query
 	}
 
 	return mailto, true
+}
+
+// mailtoKeptQuery keeps only the subject and body fields of a mailto: query. Any other field
+// (to, cc, bcc, …) is dropped, as it could make the mail client send a copy straight from the
+// user's real address. Kept fields are left as the sender encoded them, since re-encoding would
+// turn spaces into "+", which mailto: (RFC 6068) reads as a literal plus.
+func mailtoKeptQuery(query string) string {
+	var kept []string
+	for field := range strings.SplitSeq(query, "&") {
+		name, _, _ := strings.Cut(field, "=")
+		name, err := url.PathUnescape(name)
+		if err != nil {
+			continue
+		}
+
+		if strings.EqualFold(name, "subject") || strings.EqualFold(name, "body") {
+			kept = append(kept, field)
+		}
+	}
+
+	return strings.Join(kept, "&")
 }
 
 // OneClickDeactivateAlias deactivates an alias on a one-click unsubscribe request. It is

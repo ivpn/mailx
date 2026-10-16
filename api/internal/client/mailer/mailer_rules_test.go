@@ -290,6 +290,30 @@ func TestForwardRules_DisableEncryption(t *testing.T) {
 	}
 }
 
+func TestForward_PGPInlineHasOneContentType(t *testing.T) {
+	const plainText = "From: Friend <friend@example.com>\r\n" +
+		"To: myalias@mailx.net\r\n" +
+		"Subject: Hello\r\n" +
+		"MIME-Version: 1.0\r\n" +
+		"Content-Type: text/plain; charset=utf-8\r\n" +
+		"\r\n" +
+		"Hi there\r\n"
+	rcp := model.Recipient{Email: "real@domain.com", PGPEnabled: true, PGPKey: testPublicKey(t), PGPInline: true}
+
+	fwd := buildRulesForward(t, plainText, "Friend", rcp, model.Settings{}, model.RuleOutcome{})
+	if ct := fwd.header["Content-Type"]; len(ct) != 1 || !strings.HasPrefix(ct[0], "text/plain") {
+		t.Errorf("Content-Type = %q, want one text/plain", ct)
+	}
+
+	fwd = buildRulesForward(t, testRulesRawEmail, "Shop", rcp, model.Settings{}, model.RuleOutcome{})
+	if ct := fwd.header["Content-Type"]; len(ct) != 1 || !strings.HasPrefix(ct[0], "multipart/") {
+		t.Errorf("with attachments: Content-Type = %q, want one multipart", ct)
+	}
+	if !fwd.hasPart(func(p mimePart) bool { return p.filename == "deals.pdf" }) {
+		t.Errorf("with attachments: parts = %+v, want the attachment", fwd.parts)
+	}
+}
+
 func TestForwardRules_PGPMIMEGetsNewSubjectAndHeader(t *testing.T) {
 	rcp := model.Recipient{Email: "real@domain.com", PGPEnabled: true, PGPKey: testPublicKey(t)}
 	outcome := model.RuleOutcome{MatchedNames: []string{"Deals"}, SubjectValues: []string{"[Deals] {subject}"}}

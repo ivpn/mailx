@@ -291,7 +291,7 @@ func (mailer Mailer) buildForwardMessage(from string, name string, to string, rc
 		if err != nil {
 			return nil, "", err
 		}
-		m.SetHeader("Content-Type", "text/plain")
+		// gomail writes the Content-Type itself, so setting it here would duplicate it
 		m.SetBody("text/plain", armored)
 	} else {
 		m.AddAlternative("text/html", headerHtml.String()+email.HTML)

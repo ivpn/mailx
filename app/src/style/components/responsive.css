@@ -1,6 +1,6 @@
 @layer components {
     .mobile {
-        @apply sm:hidden [@media(max-height:530px)]:block;
+        @apply sm:hidden [@media(max-height:716px)]:block;
     }
 
     .tablet {

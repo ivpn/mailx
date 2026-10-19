@@ -148,9 +148,7 @@ func (mailer Mailer) buildReplyMessage(from string, name string, rcp model.Recip
 	m.AddAlternative("text/html", email.HTML)
 
 	// Preserve original metadata
-	if len(email.Headers.InReplyTo) > 0 {
-		m.SetHeader("In-Reply-To", string(email.Headers.InReplyTo[0]))
-	}
+	setThreadHeaders(m, email.Headers)
 	m.SetHeader("X-Complaints-To", mailer.cfg.Report)
 	m.SetHeader("X-Report-Abuse", mailer.cfg.Report)
 	m.SetHeader("X-Report-Abuse-To", mailer.cfg.Report)
@@ -167,7 +165,7 @@ func (mailer Mailer) buildReplyMessage(from string, name string, rcp model.Recip
 		m.Embed(
 			f.ContentID,
 			gomail.SetHeader(map[string][]string{
-				"Content-ID":          {f.ContentID},
+				"Content-ID":          {bracketID(f.ContentID)},
 				"Content-Type":        {f.ContentType.ContentType},
 				"Content-Disposition": {f.ContentDisposition.Params["type"] + "; filename=\"" + f.ContentDisposition.Params["filename"] + "\""},
 			}),
@@ -179,6 +177,38 @@ func (mailer Mailer) buildReplyMessage(from string, name string, rcp model.Recip
 	}
 
 	return m, string(email.Headers.MessageID), nil
+}
+
+// bracketID puts back the <> that letters strips from Message-ID, In-Reply-To, References and
+// Content-ID. Without them the ID is invalid (RFC 5322 3.6.4, RFC 2045 7), so Gmail replaces
+// the Message-ID and replies no longer thread with the original.
+func bracketID(id string) string {
+	if id == "" {
+		return ""
+	}
+	return "<" + id + ">"
+}
+
+// bracketIDs joins a list of IDs for In-Reply-To or References.
+func bracketIDs(ids []letters.MessageId) string {
+	var out []string
+	for _, id := range ids {
+		if id != "" {
+			out = append(out, bracketID(string(id)))
+		}
+	}
+	return strings.Join(out, " ")
+}
+
+// setThreadHeaders copies In-Reply-To and References, so replies thread with the original
+// conversation.
+func setThreadHeaders(m *gomail.Message, h letters.Headers) {
+	if v := bracketIDs(h.InReplyTo); v != "" {
+		m.SetHeader("In-Reply-To", v)
+	}
+	if v := bracketIDs(h.References); v != "" {
+		m.SetHeader("References", v)
+	}
 }
 
 // buildForwardMessage builds the outgoing forward message without dialing the network,
@@ -255,17 +285,12 @@ func (mailer Mailer) buildForwardMessage(from string, name string, to string, rc
 		m.SetHeader("X-Mailx-Original-From-Header", email.Headers.From[0].String())
 	}
 	if email.Headers.MessageID != "" {
-		m.SetHeader("Message-ID", string(email.Headers.MessageID))
+		m.SetHeader("Message-ID", bracketID(string(email.Headers.MessageID)))
 	}
 	if authResults, ok := email.Headers.ExtraHeaders["Authentication-Results"]; ok && len(authResults) > 0 {
 		m.SetHeader("X-Mailx-Authentication-Results", authResults...)
 	}
-	if len(email.Headers.InReplyTo) > 0 {
-		m.SetHeader("In-Reply-To", string(email.Headers.InReplyTo[0]))
-	}
-	if refs, ok := email.Headers.ExtraHeaders["References"]; ok && len(refs) > 0 {
-		m.SetHeader("References", refs...)
-	}
+	setThreadHeaders(m, email.Headers)
 	if received, ok := email.Headers.ExtraHeaders["Received"]; ok && len(received) > 0 {
 		ownHop := fmt.Sprintf(
 			"from unknown by %s with ESMTPS; %s",
@@ -345,7 +370,7 @@ func (mailer Mailer) buildForwardMessage(from string, name string, to string, rc
 			m.Embed(
 				f.ContentID,
 				gomail.SetHeader(map[string][]string{
-					"Content-ID":          {f.ContentID},
+					"Content-ID":          {bracketID(f.ContentID)},
 					"Content-Type":        {f.ContentType.ContentType},
 					"Content-Disposition": {f.ContentDisposition.Params["type"] + "; filename=\"" + f.ContentDisposition.Params["filename"] + "\""},
 				}),
@@ -363,7 +388,11 @@ func (mailer Mailer) buildForwardMessage(from string, name string, to string, rc
 		if err != nil {
 			return nil, "", err
 		}
-		// Kept on the outer message so mail clients can still offer unsubscribe
+		// Kept on the outer message so mail clients can still offer unsubscribe and thread replies
+		if email.Headers.MessageID != "" {
+			em.SetHeader("Message-ID", bracketID(string(email.Headers.MessageID)))
+		}
+		setThreadHeaders(em, email.Headers)
 		setListUnsubscribe(em, listUnsubscribe)
 		setTrackersRemoved(em, removedTrackers)
 		setRulesApplied(em, outcome.MatchedNames)

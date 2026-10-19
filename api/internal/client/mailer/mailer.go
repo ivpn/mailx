@@ -11,6 +11,7 @@ import (
 	"log"
 	"maps"
 	"mime"
+	"net/mail"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -231,11 +232,16 @@ func (mailer Mailer) buildForwardMessage(from string, name string, to string, rc
 	// the subject is already plain text.
 	decodedSubject := outcome.Subject(utils.DecodeHeaderWithCharset(email.Headers.Subject))
 
+	pgpMIMEType, pgpMIMEBody, isSenderPGPMIME := senderPGPMIME(data)
+
 	m := gomail.NewMessage()
+	if isSenderPGPMIME {
+		// UTF-8 so non-ASCII headers are still encoded correctly
+		m = gomail.NewRawMessage(gomail.SetCharset("UTF-8"))
+	}
 	m.SetAddressHeader("From", from, name)
 	m.SetHeader("To", to)
 	m.SetHeader("Subject", decodedSubject)
-	m.SetBody("text/plain", header.String()+email.Text)
 
 	// Preserve original metadata
 	originalSender := from
@@ -286,6 +292,17 @@ func (mailer Mailer) buildForwardMessage(from string, name string, to string, rc
 	setListUnsubscribe(m, listUnsubscribe)
 	setTrackersRemoved(m, removedTrackers)
 	setRulesApplied(m, outcome.MatchedNames)
+
+	// Forwarded as the sender encrypted it, so the recipient's mail app decrypts it directly.
+	// Rebuilding it would turn the encrypted parts into attachments.
+	if isSenderPGPMIME {
+		m.SetHeader("Content-Type", pgpMIMEType)
+		m.SetRawBody(pgpMIMEBody)
+
+		return m, string(email.Headers.MessageID), nil
+	}
+
+	m.SetBody("text/plain", header.String()+email.Text)
 
 	// PGP/Inline encryption
 	if rcp.PGPEnabled && rcp.PGPKey != "" && rcp.PGPInline {
@@ -453,6 +470,32 @@ func isAlreadyEncrypted(email letters.Email) bool {
 
 	const armor = "-----BEGIN PGP MESSAGE-----"
 	return strings.Contains(email.Text, armor) || strings.Contains(email.HTML, armor)
+}
+
+// senderPGPMIME returns the Content-Type and body of a message the sender encrypted with
+// PGP/MIME (RFC 3156), with CRLF line endings. ok is false for any other message.
+func senderPGPMIME(data []byte) (contentType string, body string, ok bool) {
+	msg, err := mail.ReadMessage(bytes.NewReader(data))
+	if err != nil {
+		return "", "", false
+	}
+
+	contentType = msg.Header.Get("Content-Type")
+	mediaType, params, err := mime.ParseMediaType(contentType)
+	if err != nil || mediaType != "multipart/encrypted" ||
+		!strings.EqualFold(params["protocol"], "application/pgp-encrypted") || params["boundary"] == "" {
+		return "", "", false
+	}
+
+	raw, err := io.ReadAll(msg.Body)
+	if err != nil {
+		return "", "", false
+	}
+
+	// Mail piped in by Postfix has LF line endings, but the headers are written with CRLF
+	body = strings.ReplaceAll(strings.ReplaceAll(string(raw), "\r\n", "\n"), "\n", "\r\n")
+
+	return contentType, body, true
 }
 
 // withTrackersReport adds the removed tracker count and report link for the header template.

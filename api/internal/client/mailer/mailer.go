@@ -11,6 +11,8 @@ import (
 	"log"
 	"maps"
 	"mime"
+	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -287,36 +289,55 @@ func (mailer Mailer) buildForwardMessage(from string, name string, to string, rc
 
 	// PGP/Inline encryption
 	if rcp.PGPEnabled && rcp.PGPKey != "" && rcp.PGPInline {
-		armored, err := utils.EncryptWithPGPInline(email.Text, rcp.PGPKey)
+		files := pgpInlineFiles(email)
+		armored, err := utils.EncryptWithPGPInline(email.Text+pgpInlineFilesNote(files), rcp.PGPKey)
 		if err != nil {
 			return nil, "", err
 		}
 		// gomail writes the Content-Type itself, so setting it here would duplicate it
 		m.SetBody("text/plain", armored)
+
+		// Each file is encrypted on its own, so nothing is forwarded in the clear
+		for _, f := range files {
+			encrypted, err := utils.EncryptFileWithPGP(f.data, rcp.PGPKey)
+			if err != nil {
+				return nil, "", err
+			}
+			m.Attach(
+				f.name,
+				gomail.SetHeader(map[string][]string{
+					"Content-Type": {"application/octet-stream; name=\"" + f.name + "\""},
+				}),
+				gomail.SetCopyFunc(func(w io.Writer) error {
+					_, err := w.Write(encrypted)
+					return err
+				}),
+			)
+		}
 	} else {
 		m.AddAlternative("text/html", headerHtml.String()+email.HTML)
-	}
 
-	for _, a := range email.AttachedFiles {
-		m.Attach(a.ContentDisposition.Params["filename"], gomail.SetCopyFunc(func(w io.Writer) error {
-			_, err = w.Write(a.Data)
-			return err
-		}))
-	}
-
-	for _, f := range email.InlineFiles {
-		m.Embed(
-			f.ContentID,
-			gomail.SetHeader(map[string][]string{
-				"Content-ID":          {f.ContentID},
-				"Content-Type":        {f.ContentType.ContentType},
-				"Content-Disposition": {f.ContentDisposition.Params["type"] + "; filename=\"" + f.ContentDisposition.Params["filename"] + "\""},
-			}),
-			gomail.SetCopyFunc(func(w io.Writer) error {
-				_, err = w.Write(f.Data)
+		for _, a := range email.AttachedFiles {
+			m.Attach(a.ContentDisposition.Params["filename"], gomail.SetCopyFunc(func(w io.Writer) error {
+				_, err = w.Write(a.Data)
 				return err
-			}),
-		)
+			}))
+		}
+
+		for _, f := range email.InlineFiles {
+			m.Embed(
+				f.ContentID,
+				gomail.SetHeader(map[string][]string{
+					"Content-ID":          {f.ContentID},
+					"Content-Type":        {f.ContentType.ContentType},
+					"Content-Disposition": {f.ContentDisposition.Params["type"] + "; filename=\"" + f.ContentDisposition.Params["filename"] + "\""},
+				}),
+				gomail.SetCopyFunc(func(w io.Writer) error {
+					_, err = w.Write(f.Data)
+					return err
+				}),
+			)
+		}
 	}
 
 	// PGP/MIME encryption
@@ -334,6 +355,61 @@ func (mailer Mailer) buildForwardMessage(from string, name string, to string, rc
 	}
 
 	return m, string(email.Headers.MessageID), nil
+}
+
+// pgpInlineFile is an attachment or inline image as forwarded to a PGP/Inline recipient.
+type pgpInlineFile struct {
+	name     string // attachment-N<ext>.pgp, so the original name isn't sent in the clear
+	original string
+	data     []byte
+}
+
+var pgpInlineExtRe = regexp.MustCompile(`^\.[a-z0-9]{1,8}$`)
+
+// pgpInlineFiles lists the attachments and inline images in the order they're forwarded. The
+// file extension is kept so the decrypted file still opens in the right app.
+func pgpInlineFiles(email letters.Email) []pgpInlineFile {
+	var files []pgpInlineFile
+	add := func(filename string, original string, data []byte) {
+		ext := strings.ToLower(filepath.Ext(filename))
+		if !pgpInlineExtRe.MatchString(ext) {
+			ext = ""
+		}
+		name := fmt.Sprintf("attachment-%d%s.pgp", len(files)+1, ext)
+		files = append(files, pgpInlineFile{name, original, data})
+	}
+
+	for _, a := range email.AttachedFiles {
+		filename := a.ContentDisposition.Params["filename"]
+		add(filename, filename, a.Data)
+	}
+	for _, f := range email.InlineFiles {
+		filename := f.ContentDisposition.Params["filename"]
+		original := filename
+		if original == "" {
+			original = f.ContentType.ContentType
+		}
+		add(filename, original+" (inline image)", f.Data)
+	}
+
+	return files
+}
+
+// pgpInlineFilesNote maps the attachment names to the original ones. It goes in the encrypted
+// body, so only the recipient sees the original names.
+func pgpInlineFilesNote(files []pgpInlineFile) string {
+	if len(files) == 0 {
+		return ""
+	}
+
+	var note strings.Builder
+	note.WriteString("\n\nAttachments, encrypted separately:\n")
+	for _, f := range files {
+		// Keeps a crafted name from adding lines to the note
+		fmt.Fprintf(&note, "%s: %s\n", f.name, strings.Join(strings.Fields(f.original), " "))
+	}
+
+	return note.String()
 }
 
 // setListUnsubscribe sets the List-Unsubscribe headers built for the forward. The original

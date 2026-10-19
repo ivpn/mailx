@@ -2,15 +2,19 @@ package mailer
 
 import (
 	"bytes"
+	"encoding/base64"
 	"io"
 	"mime"
 	"mime/multipart"
+	"mime/quotedprintable"
 	"net/mail"
+	"net/textproto"
 	"slices"
 	"strings"
 	"testing"
 
 	"github.com/ProtonMail/gopenpgp/v3/crypto"
+	"github.com/mnako/letters"
 	"ivpn.net/email/api/internal/model"
 	"ivpn.net/email/api/internal/utils/gomail.v2"
 )
@@ -124,6 +128,12 @@ func decodedHeader(t *testing.T, h mail.Header, key string) string {
 func buildRulesForward(t *testing.T, raw string, name string, rcp model.Recipient, settings model.Settings, outcome model.RuleOutcome) builtMessage {
 	t.Helper()
 
+	return writeAndParse(t, buildRulesForwardMessage(t, raw, name, rcp, settings, outcome))
+}
+
+func buildRulesForwardMessage(t *testing.T, raw string, name string, rcp model.Recipient, settings model.Settings, outcome model.RuleOutcome) *gomail.Message {
+	t.Helper()
+
 	m := Mailer{}
 	alias := model.Alias{BaseModel: model.BaseModel{ID: "alias-1"}, Name: "myalias@mailx.net"}
 	templateData := map[string]any{"alias": alias.Name, "from": "news@shop.example"}
@@ -136,17 +146,23 @@ func buildRulesForward(t *testing.T, raw string, name string, rcp model.Recipien
 		t.Fatalf("buildForwardMessage() error = %v", err)
 	}
 
-	return writeAndParse(t, msg)
+	return msg
 }
 
-func testPublicKey(t *testing.T) string {
+func testKey(t *testing.T) *crypto.Key {
 	t.Helper()
 
 	key, err := crypto.PGP().KeyGeneration().AddUserId("Test", "real@domain.com").New().GenerateKey()
 	if err != nil {
 		t.Fatalf("GenerateKey() error = %v", err)
 	}
-	publicKey, err := key.GetArmoredPublicKey()
+	return key
+}
+
+func testPublicKey(t *testing.T) string {
+	t.Helper()
+
+	publicKey, err := testKey(t).GetArmoredPublicKey()
 	if err != nil {
 		t.Fatalf("GetArmoredPublicKey() error = %v", err)
 	}
@@ -309,8 +325,164 @@ func TestForward_PGPInlineHasOneContentType(t *testing.T) {
 	if ct := fwd.header["Content-Type"]; len(ct) != 1 || !strings.HasPrefix(ct[0], "multipart/") {
 		t.Errorf("with attachments: Content-Type = %q, want one multipart", ct)
 	}
-	if !fwd.hasPart(func(p mimePart) bool { return p.filename == "deals.pdf" }) {
+	if !fwd.hasPart(func(p mimePart) bool { return p.filename == "attachment-1.pdf.pgp" }) {
 		t.Errorf("with attachments: parts = %+v, want the attachment", fwd.parts)
+	}
+}
+
+// leafPart is a decoded non-multipart part of a built message.
+type leafPart struct {
+	header textproto.MIMEHeader
+	data   []byte
+}
+
+func leafParts(t *testing.T, contentType string, encoding string, body io.Reader) []leafPart {
+	t.Helper()
+
+	mediaType, params, _ := mime.ParseMediaType(contentType)
+	if !strings.HasPrefix(mediaType, "multipart/") {
+		switch strings.ToLower(encoding) {
+		case "base64":
+			body = base64.NewDecoder(base64.StdEncoding, body)
+		case "quoted-printable":
+			body = quotedprintable.NewReader(body)
+		}
+		data, err := io.ReadAll(body)
+		if err != nil {
+			t.Fatalf("read part: %v", err)
+		}
+		return []leafPart{{textproto.MIMEHeader{"Content-Type": {contentType}}, data}}
+	}
+
+	var parts []leafPart
+	mr := multipart.NewReader(body, params["boundary"])
+	for {
+		part, err := mr.NextPart()
+		if err != nil {
+			return parts
+		}
+		for _, p := range leafParts(t, part.Header.Get("Content-Type"), part.Header.Get("Content-Transfer-Encoding"), part) {
+			if !strings.HasPrefix(part.Header.Get("Content-Type"), "multipart/") {
+				p.header = part.Header
+			}
+			parts = append(parts, p)
+		}
+	}
+}
+
+func decryptWith(t *testing.T, key *crypto.Key, data []byte, encoding int8) string {
+	t.Helper()
+
+	dec, err := crypto.PGP().Decryption().DecryptionKey(key).New()
+	if err != nil {
+		t.Fatalf("decryption handle: %v", err)
+	}
+	res, err := dec.Decrypt(data, encoding)
+	if err != nil {
+		t.Fatalf("Decrypt() error = %v", err)
+	}
+	return res.String()
+}
+
+func TestForward_PGPInlineEncryptsAttachments(t *testing.T) {
+	key := testKey(t)
+	publicKey, err := key.GetArmoredPublicKey()
+	if err != nil {
+		t.Fatalf("GetArmoredPublicKey() error = %v", err)
+	}
+	rcp := model.Recipient{Email: "real@domain.com", PGPEnabled: true, PGPKey: publicKey, PGPInline: true}
+
+	var buf bytes.Buffer
+	if _, err := buildRulesForwardMessage(t, testRulesRawEmail, "Shop", rcp, model.Settings{}, model.RuleOutcome{}).WriteTo(&buf); err != nil {
+		t.Fatalf("WriteTo() error = %v", err)
+	}
+	for _, name := range []string{"deals.pdf", "logo.png", "logo@shop.example"} {
+		if bytes.Contains(buf.Bytes(), []byte(name)) {
+			t.Errorf("raw forward contains %q in the clear", name)
+		}
+	}
+	parsed, err := mail.ReadMessage(&buf)
+	if err != nil {
+		t.Fatalf("mail.ReadMessage() error = %v", err)
+	}
+	parts := leafParts(t, parsed.Header.Get("Content-Type"), parsed.Header.Get("Content-Transfer-Encoding"), parsed.Body)
+
+	if len(parts) != 3 {
+		t.Fatalf("got %d parts, want the body and 2 attachments", len(parts))
+	}
+
+	body := decryptWith(t, key, parts[0].data, crypto.Armor)
+	for _, line := range []string{"attachment-1.pdf.pgp: deals.pdf", "attachment-2.png.pgp: logo.png (inline image)"} {
+		if !strings.Contains(body, line) {
+			t.Errorf("decrypted body = %q, want %q", body, line)
+		}
+	}
+
+	want := []struct{ name, data string }{
+		{"attachment-1.pdf.pgp", "%PDF-1.4"},
+		{"attachment-2.png.pgp", "\x89PNG\r\n\x1a\n"},
+	}
+	for i, w := range want {
+		p := parts[i+1]
+		if ct := p.header.Get("Content-Type"); ct != `application/octet-stream; name="`+w.name+`"` {
+			t.Errorf("part %d Content-Type = %q", i+1, ct)
+		}
+		if cd := p.header.Get("Content-Disposition"); cd != `attachment; filename="`+w.name+`"` {
+			t.Errorf("part %d Content-Disposition = %q", i+1, cd)
+		}
+		if cid := p.header.Get("Content-Id"); cid != "" {
+			t.Errorf("part %d Content-ID = %q, want none", i+1, cid)
+		}
+		if got := decryptWith(t, key, p.data, crypto.Bytes); got != w.data {
+			t.Errorf("part %d decrypts to %q, want %q", i+1, got, w.data)
+		}
+	}
+}
+
+func TestPGPInlineFiles(t *testing.T) {
+	attached := func(name string) letters.AttachedFile {
+		return letters.AttachedFile{ContentDisposition: letters.ContentDispositionHeader{Params: map[string]string{"filename": name}}}
+	}
+	email := letters.Email{
+		AttachedFiles: []letters.AttachedFile{
+			attached("Report.PDF"),
+			attached("no-extension"),
+			attached("archive.tar.gz"),
+			attached("odd.ext with space"),
+			attached("long.verylongext"),
+			attached("bad\r\nattachment-9.pgp: fake.pdf"),
+		},
+		InlineFiles: []letters.InlineFile{{ContentType: letters.ContentTypeHeader{ContentType: "image/png"}}},
+	}
+
+	files := pgpInlineFiles(email)
+	wantNames := []string{
+		"attachment-1.pdf.pgp",
+		"attachment-2.pgp",
+		"attachment-3.gz.pgp",
+		"attachment-4.pgp",
+		"attachment-5.pgp",
+		"attachment-6.pdf.pgp",
+		"attachment-7.pgp",
+	}
+	if len(files) != len(wantNames) {
+		t.Fatalf("got %d files, want %d", len(files), len(wantNames))
+	}
+	for i, f := range files {
+		if f.name != wantNames[i] {
+			t.Errorf("file %d name = %q, want %q", i, f.name, wantNames[i])
+		}
+	}
+
+	note := pgpInlineFilesNote(files)
+	if !strings.Contains(note, "attachment-6.pdf.pgp: bad attachment-9.pgp: fake.pdf\n") {
+		t.Errorf("note = %q, want the crafted name on one line", note)
+	}
+	if !strings.Contains(note, "attachment-7.pgp: image/png (inline image)\n") {
+		t.Errorf("note = %q, want the inline image's type when it has no name", note)
+	}
+	if pgpInlineFilesNote(nil) != "" {
+		t.Error("note added without attachments")
 	}
 }
 

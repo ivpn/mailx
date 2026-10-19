@@ -36,10 +36,10 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import axios from 'axios'
 import { announcementsApi } from '../api/announcements.ts'
 import { useAnnouncements } from '../lib/announcements.ts'
+import { useGoBack } from '../lib/useGoBack.ts'
 
 interface Announcement {
     title: string
@@ -47,8 +47,7 @@ interface Announcement {
     link: string
 }
 
-const router = useRouter()
-const goBack = () => router.back()
+const goBack = useGoBack()
 
 const list = ref<Announcement[]>([])
 const error = ref('')

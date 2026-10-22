@@ -138,7 +138,7 @@ var ruleConditionSpecs = map[RuleConditionType]ruleConditionSpec{
 	RuleConditionDestination:      {"Destination email", false, repliesAndSends},
 	RuleConditionIsMailingList:    {"Email is from a mailing list / newsletter", true, forwardsOnly},
 	RuleConditionHasAttachments:   {"Email has attachments", true, allRelayTypes},
-	RuleConditionAliasIsWildcard:  {"Alias is a wildcard (catch-all) alias", true, allRelayTypes},
+	RuleConditionAliasIsWildcard:  {"Alias is a wildcard alias", true, allRelayTypes},
 }
 
 type ruleActionValue int

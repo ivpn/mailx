@@ -131,7 +131,7 @@ func (s *Service) ProcessBounceLog(userId string, aliasId string, data []byte, m
 	var remoteMta string
 	var status string
 	var diagnosticCode string
-	var date time.Time
+	var attemptedAt *time.Time
 	var inDiag = false
 	msgType := model.Send
 	for line := range bytes.SplitSeq(data, []byte{'\n'}) {
@@ -181,9 +181,11 @@ func (s *Service) ProcessBounceLog(userId string, aliasId string, data []byte, m
 			}
 		}
 		if after, ok := bytes.CutPrefix(line, []byte("Date:")); ok {
-			date, err = mail.ParseDate(string(bytes.TrimSpace(after)))
+			date, err := mail.ParseDate(string(bytes.TrimSpace(after)))
 			if err != nil {
 				log.Println("error parsing bounce date:", err.Error())
+			} else {
+				attemptedAt = &date
 			}
 		}
 	}
@@ -191,7 +193,7 @@ func (s *Service) ProcessBounceLog(userId string, aliasId string, data []byte, m
 	lg := model.Log{
 		ID:          uuid.New().String(),
 		CreatedAt:   time.Now(),
-		AttemptedAt: date,
+		AttemptedAt: attemptedAt,
 		Type:        model.BounceMessage,
 		UserID:      userId,
 		AliasID:     aliasId,

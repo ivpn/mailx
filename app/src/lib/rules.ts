@@ -67,7 +67,7 @@ export const conditionSpecs: ConditionSpec[] = [
     { type: 'destination', label: 'destination email', boolean: false, types: ['replies', 'sends'] },
     { type: 'is_mailing_list', label: 'email is from a mailing list / newsletter', boolean: true, types: forwardsOnly },
     { type: 'has_attachments', label: 'email has attachments', boolean: true, types: allTypes },
-    { type: 'alias_is_wildcard', label: 'alias is a wildcard (catch-all) alias', boolean: true, types: allTypes },
+    { type: 'alias_is_wildcard', label: 'alias is a wildcard alias', boolean: true, types: allTypes },
 ]
 
 export const matchOptions = [

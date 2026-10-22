@@ -427,10 +427,12 @@ func (t ruleRelayTypes) String() string {
 	}
 }
 
-// hasControlChars reports whether s has a CR, LF or another control character, none of which
-// can go into a header.
+// hasControlChars reports whether s has a CR, LF or another control character, or a Unicode line
+// or paragraph separator (U+2028, U+2029), none of which belong in a header.
 func hasControlChars(s string) bool {
-	return strings.IndexFunc(s, unicode.IsControl) != -1
+	return strings.IndexFunc(s, func(r rune) bool {
+		return unicode.IsControl(r) || unicode.In(r, unicode.Zl, unicode.Zp)
+	}) != -1
 }
 
 // RecipientIDs returns the distinct recipient IDs of a forward_to value, in the order given.

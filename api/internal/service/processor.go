@@ -23,6 +23,10 @@ var (
 	// noRecipientsReason is the diagnostic shown when ErrNoRecipients drops a message, spelling
 	// out where a recipient can be set since the bare error doesn't say.
 	noRecipientsReason = "No verified recipient to forward to. Set a verified recipient on the alias, the domain's catch-all recipient, or the default recipient in Settings."
+	// disabledAliasReason and disabledDomainReason are the diagnostics shown when ErrDisabledAlias
+	// and ErrDisabledDomain drop a message; the bare errors are meant to be followed by a name.
+	disabledAliasReason  = "The alias is disabled. Enable it to receive emails again."
+	disabledDomainReason = "The alias's custom domain is disabled or not verified. Enable or verify the domain to receive emails again."
 )
 
 func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
@@ -130,7 +134,7 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 				}
 
 				if settings.LogIssues {
-					err := s.ProcessDiagnosticLog(alias, msg.From, to, ErrDisabledAlias.Error(), model.DisabledAlias)
+					err := s.ProcessDiagnosticLog(alias, msg.From, to, disabledAliasReason, model.DisabledAlias)
 					if err != nil {
 						log.Println("error processing diagnostic log", err)
 					}
@@ -146,7 +150,7 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 				}
 
 				if settings.LogIssues {
-					err := s.ProcessDiagnosticLog(alias, msg.From, to, ErrDisabledDomain.Error(), model.DisabledDomain)
+					err := s.ProcessDiagnosticLog(alias, msg.From, to, disabledDomainReason, model.DisabledDomain)
 					if err != nil {
 						log.Println("error processing diagnostic log", err)
 					}

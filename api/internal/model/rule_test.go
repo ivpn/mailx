@@ -315,6 +315,11 @@ func TestRuleValidate(t *testing.T) {
 		{"subject with CRLF", func(r *Rule) { r.Actions[0].Value = "a\r\nBcc: x@example.com" }, "Replace the subject with can't contain line breaks or control characters."},
 		{"display name with LF", func(r *Rule) { r.Actions[0] = RuleAction{Type: RuleActionSetDisplayName, Value: "a\nb"} }, "Set the sender name to can't contain line breaks or control characters."},
 		{"description with CR", func(r *Rule) { r.Actions[0] = RuleAction{Type: RuleActionSetAliasDescription, Value: "a\rb"} }, "Set the alias description to can't contain line breaks or control characters."},
+		{"name with line separator", func(r *Rule) { r.Name = "a b" }, "Name can't contain line breaks or control characters."},
+		{"subject with line separator", func(r *Rule) { r.Actions[0].Value = "a b" }, "Replace the subject with can't contain line breaks or control characters."},
+		{"display name with paragraph separator", func(r *Rule) { r.Actions[0] = RuleAction{Type: RuleActionSetDisplayName, Value: "a b"} }, "Set the sender name to can't contain line breaks or control characters."},
+		{"description with line separator", func(r *Rule) { r.Actions[0] = RuleAction{Type: RuleActionSetAliasDescription, Value: "a b"} }, "Set the alias description to can't contain line breaks or control characters."},
+		{"subject with non-ASCII text", func(r *Rule) { r.Actions[0].Value = "[Newsletter] Žltá – {subject}" }, ""},
 		{"empty description clears it", func(r *Rule) { r.Actions[0] = RuleAction{Type: RuleActionSetAliasDescription} }, ""},
 		{"hide and show banner", func(r *Rule) { r.Actions[0] = RuleAction{Type: RuleActionShowBanner} }, "Hide the Mailx banner and Show the Mailx banner can't be used together."},
 		{"block with blocklist", func(r *Rule) {

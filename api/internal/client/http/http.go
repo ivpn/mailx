@@ -3,6 +3,7 @@ package http
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -10,6 +11,8 @@ import (
 	"ivpn.net/email/api/config"
 	"ivpn.net/email/api/internal/model"
 )
+
+const maxLoggedResponse = 512
 
 type Http struct {
 	Cfg config.APIConfig
@@ -33,15 +36,15 @@ func (h Http) SignupWebhook(subID string) error {
 
 	status, res, err := req.Bytes()
 	if err != nil {
-		log.Printf("Error calling signup webhook: %v", err)
-		return errors.New("error calling signup webhook")
+		return fmt.Errorf("error calling signup webhook: %v", err)
 	}
 
 	if status != http.StatusOK {
-		// Log response for debugging
-		log.Printf("Error calling signup webhook, status: %d", status)
-		log.Printf("Signup webhook response: %s", string(res))
-		return errors.New("error response from signup webhook")
+		// Include the response for debugging, capped to keep log lines readable
+		if len(res) > maxLoggedResponse {
+			res = res[:maxLoggedResponse]
+		}
+		return fmt.Errorf("error response from signup webhook, status: %d, response: %s", status, string(res))
 	}
 
 	return nil

@@ -12,11 +12,6 @@ reason = "golang.org/x/crypto/openpgp deprecated (module-level, no fix). Not imp
 # --- npm: build tooling only, nothing ships in the app or extension bundles ---
 
 [[IgnoredVulns]]
-id = "GHSA-vfj7-8cjw-p6xm"
-ignoreUntil = 2027-01-06
-reason = "braces 3.0.3 (no fixed version) via tailwindcss/chokidar build tooling; only processes developer-controlled glob patterns."
-
-[[IgnoredVulns]]
 id = "GHSA-rj75-hqrm-r3gf"
 ignoreUntil = 2027-01-06
 reason = "postcss-selector-parser 6.x required by tailwindcss 3 (fix only in 7.x); build-time slowdown on our own CSS."

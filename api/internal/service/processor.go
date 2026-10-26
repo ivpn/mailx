@@ -12,10 +12,11 @@ import (
 )
 
 var (
-	ErrInactiveSubscription = errors.New("Subscription is inactive.")
-	ErrNoRecipients         = errors.New("No recipients found.")
-	ErrNoVerifiedRecipients = errors.New("Sender is not a verified address.")
-	ErrInactiveRecipient    = errors.New("The recipient is inactive.")
+	ErrInactiveSubscription  = errors.New("Subscription is inactive.")
+	ErrNoRecipients          = errors.New("No recipients found.")
+	ErrNoVerifiedRecipients  = errors.New("Sender is not a verified address.")
+	ErrInactiveRecipient     = errors.New("The recipient is inactive.")
+	ErrUnauthenticatedSender = errors.New("Sender failed email authentication (DMARC, DKIM or SPF).")
 )
 
 func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
@@ -77,18 +78,9 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 		return nil
 	}
 
-	// Verify Email Authentication
-	pass, err := utils.VerifyEmailAuth(data, utils.EmailAuthConfig{
-		TrustedRelayDomains: s.Cfg.API.TrustedRelayDomains,
-		DisableAlignment:    s.Cfg.API.DisableEmailAuthAlignment,
-		LogMismatch:         s.Cfg.API.LogEmailAuthMismatch,
-	})
-	if err != nil {
-		log.Println("email authentication failed:", err)
-	}
-	if !pass {
-		// Fail silently so unauthenticated emails are not kept in postfix queue
-		return nil
+	authCfg := utils.EmailAuthConfig{
+		AuthServIDs:       s.Cfg.API.EmailAuthServIDs,
+		ARCTrustedSealers: s.Cfg.API.ARCTrustedSealers,
 	}
 
 	var g errgroup.Group
@@ -146,6 +138,37 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 				}
 			}
 
+			continue
+		}
+
+		// Verify Email Authentication
+		// Replies and sends must come from the alias owner; forwards come from
+		// third parties and are only checked against the sender's DMARC policy.
+		verifyAuth := utils.VerifyForwardAuth
+		if relayType != model.Forward {
+			verifyAuth = utils.VerifyEmailAuth
+		}
+		pass, err := verifyAuth(data, authCfg)
+		if err != nil {
+			log.Println("email authentication failed:", err, alias.Name)
+		}
+		if !pass {
+			if relayType != model.Forward {
+				settings, err := s.GetSettings(context.Background(), alias.UserID)
+				if err != nil {
+					log.Println("error getting settings", err)
+					continue
+				}
+
+				if settings.LogIssues {
+					err := s.ProcessDiagnosticLog(alias, msg.From, to, ErrUnauthenticatedSender.Error(), model.UnauthorisedSend)
+					if err != nil {
+						log.Println("error processing diagnostic log", err)
+					}
+				}
+			}
+
+			// Fail silently so unauthenticated emails are not kept in postfix queue
 			continue
 		}
 

@@ -13,6 +13,7 @@ var (
 	ErrAuthServIDNotConfigured = errors.New("authserv-id is not configured")
 	ErrNoOwnAuthResults        = errors.New("no Authentication-Results header from own mail server")
 	ErrDuplicateOwnAuthResults = errors.New("multiple Authentication-Results headers with own authserv-id")
+	ErrMalformedOwnAuthResults = errors.New("malformed Authentication-Results header from own mail server")
 	ErrDMARCPolicyReject       = errors.New("dmarc=fail with policy=reject")
 	ErrNoAlignedAuthentication = errors.New("no aligned DMARC, DKIM or SPF pass")
 	ErrDMARCFail               = errors.New("dmarc=fail")
@@ -43,6 +44,17 @@ type authResults struct {
 	servID   string
 	instance int
 	results  []resInfo
+	// malformed says why the header could not be parsed cleanly, e.g. an
+	// unterminated quote or comment. Empty for a well-formed header.
+	malformed string
+}
+
+// knownMethods are the registered authentication methods (IANA "Email
+// Authentication Methods"). Rspamd only writes auth, dkim, dmarc, spf and arc.
+var knownMethods = map[string]bool{
+	"arc": true, "auth": true, "bimi": true, "dkim": true, "dkim-adsp": true, "dkim-atps": true,
+	"dmarc": true, "dnswl": true, "domainkeys": true, "iprev": true, "rrvs": true,
+	"sender-id": true, "smime": true, "spf": true, "vbr": true,
 }
 
 // VerifyEmailAuth reports whether the message's From address is authenticated.
@@ -86,7 +98,7 @@ func VerifyEmailAuth(data []byte, cfg EmailAuthConfig) (bool, error) {
 // server found dmarc=fail and the From domain asks for rejection, unless a
 // trusted ARC sealer vouches for it. A missing own header does not block
 // forwarding, so a mail server misconfiguration doesn't drop inbound mail, but
-// a duplicated one does, since only a forger adds one.
+// a duplicated or malformed one does, since only a forger produces one.
 func VerifyForwardAuth(data []byte, cfg EmailAuthConfig) (bool, error) {
 	msg, err := mail.ReadMessage(bytes.NewReader(data))
 	if err != nil {
@@ -96,7 +108,7 @@ func VerifyForwardAuth(data []byte, cfg EmailAuthConfig) (bool, error) {
 	msgID := msg.Header.Get("Message-ID")
 
 	own, err := ownAuthResults(msg.Header, cfg.AuthServIDs)
-	if errors.Is(err, ErrDuplicateOwnAuthResults) {
+	if errors.Is(err, ErrDuplicateOwnAuthResults) || errors.Is(err, ErrMalformedOwnAuthResults) {
 		return false, withMessageID(err, msgID)
 	}
 	if err != nil {
@@ -117,7 +129,8 @@ func VerifyForwardAuth(data []byte, cfg EmailAuthConfig) (bool, error) {
 
 // ownAuthResults returns the single Authentication-Results header written by
 // one of our own mail servers, identified by servIDs. A message is received by
-// one of them, so headers from more than one count as duplicates.
+// one of them, so headers from more than one count as duplicates. The header
+// must also have the shape Rspamd writes (see checkOwnAuthResults).
 func ownAuthResults(header mail.Header, servIDs []string) (authResults, error) {
 	configured := false
 	for _, servID := range servIDs {
@@ -131,10 +144,12 @@ func ownAuthResults(header mail.Header, servIDs []string) (authResults, error) {
 	}
 
 	var own []authResults
+	var ownValue string
 	for _, value := range header["Authentication-Results"] {
 		parsed := parseAuthResults(value)
 		if isOwnServID(parsed.servID, servIDs) {
 			own = append(own, parsed)
+			ownValue = value
 		}
 	}
 
@@ -142,10 +157,51 @@ func ownAuthResults(header mail.Header, servIDs []string) (authResults, error) {
 	case 0:
 		return authResults{}, ErrNoOwnAuthResults
 	case 1:
+		if reason := checkOwnAuthResults(own[0], ownValue); reason != "" {
+			return authResults{}, fmt.Errorf("%w: %s", ErrMalformedOwnAuthResults, reason)
+		}
 		return own[0], nil
 	default:
 		return authResults{}, ErrDuplicateOwnAuthResults
 	}
+}
+
+// checkOwnAuthResults returns why r, parsed from value, doesn't look like a
+// header written by Rspamd, or "" if it does. Rspamd copies sender-controlled
+// values (e.g. the SMTP MAIL FROM or DKIM d=) into its header, so a value that
+// broke out of its quotes would show up as an extra result. Rspamd quotes such
+// values but escapes only '"', not '\', so a value with a backslash can't be
+// parsed unambiguously and is rejected. Rspamd writes all DKIM results first,
+// then at most one dmarc and one spf result, and only registered methods.
+func checkOwnAuthResults(r authResults, value string) string {
+	if strings.Contains(value, `\`) {
+		return "backslash in header"
+	}
+	if r.malformed != "" {
+		return r.malformed
+	}
+
+	counts := map[string]int{}
+	afterDKIM := false
+	for _, ri := range r.results {
+		if !knownMethods[ri.method] {
+			return "unknown method " + strconv.Quote(ri.method)
+		}
+		if ri.method != "dkim" {
+			afterDKIM = true
+		} else if afterDKIM {
+			return "dkim result after other results"
+		}
+		counts[ri.method]++
+	}
+
+	for _, method := range []string{"dmarc", "spf"} {
+		if counts[method] > 1 {
+			return "multiple " + method + " results"
+		}
+	}
+
+	return ""
 }
 
 func isOwnServID(servID string, servIDs []string) bool {
@@ -162,19 +218,24 @@ func isOwnServID(servID string, servIDs []string) bool {
 	return false
 }
 
-// senderAuthenticated applies DMARC to r: dmarc=pass for fromDomain passes and
-// dmarc=fail fails. Without a DMARC result, any DKIM signature or SPF pass whose
-// domain is aligned with fromDomain is enough.
+// senderAuthenticated applies DMARC to r: dmarc=fail fails, and otherwise
+// dmarc=pass for fromDomain passes, whatever order the results are in. Without
+// a DMARC result, any DKIM signature or SPF pass whose domain is aligned with
+// fromDomain is enough.
 func senderAuthenticated(r authResults, fromDomain string) (bool, error) {
+	dmarcPass := false
 	for _, ri := range r.find("dmarc") {
 		switch ri.result {
 		case "pass":
 			if strings.EqualFold(ri.props["header.from"], fromDomain) {
-				return true, nil
+				dmarcPass = true
 			}
 		case "fail":
 			return false, fmt.Errorf("%w, fromDomain: %s", ErrDMARCFail, fromDomain)
 		}
+	}
+	if dmarcPass {
+		return true, nil
 	}
 
 	for _, ri := range r.find("dkim") {
@@ -209,10 +270,17 @@ func dmarcPolicyReject(r authResults) bool {
 // arcVouches reports whether a trusted ARC sealer recorded an aligned pass for
 // fromDomain before the message reached us. Our own mail server must report
 // arc=pass, meaning it verified the whole ARC chain, so the latest ARC-Seal and
-// the ARC-Authentication-Results header it covers are genuine.
+// the ARC-Authentication-Results header it covers are genuine. Rspamd may write
+// one arc result per verified seal, so every one of them must be a pass.
 func arcVouches(header mail.Header, own authResults, fromDomain string, trustedSealers []string) bool {
-	if !own.has("arc", "pass") {
+	arc := own.find("arc")
+	if len(arc) == 0 {
 		return false
+	}
+	for _, ri := range arc {
+		if ri.result != "pass" {
+			return false
+		}
 	}
 
 	instance, sealer := latestARCSeal(header["Arc-Seal"])
@@ -282,8 +350,11 @@ func parseTagList(value string) map[string]string {
 // kept per entry because some results (e.g. Rspamd's DMARC policy) are only
 // reported there.
 func parseAuthResults(value string) authResults {
-	segments := splitAuthResults(value)
+	segments, terminated := splitAuthResults(value)
 	parsed := authResults{}
+	if !terminated {
+		parsed.malformed = "unterminated quoted string or comment"
+	}
 
 	if len(segments) > 0 {
 		if tag, val, ok := strings.Cut(strings.TrimSpace(segments[0].text), "="); ok && strings.EqualFold(strings.TrimSpace(tag), "i") {
@@ -308,6 +379,10 @@ func parseAuthResults(value string) authResults {
 
 		method, result, ok := strings.Cut(fields[0], "=")
 		if !ok {
+			// "none" stands alone when there are no results (RFC 8601, section 2.2).
+			if (len(segments) != 2 || !strings.EqualFold(fields[0], "none")) && parsed.malformed == "" {
+				parsed.malformed = "result without method=value: " + strconv.Quote(fields[0])
+			}
 			continue
 		}
 		method, _, _ = strings.Cut(method, "/")
@@ -336,8 +411,11 @@ type authSegment struct {
 
 // splitAuthResults splits a header value on ";" into segments, keeping
 // parenthesized comments (which may nest) and quoted strings intact and
-// separating comment text from the rest.
-func splitAuthResults(value string) []authSegment {
+// separating comment text from the rest. Quoted strings are also honoured
+// inside comments, because Rspamd quotes sender-controlled values there (e.g.
+// "domain of "a)b"@example.com designates ..."). It reports whether every quoted
+// string and comment was closed.
+func splitAuthResults(value string) ([]authSegment, bool) {
 	var segments []authSegment
 	var text, comments strings.Builder
 	depth := 0
@@ -350,7 +428,7 @@ func splitAuthResults(value string) []authSegment {
 		case r == '\\' && (inQuote || depth > 0):
 			escaped = true
 			continue
-		case depth == 0 && r == '"':
+		case r == '"':
 			inQuote = !inQuote
 		case inQuote:
 		case r == '(':
@@ -379,7 +457,8 @@ func splitAuthResults(value string) []authSegment {
 		}
 	}
 
-	return append(segments, authSegment{text: text.String(), comments: comments.String()})
+	segments = append(segments, authSegment{text: text.String(), comments: comments.String()})
+	return segments, !inQuote && depth == 0 && !escaped
 }
 
 // splitFields splits on whitespace outside quoted strings.
@@ -423,15 +502,6 @@ func (r authResults) find(method string) []resInfo {
 		}
 	}
 	return found
-}
-
-func (r authResults) has(method string, result string) bool {
-	for _, ri := range r.find(method) {
-		if ri.result == result {
-			return true
-		}
-	}
-	return false
 }
 
 // dkimDomain returns the signing domain of a DKIM result: header.d, or the

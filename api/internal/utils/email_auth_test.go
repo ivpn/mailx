@@ -274,6 +274,57 @@ func TestParseAuthResults(t *testing.T) {
 			name: "ARC instance tag",
 		},
 		{
+			header: `mx.example.net; spf=pass (mx.example.net: domain of "a)b;dmarc=pass header.from=victim.example;(c@evil.example" designates 192.0.2.1 as permitted sender) smtp.mailfrom="a)b;dmarc=pass header.from=victim.example;(c@evil.example"; dmarc=fail header.from=victim.example`,
+			expected: authResults{
+				servID: "mx.example.net",
+				results: []resInfo{
+					{method: "spf", result: "pass", props: map[string]string{"smtp.mailfrom": "a)b;dmarc=pass header.from=victim.example;(c@evil.example"}, comments: ` mx.example.net: domain of "a)b;dmarc=pass header.from=victim.example;(c@evil.example" designates 192.0.2.1 as permitted sender`},
+					{method: "dmarc", result: "fail", props: map[string]string{"header.from": "victim.example"}},
+				},
+			},
+			name: "quoted string inside a comment",
+		},
+		{
+			header: `mx.example.net; spf=pass (domain of "a\"b" designates) smtp.mailfrom="a\"b"`,
+			expected: authResults{
+				servID: "mx.example.net",
+				results: []resInfo{
+					{method: "spf", result: "pass", props: map[string]string{"smtp.mailfrom": `a"b`}, comments: ` domain of "a"b" designates`},
+				},
+			},
+			name: "escaped quote inside a quoted string",
+		},
+		{
+			header: `mx.example.net; spf=pass "unterminated`,
+			expected: authResults{
+				servID:    "mx.example.net",
+				results:   []resInfo{{method: "spf", result: "pass", props: map[string]string{}}},
+				malformed: "unterminated quoted string or comment",
+			},
+			name: "unterminated quoted string",
+		},
+		{
+			header: "mx.example.net; spf=pass (unterminated smtp.mailfrom=x",
+			expected: authResults{
+				servID:    "mx.example.net",
+				results:   []resInfo{{method: "spf", result: "pass", props: map[string]string{}, comments: " unterminated smtp.mailfrom=x"}},
+				malformed: "unterminated quoted string or comment",
+			},
+			name: "unterminated comment",
+		},
+		{
+			header: "mx.example.net; dkim=none; garbage; dmarc=none",
+			expected: authResults{
+				servID: "mx.example.net",
+				results: []resInfo{
+					{method: "dkim", result: "none", props: map[string]string{}},
+					{method: "dmarc", result: "none", props: map[string]string{}},
+				},
+				malformed: `result without method=value: "garbage"`,
+			},
+			name: "result without method=value",
+		},
+		{
 			header:   "mx.example.net; none",
 			expected: authResults{servID: "mx.example.net"},
 			name:     "no results",
@@ -588,6 +639,135 @@ Just some random text`,
 			want: false,
 		},
 		{
+			name: "Rspamd header with a quoted sender address",
+			emailRaw: "From: sender@example.com\r\n" +
+				"To: recipient@example.net\r\n" +
+				"Authentication-Results: mx.example.net;\r\n" +
+				"\tdkim=pass header.d=example.com header.s=sel header.b=AbCd;\r\n" +
+				"\tspf=pass (mx.example.net: domain of \"john (smith)@example.com\" designates 192.0.2.1 as permitted sender) smtp.mailfrom=\"john (smith)@example.com\";\r\n" +
+				"\tdmarc=pass (policy=reject) header.from=example.com\r\n" +
+				"\r\nThis is a test email.",
+			want:       true,
+			wantNilErr: true,
+		},
+		{
+			name: "malformed: backslash in own header",
+			emailRaw: "From: sender@example.com\r\n" +
+				"To: recipient@example.net\r\n" +
+				"Authentication-Results: mx.example.net; dkim=pass header.d=example.com; spf=pass smtp.mailfrom=\"\\\"john smith\\\"@example.com\"; dmarc=pass header.from=example.com\r\n" +
+				"\r\nThis is a test email.",
+			want:      false,
+			wantErrIs: ErrMalformedOwnAuthResults,
+		},
+		{
+			// Rspamd escapes '"' but not '\', so DKIM b= ending in a backslash
+			// and a '"' in the sender shift the quotes and expose the injection.
+			name: "injection through DKIM b= ending in a backslash",
+			emailRaw: "From: Victim <owner@victim.example>\r\n" +
+				"To: alias@example.net\r\n" +
+				"Authentication-Results: mx.example.net;\r\n" +
+				"\tdkim=permerror header.d=evil.example header.s=sel header.b=\"abcdefg\\\";\r\n" +
+				"\tdmarc=none;\r\n" +
+				"\tspf=pass (mx.example.net: domain of \";dkim=pass header.d=victim.example;dkim=none \\\"\" designates 192.0.2.1 as permitted sender) smtp.mailfrom=\";dkim=pass header.d=victim.example;dkim=none \\\"\"\r\n" +
+				"\r\nhi\r\n",
+			want:      false,
+			wantErrIs: ErrMalformedOwnAuthResults,
+		},
+		{
+			name: "several DKIM results before the other results",
+			emailRaw: `From: sender@example.com
+To: recipient@example.net
+Authentication-Results: mx.example.net; dkim=pass header.d=relay.example; dkim=pass header.d=example.com; dmarc=pass header.from=example.com; spf=pass smtp.mailfrom=a@relay.example; auth=pass smtp.auth=user
+
+This is a test email.`,
+			want:       true,
+			wantNilErr: true,
+		},
+		{
+			name: "injection through the SPF comment: dmarc=pass before the real dmarc=fail",
+			emailRaw: "From: Victim <owner@victim.example>\r\n" +
+				"To: alias@example.net\r\n" +
+				"Authentication-Results: mx.example.net;\r\n" +
+				"\tdkim=none;\r\n" +
+				"\tspf=pass (mx.example.net: domain of \"a)b;dmarc=pass header.from=victim.example;(c@evil.example\" designates 192.0.2.1 as permitted sender) smtp.mailfrom=\"a)b;dmarc=pass header.from=victim.example;(c@evil.example\";\r\n" +
+				"\tdmarc=fail reason=\"No valid SPF, No valid DKIM\" header.from=victim.example (policy=none)\r\n" +
+				"\r\nhi\r\n",
+			want:      false,
+			wantErrIs: ErrDMARCFail,
+		},
+		{
+			name: "injection through the SPF comment: aligned dkim=pass when DMARC is none",
+			emailRaw: "From: Victim <owner@victim.example>\r\n" +
+				"To: alias@example.net\r\n" +
+				"Authentication-Results: mx.example.net;\r\n" +
+				"\tdkim=none;\r\n" +
+				"\tdmarc=none;\r\n" +
+				"\tspf=pass (mx.example.net: domain of \"a)b;dkim=pass header.d=victim.example;dkim=none (c@evil.example\" designates 192.0.2.1 as permitted sender) smtp.mailfrom=\"a)b;dkim=pass header.d=victim.example;dkim=none (c@evil.example\"\r\n" +
+				"\r\nhi\r\n",
+			want:      false,
+			wantErrIs: ErrNoAlignedAuthentication,
+		},
+		{
+			name: "malformed: second dmarc result",
+			emailRaw: `From: owner@victim.example
+To: alias@example.net
+Authentication-Results: mx.example.net; dkim=none; spf=pass smtp.mailfrom=a@evil.example; dmarc=pass header.from=victim.example; dmarc=fail header.from=victim.example (policy=none)
+
+hi`,
+			want:      false,
+			wantErrIs: ErrMalformedOwnAuthResults,
+		},
+		{
+			name: "malformed: second spf result",
+			emailRaw: `From: owner@victim.example
+To: alias@example.net
+Authentication-Results: mx.example.net; dkim=none; spf=fail smtp.mailfrom=a@evil.example; spf=pass smtp.mailfrom=a@victim.example; dmarc=none
+
+hi`,
+			want:      false,
+			wantErrIs: ErrMalformedOwnAuthResults,
+		},
+		{
+			name: "malformed: dkim result after spf",
+			emailRaw: `From: owner@victim.example
+To: alias@example.net
+Authentication-Results: mx.example.net; dkim=none; dmarc=none; spf=pass smtp.mailfrom=a@evil.example; dkim=pass header.d=victim.example
+
+hi`,
+			want:      false,
+			wantErrIs: ErrMalformedOwnAuthResults,
+		},
+		{
+			name: "malformed: unknown method",
+			emailRaw: `From: owner@victim.example
+To: alias@example.net
+Authentication-Results: mx.example.net; dkim=none; spf=pass smtp.mailfrom=a@evil.example; dmarc=pass header.from=victim.example; smtp.mailfrom=x
+
+hi`,
+			want:      false,
+			wantErrIs: ErrMalformedOwnAuthResults,
+		},
+		{
+			name: "malformed: result without method=value",
+			emailRaw: `From: owner@victim.example
+To: alias@example.net
+Authentication-Results: mx.example.net; dkim=none; spf=pass b; dmarc=pass header.from=victim.example; c
+
+hi`,
+			want:      false,
+			wantErrIs: ErrMalformedOwnAuthResults,
+		},
+		{
+			name: "malformed: unterminated quoted string",
+			emailRaw: `From: owner@victim.example
+To: alias@example.net
+Authentication-Results: mx.example.net; dkim=pass header.d=victim.example; spf=pass smtp.mailfrom="a@evil.example; dmarc=fail header.from=victim.example
+
+hi`,
+			want:      false,
+			wantErrIs: ErrMalformedOwnAuthResults,
+		},
+		{
 			name: "ARC: trusted sealer vouches for a forwarded message",
 			emailRaw: `From: sender@example.com
 To: recipient@example.net
@@ -681,6 +861,44 @@ Authentication-Results: mx.example.net; dmarc=fail header.from=example.com; arc=
 ARC-Seal: i=1; a=rsa-sha256; cv=none; d=google.com; s=arc; b=abc
 ARC-Authentication-Results: i=1; mx.google.com; dmarc=pass header.from=example.com
 ARC-Authentication-Results: i=1; mx.google.com; dmarc=fail header.from=example.com
+
+This is a test email.`,
+			want:      false,
+			wantErrIs: ErrDMARCFail,
+		},
+		{
+			name: "ARC: one arc result per verified seal",
+			emailRaw: `From: sender@example.com
+To: recipient@example.net
+Authentication-Results: mx.example.net; dmarc=fail header.from=example.com; arc=pass ("google.com:s=arc-20240605:i=1"); arc=pass ("microsoft.com:s=arcselector10001:i=2")
+ARC-Seal: i=2; a=rsa-sha256; cv=pass; d=microsoft.com; s=arcselector10001; b=abc
+ARC-Authentication-Results: i=2; mx.microsoft.com 1; dmarc=pass header.from=example.com
+ARC-Seal: i=1; a=rsa-sha256; cv=none; d=google.com; s=arc-20240605; b=abc
+ARC-Authentication-Results: i=1; mx.google.com; dmarc=pass header.from=example.com
+
+This is a test email.`,
+			want:       true,
+			wantNilErr: true,
+		},
+		{
+			name: "ARC: arc=pass next to arc=fail",
+			emailRaw: `From: sender@example.com
+To: recipient@example.net
+Authentication-Results: mx.example.net; dmarc=fail header.from=example.com; arc=fail; arc=pass
+ARC-Seal: i=1; a=rsa-sha256; cv=none; d=google.com; s=arc; b=abc
+ARC-Authentication-Results: i=1; mx.google.com; dmarc=pass header.from=example.com
+
+This is a test email.`,
+			want:      false,
+			wantErrIs: ErrDMARCFail,
+		},
+		{
+			name: "ARC: trusted sealer's dmarc=fail decides over an earlier dmarc=pass",
+			emailRaw: `From: sender@example.com
+To: recipient@example.net
+Authentication-Results: mx.example.net; dmarc=fail header.from=example.com; arc=pass
+ARC-Seal: i=1; a=rsa-sha256; cv=none; d=google.com; s=arc; b=abc
+ARC-Authentication-Results: i=1; mx.google.com; dmarc=pass header.from=example.com; dmarc=fail header.from=example.com
 
 This is a test email.`,
 			want:      false,
@@ -830,6 +1048,26 @@ This is a test email.`,
 			want:      false,
 			wantErr:   true,
 			wantErrIs: ErrDuplicateOwnAuthResults,
+		},
+		{
+			name: "malformed own header hiding policy=reject",
+			emailRaw: `From: sender@bank.example
+To: alias@example.net
+Authentication-Results: mx.example.net; dkim=none; spf=pass smtp.mailfrom="a@evil.example; dmarc=fail header.from=bank.example (policy=reject)
+
+This is a test email.`,
+			want:      false,
+			wantErr:   true,
+			wantErrIs: ErrMalformedOwnAuthResults,
+		},
+		{
+			name: "Rspamd header with a quoted sender address",
+			emailRaw: `From: sender@example.com
+To: alias@example.net
+Authentication-Results: mx.example.net; dkim=none; spf=pass (mx.example.net: domain of "a(b)c@example.com" designates 192.0.2.1 as permitted sender) smtp.mailfrom="a(b)c@example.com"; dmarc=none
+
+This is a test email.`,
+			want: true,
 		},
 		{
 			name: "invalid email format",

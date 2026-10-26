@@ -77,6 +77,9 @@ func FuzzParseAuthResults(f *testing.F) {
 		"DKIM=PASS HEADER.D=EXAMPLE.COM",
 		"i=1; mx; dmarc=fail (policy=reject) reason=\"a; (b\" header.from=x",
 		"mx; spf=pass (((unbalanced) smtp.mailfrom=a@b\\",
+		// Sender-controlled quoted value inside an Rspamd comment.
+		"mx; spf=pass (mx: domain of \"a)b;dmarc=pass header.from=x;(c@d\" designates 1.2.3.4) smtp.mailfrom=\"a)b;(c@d\"; dmarc=fail",
+		"mx; spf=pass (mx: domain of \"a\\\\\"b);dmarc=pass\" designates) smtp.mailfrom=x",
 	}
 	for _, s := range seeds {
 		f.Add(s)

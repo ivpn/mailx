@@ -266,7 +266,7 @@ func latestARCSeal(seals []string) (int, string) {
 // ARC-Seal, lowercasing tags and values.
 func parseTagList(value string) map[string]string {
 	tags := map[string]string{}
-	for _, part := range strings.Split(value, ";") {
+	for part := range strings.SplitSeq(value, ";") {
 		tag, val, ok := strings.Cut(part, "=")
 		if !ok {
 			continue

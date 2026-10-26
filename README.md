@@ -45,6 +45,7 @@ cd mailserver
 mkdir -p docker-data/dms/config/rspamd/override.d
 cp config/postfix-main.cf.sample docker-data/dms/config/postfix-main.cf
 cp config/postfix-header-checks.cf.sample docker-data/dms/config/postfix-header-checks.cf
+cp config/postfix-sender-access.cf.sample docker-data/dms/config/postfix-sender-access.cf
 cp config/postfix-relay-domains.cf.sample docker-data/dms/config/postfix-relay-domains.cf
 cp config/postfix-aliases.cf.sample docker-data/dms/config/postfix-aliases.cf
 cp config/user-patches.sh.sample docker-data/dms/config/user-patches.sh
@@ -290,6 +291,8 @@ ARC_TRUSTED_SEALERS=google.com,microsoft.com,messagingengine.com,zohomail.com,zo
 `ARC_TRUSTED_SEALERS` lists the providers (the `d=` of their `ARC-Seal` header) trusted to vouch for forwarded mail that no longer passes DMARC. Leave the variable out to use the built-in default; an empty value trusts no provider.
 
 Rspamd must be the only milter writing `Authentication-Results`. The mailserver compose files set `ENABLE_OPENDKIM`, `ENABLE_OPENDMARC`, `ENABLE_POLICYD_SPF` and `ENABLE_AMAVIS` to `0`; keep them that way.
+
+The API also checks that this header has the shape Rspamd writes: DKIM results first, at most one `dmarc` and one `spf` result, and no backslashes. A header that doesn't is treated as forged, so replies and sends are rejected and forwards are dropped, with `malformed Authentication-Results header from own mail server` in the API log. After upgrading the mailserver image, send a test reply and forward, and check the API log for that message.
 
 #### Restart api:
 ```bash

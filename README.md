@@ -44,6 +44,7 @@ cp mailserver/.env.sample mailserver/.env
 cd mailserver
 mkdir -p docker-data/dms/config/rspamd/override.d
 cp config/postfix-main.cf.sample docker-data/dms/config/postfix-main.cf
+cp config/postfix-header-checks.cf.sample docker-data/dms/config/postfix-header-checks.cf
 cp config/postfix-relay-domains.cf.sample docker-data/dms/config/postfix-relay-domains.cf
 cp config/postfix-aliases.cf.sample docker-data/dms/config/postfix-aliases.cf
 cp config/user-patches.sh.sample docker-data/dms/config/user-patches.sh
@@ -280,7 +281,15 @@ dig TXT mail._domainkey.domain.com +short
 ```bash
 nano .env
 DOMAINS=domain1.com,domain2.com
+EMAIL_AUTH_SERVID=mail.domain.com
+ARC_TRUSTED_SEALERS=google.com,microsoft.com,messagingengine.com,zohomail.com,zohomail.eu,icloud.com,yahoo.com
 ```
+
+`EMAIL_AUTH_SERVID` is the authserv-id each of your mail servers' Rspamd writes in its `Authentication-Results` header (the first word, usually the mail server hostname), comma-separated if you run several. Only these headers are trusted when checking that a reply or send comes from the alias owner. If it's empty, all replies and sends are rejected.
+
+`ARC_TRUSTED_SEALERS` lists the providers (the `d=` of their `ARC-Seal` header) trusted to vouch for forwarded mail that no longer passes DMARC. Leave the variable out to use the built-in default; an empty value trusts no provider.
+
+Rspamd must be the only milter writing `Authentication-Results`. The mailserver compose files set `ENABLE_OPENDKIM`, `ENABLE_OPENDMARC`, `ENABLE_POLICYD_SPF` and `ENABLE_AMAVIS` to `0`; keep them that way.
 
 #### Restart api:
 ```bash

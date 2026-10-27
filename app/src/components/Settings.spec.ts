@@ -64,6 +64,8 @@ const input = (id: string) => root.querySelector(`#${id}`) as HTMLInputElement
 const section = (id: string) => input(id).parentElement as HTMLElement
 const form = (id: string) => input(id).closest('form') as HTMLFormElement
 
+const button = (id: string) => form(id).querySelector('button') as HTMLButtonElement
+
 const submit = async (id: string) => {
     form(id).dispatchEvent(new Event('submit'))
     await flush()
@@ -191,6 +193,7 @@ describe('Settings defaults', () => {
         await mount({ recipient: '' })
 
         expect(input('recipient').value).toBe('me@example.com')
+        expect(button('recipient').disabled).toBe(false)
         await submit('recipient')
         expect(api.updateDefaultRecipient).toHaveBeenCalledWith('me@example.com')
     })
@@ -200,7 +203,35 @@ describe('Settings defaults', () => {
         await mount()
 
         expect(input('recipient').disabled).toBe(true)
-        expect((form('recipient').querySelector('button') as HTMLButtonElement).disabled).toBe(true)
+        expect(button('recipient').disabled).toBe(true)
+    })
+
+    it('enables Update only while the selection differs from the saved value', async () => {
+        api.updateDefaultDomain.mockResolvedValue({ data: { message: 'Default domain updated successfully.' } } as any)
+        await mount({ domain: 'mailx.net' })
+
+        expect(button('domain').disabled).toBe(true)
+
+        choose('domain', 'mailx.io')
+        await nextTick()
+        expect(button('domain').disabled).toBe(false)
+
+        choose('domain', 'mailx.net')
+        await nextTick()
+        expect(button('domain').disabled).toBe(true)
+
+        choose('domain', 'mailx.io')
+        await submit('domain')
+        expect(api.updateDefaultDomain).toHaveBeenCalledWith('mailx.io')
+        expect(button('domain').disabled).toBe(true)
+    })
+
+    it('does not save when the selection is unchanged', async () => {
+        await mount({ domain: 'mailx.net' })
+
+        await submit('domain')
+
+        expect(api.updateDefaultDomain).not.toHaveBeenCalled()
     })
 
     it('saves the from name, including an empty one', async () => {
@@ -224,10 +255,12 @@ describe('Settings defaults', () => {
         api.updateDefaultDomain.mockRejectedValue(apiError('The selected domain is invalid.'))
         await mount()
 
+        choose('domain', 'mailx.io')
         await submit('domain')
 
         expect(root.querySelector('#domain-error')?.textContent).toContain('The selected domain is invalid.')
         expect(input('domain').getAttribute('aria-invalid')).toBe('true')
+        expect(button('domain').disabled).toBe(false)
         expect(form('recipient').querySelector('.error')).toBeNull()
     })
 })

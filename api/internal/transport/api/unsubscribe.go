@@ -13,7 +13,7 @@ import (
 var (
 	ErrListUnsubscribeBehaviourRequired = "The behaviour field is required."
 	ErrListUnsubscribeBehaviourInvalid  = "The selected behaviour is invalid."
-	UpdateListUnsubscribeSuccess        = "List-Unsubscribe behaviour updated successfully."
+	UpdateListUnsubscribeSuccess        = "Unsubscribe behaviour updated successfully."
 )
 
 type OneClickService interface {

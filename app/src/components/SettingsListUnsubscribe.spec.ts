@@ -60,7 +60,7 @@ describe('SettingsListUnsubscribe', () => {
     })
 
     it('sends the selected behaviour as a number', async () => {
-        update.mockResolvedValue({ data: { message: 'List-Unsubscribe behaviour updated successfully.' } } as any)
+        update.mockResolvedValue({ data: { message: 'Unsubscribe behaviour updated successfully.' } } as any)
         mount({ initialBehaviour: 0 })
 
         select().value = '3'

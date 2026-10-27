@@ -21,7 +21,7 @@
                 </option>
             </select>
         </div>
-        <button type="submit" class="cta sm" :disabled="saving">
+        <button type="submit" class="cta sm" :disabled="saving || !changed">
             Update
         </button>
         <p v-if="error" id="list-unsubscribe-behaviour-error" class="error">Error: {{ error }}</p>
@@ -30,9 +30,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import axios from 'axios'
+import { computed, ref } from 'vue'
 import { settingsApi } from '../api/settings.ts'
+import { useSettingSave } from '../lib/useSettingSave.ts'
 
 const props = defineProps({
     initialBehaviour: { type: Number, default: 0 },
@@ -47,26 +47,17 @@ const options = [
 ]
 
 const behaviour = ref(props.initialBehaviour)
-const saving = ref(false)
-const error = ref('')
-const success = ref('')
+const saved = ref(props.initialBehaviour)
+// Update is enabled only when the selection differs from the stored behaviour
+const changed = computed(() => behaviour.value !== saved.value)
+const { saving, error, success, save: saveSetting } = useSettingSave()
 
 const save = async () => {
-    saving.value = true
-    error.value = ''
-    success.value = ''
+    if (!changed.value) return
 
-    try {
-        const res = await settingsApi.updateListUnsubscribeBehaviour(behaviour.value)
-        success.value = res.data.message
-    } catch (err) {
-        if (axios.isAxiosError(err)) {
-            error.value = err.response?.data.error || err.message
-        } else {
-            error.value = 'Something went wrong'
-        }
-    } finally {
-        saving.value = false
+    const next = behaviour.value
+    if (await saveSetting(() => settingsApi.updateListUnsubscribeBehaviour(next))) {
+        saved.value = next
     }
 }
 </script>

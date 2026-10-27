@@ -32,7 +32,7 @@ type SessionService interface {
 	GetSession(context.Context, string) (model.Session, bool, error)
 	SaveSession(context.Context, webauthn.SessionData, string, string, time.Time, bool) error
 	SaveCeremony(context.Context, model.Ceremony, time.Duration) (string, error)
-	ConsumeCeremony(context.Context, string) (model.Ceremony, error)
+	ConsumeCeremony(context.Context, string, model.CeremonyType) (model.Ceremony, error)
 }
 
 type CredentialService interface {
@@ -117,7 +117,7 @@ func (h *Handler) BeginRegistration(c *fiber.Ctx) error {
 	}
 
 	// Save the ceremony
-	token, err := h.Service.SaveCeremony(c.Context(), model.Ceremony{UserID: user.ID, SessionData: *sessionData}, auth.WebAuthnCeremonyExpiration)
+	token, err := h.Service.SaveCeremony(c.Context(), model.Ceremony{Type: model.CeremonyRegistration, UserID: user.ID, SessionData: *sessionData}, auth.WebAuthnCeremonyExpiration)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrSaveSession,
@@ -140,7 +140,7 @@ func (h *Handler) BeginRegistration(c *fiber.Ctx) error {
 // @Router /register/finish [post]
 func (h *Handler) FinishRegistration(c *fiber.Ctx) error {
 	// Get ceremony (single-use)
-	ceremony, err := h.Service.ConsumeCeremony(c.Context(), c.Cookies(auth.AUTHN_TEMP_COOKIE))
+	ceremony, err := h.Service.ConsumeCeremony(c.Context(), c.Cookies(auth.AUTHN_TEMP_COOKIE), model.CeremonyRegistration)
 	auth.ClearCookies(c, auth.AUTHN_TEMP_COOKIE)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -153,6 +153,15 @@ func (h *Handler) FinishRegistration(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
+		})
+	}
+
+	// Only an unfinished signup can be completed here (same rule as GetUserByEmailUnfinishedSignup);
+	// established accounts add passkeys via /register/add. IsActive isn't used, since ChangeEmail
+	// also clears it.
+	if user.PasswordHash != "" || len(user.Creds) > 0 {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrFinishRegistration,
 		})
 	}
 
@@ -242,7 +251,7 @@ func (h *Handler) AddPasskey(c *fiber.Ctx) error {
 	}
 
 	// Save the ceremony
-	token, err := h.Service.SaveCeremony(c.Context(), model.Ceremony{UserID: user.ID, SessionData: *sessionData}, auth.WebAuthnCeremonyExpiration)
+	token, err := h.Service.SaveCeremony(c.Context(), model.Ceremony{Type: model.CeremonyAddPasskey, UserID: user.ID, SessionData: *sessionData}, auth.WebAuthnCeremonyExpiration)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrSaveSession,
@@ -265,7 +274,7 @@ func (h *Handler) AddPasskey(c *fiber.Ctx) error {
 // @Router /register/add/finish [post]
 func (h *Handler) FinishAddPasskey(c *fiber.Ctx) error {
 	// Get ceremony (single-use)
-	ceremony, err := h.Service.ConsumeCeremony(c.Context(), c.Cookies(auth.AUTHN_TEMP_COOKIE))
+	ceremony, err := h.Service.ConsumeCeremony(c.Context(), c.Cookies(auth.AUTHN_TEMP_COOKIE), model.CeremonyAddPasskey)
 	auth.ClearCookies(c, auth.AUTHN_TEMP_COOKIE)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -391,7 +400,7 @@ func (h *Handler) BeginLogin(c *fiber.Ctx) error {
 	}
 
 	// Save the ceremony
-	token, err := h.Service.SaveCeremony(c.Context(), model.Ceremony{UserID: user.ID, SessionData: *sessionData, Remember: req.Remember}, auth.WebAuthnCeremonyExpiration)
+	token, err := h.Service.SaveCeremony(c.Context(), model.Ceremony{Type: model.CeremonyLogin, UserID: user.ID, SessionData: *sessionData, Remember: req.Remember}, auth.WebAuthnCeremonyExpiration)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrSaveSession,
@@ -414,7 +423,7 @@ func (h *Handler) BeginLogin(c *fiber.Ctx) error {
 // @Router /login/finish [post]
 func (h *Handler) FinishLogin(c *fiber.Ctx) error {
 	// Get ceremony (single-use)
-	ceremony, err := h.Service.ConsumeCeremony(c.Context(), c.Cookies(auth.AUTHN_TEMP_COOKIE))
+	ceremony, err := h.Service.ConsumeCeremony(c.Context(), c.Cookies(auth.AUTHN_TEMP_COOKIE), model.CeremonyLogin)
 	auth.ClearCookies(c, auth.AUTHN_TEMP_COOKIE)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -513,7 +522,7 @@ func (h *Handler) BeginPasskeyLogin(c *fiber.Ctx) error {
 	}
 
 	// Save the ceremony
-	token, err := h.Service.SaveCeremony(c.Context(), model.Ceremony{SessionData: *sessionData, Remember: req.Remember}, auth.WebAuthnCeremonyExpiration)
+	token, err := h.Service.SaveCeremony(c.Context(), model.Ceremony{Type: model.CeremonyPasskeyLogin, SessionData: *sessionData, Remember: req.Remember}, auth.WebAuthnCeremonyExpiration)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrSaveSession,
@@ -536,7 +545,7 @@ func (h *Handler) BeginPasskeyLogin(c *fiber.Ctx) error {
 // @Router /login/passkey/finish [post]
 func (h *Handler) FinishPasskeyLogin(c *fiber.Ctx) error {
 	// Get ceremony (single-use)
-	ceremony, err := h.Service.ConsumeCeremony(c.Context(), c.Cookies(auth.AUTHN_TEMP_COOKIE))
+	ceremony, err := h.Service.ConsumeCeremony(c.Context(), c.Cookies(auth.AUTHN_TEMP_COOKIE), model.CeremonyPasskeyLogin)
 	auth.ClearCookies(c, auth.AUTHN_TEMP_COOKIE)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{

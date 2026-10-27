@@ -32,7 +32,7 @@ func (h Http) SignupWebhook(subID string) error {
 	req.Body([]byte(`{"uuid": "` + subID + `", "service": "mail"}`))
 
 	// Log request for debugging
-	log.Printf("Signup webhook request: %+v", req)
+	// log.Printf("Signup webhook request: %+v", req)
 
 	status, res, err := req.Bytes()
 	if err != nil {

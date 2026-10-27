@@ -6,7 +6,7 @@
         <div class="card-primary grow-0 mb-6">
             <h4>Add to blocklist</h4>
             <p>
-                Emails from blocked senders are discarded before they reach your recipients. Blocking a domain also blocks its subdomains. With email delivery diagnostics enabled in <router-link to="/account/settings">Settings</router-link>, blocked emails are listed in <router-link to="/account/diagnostics">Diagnostics</router-link>.
+                Emails from blocked senders are discarded before they reach your recipients. Blocking a domain also blocks its subdomains. Learn more in the <router-link to="/faq">FAQ</router-link>.
             </p>
             <form @submit.prevent="addItem" autocomplete="off" class="flex flex-col lg:flex-row gap-3">
                 <select v-model="req.type" class="lg:w-40 lg:shrink-0 mb-0" aria-label="Type">

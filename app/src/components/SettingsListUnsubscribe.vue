@@ -1,13 +1,13 @@
 <template>
-    <h4>List-Unsubscribe</h4>
+    <h4>Unsubscribe Behaviour</h4>
     <p>
-        Control how List-Unsubscribe and List-Unsubscribe-Post headers are set on forwarded emails.
-        On email clients that support it, clicking "Unsubscribe" will perform one of these actions.
+        Choose what happens when you click "Unsubscribe" in your email client (where supported) on emails forwarded by Mailx.
+        This sets the List-Unsubscribe and List-Unsubscribe-Post headers on those emails.
     </p>
     <form @submit.prevent="save" class="mb-8">
         <div class="max-w-full mb-4">
             <label for="list-unsubscribe-behaviour">
-                Select behaviour:
+                Set "Unsubscribe" behaviour:
             </label>
             <select
                 id="list-unsubscribe-behaviour"
@@ -22,7 +22,7 @@
             </select>
         </div>
         <button type="submit" class="cta sm" :disabled="saving">
-            Update List-Unsubscribe
+            Update
         </button>
         <p v-if="error" id="list-unsubscribe-behaviour-error" class="error">Error: {{ error }}</p>
         <p v-if="success" class="success">{{ success }}</p>
@@ -39,11 +39,11 @@ const props = defineProps({
 })
 
 const options = [
-    { value: 0, label: 'Use original List-Unsubscribe, fallback to one-click deactivate alias' },
-    { value: 1, label: 'Use one-click deactivate alias' },
-    { value: 2, label: 'Use one-click delete alias' },
-    { value: 3, label: 'Use one-click block sender email' },
-    { value: 4, label: 'Use one-click block sender domain' },
+    { value: 0, label: 'Unsubscribe from sender, fallback: deactivate alias' },
+    { value: 1, label: 'Deactivate alias' },
+    { value: 2, label: 'Delete alias' },
+    { value: 3, label: 'Block sender email address' },
+    { value: 4, label: 'Block sender domain' },
 ]
 
 const behaviour = ref(props.initialBehaviour)

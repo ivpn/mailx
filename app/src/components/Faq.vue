@@ -7,7 +7,7 @@
             </button>
         </p>
         <h1>Mailx FAQ</h1>
-        <p class="text-sm">Last updated: 9 September 2026</p>
+        <p class="text-sm">Last updated: 27 October 2026</p>
 
         <h2>Aliases: How do I add an email alias?</h2>
         <p>Click the 'Aliases' tab on the left side of the page.</p>
@@ -78,6 +78,29 @@
         <p>Click the 'Recipients' tab on the left side of the page.</p>
         <p>Click the ellipsis menu button under the 'Actions' column on the right side.  Click the 'Delete' option.</p>
         <p>A confirmation box will appear.  Click 'OK' to delete the recipient, or click 'Cancel'.</p>
+
+        <hr>
+
+        <h2>Blocklist: What is the Blocklist?</h2>
+        <p>The 'Blocklist' lets you stop unwanted senders from reaching you.  Emails from a blocked email address or domain are discarded before they are forwarded to your recipients.</p>
+        <p>The blocklist applies to all aliases on your account, including wildcard and catch-all aliases.  It only affects incoming emails - sending and replying from your aliases is not affected.</p>
+        <p>Senders are not notified when their emails are blocked.</p>
+
+        <h2>Blocklist: How do I block a sender?</h2>
+        <p>Click the 'Blocklist' tab on the left side of the page.</p>
+        <p>Choose 'Email' to block a single address (e.g. name@example.com), or 'Domain' to block every address at that domain (e.g. example.com).  Enter the value and click the 'Add to blocklist' button.</p>
+        <p>Blocking a domain also blocks all of its subdomains.  For example, blocking 'example.com' also blocks emails from 'mail.example.com'.  Values are not case-sensitive.</p>
+        <p>Note: The blocklist limit is 1,000 entries.</p>
+
+        <h2>Blocklist: How do I see how many emails were blocked?</h2>
+        <p>The 'Blocked' column on the 'Blocklist' page shows how many emails each entry has blocked.  This counter is always on and does not require diagnostics.</p>
+        <p>Blocked emails are also included in the 'Blocks' stats of the alias they were sent to, on the 'Aliases' page.</p>
+        <p>To see the details of each blocked email (sender, alias, and the matching blocklist entry), enable 'Diagnostics' on the 'Settings' page.  Blocked emails will then be listed on the 'Diagnostics' page, where diagnostic logs are kept for 7 days.  Emails blocked while diagnostics was disabled are not listed.</p>
+
+        <h2>Blocklist: How do I unblock a sender?</h2>
+        <p>On the 'Blocklist' page, choose an entry, and click the ellipsis menu button under the 'Actions' column on the right side.  Click the 'Delete' option.</p>
+        <p>A confirmation box will appear.  Click 'OK' to remove the entry, or click 'Cancel'.</p>
+        <p>Emails from this sender will be forwarded again from then on.  Emails that were blocked earlier are not stored and cannot be recovered.</p>
 
         <hr>
 

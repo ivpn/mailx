@@ -1,8 +1,8 @@
 <template>
     <h4>Email Trackers</h4>
     <p>
-        Remove tracking pixels from forwarded emails. Senders can use them to see when you open an email, your IP address, your device and your approximate location.
-        When trackers are removed, the Mailx header shows how many, with a link to a report.
+        Remove tracking pixels from forwarded emails. This stops senders from using them to see when you open an email, your IP address, your device and your approximate location.
+        When trackers are removed, the Mailx header at the top of the email shows how many, with a link to a full report.
     </p>
     <div class="mb-8">
         <label for="block-trackers">

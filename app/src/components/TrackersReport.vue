@@ -4,7 +4,7 @@
         <div v-if="report">
             <p>
                 Mailx removed {{ report.total }} {{ report.total === 1 ? 'tracker' : 'trackers' }} from this email before forwarding it.
-                Tracking pixels let senders see when you open an email, your IP address, your device and your approximate location.
+                Trackers like this let senders see when you open an email and learn your IP address, device and approximate location.
             </p>
             <p v-if="report.total > report.trackers.length" class="text-tertiary">
                 Showing the first {{ report.trackers.length }} of {{ report.total }} trackers.
@@ -32,7 +32,8 @@
             This report link is invalid or incomplete. Open it again from the "View report" link in the forwarded email.
         </p>
         <p class="text-sm text-tertiary">
-            This report is read from the link in your browser. It is never sent to Mailx servers, and Mailx doesn't store it.
+            The details of this report are contained in the link in the forwarded email and are only shown in your browser.
+            They are never sent to Mailx servers, and Mailx doesn't keep a copy.
             You can turn off tracker blocking in Settings.
         </p>
         <br>

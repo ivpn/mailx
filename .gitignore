@@ -1,3 +1,4 @@
 *.pem
 /docs/
+/tmp/
 /.claude/skills/

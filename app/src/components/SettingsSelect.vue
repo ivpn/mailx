@@ -17,7 +17,7 @@
                 </option>
             </select>
         </div>
-        <button type="submit" class="cta sm" :disabled="saving || !options.length">
+        <button type="submit" class="cta sm" :disabled="saving || !options.length || !changed">
             {{ buttonLabel }}
         </button>
         <p v-if="error" :id="`${id}-error`" class="error">Error: {{ error }}</p>
@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, type PropType } from 'vue'
+import { computed, ref, watch, type PropType } from 'vue'
 import { useSettingSave } from '../lib/useSettingSave.ts'
 
 export interface SelectOption {
@@ -44,6 +44,10 @@ const props = defineProps({
 })
 
 const value = ref(props.initialValue)
+const saved = ref(props.initialValue)
+// Update is enabled only when there is something to save, including a first option
+// shown in place of a value that isn't stored
+const changed = computed(() => value.value !== saved.value)
 const { saving, error, success, save } = useSettingSave()
 
 // Options can load after the setting, and a value that isn't stored yet shows the first option
@@ -53,5 +57,12 @@ watch(() => props.options, (options) => {
     }
 }, { immediate: true })
 
-const submit = () => save(() => props.update(value.value))
+const submit = async () => {
+    if (!changed.value) return
+
+    const next = value.value
+    if (await save(() => props.update(next))) {
+        saved.value = next
+    }
+}
 </script>

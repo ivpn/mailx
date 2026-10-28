@@ -113,7 +113,12 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 			err = ErrNoRecipients
 		}
 		if err != nil {
-			log.Println("error processing message:", err, alias.ID)
+			// A missing alias has no ID, so log the domain part instead of the address to keep it private
+			if errors.Is(err, ErrGetAliasByName) {
+				log.Println("error processing message:", err, aliasDomainPart(alias.Name))
+			} else {
+				log.Println("error processing message:", err, alias.ID)
+			}
 
 			// Handle ErrNoVerifiedRecipients
 			if errors.Is(err, ErrNoVerifiedRecipients) {

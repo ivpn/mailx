@@ -9,7 +9,7 @@
             </div>
         </header>
         <p class="mt-0 mb-6">
-            Rules are applied from top to bottom to emails on your aliases. Drag rules to change the order. Every matching rule is applied unless a rule has the <em>Stop processing more rules</em> action.
+            Rules automatically block, forward or modify emails sent to your aliases, based on conditions you set. They run from top to bottom, and every matching rule applies. Drag rules to change the order.
         </p>
         <div v-if="readOnly" class="card-tertiary mb-6" data-test="read-only-notice">
             <footer class="mt-0">

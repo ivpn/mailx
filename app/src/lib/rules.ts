@@ -117,7 +117,10 @@ export const actionSpecs: ActionSpec[] = [
         placeholder: 'Leave empty to clear it',
     },
     { type: 'remove_attachments', label: 'remove attachments', value: 'none', required: false, types: forwardsOnly },
-    { type: 'stop', label: 'stop processing more rules', value: 'none', required: false, types: allTypes },
+    {
+        type: 'stop', label: 'stop processing more rules', value: 'none', required: false, types: allTypes,
+        hint: 'Note: other rules below this one won\'t run on emails this rule matches.',
+    },
 ]
 
 // forward_to is the only action that can be used more than once in a rule
@@ -135,8 +138,15 @@ export const joinLabels = (labels: string[]) => {
 // Whether a condition or action that supports `types` can't be used with every selected type
 export const isUnsupported = (types: RelayType[], selected: RelayType[]) => selected.some(type => !types.includes(type))
 
-export const onlyAvailableFor = (types: RelayType[]) =>
-    'Only available for ' + joinLabels(relayTypes.filter(t => types.includes(t.value)).map(t => t.label))
+const typeLabels = (types: RelayType[]) => relayTypes.filter(t => types.includes(t.value)).map(t => t.label)
+
+export const onlyAvailableFor = (types: RelayType[]) => 'Only available for ' + joinLabels(typeLabels(types))
+
+// Disabled options don't show a tooltip in most browsers, so the label says why it can't be picked
+export const optionLabel = (spec: { label: string, types: RelayType[] }, selected: RelayType[]) =>
+    isUnsupported(spec.types, selected)
+        ? `${spec.label} (${joinLabels(typeLabels(spec.types)).toLowerCase()} only)`
+        : spec.label
 
 export const ruleRelayLabels = (rule: Pick<Rule, RelayType>) =>
     relayTypes.filter(t => rule[t.value]).map(t => t.label)

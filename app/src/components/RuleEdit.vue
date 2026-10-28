@@ -32,6 +32,22 @@
                             </div>
 
                             <div class="pb-5">
+                                <p class="text-secondary text-sm font-bold mb-3 mt-0">Apply to</p>
+                                <div class="flex flex-wrap gap-5">
+                                    <label v-for="type in relayTypes" :key="type.value" class="font-normal mb-0 gap-2">
+                                        <input
+                                            v-model="form[type.value]"
+                                            v-bind:id="'rule_apply_' + type.value"
+                                            type="checkbox"
+                                            class="checkbox-plain"
+                                        >
+                                        {{ type.label }}
+                                    </label>
+                                </div>
+                                <p v-if="typesError" class="error">Required</p>
+                            </div>
+
+                            <div class="pb-5">
                                 <p class="text-secondary text-sm font-bold mb-3 mt-0">Conditions</p>
                                 <template v-for="(row, index) in form.conditions" :key="row.key">
                                     <div v-if="index > 0" class="flex items-center gap-2 my-2">
@@ -66,9 +82,8 @@
                                                     :key="spec.type"
                                                     :value="spec.type"
                                                     :disabled="isUnsupported(spec.types, selectedTypes)"
-                                                    :title="isUnsupported(spec.types, selectedTypes) ? onlyAvailableFor(spec.types) : undefined"
                                                 >
-                                                    {{ spec.label }}
+                                                    {{ optionLabel(spec, selectedTypes) }}
                                                 </option>
                                             </select>
                                             <select
@@ -169,9 +184,8 @@
                                                     :key="spec.type"
                                                     :value="spec.type"
                                                     :disabled="actionOptionDisabled(spec, row)"
-                                                    :title="isUnsupported(spec.types, selectedTypes) ? onlyAvailableFor(spec.types) : undefined"
                                                 >
-                                                    {{ spec.label }}
+                                                    {{ optionLabel(spec, selectedTypes) }}
                                                 </option>
                                             </select>
                                             <button
@@ -195,7 +209,6 @@
                                                 type="text"
                                                 data-test="action-value"
                                             >
-                                            <p v-if="actionSpec(row.type)?.hint" class="text-xs text-tertiary mt-1 mb-0">{{ actionSpec(row.type)?.hint }}</p>
                                         </div>
                                         <div v-if="actionSpec(row.type)?.value === 'recipients'" class="mt-2 flex flex-col gap-2" role="group" aria-label="Recipients">
                                             <label v-for="recipient in recipients" :key="recipient.id" class="font-normal mb-0 gap-2 break-all">
@@ -213,6 +226,7 @@
                                                 You don't have any verified recipients.
                                             </p>
                                         </div>
+                                        <p v-if="actionSpec(row.type)?.hint" class="text-xs text-tertiary mt-2 mb-0" data-test="action-hint">{{ actionSpec(row.type)?.hint }}</p>
                                         <p v-if="actionError(row)" class="error mt-2 mb-0" data-test="action-error">{{ actionError(row) }}</p>
                                     </div>
                                 </template>
@@ -225,22 +239,6 @@
                                 >
                                     + Add action
                                 </button>
-                            </div>
-
-                            <div class="pb-3">
-                                <p class="text-secondary text-sm font-bold mb-3 mt-0">Apply to</p>
-                                <div class="flex flex-wrap gap-5">
-                                    <label v-for="type in relayTypes" :key="type.value" class="font-normal mb-0 gap-2">
-                                        <input
-                                            v-model="form[type.value]"
-                                            v-bind:id="'rule_apply_' + type.value"
-                                            type="checkbox"
-                                            class="checkbox-plain"
-                                        >
-                                        {{ type.label }}
-                                    </label>
-                                </div>
-                                <p v-if="typesError" class="error">Required</p>
                             </div>
                         </article>
                         <footer>
@@ -278,11 +276,13 @@ import {
     conditionSpec,
     conditionSpecs,
     defaultMatch,
+    duplicateName,
     isInactiveSubError,
     isRegexMatch,
     isUnsupported,
     matchOptions,
     onlyAvailableFor,
+    optionLabel,
     relayTypes,
     repeatableActions,
     ruleLimits,
@@ -514,9 +514,10 @@ const save = async () => {
 
 const modal = () => document.getElementById(modalId) as HTMLElement
 
-const open = (rule?: Rule | null) => {
-    editingId.value = rule?.id ?? ''
-    form.name = rule?.name ?? ''
+// A duplicated rule opens as a new rule with the same inputs
+const open = (rule?: Rule | null, duplicate = false) => {
+    editingId.value = duplicate ? '' : rule?.id ?? ''
+    form.name = rule ? (duplicate ? duplicateName(rule.name) : rule.name) : ''
     form.operator = rule?.operator ?? 'AND'
     form.forwards = rule ? rule.forwards : true
     form.replies = rule?.replies ?? false

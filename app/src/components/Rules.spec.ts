@@ -168,6 +168,18 @@ describe('Rules list', () => {
         expect(handles().every((h) => h.tabIndex === 0 && h.classList.contains('cursor-grab'))).toBe(true)
     })
 
+    it('marks the rules that stop processing the rules below them', async () => {
+        await mount([
+            rule('a', { actions: [{ type: 'block' }, { type: 'stop' }] }),
+            rule('b'),
+        ])
+
+        const [first, second] = all('[data-test="rule-row"]')
+        expect(first.querySelector('[data-test="rule-stops"]')?.textContent).toContain('Stops')
+        expect(second.querySelector('[data-test="rule-stops"]')).toBeNull()
+        expect(rowNames()).toEqual(['Rule a', 'Rule b'])
+    })
+
     it('opens the editor for a new rule and for an existing one', async () => {
         await mount([rule('a')])
 
@@ -179,6 +191,51 @@ describe('Rules list', () => {
         await flush()
         expect(one<HTMLInputElement>('#rule_name').value).toBe('Rule a')
         expect(overlay.open).toHaveBeenCalledTimes(2)
+    })
+
+    it('duplicates a rule as a new rule with the same inputs', async () => {
+        api.create.mockResolvedValue({ data: {} } as any)
+        await mount([rule('a', {
+            operator: 'OR',
+            conditions: [
+                { type: 'subject', match: 'contains', values: ['x', 'y'] },
+                { type: 'has_attachments', match: '', values: [] },
+            ],
+            actions: [{ type: 'forward_to', value: 'rcp-1' }, { type: 'stop' }],
+            forwards: true,
+        })])
+
+        one<HTMLButtonElement>('[data-test="rule-duplicate"]').click()
+        await flush()
+        expect(overlay.open).toHaveBeenCalled()
+        expect(root.textContent).toContain('New rule')
+        expect(one<HTMLInputElement>('#rule_name').value).toBe('Rule a (copy)')
+
+        one<HTMLButtonElement>('[data-test="save"]').click()
+        await flush()
+        expect(api.update).not.toHaveBeenCalled()
+        expect(api.create).toHaveBeenCalledWith({
+            name: 'Rule a (copy)',
+            operator: 'OR',
+            conditions: [
+                { type: 'subject', match: 'contains', values: ['x', 'y'] },
+                { type: 'has_attachments', match: '', values: [] },
+            ],
+            actions: [{ type: 'forward_to', value: 'rcp-1' }, { type: 'stop' }],
+            forwards: true,
+            replies: false,
+            sends: false,
+        })
+    })
+
+    it('keeps the name of a duplicated rule within the limit', async () => {
+        await mount([rule('a', { name: 'n'.repeat(50) })])
+
+        one<HTMLButtonElement>('[data-test="rule-duplicate"]').click()
+        await flush()
+        const name = one<HTMLInputElement>('#rule_name').value
+        expect(name).toHaveLength(50)
+        expect(name.endsWith(' (copy)')).toBe(true)
     })
 
     it('deletes a rule after confirmation', async () => {
@@ -287,6 +344,7 @@ describe('Rules with an inactive subscription', () => {
         expect(one('[data-test="read-only-notice"] a')).not.toBeNull()
         expect(one<HTMLButtonElement>('[data-test="new-rule"]').disabled).toBe(true)
         expect(all<HTMLButtonElement>('[data-test="rule-edit"]').every((b) => b.disabled)).toBe(true)
+        expect(all<HTMLButtonElement>('[data-test="rule-duplicate"]').every((b) => b.disabled)).toBe(true)
         expect(all<HTMLButtonElement>('[data-test="rule-delete"]').every((b) => b.disabled)).toBe(true)
         expect(toggles().every((t) => t.disabled)).toBe(true)
         expect(handles().every((h) => h.getAttribute('aria-disabled') === 'true' && h.tabIndex === -1)).toBe(true)

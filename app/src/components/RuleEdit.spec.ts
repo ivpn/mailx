@@ -190,6 +190,14 @@ describe('RuleEdit rows', () => {
         expect(second.value).toBe('forward_to')
     })
 
+    it('warns that stop skips the rules below', async () => {
+        await mount()
+        expect(all('[data-test="action-hint"]')).toHaveLength(0)
+
+        await choose(one<HTMLSelectElement>('[data-test="action-type"]'), 'stop')
+        expect(one('[data-test="action-hint"]').textContent).toContain('other rules below this one won\'t run')
+    })
+
     it('keeps every operator select in sync', async () => {
         await mount()
         await click(one('[data-test="add-condition"]'))
@@ -271,14 +279,16 @@ describe('RuleEdit apply to', () => {
         expect(one<HTMLInputElement>('#rule_apply_forwards').checked).toBe(true)
         expect(option(conditionType, 'sender_domain').disabled).toBe(false)
         expect(option(conditionType, 'destination').disabled).toBe(true)
-        expect(option(conditionType, 'destination').title).toBe('Only available for Replies and Sends')
+        expect(option(conditionType, 'destination').text).toBe('destination email (replies and sends only)')
+        expect(option(conditionType, 'sender_domain').text).toBe('sender domain')
 
         await checkApply('replies', true)
         expect(option(conditionType, 'sender_domain').disabled).toBe(true)
-        expect(option(conditionType, 'sender_domain').title).toBe('Only available for Forwards')
+        expect(option(conditionType, 'sender_domain').text).toBe('sender domain (forwards only)')
         expect(option(actionType, 'blocklist_sender').disabled).toBe(true)
-        expect(option(actionType, 'blocklist_sender').title).toBe('Only available for Forwards')
+        expect(option(actionType, 'blocklist_sender').text).toBe('add sender email to the blocklist (forwards only)')
         expect(option(conditionType, 'subject').disabled).toBe(false)
+        expect(option(conditionType, 'subject').text).toBe('subject')
         expect(option(actionType, 'block').disabled).toBe(false)
     })
 

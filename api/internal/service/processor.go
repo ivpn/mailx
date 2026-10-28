@@ -21,7 +21,8 @@ var (
 
 func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 	msg, parseErr := model.ParseMsg(data)
-	if envelopeRecipient == "" {
+	fromEnvelope := envelopeRecipient != ""
+	if !fromEnvelope {
 		// Caller didn't pass the actual envelope recipient (e.g. Postfix pipe not
 		// yet updated to pass it); fall back to guessing it from headers.
 		envelopeRecipient = msg.EnvelopeRecipient
@@ -33,7 +34,7 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 			return nil
 		}
 
-		for _, to := range utils.SelectTargets(msg.To, envelopeRecipient) {
+		for _, to := range utils.SelectTargets(msg.To, envelopeRecipient, fromEnvelope) {
 			_, alias, _, err := s.FindRecipients(msg.From, to, msg.Type)
 			if alias.UserID == "" {
 				continue
@@ -85,7 +86,7 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 
 	var g errgroup.Group
 
-	for _, to := range utils.SelectTargets(msg.To, envelopeRecipient) {
+	for _, to := range utils.SelectTargets(msg.To, envelopeRecipient, fromEnvelope) {
 		recipients, alias, relayType, err := s.FindRecipients(msg.From, to, msg.Type)
 		if err != nil {
 			log.Println("error processing message:", err, alias.Name)

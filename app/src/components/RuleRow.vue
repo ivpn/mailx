@@ -23,6 +23,10 @@
         <td class="whitespace-normal">
             <div class="flex items-center gap-1">
                 <p class="m-0 break-all">{{ rule.name }}</p>
+                <span v-if="stops" class="hs-tooltip inline-flex shrink-0" data-test="rule-stops">
+                    <span class="badge hs-tooltip-toggle">Stops</span>
+                    <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">{{ stopsText }}</span>
+                </span>
                 <span v-if="rule.invalid_recipients" class="hs-tooltip inline-flex shrink-0" data-test="invalid-recipients">
                     <i class="icon alert icon-error text-xs hs-tooltip-toggle" aria-label="Missing recipient"></i>
                     <span class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">{{ invalidRecipientsText }}</span>
@@ -63,6 +67,10 @@
                         <i class="icon icon-primary edit text-xs"></i>
                         Edit
                     </button>
+                    <button @click.stop="duplicate" v-bind:disabled="readOnly" data-test="rule-duplicate">
+                        <i class="icon icon-primary copy text-xs"></i>
+                        Duplicate
+                    </button>
                     <button @click.stop="remove" v-bind:disabled="readOnly" class="delete" data-test="rule-delete">
                         <i class="icon icon-error trash text-xs"></i>
                         Delete
@@ -96,6 +104,7 @@
                             <p class="plain text-base text-primary text-wrap">
                                 <span class="text-sm text-secondary">Name:</span><br>
                                 {{ rule.name }}
+                                <span v-if="stops" class="badge" v-bind:title="stopsText" data-test="rule-stops">Stops</span>
                                 <i v-if="rule.invalid_recipients" class="icon alert icon-error text-xs" v-bind:title="invalidRecipientsText"></i>
                                 <br>
                                 <span class="text-xs text-tertiary">{{ relayLabels }}</span>
@@ -138,6 +147,10 @@
                                 <i class="icon icon-primary edit text-xs"></i>
                                 Edit
                             </button>
+                            <button @click.stop="duplicate" v-bind:disabled="readOnly" data-test="rule-duplicate">
+                                <i class="icon icon-primary copy text-xs"></i>
+                                Duplicate
+                            </button>
                             <button @click.stop="remove" v-bind:disabled="readOnly" class="delete" data-test="rule-delete">
                                 <i class="icon icon-error trash text-xs"></i>
                                 Delete
@@ -155,12 +168,13 @@
 import { computed } from 'vue'
 import { useBreakpoint } from '../lib/useBreakpoint.ts'
 import { closeDropdowns } from '../lib/preline.ts'
-import { type Rule, ruleRelayLabels } from '../lib/rules.ts'
+import { type Rule, ruleRelayLabels, ruleStops } from '../lib/rules.ts'
 
 const props = defineProps<{ rule: Rule, readOnly: boolean }>()
 const emit = defineEmits<{
     onToggle: [rule: Rule],
     onEdit: [rule: Rule],
+    onDuplicate: [rule: Rule],
     onDelete: [rule: Rule],
     onMove: [rule: Rule, delta: number],
 }>()
@@ -168,7 +182,11 @@ const { isDesktop } = useBreakpoint()
 
 const invalidRecipientsText = "A recipient this rule forwards to was deleted or deactivated. The alias's own recipients are used instead."
 
+const stopsText = "Rules below this one don't run on emails this rule matches."
+
 const relayLabels = computed(() => ruleRelayLabels(props.rule).join(' · '))
+
+const stops = computed(() => ruleStops(props.rule))
 
 const lastAppliedText = computed(() => props.rule.last_applied_at
     ? 'Last applied: ' + new Date(props.rule.last_applied_at).toLocaleString()
@@ -182,6 +200,11 @@ const move = (delta: number) => {
 const edit = () => {
     closeDropdowns()
     emit('onEdit', props.rule)
+}
+
+const duplicate = () => {
+    closeDropdowns()
+    emit('onDuplicate', props.rule)
 }
 
 const remove = () => {

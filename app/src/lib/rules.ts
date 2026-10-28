@@ -151,6 +151,15 @@ export const optionLabel = (spec: { label: string, types: RelayType[] }, selecte
 export const ruleRelayLabels = (rule: Pick<Rule, RelayType>) =>
     relayTypes.filter(t => rule[t.value]).map(t => t.label)
 
+// Whether the rules below this one are skipped for the emails it matches
+export const ruleStops = (rule: Pick<Rule, 'actions'>) => rule.actions.some(action => action.type === 'stop')
+
+// The name a duplicated rule starts with, kept within the name limit
+export const duplicateName = (name: string) => {
+    const suffix = ' (copy)'
+    return name.slice(0, ruleLimits.name - suffix.length).trimEnd() + suffix
+}
+
 export const isInactiveSubError = (message: string) => message.startsWith('Your subscription is not active')
 
 // The server rejects a reorder sent from a list that's out of date, e.g. after a change in another tab

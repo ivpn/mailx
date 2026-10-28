@@ -276,6 +276,7 @@ import {
     conditionSpec,
     conditionSpecs,
     defaultMatch,
+    duplicateName,
     isInactiveSubError,
     isRegexMatch,
     isUnsupported,
@@ -513,9 +514,10 @@ const save = async () => {
 
 const modal = () => document.getElementById(modalId) as HTMLElement
 
-const open = (rule?: Rule | null) => {
-    editingId.value = rule?.id ?? ''
-    form.name = rule?.name ?? ''
+// A duplicated rule opens as a new rule with the same inputs
+const open = (rule?: Rule | null, duplicate = false) => {
+    editingId.value = duplicate ? '' : rule?.id ?? ''
+    form.name = rule ? (duplicate ? duplicateName(rule.name) : rule.name) : ''
     form.operator = rule?.operator ?? 'AND'
     form.forwards = rule ? rule.forwards : true
     form.replies = rule?.replies ?? false

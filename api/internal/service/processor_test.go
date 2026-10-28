@@ -1,6 +1,9 @@
 package service
 
 import (
+	"bytes"
+	"log"
+	"os"
 	"slices"
 	"strings"
 	"testing"
@@ -323,6 +326,31 @@ func TestProcessMessage_NoValidRecipientLogsNoRecipients(t *testing.T) {
 				t.Errorf("log = %+v, want a no_recipients log for %s", lg, tt.to)
 			}
 		})
+	}
+}
+
+// A missing alias has no ID, so the error log names its domain, and never the full address.
+func TestProcessMessage_AliasNotFoundLogsDomain(t *testing.T) {
+	var buf bytes.Buffer
+	log.SetOutput(&buf)
+	t.Cleanup(func() { log.SetOutput(os.Stderr) })
+
+	s, store := newBlocklistTestService()
+	to := "missing@mailx.net"
+
+	if err := s.ProcessMessage(blockedSenderMsg(to), to); err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+
+	got := buf.String()
+	if !strings.Contains(got, "error processing message: alias not found: mailx.net") {
+		t.Errorf("expected the domain in the log, got %q", got)
+	}
+	if strings.Contains(got, to) {
+		t.Errorf("expected the address not to be logged, got %q", got)
+	}
+	if len(store.logs) != 0 {
+		t.Errorf("expected no diagnostic log, got %+v", store.logs)
 	}
 }
 

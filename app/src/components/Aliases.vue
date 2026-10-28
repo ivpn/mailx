@@ -30,14 +30,11 @@
             <span class="bg-secondary rounded flex items-center justify-center p-2 mb-5">
                 <i class="icon at icon-accent text-2xl"></i>
             </span>
-            <h4 class="mb-6">
-                <span v-if="!searchQuery">You have no aliases yet</span>
-                <span v-else>No aliases found</span>
-            </h4>
+            <h4 class="mb-6">You have no aliases yet</h4>
             <p v-if="!recipients.length" class="text-tertiary mb-6">
                 To get started, first <router-link to="/account/profile">verify</router-link> your primary email address.
             </p>
-            <button v-if="!searchQuery && recipients.length" class="cta" data-hs-overlay="#modal-create-alias-false">
+            <button v-if="recipients.length" class="cta" data-hs-overlay="#modal-create-alias-false">
                 New Alias
             </button>
         </div>
@@ -259,10 +256,11 @@ const statusLabel = computed(() => {
     return 'All'
 })
 
-// Only the default filter gets the full-page empty card; every other filter keeps the table (and
-// with it the status dropdown) on screen so the user can pick their way back out of it. Holding
-// off while a fetch is in flight stops the card from flashing over a list that is about to fill.
-const showEmptyCard = computed(() => loaded.value && !loading.value && !list.value.length && status.value === 'active_inactive')
+// Only the default filter with no search gets the full-page empty card; every other filter or
+// search keeps the table (and with it the status dropdown) on screen so the user can pick their
+// way back out of it, e.g. switch a search to Deleted. Holding off while a fetch is in flight
+// stops the card from flashing over a list that is about to fill.
+const showEmptyCard = computed(() => loaded.value && !loading.value && !list.value.length && status.value === 'active_inactive' && !searchQuery.value)
 
 const selectedIds = ref(new Set<string>())
 const selectAllCheckbox = ref<HTMLInputElement | null>(null)

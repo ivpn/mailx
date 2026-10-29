@@ -4,7 +4,9 @@ import (
 	"log"
 	"regexp"
 	"strings"
+	"time"
 
+	"github.com/ProtonMail/gopenpgp/v3/crypto"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -110,8 +112,23 @@ func pgpKeyValidation(fl validator.FieldLevel) bool {
 		return true
 	}
 
-	// Check that the key starts with a valid PGP header
-	return strings.HasPrefix(key, "-----BEGIN PGP PUBLIC KEY BLOCK-----") && strings.HasSuffix(key, "-----END PGP PUBLIC KEY BLOCK-----")
+	return IsValidPGPPublicKey(key)
+}
+
+// IsValidPGPPublicKey reports whether key is an armored PGP public key that
+// can be used to encrypt mail now (not private, expired, revoked or sign-only).
+func IsValidPGPPublicKey(key string) bool {
+	// Check that the key has a valid PGP header and footer
+	if !strings.HasPrefix(key, "-----BEGIN PGP PUBLIC KEY BLOCK-----") || !strings.HasSuffix(key, "-----END PGP PUBLIC KEY BLOCK-----") {
+		return false
+	}
+
+	publicKey, err := crypto.NewKeyFromArmored(key)
+	if err != nil {
+		return false
+	}
+
+	return !publicKey.IsPrivate() && publicKey.CanEncrypt(time.Now().Unix())
 }
 
 func searchValidation(fl validator.FieldLevel) bool {

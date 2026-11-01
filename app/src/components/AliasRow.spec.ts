@@ -5,6 +5,7 @@ import AliasRow from './AliasRow.vue'
 import { aliasApi } from '../api/alias.ts'
 import events from '../events.ts'
 import { formatPausedUntil } from '../lib/aliasPause.ts'
+import { closeDropdowns } from '../lib/preline.ts'
 
 vi.mock('../api/alias.ts', () => ({
     aliasApi: { update: vi.fn(), pin: vi.fn(), pause: vi.fn(), unpause: vi.fn(), restore: vi.fn() },
@@ -192,5 +193,36 @@ describe('AliasRow pause', () => {
         await flush()
         expect(aliasApi.unpause).not.toHaveBeenCalled()
         expect(onPause).not.toHaveBeenCalled()
+    })
+})
+
+describe('AliasRow forget', () => {
+    const forgetButton = () => [...root.querySelectorAll<HTMLButtonElement>('.hs-dropdown-menu button')].find((b) => b.textContent?.trim() === 'Forget')!
+
+    beforeEach(() => {
+        vi.mocked(closeDropdowns).mockClear()
+    })
+
+    it.each([['alias list', false], ['wildcard list', true]])('closes the menu and asks the %s to forget the alias', async (_, wildcard) => {
+        vi.spyOn(window, 'confirm').mockReturnValue(true)
+        const emit = vi.spyOn(events, 'emit')
+        await mount(testAlias({ is_custom_domain: true }), { wildcard })
+
+        forgetButton().click()
+        await flush()
+
+        expect(closeDropdowns).toHaveBeenCalled()
+        expect(emit).toHaveBeenCalledWith('alias.forget', { id: 'alias-1' })
+    })
+
+    it('does nothing when the confirmation is declined', async () => {
+        vi.spyOn(window, 'confirm').mockReturnValue(false)
+        const emit = vi.spyOn(events, 'emit')
+        await mount(testAlias({ is_custom_domain: true }))
+
+        forgetButton().click()
+        await flush()
+
+        expect(emit).not.toHaveBeenCalledWith('alias.forget', expect.anything())
     })
 })

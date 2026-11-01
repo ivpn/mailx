@@ -278,6 +278,18 @@ const deleteAlias = async (payload: any) => {
     }
 }
 
+const forgetAlias = async (payload: any) => {
+    try {
+        await aliasApi.forget(payload.id)
+        error.value = ''
+        fetch()
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.message
+        }
+    }
+}
+
 // Bound once per list render; the row components deliberately do not init Preline themselves.
 const bindPreline = () => {
     initTooltips()
@@ -300,6 +312,10 @@ const onUpdatePage = (obj: any) => {
 
 const onDeleteAlias = (payload: { id: string, wildcard: boolean }) => {
     deleteAlias(payload)
+}
+
+const onForgetAlias = (payload: { id: string }) => {
+    forgetAlias(payload)
 }
 
 // Flipping a row's switch changes which aliases belong in the list, but only while the list is
@@ -364,6 +380,7 @@ onMounted(async () => {
     events.on('alias.update', fetch)
     events.on('alias.enabled', onAliasEnabled)
     events.on('alias.delete', onDeleteAlias)
+    events.on('alias.forget', onForgetAlias)
 })
 
 onUnmounted(() => {
@@ -371,5 +388,6 @@ onUnmounted(() => {
     events.off('alias.update', fetch)
     events.off('alias.enabled', onAliasEnabled)
     events.off('alias.delete', onDeleteAlias)
+    events.off('alias.forget', onForgetAlias)
 })
 </script>

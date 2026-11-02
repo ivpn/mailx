@@ -24,50 +24,59 @@ type Message struct {
 	Type      MessageType `json:"type" gorm:"index:idx_messages_alias_id_type,priority:2"`
 }
 
+// ReplyTo is one way to read a reply-encoded address: the alias name and the address it replies to.
+type ReplyTo struct {
+	Alias string
+	To    string
+}
+
+// ReplyToCandidates returns each way a reply-encoded address ("alias+to=example.com@domain.com")
+// splits into an alias name and the address it replies to, longest alias name first. Both may
+// contain "+", so "a+b+c=example.com@domain.com" reads as "a+b@domain.com" replying to
+// "c@example.com" or as "a@domain.com" replying to "b+c@example.com". It returns nil for an
+// address that isn't reply-encoded.
+func ReplyToCandidates(email string) []ReplyTo {
+	atIndex := strings.Index(email, "@")
+	if atIndex == -1 {
+		return nil
+	}
+
+	local, domain := email[:atIndex], email[atIndex:]
+	var candidates []ReplyTo
+	for i := strings.LastIndex(local, "+"); i > 0; i = strings.LastIndex(local[:i], "+") {
+		to := local[i+1:]
+		if to == "" || !strings.Contains(to, "=") {
+			continue
+		}
+		candidates = append(candidates, ReplyTo{Alias: local[:i] + domain, To: strings.Replace(to, "=", "@", 1)})
+	}
+
+	return candidates
+}
+
+// ParseReplyTo returns the alias name an address is for and, for a reply-encoded address, the
+// address it replies to. A reply-encoded address splits at the first "+", so the reply target
+// may contain "+" ("a+b+c=example.com@domain.com" -> "a@domain.com", "b+c@example.com"), except
+// a Wildcard Alias reply ("*+shop+c=example.com@domain.com" -> "*+shop@domain.com"). It can't
+// tell an alias with "+" in its name apart, so FindRecipients tries every ReplyToCandidates split.
 func ParseReplyTo(email string) (string, string) {
-	alias := email
-
-	// Check if "+" exists in the email
-	plusIndex := strings.Index(email, "+")
-	if plusIndex == -1 {
-		return alias, ""
-	}
-
-	// Get respond to email between "+" and "@"
-	if plusIndex == -1 {
-		return alias, ""
-	}
-
-	// Get respond to email between "+" and "@"
-	rcp := email[plusIndex+1 : strings.Index(email, "@")]
-
-	// Check if respond to email is not empty and contains "=" and "+"
-	if rcp != "" && strings.Contains(rcp, "=") && strings.Contains(rcp, "+") {
-		// Get rcp after "+" and replace "=" with "@" to get valid respond to email
-		rcp = rcp[strings.Index(rcp, "+")+1:]
-		rcp = strings.Replace(rcp, "=", "@", 1)
-
-		// Get the string between the two "+" and the domain after "@"
-		alias = "*" + email[strings.Index(email, "+"):strings.LastIndex(email, "+")] + email[strings.Index(email, "@"):]
-		return alias, rcp
-	}
-
-	// Check if respond to email is not empty and contains "="
-	if rcp != "" && strings.Contains(rcp, "=") {
-		// Replace "=" with "@" to get valid respond to email
-		rcp = strings.Replace(rcp, "=", "@", 1)
-
-		// Get alias name up to "+" and domain after "@"
-		alias = email[:strings.Index(email, "+")] + email[strings.Index(email, "@"):]
-		return alias, rcp
+	if candidates := ReplyToCandidates(email); len(candidates) > 0 {
+		reply := candidates[len(candidates)-1]
+		// "*@domain.com" is never an alias, only the start of a Wildcard Alias name
+		if strings.HasPrefix(reply.Alias, "*@") && len(candidates) > 1 {
+			reply = candidates[len(candidates)-2]
+		}
+		return reply.Alias, reply.To
 	}
 
 	// Plain sub-address tag (e.g. "alias+tag@domain.com"): resolve against the base alias.
-	if rcp != "" {
-		alias = email[:plusIndex] + email[strings.Index(email, "@"):]
+	atIndex := strings.Index(email, "@")
+	plusIndex := strings.Index(email, "+")
+	if plusIndex > 0 && atIndex > plusIndex+1 {
+		return email[:plusIndex] + email[atIndex:], ""
 	}
 
-	return alias, ""
+	return email, ""
 }
 
 // WildcardAliasForDelimiter returns the wildcard-suffix form of a tagged address for the
@@ -102,23 +111,6 @@ func GenerateReplyTo(alias string, to string) string {
 	replaced := strings.Replace(to, "@", "=", 1)
 	email := strings.Replace(alias, "@", "+"+replaced+"@", 1)
 	return email
-}
-
-// ReplyAliasName returns the alias name a reply-encoded address was generated from, taken
-// verbatim up to the last "+" (e.g. "a+b+reply=example.com@domain.com" -> "a+b@domain.com").
-// ParseReplyTo reads the same address as a Wildcard Alias reply ("*+b@domain.com").
-func ReplyAliasName(email string) string {
-	atIndex := strings.Index(email, "@")
-	if atIndex == -1 {
-		return email
-	}
-
-	plusIndex := strings.LastIndex(email[:atIndex], "+")
-	if plusIndex == -1 {
-		return email
-	}
-
-	return email[:plusIndex] + email[atIndex:]
 }
 
 func PlainTextToHTML(text string) string {

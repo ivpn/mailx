@@ -234,7 +234,12 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 
 		// Rules - matched against the original email before the inbound alias below, so a rule
 		// that blocks the email also stops the alias from being created.
-		outcome := s.ApplyRules(context.Background(), alias, msg, relayType, to, data)
+		// A reply or send goes to the single target FindRecipients decoded from the address.
+		destination := ""
+		if relayType != model.Forward {
+			destination = recipients[0].Email
+		}
+		outcome := s.ApplyRules(context.Background(), alias, msg, relayType, destination, data)
 
 		// Handle Inbound Alias
 		if alias.Origin == model.Inbound && alias.ID == "" && !outcome.Block {

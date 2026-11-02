@@ -493,9 +493,9 @@ func (s *Service) DeleteAliasByDomain(ctx context.Context, domain string, userID
 }
 
 func (s *Service) FindAlias(email string) (model.Alias, error) {
-	name, _ := model.ParseReplyTo(email)
-	alias, err := s.GetAliasByName(name)
+	alias, _, err := s.findAlias(email)
 	if err != nil {
+		name, _ := model.ParseReplyTo(email)
 		return model.Alias{Name: name}, err
 	}
 

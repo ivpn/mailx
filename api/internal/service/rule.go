@@ -298,8 +298,9 @@ func activeRecipientIDs(rcps []model.Recipient) map[string]bool {
 
 // ApplyRules evaluates the user's active rules for the email type against the original email and
 // counts each matching rule once, in a single query. A failed lookup applies no rules, so the
-// email is delivered the way it would be without them.
-func (s *Service) ApplyRules(ctx context.Context, alias model.Alias, msg model.Msg, relayType model.MessageType, to string, data []byte) model.RuleOutcome {
+// email is delivered the way it would be without them. destination is the address a reply or send
+// goes to, as FindRecipients resolved it.
+func (s *Service) ApplyRules(ctx context.Context, alias model.Alias, msg model.Msg, relayType model.MessageType, destination string, data []byte) model.RuleOutcome {
 	if alias.UserID == "" {
 		return model.RuleOutcome{}
 	}
@@ -325,7 +326,7 @@ func (s *Service) ApplyRules(ctx context.Context, alias model.Alias, msg model.M
 		HasAttachments: sync.OnceValue(func() bool { return model.HasAttachments(data) }),
 	}
 	if relayType != model.Forward {
-		_, in.Destination = model.ParseReplyTo(to)
+		in.Destination = destination
 	}
 
 	outcome := model.EvaluateRules(rules, in)

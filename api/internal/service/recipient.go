@@ -310,36 +310,10 @@ func (s *Service) DeleteRecipientByUserID(ctx context.Context, userID string) er
 }
 
 func (s *Service) FindRecipients(from string, to string, msgType model.MessageType) ([]model.Recipient, model.Alias, model.MessageType, error) {
-	aliasName, replyTo := model.ParseReplyTo(to)
-
-	// An alias whose name itself contains "+" (e.g. a Custom or catch-all created alias) must
-	// match verbatim before falling back to the base alias with the "+tag" stripped. A reply
-	// from such an alias ("a+b+reply=example.com@domain.com") reads the same as a Wildcard
-	// Alias reply, which ParseReplyTo assumes ("*+b@domain.com"), so try "a+b@domain.com" first.
-	exactName := to
-	if replyTo != "" {
-		exactName = model.ReplyAliasName(to)
-	}
-	alias, err := s.GetAliasByName(exactName)
-	if err != nil && aliasName != exactName {
-		alias, err = s.GetAliasByName(aliasName)
-	}
-	// Fall back to a Wildcard Alias match (e.g. "*+suffix@domain.com" or "*.suffix@domain.com")
-	// before giving up, trying each supported delimiter in turn.
-	if err != nil {
-		for _, delimiter := range model.WildcardDelimiters {
-			wildcardName, ok := model.WildcardAliasForDelimiter(to, delimiter)
-			if !ok {
-				continue
-			}
-			if wcAlias, wcErr := s.GetAliasByName(wildcardName); wcErr == nil {
-				alias, err = wcAlias, nil
-				break
-			}
-		}
-	}
+	alias, replyTo, err := s.findAlias(to)
 	// If we still don't have an alias, check for a catch-all domain.
 	if err != nil {
+		aliasName, replyTo := model.ParseReplyTo(to)
 		domainPart := aliasDomainPart(aliasName)
 		if isCustomAliasDomain(domainPart, s.Cfg.API.Domains) {
 			// A reply-encoded address that doesn't resolve to a real alias must never
@@ -395,6 +369,47 @@ func (s *Service) FindRecipients(from string, to string, msgType model.MessageTy
 	}
 
 	return rcps, alias, model.Forward, nil
+}
+
+// findAlias returns the alias an address is for and, for a reply-encoded address, the address it
+// replies to. An alias name ("a+b@domain.com") and a reply target ("b+c@example.com") may both
+// contain "+", so every split of a reply-encoded address is tried against existing aliases,
+// longest alias name first, before any Wildcard Alias. A reply through an alias to a "+" address
+// then never goes out through a Wildcard Alias to a different address.
+func (s *Service) findAlias(to string) (model.Alias, string, error) {
+	candidates := model.ReplyToCandidates(to)
+	if len(candidates) == 0 {
+		// An alias whose name itself contains "+" (e.g. a Custom or catch-all created alias) must
+		// match verbatim before falling back to the base alias with the "+tag" stripped.
+		candidates = []model.ReplyTo{{Alias: to}}
+		if aliasName, _ := model.ParseReplyTo(to); aliasName != to {
+			candidates = append(candidates, model.ReplyTo{Alias: aliasName})
+		}
+	}
+
+	var err error
+	for _, c := range candidates {
+		var alias model.Alias
+		if alias, err = s.GetAliasByName(c.Alias); err == nil {
+			return alias, c.To, nil
+		}
+	}
+
+	// Fall back to a Wildcard Alias match (e.g. "*+suffix@domain.com" or "*.suffix@domain.com")
+	// before giving up, trying each supported delimiter in turn.
+	for _, c := range candidates {
+		for _, delimiter := range model.WildcardDelimiters {
+			wildcardName, ok := model.WildcardAliasForDelimiter(c.Alias, delimiter)
+			if !ok {
+				continue
+			}
+			if alias, wcErr := s.GetAliasByName(wildcardName); wcErr == nil {
+				return alias, c.To, nil
+			}
+		}
+	}
+
+	return model.Alias{}, "", err
 }
 
 func (s *Service) checkAliasEnabled(alias model.Alias) error {

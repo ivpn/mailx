@@ -22,6 +22,7 @@ func New(db *gorm.DB) {
 	every(time.Hour, "DeleteTerminatedUsers", func() { jobs.DeleteTerminatedUsers(db) }, nil)
 	every(time.Hour, "CleanupDeletedAliases", func() { jobs.CleanupDeletedAliases(db) }, nil)
 	every(time.Hour, "DeleteExpiredSessions", func() { jobs.DeleteExpiredSessions(db, cfg.API) }, nil)
+	every(time.Hour, "BackfillSessionScopes", func() { jobs.BackfillSessionScopes(db, cfg.API) }, nil)
 	every(time.Hour, "NotifyExpiringSubscriptions", func() { jobs.NotifyExpiringSubscriptionsJob(cfg, db) }, nil)
 	every(time.Hour, "DeleteOldLogs", func() { jobs.DeleteOldLogs(db) }, nil)
 	every(12*time.Hour, "VerifyDomains", func() { jobs.VerifyDomainsJob(cfg, db) }, nil)

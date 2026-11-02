@@ -100,7 +100,7 @@ func (s *ceremonyTestService) UpdateCredential(context.Context, webauthn.Credent
 	return nil
 }
 
-func (s *ceremonyTestService) SaveSession(context.Context, webauthn.SessionData, string, string, time.Time, bool) error {
+func (s *ceremonyTestService) SaveSession(context.Context, model.Session) error {
 	s.calls = append(s.calls, "SaveSession")
 	return nil
 }

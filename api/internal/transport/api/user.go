@@ -281,7 +281,14 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 			"error": ErrSaveSession,
 		})
 	}
-	err = h.Service.SaveSession(c.Context(), sessionData, token, user.ID, exp, req.Remember)
+	err = h.Service.SaveSession(c.Context(), model.Session{
+		UserID:      user.ID,
+		Token:       token,
+		SessionData: sessionData,
+		ExpiresAt:   exp,
+		Remember:    req.Remember,
+		Scope:       model.SessionScopeWeb,
+	})
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrSaveSession,

@@ -3,9 +3,8 @@ package service
 import (
 	"context"
 	"errors"
-	"time"
+	"log"
 
-	"github.com/go-webauthn/webauthn/webauthn"
 	"ivpn.net/email/api/internal/model"
 )
 
@@ -18,7 +17,7 @@ var (
 type SessionStore interface {
 	GetSession(context.Context, string) (model.Session, bool, error)
 	GetSessionCount(context.Context, string) (int, error)
-	SaveSession(context.Context, webauthn.SessionData, string, string, time.Time, bool) error
+	SaveSession(context.Context, model.Session) error
 	DeleteSession(context.Context, string) error
 	DeleteSessionByUserID(context.Context, string) error
 }
@@ -54,9 +53,12 @@ func (s *Service) CheckSessionCount(ctx context.Context, userID string) (bool, e
 	return true, nil
 }
 
-func (s *Service) SaveSession(ctx context.Context, session webauthn.SessionData, token string, userID string, exp time.Time, remember bool) error {
-	err := s.Store.SaveSession(ctx, session, token, userID, exp, remember)
+// SaveSession saves a new session. Its Scope must be set: model.SessionScopeWeb for a sign-in, or
+// model.SessionScopeAPI for an access key.
+func (s *Service) SaveSession(ctx context.Context, session model.Session) error {
+	err := s.Store.SaveSession(ctx, session)
 	if err != nil {
+		log.Printf("error saving session: %s", err.Error())
 		return ErrSaveSession
 	}
 

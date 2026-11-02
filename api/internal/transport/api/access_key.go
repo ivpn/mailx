@@ -229,7 +229,15 @@ func (h *Handler) Authenticate(c *fiber.Ctx) error {
 			"error": ErrSaveSession,
 		})
 	}
-	err = h.Service.SaveSession(c.Context(), sessionData, token, user.ID, exp, false)
+	// Scoped to the alias API, and linked to the key so revoking the key ends the session
+	err = h.Service.SaveSession(c.Context(), model.Session{
+		UserID:      user.ID,
+		Token:       token,
+		SessionData: sessionData,
+		ExpiresAt:   exp,
+		Scope:       model.SessionScopeAPI,
+		AccessKeyID: accessKey.ID,
+	})
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrSaveSession,

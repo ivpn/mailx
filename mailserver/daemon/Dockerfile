@@ -19,5 +19,5 @@ COPY --from=builder /daemon/daemon /usr/local/bin/daemon
 USER app
 
 # run the service on container startup
-EXPOSE 10025
+EXPOSE 10025 10026
 CMD ["daemon"]

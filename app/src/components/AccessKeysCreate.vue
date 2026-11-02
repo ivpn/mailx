@@ -36,13 +36,13 @@
                                     Expires After:
                                 </label>
                                 <select v-model="accessKey.expires_at" name="accesskey_expires_at" id="accesskey_expires_at">
-                                    <option value="">Never</option>
                                     <option value="7d">1 week</option>
                                     <option value="30d">1 month</option>
                                     <option value="90d">3 months</option>
                                     <option value="180d">6 months</option>
                                     <option value="365d">1 year</option>
                                 </select>
+                                <p class="text-sm mt-2">Access Keys expire after one year at most.</p>
                             </div>
                         </article>
                         <footer>
@@ -139,8 +139,6 @@ const postAccessKey = async () => {
 }
 
 const parseExpiry = (value: string) => {
-    if (!value) return null // "Never"
-
     const amount = parseInt(value)    // e.g. 7
     const unit = value.replace(String(amount), "") // "d"
 

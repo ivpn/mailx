@@ -17,6 +17,7 @@ var (
 	ErrPostAccessKey    = "Unable to create access key. Please try again."
 	ErrDeleteAccessKey  = "Unable to delete access key. Please try again."
 	ErrInvalidAccessKey = "Invalid access key provided."
+	ErrAccessKeyExpiry  = "Access Key expiry can't be more than one year from now."
 	ErrGetDefaults      = "Unable to retrieve default settings."
 )
 
@@ -102,6 +103,11 @@ func (h *Handler) PostAccessKey(c *fiber.Ctx) error {
 		if err != nil {
 			return c.Status(400).JSON(fiber.Map{
 				"error": ErrPostAccessKey,
+			})
+		}
+		if !model.IsValidAccessKeyExpiry(expiresAt) {
+			return c.Status(400).JSON(fiber.Map{
+				"error": ErrAccessKeyExpiry,
 			})
 		}
 		accessKey.ExpiresAt = &expiresAt

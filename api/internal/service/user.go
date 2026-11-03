@@ -21,7 +21,7 @@ var (
 	ErrGetUserStats        = errors.New("Unable to retrieve user statistics.")
 	ErrSaveUser            = errors.New("Unable to save user.")
 	ErrPostUser            = errors.New("Unable to create user.")
-	ErrSignupWebhook       = errors.New("Unable to call signup webhook.")
+	ErrSignupWebhook       = errors.New("Unable to complete signup. Signup webhook failed, please try again later.")
 	ErrActivateUser        = errors.New("Unable to activate user.")
 	ErrDeleteUser          = errors.New("Unable to delete user.")
 	ErrCreateOTP           = errors.New("Unable to generate OTP.")
@@ -105,6 +105,10 @@ func (s *Service) GetUnfinishedSignupOrPostUser(ctx context.Context, user model.
 		err = s.PostUser(ctx, user, subID, sessionId)
 		if err != nil {
 			log.Printf("error creating user: %s", err.Error())
+			// Only the webhook failure is surfaced; other causes (e.g. duplicate email) stay generic
+			if errors.Is(err, ErrSignupWebhook) {
+				return model.User{}, ErrSignupWebhook
+			}
 			return model.User{}, ErrPostUser
 		}
 	}
@@ -187,22 +191,34 @@ func (s *Service) PostUser(ctx context.Context, user model.User, subID string, s
 	err = s.PostSubscription(ctx, user.ID, preauth)
 	if err != nil {
 		log.Printf("error creating user: %s", err.Error())
+		s.rollbackPostUser(ctx, user.ID)
 		return ErrPostUser
 	}
 
 	err = s.PostSettings(ctx, user.ID)
 	if err != nil {
 		log.Printf("error creating user: %s", err.Error())
+		s.rollbackPostUser(ctx, user.ID)
 		return ErrPostUser
 	}
 
 	err = s.Http.SignupWebhook(subID)
 	if err != nil {
 		log.Printf("error creating user: %s", err.Error())
+		s.rollbackPostUser(ctx, user.ID)
 		return ErrSignupWebhook
 	}
 
 	return nil
+}
+
+// rollbackPostUser removes the rows created by a failed PostUser, so the
+// same email can be used to sign up again
+func (s *Service) rollbackPostUser(ctx context.Context, userID string) {
+	err := s.DeleteUnfinishedSignup(ctx, userID)
+	if err != nil {
+		log.Printf("error rolling back user creation: %s", err.Error())
+	}
 }
 
 func (s *Service) SendUserOTP(ctx context.Context, userID string) error {

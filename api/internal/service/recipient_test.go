@@ -466,6 +466,68 @@ func TestFindRecipients_ReplyFromWildcardAlias(t *testing.T) {
 	}
 }
 
+// A send or reply to a "+" address ("someone+news@gmail.com") goes to that address through the
+// base alias, never through a matching Wildcard Alias ("*+someone@...") to "news@gmail.com".
+func TestFindRecipients_ReplyToPlusAddress(t *testing.T) {
+	store := newFakeStore()
+	store.aliases["myalias@customdomain.com"] = model.Alias{
+		BaseModel: model.BaseModel{ID: "alias-1f"},
+		Name:      "myalias@customdomain.com",
+		UserID:    "user-1f",
+		Enabled:   true,
+	}
+	store.aliases["*+someone@customdomain.com"] = model.Alias{
+		BaseModel: model.BaseModel{ID: "alias-1f-wildcard"},
+		Name:      "*+someone@customdomain.com",
+		UserID:    "user-1f",
+		Enabled:   true,
+		Wildcard:  true,
+	}
+	store.domains["customdomain.com"] = model.Domain{Name: "customdomain.com", UserID: "user-1f", Enabled: true}
+	store.verifiedRecipients["user-1f"] = []model.Recipient{{Email: "sender@somewhere.com", IsActive: true}}
+	s := newTestService(store)
+
+	rcps, alias, msgType, err := s.FindRecipients("sender@somewhere.com", "myalias+someone+news=gmail.com@customdomain.com", model.Send)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if alias.ID != "alias-1f" {
+		t.Errorf("expected alias alias-1f, got %+v", alias)
+	}
+	if msgType != model.Send {
+		t.Errorf("expected msgType Send, got %v", msgType)
+	}
+	if len(rcps) != 1 || rcps[0].Email != "someone+news@gmail.com" {
+		t.Errorf("expected reply target someone+news@gmail.com, got %+v", rcps)
+	}
+}
+
+// A reply through a Wildcard Alias to a "+" address keeps the whole target.
+func TestFindRecipients_ReplyFromWildcardAliasToPlusAddress(t *testing.T) {
+	store := newFakeStore()
+	store.aliases["*+shop@customdomain.com"] = model.Alias{
+		BaseModel: model.BaseModel{ID: "alias-1g"},
+		Name:      "*+shop@customdomain.com",
+		UserID:    "user-1g",
+		Enabled:   true,
+		Wildcard:  true,
+	}
+	store.domains["customdomain.com"] = model.Domain{Name: "customdomain.com", UserID: "user-1g", Enabled: true}
+	store.verifiedRecipients["user-1g"] = []model.Recipient{{Email: "sender@somewhere.com", IsActive: true}}
+	s := newTestService(store)
+
+	rcps, alias, _, err := s.FindRecipients("sender@somewhere.com", "*+shop+someone+news=gmail.com@customdomain.com", model.Reply)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if alias.ID != "alias-1g" {
+		t.Errorf("expected wildcard alias alias-1g, got %+v", alias)
+	}
+	if len(rcps) != 1 || rcps[0].Email != "someone+news@gmail.com" {
+		t.Errorf("expected reply target someone+news@gmail.com, got %+v", rcps)
+	}
+}
+
 func TestFindRecipients_WildcardAliasFallbackWhenBaseAliasMissing(t *testing.T) {
 	store := newFakeStore()
 	store.aliases["*+news@customdomain.com"] = model.Alias{

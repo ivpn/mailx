@@ -180,13 +180,18 @@ func TestListUnsubscribeHeaders_Original(t *testing.T) {
 			want:         model.ListUnsubscribeHeaders{Value: "<mailto:myalias+unsub=list.example.com@mailx.net>"},
 		},
 		{
+			name:     "mailto with a plus address is rewritten",
+			original: "<mailto:unsub+token@list.example.com>",
+			want:     model.ListUnsubscribeHeaders{Value: "<mailto:myalias+unsub+token=list.example.com@mailx.net>"},
+		},
+		{
 			name:     "mailto that can't be rewritten is dropped",
-			original: "<mailto:unsub+token@list.example.com>, <https://list.example.com/unsub>",
+			original: "<mailto:unsub=token@list.example.com>, <https://list.example.com/unsub>",
 			want:     model.ListUnsubscribeHeaders{Value: "<https://list.example.com/unsub>"},
 		},
 		{
 			name:     "only unusable URIs falls back to deactivate",
-			original: "<mailto:unsub+token@list.example.com>, <ftp://list.example.com>",
+			original: "<mailto:unsub=token@list.example.com>, <ftp://list.example.com>",
 			want:     model.ListUnsubscribeHeaders{Value: "<https://api.mailx.net/deactivate>", Post: "List-Unsubscribe=One-Click"},
 		},
 		{

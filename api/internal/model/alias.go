@@ -123,14 +123,25 @@ type AliasList struct {
 	Total   int     `json:"total"`
 }
 
+// AliasImportReq is one CSV row of an alias import. LocalPart is validated the same way as
+// when creating an alias, so exported aliases can be imported back.
 type AliasImportReq struct {
+	Row         int    `json:"-"`
 	Description string `json:"description"`
 	Enabled     bool   `json:"enabled"`
 	Recipients  string `json:"recipients" validate:"required"`
 	FromName    string `json:"from_name"`
 	Format      string `json:"format"`
 	Domain      string `json:"domain" validate:"required"`
-	LocalPart   string `json:"local_part" validate:"omitempty,min=6,max=24"`
+	LocalPart   string `json:"local_part" validate:"required,emaillocalpart"`
+}
+
+// AliasImportSkip is an import row that wasn't imported, with the reason shown to the user.
+// Row is the row's line number in the CSV file, the header being line 1.
+type AliasImportSkip struct {
+	Row    int    `json:"row"`
+	Alias  string `json:"alias"`
+	Reason string `json:"reason"`
 }
 
 // AliasSortColumns is the single source of truth for GetAliases sort_by values, enforced

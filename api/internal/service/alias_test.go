@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-sql-driver/mysql"
 	"gorm.io/gorm"
 	"ivpn.net/email/api/internal/model"
 )
@@ -377,7 +378,7 @@ func TestImportAliases_InactiveSubscriptionFailsFast(t *testing.T) {
 		{Domain: "customdomain.com", LocalPart: "newalias", Recipients: "rcpt@example.com", Format: model.AliasFormatCustom},
 	}
 
-	aliases, err := s.ImportAliases(context.Background(), reqs, "user-1")
+	aliases, _, err := s.ImportAliases(context.Background(), reqs, "user-1")
 	if !errors.Is(err, ErrPostAliasInactiveSub) {
 		t.Errorf("expected error %v, got %v", ErrPostAliasInactiveSub, err)
 	}
@@ -397,12 +398,75 @@ func TestImportAliases_ActiveSubscriptionImportsValidRows(t *testing.T) {
 		{Domain: "customdomain.com", LocalPart: "newalias", Recipients: "rcpt@example.com", Format: model.AliasFormatCustom},
 	}
 
-	aliases, err := s.ImportAliases(context.Background(), reqs, "user-1")
+	aliases, skipped, err := s.ImportAliases(context.Background(), reqs, "user-1")
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
 	if len(aliases) != 1 || aliases[0].Name != "newalias@customdomain.com" {
 		t.Errorf("expected 1 imported alias newalias@customdomain.com, got %+v", aliases)
+	}
+	if len(skipped) != 0 {
+		t.Errorf("expected no skipped rows, got %+v", skipped)
+	}
+}
+
+func TestImportAliases_ReportsSkippedRows(t *testing.T) {
+	store := newFakeStore()
+	store.subscription = model.Subscription{ActiveUntil: time.Now().Add(time.Hour)}
+	store.domains["customdomain.com"] = model.Domain{Name: "customdomain.com", UserID: "user-1", Enabled: true}
+	store.verifiedRecipients["user-1"] = []model.Recipient{{Email: "rcpt@example.com"}}
+	s := newTestService(store)
+
+	reqs := []model.AliasImportReq{
+		{Row: 2, Domain: "customdomain.com", LocalPart: "a", Recipients: "rcpt@example.com", Format: model.AliasFormatCustom},
+		{Row: 3, Domain: "other.com", LocalPart: "wrongdomain", Recipients: "rcpt@example.com", Format: model.AliasFormatCustom},
+		{Row: 4, Domain: "customdomain.com", LocalPart: "norcpt", Recipients: "unverified@example.com", Format: model.AliasFormatCustom},
+		{Row: 5, Domain: "customdomain.com", LocalPart: "averyveryverylongaliasname.29", Recipients: "rcpt@example.com", Format: model.AliasFormatCustom},
+	}
+
+	aliases, skipped, err := s.ImportAliases(context.Background(), reqs, "user-1")
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if len(aliases) != 2 || aliases[0].Name != "a@customdomain.com" || aliases[1].Name != "averyveryverylongaliasname.29@customdomain.com" {
+		t.Errorf("expected short and long names imported, got %+v", aliases)
+	}
+
+	want := []model.AliasImportSkip{
+		{Row: 3, Alias: "wrongdomain@other.com", Reason: ErrImportDomain.Error()},
+		{Row: 4, Alias: "norcpt@customdomain.com", Reason: ErrImportUnverifiedRcp.Error()},
+	}
+	if len(skipped) != len(want) {
+		t.Fatalf("expected skipped %+v, got %+v", want, skipped)
+	}
+	for i := range want {
+		if skipped[i] != want[i] {
+			t.Errorf("skipped[%d] = %+v, want %+v", i, skipped[i], want[i])
+		}
+	}
+}
+
+func TestImportAliases_ReportsDuplicateAlias(t *testing.T) {
+	store := newFakeStore()
+	store.subscription = model.Subscription{ActiveUntil: time.Now().Add(time.Hour)}
+	store.domains["customdomain.com"] = model.Domain{Name: "customdomain.com", UserID: "user-1", Enabled: true}
+	store.verifiedRecipients["user-1"] = []model.Recipient{{Email: "rcpt@example.com"}}
+	store.postAliasErr = &mysql.MySQLError{Number: 1062, Message: "Duplicate entry"}
+	s := newTestService(store)
+
+	reqs := []model.AliasImportReq{
+		{Row: 2, Domain: "customdomain.com", LocalPart: "existing", Recipients: "rcpt@example.com", Format: model.AliasFormatCustom},
+	}
+
+	aliases, skipped, err := s.ImportAliases(context.Background(), reqs, "user-1")
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if len(aliases) != 0 {
+		t.Errorf("expected no aliases imported, got %+v", aliases)
+	}
+	if len(skipped) != 1 || skipped[0].Reason != ErrPostAliasExists.Error() {
+		t.Errorf("expected 1 skipped row with reason %q, got %+v", ErrPostAliasExists, skipped)
 	}
 }
 

@@ -22,12 +22,15 @@ var (
 	ErrPostAlias            = errors.New("Unable to create alias. Please try again.")
 	ErrPostInboundAlias     = errors.New("Unable to create inbound alias. Please try again.")
 	ErrPostAliasLimit       = errors.New("You’ve reached the maximum number of allowed aliases.")
+	ErrPostAliasExists      = errors.New("This alias already exists or was deleted.")
 	ErrUpdateAlias          = errors.New("Unable to update alias. Please try again.")
 	ErrDeleteAlias          = errors.New("Unable to delete alias. Please try again.")
 	ErrDeleteAliasByUserID  = errors.New("Unable to delete aliases for this user.")
 	ErrDeleteAliasByDomain  = errors.New("Unable to delete aliases for this domain.")
 	ErrFailedImport         = errors.New("Failed to import aliases. Please check the format and try again.")
 	ErrFailedImportLimit    = errors.New("Failed to import aliases. You can only import up to 500 aliases at a time.")
+	ErrImportUnverifiedRcp  = errors.New("None of the recipients is verified.")
+	ErrImportDomain         = errors.New("The domain is not one of your custom domains.")
 	ErrPostAliasInactiveSub = errors.New("Your subscription is not active. Please renew to create new aliases.")
 
 	ErrPauseAliasDuration      = errors.New("Choose a pause of 1 to 10 hours, days or weeks.")
@@ -275,6 +278,10 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 			if errors.Is(err, model.ErrInboundHourlyLimit) {
 				return model.Alias{}, ErrPostInboundAlias
 			}
+			var mysqlErr *mysql.MySQLError
+			if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
+				return model.Alias{}, ErrPostAliasExists
+			}
 			log.Printf("error creating custom alias: %s", err.Error())
 			return model.Alias{}, ErrPostAlias
 		}
@@ -502,31 +509,43 @@ func (s *Service) FindAlias(email string) (model.Alias, error) {
 	return alias, nil
 }
 
-func (s *Service) ImportAliases(ctx context.Context, aliases []model.AliasImportReq, userID string) ([]model.Alias, error) {
+// ImportAliases creates the aliases of the given import rows. Rows that can't be imported
+// are returned as skipped, each with its reason, instead of failing the whole import.
+func (s *Service) ImportAliases(ctx context.Context, aliases []model.AliasImportReq, userID string) ([]model.Alias, []model.AliasImportSkip, error) {
 	var importedAliases []model.Alias
+	var skipped []model.AliasImportSkip
 
 	sub, err := s.GetSubscription(ctx, userID)
 	if err != nil {
 		log.Printf("error fetching subscription: %s", err.Error())
-		return nil, ErrPostAlias
+		return nil, nil, ErrPostAlias
 	}
 
 	if !sub.ActiveStatus() {
-		return nil, ErrPostAliasInactiveSub
+		return nil, nil, ErrPostAliasInactiveSub
 	}
 
 	domains, err := s.GetDomains(ctx, userID)
 	if err != nil {
-		return nil, ErrFailedImport
+		return nil, nil, ErrFailedImport
 	}
 
 	if len(aliases) > 500 {
-		return nil, ErrFailedImportLimit
+		return nil, nil, ErrFailedImportLimit
 	}
 
 	for _, req := range aliases {
+		skip := func(reason error) {
+			skipped = append(skipped, model.AliasImportSkip{
+				Row:    req.Row,
+				Alias:  req.LocalPart + "@" + req.Domain,
+				Reason: reason.Error(),
+			})
+		}
+
 		rcps, err := s.GetVerifiedRecipients(ctx, req.Recipients, userID)
 		if err != nil || len(rcps) == 0 {
+			skip(ErrImportUnverifiedRcp)
 			continue
 		}
 
@@ -539,6 +558,7 @@ func (s *Service) ImportAliases(ctx context.Context, aliases []model.AliasImport
 		}
 
 		if !domainFound {
+			skip(ErrImportDomain)
 			continue
 		}
 
@@ -553,13 +573,14 @@ func (s *Service) ImportAliases(ctx context.Context, aliases []model.AliasImport
 
 		importedAlias, err := s.PostAlias(ctx, alias, req.Format, req.Domain, req.LocalPart, "")
 		if err != nil {
+			skip(err)
 			continue
 		}
 
 		importedAliases = append(importedAliases, importedAlias)
 	}
 
-	return importedAliases, nil
+	return importedAliases, skipped, nil
 }
 
 func (s *Service) RestoreAlias(ctx context.Context, ID string, userID string) error {

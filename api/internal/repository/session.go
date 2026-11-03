@@ -3,12 +3,17 @@ package repository
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"time"
 
+	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 	"ivpn.net/email/api/internal/model"
 )
+
+var ErrAccessKeyNotFound = errors.New("access key not found")
 
 func (d *Database) GetSession(ctx context.Context, token string) (model.Session, bool, error) {
 	var session model.Session
@@ -33,6 +38,9 @@ func (d *Database) GetSessionCount(ctx context.Context, userID string) (int, err
 }
 
 // SaveSession refuses a session without a valid scope, so every caller decides what it may reach.
+// A session made from an access key is saved only while the key exists. The key row is locked until
+// the insert, so a DeleteAccessKey running at the same time either ends this session or makes it
+// fail, and never leaves it outliving the key.
 func (d *Database) SaveSession(ctx context.Context, session model.Session) error {
 	if !session.Scope.Valid() {
 		return model.ErrInvalidSessionScope
@@ -43,15 +51,29 @@ func (d *Database) SaveSession(ctx context.Context, session model.Session) error
 		return err
 	}
 
-	return d.Client.Create(&model.Session{
-		UserID:      session.UserID,
-		Token:       session.Token,
-		Data:        data,
-		ExpiresAt:   session.ExpiresAt,
-		Remember:    session.Remember,
-		Scope:       session.Scope,
-		AccessKeyID: session.AccessKeyID,
-	}).Error
+	return d.Client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		if session.AccessKeyID != "" {
+			var key model.AccessKey
+			err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).Select("id").
+				Where("id = ? AND user_id = ?", session.AccessKeyID, session.UserID).First(&key).Error
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return ErrAccessKeyNotFound
+			}
+			if err != nil {
+				return err
+			}
+		}
+
+		return tx.Create(&model.Session{
+			UserID:      session.UserID,
+			Token:       session.Token,
+			Data:        data,
+			ExpiresAt:   session.ExpiresAt,
+			Remember:    session.Remember,
+			Scope:       session.Scope,
+			AccessKeyID: session.AccessKeyID,
+		}).Error
+	})
 }
 
 // BackfillSessionScopes sets the scope of sessions saved before sessions had one, and returns how

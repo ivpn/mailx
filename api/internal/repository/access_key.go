@@ -34,15 +34,17 @@ func (d *Database) PostAccessKey(ctx context.Context, accessKey model.AccessKey)
 
 // DeleteAccessKey deletes the key and ends the sessions made from it. It also ends the user's api
 // sessions saved before sessions recorded their access key, since any of them may be this key's.
+// The key is deleted first, so its row stays locked while the sessions are deleted, and SaveSession
+// can't add a session from it in between.
 func (d *Database) DeleteAccessKey(ctx context.Context, accessKeyID string, userId string) error {
-	return d.Client.Transaction(func(tx *gorm.DB) error {
-		err := tx.Where("user_id = ? AND (access_key_id = ? OR (scope = ? AND (access_key_id IS NULL OR access_key_id = '')))",
-			userId, accessKeyID, model.SessionScopeAPI).Delete(&model.Session{}).Error
+	return d.Client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		err := tx.Where("id = ? AND user_id = ?", accessKeyID, userId).Delete(&model.AccessKey{}).Error
 		if err != nil {
 			return err
 		}
 
-		return tx.Where("id = ? AND user_id = ?", accessKeyID, userId).Delete(&model.AccessKey{}).Error
+		return tx.Where("user_id = ? AND (access_key_id = ? OR (scope = ? AND (access_key_id IS NULL OR access_key_id = '')))",
+			userId, accessKeyID, model.SessionScopeAPI).Delete(&model.Session{}).Error
 	})
 }
 

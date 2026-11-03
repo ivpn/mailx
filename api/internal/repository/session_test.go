@@ -50,8 +50,11 @@ func TestSaveSessionStoresScope(t *testing.T) {
 	d := newSessionTestDB(t)
 	exp := time.Now().Add(time.Hour)
 
+	key, err := d.PostAccessKey(ctx, model.AccessKey{UserId: "user-1", Name: "extension"})
+	require.NoError(t, err)
+
 	require.NoError(t, d.SaveSession(ctx, model.Session{UserID: "user-1", Token: "web", ExpiresAt: exp, Scope: model.SessionScopeWeb}))
-	require.NoError(t, d.SaveSession(ctx, model.Session{UserID: "user-1", Token: "api", ExpiresAt: exp, Scope: model.SessionScopeAPI, AccessKeyID: "key-1"}))
+	require.NoError(t, d.SaveSession(ctx, model.Session{UserID: "user-1", Token: "api", ExpiresAt: exp, Scope: model.SessionScopeAPI, AccessKeyID: key.ID}))
 
 	web, _, err := d.GetSession(ctx, "web")
 	require.NoError(t, err)
@@ -61,7 +64,30 @@ func TestSaveSessionStoresScope(t *testing.T) {
 	api, _, err := d.GetSession(ctx, "api")
 	require.NoError(t, err)
 	assert.Equal(t, model.SessionScopeAPI, api.Scope)
-	assert.Equal(t, "key-1", api.AccessKeyID)
+	assert.Equal(t, key.ID, api.AccessKeyID)
+}
+
+func TestSaveSessionRequiresExistingAccessKey(t *testing.T) {
+	ctx := context.Background()
+	d := newSessionTestDB(t)
+	exp := time.Now().Add(time.Hour)
+
+	key, err := d.PostAccessKey(ctx, model.AccessKey{UserId: "user-1", Name: "extension"})
+	require.NoError(t, err)
+	other, err := d.PostAccessKey(ctx, model.AccessKey{UserId: "user-2", Name: "extension"})
+	require.NoError(t, err)
+
+	// A key deleted after it was checked at login, but before the session was saved
+	require.NoError(t, d.DeleteAccessKey(ctx, key.ID, "user-1"))
+	err = d.SaveSession(ctx, model.Session{UserID: "user-1", Token: "deleted-key", ExpiresAt: exp, Scope: model.SessionScopeAPI, AccessKeyID: key.ID})
+	assert.ErrorIs(t, err, ErrAccessKeyNotFound)
+
+	err = d.SaveSession(ctx, model.Session{UserID: "user-1", Token: "other-user-key", ExpiresAt: exp, Scope: model.SessionScopeAPI, AccessKeyID: other.ID})
+	assert.ErrorIs(t, err, ErrAccessKeyNotFound)
+
+	var count int64
+	require.NoError(t, d.Client.Model(&model.Session{}).Count(&count).Error)
+	assert.Zero(t, count, "no session is saved without its access key")
 }
 
 func TestSaveSessionRequiresScope(t *testing.T) {

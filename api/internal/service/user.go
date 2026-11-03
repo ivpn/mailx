@@ -509,8 +509,9 @@ func (s *Service) ChangeEmail(ctx context.Context, userID string, email string) 
 func (s *Service) InitiatePasswordReset(ctx context.Context, email string) error {
 	user, err := s.Store.GetUserByEmail(ctx, email)
 	if err != nil {
+		// Respond the same as for an existing account to avoid account enumeration
 		log.Printf("error initiating password reset: %s", err.Error())
-		return ErrIncorrectEmail
+		return nil
 	}
 
 	otp, err := utils.CreateLongOTP()

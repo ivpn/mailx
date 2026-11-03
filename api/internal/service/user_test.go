@@ -137,6 +137,49 @@ func TestTotpEnableConfirm_BackupCodes(t *testing.T) {
 	}
 }
 
+// passwordResetTestStore is a minimal UserStore fake scoped to password reset tests.
+type passwordResetTestStore struct {
+	Store
+	users map[string]model.User
+}
+
+func (s *passwordResetTestStore) GetUserByEmail(ctx context.Context, email string) (model.User, error) {
+	user, ok := s.users[email]
+	if !ok {
+		return model.User{}, errNotFound
+	}
+	return user, nil
+}
+
+func TestInitiatePasswordReset_UnknownEmail(t *testing.T) {
+	cache := newTotpTestCache()
+	s := &Service{Store: &passwordResetTestStore{}, Cache: cache}
+
+	err := s.InitiatePasswordReset(context.Background(), "nobody@example.com")
+	if err != nil {
+		t.Fatalf("Expected no error for unknown email, got %v", err)
+	}
+	if len(cache.data) != 0 {
+		t.Errorf("Expected no reset OTP to be stored, got %d entries", len(cache.data))
+	}
+}
+
+func TestInitiatePasswordReset_ExistingEmail(t *testing.T) {
+	cache := newTotpTestCache()
+	store := &passwordResetTestStore{users: map[string]model.User{
+		"user@example.com": {Email: "user@example.com"},
+	}}
+	s := &Service{Store: store, Cache: cache}
+
+	err := s.InitiatePasswordReset(context.Background(), "user@example.com")
+	if err != nil {
+		t.Fatalf("InitiatePasswordReset returned an error: %v", err)
+	}
+	if len(cache.data) != 1 {
+		t.Errorf("Expected 1 reset OTP to be stored, got %d entries", len(cache.data))
+	}
+}
+
 // computeTotpCodeForTest duplicates internal/utils/otp_2fa.go's unexported computeCode,
 // since it isn't reachable across the package boundary from these service-layer tests.
 func computeTotpCodeForTest(t *testing.T, secret string) string {

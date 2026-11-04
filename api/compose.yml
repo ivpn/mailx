@@ -58,7 +58,7 @@ services:
       net:
   
   redis:
-    image: redis:8.10.2@sha256:c94085d298b738be22c9ccdc0ac3761fa6649df7dd82ad1d42367f3cb9714935
+    image: redis:8.10.3@sha256:de1068af6f552240dfab67bcc9bfef99bfc60f776bb4580ef077ea4c8c97e848
     container_name: email-redis
     restart: unless-stopped
     volumes:

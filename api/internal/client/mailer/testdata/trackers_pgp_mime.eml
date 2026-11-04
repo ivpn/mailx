@@ -1,0 +1,26 @@
+From: Friend <friend@example.com>
+To: myalias@mailx.net
+Subject: Secret
+Message-ID: <mno345@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/encrypted; protocol="application/pgp-encrypted"; boundary="enc-boundary"
+
+This is an OpenPGP/MIME encrypted message (RFC 4880 and 3156)
+--enc-boundary
+Content-Type: application/pgp-encrypted
+Content-Description: PGP/MIME version identification
+
+Version: 1
+
+--enc-boundary
+Content-Type: application/octet-stream; name="encrypted.asc"
+Content-Description: OpenPGP encrypted message
+Content-Disposition: inline; filename="encrypted.asc"
+
+-----BEGIN PGP MESSAGE-----
+
+hQEMA0l1c2VyLWtleS1pZAEH/2dFbmNyeXB0ZWQtcGF5bG9hZA==
+=abcd
+-----END PGP MESSAGE-----
+
+--enc-boundary--

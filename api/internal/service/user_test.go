@@ -57,6 +57,16 @@ func (c *totpTestCache) Get(ctx context.Context, key string) (string, error) {
 	return v, nil
 }
 
+func (c *totpTestCache) SetNX(ctx context.Context, key string, value any, exp time.Duration) (bool, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if _, ok := c.data[key]; ok {
+		return false, nil
+	}
+	c.data[key] = fmt.Sprintf("%v", value)
+	return true, nil
+}
+
 func (c *totpTestCache) GetDel(ctx context.Context, key string) (string, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -124,6 +134,49 @@ func TestTotpEnableConfirm_BackupCodes(t *testing.T) {
 				t.Errorf("Unexpected character %c in backup code %s", ch, c)
 			}
 		}
+	}
+}
+
+// passwordResetTestStore is a minimal UserStore fake scoped to password reset tests.
+type passwordResetTestStore struct {
+	Store
+	users map[string]model.User
+}
+
+func (s *passwordResetTestStore) GetUserByEmail(ctx context.Context, email string) (model.User, error) {
+	user, ok := s.users[email]
+	if !ok {
+		return model.User{}, errNotFound
+	}
+	return user, nil
+}
+
+func TestInitiatePasswordReset_UnknownEmail(t *testing.T) {
+	cache := newTotpTestCache()
+	s := &Service{Store: &passwordResetTestStore{}, Cache: cache}
+
+	err := s.InitiatePasswordReset(context.Background(), "nobody@example.com")
+	if err != nil {
+		t.Fatalf("Expected no error for unknown email, got %v", err)
+	}
+	if len(cache.data) != 0 {
+		t.Errorf("Expected no reset OTP to be stored, got %d entries", len(cache.data))
+	}
+}
+
+func TestInitiatePasswordReset_ExistingEmail(t *testing.T) {
+	cache := newTotpTestCache()
+	store := &passwordResetTestStore{users: map[string]model.User{
+		"user@example.com": {Email: "user@example.com"},
+	}}
+	s := &Service{Store: store, Cache: cache}
+
+	err := s.InitiatePasswordReset(context.Background(), "user@example.com")
+	if err != nil {
+		t.Fatalf("InitiatePasswordReset returned an error: %v", err)
+	}
+	if len(cache.data) != 1 {
+		t.Errorf("Expected 1 reset OTP to be stored, got %d entries", len(cache.data))
 	}
 }
 

@@ -91,13 +91,34 @@ func TestParseReplyTo(t *testing.T) {
 			expectedRcp:   "",
 		},
 		{
-			email:         "user+catchall+reply=example.com@domain.com",
-			expectedAlias: "*+catchall@domain.com",
+			// Never read as a Wildcard Alias reply ("*+someone@domain.com" to "news@gmail.com")
+			email:         "user+someone+news=gmail.com@domain.com",
+			expectedAlias: "user@domain.com",
+			expectedRcp:   "someone+news@gmail.com",
+		},
+		{
+			email:         "*+shop+reply=example.com@domain.com",
+			expectedAlias: "*+shop@domain.com",
 			expectedRcp:   "reply@example.com",
+		},
+		{
+			email:         "*+shop+someone+news=gmail.com@domain.com",
+			expectedAlias: "*+shop@domain.com",
+			expectedRcp:   "someone+news@gmail.com",
 		},
 		{
 			email:         "user+catchall@domain.com",
 			expectedAlias: "user@domain.com",
+			expectedRcp:   "",
+		},
+		{
+			email:         "+tag@domain.com",
+			expectedAlias: "+tag@domain.com",
+			expectedRcp:   "",
+		},
+		{
+			email:         "user@domain+tag.com",
+			expectedAlias: "user@domain+tag.com",
 			expectedRcp:   "",
 		},
 	}
@@ -115,22 +136,36 @@ func TestParseReplyTo(t *testing.T) {
 	}
 }
 
-func TestReplyAliasName(t *testing.T) {
+func TestReplyToCandidates(t *testing.T) {
 	tests := []struct {
 		email    string
-		expected string
+		expected []ReplyTo
 	}{
-		{"a+b897611+reply=example.com@domain.com", "a+b897611@domain.com"},
-		{"user+reply=example.com@domain.com", "user@domain.com"},
-		{"*+shop+reply=example.com@domain.com", "*+shop@domain.com"},
-		{"user@domain.com", "user@domain.com"},
-		{"invalid", "invalid"},
+		{"user+reply=example.com@domain.com", []ReplyTo{{"user@domain.com", "reply@example.com"}}},
+		{"a+b+c=example.com@domain.com", []ReplyTo{
+			{"a+b@domain.com", "c@example.com"},
+			{"a@domain.com", "b+c@example.com"},
+		}},
+		{"*+shop+reply=example.com@domain.com", []ReplyTo{
+			{"*+shop@domain.com", "reply@example.com"},
+			{"*@domain.com", "shop+reply@example.com"},
+		}},
+		{"user+tag@domain.com", nil},
+		{"+reply=example.com@domain.com", nil},
+		{"user@domain.com", nil},
+		{"invalid", nil},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.email, func(t *testing.T) {
-			if got := ReplyAliasName(tt.email); got != tt.expected {
-				t.Errorf("expected %s, got %s", tt.expected, got)
+			got := ReplyToCandidates(tt.email)
+			if len(got) != len(tt.expected) {
+				t.Fatalf("expected %+v, got %+v", tt.expected, got)
+			}
+			for i := range got {
+				if got[i] != tt.expected[i] {
+					t.Errorf("expected %+v, got %+v", tt.expected, got)
+				}
 			}
 		})
 	}

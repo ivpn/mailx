@@ -32,6 +32,58 @@ func (d *Database) UpdateSettings(ctx context.Context, settings model.Settings) 
 	}).Error
 }
 
+func (d *Database) UpdateListUnsubscribeBehaviour(ctx context.Context, userID string, behaviour model.ListUnsubscribeBehaviour) error {
+	q := d.Client.Model(&model.Settings{}).Where("user_id = ?", userID).Update("list_unsubscribe_behaviour", behaviour)
+	if q.Error != nil {
+		return q.Error
+	}
+	if q.RowsAffected == 0 {
+		return fmt.Errorf("could not find settings by user ID")
+	}
+
+	return nil
+}
+
+func (d *Database) UpdateBlockTrackers(ctx context.Context, userID string, enabled bool) error {
+	return d.updateSettingsColumn(userID, "block_trackers", enabled)
+}
+
+func (d *Database) UpdateRemoveHeader(ctx context.Context, userID string, removeHeader bool) error {
+	return d.updateSettingsColumn(userID, "remove_header", removeHeader)
+}
+
+func (d *Database) UpdateLogIssues(ctx context.Context, userID string, enabled bool) error {
+	return d.updateSettingsColumn(userID, "log_issues", enabled)
+}
+
+func (d *Database) UpdateDefaultDomain(ctx context.Context, userID string, domain string) error {
+	return d.updateSettingsColumn(userID, "domain", domain)
+}
+
+func (d *Database) UpdateDefaultRecipient(ctx context.Context, userID string, recipient string) error {
+	return d.updateSettingsColumn(userID, "recipient", recipient)
+}
+
+func (d *Database) UpdateAliasFormat(ctx context.Context, userID string, format string) error {
+	return d.updateSettingsColumn(userID, "alias_format", format)
+}
+
+func (d *Database) UpdateFromName(ctx context.Context, userID string, fromName string) error {
+	return d.updateSettingsColumn(userID, "from_name", fromName)
+}
+
+func (d *Database) updateSettingsColumn(userID string, column string, value any) error {
+	q := d.Client.Model(&model.Settings{}).Where("user_id = ?", userID).Update(column, value)
+	if q.Error != nil {
+		return q.Error
+	}
+	if q.RowsAffected == 0 {
+		return fmt.Errorf("could not find settings by user ID")
+	}
+
+	return nil
+}
+
 func (d *Database) DeleteSettings(ctx context.Context, userID string) error {
 	return d.Client.Where("user_id = ?", userID).Delete(&model.Settings{}).Error
 }

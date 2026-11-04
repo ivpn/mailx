@@ -49,6 +49,16 @@ func DefaultAccessKeyExpiry() *time.Time {
 	return &expiresAt
 }
 
+// accessKeyExpirySkew allows for client clock skew and DST shifts when
+// the app computes "1 year" from the user's local time.
+const accessKeyExpirySkew = 24 * time.Hour
+
+// IsValidAccessKeyExpiry reports whether t is within the maximum
+// access key lifetime (DefaultAccessKeyTTL) from now.
+func IsValidAccessKeyExpiry(t time.Time) bool {
+	return !t.After(time.Now().Add(DefaultAccessKeyTTL + accessKeyExpirySkew))
+}
+
 func (a *AccessKey) IsExpired() bool {
 	if a.ExpiresAt == nil {
 		return false // never expires

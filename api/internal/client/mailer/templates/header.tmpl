@@ -12,6 +12,14 @@ This email was sent to {{.alias}} from {{.from}}
                 <a style="color: rgb(59 130 246);text-decoration: none;" href="mailto:{{.alias}}">{{.alias}}</a>
                 from
                 <a style="color: rgb(59 130 246);text-decoration: none;" href="mailto:{{.from}}">{{.from}}</a>
+                {{- if .trackersRemoved}}
+                <br>
+                {{.trackersRemoved}} {{if eq .trackersRemoved 1}}tracker{{else}}trackers{{end}} removed
+                {{- if .trackersReportURL}}
+                &middot;
+                <a style="color: rgb(59 130 246);text-decoration: none;" href="{{.trackersReportURL}}">View report</a>
+                {{- end}}
+                {{- end}}
             </div>
             <br>
         </td>

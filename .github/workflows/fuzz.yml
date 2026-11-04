@@ -1,0 +1,48 @@
+name: Fuzz
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fuzz:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - package: ./internal/model
+            target: FuzzParseMsg
+          - package: ./internal/utils
+            target: FuzzVerifyEmailAuth
+          - package: ./internal/utils
+            target: FuzzEncryptWithPGPInline
+          - package: ./internal/client/mailer
+            target: FuzzLettersParseEmail
+          - package: ./internal/client/mailer
+            target: FuzzMIMEDepthExceeds
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - name: Set up Go
+        uses: actions/setup-go@7b8cf10d4e4a01d4992d18a89f4d7dc5a3e6d6f4 # v4
+        with:
+          go-version-file: api/go.mod
+      - name: Fuzz
+        env:
+          PACKAGE: ${{ matrix.package }}
+          TARGET: ${{ matrix.target }}
+        run: go test "$PACKAGE" -run '^$' -fuzz "^${TARGET}\$" -fuzztime=10m
+      - name: Upload failing input
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: fuzz-${{ matrix.target }}
+          path: api/**/testdata/fuzz/${{ matrix.target }}/

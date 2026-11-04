@@ -63,6 +63,11 @@ type AliasPinReq struct {
 	Pinned bool `json:"pinned"`
 }
 
+type AliasPauseReq struct {
+	Value int    `json:"value" validate:"required,min=1,max=10"`
+	Unit  string `json:"unit" validate:"required,oneof=hours days weeks"`
+}
+
 type BulkAliasIDsReq struct {
 	IDs []string `json:"ids" validate:"required,min=1,max=500,dive,uuid"`
 }
@@ -89,6 +94,38 @@ type SettingsReq struct {
 	AliasFormat  string `json:"alias_format"`
 	LogIssues    bool   `json:"log_issues"`
 	RemoveHeader bool   `json:"remove_header"`
+}
+
+type ListUnsubscribeBehaviourReq struct {
+	Behaviour *int `json:"list_unsubscribe_behaviour"`
+}
+
+type BlockTrackersReq struct {
+	BlockTrackers *bool `json:"block_trackers"`
+}
+
+type RemoveHeaderReq struct {
+	RemoveHeader *bool `json:"remove_header"`
+}
+
+type LogIssuesReq struct {
+	LogIssues *bool `json:"log_issues"`
+}
+
+type DefaultDomainReq struct {
+	Domain *string `json:"domain"`
+}
+
+type DefaultRecipientReq struct {
+	Recipient *string `json:"recipient"`
+}
+
+type AliasFormatReq struct {
+	AliasFormat *string `json:"alias_format"`
+}
+
+type FromNameReq struct {
+	FromName *string `json:"from_name"`
 }
 
 type DeleteUserReq struct {
@@ -130,6 +167,42 @@ type AccessKeyReq struct {
 
 type DomainReq struct {
 	Name string `json:"name" validate:"required,fqdn"`
+}
+
+type BlocklistReq struct {
+	Type  string `json:"type" validate:"required,oneof=email domain"`
+	Value string `json:"value" validate:"required,max=255"`
+}
+
+// RuleReq carries a rule's definition. Limits and the combinations of conditions, actions and
+// email types are checked by model.Rule.Validate, which explains what's wrong.
+type RuleReq struct {
+	Name       string             `json:"name" validate:"required"`
+	Operator   string             `json:"operator" validate:"required,oneof=AND OR"`
+	Conditions []RuleConditionReq `json:"conditions" validate:"required,dive"`
+	Actions    []RuleActionReq    `json:"actions" validate:"required,dive"`
+	Forwards   bool               `json:"forwards"`
+	Replies    bool               `json:"replies"`
+	Sends      bool               `json:"sends"`
+}
+
+type RuleConditionReq struct {
+	Type   string   `json:"type" validate:"required"`
+	Match  string   `json:"match"`
+	Values []string `json:"values"`
+}
+
+type RuleActionReq struct {
+	Type  string `json:"type" validate:"required"`
+	Value string `json:"value"`
+}
+
+type RuleActiveReq struct {
+	Active *bool `json:"active"`
+}
+
+type RuleOrderReq struct {
+	IDs []string `json:"ids" validate:"required,dive,uuid"`
 }
 
 type UpdateDomainReq struct {

@@ -1,0 +1,72 @@
+# Accepted residual advisories for .github/workflows/sca.yml.
+# Context: docs/audit/4. AI-assisted software composition analysis (SCA) & supply chain FINDINGS.md
+# Every entry expires; when it does, CI fails again and the entry must be re-reviewed.
+
+# --- Go ---
+
+[[IgnoredVulns]]
+id = "GO-2026-5932"
+ignoreUntil = 2027-01-06
+reason = "golang.org/x/crypto/openpgp deprecated (module-level, no fix). Not imported; the API uses github.com/ProtonMail/go-crypto."
+
+# --- npm: build tooling only, nothing ships in the app or extension bundles ---
+
+[[IgnoredVulns]]
+id = "GHSA-g7r4-m6w7-qqqr"
+ignoreUntil = 2027-01-06
+reason = "esbuild 0.27.x pinned by wxt 0.20.x; Windows-only dev-server issue, wxt builds use vite's patched esbuild."
+
+# adm-zip 0.5.16, minimatch 3.1.5 and uuid 8.3.2 come only from wxt -> web-ext-run
+# (the dev-mode browser launcher: firefox-profile, multimatch, node-notifier) and run on
+# our own build output. wxt 0.21 drops web-ext-run but needs Node 22 for all
+# extension builds; revisit when the team moves to Node 22.
+
+[[IgnoredVulns]]
+id = "GHSA-7q85-xj36-vmfc"
+ignoreUntil = 2027-01-06
+reason = "adm-zip via wxt->web-ext-run->firefox-profile (dev only); fix 0.6.x outside firefox-profile's range."
+
+[[IgnoredVulns]]
+id = "GHSA-8238-w5pm-2374"
+ignoreUntil = 2027-01-06
+reason = "adm-zip via wxt->web-ext-run->firefox-profile (dev only); fix 0.6.x outside firefox-profile's range."
+
+[[IgnoredVulns]]
+id = "GHSA-c6fg-446q-cg94"
+ignoreUntil = 2027-01-06
+reason = "adm-zip via wxt->web-ext-run->firefox-profile (dev only); fix 0.6.x outside firefox-profile's range."
+
+[[IgnoredVulns]]
+id = "GHSA-j5f4-cc29-5x44"
+ignoreUntil = 2027-01-06
+reason = "adm-zip via wxt->web-ext-run->firefox-profile (dev only); fix 0.6.x outside firefox-profile's range."
+
+[[IgnoredVulns]]
+id = "GHSA-p634-w6r4-rjp2"
+ignoreUntil = 2027-01-06
+reason = "adm-zip via wxt->web-ext-run->firefox-profile (dev only); fix 0.6.x outside firefox-profile's range."
+
+[[IgnoredVulns]]
+id = "GHSA-rcw4-f5rp-g42v"
+ignoreUntil = 2027-01-06
+reason = "adm-zip via wxt->web-ext-run->firefox-profile (dev only); fix 0.6.x outside firefox-profile's range."
+
+[[IgnoredVulns]]
+id = "GHSA-vwc7-r8mq-g2x9"
+ignoreUntil = 2027-01-06
+reason = "adm-zip via wxt->web-ext-run->firefox-profile (dev only); fix 0.6.x outside firefox-profile's range."
+
+[[IgnoredVulns]]
+id = "GHSA-xcpc-8h2w-3j85"
+ignoreUntil = 2027-01-06
+reason = "adm-zip via wxt->web-ext-run->firefox-profile (dev only); fix 0.6.x outside firefox-profile's range."
+
+[[IgnoredVulns]]
+id = "GHSA-g3hv-75wg-m249"
+ignoreUntil = 2027-01-06
+reason = "minimatch 3.1.5 via wxt->web-ext-run->multimatch 6.0.0 (exact pin, dev only); fix 11.x outside multimatch's range. Patterns come from our own run config, not attacker input."
+
+[[IgnoredVulns]]
+id = "GHSA-w5hq-g745-h8pq"
+ignoreUntil = 2027-01-06
+reason = "uuid 8.3.2 via wxt->web-ext-run->node-notifier (dev only); only v4() is used, not the affected v3/v5/v6 buffer path."

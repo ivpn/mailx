@@ -120,6 +120,22 @@
         &.pin {
             mask-image: url("../../assets/icons/icon-pin.svg");
         }
+
+        &.pause {
+            mask-image: url("../../assets/icons/icon-pause.svg");
+        }
+
+        &.filter {
+            mask-image: url("../../assets/icons/icon-filter.svg");
+        }
+
+        &.reorder {
+            mask-image: url("../../assets/icons/icon-reorder.svg");
+        }
+
+        &.menu {
+            mask-image: url("../../assets/icons/icon-menu.svg");
+        }
     }
 
     .logo {

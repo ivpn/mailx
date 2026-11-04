@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/go-sql-driver/mysql"
 	"ivpn.net/email/api/internal/model"
@@ -15,17 +16,26 @@ var (
 	ErrGetAliases           = errors.New("Unable to retrieve aliases.")
 	ErrGetAliasByName       = errors.New("alias not found:")
 	ErrDisabledAlias        = errors.New("alias disabled:")
+	ErrPausedAlias          = errors.New("alias paused until:")
+	ErrDeletedAlias       = errors.New("alias deleted:")
 	ErrDisabledDomain       = errors.New("domain disabled:")
 	ErrPostAlias            = errors.New("Unable to create alias. Please try again.")
 	ErrPostInboundAlias     = errors.New("Unable to create inbound alias. Please try again.")
 	ErrPostAliasLimit       = errors.New("You’ve reached the maximum number of allowed aliases.")
+	ErrPostAliasExists      = errors.New("This alias already exists or was deleted.")
 	ErrUpdateAlias          = errors.New("Unable to update alias. Please try again.")
 	ErrDeleteAlias          = errors.New("Unable to delete alias. Please try again.")
 	ErrDeleteAliasByUserID  = errors.New("Unable to delete aliases for this user.")
 	ErrDeleteAliasByDomain  = errors.New("Unable to delete aliases for this domain.")
 	ErrFailedImport         = errors.New("Failed to import aliases. Please check the format and try again.")
 	ErrFailedImportLimit    = errors.New("Failed to import aliases. You can only import up to 500 aliases at a time.")
+	ErrImportUnverifiedRcp  = errors.New("None of the recipients is verified.")
+	ErrImportDomain         = errors.New("The domain is not one of your custom domains.")
 	ErrPostAliasInactiveSub = errors.New("Your subscription is not active. Please renew to create new aliases.")
+
+	ErrPauseAliasDuration      = errors.New("Choose a pause of 1 to 10 hours, days or weeks.")
+	ErrPauseAliasInactiveSub   = errors.New("Your subscription is not active. Please renew to pause aliases.")
+	ErrUnpauseAliasInactiveSub = errors.New("Your subscription is not active. Please renew to unpause aliases.")
 
 	ErrForgetAlias                = errors.New("Unable to permanently delete alias. Please try again.")
 	ErrForgetAliasNotCustomDomain = errors.New("Only custom domain aliases can be permanently deleted.")
@@ -50,11 +60,15 @@ type AliasStore interface {
 	PostAlias(context.Context, model.Alias, int, int) (model.Alias, error)
 	UpdateAlias(context.Context, model.Alias) error
 	UpdateAliasPinned(context.Context, string, string, bool) error
+	UpdateAliasPausedUntil(context.Context, string, string, *time.Time) error
+	UpdateAliasDescription(context.Context, string, string, string) error
 	DeleteAlias(context.Context, string, string) error
 	DeleteAliasByUserID(context.Context, string) error
 	DeleteAliasByDomain(context.Context, string, string) error
 	RestoreAlias(context.Context, string, string) error
 	GetAliasUnscoped(context.Context, string, string) (model.Alias, error)
+	GetAliasByIDUnscoped(context.Context, string) (model.Alias, error)
+	IsAliasNameDeleted(string) (bool, error)
 	ForgetAlias(context.Context, string, string) error
 	BulkUpdateAliasEnabled(context.Context, []string, string, bool) error
 	BulkUpdateAliasPinned(context.Context, []string, string, bool) error
@@ -114,6 +128,8 @@ func (s *Service) GetAlias(ctx context.Context, ID string, userID string) (model
 		return model.Alias{}, ErrGetAlias
 	}
 
+	alias.ClearExpiredPause(time.Now())
+
 	domainPart := aliasDomainPart(alias.Name)
 	alias.IsCustomDomain = isCustomAliasDomain(domainPart, s.Cfg.API.Domains)
 	if alias.IsCustomDomain {
@@ -155,7 +171,10 @@ func (s *Service) GetAliases(ctx context.Context, userID string, limit int, page
 		}
 	}
 
+	now := time.Now()
 	for i := range aliases {
+		aliases[i].ClearExpiredPause(now)
+
 		domainPart := aliasDomainPart(aliases[i].Name)
 		aliases[i].IsCustomDomain = isCustomAliasDomain(domainPart, s.Cfg.API.Domains)
 		if aliases[i].IsCustomDomain {
@@ -259,6 +278,10 @@ func (s *Service) PostAlias(ctx context.Context, alias model.Alias, format strin
 			if errors.Is(err, model.ErrInboundHourlyLimit) {
 				return model.Alias{}, ErrPostInboundAlias
 			}
+			var mysqlErr *mysql.MySQLError
+			if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
+				return model.Alias{}, ErrPostAliasExists
+			}
 			log.Printf("error creating custom alias: %s", err.Error())
 			return model.Alias{}, ErrPostAlias
 		}
@@ -316,14 +339,14 @@ func (s *Service) GetWildcardDomainInfo(ctx context.Context, userID string, doma
 
 func (s *Service) PostInboundAlias(ctx context.Context, alias model.Alias) (model.Alias, error) {
 	if alias.Origin != model.Inbound || alias.ID != "" {
-		log.Printf("skip inbound alias for %s: origin=%v id=%q", alias.Name, alias.Origin, alias.ID)
+		log.Printf("skip inbound alias: origin=%v id=%q", alias.Origin, alias.ID)
 		return model.Alias{}, ErrPostInboundAlias
 	}
 
 	domain := aliasDomainPart(alias.Name)
 
 	if !isCustomAliasDomain(domain, s.Cfg.API.Domains) {
-		log.Printf("skip inbound alias for %s: %s is not a custom domain", alias.Name, domain)
+		log.Printf("skip inbound alias: %s is not a custom domain", domain)
 		return model.Alias{}, ErrPostInboundAlias
 	}
 
@@ -334,12 +357,12 @@ func (s *Service) PostInboundAlias(ctx context.Context, alias model.Alias) (mode
 	}
 
 	if !isCustomDomainEnabled(domain, domains) {
-		log.Printf("skip inbound alias for %s: domain %s not verified/enabled for user %s", alias.Name, domain, alias.UserID)
+		log.Printf("skip inbound alias: domain %s not verified/enabled", domain)
 		return model.Alias{}, ErrPostInboundAlias
 	}
 
 	if !isCreateAliasEnabled(domain, domains) {
-		log.Printf("skip inbound alias for %s: create_alias disabled for domain %s", alias.Name, domain)
+		log.Printf("skip inbound alias: create_alias disabled for domain %s", domain)
 		return model.Alias{}, ErrPostInboundAlias
 	}
 
@@ -350,7 +373,7 @@ func (s *Service) PostInboundAlias(ctx context.Context, alias model.Alias) (mode
 		return model.Alias{}, ErrPostInboundAlias
 	}
 
-	log.Printf("created inbound alias %s (id=%s)", alias.Name, alias.ID)
+	log.Printf("created inbound alias %s", alias.ID)
 	return alias, nil
 }
 
@@ -372,6 +395,78 @@ func (s *Service) UpdateAliasPinned(ctx context.Context, ID string, userID strin
 	}
 
 	return nil
+}
+
+// PauseAlias discards forwards to the alias for value units from now, replacing any pause that
+// is still running. The end time is worked out here, so a wrong client clock can't move it.
+func (s *Service) PauseAlias(ctx context.Context, ID string, userID string, value int, unit string) (time.Time, error) {
+	duration, err := model.PauseDuration(value, unit)
+	if err != nil {
+		return time.Time{}, ErrPauseAliasDuration
+	}
+
+	sub, err := s.GetSubscription(ctx, userID)
+	if err != nil {
+		log.Printf("error fetching subscription: %s", err.Error())
+		return time.Time{}, ErrUpdateAlias
+	}
+
+	if !sub.ActiveStatus() {
+		return time.Time{}, ErrPauseAliasInactiveSub
+	}
+
+	pausedUntil := time.Now().UTC().Truncate(time.Second).Add(duration)
+	err = s.Store.UpdateAliasPausedUntil(ctx, ID, userID, &pausedUntil)
+	if err != nil {
+		log.Printf("error pausing alias: %s", err.Error())
+		return time.Time{}, ErrUpdateAlias
+	}
+
+	return pausedUntil, nil
+}
+
+// UnpauseAlias ends a pause at once. It succeeds for an alias that isn't paused.
+func (s *Service) UnpauseAlias(ctx context.Context, ID string, userID string) error {
+	sub, err := s.GetSubscription(ctx, userID)
+	if err != nil {
+		log.Printf("error fetching subscription: %s", err.Error())
+		return ErrUpdateAlias
+	}
+
+	if !sub.ActiveStatus() {
+		return ErrUnpauseAliasInactiveSub
+	}
+
+	err = s.Store.UpdateAliasPausedUntil(ctx, ID, userID, nil)
+	if err != nil {
+		log.Printf("error unpausing alias: %s", err.Error())
+		return ErrUpdateAlias
+	}
+
+	return nil
+}
+
+// DiscardPausedMessage drops a forward to a paused alias the way a disabled alias does: the
+// alias records a block in its stats and, with diagnostics enabled, the discard is logged.
+func (s *Service) DiscardPausedMessage(alias model.Alias, from string, to string) {
+	ctx := context.Background()
+
+	if err := s.SaveMessage(ctx, alias, model.Block); err != nil {
+		log.Println("error saving message", err)
+	}
+
+	settings, err := s.GetSettings(ctx, alias.UserID)
+	if err != nil {
+		log.Println("error getting settings", err)
+		return
+	}
+
+	if settings.LogIssues && alias.PausedUntil != nil {
+		reason := ErrPausedAlias.Error() + " " + alias.PausedUntil.UTC().Format(time.RFC3339)
+		if err := s.ProcessDiagnosticLog(alias, from, to, reason, model.PausedAlias); err != nil {
+			log.Println("error processing diagnostic log", err)
+		}
+	}
 }
 
 func (s *Service) DeleteAlias(ctx context.Context, ID string, userID string) error {
@@ -405,40 +500,52 @@ func (s *Service) DeleteAliasByDomain(ctx context.Context, domain string, userID
 }
 
 func (s *Service) FindAlias(email string) (model.Alias, error) {
-	name, _ := model.ParseReplyTo(email)
-	alias, err := s.GetAliasByName(name)
+	alias, _, err := s.findAlias(email)
 	if err != nil {
+		name, _ := model.ParseReplyTo(email)
 		return model.Alias{Name: name}, err
 	}
 
 	return alias, nil
 }
 
-func (s *Service) ImportAliases(ctx context.Context, aliases []model.AliasImportReq, userID string) ([]model.Alias, error) {
+// ImportAliases creates the aliases of the given import rows. Rows that can't be imported
+// are returned as skipped, each with its reason, instead of failing the whole import.
+func (s *Service) ImportAliases(ctx context.Context, aliases []model.AliasImportReq, userID string) ([]model.Alias, []model.AliasImportSkip, error) {
 	var importedAliases []model.Alias
+	var skipped []model.AliasImportSkip
 
 	sub, err := s.GetSubscription(ctx, userID)
 	if err != nil {
 		log.Printf("error fetching subscription: %s", err.Error())
-		return nil, ErrPostAlias
+		return nil, nil, ErrPostAlias
 	}
 
 	if !sub.ActiveStatus() {
-		return nil, ErrPostAliasInactiveSub
+		return nil, nil, ErrPostAliasInactiveSub
 	}
 
 	domains, err := s.GetDomains(ctx, userID)
 	if err != nil {
-		return nil, ErrFailedImport
+		return nil, nil, ErrFailedImport
 	}
 
 	if len(aliases) > 500 {
-		return nil, ErrFailedImportLimit
+		return nil, nil, ErrFailedImportLimit
 	}
 
 	for _, req := range aliases {
+		skip := func(reason error) {
+			skipped = append(skipped, model.AliasImportSkip{
+				Row:    req.Row,
+				Alias:  req.LocalPart + "@" + req.Domain,
+				Reason: reason.Error(),
+			})
+		}
+
 		rcps, err := s.GetVerifiedRecipients(ctx, req.Recipients, userID)
 		if err != nil || len(rcps) == 0 {
+			skip(ErrImportUnverifiedRcp)
 			continue
 		}
 
@@ -451,6 +558,7 @@ func (s *Service) ImportAliases(ctx context.Context, aliases []model.AliasImport
 		}
 
 		if !domainFound {
+			skip(ErrImportDomain)
 			continue
 		}
 
@@ -465,13 +573,14 @@ func (s *Service) ImportAliases(ctx context.Context, aliases []model.AliasImport
 
 		importedAlias, err := s.PostAlias(ctx, alias, req.Format, req.Domain, req.LocalPart, "")
 		if err != nil {
+			skip(err)
 			continue
 		}
 
 		importedAliases = append(importedAliases, importedAlias)
 	}
 
-	return importedAliases, nil
+	return importedAliases, skipped, nil
 }
 
 func (s *Service) RestoreAlias(ctx context.Context, ID string, userID string) error {

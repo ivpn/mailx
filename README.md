@@ -145,6 +145,10 @@ check_pubkey = false; # you want to use this in the beginning
 path = "/tmp/docker-mailserver/rspamd/dkim/rsa-2048-mail-domain.com.private.txt";
 selector = "mail";
 
+# Headers covered by the DKIM signature. Includes the List-Unsubscribe headers,
+# which RFC 8058 one-click unsubscribe requires.
+sign_headers = "(o)from:(x)sender:(o)reply-to:(o)subject:(x)date:(x)message-id:(o)to:(o)cc:(x)mime-version:(x)content-type:(x)content-transfer-encoding:resent-to:resent-cc:resent-from:resent-sender:resent-message-id:(x)in-reply-to:(x)references:list-id:list-help:list-owner:(x)list-unsubscribe:(x)list-unsubscribe-post:list-subscribe:list-post:(x)openpgp:(x)autocrypt";
+
 domain {
     domain.com {
         path = "/tmp/docker-mailserver/rspamd/dkim/rsa-2048-mail-domain.com.private.txt";

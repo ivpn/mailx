@@ -33,10 +33,8 @@ func newForwardParser() *letters.EmailParser {
 // (github.com/mnako/letters) exactly as it is invoked on raw, unauthenticated
 // inbound message bytes in Mailer.Reply / Mailer.buildForwardMessage — i.e.
 // on every message Postfix pipes to POST /email once SPF/DKIM/DMARC checks
-// pass. A crash here is remotely triggerable and, since the API server has
-// no panic-recovery middleware (see internal/transport/api/server.go), a
-// panic or unrecoverable runtime crash in this path takes down the whole
-// process, not just the one request.
+// pass. A crash here is remotely triggerable. Production recovers panics in
+// parseEmail, so the parser is called directly here for the fuzzer to see them.
 func FuzzLettersParseEmail(f *testing.F) {
 	plain := "From: a@example.com\r\nTo: b@example.com\r\nSubject: Test\r\n\r\nBody."
 	multipartMixed := "From: a@example.com\r\nTo: b@example.com\r\nSubject: Test\r\n" +
@@ -71,9 +69,10 @@ func FuzzLettersParseEmail(f *testing.F) {
 	// depth limit. Parse time scales at least quadratically with depth
 	// (measured: depth=1600 -> ~1s, depth=3200 -> ~4.2s, depth=5000 -> hangs
 	// the Go fuzz engine's baseline-coverage watchdog outright — see
-	// docs/fuzzing-findings.md finding F-1). Only a small depth is kept
-	// here so this seed corpus entry stays fast for plain `go test`; the
-	// quadratic blowup is reproduced separately in the findings report.
+	// docs/audit/3. AI-guided fuzzing FINDINGS.md finding F-1; production
+	// rejects past maxMIMEDepth). Only a small depth is kept here so this
+	// seed corpus entry stays fast for plain `go test`; the quadratic
+	// blowup is reproduced separately in the findings report.
 	for _, depth := range []int{50} {
 		leaf := "From: a@example.com\r\nTo: b@example.com\r\nSubject: leaf\r\n\r\nleaf body"
 		nested := leaf
@@ -100,7 +99,32 @@ func FuzzLettersParseEmail(f *testing.F) {
 			processed = data
 		}
 
+		// Production rejects these before parsing, and they're known to be slow (F-1)
+		if mimeDepthExceeds(processed, maxMIMEDepth) {
+			return
+		}
+
 		parser := newForwardParser()
 		_, _ = parser.Parse(bytes.NewReader(processed))
+	})
+}
+
+// FuzzMIMEDepthExceeds fuzzes the nesting guard that runs on raw inbound
+// message bytes before letters does.
+func FuzzMIMEDepthExceeds(f *testing.F) {
+	f.Add([]byte(testForwardRawEmail))
+	f.Add(nestedEmail(3))
+	f.Add(nestedEmail(maxMIMEDepth + 1))
+	f.Add([]byte("From: a@example.com\r\nContent-Type: multipart/mixed; boundary=\r\n\r\nbody"))
+	f.Add([]byte("garbage, not an email at all"))
+
+	f.Fuzz(func(t *testing.T, data []byte) {
+		defer func() {
+			if r := recover(); r != nil {
+				t.Fatalf("mimeDepthExceeds panicked on input (len=%d): %v", len(data), r)
+			}
+		}()
+
+		_ = mimeDepthExceeds(data, maxMIMEDepth)
 	})
 }

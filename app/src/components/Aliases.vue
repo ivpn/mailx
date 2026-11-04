@@ -30,14 +30,11 @@
             <span class="bg-secondary rounded flex items-center justify-center p-2 mb-5">
                 <i class="icon at icon-accent text-2xl"></i>
             </span>
-            <h4 class="mb-6">
-                <span v-if="!searchQuery">You have no aliases yet</span>
-                <span v-else>No aliases found</span>
-            </h4>
+            <h4 class="mb-6">You have no aliases yet</h4>
             <p v-if="!recipients.length" class="text-tertiary mb-6">
                 To get started, first <router-link to="/account/profile">verify</router-link> your primary email address.
             </p>
-            <button v-if="!searchQuery && recipients.length" class="cta" data-hs-overlay="#modal-create-alias-false">
+            <button v-if="recipients.length" class="cta" data-hs-overlay="#modal-create-alias-false">
                 New Alias
             </button>
         </div>
@@ -164,9 +161,12 @@
                                 :wildcard=false
                                 :selectable="true"
                                 :selected="selectedIds.has(alias.id)"
+                                :read-only-pause="readOnlyPause"
                                 @onToggleSelect="toggleSelectOne"
                                 @onEdit="onEditAlias"
                                 @onSend="onSendAlias"
+                                @onPause="onPauseAlias"
+                                @onActionError="onActionError"
                             />
                             <!-- Also keeps <tbody> from collapsing to its bare divide-y border, which
                                  Chrome reads as a 1px overflow and answers with a stray scrollbar. -->
@@ -185,6 +185,7 @@
     <AliasCreate v-if="recipients.length && settings.id && loaded" :recipients.sync="recipients" :settings.sync="settings" :wildcard=false :label="'New Alias'" />
     <AliasEdit v-if="recipients.length" ref="editModal" :recipients="recipients" :key="recipients.join(',')" />
     <AliasSend ref="sendModal" />
+    <AliasPause ref="pauseModal" />
 </template>
 
 <script setup lang="ts">
@@ -192,15 +193,18 @@ import { onMounted, onUnmounted, ref, computed, watch, watchEffect, nextTick } f
 import axios from 'axios'
 import { aliasApi } from '../api/alias'
 import { settingsApi } from '../api/settings.ts'
+import { subscriptionApi } from '../api/subscription.ts'
 import AliasRow from './AliasRow.vue'
 import AliasCreate from './AliasCreate.vue'
 import AliasEdit from './AliasEdit.vue'
 import AliasSend from './AliasSend.vue'
+import AliasPause from './AliasPause.vue'
 import Pagination from './Pagination.vue'
 import events from '../events.ts'
 import { RouterLink } from 'vue-router'
 import { closeDropdowns, initDropdowns, initOverlays, initTooltips } from '../lib/preline.ts'
 import { useBreakpoint } from '../lib/useBreakpoint.ts'
+import { isPauseReadOnly } from '../lib/aliasPause.ts'
 
 const alias = {
     id: '',
@@ -212,6 +216,7 @@ const alias = {
     recipients: '',
     from_name: '',
     pinned: false,
+    paused_until: null as string | null,
     is_custom_domain: false,
     is_domain_verified: null as boolean | null,
     is_domain_enabled: false,
@@ -251,16 +256,20 @@ const statusLabel = computed(() => {
     return 'All'
 })
 
-// Only the default filter gets the full-page empty card; every other filter keeps the table (and
-// with it the status dropdown) on screen so the user can pick their way back out of it. Holding
-// off while a fetch is in flight stops the card from flashing over a list that is about to fill.
-const showEmptyCard = computed(() => loaded.value && !loading.value && !list.value.length && status.value === 'active_inactive')
+// Only the default filter with no search gets the full-page empty card; every other filter or
+// search keeps the table (and with it the status dropdown) on screen so the user can pick their
+// way back out of it, e.g. switch a search to Deleted. Holding off while a fetch is in flight
+// stops the card from flashing over a list that is about to fill.
+const showEmptyCard = computed(() => loaded.value && !loading.value && !list.value.length && status.value === 'active_inactive' && !searchQuery.value)
 
 const selectedIds = ref(new Set<string>())
 const selectAllCheckbox = ref<HTMLInputElement | null>(null)
 const bulkLoading = ref(false)
 const editModal = ref<InstanceType<typeof AliasEdit> | null>(null)
 const sendModal = ref<InstanceType<typeof AliasSend> | null>(null)
+const pauseModal = ref<InstanceType<typeof AliasPause> | null>(null)
+const subscriptionStatus = ref('')
+const readOnlyPause = computed(() => isPauseReadOnly(subscriptionStatus.value))
 
 const selectedAliases = computed(() => list.value.filter(a => selectedIds.value.has(a.id)))
 const selectedCount = computed(() => selectedAliases.value.length)
@@ -361,6 +370,13 @@ const getSettings = async () => {
     }
 }
 
+const getSubscription = async () => {
+    try {
+        const res = await subscriptionApi.get()
+        subscriptionStatus.value = res.data.status || ''
+    } catch {}
+}
+
 const deleteAlias = async (payload: any) => {
     try {
         await aliasApi.delete(payload.id)
@@ -420,6 +436,17 @@ const onEditAlias = (alias: any) => {
 
 const onSendAlias = (alias: any) => {
     sendModal.value?.open(alias)
+}
+
+const onPauseAlias = (alias: any) => {
+    pauseModal.value?.open(alias)
+}
+
+// A row action the server rejected (e.g. Unpause after the subscription lapsed) is shown like the
+// other alias errors, over a list and subscription status reloaded to the current state.
+const onActionError = async (message: string) => {
+    await Promise.all([getList(), getSubscription()])
+    error.value = message
 }
 
 const sort = (e: any) => {
@@ -570,7 +597,8 @@ const bulkForget = async () => {
 }
 
 onMounted(async () => {
-    await getSettings()
+    // The subscription status is known before the rows render, so their tooltips bind with them.
+    await Promise.all([getSettings(), getSubscription()])
     getList()
     initDropdowns()
     events.on('alias.create', getList)

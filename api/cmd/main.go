@@ -6,6 +6,7 @@ import (
 
 	"ivpn.net/email/api/config"
 	"ivpn.net/email/api/internal/cron"
+	"ivpn.net/email/api/internal/cron/jobs"
 	"ivpn.net/email/api/internal/repository"
 	"ivpn.net/email/api/internal/service"
 	"ivpn.net/email/api/internal/transport/api"
@@ -26,6 +27,9 @@ func Run() error {
 	if err != nil {
 		return err
 	}
+
+	// Before serving requests, so sessions saved before scopes existed keep working
+	jobs.BackfillSessionScopes(db.Client, cfg.API)
 
 	cron.New(db.Client)
 

@@ -15,6 +15,7 @@ var (
 	ActivateRecipientSuccess = "Recipient activated successfully."
 	UpdateRecipientSuccess   = "Recipient updated successfully."
 	DeleteRecipientSuccess   = "Recipient deleted successfully."
+	ErrInvalidPGPKey         = "Invalid PGP public key. Please paste a valid, non-expired public key that supports encryption."
 )
 
 type RecipientService interface {
@@ -147,6 +148,14 @@ func (h *Handler) UpdateRecipient(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidRequest,
+		})
+	}
+
+	// A pasted key is checked here for a clear error; a 64-char hash is the
+	// stored key echoed back and is left unchanged below
+	if strings.HasPrefix(req.PGPKey, "-----BEGIN PGP PUBLIC KEY BLOCK-----") && !utils.IsValidPGPPublicKey(req.PGPKey) {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrInvalidPGPKey,
 		})
 	}
 

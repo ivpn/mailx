@@ -202,8 +202,8 @@ func (s *Service) DeleteRecipient(ctx context.Context, ID string, userID string,
 		return ErrDeleteRecipient
 	}
 
-	// Get aliases
-	aliases, err := s.Store.GetAliasesNoStats(ctx, userID, 0, 0, "created_at", "DESC", "", "", "active")
+	// Get aliases, disabled ones included so re-enabling one can't forward to a deleted recipient
+	aliases, err := s.Store.GetAliasesNoStats(ctx, userID, 0, 0, "created_at", "DESC", "", "", "active_inactive")
 	if err != nil {
 		log.Printf("error deleting recipient, GetAliases: %s", err.Error())
 		return ErrDeleteRecipient
@@ -212,18 +212,36 @@ func (s *Service) DeleteRecipient(ctx context.Context, ID string, userID string,
 	// Delete recipient from each alias
 	// Disable alias if no recipients left
 	for _, alias := range aliases {
-		if strings.Contains(alias.Recipients, recipient.Email) {
-			r := alias.Recipients
-			r = strings.Replace(r, recipient.Email+",", "", -1)
-			r = strings.Replace(r, ","+recipient.Email, "", -1)
-			r = strings.Replace(r, recipient.Email, "", -1)
+		if r, found := model.RemoveCommaSeparatedEmail(alias.Recipients, recipient.Email); found {
 			alias.Recipients = model.MergeCommaSeparatedEmails(r, newRecipients)
-			alias.Enabled = alias.Recipients != ""
+			alias.Enabled = alias.Enabled && alias.Recipients != ""
 
 			// Update alias
 			err = s.Store.UpdateAlias(ctx, alias)
 			if err != nil {
 				log.Printf("error deleting recipient, UpdateAlias: %s", err.Error())
+				return ErrDeleteRecipient
+			}
+		}
+	}
+
+	// Get domains
+	domains, err := s.Store.GetDomains(ctx, userID)
+	if err != nil {
+		log.Printf("error deleting recipient, GetDomains: %s", err.Error())
+		return ErrDeleteRecipient
+	}
+
+	// Clear recipient from each custom domain
+	// Catch-all falls back to the default recipient in Settings
+	for _, domain := range domains {
+		if strings.EqualFold(domain.Recipient, recipient.Email) {
+			domain.Recipient = ""
+
+			// Update domain
+			err = s.Store.UpdateDomain(ctx, domain)
+			if err != nil {
+				log.Printf("error deleting recipient, UpdateDomain: %s", err.Error())
 				return ErrDeleteRecipient
 			}
 		}
@@ -292,36 +310,10 @@ func (s *Service) DeleteRecipientByUserID(ctx context.Context, userID string) er
 }
 
 func (s *Service) FindRecipients(from string, to string, msgType model.MessageType) ([]model.Recipient, model.Alias, model.MessageType, error) {
-	aliasName, replyTo := model.ParseReplyTo(to)
-
-	// An alias whose name itself contains "+" (e.g. a Custom or catch-all created alias) must
-	// match verbatim before falling back to the base alias with the "+tag" stripped. A reply
-	// from such an alias ("a+b+reply=example.com@domain.com") reads the same as a Wildcard
-	// Alias reply, which ParseReplyTo assumes ("*+b@domain.com"), so try "a+b@domain.com" first.
-	exactName := to
-	if replyTo != "" {
-		exactName = model.ReplyAliasName(to)
-	}
-	alias, err := s.GetAliasByName(exactName)
-	if err != nil && aliasName != exactName {
-		alias, err = s.GetAliasByName(aliasName)
-	}
-	// Fall back to a Wildcard Alias match (e.g. "*+suffix@domain.com" or "*.suffix@domain.com")
-	// before giving up, trying each supported delimiter in turn.
-	if err != nil {
-		for _, delimiter := range model.WildcardDelimiters {
-			wildcardName, ok := model.WildcardAliasForDelimiter(to, delimiter)
-			if !ok {
-				continue
-			}
-			if wcAlias, wcErr := s.GetAliasByName(wildcardName); wcErr == nil {
-				alias, err = wcAlias, nil
-				break
-			}
-		}
-	}
+	alias, replyTo, err := s.findAlias(to)
 	// If we still don't have an alias, check for a catch-all domain.
 	if err != nil {
+		aliasName, replyTo := model.ParseReplyTo(to)
 		domainPart := aliasDomainPart(aliasName)
 		if isCustomAliasDomain(domainPart, s.Cfg.API.Domains) {
 			// A reply-encoded address that doesn't resolve to a real alias must never
@@ -377,6 +369,47 @@ func (s *Service) FindRecipients(from string, to string, msgType model.MessageTy
 	}
 
 	return rcps, alias, model.Forward, nil
+}
+
+// findAlias returns the alias an address is for and, for a reply-encoded address, the address it
+// replies to. An alias name ("a+b@domain.com") and a reply target ("b+c@example.com") may both
+// contain "+", so every split of a reply-encoded address is tried against existing aliases,
+// longest alias name first, before any Wildcard Alias. A reply through an alias to a "+" address
+// then never goes out through a Wildcard Alias to a different address.
+func (s *Service) findAlias(to string) (model.Alias, string, error) {
+	candidates := model.ReplyToCandidates(to)
+	if len(candidates) == 0 {
+		// An alias whose name itself contains "+" (e.g. a Custom or catch-all created alias) must
+		// match verbatim before falling back to the base alias with the "+tag" stripped.
+		candidates = []model.ReplyTo{{Alias: to}}
+		if aliasName, _ := model.ParseReplyTo(to); aliasName != to {
+			candidates = append(candidates, model.ReplyTo{Alias: aliasName})
+		}
+	}
+
+	var err error
+	for _, c := range candidates {
+		var alias model.Alias
+		if alias, err = s.GetAliasByName(c.Alias); err == nil {
+			return alias, c.To, nil
+		}
+	}
+
+	// Fall back to a Wildcard Alias match (e.g. "*+suffix@domain.com" or "*.suffix@domain.com")
+	// before giving up, trying each supported delimiter in turn.
+	for _, c := range candidates {
+		for _, delimiter := range model.WildcardDelimiters {
+			wildcardName, ok := model.WildcardAliasForDelimiter(c.Alias, delimiter)
+			if !ok {
+				continue
+			}
+			if alias, wcErr := s.GetAliasByName(wildcardName); wcErr == nil {
+				return alias, c.To, nil
+			}
+		}
+	}
+
+	return model.Alias{}, "", err
 }
 
 func (s *Service) checkAliasEnabled(alias model.Alias) error {
@@ -442,6 +475,16 @@ func (s *Service) resolveCatchAll(domainPart string, candidateName string, isRep
 		return true, nil, catchAllAlias, ErrDisabledDomain
 	}
 
+	// A deleted alias keeps its address out of the catch-all, so deleting it (e.g. through a
+	// one-click unsubscribe) stops its mail instead of the catch-all forwarding it anyway.
+	deleted, err := s.Store.IsAliasNameDeleted(candidateName)
+	if err != nil {
+		log.Printf("error checking for deleted catch-all alias: %s", err.Error())
+	}
+	if deleted {
+		return true, nil, catchAllAlias, ErrDeletedAlias
+	}
+
 	recipientEmail := domain.Recipient
 	if recipientEmail == "" {
 		settings, err := s.GetSettings(context.Background(), domain.UserID)
@@ -474,9 +517,14 @@ func (s *Service) resolveForward(alias model.Alias) ([]model.Recipient, error) {
 
 	var recipients []model.Recipient
 	for _, rcp := range rcps {
-		if strings.Contains(alias.Recipients, rcp.Email) {
+		if rcp.IsActive && model.ContainsCommaSeparatedEmail(alias.Recipients, rcp.Email) {
 			recipients = append(recipients, rcp)
 		}
+	}
+
+	// None of the alias's recipients is still a verified recipient of the user
+	if len(recipients) == 0 {
+		return []model.Recipient{}, ErrNoRecipients
 	}
 
 	return recipients, nil

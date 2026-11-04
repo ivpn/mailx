@@ -109,6 +109,8 @@ func migrate(db *gorm.DB) error {
 		&model.Log{},
 		&model.AccessKey{},
 		&model.Domain{},
+		&model.BlocklistItem{},
+		&model.Rule{},
 	)
 	if err != nil {
 		return err

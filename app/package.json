@@ -16,7 +16,7 @@
     "@preline/select": "^2.5.2",
     "@preline/tabs": "^2.5.0",
     "@preline/theme-switch": "^2.4.1",
-    "@preline/tooltip": "^2.1.0",
+    "@preline/tooltip": "^5.0.0",
     "@simplewebauthn/browser": "13.1.0",
     "@tailwindcss/forms": "^0.5.7",
     "apexcharts": "^3.49.0",

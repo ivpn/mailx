@@ -25,9 +25,13 @@ func RemoveHeader(text string) string {
 
 // SelectTargets scopes processing to the single To address matching this
 // invocation's envelope recipient (Postfix pipes one copy per recipient), so
-// the same message doesn't get reprocessed for every address in To. Falls
-// back to all of to when deliveredTo is empty or doesn't match any of them.
-func SelectTargets(to []string, deliveredTo string) []string {
+// the same message doesn't get reprocessed for every address in To. When
+// fromEnvelope is set, deliveredTo is the envelope recipient Postfix passed and
+// is the target even if To doesn't list it (Bcc, auto-forwards that keep the
+// original To). Otherwise deliveredTo was guessed from headers such as
+// Delivered-To, which an earlier hop may have written, so it falls back to all
+// of to when deliveredTo is empty or doesn't match any of them.
+func SelectTargets(to []string, deliveredTo string, fromEnvelope bool) []string {
 	if deliveredTo == "" {
 		return to
 	}
@@ -36,6 +40,10 @@ func SelectTargets(to []string, deliveredTo string) []string {
 		if strings.EqualFold(addr, deliveredTo) {
 			return []string{addr}
 		}
+	}
+
+	if fromEnvelope {
+		return []string{deliveredTo}
 	}
 
 	return to

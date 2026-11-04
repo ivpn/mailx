@@ -4,6 +4,7 @@ smtp_tls_protocols = !SSLv2, !SSLv3
 smtpd_tls_protocols = !SSLv2, !SSLv3
 
 always_add_missing_headers = yes
+header_checks = regexp:/tmp/docker-mailserver/postfix-header-checks.cf
 
 milter_default_action = accept
 milter_protocol = 6
@@ -30,6 +31,7 @@ smtpd_recipient_restrictions =
 smtpd_sender_restrictions =
     permit_mynetworks,
     permit_sasl_authenticated,
+    check_sender_access regexp:/tmp/docker-mailserver/postfix-sender-access.cf,
     reject_sender_login_mismatch,
     reject_non_fqdn_sender,
     reject_unlisted_sender,

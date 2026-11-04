@@ -112,20 +112,9 @@ func RemoveHtmlHeader(html string) string {
 }
 
 func EncryptWithPGPInline(plainText string, recipientKey string) (string, error) {
-	publicKey, err := crypto.NewKeyFromArmored(recipientKey)
+	pgpMessage, err := encryptForRecipient([]byte(plainText), recipientKey)
 	if err != nil {
-		return "", fmt.Errorf("parse public key: %w", err)
-	}
-
-	pgp := crypto.PGP()
-	encHandle, err := pgp.Encryption().Recipient(publicKey).New()
-	if err != nil {
-		return "", fmt.Errorf("create encryption handle: %w", err)
-	}
-
-	pgpMessage, err := encHandle.Encrypt([]byte(plainText))
-	if err != nil {
-		return "", fmt.Errorf("encrypt text: %w", err)
+		return "", err
 	}
 
 	armored, err := pgpMessage.ArmorBytes()
@@ -134,6 +123,37 @@ func EncryptWithPGPInline(plainText string, recipientKey string) (string, error)
 	}
 
 	return string(armored), nil
+}
+
+// EncryptFileWithPGP encrypts an attachment for a PGP/Inline forward. It returns binary
+// OpenPGP data, as mail clients expect in a .pgp attachment.
+func EncryptFileWithPGP(data []byte, recipientKey string) ([]byte, error) {
+	pgpMessage, err := encryptForRecipient(data, recipientKey)
+	if err != nil {
+		return nil, err
+	}
+
+	return pgpMessage.Bytes(), nil
+}
+
+func encryptForRecipient(data []byte, recipientKey string) (*crypto.PGPMessage, error) {
+	publicKey, err := crypto.NewKeyFromArmored(recipientKey)
+	if err != nil {
+		return nil, fmt.Errorf("parse public key: %w", err)
+	}
+
+	pgp := crypto.PGP()
+	encHandle, err := pgp.Encryption().Recipient(publicKey).New()
+	if err != nil {
+		return nil, fmt.Errorf("create encryption handle: %w", err)
+	}
+
+	pgpMessage, err := encHandle.Encrypt(data)
+	if err != nil {
+		return nil, fmt.Errorf("encrypt: %w", err)
+	}
+
+	return pgpMessage, nil
 }
 
 // toHeaderAddr is the address shown in the built message's To: header; it is not

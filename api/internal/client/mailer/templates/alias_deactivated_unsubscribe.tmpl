@@ -1,0 +1,45 @@
+{{define "body"}}
+Hi,
+
+Your alias {{.alias}} has been deactivated because a one-click unsubscribe request was received.
+
+All emails sent to this alias are now discarded, not just emails from the sender you unsubscribed from.
+
+Request details:
+{{- if .timestamp}}
+When: {{.timestamp}}
+{{- end}}
+{{- if .ip}}
+IP address: {{.ip}}
+{{- end}}
+{{- if .userAgent}}
+User agent: {{.userAgent}}
+{{- end}}
+
+If you didn't intend to do this, you can reactivate the alias from your aliases:
+{{.origin}}/account
+
+Sent by {{.from}}
+{{end}}
+
+{{define "bodyHtml"}}
+<div style="font-family: Arial, Helvetica, sans-serif;font-size: 15px;">
+Hi,<br><br>
+Your alias <strong>{{.alias}}</strong> has been deactivated because a one-click unsubscribe request was received.<br><br>
+<strong>All emails sent to this alias are now discarded</strong>, not just emails from the sender you unsubscribed from.<br><br>
+Request details:<br>
+{{- if .timestamp}}
+When: {{.timestamp}}<br>
+{{- end}}
+{{- if .ip}}
+IP address: {{.ip}}<br>
+{{- end}}
+{{- if .userAgent}}
+User agent: {{.userAgent}}<br>
+{{- end}}
+<br>
+If you didn't intend to do this, you can reactivate the alias from your aliases.<br><br>
+<a href="{{.origin}}/account" style="display:inline-block;padding:10px 16px;background:#1a1a1a;color:#ffffff;text-decoration:none;border-radius:6px;">View Your Aliases</a><br><br>
+Sent by {{.from}}
+</div>
+{{end}}

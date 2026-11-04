@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/araddon/dateparse"
 	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/gofiber/fiber/v2"
 	"ivpn.net/email/api/internal/middleware/auth"
@@ -18,6 +17,7 @@ var (
 	ErrPostAccessKey    = "Unable to create access key. Please try again."
 	ErrDeleteAccessKey  = "Unable to delete access key. Please try again."
 	ErrInvalidAccessKey = "Invalid access key provided."
+	ErrAccessKeyExpiry  = "Access Key expiry can't be more than one year from now."
 	ErrGetDefaults      = "Unable to retrieve default settings."
 )
 
@@ -99,10 +99,15 @@ func (h *Handler) PostAccessKey(c *fiber.Ctx) error {
 
 	// Set expiration if provided
 	if req.ExpiresAt != "" {
-		expiresAt, err := dateparse.ParseAny(req.ExpiresAt)
+		expiresAt, err := parseExpiresAt(req.ExpiresAt)
 		if err != nil {
 			return c.Status(400).JSON(fiber.Map{
 				"error": ErrPostAccessKey,
+			})
+		}
+		if !model.IsValidAccessKeyExpiry(expiresAt) {
+			return c.Status(400).JSON(fiber.Map{
+				"error": ErrAccessKeyExpiry,
 			})
 		}
 		accessKey.ExpiresAt = &expiresAt
@@ -224,7 +229,15 @@ func (h *Handler) Authenticate(c *fiber.Ctx) error {
 			"error": ErrSaveSession,
 		})
 	}
-	err = h.Service.SaveSession(c.Context(), sessionData, token, user.ID, exp, false)
+	// Scoped to the alias API, and linked to the key so revoking the key ends the session
+	err = h.Service.SaveSession(c.Context(), model.Session{
+		UserID:      user.ID,
+		Token:       token,
+		SessionData: sessionData,
+		ExpiresAt:   exp,
+		Scope:       model.SessionScopeAPI,
+		AccessKeyID: accessKey.ID,
+	})
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrSaveSession,
@@ -294,15 +307,28 @@ func (h *Handler) GetDefaults(c *fiber.Ctx) error {
 	}
 
 	return c.Status(200).JSON(fiber.Map{
-		"id":             settings.ID,
-		"domain":         settings.Domain,
-		"domains":        strings.Split(h.Cfg.Domains, ","),
-		"custom_domains": customDomains,
-		"recipient":      settings.Recipient,
-		"recipients":     rcps,
-		"alias_format":   settings.AliasFormat,
-		"from_name":      settings.FromName,
-		"log_issues":     settings.LogIssues,
-		"remove_header":  settings.RemoveHeader,
+		"id":                         settings.ID,
+		"domain":                     settings.Domain,
+		"domains":                    strings.Split(h.Cfg.Domains, ","),
+		"custom_domains":             customDomains,
+		"recipient":                  settings.Recipient,
+		"recipients":                 rcps,
+		"alias_format":               settings.AliasFormat,
+		"from_name":                  settings.FromName,
+		"log_issues":                 settings.LogIssues,
+		"remove_header":              settings.RemoveHeader,
+		"list_unsubscribe_behaviour": settings.ListUnsubscribeBehaviour,
+		"block_trackers":             settings.BlockTrackers,
 	})
+}
+
+// parseExpiresAt accepts an RFC 3339 timestamp (what the app sends via
+// JSON-serialised Date, e.g. "2027-01-02T15:04:05.000Z") or a plain
+// YYYY-MM-DD date, interpreted as midnight UTC.
+func parseExpiresAt(s string) (time.Time, error) {
+	if t, err := time.Parse(time.RFC3339, s); err == nil {
+		return t, nil
+	}
+
+	return time.Parse(time.DateOnly, s)
 }

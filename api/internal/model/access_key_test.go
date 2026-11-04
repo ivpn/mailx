@@ -46,6 +46,26 @@ func TestAccessKeyIsExpired(t *testing.T) {
 	})
 }
 
+func TestIsValidAccessKeyExpiry(t *testing.T) {
+	t.Run("valid when one year from now", func(t *testing.T) {
+		if !IsValidAccessKeyExpiry(time.Now().Add(DefaultAccessKeyTTL)) {
+			t.Error("expected expiry one year from now to be valid")
+		}
+	})
+
+	t.Run("valid when within clock skew allowance", func(t *testing.T) {
+		if !IsValidAccessKeyExpiry(time.Now().Add(DefaultAccessKeyTTL + time.Hour)) {
+			t.Error("expected expiry one year and one hour from now to be valid")
+		}
+	})
+
+	t.Run("invalid when more than one year from now", func(t *testing.T) {
+		if IsValidAccessKeyExpiry(time.Now().Add(2 * DefaultAccessKeyTTL)) {
+			t.Error("expected expiry two years from now to be invalid")
+		}
+	})
+}
+
 func TestGenToken(t *testing.T) {
 	t.Run("generates token of correct length", func(t *testing.T) {
 		lengths := []int{8, 16, 32, 64}

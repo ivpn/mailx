@@ -30,8 +30,18 @@
             </button>
         </div>
         <p v-if="error" class="error">Error: {{ error }}</p>
-        <p v-if="success.count > 0" class="success">Successfully imported {{ success.count }} aliases</p>
-        <p v-if="success.count === 0 && success.message" class="success">0 aliases imported</p>
+        <p v-if="success.count > 0 && !skipped.length" class="success">Successfully imported {{ success.count }} aliases</p>
+        <p v-if="success.count === 0 && success.message && !skipped.length" class="success">0 aliases imported</p>
+        <div v-if="skipped.length">
+            <p class="error">
+                Imported {{ success.count }} aliases. {{ skipped.length }} {{ skipped.length === 1 ? 'row was' : 'rows were' }} not imported:
+            </p>
+            <ul class="text-sm">
+                <li v-for="skip in skipped" :key="skip.row" class="mb-1">
+                    Row {{ skip.row }}: {{ skip.alias }} – {{ skip.reason }}
+                </li>
+            </ul>
+        </div>
     </div>
 </template>
 
@@ -46,6 +56,7 @@ const success = ref({
     count: 0,
     message: '',
 })
+const skipped = ref<{ row: number, alias: string, reason: string }[]>([])
 
 const validateFile = (file: File | null): string | null => {
     if (!file) {
@@ -59,6 +70,8 @@ const validateFile = (file: File | null): string | null => {
 
 const importAliases = async () => {
     importing.value = true
+    success.value = { count: 0, message: '' }
+    skipped.value = []
     try {
         const fileInput = document.getElementById('csv') as HTMLInputElement
         if (!fileInput.files || fileInput.files.length === 0) {
@@ -77,6 +90,7 @@ const importAliases = async () => {
         const res = await aliasApi.import(formData)
         success.value.count = res.data.count
         success.value.message = res.data.message
+        skipped.value = res.data.skipped || []
         error.value = ''
     } catch (err) {
         if (axios.isAxiosError(err)) {

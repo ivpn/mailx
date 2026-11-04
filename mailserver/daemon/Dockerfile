@@ -1,5 +1,5 @@
 # stage 1: building application binary file
-FROM golang:1.24@sha256:d2d2bc1c84f7e60d7d2438a3836ae7d0c847f4888464e7ec9ba3a1339a1ee804 AS builder
+FROM golang:1.26.10@sha256:fb456410ab4c979617acaf28c46b2b9fe60b11bcc3dc8ceea0eaeb3e7cd0f8a8 AS builder
 
 RUN mkdir /daemon
 ADD . /daemon
@@ -12,7 +12,7 @@ ENV GOARCH=amd64
 RUN go build -o daemon main.go
 
 # stage 2: copy only the application binary file to a minimal, non-root container
-FROM alpine:3.21@sha256:48b0309ca019d89d40f670aa1bc06e426dc0931948452e8491e3d65087abc07d AS production
+FROM alpine:3.24.2@sha256:294b683cb724975bec92580e1e685676bd4b50bda910ddb8c51d4cabeaec77e6 AS production
 
 RUN addgroup -S app && adduser -S app -G app
 COPY --from=builder /daemon/daemon /usr/local/bin/daemon

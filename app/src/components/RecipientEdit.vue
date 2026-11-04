@@ -17,7 +17,7 @@
                                 To use this option, please add a PGP key first.
                             </p>
                             <p>
-                                Enable this option to use PGP/Inline instead of the default PGP/MIME encryption. Do not enable if you want to receive encrypted emails with attachments or HTML content. Only forwarded emails are encrypted. 
+                                Enable this option to use PGP/Inline instead of the default PGP/MIME encryption. Only the plain-text version of an email is forwarded, without HTML content. Attachments and inline images are encrypted separately as .pgp files. Only forwarded emails are encrypted.
                             </p>
                         </div>
                         <div class="pb-5">

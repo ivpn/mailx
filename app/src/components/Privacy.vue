@@ -68,11 +68,10 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
 import Footer from './Footer.vue'
+import { useGoBack } from '../lib/useGoBack.ts'
 
-const router = useRouter()
-const goBack = () => router.back()
+const goBack = useGoBack()
 </script>
 
 <style scoped>

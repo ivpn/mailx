@@ -1,0 +1,8 @@
+From: Friend <friend@example.com>
+To: myalias@mailx.net
+Subject: Photos
+Message-ID: <ghi789@example.com>
+MIME-Version: 1.0
+Content-Type: text/html; charset="utf-8"
+
+<DIV><P>Here are the photos<BR><img src=https://photos.example.com/a.jpg width=400></DIV>

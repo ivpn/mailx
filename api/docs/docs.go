@@ -446,6 +446,99 @@ const docTemplate = `{
                 }
             }
         },
+        "/alias/{id}/pause": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Discard forwards to the alias for 1-10 hours, days or weeks from now. Replies and sends keep working. Pausing a paused alias replaces its end time.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "alias"
+                ],
+                "summary": "Pause alias",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Alias ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Pause request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.AliasPauseReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.AliasPauseRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "End an alias's pause, so forwards are delivered again. Succeeds for an alias that isn't paused.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "alias"
+                ],
+                "summary": "Unpause alias",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Alias ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
         "/alias/{id}/pin": {
             "put": {
                 "security": [
@@ -1265,6 +1358,149 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/blocklist": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get a page of blocklist entries for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "blocklist"
+                ],
+                "summary": "Get blocklist",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page size (max 100)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.BlocklistList"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Block inbound email from a sender address or domain (including its subdomains)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "blocklist"
+                ],
+                "summary": "Add to blocklist",
+                "parameters": [
+                    {
+                        "description": "Blocklist Request",
+                        "name": "blocklist",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.BlocklistReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "id, message",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/blocklist/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Remove an entry from the authenticated user's blocklist",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "blocklist"
+                ],
+                "summary": "Delete blocklist entry",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Blocklist entry ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -2485,6 +2721,298 @@ const docTemplate = `{
                 }
             }
         },
+        "/rule": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create a rule, applied after the user's existing rules",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rule"
+                ],
+                "summary": "Create rule",
+                "parameters": [
+                    {
+                        "description": "Rule request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.RuleReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "message, rule",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/rule/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Replace a rule's name, conditions, actions and email types. Its order, active flag and Applied count are kept.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rule"
+                ],
+                "summary": "Update rule",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Rule ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Rule request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.RuleReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "message, rule",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete a rule",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rule"
+                ],
+                "summary": "Delete rule",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Rule ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/rule/{id}/active": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Turn a rule on or off",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rule"
+                ],
+                "summary": "Update rule active",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Rule ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Rule active request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.RuleActiveReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/rules": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all of the authenticated user's rules, in the order they're applied",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rule"
+                ],
+                "summary": "Get rules",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Rule"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/rules/order": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Set the order rules are applied in. ids must be exactly the user's rule IDs.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rule"
+                ],
+                "summary": "Reorder rules",
+                "parameters": [
+                    {
+                        "description": "Rule order request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.RuleOrderReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
         "/settings": {
             "get": {
                 "security": [
@@ -2555,6 +3083,414 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/settings/alias-format": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Set the default alias format for new aliases: words, random or uuid",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Update default alias format",
+                "parameters": [
+                    {
+                        "description": "Default alias format",
+                        "name": "settings",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.AliasFormatReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/settings/block-trackers": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Turn removal of tracking pixels from forwarded emails on or off",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Update block email trackers",
+                "parameters": [
+                    {
+                        "description": "Block email trackers",
+                        "name": "settings",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.BlockTrackersReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/settings/domain": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Set the default alias domain for new aliases: a built-in domain or a verified custom domain name",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Update default domain",
+                "parameters": [
+                    {
+                        "description": "Default domain",
+                        "name": "settings",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.DefaultDomainReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/settings/from-name": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Set the From name used for replies and sends; an empty value uses the alias address",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Update from name",
+                "parameters": [
+                    {
+                        "description": "From name",
+                        "name": "settings",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.FromNameReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/settings/list-unsubscribe-behaviour": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Set what a mail client's \"Unsubscribe\" button does on forwarded emails",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Update List-Unsubscribe behaviour",
+                "parameters": [
+                    {
+                        "description": "List-Unsubscribe behaviour",
+                        "name": "settings",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.ListUnsubscribeBehaviourReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/settings/log-issues": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Turn diagnostic logging of failed deliveries and forwarding issues on or off",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Update diagnostics",
+                "parameters": [
+                    {
+                        "description": "Enable diagnostics",
+                        "name": "settings",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.LogIssuesReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/settings/recipient": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Set the default recipient for new aliases; it must be one of the user's verified recipients",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Update default recipient",
+                "parameters": [
+                    {
+                        "description": "Default recipient",
+                        "name": "settings",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.DefaultRecipientReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/settings/remove-header": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Turn the Mailx header in forwarded emails off (remove_header true) or on",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Update Mailx header",
+                "parameters": [
+                    {
+                        "description": "Remove Mailx header",
+                        "name": "settings",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.RemoveHeaderReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SuccessRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorRes"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorRes"
                         }
@@ -3380,6 +4316,48 @@ const docTemplate = `{
                 }
             }
         },
+        "api.AliasFormatReq": {
+            "type": "object",
+            "properties": {
+                "alias_format": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.AliasPauseReq": {
+            "type": "object",
+            "required": [
+                "unit",
+                "value"
+            ],
+            "properties": {
+                "unit": {
+                    "type": "string",
+                    "enum": [
+                        "hours",
+                        "days",
+                        "weeks"
+                    ]
+                },
+                "value": {
+                    "type": "integer",
+                    "maximum": 10,
+                    "minimum": 1
+                }
+            }
+        },
+        "api.AliasPauseRes": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "paused_until": {
+                    "type": "string",
+                    "example": "2026-10-15T08:00:00Z"
+                }
+            }
+        },
         "api.AliasPinReq": {
             "type": "object",
             "properties": {
@@ -3457,6 +4435,34 @@ const docTemplate = `{
                 }
             }
         },
+        "api.BlockTrackersReq": {
+            "type": "object",
+            "properties": {
+                "block_trackers": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "api.BlocklistReq": {
+            "type": "object",
+            "required": [
+                "type",
+                "value"
+            ],
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "email",
+                        "domain"
+                    ]
+                },
+                "value": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            }
+        },
         "api.BulkAliasEnabledReq": {
             "type": "object",
             "required": [
@@ -3522,6 +4528,22 @@ const docTemplate = `{
                 }
             }
         },
+        "api.DefaultDomainReq": {
+            "type": "object",
+            "properties": {
+                "domain": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.DefaultRecipientReq": {
+            "type": "object",
+            "properties": {
+                "recipient": {
+                    "type": "string"
+                }
+            }
+        },
         "api.DeleteRecipientReq": {
             "type": "object",
             "properties": {
@@ -3574,6 +4596,30 @@ const docTemplate = `{
                 }
             }
         },
+        "api.FromNameReq": {
+            "type": "object",
+            "properties": {
+                "from_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.ListUnsubscribeBehaviourReq": {
+            "type": "object",
+            "properties": {
+                "list_unsubscribe_behaviour": {
+                    "type": "integer"
+                }
+            }
+        },
+        "api.LogIssuesReq": {
+            "type": "object",
+            "properties": {
+                "log_issues": {
+                    "type": "boolean"
+                }
+            }
+        },
         "api.PASessionReq": {
             "type": "object",
             "required": [
@@ -3613,6 +4659,14 @@ const docTemplate = `{
                 }
             }
         },
+        "api.RemoveHeaderReq": {
+            "type": "object",
+            "properties": {
+                "remove_header": {
+                    "type": "boolean"
+                }
+            }
+        },
         "api.ResetPasswordReq": {
             "type": "object",
             "required": [
@@ -3635,6 +4689,104 @@ const docTemplate = `{
             "properties": {
                 "sessionid": {
                     "type": "string"
+                }
+            }
+        },
+        "api.RuleActionReq": {
+            "type": "object",
+            "required": [
+                "type"
+            ],
+            "properties": {
+                "type": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.RuleActiveReq": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "api.RuleConditionReq": {
+            "type": "object",
+            "required": [
+                "type"
+            ],
+            "properties": {
+                "match": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "values": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "api.RuleOrderReq": {
+            "type": "object",
+            "required": [
+                "ids"
+            ],
+            "properties": {
+                "ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "api.RuleReq": {
+            "type": "object",
+            "required": [
+                "actions",
+                "conditions",
+                "name",
+                "operator"
+            ],
+            "properties": {
+                "actions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/api.RuleActionReq"
+                    }
+                },
+                "conditions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/api.RuleConditionReq"
+                    }
+                },
+                "forwards": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "operator": {
+                    "type": "string",
+                    "enum": [
+                        "AND",
+                        "OR"
+                    ]
+                },
+                "replies": {
+                    "type": "boolean"
+                },
+                "sends": {
+                    "type": "boolean"
                 }
             }
         },
@@ -3848,6 +5000,9 @@ const docTemplate = `{
                 "origin": {
                     "$ref": "#/definitions/model.AliasOrigin"
                 },
+                "paused_until": {
+                    "type": "string"
+                },
                 "pinned": {
                     "type": "boolean"
                 },
@@ -3905,6 +5060,51 @@ const docTemplate = `{
                     "type": "integer"
                 }
             }
+        },
+        "model.BlocklistItem": {
+            "type": "object",
+            "properties": {
+                "blocked": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/model.BlocklistType"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.BlocklistList": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.BlocklistItem"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.BlocklistType": {
+            "type": "string",
+            "enum": [
+                "email",
+                "domain"
+            ],
+            "x-enum-varnames": [
+                "BlocklistEmail",
+                "BlocklistDomain"
+            ]
         },
         "model.Credential": {
             "type": "object",
@@ -3987,6 +5187,23 @@ const docTemplate = `{
                 }
             }
         },
+        "model.ListUnsubscribeBehaviour": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3,
+                4
+            ],
+            "x-enum-varnames": [
+                "ListUnsubscribeOriginalWithFallback",
+                "ListUnsubscribeDeactivate",
+                "ListUnsubscribeDelete",
+                "ListUnsubscribeBlockEmail",
+                "ListUnsubscribeBlockDomain"
+            ]
+        },
         "model.Log": {
             "type": "object",
             "properties": {
@@ -4028,7 +5245,11 @@ const docTemplate = `{
                 "disabled_alias",
                 "disabled_domain",
                 "unauthorised_send",
-                "inactive_subscription"
+                "inactive_subscription",
+                "blocked_sender",
+                "blocked_by_rule",
+                "paused_alias",
+                "no_recipients"
             ],
             "x-enum-varnames": [
                 "BounceMessage",
@@ -4037,7 +5258,11 @@ const docTemplate = `{
                 "DisabledAlias",
                 "DisabledDomain",
                 "UnauthorisedSend",
-                "InactiveSubscription"
+                "InactiveSubscription",
+                "BlockedSender",
+                "BlockedByRule",
+                "PausedAlias",
+                "NoRecipients"
             ]
         },
         "model.Recipient": {
@@ -4066,11 +5291,196 @@ const docTemplate = `{
                 }
             }
         },
+        "model.Rule": {
+            "type": "object",
+            "properties": {
+                "actions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.RuleAction"
+                    }
+                },
+                "active": {
+                    "type": "boolean"
+                },
+                "applied": {
+                    "type": "integer"
+                },
+                "conditions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.RuleCondition"
+                    }
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "forwards": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "invalid_recipients": {
+                    "description": "InvalidRecipients is set when a forward_to action points at a recipient that has since\nbeen deleted or deactivated.",
+                    "type": "boolean"
+                },
+                "last_applied_at": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "operator": {
+                    "$ref": "#/definitions/model.RuleOperator"
+                },
+                "order": {
+                    "type": "integer"
+                },
+                "replies": {
+                    "type": "boolean"
+                },
+                "sends": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "model.RuleAction": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "$ref": "#/definitions/model.RuleActionType"
+                },
+                "value": {
+                    "description": "empty for flag actions",
+                    "type": "string"
+                }
+            }
+        },
+        "model.RuleActionType": {
+            "type": "string",
+            "enum": [
+                "block",
+                "blocklist_sender",
+                "blocklist_domain",
+                "replace_subject",
+                "set_display_name",
+                "forward_to",
+                "disable_encryption",
+                "hide_banner",
+                "show_banner",
+                "deactivate_alias",
+                "set_alias_description",
+                "remove_attachments",
+                "stop"
+            ],
+            "x-enum-varnames": [
+                "RuleActionBlock",
+                "RuleActionBlocklistSender",
+                "RuleActionBlocklistDomain",
+                "RuleActionReplaceSubject",
+                "RuleActionSetDisplayName",
+                "RuleActionForwardTo",
+                "RuleActionDisableEncryption",
+                "RuleActionHideBanner",
+                "RuleActionShowBanner",
+                "RuleActionDeactivateAlias",
+                "RuleActionSetAliasDescription",
+                "RuleActionRemoveAttachments",
+                "RuleActionStop"
+            ]
+        },
+        "model.RuleCondition": {
+            "type": "object",
+            "properties": {
+                "match": {
+                    "$ref": "#/definitions/model.RuleMatch"
+                },
+                "type": {
+                    "$ref": "#/definitions/model.RuleConditionType"
+                },
+                "values": {
+                    "description": "ORed together; empty for boolean types",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "model.RuleConditionType": {
+            "type": "string",
+            "enum": [
+                "sender",
+                "sender_domain",
+                "sender_name",
+                "subject",
+                "alias",
+                "alias_description",
+                "destination",
+                "is_mailing_list",
+                "has_attachments",
+                "alias_is_wildcard"
+            ],
+            "x-enum-varnames": [
+                "RuleConditionSender",
+                "RuleConditionSenderDomain",
+                "RuleConditionSenderName",
+                "RuleConditionSubject",
+                "RuleConditionAlias",
+                "RuleConditionAliasDescription",
+                "RuleConditionDestination",
+                "RuleConditionIsMailingList",
+                "RuleConditionHasAttachments",
+                "RuleConditionAliasIsWildcard"
+            ]
+        },
+        "model.RuleMatch": {
+            "type": "string",
+            "enum": [
+                "is",
+                "is_not",
+                "contains",
+                "not_contains",
+                "starts_with",
+                "not_starts_with",
+                "ends_with",
+                "not_ends_with",
+                "regex",
+                "not_regex"
+            ],
+            "x-enum-varnames": [
+                "RuleMatchIs",
+                "RuleMatchIsNot",
+                "RuleMatchContains",
+                "RuleMatchNotContains",
+                "RuleMatchStartsWith",
+                "RuleMatchNotStartsWith",
+                "RuleMatchEndsWith",
+                "RuleMatchNotEndsWith",
+                "RuleMatchRegex",
+                "RuleMatchNotRegex"
+            ]
+        },
+        "model.RuleOperator": {
+            "type": "string",
+            "enum": [
+                "AND",
+                "OR"
+            ],
+            "x-enum-varnames": [
+                "RuleAnd",
+                "RuleOr"
+            ]
+        },
         "model.Settings": {
             "type": "object",
             "properties": {
                 "alias_format": {
                     "type": "string"
+                },
+                "block_trackers": {
+                    "type": "boolean"
                 },
                 "created_at": {
                     "type": "string"
@@ -4083,6 +5493,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "string"
+                },
+                "list_unsubscribe_behaviour": {
+                    "$ref": "#/definitions/model.ListUnsubscribeBehaviour"
                 },
                 "log_issues": {
                     "type": "boolean"

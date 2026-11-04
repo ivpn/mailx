@@ -4,21 +4,31 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"embed"
+	"encoding/base64"
 	"fmt"
 	"html/template"
 	"io"
 	"log"
+	"maps"
+	"mime"
 	"net/mail"
+	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/mnako/letters"
 	"ivpn.net/email/api/config"
 	"ivpn.net/email/api/internal/model"
 	"ivpn.net/email/api/internal/utils"
 	"ivpn.net/email/api/internal/utils/gomail.v2"
+	"ivpn.net/email/api/internal/utils/trackers"
 )
+
+// TrackersReportPath is the app page that renders the removed trackers encoded in its fragment.
+const TrackersReportPath = "/trackers-report"
 
 //go:embed templates/*
 var templateFS embed.FS
@@ -48,6 +58,9 @@ func New(cfg config.SMTPClientConfig) Mailer {
 			dialer = &gomail.Dialer{Host: host, Port: port}
 		} else {
 			dialer = gomail.NewDialer(host, port, cfg.User, cfg.Password)
+			if cfg.StartTLS == "opportunistic" {
+				dialer.StartTLSPolicy = gomail.OpportunisticStartTLS
+			}
 		}
 
 		conn, err := dialer.Dial()
@@ -90,33 +103,28 @@ func (mailer Mailer) Send(to string, subject string, body string) error {
 	return nil
 }
 
-func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data []byte, alias model.Alias) error {
-	// Preprocess email data to decode RFC 2047 encoded headers
-	processedData, err := utils.PreprocessEmailData(data)
-	if err != nil {
-		log.Printf("Warning: failed to preprocess email data: %v", err)
-		processedData = data // Fallback to original data
-	}
-
-	parser := letters.NewEmailParser(
-		// Malformed headers can cause the parser to fail,
-		// so we skip parsing of headers that are not needed for forwarding
-		letters.WithToHeaderParser(
-			func(header mail.Header, s string) ([]*mail.Address, error) {
-				return nil, nil
-			},
-		),
-		letters.WithReplyToHeaderParser(
-			func(header mail.Header, s string) ([]*mail.Address, error) {
-				return nil, nil
-			},
-		),
-	)
-
-	reader := bytes.NewReader(processedData)
-	email, err := parser.Parse(reader)
+func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data []byte, alias model.Alias, outcome model.RuleOutcome) error {
+	m, messageID, err := mailer.buildReplyMessage(from, name, rcp, data, alias, outcome)
 	if err != nil {
 		return err
+	}
+
+	err = mailer.dialer.DialAndSend(m)
+	if err != nil {
+		return err
+	}
+
+	log.Printf("Email reply sent successfully, %s", messageID)
+
+	return nil
+}
+
+// buildReplyMessage builds the outgoing reply/send message without dialing the network, so it
+// can be unit tested in isolation.
+func (mailer Mailer) buildReplyMessage(from string, name string, rcp model.Recipient, data []byte, alias model.Alias, outcome model.RuleOutcome) (*gomail.Message, string, error) {
+	email, err := parseEmail(data)
+	if err != nil {
+		return nil, "", err
 	}
 
 	email.Text = utils.RemoveHeader(email.Text)
@@ -130,7 +138,7 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 	// it cannot look up the charset (e.g. an empty-charset encoded-word that
 	// slipped through preprocessing).  DecodeHeaderWithCharset is a no-op when
 	// the subject is already plain text.
-	decodedSubject := utils.DecodeHeaderWithCharset(email.Headers.Subject)
+	decodedSubject := outcome.Subject(utils.DecodeHeaderWithCharset(email.Headers.Subject))
 
 	m := gomail.NewMessage()
 	m.SetAddressHeader("From", from, name)
@@ -140,9 +148,7 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 	m.AddAlternative("text/html", email.HTML)
 
 	// Preserve original metadata
-	if len(email.Headers.InReplyTo) > 0 {
-		m.SetHeader("In-Reply-To", string(email.Headers.InReplyTo[0]))
-	}
+	setThreadHeaders(m, email.Headers)
 	m.SetHeader("X-Complaints-To", mailer.cfg.Report)
 	m.SetHeader("X-Report-Abuse", mailer.cfg.Report)
 	m.SetHeader("X-Report-Abuse-To", mailer.cfg.Report)
@@ -159,7 +165,7 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 		m.Embed(
 			f.ContentID,
 			gomail.SetHeader(map[string][]string{
-				"Content-ID":          {f.ContentID},
+				"Content-ID":          {bracketID(f.ContentID)},
 				"Content-Type":        {f.ContentType.ContentType},
 				"Content-Disposition": {f.ContentDisposition.Params["type"] + "; filename=\"" + f.ContentDisposition.Params["filename"] + "\""},
 			}),
@@ -170,46 +176,60 @@ func (mailer Mailer) Reply(from string, name string, rcp model.Recipient, data [
 		)
 	}
 
-	err = mailer.dialer.DialAndSend(m)
-	if err != nil {
-		return err
+	return m, string(email.Headers.MessageID), nil
+}
+
+// bracketID puts back the <> that letters strips from Message-ID, In-Reply-To, References and
+// Content-ID. Without them the ID is invalid (RFC 5322 3.6.4, RFC 2045 7), so Gmail replaces
+// the Message-ID and replies no longer thread with the original.
+func bracketID(id string) string {
+	if id == "" {
+		return ""
 	}
+	return "<" + id + ">"
+}
 
-	log.Printf("Email reply sent successfully, %s", email.Headers.MessageID)
+// bracketIDs joins a list of IDs for In-Reply-To or References.
+func bracketIDs(ids []letters.MessageId) string {
+	var out []string
+	for _, id := range ids {
+		if id != "" {
+			out = append(out, bracketID(string(id)))
+		}
+	}
+	return strings.Join(out, " ")
+}
 
-	return nil
+// setThreadHeaders copies In-Reply-To and References, so replies thread with the original
+// conversation.
+func setThreadHeaders(m *gomail.Message, h letters.Headers) {
+	if v := bracketIDs(h.InReplyTo); v != "" {
+		m.SetHeader("In-Reply-To", v)
+	}
+	if v := bracketIDs(h.References); v != "" {
+		m.SetHeader("References", v)
+	}
 }
 
 // buildForwardMessage builds the outgoing forward message without dialing the network,
 // so the To: header logic can be unit tested in isolation.
-func (mailer Mailer) buildForwardMessage(from string, name string, to string, rcp model.Recipient, data []byte, templateFile string, templateData any, settings model.Settings, alias model.Alias) (*gomail.Message, string, error) {
-	// Preprocess email data to decode RFC 2047 encoded headers
-	processedData, err := utils.PreprocessEmailData(data)
-	if err != nil {
-		log.Printf("Warning: failed to preprocess email data: %v", err)
-		processedData = data // Fallback to original data
+func (mailer Mailer) buildForwardMessage(from string, name string, to string, rcp model.Recipient, data []byte, templateFile string, templateData map[string]any, settings model.Settings, alias model.Alias, listUnsubscribe model.ListUnsubscribeHeaders, outcome model.RuleOutcome) (*gomail.Message, string, error) {
+	if outcome.DisableEncryption {
+		rcp.PGPEnabled = false
 	}
 
-	parser := letters.NewEmailParser(
-		// Malformed headers can cause the parser to fail,
-		// so we skip parsing of headers that are not needed for forwarding
-		letters.WithToHeaderParser(
-			func(header mail.Header, s string) ([]*mail.Address, error) {
-				return nil, nil
-			},
-		),
-		letters.WithReplyToHeaderParser(
-			func(header mail.Header, s string) ([]*mail.Address, error) {
-				return nil, nil
-			},
-		),
-	)
-
-	reader := bytes.NewReader(processedData)
-	email, err := parser.Parse(reader)
+	email, err := parseEmail(data)
 	if err != nil {
 		return nil, "", err
 	}
+
+	// The body of an email the sender encrypted can't be changed
+	if outcome.RemoveAttachments && !isAlreadyEncrypted(email) {
+		email.AttachedFiles = nil
+	}
+
+	removedTrackers := removeTrackers(&email, settings, rcp)
+	templateData = mailer.withTrackersReport(templateData, removedTrackers)
 
 	tmpl, err := template.New("email").ParseFS(templateFS, "templates/"+templateFile)
 	if err != nil {
@@ -240,13 +260,18 @@ func (mailer Mailer) buildForwardMessage(from string, name string, to string, rc
 	// it cannot look up the charset (e.g. an empty-charset encoded-word that
 	// slipped through preprocessing).  DecodeHeaderWithCharset is a no-op when
 	// the subject is already plain text.
-	decodedSubject := utils.DecodeHeaderWithCharset(email.Headers.Subject)
+	decodedSubject := outcome.Subject(utils.DecodeHeaderWithCharset(email.Headers.Subject))
+
+	pgpMIMEType, pgpMIMEBody, isSenderPGPMIME := senderPGPMIME(data)
 
 	m := gomail.NewMessage()
+	if isSenderPGPMIME {
+		// UTF-8 so non-ASCII headers are still encoded correctly
+		m = gomail.NewRawMessage(gomail.SetCharset("UTF-8"))
+	}
 	m.SetAddressHeader("From", from, name)
 	m.SetHeader("To", to)
 	m.SetHeader("Subject", decodedSubject)
-	m.SetBody("text/plain", header.String()+email.Text)
 
 	// Preserve original metadata
 	originalSender := from
@@ -260,17 +285,12 @@ func (mailer Mailer) buildForwardMessage(from string, name string, to string, rc
 		m.SetHeader("X-Mailx-Original-From-Header", email.Headers.From[0].String())
 	}
 	if email.Headers.MessageID != "" {
-		m.SetHeader("Message-ID", string(email.Headers.MessageID))
+		m.SetHeader("Message-ID", bracketID(string(email.Headers.MessageID)))
 	}
 	if authResults, ok := email.Headers.ExtraHeaders["Authentication-Results"]; ok && len(authResults) > 0 {
 		m.SetHeader("X-Mailx-Authentication-Results", authResults...)
 	}
-	if len(email.Headers.InReplyTo) > 0 {
-		m.SetHeader("In-Reply-To", string(email.Headers.InReplyTo[0]))
-	}
-	if refs, ok := email.Headers.ExtraHeaders["References"]; ok && len(refs) > 0 {
-		m.SetHeader("References", refs...)
-	}
+	setThreadHeaders(m, email.Headers)
 	if received, ok := email.Headers.ExtraHeaders["Received"]; ok && len(received) > 0 {
 		ownHop := fmt.Sprintf(
 			"from unknown by %s with ESMTPS; %s",
@@ -294,39 +314,72 @@ func (mailer Mailer) buildForwardMessage(from string, name string, to string, rc
 	m.SetHeader("X-Report-Abuse", mailer.cfg.Report)
 	m.SetHeader("X-Report-Abuse-To", mailer.cfg.Report)
 	m.SetHeader("Feedback-ID", fmt.Sprintf("mailx:%x:forward", sha256.Sum256([]byte(mailer.cfg.TokenSecret+alias.ID))))
+	setListUnsubscribe(m, listUnsubscribe)
+	setTrackersRemoved(m, removedTrackers)
+	setRulesApplied(m, outcome.MatchedNames)
+
+	// Forwarded as the sender encrypted it, so the recipient's mail app decrypts it directly.
+	// Rebuilding it would turn the encrypted parts into attachments.
+	if isSenderPGPMIME {
+		m.SetHeader("Content-Type", pgpMIMEType)
+		m.SetRawBody(pgpMIMEBody)
+
+		return m, string(email.Headers.MessageID), nil
+	}
+
+	m.SetBody("text/plain", header.String()+email.Text)
 
 	// PGP/Inline encryption
 	if rcp.PGPEnabled && rcp.PGPKey != "" && rcp.PGPInline {
-		armored, err := utils.EncryptWithPGPInline(email.Text, rcp.PGPKey)
+		files := pgpInlineFiles(email)
+		armored, err := utils.EncryptWithPGPInline(email.Text+pgpInlineFilesNote(files), rcp.PGPKey)
 		if err != nil {
 			return nil, "", err
 		}
-		m.SetHeader("Content-Type", "text/plain")
+		// gomail writes the Content-Type itself, so setting it here would duplicate it
 		m.SetBody("text/plain", armored)
+
+		// Each file is encrypted on its own, so nothing is forwarded in the clear
+		for _, f := range files {
+			encrypted, err := utils.EncryptFileWithPGP(f.data, rcp.PGPKey)
+			if err != nil {
+				return nil, "", err
+			}
+			m.Attach(
+				f.name,
+				gomail.SetHeader(map[string][]string{
+					"Content-Type": {"application/octet-stream; name=\"" + f.name + "\""},
+				}),
+				gomail.SetCopyFunc(func(w io.Writer) error {
+					_, err := w.Write(encrypted)
+					return err
+				}),
+			)
+		}
 	} else {
 		m.AddAlternative("text/html", headerHtml.String()+email.HTML)
-	}
 
-	for _, a := range email.AttachedFiles {
-		m.Attach(a.ContentDisposition.Params["filename"], gomail.SetCopyFunc(func(w io.Writer) error {
-			_, err = w.Write(a.Data)
-			return err
-		}))
-	}
-
-	for _, f := range email.InlineFiles {
-		m.Embed(
-			f.ContentID,
-			gomail.SetHeader(map[string][]string{
-				"Content-ID":          {f.ContentID},
-				"Content-Type":        {f.ContentType.ContentType},
-				"Content-Disposition": {f.ContentDisposition.Params["type"] + "; filename=\"" + f.ContentDisposition.Params["filename"] + "\""},
-			}),
-			gomail.SetCopyFunc(func(w io.Writer) error {
-				_, err = w.Write(f.Data)
+		for _, a := range email.AttachedFiles {
+			m.Attach(a.ContentDisposition.Params["filename"], gomail.SetCopyFunc(func(w io.Writer) error {
+				_, err = w.Write(a.Data)
 				return err
-			}),
-		)
+			}))
+		}
+
+		for _, f := range email.InlineFiles {
+			m.Embed(
+				f.ContentID,
+				gomail.SetHeader(map[string][]string{
+					"Content-ID":          {bracketID(f.ContentID)},
+					"Content-Type":        {f.ContentType.ContentType},
+					"Content-Disposition": {f.ContentDisposition.Params["type"] + "; filename=\"" + f.ContentDisposition.Params["filename"] + "\""},
+				}),
+				gomail.SetCopyFunc(func(w io.Writer) error {
+					_, err = w.Write(f.Data)
+					return err
+				}),
+			)
+		}
 	}
 
 	// PGP/MIME encryption
@@ -335,6 +388,14 @@ func (mailer Mailer) buildForwardMessage(from string, name string, to string, rc
 		if err != nil {
 			return nil, "", err
 		}
+		// Kept on the outer message so mail clients can still offer unsubscribe and thread replies
+		if email.Headers.MessageID != "" {
+			em.SetHeader("Message-ID", bracketID(string(email.Headers.MessageID)))
+		}
+		setThreadHeaders(em, email.Headers)
+		setListUnsubscribe(em, listUnsubscribe)
+		setTrackersRemoved(em, removedTrackers)
+		setRulesApplied(em, outcome.MatchedNames)
 
 		return em, string(email.Headers.MessageID), nil
 	}
@@ -342,8 +403,207 @@ func (mailer Mailer) buildForwardMessage(from string, name string, to string, rc
 	return m, string(email.Headers.MessageID), nil
 }
 
-func (mailer Mailer) Forward(from string, name string, to string, rcp model.Recipient, data []byte, templateFile string, templateData any, settings model.Settings, alias model.Alias) error {
-	m, messageID, err := mailer.buildForwardMessage(from, name, to, rcp, data, templateFile, templateData, settings, alias)
+// pgpInlineFile is an attachment or inline image as forwarded to a PGP/Inline recipient.
+type pgpInlineFile struct {
+	name     string // attachment-N<ext>.pgp, so the original name isn't sent in the clear
+	original string
+	data     []byte
+}
+
+var pgpInlineExtRe = regexp.MustCompile(`^\.[a-z0-9]{1,8}$`)
+
+// pgpInlineFiles lists the attachments and inline images in the order they're forwarded. The
+// file extension is kept so the decrypted file still opens in the right app.
+func pgpInlineFiles(email letters.Email) []pgpInlineFile {
+	var files []pgpInlineFile
+	add := func(filename string, original string, data []byte) {
+		ext := strings.ToLower(filepath.Ext(filename))
+		if !pgpInlineExtRe.MatchString(ext) {
+			ext = ""
+		}
+		name := fmt.Sprintf("attachment-%d%s.pgp", len(files)+1, ext)
+		files = append(files, pgpInlineFile{name, original, data})
+	}
+
+	for _, a := range email.AttachedFiles {
+		filename := a.ContentDisposition.Params["filename"]
+		add(filename, filename, a.Data)
+	}
+	for _, f := range email.InlineFiles {
+		filename := f.ContentDisposition.Params["filename"]
+		original := filename
+		if original == "" {
+			original = f.ContentType.ContentType
+		}
+		add(filename, original+" (inline image)", f.Data)
+	}
+
+	return files
+}
+
+// pgpInlineFilesNote maps the attachment names to the original ones. It goes in the encrypted
+// body, so only the recipient sees the original names.
+func pgpInlineFilesNote(files []pgpInlineFile) string {
+	if len(files) == 0 {
+		return ""
+	}
+
+	var note strings.Builder
+	note.WriteString("\n\nAttachments, encrypted separately:\n")
+	for _, f := range files {
+		// Keeps a crafted name from adding lines to the note
+		fmt.Fprintf(&note, "%s: %s\n", f.name, strings.Join(strings.Fields(f.original), " "))
+	}
+
+	return note.String()
+}
+
+// setListUnsubscribe sets the List-Unsubscribe headers built for the forward. The original
+// message's headers are never copied over, so they can't appear twice.
+func setListUnsubscribe(m *gomail.Message, listUnsubscribe model.ListUnsubscribeHeaders) {
+	if listUnsubscribe.Value == "" {
+		return
+	}
+
+	m.SetHeader("List-Unsubscribe", listUnsubscribe.Value)
+	if listUnsubscribe.Post != "" {
+		m.SetHeader("List-Unsubscribe-Post", listUnsubscribe.Post)
+	}
+}
+
+// removeTrackers strips tracking pixels from the HTML body in place when the user has tracker
+// blocking on, and returns what was removed. On failure the HTML is forwarded unchanged.
+func removeTrackers(email *letters.Email, settings model.Settings, rcp model.Recipient) []trackers.Tracker {
+	// PGP/Inline forwards only the text body
+	pgpInline := rcp.PGPEnabled && rcp.PGPKey != "" && rcp.PGPInline
+	if !settings.BlockTrackers || email.HTML == "" || pgpInline || isAlreadyEncrypted(*email) {
+		return nil
+	}
+
+	res, err := trackers.Remove(email.HTML)
+	if err != nil {
+		log.Printf("Warning: forwarding HTML without removing trackers: %v", err)
+		return nil
+	}
+	email.HTML = res.HTML
+
+	return res.Removed
+}
+
+// isAlreadyEncrypted reports whether the sender encrypted the message, so its body can't be changed.
+func isAlreadyEncrypted(email letters.Email) bool {
+	switch strings.ToLower(email.Headers.ContentType.ContentType) {
+	case "multipart/encrypted", "application/pkcs7-mime", "application/x-pkcs7-mime":
+		return true
+	}
+
+	const armor = "-----BEGIN PGP MESSAGE-----"
+	return strings.Contains(email.Text, armor) || strings.Contains(email.HTML, armor)
+}
+
+// senderPGPMIME returns the Content-Type and body of a message the sender encrypted with
+// PGP/MIME (RFC 3156), with CRLF line endings. ok is false for any other message.
+func senderPGPMIME(data []byte) (contentType string, body string, ok bool) {
+	msg, err := mail.ReadMessage(bytes.NewReader(data))
+	if err != nil {
+		return "", "", false
+	}
+
+	contentType = msg.Header.Get("Content-Type")
+	mediaType, params, err := mime.ParseMediaType(contentType)
+	if err != nil || mediaType != "multipart/encrypted" ||
+		!strings.EqualFold(params["protocol"], "application/pgp-encrypted") || params["boundary"] == "" {
+		return "", "", false
+	}
+
+	raw, err := io.ReadAll(msg.Body)
+	if err != nil {
+		return "", "", false
+	}
+
+	// Mail piped in by Postfix has LF line endings, but the headers are written with CRLF
+	body = strings.ReplaceAll(strings.ReplaceAll(string(raw), "\r\n", "\n"), "\n", "\r\n")
+
+	return contentType, body, true
+}
+
+// withTrackersReport adds the removed tracker count and report link for the header template.
+func (mailer Mailer) withTrackersReport(templateData map[string]any, removed []trackers.Tracker) map[string]any {
+	if len(removed) == 0 {
+		return templateData
+	}
+
+	data := maps.Clone(templateData)
+	if data == nil {
+		data = map[string]any{}
+	}
+	data["trackersRemoved"] = len(removed)
+	if mailer.cfg.AppURL != "" {
+		// The fragment is never sent to the server, so the report stays in the email
+		data["trackersReportURL"] = mailer.cfg.AppURL + TrackersReportPath + "#" + trackers.EncodeReport(removed)
+	}
+
+	return data
+}
+
+func setTrackersRemoved(m *gomail.Message, removed []trackers.Tracker) {
+	if len(removed) == 0 {
+		return
+	}
+
+	m.SetHeader("X-Mailx-Trackers-Removed", strconv.Itoa(len(removed)))
+}
+
+// setRulesApplied lists the rules that matched a forward, so users can filter on them in their
+// mail client. It's never set on replies or sends, which go to third parties.
+func setRulesApplied(m *gomail.Message, names []string) {
+	if len(names) == 0 {
+		return
+	}
+
+	encoded := make([]string, len(names))
+	for i, name := range names {
+		encoded[i] = encodeRuleName(name)
+	}
+
+	// Each value is joined with ", " and folded by the writer
+	m.SetHeader("X-Mailx-Rules-Applied", encoded...)
+}
+
+// ruleNameSpecials are characters that are encoded in a rule name, so a name can't read as
+// several names, or as markup, to a mail client.
+const ruleNameSpecials = `,;<>"'()[]\=?`
+
+// encodeRuleName RFC 2047-encodes a rule name that has non-ASCII text or ruleNameSpecials, as
+// base64 encoded-words of at most 75 characters split on rune boundaries. Other names are used
+// as they are.
+func encodeRuleName(name string) string {
+	if !strings.ContainsAny(name, ruleNameSpecials) && mime.QEncoding.Encode("UTF-8", name) == name {
+		return name
+	}
+
+	// "=?UTF-8?b?" + "?=" leaves 63 characters, which is 45 bytes of base64 input
+	const maxChunk = 45
+
+	var words []string
+	for len(name) > 0 {
+		n := 0
+		for n < len(name) {
+			_, size := utf8.DecodeRuneInString(name[n:])
+			if n > 0 && n+size > maxChunk {
+				break
+			}
+			n += size
+		}
+		words = append(words, "=?UTF-8?b?"+base64.StdEncoding.EncodeToString([]byte(name[:n]))+"?=")
+		name = name[n:]
+	}
+
+	return strings.Join(words, " ")
+}
+
+func (mailer Mailer) Forward(from string, name string, to string, rcp model.Recipient, data []byte, templateFile string, templateData map[string]any, settings model.Settings, alias model.Alias, listUnsubscribe model.ListUnsubscribeHeaders, outcome model.RuleOutcome) error {
+	m, messageID, err := mailer.buildForwardMessage(from, name, to, rcp, data, templateFile, templateData, settings, alias, listUnsubscribe, outcome)
 	if err != nil {
 		return err
 	}

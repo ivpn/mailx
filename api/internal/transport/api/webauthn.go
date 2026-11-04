@@ -30,7 +30,7 @@ var (
 
 type SessionService interface {
 	GetSession(context.Context, string) (model.Session, bool, error)
-	SaveSession(context.Context, webauthn.SessionData, string, string, time.Time, bool) error
+	SaveSession(context.Context, model.Session) error
 	SaveCeremony(context.Context, model.Ceremony, time.Duration) (string, error)
 	ConsumeCeremony(context.Context, string, model.CeremonyType) (model.Ceremony, error)
 }
@@ -208,7 +208,13 @@ func (h *Handler) FinishRegistration(c *fiber.Ctx) error {
 			"error": ErrSaveSession,
 		})
 	}
-	err = h.Service.SaveSession(c.Context(), sessionData, token, user.ID, exp, false)
+	err = h.Service.SaveSession(c.Context(), model.Session{
+		UserID:      user.ID,
+		Token:       token,
+		SessionData: sessionData,
+		ExpiresAt:   exp,
+		Scope:       model.SessionScopeWeb,
+	})
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrSaveSession,
@@ -332,7 +338,13 @@ func (h *Handler) FinishAddPasskey(c *fiber.Ctx) error {
 			"error": ErrSaveSession,
 		})
 	}
-	err = h.Service.SaveSession(c.Context(), sessionData, token, user.ID, exp, false)
+	err = h.Service.SaveSession(c.Context(), model.Session{
+		UserID:      user.ID,
+		Token:       token,
+		SessionData: sessionData,
+		ExpiresAt:   exp,
+		Scope:       model.SessionScopeWeb,
+	})
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrSaveSession,
@@ -484,7 +496,14 @@ func (h *Handler) FinishLogin(c *fiber.Ctx) error {
 			"error": ErrSaveSession,
 		})
 	}
-	err = h.Service.SaveSession(c.Context(), sessionData, token, user.ID, exp, ceremony.Remember)
+	err = h.Service.SaveSession(c.Context(), model.Session{
+		UserID:      user.ID,
+		Token:       token,
+		SessionData: sessionData,
+		ExpiresAt:   exp,
+		Remember:    ceremony.Remember,
+		Scope:       model.SessionScopeWeb,
+	})
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrSaveSession,
@@ -629,7 +648,14 @@ func (h *Handler) FinishPasskeyLogin(c *fiber.Ctx) error {
 			"error": ErrSaveSession,
 		})
 	}
-	err = h.Service.SaveSession(c.Context(), newSessionData, token, loggedInUser.ID, exp, ceremony.Remember)
+	err = h.Service.SaveSession(c.Context(), model.Session{
+		UserID:      loggedInUser.ID,
+		Token:       token,
+		SessionData: newSessionData,
+		ExpiresAt:   exp,
+		Remember:    ceremony.Remember,
+		Scope:       model.SessionScopeWeb,
+	})
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrSaveSession,

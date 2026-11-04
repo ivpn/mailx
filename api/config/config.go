@@ -32,6 +32,8 @@ type APIConfig struct {
 	PreauthPSK              string
 	PreauthTTL              time.Duration
 	AnnouncementsURL        string
+	PublicURL               string
+	UnsubscribeSecret       string
 }
 
 type DBConfig struct {
@@ -67,6 +69,8 @@ type SMTPClientConfig struct {
 	DkimSelector string
 	Report       string
 	TokenSecret  string
+	AppURL       string
+	StartTLS     string // "opportunistic" allows plaintext when the server doesn't offer STARTTLS; anything else requires it
 }
 
 type ServiceConfig struct {
@@ -158,6 +162,7 @@ func New() (Config, error) {
 	redisAddrs := strings.Split(os.Getenv("REDIS_ADDRESSES"), ",")
 	apiTrustedProxies := strings.Split(os.Getenv("API_TRUSTED_PROXIES"), ",")
 	apiAllowIPs := strings.Split(os.Getenv("API_ALLOW_IPS"), ",")
+	appURL, _, _ := strings.Cut(os.Getenv("API_ALLOW_ORIGIN"), ",")
 
 	// ARC seals from these providers are trusted unless ARC_TRUSTED_SEALERS is set
 	// (set it empty to trust no ARC sealer).
@@ -206,6 +211,8 @@ func New() (Config, error) {
 			PreauthPSK:              os.Getenv("PREAUTH_PSK"),
 			PreauthTTL:              preauthTTL,
 			AnnouncementsURL:        os.Getenv("ANNOUNCEMENTS_URL"),
+			PublicURL:               strings.TrimSuffix(os.Getenv("API_PUBLIC_URL"), "/"),
+			UnsubscribeSecret:       os.Getenv("UNSUBSCRIBE_SIGNING_SECRET"),
 		},
 		DB: DBConfig{
 			Hosts:    dbHosts,
@@ -238,6 +245,8 @@ func New() (Config, error) {
 			DkimSelector: os.Getenv("SMTP_CLIENT_DKIM_SELECTOR"),
 			Report:       os.Getenv("SMTP_CLIENT_REPORT"),
 			TokenSecret:  os.Getenv("TOKEN_SECRET"),
+			AppURL:       strings.TrimSuffix(strings.TrimSpace(appURL), "/"),
+			StartTLS:     os.Getenv("SMTP_CLIENT_STARTTLS"),
 		},
 
 		Service: ServiceConfig{

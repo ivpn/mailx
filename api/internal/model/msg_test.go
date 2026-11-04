@@ -549,3 +549,26 @@ func compareMessages(a, b Msg) bool {
 	}
 	return true
 }
+
+func TestParseMsg_ListUnsubscribe(t *testing.T) {
+	raw := "From: News <news@example.com>\r\n" +
+		"To: alias@mailx.net\r\n" +
+		"Subject: Newsletter\r\n" +
+		"List-Unsubscribe: <mailto:unsub@example.com?subject=stop>,\r\n" +
+		"\t<https://example.com/unsub?id=1>\r\n" +
+		"List-Unsubscribe-Post: List-Unsubscribe=One-Click\r\n" +
+		"\r\n" +
+		"Body\r\n"
+
+	msg, err := ParseMsg([]byte(raw))
+	if err != nil {
+		t.Fatalf("ParseMsg() error = %v", err)
+	}
+
+	if want := "<mailto:unsub@example.com?subject=stop>, <https://example.com/unsub?id=1>"; msg.ListUnsubscribe != want {
+		t.Errorf("ListUnsubscribe = %q, want %q", msg.ListUnsubscribe, want)
+	}
+	if msg.ListUnsubscribePost != "List-Unsubscribe=One-Click" {
+		t.Errorf("ListUnsubscribePost = %q, want List-Unsubscribe=One-Click", msg.ListUnsubscribePost)
+	}
+}

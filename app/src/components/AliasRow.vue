@@ -46,7 +46,8 @@
                         {{ copyText }}: {{ alias.name }}
                     </span>
                 </p>
-                <p v-if="isCreatedByWildcard" class="text-xs text-tertiary mt-1">Created by Catch-All</p>
+                <p v-if="isPaused" class="text-xs text-tertiary mt-1" data-test="alias-paused-until">Paused until {{ pausedUntilLabel }}</p>
+                <p v-else-if="isCreatedByWildcard" class="text-xs text-tertiary mt-1" data-test="alias-catch-all">Created by Catch-All</p>
             </div>
         </td>
         <td>
@@ -110,7 +111,18 @@
                         <i class="icon icon-primary pin text-xs"></i>
                         {{ alias.pinned ? 'Unpin' : 'Pin' }}
                     </button>
-                    <button 
+                    <!-- A disabled button gets no pointer events, so the tooltip hangs off a wrapper. -->
+                    <div v-if="!alias.deleted_at" class="hs-tooltip">
+                        <button
+                            v-bind:disabled="readOnlyPause"
+                            @click.stop="togglePause"
+                            data-test="alias-pause">
+                            <i class="icon icon-primary pause text-xs"></i>
+                            {{ isPaused ? 'Unpause' : 'Pause' }}
+                        </button>
+                        <span v-if="readOnlyPause" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">{{ pauseTooltip }}</span>
+                    </div>
+                    <button
                         v-if="alias.deleted_at"
                         @click.stop="restoreAlias">
                         <i class="icon icon-primary reply text-xs"></i>
@@ -150,7 +162,8 @@
                                     {{ copyText }}: {{ alias.name }}
                                 </span>
                             </p>
-                            <p v-if="isCreatedByWildcard" class="text-xs text-tertiary mt-1">Created by Wildcard</p>
+                            <p v-if="isPaused" class="text-xs text-tertiary mt-1" data-test="alias-paused-until">Paused until {{ pausedUntilLabel }}</p>
+                            <p v-else-if="isCreatedByWildcard" class="text-xs text-tertiary mt-1" data-test="alias-catch-all">Created by Catch-All</p>
                         </div>
                     </div>
                     <div class="flex items-center hs-tooltip">
@@ -202,6 +215,16 @@
                                 <i class="icon icon-primary pin text-xs"></i>
                                 {{ alias.pinned ? 'Unpin' : 'Pin' }}
                             </button>
+                            <div v-if="!alias.deleted_at" class="hs-tooltip">
+                                <button
+                                    v-bind:disabled="readOnlyPause"
+                                    @click.stop="togglePause"
+                                    data-test="alias-pause">
+                                    <i class="icon icon-primary pause text-xs"></i>
+                                    {{ isPaused ? 'Unpause' : 'Pause' }}
+                                </button>
+                                <span v-if="readOnlyPause" class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible" role="tooltip">{{ pauseTooltip }}</span>
+                            </div>
                             <button
                                 v-if="alias.deleted_at"
                                 @click.stop="restoreAlias">
@@ -257,14 +280,17 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import axios from 'axios'
 import { aliasApi } from '../api/alias.ts'
 import events from '../events.ts'
 import { formatDistanceToNow } from 'date-fns'
 import { closeDropdowns } from '../lib/preline.ts'
 import { useBreakpoint } from '../lib/useBreakpoint.ts'
+import { formatPausedUntil, useNow } from '../lib/aliasPause.ts'
 
-const props = defineProps(['alias', 'recipients', 'wildcard', 'selectable', 'selected'])
-defineEmits(['onToggleSelect', 'onEdit', 'onSend'])
+// readOnlyPause: the subscription isn't active, so Pause/Unpause are shown disabled.
+const props = defineProps(['alias', 'recipients', 'wildcard', 'selectable', 'selected', 'readOnlyPause'])
+const emit = defineEmits(['onToggleSelect', 'onEdit', 'onSend', 'onPause', 'onActionError'])
 const { isDesktop } = useBreakpoint()
 // Computed, not ref(props.alias): rows are keyed by alias id and survive list refreshes, so the
 // row has to track the replacement object rather than the one captured at mount.
@@ -272,6 +298,13 @@ const alias = computed(() => props.alias)
 const isDomainUnverified = computed(() => alias.value.is_custom_domain === true && (alias.value.is_domain_verified === false || alias.value.is_domain_enabled === false))
 const isAliasDeleted = computed(() => alias.value.deleted_at !== null)
 const isCreatedByWildcard = computed(() => alias.value.origin === 1)
+// A past paused_until (e.g. in a response that has gone stale) counts as unpaused.
+const now = useNow()
+const isPaused = computed(() => !!alias.value.paused_until && new Date(alias.value.paused_until) > now.value)
+const pausedUntilLabel = computed(() => isPaused.value ? formatPausedUntil(alias.value.paused_until) : '')
+const pauseTooltip = computed(() => isPaused.value
+    ? `Renew your subscription to unpause. The pause ends automatically on ${pausedUntilLabel.value}.`
+    : 'Renew your subscription to pause aliases.')
 const truncatedDescription = computed(() => {
     const desc = alias.value.description
     if (!desc) return ''
@@ -297,6 +330,26 @@ const togglePin = async () => {
     } catch {}
 }
 
+// Unpausing is easy to undo, so it needs no confirmation.
+const togglePause = async () => {
+    if (props.readOnlyPause) return
+    closeDropdowns()
+
+    if (!isPaused.value) {
+        emit('onPause', alias.value)
+        return
+    }
+
+    try {
+        await aliasApi.unpause(alias.value.id)
+        events.emit('alias.update', {})
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            emit('onActionError', err.response?.data?.error || err.message)
+        }
+    }
+}
+
 const deleteAlias = () => {
     closeDropdowns()
     const errMessage = props.wildcard ? 'WARNING: You will not be able to create the same wildcard alias in the next 90 days. Are you sure you want to delete alias? ' : 'Are you sure you want to delete alias? A deleted email alias can be restored within 90 days.'
@@ -314,6 +367,7 @@ const restoreAlias = async () => {
 }
 
 const forgetAlias = () => {
+    closeDropdowns()
     const errMessage = 'WARNING: This operation cannot be undone. You will not be able to restore this alias. Are you sure you want to permanently delete alias?'
     if (!confirm(errMessage)) return
 

@@ -20,11 +20,14 @@ type Store interface {
 	LogStore
 	AccessKeyStore
 	DomainStore
+	BlocklistStore
+	RuleStore
 }
 
 type Cache interface {
 	Set(context.Context, string, any, time.Duration) error
 	Get(context.Context, string) (string, error)
+	SetNX(context.Context, string, any, time.Duration) (bool, error)
 	GetDel(context.Context, string) (string, error)
 	Del(context.Context, string) error
 	Incr(context.Context, string, time.Duration) error

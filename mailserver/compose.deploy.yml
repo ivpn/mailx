@@ -1,6 +1,6 @@
 services:
   mailserver:
-    image: ghcr.io/docker-mailserver/docker-mailserver:latest
+    image: ghcr.io/docker-mailserver/docker-mailserver:16.0.1@sha256:d0fe7668defe157aad57ea31b1707ad1e2fb57d7a91bdf17cbdf876549946c86
     container_name: mailserver
     hostname: ${DMS_HOSTNAME}
     env_file: mailserver.env
@@ -48,7 +48,9 @@ services:
     cap_add:
       - NET_ADMIN
     healthcheck:
-      test: "ss --listening --tcp | grep -P 'LISTEN.+:smtp' || exit 1"
+      # Also fails if user-patches.sh didn't install the curl_email pipe
+      # transport (e.g. after an image upgrade changed Postfix/DMS internals).
+      test: "ss --listening --tcp | grep -P 'LISTEN.+:smtp' && postconf -M curl_email/unix | grep -q curl-email.sh || exit 1"
       timeout: 3s
       retries: 3
     networks:
@@ -56,7 +58,8 @@ services:
         ipv4_address: ${DMS_IP}
 
   daemon:
-    image: ${IMAGE_REGISTRY}${DAEMON_IMAGE}:${IMAGE_TAG}
+    # IMAGE_TAG must be an immutable release tag (e.g. v1.2.3), never "latest"
+    image: ${IMAGE_REGISTRY}${DAEMON_IMAGE}:${IMAGE_TAG:?set IMAGE_TAG to a release version tag}
     container_name: daemon
     volumes:
       - ./docker-data/dms/mail-logs/:/var/log/mail/

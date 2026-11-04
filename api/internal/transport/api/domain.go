@@ -15,6 +15,7 @@ var (
 	ErrPostDomain                = "Unable to create custom domain. Please try again."
 	ErrUpdateDomain              = "Unable to update custom domain. Please try again."
 	ErrDeleteDomain              = "Unable to delete custom domain. Please try again."
+	ErrDomainRecipientInvalid    = "The selected recipient is invalid."
 	PostDomainSuccess            = "Custom domain added successfully."
 	UpdateDomainSuccess          = "Custom domain updated successfully."
 	DeleteDomainSuccess          = "Custom domain deleted successfully."
@@ -152,6 +153,13 @@ func (h *Handler) UpdateDomain(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": ErrInvalidRequest,
+		})
+	}
+
+	// An empty recipient falls back to the default recipient in Settings
+	if req.Recipient != "" && !h.isUserRecipient(c.Context(), userID, req.Recipient) {
+		return c.Status(400).JSON(fiber.Map{
+			"error": ErrDomainRecipientInvalid,
 		})
 	}
 

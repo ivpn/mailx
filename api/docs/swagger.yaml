@@ -15,6 +15,35 @@ definitions:
     required:
     - otp
     type: object
+  api.AliasFormatReq:
+    properties:
+      alias_format:
+        type: string
+    type: object
+  api.AliasPauseReq:
+    properties:
+      unit:
+        enum:
+        - hours
+        - days
+        - weeks
+        type: string
+      value:
+        maximum: 10
+        minimum: 1
+        type: integer
+    required:
+    - unit
+    - value
+    type: object
+  api.AliasPauseRes:
+    properties:
+      message:
+        type: string
+      paused_until:
+        example: "2026-10-15T08:00:00Z"
+        type: string
+    type: object
   api.AliasPinReq:
     properties:
       pinned:
@@ -67,6 +96,25 @@ definitions:
     required:
     - access_key
     type: object
+  api.BlockTrackersReq:
+    properties:
+      block_trackers:
+        type: boolean
+    type: object
+  api.BlocklistReq:
+    properties:
+      type:
+        enum:
+        - email
+        - domain
+        type: string
+      value:
+        maxLength: 255
+        type: string
+    required:
+    - type
+    - value
+    type: object
   api.BulkAliasEnabledReq:
     properties:
       enabled:
@@ -111,6 +159,16 @@ definitions:
       password:
         type: string
     type: object
+  api.DefaultDomainReq:
+    properties:
+      domain:
+        type: string
+    type: object
+  api.DefaultRecipientReq:
+    properties:
+      recipient:
+        type: string
+    type: object
   api.DeleteRecipientReq:
     properties:
       recipients:
@@ -144,6 +202,21 @@ definitions:
       error:
         type: string
     type: object
+  api.FromNameReq:
+    properties:
+      from_name:
+        type: string
+    type: object
+  api.ListUnsubscribeBehaviourReq:
+    properties:
+      list_unsubscribe_behaviour:
+        type: integer
+    type: object
+  api.LogIssuesReq:
+    properties:
+      log_issues:
+        type: boolean
+    type: object
   api.PASessionReq:
     properties:
       id:
@@ -170,6 +243,11 @@ definitions:
     required:
     - id
     type: object
+  api.RemoveHeaderReq:
+    properties:
+      remove_header:
+        type: boolean
+    type: object
   api.ResetPasswordReq:
     properties:
       otp:
@@ -185,6 +263,71 @@ definitions:
         type: string
     required:
     - sessionid
+    type: object
+  api.RuleActionReq:
+    properties:
+      type:
+        type: string
+      value:
+        type: string
+    required:
+    - type
+    type: object
+  api.RuleActiveReq:
+    properties:
+      active:
+        type: boolean
+    type: object
+  api.RuleConditionReq:
+    properties:
+      match:
+        type: string
+      type:
+        type: string
+      values:
+        items:
+          type: string
+        type: array
+    required:
+    - type
+    type: object
+  api.RuleOrderReq:
+    properties:
+      ids:
+        items:
+          type: string
+        type: array
+    required:
+    - ids
+    type: object
+  api.RuleReq:
+    properties:
+      actions:
+        items:
+          $ref: '#/definitions/api.RuleActionReq'
+        type: array
+      conditions:
+        items:
+          $ref: '#/definitions/api.RuleConditionReq'
+        type: array
+      forwards:
+        type: boolean
+      name:
+        type: string
+      operator:
+        enum:
+        - AND
+        - OR
+        type: string
+      replies:
+        type: boolean
+      sends:
+        type: boolean
+    required:
+    - actions
+    - conditions
+    - name
+    - operator
     type: object
   api.SettingsReq:
     properties:
@@ -325,6 +468,8 @@ definitions:
         type: string
       origin:
         $ref: '#/definitions/model.AliasOrigin'
+      paused_until:
+        type: string
       pinned:
         type: boolean
       recipients:
@@ -364,6 +509,36 @@ definitions:
       sends:
         type: integer
     type: object
+  model.BlocklistItem:
+    properties:
+      blocked:
+        type: integer
+      created_at:
+        type: string
+      id:
+        type: string
+      type:
+        $ref: '#/definitions/model.BlocklistType'
+      value:
+        type: string
+    type: object
+  model.BlocklistList:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/model.BlocklistItem'
+        type: array
+      total:
+        type: integer
+    type: object
+  model.BlocklistType:
+    enum:
+    - email
+    - domain
+    type: string
+    x-enum-varnames:
+    - BlocklistEmail
+    - BlocklistDomain
   model.Credential:
     properties:
       created_at:
@@ -418,6 +593,20 @@ definitions:
         description: nullable
         type: string
     type: object
+  model.ListUnsubscribeBehaviour:
+    enum:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    type: integer
+    x-enum-varnames:
+    - ListUnsubscribeOriginalWithFallback
+    - ListUnsubscribeDeactivate
+    - ListUnsubscribeDelete
+    - ListUnsubscribeBlockEmail
+    - ListUnsubscribeBlockDomain
   model.Log:
     properties:
       attempted_at:
@@ -448,6 +637,10 @@ definitions:
     - disabled_domain
     - unauthorised_send
     - inactive_subscription
+    - blocked_sender
+    - blocked_by_rule
+    - paused_alias
+    - no_recipients
     type: string
     x-enum-varnames:
     - BounceMessage
@@ -457,6 +650,10 @@ definitions:
     - DisabledDomain
     - UnauthorisedSend
     - InactiveSubscription
+    - BlockedSender
+    - BlockedByRule
+    - PausedAlias
+    - NoRecipients
   model.Recipient:
     properties:
       created_at:
@@ -474,10 +671,156 @@ definitions:
       pgp_key:
         type: string
     type: object
+  model.Rule:
+    properties:
+      actions:
+        items:
+          $ref: '#/definitions/model.RuleAction'
+        type: array
+      active:
+        type: boolean
+      applied:
+        type: integer
+      conditions:
+        items:
+          $ref: '#/definitions/model.RuleCondition'
+        type: array
+      created_at:
+        type: string
+      forwards:
+        type: boolean
+      id:
+        type: string
+      invalid_recipients:
+        description: |-
+          InvalidRecipients is set when a forward_to action points at a recipient that has since
+          been deleted or deactivated.
+        type: boolean
+      last_applied_at:
+        type: string
+      name:
+        type: string
+      operator:
+        $ref: '#/definitions/model.RuleOperator'
+      order:
+        type: integer
+      replies:
+        type: boolean
+      sends:
+        type: boolean
+    type: object
+  model.RuleAction:
+    properties:
+      type:
+        $ref: '#/definitions/model.RuleActionType'
+      value:
+        description: empty for flag actions
+        type: string
+    type: object
+  model.RuleActionType:
+    enum:
+    - block
+    - blocklist_sender
+    - blocklist_domain
+    - replace_subject
+    - set_display_name
+    - forward_to
+    - disable_encryption
+    - hide_banner
+    - show_banner
+    - deactivate_alias
+    - set_alias_description
+    - remove_attachments
+    - stop
+    type: string
+    x-enum-varnames:
+    - RuleActionBlock
+    - RuleActionBlocklistSender
+    - RuleActionBlocklistDomain
+    - RuleActionReplaceSubject
+    - RuleActionSetDisplayName
+    - RuleActionForwardTo
+    - RuleActionDisableEncryption
+    - RuleActionHideBanner
+    - RuleActionShowBanner
+    - RuleActionDeactivateAlias
+    - RuleActionSetAliasDescription
+    - RuleActionRemoveAttachments
+    - RuleActionStop
+  model.RuleCondition:
+    properties:
+      match:
+        $ref: '#/definitions/model.RuleMatch'
+      type:
+        $ref: '#/definitions/model.RuleConditionType'
+      values:
+        description: ORed together; empty for boolean types
+        items:
+          type: string
+        type: array
+    type: object
+  model.RuleConditionType:
+    enum:
+    - sender
+    - sender_domain
+    - sender_name
+    - subject
+    - alias
+    - alias_description
+    - destination
+    - is_mailing_list
+    - has_attachments
+    - alias_is_wildcard
+    type: string
+    x-enum-varnames:
+    - RuleConditionSender
+    - RuleConditionSenderDomain
+    - RuleConditionSenderName
+    - RuleConditionSubject
+    - RuleConditionAlias
+    - RuleConditionAliasDescription
+    - RuleConditionDestination
+    - RuleConditionIsMailingList
+    - RuleConditionHasAttachments
+    - RuleConditionAliasIsWildcard
+  model.RuleMatch:
+    enum:
+    - is
+    - is_not
+    - contains
+    - not_contains
+    - starts_with
+    - not_starts_with
+    - ends_with
+    - not_ends_with
+    - regex
+    - not_regex
+    type: string
+    x-enum-varnames:
+    - RuleMatchIs
+    - RuleMatchIsNot
+    - RuleMatchContains
+    - RuleMatchNotContains
+    - RuleMatchStartsWith
+    - RuleMatchNotStartsWith
+    - RuleMatchEndsWith
+    - RuleMatchNotEndsWith
+    - RuleMatchRegex
+    - RuleMatchNotRegex
+  model.RuleOperator:
+    enum:
+    - AND
+    - OR
+    type: string
+    x-enum-varnames:
+    - RuleAnd
+    - RuleOr
   model.Settings:
     properties:
       alias_format:
         type: string
+      block_trackers:
+        type: boolean
       created_at:
         type: string
       domain:
@@ -486,6 +829,8 @@ definitions:
         type: string
       id:
         type: string
+      list_unsubscribe_behaviour:
+        $ref: '#/definitions/model.ListUnsubscribeBehaviour'
       log_issues:
         type: boolean
       recipient:
@@ -775,6 +1120,68 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Update alias
+      tags:
+      - alias
+  /alias/{id}/pause:
+    delete:
+      consumes:
+      - application/json
+      description: End an alias's pause, so forwards are delivered again. Succeeds
+        for an alias that isn't paused.
+      parameters:
+      - description: Alias ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Unpause alias
+      tags:
+      - alias
+    put:
+      consumes:
+      - application/json
+      description: Discard forwards to the alias for 1-10 hours, days or weeks from
+        now. Replies and sends keep working. Pausing a paused alias replaces its end
+        time.
+      parameters:
+      - description: Alias ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Pause request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.AliasPauseReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.AliasPauseRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Pause alias
       tags:
       - alias
   /alias/{id}/pin:
@@ -1392,6 +1799,97 @@ paths:
       summary: Logout API user
       tags:
       - access_key
+  /blocklist:
+    get:
+      consumes:
+      - application/json
+      description: Get a page of blocklist entries for the authenticated user
+      parameters:
+      - description: Page size (max 100)
+        in: query
+        name: limit
+        type: integer
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.BlocklistList'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get blocklist
+      tags:
+      - blocklist
+    post:
+      consumes:
+      - application/json
+      description: Block inbound email from a sender address or domain (including
+        its subdomains)
+      parameters:
+      - description: Blocklist Request
+        in: body
+        name: blocklist
+        required: true
+        schema:
+          $ref: '#/definitions/api.BlocklistReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: id, message
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Add to blocklist
+      tags:
+      - blocklist
+  /blocklist/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove an entry from the authenticated user's blocklist
+      parameters:
+      - description: Blocklist entry ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete blocklist entry
+      tags:
+      - blocklist
   /domains:
     get:
       consumes:
@@ -2169,6 +2667,194 @@ paths:
       summary: Rotate pre-auth session ID
       tags:
       - subscription
+  /rule:
+    post:
+      consumes:
+      - application/json
+      description: Create a rule, applied after the user's existing rules
+      parameters:
+      - description: Rule request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.RuleReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message, rule
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Create rule
+      tags:
+      - rule
+  /rule/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a rule
+      parameters:
+      - description: Rule ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete rule
+      tags:
+      - rule
+    put:
+      consumes:
+      - application/json
+      description: Replace a rule's name, conditions, actions and email types. Its
+        order, active flag and Applied count are kept.
+      parameters:
+      - description: Rule ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Rule request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.RuleReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message, rule
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update rule
+      tags:
+      - rule
+  /rule/{id}/active:
+    put:
+      consumes:
+      - application/json
+      description: Turn a rule on or off
+      parameters:
+      - description: Rule ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Rule active request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.RuleActiveReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update rule active
+      tags:
+      - rule
+  /rules:
+    get:
+      consumes:
+      - application/json
+      description: Get all of the authenticated user's rules, in the order they're
+        applied
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Rule'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Get rules
+      tags:
+      - rule
+  /rules/order:
+    put:
+      consumes:
+      - application/json
+      description: Set the order rules are applied in. ids must be exactly the user's
+        rule IDs.
+      parameters:
+      - description: Rule order request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/api.RuleOrderReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Reorder rules
+      tags:
+      - rule
   /settings:
     get:
       consumes:
@@ -2215,6 +2901,269 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Update settings
+      tags:
+      - settings
+  /settings/alias-format:
+    put:
+      consumes:
+      - application/json
+      description: 'Set the default alias format for new aliases: words, random or
+        uuid'
+      parameters:
+      - description: Default alias format
+        in: body
+        name: settings
+        required: true
+        schema:
+          $ref: '#/definitions/api.AliasFormatReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update default alias format
+      tags:
+      - settings
+  /settings/block-trackers:
+    put:
+      consumes:
+      - application/json
+      description: Turn removal of tracking pixels from forwarded emails on or off
+      parameters:
+      - description: Block email trackers
+        in: body
+        name: settings
+        required: true
+        schema:
+          $ref: '#/definitions/api.BlockTrackersReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update block email trackers
+      tags:
+      - settings
+  /settings/domain:
+    put:
+      consumes:
+      - application/json
+      description: 'Set the default alias domain for new aliases: a built-in domain
+        or a verified custom domain name'
+      parameters:
+      - description: Default domain
+        in: body
+        name: settings
+        required: true
+        schema:
+          $ref: '#/definitions/api.DefaultDomainReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update default domain
+      tags:
+      - settings
+  /settings/from-name:
+    put:
+      consumes:
+      - application/json
+      description: Set the From name used for replies and sends; an empty value uses
+        the alias address
+      parameters:
+      - description: From name
+        in: body
+        name: settings
+        required: true
+        schema:
+          $ref: '#/definitions/api.FromNameReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update from name
+      tags:
+      - settings
+  /settings/list-unsubscribe-behaviour:
+    put:
+      consumes:
+      - application/json
+      description: Set what a mail client's "Unsubscribe" button does on forwarded
+        emails
+      parameters:
+      - description: List-Unsubscribe behaviour
+        in: body
+        name: settings
+        required: true
+        schema:
+          $ref: '#/definitions/api.ListUnsubscribeBehaviourReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update List-Unsubscribe behaviour
+      tags:
+      - settings
+  /settings/log-issues:
+    put:
+      consumes:
+      - application/json
+      description: Turn diagnostic logging of failed deliveries and forwarding issues
+        on or off
+      parameters:
+      - description: Enable diagnostics
+        in: body
+        name: settings
+        required: true
+        schema:
+          $ref: '#/definitions/api.LogIssuesReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update diagnostics
+      tags:
+      - settings
+  /settings/recipient:
+    put:
+      consumes:
+      - application/json
+      description: Set the default recipient for new aliases; it must be one of the
+        user's verified recipients
+      parameters:
+      - description: Default recipient
+        in: body
+        name: settings
+        required: true
+        schema:
+          $ref: '#/definitions/api.DefaultRecipientReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update default recipient
+      tags:
+      - settings
+  /settings/remove-header:
+    put:
+      consumes:
+      - application/json
+      description: Turn the Mailx header in forwarded emails off (remove_header true)
+        or on
+      parameters:
+      - description: Remove Mailx header
+        in: body
+        name: settings
+        required: true
+        schema:
+          $ref: '#/definitions/api.RemoveHeaderReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/api.ErrorRes'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Mailx header
       tags:
       - settings
   /sub:

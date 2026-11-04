@@ -22,7 +22,7 @@ func TestBuildForwardMessage_ToHeaderUsesOriginalAliasAddress(t *testing.T) {
 
 	msg, _, err := m.buildForwardMessage(
 		"sender@example.com", "Sender", to, rcp,
-		[]byte(testForwardRawEmail), "header.tmpl", templateData, settings, alias,
+		[]byte(testForwardRawEmail), "header.tmpl", templateData, settings, alias, model.ListUnsubscribeHeaders{}, model.RuleOutcome{},
 	)
 	if err != nil {
 		t.Fatalf("buildForwardMessage() error = %v", err)
@@ -59,7 +59,7 @@ func TestBuildForwardMessage_ToHeaderUsesLiteralTaggedAddress(t *testing.T) {
 
 	msg, _, err := m.buildForwardMessage(
 		"sender@example.com", "Sender", to, rcp,
-		[]byte(testForwardRawEmail), "header.tmpl", templateData, settings, alias,
+		[]byte(testForwardRawEmail), "header.tmpl", templateData, settings, alias, model.ListUnsubscribeHeaders{}, model.RuleOutcome{},
 	)
 	if err != nil {
 		t.Fatalf("buildForwardMessage() error = %v", err)

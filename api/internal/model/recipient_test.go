@@ -161,3 +161,29 @@ func equalSet(a, b []string) bool {
 	}
 	return true
 }
+
+func TestRemoveCommaSeparatedEmail(t *testing.T) {
+	tests := []struct {
+		list      string
+		email     string
+		want      string
+		wantFound bool
+	}{
+		{"a@example.com", "a@example.com", "", true},
+		{"a@example.com,b@example.com", "a@example.com", "b@example.com", true},
+		{"b@example.com,a@example.com,c@example.com", "A@example.com", "b@example.com,c@example.com", true},
+		{"ba@example.com,c@example.com", "a@example.com", "ba@example.com,c@example.com", false},
+		{"a@example.com.au", "a@example.com", "a@example.com.au", false},
+		{"", "a@example.com", "", false},
+	}
+
+	for _, tt := range tests {
+		got, found := RemoveCommaSeparatedEmail(tt.list, tt.email)
+		if got != tt.want || found != tt.wantFound {
+			t.Errorf("RemoveCommaSeparatedEmail(%q, %q) = %q, %v, want %q, %v", tt.list, tt.email, got, found, tt.want, tt.wantFound)
+		}
+		if ContainsCommaSeparatedEmail(tt.list, tt.email) != tt.wantFound {
+			t.Errorf("ContainsCommaSeparatedEmail(%q, %q) = %v, want %v", tt.list, tt.email, !tt.wantFound, tt.wantFound)
+		}
+	}
+}

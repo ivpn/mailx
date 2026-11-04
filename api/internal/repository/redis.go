@@ -101,6 +101,11 @@ func (r *Redis) Get(ctx context.Context, key string) (string, error) {
 	return r.Client.Get(ctx, key).Result()
 }
 
+// SetNX sets key only if it doesn't exist yet, reporting whether it was set.
+func (r *Redis) SetNX(ctx context.Context, key string, value any, expiration time.Duration) (bool, error) {
+	return r.Client.SetNX(ctx, key, value, expiration).Result()
+}
+
 // GetDel atomically reads and deletes a key. It uses MULTI/EXEC rather than GETDEL so it works on
 // Redis versions older than 6.2.
 func (r *Redis) GetDel(ctx context.Context, key string) (string, error) {

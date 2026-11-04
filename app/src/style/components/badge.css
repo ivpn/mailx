@@ -18,6 +18,10 @@
             @apply bg-cyan-500 dark:bg-cyan-700 text-white font-semibold;
         }
 
+        &.paused_alias {
+            @apply bg-sky-500 dark:bg-sky-700 text-white font-semibold;
+        }
+
         &.disabled_domain {
             @apply bg-rose-500 dark:bg-rose-700 text-white font-semibold;
         }
@@ -36,6 +40,18 @@
 
         &.failed_delivery {
             @apply bg-red-500 dark:bg-red-700 text-white font-semibold;
+        }
+
+        &.blocked_sender {
+            @apply bg-slate-600 dark:bg-slate-700 text-white font-semibold;
+        }
+
+        &.blocked_by_rule {
+            @apply bg-indigo-500 dark:bg-indigo-700 text-white font-semibold;
+        }
+        
+        &.no_recipients {
+            @apply bg-orange-500 dark:bg-orange-700 text-white font-semibold;
         }
 
         &.small {

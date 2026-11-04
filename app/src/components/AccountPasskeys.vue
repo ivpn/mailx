@@ -42,21 +42,23 @@
                         </td>
                     </tr>
                     <tr v-for="cred in list" :key="`tablet-${cred.id}`" class="tablet">
-                        <hr>
-                        <div class="flex gap-2 justify-between">
-                            <div class="text-start">
-                                <p class="mb-4 text-sm">{{ new Date(cred.created_at).toDateString() }}</p>
-                                <div>
-                                    <p class="mb-1 text-sm">ID:</p>
-                                    {{ cred.id }}
+                        <td class="whitespace-normal">
+                            <hr>
+                            <div class="flex gap-2 justify-between">
+                                <div class="text-start">
+                                    <p class="mb-4 text-sm">{{ new Date(cred.created_at).toDateString() }}</p>
+                                    <div>
+                                        <p class="mb-1 text-sm">ID:</p>
+                                        {{ cred.id }}
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="text-end">
+                                <div class="text-end">
                                     <button @click.stop="deleteCred(cred.id)" class="delete w-full flex items-center gap-x-2 py-2 place-content-end">
                                         <i class="icon icon-error trash text-xs"></i>
                                     </button>
+                                </div>
                             </div>
-                        </div>
+                        </td>
                     </tr>
                 </tbody>
             </table>

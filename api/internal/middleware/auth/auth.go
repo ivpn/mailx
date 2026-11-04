@@ -40,12 +40,14 @@ type Service interface {
 	GetUser(context.Context, string) (model.User, error)
 }
 
+// New authenticates a session by the web app's authn cookie. Only web sessions pass: a session made
+// from an access key is refused even when sent as the cookie.
 func New(cfg config.APIConfig, cache Cache, service Service) fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
 		if c.Cookies(AUTHN_COOKIE) != "" {
 			session, ok, err := service.GetSession(c.Context(), c.Cookies(AUTHN_COOKIE))
-			if err == nil && ok {
+			if err == nil && ok && session.Scope == model.SessionScopeWeb {
 				user, err := service.GetUser(c.Context(), session.UserID)
 				if err == nil {
 					c.Locals(USER_ID, user.ID)
@@ -99,6 +101,8 @@ func NewAPICORS(cfg config.APIConfig) fiber.Handler {
 	})
 }
 
+// NewAPIAuth authenticates the access-key API by bearer token. Only sessions made from an access key
+// pass, so a web session token can't be used here.
 func NewAPIAuth(cfg config.APIConfig, service Service) fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
@@ -106,7 +110,7 @@ func NewAPIAuth(cfg config.APIConfig, service Service) fiber.Handler {
 
 		if token != "" {
 			session, ok, err := service.GetSession(c.Context(), token)
-			if err == nil && ok {
+			if err == nil && ok && session.Scope == model.SessionScopeAPI {
 				user, err := service.GetUser(c.Context(), session.UserID)
 				if err == nil {
 					c.Locals(USER_ID, user.ID)

@@ -3,6 +3,8 @@ import Dashboard from './components/Dashboard.vue'
 import QuickActions from './components/QuickActions.vue'
 import Recipients from './components/Recipients.vue'
 import Domains from './components/Domains.vue'
+import Blocklist from './components/Blocklist.vue'
+import Rules from './components/Rules.vue'
 import Wildcards from './components/Wildcards.vue'
 import Stats from './components/Stats.vue'
 import Diagnostics from './components/Diagnostics.vue'
@@ -17,6 +19,7 @@ import Terms from './components/Terms.vue'
 import Privacy from './components/Privacy.vue'
 import Faq from './components/Faq.vue'
 import Announcements from './components/Announcements.vue'
+import TrackersReport from './components/TrackersReport.vue'
 import NotFound from './components/NotFound.vue'
 import Landing from './components/Landing.vue'
 import { type IStaticMethods } from 'preline/preline'
@@ -50,6 +53,16 @@ const dashboardChildren: RouteRecordRaw[] = [
         path: 'domains',
         name: `${AppName}: Domains`,
         component: Domains,
+    },
+    {
+        path: 'blocklist',
+        name: `${AppName}: Blocklist`,
+        component: Blocklist,
+    },
+    {
+        path: 'rules',
+        name: `${AppName}: Rules`,
+        component: Rules,
     },
     {
         path: 'stats',
@@ -134,6 +147,11 @@ const routes: RouteRecordRaw[] = [
         path: '/announcements',
         name: `${AppName}: Announcements`,
         component: Announcements
+    },
+    {
+        path: '/trackers-report',
+        name: `${AppName}: Trackers Report`,
+        component: TrackersReport
     },
     {
         path: '/:pathMatch(.*)*',

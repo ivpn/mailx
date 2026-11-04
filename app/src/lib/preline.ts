@@ -53,6 +53,9 @@ const guard = (selector: string, getCollection: () => Collection, autoInit: () =
 }
 
 export const initDropdowns = guard('.hs-dropdown', collections.dropdown, () => dropdown.autoInit())
+// Preline creates an overlay instance per element that toggles it ([data-hs-overlay]), never for
+// the modal itself, so overlay.open() on a modal without a toggle silently does nothing. A modal
+// opened only from code (e.g. RuleEdit.vue) renders a hidden toggle for this to bind.
 export const initOverlays = guard('[data-hs-overlay]', collections.overlay, () => overlay.autoInit())
 export const initSelects = guard('[data-hs-select]', collections.select, () => select.autoInit())
 

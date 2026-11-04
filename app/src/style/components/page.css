@@ -67,7 +67,7 @@
     }
 
     .head {
-        @apply min-h-[0px] [@media(max-height:530px)]:min-h-[0px] [@media(max-height:530px)]:mb-6 sm:min-h-[100px] mb-6 sm:mb-0 flex items-center gap-2;
+        @apply min-h-[0px] [@media(max-height:716px)]:min-h-[0px] [@media(max-height:716px)]:mb-6 sm:min-h-[100px] mb-6 sm:mb-0 flex items-center gap-2;
 
         h1, h2, h3, h4, h5, h6 {
             @apply m-0;

@@ -1,0 +1,41 @@
+version: 2
+updates:
+  - package-ecosystem: gomod
+    directories:
+      - /api
+      - /mailserver/daemon
+    schedule:
+      interval: weekly
+    groups:
+      golang-x:
+        patterns:
+          - golang.org/x/*
+
+  - package-ecosystem: npm
+    directories:
+      - /app
+      - /wxt
+    schedule:
+      interval: weekly
+
+  # Base images in the Dockerfiles are pinned by tag + digest; this keeps the
+  # digests from going stale.
+  - package-ecosystem: docker
+    directories:
+      - /api
+      - /app
+      - /mailserver/daemon
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: docker-compose
+    directories:
+      - /api
+      - /mailserver
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

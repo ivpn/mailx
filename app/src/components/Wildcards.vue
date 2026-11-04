@@ -110,7 +110,18 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <AliasRow v-for="alias in list" :alias="alias" :key="alias.id" :recipients.sync="recipients" :wildcard=true @onEdit="onEditAlias" @onSend="onSendAlias" />
+                            <AliasRow
+                                v-for="alias in list"
+                                :alias="alias"
+                                :key="alias.id"
+                                :recipients.sync="recipients"
+                                :wildcard=true
+                                :read-only-pause="readOnlyPause"
+                                @onEdit="onEditAlias"
+                                @onSend="onSendAlias"
+                                @onPause="onPauseAlias"
+                                @onActionError="onActionError"
+                            />
                             <!-- Also keeps <tbody> from collapsing to its bare divide-y border, which
                                  Chrome reads as a 1px overflow and answers with a stray scrollbar. -->
                             <tr v-if="!list.length && loaded">
@@ -127,6 +138,7 @@
     <AliasCreate v-if="recipients.length && settings.id && loaded" :recipients.sync="recipients" :settings.sync="settings" :wildcard=true :label="'New Wildcard Alias'" />
     <AliasEdit v-if="recipients.length" ref="editModal" :recipients="recipients" :key="recipients.join(',')" />
     <AliasSend ref="sendModal" />
+    <AliasPause ref="pauseModal" />
 </template>
 
 <script setup lang="ts">
@@ -134,15 +146,18 @@ import { onMounted, onUnmounted, ref, computed, watch, nextTick } from 'vue'
 import axios from 'axios'
 import { aliasApi } from '../api/alias'
 import { settingsApi } from '../api/settings.ts'
+import { subscriptionApi } from '../api/subscription.ts'
 import AliasRow from './AliasRow.vue'
 import AliasCreate from './AliasCreate.vue'
 import AliasEdit from './AliasEdit.vue'
 import AliasSend from './AliasSend.vue'
+import AliasPause from './AliasPause.vue'
 import Pagination from './Pagination.vue'
 import events from '../events.ts'
 import { RouterLink } from 'vue-router'
 import { closeDropdowns, initDropdowns, initOverlays, initTooltips } from '../lib/preline.ts'
 import { useBreakpoint } from '../lib/useBreakpoint.ts'
+import { isPauseReadOnly } from '../lib/aliasPause.ts'
 
 const alias = {
     id: '',
@@ -154,6 +169,7 @@ const alias = {
     recipients: '',
     from_name: '',
     pinned: false,
+    paused_until: null as string | null,
     stats: {
         forwards: 0,
         blocks: 0,
@@ -183,6 +199,9 @@ const sortOrder = ref('DESC')
 const status = ref('active_inactive')
 const editModal = ref<InstanceType<typeof AliasEdit> | null>(null)
 const sendModal = ref<InstanceType<typeof AliasSend> | null>(null)
+const pauseModal = ref<InstanceType<typeof AliasPause> | null>(null)
+const subscriptionStatus = ref('')
+const readOnlyPause = computed(() => isPauseReadOnly(subscriptionStatus.value))
 const statusLabel = computed(() => {
     if (status.value === 'active') return 'Enabled'
     if (status.value === 'inactive') return 'Disabled'
@@ -240,9 +259,28 @@ const getSettings = async () => {
     }
 }
 
+const getSubscription = async () => {
+    try {
+        const res = await subscriptionApi.get()
+        subscriptionStatus.value = res.data.status || ''
+    } catch {}
+}
+
 const deleteAlias = async (payload: any) => {
     try {
         await aliasApi.delete(payload.id)
+        error.value = ''
+        fetch()
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error.value = err.message
+        }
+    }
+}
+
+const forgetAlias = async (payload: any) => {
+    try {
+        await aliasApi.forget(payload.id)
         error.value = ''
         fetch()
     } catch (err) {
@@ -276,6 +314,10 @@ const onDeleteAlias = (payload: { id: string, wildcard: boolean }) => {
     deleteAlias(payload)
 }
 
+const onForgetAlias = (payload: { id: string }) => {
+    forgetAlias(payload)
+}
+
 // Flipping a row's switch changes which aliases belong in the list, but only while the list is
 // filtered on that state.
 const onAliasEnabled = () => {
@@ -290,6 +332,17 @@ const onEditAlias = (alias: any) => {
 
 const onSendAlias = (alias: any) => {
     sendModal.value?.open(alias)
+}
+
+const onPauseAlias = (alias: any) => {
+    pauseModal.value?.open(alias)
+}
+
+// A row action the server rejected (e.g. Unpause after the subscription lapsed) is shown like the
+// other alias errors, over a list and subscription status reloaded to the current state.
+const onActionError = async (message: string) => {
+    await Promise.all([getList(), getSubscription()])
+    error.value = message
 }
 
 const setStatus = (value: string) => {
@@ -319,13 +372,15 @@ const fetch = () => {
 }
 
 onMounted(async () => {
-    await getSettings()
+    // The subscription status is known before the rows render, so their tooltips bind with them.
+    await Promise.all([getSettings(), getSubscription()])
     fetch()
     initDropdowns()
     events.on('alias.create', fetch)
     events.on('alias.update', fetch)
     events.on('alias.enabled', onAliasEnabled)
     events.on('alias.delete', onDeleteAlias)
+    events.on('alias.forget', onForgetAlias)
 })
 
 onUnmounted(() => {
@@ -333,5 +388,6 @@ onUnmounted(() => {
     events.off('alias.update', fetch)
     events.off('alias.enabled', onAliasEnabled)
     events.off('alias.delete', onDeleteAlias)
+    events.off('alias.forget', onForgetAlias)
 })
 </script>

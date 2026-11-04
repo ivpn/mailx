@@ -12,18 +12,23 @@ const (
 	DisabledDomain       LogType = "disabled_domain"
 	UnauthorisedSend     LogType = "unauthorised_send"
 	InactiveSubscription LogType = "inactive_subscription"
+	BlockedSender        LogType = "blocked_sender"
+	BlockedByRule        LogType = "blocked_by_rule"
+	PausedAlias          LogType = "paused_alias"
+	NoRecipients         LogType = "no_recipients"
 )
 
 type Log struct {
-	ID          string    `json:"id"`
-	CreatedAt   time.Time `json:"created_at"`
-	AttemptedAt time.Time `json:"attempted_at"`
-	Type        LogType   `json:"log_type"`
-	UserID      string    `json:"-"`
-	AliasID     string    `json:"-"`
-	From        string    `json:"from"`
-	Destination string    `json:"destination"`
-	Message     string    `json:"message"`
-	Status      string    `json:"status"`
-	RemoteMta   string    `json:"remote_mta"`
+	ID        string    `json:"id"`
+	CreatedAt time.Time `json:"created_at"`
+	// AttemptedAt is the delivery attempt date from a bounce; null for every other log type.
+	AttemptedAt *time.Time `json:"attempted_at"`
+	Type        LogType    `json:"log_type"`
+	UserID      string     `json:"-"`
+	AliasID     string     `json:"-"`
+	From        string     `json:"from"`
+	Destination string     `json:"destination"`
+	Message     string     `json:"message"`
+	Status      string     `json:"status"`
+	RemoteMta   string     `json:"remote_mta"`
 }

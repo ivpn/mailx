@@ -1,0 +1,8 @@
+From: Example App <hello@app.example>
+To: myalias@mailx.net
+Subject: Welcome
+Message-ID: <def456@app.example>
+MIME-Version: 1.0
+Content-Type: text/html; charset="utf-8"
+
+<div style="font-family:Arial"><img src="https://cdn.mcauto-images-production.sendgrid.net/abc/logo.png" width="120"><p>Welcome aboard!</p></div><img src="https://u123456.ct.sendgrid.net/wf/open?upn=abcdef" alt="" width="1" height="1" border="0" style="height:1px !important;width:1px !important;border-width:0 !important;margin-top:0 !important;margin-bottom:0 !important;margin-right:0 !important;margin-left:0 !important;padding-top:0 !important;padding-bottom:0 !important;padding-right:0 !important;padding-left:0 !important;"/>

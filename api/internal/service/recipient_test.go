@@ -21,6 +21,7 @@ type fakeStore struct {
 	Store
 
 	aliases            map[string]model.Alias
+	deletedAliasNames  map[string]bool
 	domains            map[string]model.Domain
 	settingsByUser     map[string]model.Settings
 	verifiedRecipients map[string][]model.Recipient
@@ -48,6 +49,10 @@ func (f *fakeStore) GetAliasByName(name string) (model.Alias, error) {
 	return alias, nil
 }
 
+func (f *fakeStore) IsAliasNameDeleted(name string) (bool, error) {
+	return f.deletedAliasNames[name], nil
+}
+
 func (f *fakeStore) GetVerifiedDomainByName(ctx context.Context, name string) (model.Domain, error) {
 	domain, ok := f.domains[name]
 	if !ok {
@@ -64,6 +69,41 @@ func (f *fakeStore) GetDomains(ctx context.Context, userID string) ([]model.Doma
 		}
 	}
 	return result, nil
+}
+
+func (f *fakeStore) UpdateDomain(ctx context.Context, domain model.Domain) error {
+	for name, d := range f.domains {
+		if d.ID == domain.ID && d.UserID == domain.UserID {
+			f.domains[name] = domain
+			return nil
+		}
+	}
+	return errNotFound
+}
+
+func (f *fakeStore) GetRecipient(ctx context.Context, ID string, userID string) (model.Recipient, error) {
+	for _, rcp := range f.recipients[userID] {
+		if rcp.ID == ID {
+			return rcp, nil
+		}
+	}
+	return model.Recipient{}, errNotFound
+}
+
+func (f *fakeStore) DeleteRecipient(ctx context.Context, ID string, userID string) error {
+	rcps := f.recipients[userID]
+	for i, rcp := range rcps {
+		if rcp.ID == ID {
+			f.recipients[userID] = append(rcps[:i:i], rcps[i+1:]...)
+			return nil
+		}
+	}
+	return errNotFound
+}
+
+func (f *fakeStore) UpdateAlias(ctx context.Context, alias model.Alias) error {
+	f.aliases[alias.Name] = alias
+	return nil
 }
 
 func (f *fakeStore) GetSettings(ctx context.Context, userID string) (model.Settings, error) {
@@ -139,6 +179,37 @@ func (f *fakeStore) ForgetAlias(ctx context.Context, ID string, userID string) e
 	for name, a := range f.aliases {
 		if a.ID == ID && a.UserID == userID {
 			delete(f.aliases, name)
+			return nil
+		}
+	}
+	return errNotFound
+}
+
+func (f *fakeStore) GetAlias(ctx context.Context, ID string, userID string) (model.Alias, error) {
+	for _, a := range f.aliases {
+		if a.ID == ID && a.UserID == userID && !a.DeletedAt.Valid {
+			return a, nil
+		}
+	}
+	return model.Alias{}, errNotFound
+}
+
+func (f *fakeStore) GetAliasCount(ctx context.Context, userID string, wildcard string, search string, status string) (int, error) {
+	aliases, _ := f.GetAliases(ctx, userID, 0, 0, "", "", wildcard, search, status)
+	return len(aliases), nil
+}
+
+func (f *fakeStore) GetVerifiedDomains(ctx context.Context, userID string) ([]model.Domain, error) {
+	return f.GetDomains(ctx, userID)
+}
+
+// UpdateAliasPausedUntil mirrors the repository: deleted aliases and other users' aliases are
+// not found.
+func (f *fakeStore) UpdateAliasPausedUntil(ctx context.Context, ID string, userID string, pausedUntil *time.Time) error {
+	for name, a := range f.aliases {
+		if a.ID == ID && a.UserID == userID && !a.DeletedAt.Valid {
+			a.PausedUntil = pausedUntil
+			f.aliases[name] = a
 			return nil
 		}
 	}
@@ -258,7 +329,7 @@ func TestFindRecipients_PlusTagResolvesExistingAlias(t *testing.T) {
 		Enabled:    true,
 		Recipients: "rcpt@example.com",
 	}
-	store.recipients["user-1"] = []model.Recipient{{Email: "rcpt@example.com"}}
+	store.recipients["user-1"] = []model.Recipient{{Email: "rcpt@example.com", IsActive: true}}
 	s := newTestService(store)
 
 	rcps, alias, msgType, err := s.FindRecipients("sender@somewhere.com", "myalias+shop@mailx.net", model.Send)
@@ -293,7 +364,7 @@ func TestFindRecipients_AliasWithPlusInNameResolvesVerbatim(t *testing.T) {
 		Enabled:  true,
 		CatchAll: true,
 	}
-	store.recipients["user-1b"] = []model.Recipient{{Email: "rcpt@example.com"}}
+	store.recipients["user-1b"] = []model.Recipient{{Email: "rcpt@example.com", IsActive: true}}
 	s := newTestService(store)
 
 	rcps, alias, msgType, err := s.FindRecipients("sender@somewhere.com", "a+b-c_d897611@customdomain.com", model.Send)
@@ -315,18 +386,20 @@ func TestFindRecipients_AliasWithPlusInNameResolvesVerbatim(t *testing.T) {
 func TestFindRecipients_ExactPlusAliasPreferredOverBaseAlias(t *testing.T) {
 	store := newFakeStore()
 	store.aliases["myalias@mailx.net"] = model.Alias{
-		BaseModel: model.BaseModel{ID: "alias-base"},
-		Name:      "myalias@mailx.net",
-		UserID:    "user-1c",
-		Enabled:   true,
+		BaseModel:  model.BaseModel{ID: "alias-base"},
+		Name:       "myalias@mailx.net",
+		UserID:     "user-1c",
+		Enabled:    true,
+		Recipients: "rcpt@example.com",
 	}
 	store.aliases["myalias+shop@mailx.net"] = model.Alias{
-		BaseModel: model.BaseModel{ID: "alias-exact"},
-		Name:      "myalias+shop@mailx.net",
-		UserID:    "user-1c",
-		Enabled:   true,
+		BaseModel:  model.BaseModel{ID: "alias-exact"},
+		Name:       "myalias+shop@mailx.net",
+		UserID:     "user-1c",
+		Enabled:    true,
+		Recipients: "rcpt@example.com",
 	}
-	store.recipients["user-1c"] = []model.Recipient{{Email: "rcpt@example.com"}}
+	store.recipients["user-1c"] = []model.Recipient{{Email: "rcpt@example.com", IsActive: true}}
 	s := newTestService(store)
 
 	_, alias, _, err := s.FindRecipients("sender@somewhere.com", "myalias+shop@mailx.net", model.Send)
@@ -393,6 +466,68 @@ func TestFindRecipients_ReplyFromWildcardAlias(t *testing.T) {
 	}
 }
 
+// A send or reply to a "+" address ("someone+news@gmail.com") goes to that address through the
+// base alias, never through a matching Wildcard Alias ("*+someone@...") to "news@gmail.com".
+func TestFindRecipients_ReplyToPlusAddress(t *testing.T) {
+	store := newFakeStore()
+	store.aliases["myalias@customdomain.com"] = model.Alias{
+		BaseModel: model.BaseModel{ID: "alias-1f"},
+		Name:      "myalias@customdomain.com",
+		UserID:    "user-1f",
+		Enabled:   true,
+	}
+	store.aliases["*+someone@customdomain.com"] = model.Alias{
+		BaseModel: model.BaseModel{ID: "alias-1f-wildcard"},
+		Name:      "*+someone@customdomain.com",
+		UserID:    "user-1f",
+		Enabled:   true,
+		Wildcard:  true,
+	}
+	store.domains["customdomain.com"] = model.Domain{Name: "customdomain.com", UserID: "user-1f", Enabled: true}
+	store.verifiedRecipients["user-1f"] = []model.Recipient{{Email: "sender@somewhere.com", IsActive: true}}
+	s := newTestService(store)
+
+	rcps, alias, msgType, err := s.FindRecipients("sender@somewhere.com", "myalias+someone+news=gmail.com@customdomain.com", model.Send)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if alias.ID != "alias-1f" {
+		t.Errorf("expected alias alias-1f, got %+v", alias)
+	}
+	if msgType != model.Send {
+		t.Errorf("expected msgType Send, got %v", msgType)
+	}
+	if len(rcps) != 1 || rcps[0].Email != "someone+news@gmail.com" {
+		t.Errorf("expected reply target someone+news@gmail.com, got %+v", rcps)
+	}
+}
+
+// A reply through a Wildcard Alias to a "+" address keeps the whole target.
+func TestFindRecipients_ReplyFromWildcardAliasToPlusAddress(t *testing.T) {
+	store := newFakeStore()
+	store.aliases["*+shop@customdomain.com"] = model.Alias{
+		BaseModel: model.BaseModel{ID: "alias-1g"},
+		Name:      "*+shop@customdomain.com",
+		UserID:    "user-1g",
+		Enabled:   true,
+		Wildcard:  true,
+	}
+	store.domains["customdomain.com"] = model.Domain{Name: "customdomain.com", UserID: "user-1g", Enabled: true}
+	store.verifiedRecipients["user-1g"] = []model.Recipient{{Email: "sender@somewhere.com", IsActive: true}}
+	s := newTestService(store)
+
+	rcps, alias, _, err := s.FindRecipients("sender@somewhere.com", "*+shop+someone+news=gmail.com@customdomain.com", model.Reply)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if alias.ID != "alias-1g" {
+		t.Errorf("expected wildcard alias alias-1g, got %+v", alias)
+	}
+	if len(rcps) != 1 || rcps[0].Email != "someone+news@gmail.com" {
+		t.Errorf("expected reply target someone+news@gmail.com, got %+v", rcps)
+	}
+}
+
 func TestFindRecipients_WildcardAliasFallbackWhenBaseAliasMissing(t *testing.T) {
 	store := newFakeStore()
 	store.aliases["*+news@customdomain.com"] = model.Alias{
@@ -404,7 +539,7 @@ func TestFindRecipients_WildcardAliasFallbackWhenBaseAliasMissing(t *testing.T) 
 		Recipients: "rcpt@example.com",
 	}
 	store.domains["customdomain.com"] = model.Domain{Name: "customdomain.com", UserID: "user-2", Enabled: true}
-	store.recipients["user-2"] = []model.Recipient{{Email: "rcpt@example.com"}}
+	store.recipients["user-2"] = []model.Recipient{{Email: "rcpt@example.com", IsActive: true}}
 	s := newTestService(store)
 
 	rcps, alias, msgType, err := s.FindRecipients("sender@somewhere.com", "anything+news@customdomain.com", model.Send)
@@ -433,7 +568,7 @@ func TestFindRecipients_DotWildcardAliasFallbackWhenBaseAliasMissing(t *testing.
 		Recipients: "rcpt@example.com",
 	}
 	store.domains["customdomain.com"] = model.Domain{Name: "customdomain.com", UserID: "user-2b", Enabled: true}
-	store.recipients["user-2b"] = []model.Recipient{{Email: "rcpt@example.com"}}
+	store.recipients["user-2b"] = []model.Recipient{{Email: "rcpt@example.com", IsActive: true}}
 	s := newTestService(store)
 
 	rcps, alias, msgType, err := s.FindRecipients("sender@somewhere.com", "anything.news@customdomain.com", model.Send)
@@ -551,7 +686,7 @@ func TestFindRecipients_PlusTagWithMatchingWildcardRidesWildcardNotCatchAll(t *t
 		CatchAll:  true,
 		Recipient: "catchall@example.com",
 	}
-	store.recipients["user-6"] = []model.Recipient{{Email: "rcpt@example.com"}}
+	store.recipients["user-6"] = []model.Recipient{{Email: "rcpt@example.com", IsActive: true}}
 	s := newTestService(store)
 
 	_, alias, _, err := s.FindRecipients("sender@somewhere.com", "newalias+shop@customdomain.com", model.Send)
@@ -632,7 +767,7 @@ func TestFindRecipients_DottedAddressWithMatchingWildcardRidesWildcardNotCatchAl
 		CatchAll:  true,
 		Recipient: "catchall@example.com",
 	}
-	store.recipients["user-6d"] = []model.Recipient{{Email: "rcpt@example.com"}}
+	store.recipients["user-6d"] = []model.Recipient{{Email: "rcpt@example.com", IsActive: true}}
 	s := newTestService(store)
 
 	_, alias, _, err := s.FindRecipients("sender@somewhere.com", "newalias.shop@customdomain.com", model.Send)
@@ -668,6 +803,28 @@ func TestFindRecipients_PlainAddressOnCatchAllDomainIsAutoCreated(t *testing.T) 
 	}
 }
 
+func TestFindRecipients_DeletedAliasOnCatchAllDomainIsNotForwarded(t *testing.T) {
+	store := newFakeStore()
+	store.domains["domain.net"] = model.Domain{
+		Name:      "domain.net",
+		UserID:    "user-6d",
+		Enabled:   true,
+		CatchAll:  true,
+		Recipient: "catchall@example.com",
+	}
+	store.verifiedRecipients["user-6d"] = []model.Recipient{{Email: "catchall@example.com", IsActive: true}}
+	store.deletedAliasNames = map[string]bool{"deleted@domain.net": true}
+	s := newTestService(store)
+
+	rcps, _, _, err := s.FindRecipients("sender@somewhere.com", "deleted@domain.net", model.Send)
+	if !errors.Is(err, ErrDeletedAlias) {
+		t.Fatalf("expected ErrDeletedAlias, got %v", err)
+	}
+	if len(rcps) != 0 {
+		t.Errorf("expected no recipients for a deleted alias, got %+v", rcps)
+	}
+}
+
 func TestFindRecipients_NoAliasNoCatchAllReturnsError(t *testing.T) {
 	store := newFakeStore()
 	s := newTestService(store)
@@ -684,17 +841,24 @@ func TestFindRecipients_NoAliasNoCatchAllReturnsError(t *testing.T) {
 func TestResolveForward(t *testing.T) {
 	store := newFakeStore()
 	store.recipients["user-1"] = []model.Recipient{
-		{Email: "a@example.com"},
-		{Email: "b@example.com"},
+		{Email: "a@example.com", IsActive: true},
+		{Email: "b@example.com", IsActive: true},
+		{Email: "pending@example.com"},
 	}
 	s := newTestService(store)
 
-	rcps, err := s.resolveForward(model.Alias{UserID: "user-1", Recipients: "a@example.com"})
+	rcps, err := s.resolveForward(model.Alias{UserID: "user-1", Recipients: "A@example.com,pending@example.com"})
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
 	if len(rcps) != 1 || rcps[0].Email != "a@example.com" {
 		t.Errorf("expected only a@example.com, got %+v", rcps)
+	}
+
+	for _, recipients := range []string{"gone@example.com", "pending@example.com", "ba@example.com", ""} {
+		if _, err := s.resolveForward(model.Alias{UserID: "user-1", Recipients: recipients}); err != ErrNoRecipients {
+			t.Errorf("resolveForward(%q) error = %v, want ErrNoRecipients", recipients, err)
+		}
 	}
 }
 
@@ -705,5 +869,64 @@ func TestResolveForward_NoRecipientsConfigured(t *testing.T) {
 	_, err := s.resolveForward(model.Alias{UserID: "user-1"})
 	if err != ErrNoRecipients {
 		t.Fatalf("expected ErrNoRecipients, got %v", err)
+	}
+}
+
+func TestDeleteRecipient_ClearsDomainRecipient(t *testing.T) {
+	store := newFakeStore()
+	store.recipients["user-1"] = []model.Recipient{
+		{BaseModel: model.BaseModel{ID: "rcp-1"}, Email: "a@example.com"},
+		{BaseModel: model.BaseModel{ID: "rcp-2"}, Email: "b@example.com"},
+	}
+	store.domains["one.example"] = model.Domain{BaseModel: model.BaseModel{ID: "dom-1"}, UserID: "user-1", Name: "one.example", Recipient: "A@example.com"}
+	store.domains["two.example"] = model.Domain{BaseModel: model.BaseModel{ID: "dom-2"}, UserID: "user-1", Name: "two.example", Recipient: "b@example.com"}
+	store.domains["other.example"] = model.Domain{BaseModel: model.BaseModel{ID: "dom-3"}, UserID: "user-2", Name: "other.example", Recipient: "a@example.com"}
+	s := newTestService(store)
+
+	if err := s.DeleteRecipient(context.Background(), "rcp-1", "user-1", ""); err != nil {
+		t.Fatalf("DeleteRecipient() error = %v", err)
+	}
+
+	for name, want := range map[string]string{
+		"one.example":   "",
+		"two.example":   "b@example.com",
+		"other.example": "a@example.com",
+	} {
+		if got := store.domains[name].Recipient; got != want {
+			t.Errorf("%s recipient = %q, want %q", name, got, want)
+		}
+	}
+	if len(store.recipients["user-1"]) != 1 {
+		t.Errorf("expected recipient to be deleted, got %+v", store.recipients["user-1"])
+	}
+}
+
+func TestDeleteRecipient_UpdatesAliases(t *testing.T) {
+	store := newFakeStore()
+	store.recipients["user-1"] = []model.Recipient{
+		{BaseModel: model.BaseModel{ID: "rcp-1"}, Email: "a@example.com"},
+	}
+	store.aliases = map[string]model.Alias{
+		"only@mailx.net":     {UserID: "user-1", Name: "only@mailx.net", Enabled: true, Recipients: "a@example.com"},
+		"shared@mailx.net":   {UserID: "user-1", Name: "shared@mailx.net", Enabled: true, Recipients: "a@example.com,c@example.com"},
+		"disabled@mailx.net": {UserID: "user-1", Name: "disabled@mailx.net", Enabled: false, Recipients: "c@example.com,A@example.com"},
+		"similar@mailx.net":  {UserID: "user-1", Name: "similar@mailx.net", Enabled: true, Recipients: "ba@example.com,c@example.com"},
+	}
+	s := newTestService(store)
+
+	if err := s.DeleteRecipient(context.Background(), "rcp-1", "user-1", ""); err != nil {
+		t.Fatalf("DeleteRecipient() error = %v", err)
+	}
+
+	for name, want := range map[string]model.Alias{
+		"only@mailx.net":     {Enabled: false, Recipients: ""},
+		"shared@mailx.net":   {Enabled: true, Recipients: "c@example.com"},
+		"disabled@mailx.net": {Enabled: false, Recipients: "c@example.com"},
+		"similar@mailx.net":  {Enabled: true, Recipients: "ba@example.com,c@example.com"},
+	} {
+		got := store.aliases[name]
+		if got.Enabled != want.Enabled || got.Recipients != want.Recipients {
+			t.Errorf("%s = {enabled: %v, recipients: %q}, want {enabled: %v, recipients: %q}", name, got.Enabled, got.Recipients, want.Enabled, want.Recipients)
+		}
 	}
 }

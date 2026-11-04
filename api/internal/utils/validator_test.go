@@ -1,7 +1,10 @@
 package utils
 
 import (
+	"strings"
 	"testing"
+
+	"github.com/ProtonMail/gopenpgp/v3/crypto"
 )
 
 func TestNewValidator(t *testing.T) {
@@ -38,9 +41,14 @@ func TestNewValidator(t *testing.T) {
 	}
 
 	// Test if the custom PGP key validation is registered correctly
-	err = v.Var("-----BEGIN PGP PUBLIC KEY BLOCK----- ... -----END PGP PUBLIC KEY BLOCK-----", "pgp")
+	err = v.Var(testPGPKeys(t).public, "pgp")
 	if err != nil {
 		t.Errorf("expected PGP key to be valid, but got error: %v", err)
+	}
+
+	err = v.Var("-----BEGIN PGP PUBLIC KEY BLOCK----- ... -----END PGP PUBLIC KEY BLOCK-----", "pgp")
+	if err == nil {
+		t.Error("expected PGP key with armor but no key data to be invalid, but got no error")
 	}
 
 	err = v.Var("invalid-key", "pgp")
@@ -51,6 +59,58 @@ func TestNewValidator(t *testing.T) {
 	err = v.Var("", "pgp")
 	if err != nil {
 		t.Errorf("expected empty PGP key to be valid, but got error: %v", err)
+	}
+}
+
+type pgpTestKeys struct {
+	public  string
+	private string
+}
+
+func testPGPKeys(t *testing.T) pgpTestKeys {
+	t.Helper()
+
+	key, err := crypto.PGP().KeyGeneration().AddUserId("test", "test@example.com").New().GenerateKey()
+	if err != nil {
+		t.Fatalf("GenerateKey() error = %v", err)
+	}
+	public, err := key.GetArmoredPublicKey()
+	if err != nil {
+		t.Fatalf("GetArmoredPublicKey() error = %v", err)
+	}
+	private, err := key.Armor()
+	if err != nil {
+		t.Fatalf("Armor() error = %v", err)
+	}
+
+	return pgpTestKeys{public: public, private: private}
+}
+
+func TestIsValidPGPPublicKey(t *testing.T) {
+	keys := testPGPKeys(t)
+	lines := strings.Split(keys.public, "\n")
+
+	tests := []struct {
+		key   string
+		valid bool
+		desc  string
+	}{
+		{keys.public, true, "generated public key"},
+		{strings.TrimSpace(keys.public), true, "public key trimmed like the app sends it"},
+		{"-----BEGIN PGP PUBLIC KEY BLOCK-----\nnot a key\n-----END PGP PUBLIC KEY BLOCK-----", false, "armor with text instead of a key (issue #517)"},
+		{"-----BEGIN PGP PUBLIC KEY BLOCK-----\n\n-----END PGP PUBLIC KEY BLOCK-----", false, "armor with no key data"},
+		{"-----BEGIN PGP PUBLIC KEY BLOCK-----\n\nAAAA\n-----END PGP PUBLIC KEY BLOCK-----", false, "armor with junk base64"},
+		{strings.Join(append(lines[:len(lines)/2:len(lines)/2], "-----END PGP PUBLIC KEY BLOCK-----"), "\n"), false, "truncated public key"},
+		{strings.ReplaceAll(keys.private, "PRIVATE KEY BLOCK", "PUBLIC KEY BLOCK"), false, "private key relabelled as public"},
+		{keys.private, false, "private key"},
+		{"not a key", false, "plain text"},
+		{"", false, "empty string"},
+	}
+
+	for _, tt := range tests {
+		if got := IsValidPGPPublicKey(tt.key); got != tt.valid {
+			t.Errorf("IsValidPGPPublicKey() = %v, want %v (%s)", got, tt.valid, tt.desc)
+		}
 	}
 }
 

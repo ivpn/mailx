@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/smtp"
-	"slices"
 )
 
 // loginAuth is an smtp.Auth that implements the LOGIN authentication mechanism.
@@ -16,11 +15,11 @@ type loginAuth struct {
 }
 
 func (a *loginAuth) Start(server *smtp.ServerInfo) (string, []byte, error) {
-	if !server.TLS {
-		advertised := slices.Contains(server.Auth, "LOGIN")
-		if !advertised {
-			return "", nil, errors.New("gomail: unencrypted connection")
-		}
+	// Like net/smtp's PlainAuth, never send the password over an unencrypted
+	// connection except to localhost. Upstream gomail allowed it whenever the
+	// server advertised LOGIN, which an on-path attacker can fake.
+	if !server.TLS && !isLocalhost(server.Name) {
+		return "", nil, errors.New("gomail: unencrypted connection")
 	}
 	if server.Name != a.host {
 		return "", nil, errors.New("gomail: wrong host name")
@@ -41,4 +40,8 @@ func (a *loginAuth) Next(fromServer []byte, more bool) ([]byte, error) {
 	default:
 		return nil, fmt.Errorf("gomail: unexpected server challenge: %s", fromServer)
 	}
+}
+
+func isLocalhost(name string) bool {
+	return name == "localhost" || name == "127.0.0.1" || name == "::1"
 }

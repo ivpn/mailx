@@ -2,6 +2,7 @@ package gomail
 
 import (
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -33,7 +34,28 @@ type Dialer struct {
 	// LocalName is the hostname sent to the SMTP server with the HELO command.
 	// By default, "localhost" is sent.
 	LocalName string
+	// StartTLSPolicy defines what happens when SSL is false and the server
+	// does not advertise STARTTLS. NewDialer sets MandatoryStartTLS.
+	StartTLSPolicy StartTLSPolicy
 }
+
+// StartTLSPolicy constants are valid values for Dialer.StartTLSPolicy.
+type StartTLSPolicy int
+
+const (
+	// OpportunisticStartTLS upgrades the connection with STARTTLS when the
+	// server advertises it and otherwise continues in plaintext. This is
+	// upstream gomail's behaviour and the zero value.
+	OpportunisticStartTLS StartTLSPolicy = iota
+	// MandatoryStartTLS fails the connection when the server does not
+	// advertise STARTTLS, so a stripped STARTTLS can't downgrade the session
+	// (and the credentials sent in it) to plaintext.
+	MandatoryStartTLS
+)
+
+// ErrStartTLSUnsupported is returned by Dial when StartTLSPolicy is
+// MandatoryStartTLS and the server does not advertise STARTTLS.
+var ErrStartTLSUnsupported = errors.New("gomail: server does not support STARTTLS")
 
 // NewDialer returns a new SMTP Dialer. The given parameters are used to connect
 // to the SMTP server.
@@ -44,6 +66,8 @@ func NewDialer(host string, port int, username, password string) *Dialer {
 		Username: username,
 		Password: password,
 		SSL:      port == 465,
+
+		StartTLSPolicy: MandatoryStartTLS,
 	}
 }
 
@@ -84,6 +108,9 @@ func (d *Dialer) Dial() (SendCloser, error) {
 				c.Close()
 				return nil, err
 			}
+		} else if d.StartTLSPolicy == MandatoryStartTLS {
+			c.Close()
+			return nil, ErrStartTLSUnsupported
 		}
 	}
 
@@ -116,7 +143,7 @@ func (d *Dialer) Dial() (SendCloser, error) {
 
 func (d *Dialer) tlsConfig() *tls.Config {
 	if d.TLSConfig == nil {
-		return &tls.Config{ServerName: d.Host}
+		return &tls.Config{ServerName: d.Host, MinVersion: tls.VersionTLS12}
 	}
 	return d.TLSConfig
 }

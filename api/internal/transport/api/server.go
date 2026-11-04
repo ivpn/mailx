@@ -23,7 +23,10 @@ type Service interface {
 	LogService
 	AccessKeyService
 	DomainService
+	BlocklistService
+	RuleService
 	StepUpService
+	OneClickService
 }
 
 type Handler struct {

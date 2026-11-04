@@ -8,7 +8,7 @@ const STORAGE_KEYS = {
     apiToken: 'apiToken',
     defaults: 'defaults',
     preferences: 'preferences',
-}
+} as const
 
 type Listener<T> = (value: T) => void
 
@@ -18,7 +18,7 @@ const preferencesListeners = new Set<Listener<Preferences | { input_button: true
 
 export const store = {
     async getApiToken(): Promise<string | undefined> {
-        const { apiToken } = await browser.storage.local.get(STORAGE_KEYS.apiToken)
+        const { apiToken } = await browser.storage.local.get<{ apiToken?: string }>(STORAGE_KEYS.apiToken)
         return apiToken
     },
 
@@ -37,7 +37,7 @@ export const store = {
     },
 
     async getDefaults(): Promise<Defaults | undefined> {
-        const { defaults } = await browser.storage.local.get(STORAGE_KEYS.defaults)
+        const { defaults } = await browser.storage.local.get<{ defaults?: Defaults }>(STORAGE_KEYS.defaults)
         return defaults
     },
 
@@ -53,7 +53,7 @@ export const store = {
     },
 
     async getPreferences(): Promise<Preferences> {
-        const { preferences } = await browser.storage.local.get(STORAGE_KEYS.preferences)
+        const { preferences } = await browser.storage.local.get<{ preferences?: Preferences }>(STORAGE_KEYS.preferences)
         return preferences || { input_button: true, add_description: true }
     },
 

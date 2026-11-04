@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -292,6 +293,37 @@ func (d *Database) UpdateAliasPinned(ctx context.Context, ID string, userID stri
 	return d.Client.Model(&model.Alias{}).Where("id = ? AND user_id = ?", ID, userID).Update("pinned", pinned).Error
 }
 
+// UpdateAliasPausedUntil sets paused_until in isolation (nil unpauses), so pausing never touches
+// the fields the Edit modal saves. The soft-delete scope excludes deleted aliases, and an alias
+// that isn't found for userID is an error.
+func (d *Database) UpdateAliasPausedUntil(ctx context.Context, ID string, userID string, pausedUntil *time.Time) error {
+	q := d.Client.WithContext(ctx).Model(&model.Alias{}).Where("id = ? AND user_id = ?", ID, userID).Update("paused_until", pausedUntil)
+	if q.Error != nil {
+		return q.Error
+	}
+	if q.RowsAffected > 0 {
+		return nil
+	}
+
+	// MySQL reports 0 rows for a match whose values didn't change (e.g. unpausing an alias that
+	// isn't paused), so tell that apart from a missing alias.
+	var count int64
+	if err := d.Client.WithContext(ctx).Model(&model.Alias{}).Where("id = ? AND user_id = ?", ID, userID).Count(&count).Error; err != nil {
+		return err
+	}
+	if count == 0 {
+		return gorm.ErrRecordNotFound
+	}
+
+	return nil
+}
+
+// UpdateAliasDescription sets the description in isolation, so a rule changing it in the mail
+// pipeline can't overwrite other fields the user edited in the meantime.
+func (d *Database) UpdateAliasDescription(ctx context.Context, ID string, userID string, description string) error {
+	return d.Client.Model(&model.Alias{}).Where("id = ? AND user_id = ?", ID, userID).Update("description", description).Error
+}
+
 func (d *Database) DeleteAliasByUserID(ctx context.Context, userID string) error {
 	return d.Client.Where("user_id = ?", userID).Delete(&model.Alias{}).Error
 }
@@ -310,6 +342,21 @@ func (d *Database) GetAliasUnscoped(ctx context.Context, ID string, userID strin
 	var alias model.Alias
 	err := d.Client.Unscoped().Where("id = ? AND user_id = ?", ID, userID).First(&alias).Error
 	return alias, err
+}
+
+// GetAliasByIDUnscoped fetches an alias by ID alone, regardless of soft-delete state, for
+// requests that are authorised by a signed URL instead of a user session.
+func (d *Database) GetAliasByIDUnscoped(ctx context.Context, ID string) (model.Alias, error) {
+	var alias model.Alias
+	err := d.Client.WithContext(ctx).Unscoped().Where("id = ?", ID).First(&alias).Error
+	return alias, err
+}
+
+// IsAliasNameDeleted reports whether a soft-deleted alias holds the given name.
+func (d *Database) IsAliasNameDeleted(name string) (bool, error) {
+	var count int64
+	err := d.Client.Unscoped().Model(&model.Alias{}).Where("name = ? AND deleted_at IS NOT NULL", name).Count(&count).Error
+	return count > 0, err
 }
 
 // ForgetAlias permanently removes an alias row, regardless of its soft-delete state - the

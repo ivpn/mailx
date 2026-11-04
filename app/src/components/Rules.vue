@@ -115,7 +115,7 @@ import { recipientApi } from '../api/recipient.ts'
 import { subscriptionApi } from '../api/subscription.ts'
 import RuleEdit from './RuleEdit.vue'
 import RuleRow from './RuleRow.vue'
-import { initDropdowns, initOverlays } from '../lib/preline.ts'
+import { initDropdowns, initOverlays, initTooltips } from '../lib/preline.ts'
 import { useBreakpoint } from '../lib/useBreakpoint.ts'
 import { type Rule, isInactiveSubError, isStaleRulesError } from '../lib/rules.ts'
 
@@ -294,6 +294,7 @@ watch(isDesktop, () => {
 
 onMounted(async () => {
     initOverlays()
+    initTooltips()
     await Promise.all([getSubscription(), getRecipients()])
     getList()
 })

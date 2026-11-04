@@ -1,0 +1,5 @@
+# Reject envelope senders (MAIL FROM) with characters that have a special
+# meaning in an Authentication-Results header. Rspamd copies the sender into
+# that header in a quoted string, but escapes only '"', not '\', so such a
+# sender could inject results the API trusts. Real senders don't use them.
+/[\\"();]/ REJECT Sender address contains invalid characters

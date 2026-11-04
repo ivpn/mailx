@@ -37,7 +37,7 @@ services:
       net:
 
   db:
-    image: mariadb:13.0.2@sha256:f1bba652ba57bea3099ca2fe1af692af537c27d96e0bcde39dce29e2ba1ec4f3
+    image: mariadb:13.0.2@sha256:f4054da26e3a9dd6c8b5cc97363e544408b15c0fb369d7359c25dc04826eb6e1
     container_name: email-db
     restart: unless-stopped
     healthcheck:
@@ -58,7 +58,7 @@ services:
       net:
   
   redis:
-    image: redis:8.10.2@sha256:c94085d298b738be22c9ccdc0ac3761fa6649df7dd82ad1d42367f3cb9714935
+    image: redis:8.10.3@sha256:de1068af6f552240dfab67bcc9bfef99bfc60f776bb4580ef077ea4c8c97e848
     container_name: email-redis
     restart: unless-stopped
     volumes:
@@ -67,7 +67,7 @@ services:
       net:
   
   backup:
-    image: offen/docker-volume-backup:v2.49.1@sha256:e1da571e739d73f633f19e7a9f324007907089ffd80b3b7a1d71de5b87f80d77
+    image: offen/docker-volume-backup:v2.50.1@sha256:06fccb4c6ff79c4d5e4a839ace17c174da82a9327f43594f8a2c6a15f43bc660
     container_name: backup
     restart: unless-stopped
     depends_on:

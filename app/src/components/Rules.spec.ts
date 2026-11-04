@@ -30,6 +30,7 @@ vi.mock('@preline/overlay', () => ({
 vi.mock('../lib/preline.ts', () => ({
     initDropdowns: vi.fn(),
     initOverlays: vi.fn(),
+    initTooltips: vi.fn(),
     closeDropdowns: vi.fn(),
 }))
 vi.mock('../lib/useBreakpoint.ts', async () => {

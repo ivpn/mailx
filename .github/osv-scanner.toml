@@ -16,8 +16,8 @@ id = "GHSA-g7r4-m6w7-qqqr"
 ignoreUntil = 2027-01-06
 reason = "esbuild 0.27.x pinned by wxt 0.20.x; Windows-only dev-server issue, wxt builds use vite's patched esbuild."
 
-# adm-zip 0.5.16, node-forge 1.4.0 and uuid 8.3.2 come only from wxt -> web-ext-run
-# (the dev-mode browser launcher: firefox-profile, adbkit, node-notifier) and run on
+# adm-zip 0.5.16, minimatch 3.1.5 and uuid 8.3.2 come only from wxt -> web-ext-run
+# (the dev-mode browser launcher: firefox-profile, multimatch, node-notifier) and run on
 # our own build output. wxt 0.21 drops web-ext-run but needs Node 22 for all
 # extension builds; revisit when the team moves to Node 22.
 
@@ -62,9 +62,9 @@ ignoreUntil = 2027-01-06
 reason = "adm-zip via wxt->web-ext-run->firefox-profile (dev only); fix 0.6.x outside firefox-profile's range."
 
 [[IgnoredVulns]]
-id = "GHSA-86w9-cpqp-85rv"
+id = "GHSA-g3hv-75wg-m249"
 ignoreUntil = 2027-01-06
-reason = "node-forge (no fixed version) via wxt->web-ext-run->adbkit; only used for Firefox-for-Android dev runs."
+reason = "minimatch 3.1.5 via wxt->web-ext-run->multimatch 6.0.0 (exact pin, dev only); fix 11.x outside multimatch's range. Patterns come from our own run config, not attacker input."
 
 [[IgnoredVulns]]
 id = "GHSA-w5hq-g745-h8pq"

@@ -492,10 +492,11 @@ func TestRawMessageWithUTF8Charset_CyrillicHeaders(t *testing.T) {
 
 func TestSelectTargets(t *testing.T) {
 	tests := []struct {
-		name        string
-		to          []string
-		deliveredTo string
-		want        []string
+		name         string
+		to           []string
+		deliveredTo  string
+		fromEnvelope bool
+		want         []string
 	}{
 		{
 			name:        "no Delivered-To returns all To entries",
@@ -527,11 +528,46 @@ func TestSelectTargets(t *testing.T) {
 			deliveredTo: "alias1@example.com",
 			want:        []string{"alias1@example.com"},
 		},
+		{
+			name:         "envelope recipient matches one of several To entries",
+			to:           []string{"alias1@example.com", "alias2@example.com"},
+			deliveredTo:  "alias2@example.com",
+			fromEnvelope: true,
+			want:         []string{"alias2@example.com"},
+		},
+		{
+			name:         "envelope recipient match keeps the To spelling",
+			to:           []string{"Alias1@example.com"},
+			deliveredTo:  "alias1@example.com",
+			fromEnvelope: true,
+			want:         []string{"Alias1@example.com"},
+		},
+		{
+			name:         "auto-forward keeping the original To targets the envelope recipient",
+			to:           []string{"owner@gmail.com"},
+			deliveredTo:  "alias1@example.com",
+			fromEnvelope: true,
+			want:         []string{"alias1@example.com"},
+		},
+		{
+			name:         "Bcc recipient not in To targets the envelope recipient",
+			to:           []string{"someone@example.org", "alias2@example.com"},
+			deliveredTo:  "alias1@example.com",
+			fromEnvelope: true,
+			want:         []string{"alias1@example.com"},
+		},
+		{
+			name:         "envelope recipient with empty To",
+			to:           []string{},
+			deliveredTo:  "alias1@example.com",
+			fromEnvelope: true,
+			want:         []string{"alias1@example.com"},
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := SelectTargets(tt.to, tt.deliveredTo)
+			got := SelectTargets(tt.to, tt.deliveredTo, tt.fromEnvelope)
 			if len(got) != len(tt.want) {
 				t.Fatalf("SelectTargets() = %v, want %v", got, tt.want)
 			}

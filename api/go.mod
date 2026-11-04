@@ -6,7 +6,7 @@ require (
 	github.com/ProtonMail/gopenpgp/v3 v3.5.2
 	github.com/alexedwards/argon2id v1.0.0
 	github.com/go-playground/validator/v10 v10.20.0
-	github.com/go-sql-driver/mysql v1.7.1
+	github.com/go-sql-driver/mysql v1.10.1
 	github.com/go-webauthn/webauthn v0.11.2
 	github.com/gofiber/fiber/v2 v2.52.15
 	github.com/gofiber/swagger v1.1.1
@@ -27,6 +27,7 @@ require (
 )
 
 require (
+	filippo.io/edwards25519 v1.2.0 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/ProtonMail/go-crypto v1.5.2 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect

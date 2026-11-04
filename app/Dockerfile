@@ -25,7 +25,7 @@ RUN test -n "$VITE_API_URL" || (echo "ERROR: --build-arg VITE_API_URL is require
 RUN yarn build
 
 # production stage - nginx-unprivileged already runs as a non-root user by design
-FROM nginxinc/nginx-unprivileged:1.31.6-alpine3.24@sha256:b9241c6e7b8e9a862f129d8d4199ab64b10390949a78bdd5603379b32c844083 AS production-build
+FROM nginxinc/nginx-unprivileged:1.31.7-alpine3.24@sha256:b5047b9b76845eac124358373c6852377c52e4b05834a47647e955dd91cb8f1e AS production-build
 USER root
 COPY nginx.conf /etc/nginx/nginx.conf
 RUN rm -rf /usr/share/nginx/html/*

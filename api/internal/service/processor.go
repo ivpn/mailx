@@ -15,10 +15,11 @@ import (
 )
 
 var (
-	ErrInactiveSubscription = errors.New("Subscription is inactive.")
-	ErrNoRecipients         = errors.New("No recipients found.")
-	ErrNoVerifiedRecipients = errors.New("Sender is not a verified address.")
-	ErrInactiveRecipient    = errors.New("The recipient is inactive.")
+	ErrInactiveSubscription  = errors.New("Subscription is inactive.")
+	ErrNoRecipients          = errors.New("No recipients found.")
+	ErrNoVerifiedRecipients  = errors.New("Sender is not a verified address.")
+	ErrInactiveRecipient     = errors.New("The recipient is inactive.")
+	ErrUnauthenticatedSender = errors.New("Sender failed email authentication (DMARC, DKIM or SPF).")
 
 	// queueMessage hands an email to the mailer for one recipient; tests replace it.
 	queueMessage = (*Service).QueueMessage
@@ -33,7 +34,8 @@ var (
 
 func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 	msg, parseErr := model.ParseMsg(data)
-	if envelopeRecipient == "" {
+	fromEnvelope := envelopeRecipient != ""
+	if !fromEnvelope {
 		// Caller didn't pass the actual envelope recipient (e.g. Postfix pipe not
 		// yet updated to pass it); fall back to guessing it from headers.
 		envelopeRecipient = msg.EnvelopeRecipient
@@ -45,7 +47,7 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 			return nil
 		}
 
-		for _, to := range utils.SelectTargets(msg.To, envelopeRecipient) {
+		for _, to := range utils.SelectTargets(msg.To, envelopeRecipient, fromEnvelope) {
 			_, alias, _, err := s.FindRecipients(msg.From, to, msg.Type)
 			if alias.UserID == "" {
 				continue
@@ -90,23 +92,14 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 		return nil
 	}
 
-	// Verify Email Authentication
-	pass, err := utils.VerifyEmailAuth(data, utils.EmailAuthConfig{
-		TrustedRelayDomains: s.Cfg.API.TrustedRelayDomains,
-		DisableAlignment:    s.Cfg.API.DisableEmailAuthAlignment,
-		LogMismatch:         s.Cfg.API.LogEmailAuthMismatch,
-	})
-	if err != nil {
-		log.Println("email authentication failed:", err)
-	}
-	if !pass {
-		// Fail silently so unauthenticated emails are not kept in postfix queue
-		return nil
+	authCfg := utils.EmailAuthConfig{
+		AuthServIDs:       s.Cfg.API.EmailAuthServIDs,
+		ARCTrustedSealers: s.Cfg.API.ARCTrustedSealers,
 	}
 
 	var g errgroup.Group
 
-	for _, to := range utils.SelectTargets(msg.To, envelopeRecipient) {
+	for _, to := range utils.SelectTargets(msg.To, envelopeRecipient, fromEnvelope) {
 		recipients, alias, relayType, err := s.FindRecipients(msg.From, to, msg.Type)
 		// No recipient means the email would be dropped silently, so log it as ErrNoRecipients
 		if err == nil && len(recipients) == 0 {
@@ -187,13 +180,46 @@ func (s *Service) ProcessMessage(data []byte, envelopeRecipient string) error {
 			continue
 		}
 
+		// Verify Email Authentication
+		// Replies and sends must come from the alias owner; forwards come from
+		// third parties and are only checked against the sender's DMARC policy.
+		verifyAuth := utils.VerifyForwardAuth
+		if relayType != model.Forward {
+			verifyAuth = utils.VerifyEmailAuth
+		}
+		pass, err := verifyAuth(data, authCfg)
+		if err != nil {
+			log.Println("email authentication failed:", err, alias.Name)
+		}
+		if !pass {
+			if relayType != model.Forward {
+				settings, err := s.GetSettings(context.Background(), alias.UserID)
+				if err != nil {
+					log.Println("error getting settings", err)
+					continue
+				}
+
+				if settings.LogIssues {
+					err := s.ProcessDiagnosticLog(alias, msg.From, to, ErrUnauthenticatedSender.Error(), model.UnauthorisedSend)
+					if err != nil {
+						log.Println("error processing diagnostic log", err)
+					}
+				}
+			}
+
+			// Fail silently so unauthenticated emails are not kept in postfix queue
+			continue
+		}
+
 		// Paused alias - forwards are discarded until paused_until. Replies/sends still work.
+		// Checked after authentication so spoofed mail doesn't add to the paused-alias stats or logs.
 		if relayType == model.Forward && alias.IsPaused(time.Now().UTC()) {
 			s.DiscardPausedMessage(alias, msg.From, to)
 			continue
 		}
 
-		// Blocklist - checked before the inbound alias below so a blocked sender can't provision
+		// Blocklist - checked after authentication so a spoofed From can't match (or skew stats of)
+		// a blocklist entry, and before the inbound alias below so a blocked sender can't provision
 		// catch-all aliases. Replies/sends come from the user's own recipients, so only forwards apply.
 		if relayType == model.Forward {
 			if item, blocked := s.FindBlocklistMatch(context.Background(), alias.UserID, msg.From); blocked {

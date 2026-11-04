@@ -1,0 +1,4 @@
+# Remove Authentication-Results headers written by the sender or earlier hops,
+# so the only one the API sees is the one Rspamd adds (RFC 8601, section 5).
+# Headers added by milters (Rspamd) are not subject to header_checks.
+/^Authentication-Results:/ IGNORE

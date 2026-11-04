@@ -12,7 +12,7 @@ ENV GOARCH=amd64
 RUN go build -o api ./cmd/
 
 # stage 2: copy only the application binary file to a minimal, non-root container
-FROM alpine:3.24.2@sha256:294b683cb724975bec92580e1e685676bd4b50bda910ddb8c51d4cabeaec77e6 AS production
+FROM alpine:3.24.3@sha256:be2656061b536c1883c4034790e21d0a09c5aaaf51968b89368a3c0371ea2c9a AS production
 
 RUN addgroup -S app && adduser -S app -G app
 # owned so the /var/log named volume inherits this ownership on first mount

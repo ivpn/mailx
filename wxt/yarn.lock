@@ -498,10 +498,10 @@
   resolved "https://registry.yarnpkg.com/@preline/select/-/select-3.2.3.tgz#b306ee6e3a532a6720d9393c7304febaac1d7d40"
   integrity sha512-a9wk4khZJHJh1BYfhcvX2eaKtBwY/J8GSzQveogNrdMNIwEtQpsbzK6DvHoxsv3pwwREQmJt9Hoc5v6ZLf7pPQ==
 
-"@preline/tooltip@^3.2.3":
-  version "3.2.3"
-  resolved "https://registry.yarnpkg.com/@preline/tooltip/-/tooltip-3.2.3.tgz#4e492953c087d44324a15616bd5fa7516975f311"
-  integrity sha512-VB2ywqCkE+JocSkf1pvIpwzD6GOKsznJdD4AYUH9a0zDf31VlrAmqTvXL57E/yfcR4qzYR71+tyXxhtw85ifxA==
+"@preline/tooltip@^5.0.0":
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/@preline/tooltip/-/tooltip-5.0.0.tgz#135756c26b46221dd34bff73528b699944422116"
+  integrity sha512-hSIRLH/rQ/HT67mU1r06JxEkhFZNte1r/FTbiz5ANJmx4bNUoyiukiTENRbE2bS83lmuCUIhWlmbq/8B1fTG7Q==
   dependencies:
     "@floating-ui/dom" "^1.6.13"
 

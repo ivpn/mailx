@@ -238,8 +238,8 @@ func newRuleTestService(t *testing.T) (*Service, *ruleStore, func() []queuedMess
 
 	s := &Service{
 		Cfg: config.Config{API: config.APIConfig{
-			Domains:                   "mailx.net",
-			DisableEmailAuthAlignment: true,
+			Domains:          "mailx.net",
+			EmailAuthServIDs: []string{"mx.mailx.net"},
 		}},
 		Store: store,
 	}

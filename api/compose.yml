@@ -67,7 +67,7 @@ services:
       net:
   
   backup:
-    image: offen/docker-volume-backup:v2.49.1@sha256:e1da571e739d73f633f19e7a9f324007907089ffd80b3b7a1d71de5b87f80d77
+    image: offen/docker-volume-backup:v2.50.1@sha256:06fccb4c6ff79c4d5e4a839ace17c174da82a9327f43594f8a2c6a15f43bc660
     container_name: backup
     restart: unless-stopped
     depends_on:

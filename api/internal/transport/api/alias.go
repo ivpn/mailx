@@ -279,6 +279,19 @@ func (h *Handler) ExportAliases(c *fiber.Ctx) error {
 	return c.SendString(b.String())
 }
 
+// isOwnDomain reports whether domain exactly matches one of the comma-separated
+// service domains, case-insensitively. Unlike strings.Contains, it doesn't match
+// substrings (e.g. "vpn.net" inside "ivpn.net") and ignores casing differences.
+func isOwnDomain(domains string, domain string) bool {
+	for _, d := range strings.Split(domains, ",") {
+		if strings.EqualFold(strings.TrimSpace(d), domain) {
+			return true
+		}
+	}
+
+	return false
+}
+
 // resolveDomain resolves an AliasReq-style domain value - either a plain built-in domain
 // name or a custom domain's UUID - to its FQDN. ok is false if domainParam doesn't resolve
 // to a valid domain accessible to userID.
@@ -292,7 +305,7 @@ func (h *Handler) resolveDomain(ctx context.Context, userID string, domainParam 
 		return fqdn.Name, true, true
 	}
 
-	if !strings.Contains(h.Cfg.Domains, domain) {
+	if !isOwnDomain(h.Cfg.Domains, domain) {
 		return "", false, false
 	}
 

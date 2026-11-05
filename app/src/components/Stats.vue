@@ -35,6 +35,7 @@ import { ref, onMounted } from 'vue'
 import { userApi } from '../api/user.ts'
 import axios from 'axios'
 import ApexCharts from 'apexcharts'
+import type { ApexOptions } from 'apexcharts'
 
 interface Message {
     created_at: string
@@ -73,7 +74,7 @@ const getStats = async () => {
 }
 
 const initChart = () => {
-    const options = {
+    const options: ApexOptions = {
         chart: {
             type: 'bar',
             height: 350,
@@ -97,11 +98,14 @@ const initChart = () => {
         },
     }
 
-    const chart = new ApexCharts(document.querySelector('#chart'), options)
+    const el = document.querySelector<HTMLElement>('#chart')
+    if (!el) return
+
+    const chart = new ApexCharts(el, options)
     chart.render()
 }
 
-function getTheme(): string {
+function getTheme(): 'light' | 'dark' {
     if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         return 'dark'
     } else {

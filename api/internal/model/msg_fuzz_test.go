@@ -89,6 +89,12 @@ func FuzzExtractOriginalFrom(f *testing.F) {
 		"",
 		// Header only, no body/boundary.
 		"Content-Type: multipart/report; boundary=\r\n\r\n",
+		// Headers-only bounce (RFC 6522).
+		"Content-Type: multipart/report; boundary=BND\r\n\r\n--BND\r\nContent-Type: text/rfc822-headers\r\n\r\nFrom: original@example.com\r\n--BND--\r\n",
+		// Report nested in multipart/mixed.
+		"Content-Type: multipart/mixed; boundary=O\r\n\r\n--O\r\nContent-Type: multipart/report; boundary=I\r\n\r\n--I\r\nContent-Type: message/rfc822\r\n\r\nFrom: original@example.com\r\n\r\nBody\r\n--I--\r\n--O--\r\n",
+		// Base64-encoded original.
+		"Content-Type: multipart/report; boundary=BND\r\n\r\n--BND\r\nContent-Type: message/rfc822\r\nContent-Transfer-Encoding: base64\r\n\r\nRnJvbTogb3JpZ2luYWxAZXhhbXBsZS5jb20NCg0K\r\n--BND--\r\n",
 	}
 	for _, s := range seeds {
 		f.Add([]byte(s))

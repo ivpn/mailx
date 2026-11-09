@@ -2,6 +2,8 @@ package model
 
 import (
 	"bytes"
+	"encoding/base64"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -164,25 +166,31 @@ func isBounce(m *mail.Message) bool {
 	return false
 }
 
-// ExtractOriginalFrom parses a bounce/DSN email and returns the "From:"
-// address of the *original* message embedded as "message/rfc822".
-// Returns an empty string if not found.
+// originalMessageTypes are the part types a bounce (DSN) uses to return the
+// original message: the whole message (RFC 2046, RFC 6532) or only its header
+// (RFC 6522, RFC 6533), e.g. when the sender asked for RET=HDRS.
+var originalMessageTypes = map[string]bool{
+	"message/rfc822":         true,
+	"message/global":         true,
+	"text/rfc822-headers":    true,
+	"message/global-headers": true,
+}
+
+var errNoOriginalMessage = errors.New("no message/rfc822 or text/rfc822-headers part found")
+
+// ExtractOriginalFrom parses a bounce (DSN) and returns the From address of
+// the original message it returns. The original message, or only its header,
+// can be at any depth up to maxMIMEDepth, e.g. a multipart/report inside a
+// multipart/mixed. The first one found is used.
 func ExtractOriginalFrom(data []byte) (string, error) {
 	msg, err := mail.ReadMessage(bytes.NewReader(data))
 	if err != nil {
 		return "", fmt.Errorf("read message: %w", err)
 	}
 
-	contentType := msg.Header.Get("Content-Type")
-	mediaType, params, err := mime.ParseMediaType(contentType)
+	mediaType, params, err := mime.ParseMediaType(msg.Header.Get("Content-Type"))
 	if err != nil {
 		return "", fmt.Errorf("parse content-type: %w", err)
-	}
-
-	// Read entire body first to safely re-use it.
-	body, err := io.ReadAll(msg.Body)
-	if err != nil {
-		return "", fmt.Errorf("read body: %w", err)
 	}
 
 	// Must be multipart with a boundary.
@@ -190,36 +198,63 @@ func ExtractOriginalFrom(data []byte) (string, error) {
 		return "", fmt.Errorf("not a multipart/report message")
 	}
 
-	mr := multipart.NewReader(bytes.NewReader(body), params["boundary"])
-	for {
-		part, err := mr.NextPart()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return "", fmt.Errorf("next part: %w", err)
-		}
-
-		pType := part.Header.Get("Content-Type")
-		if strings.HasPrefix(strings.ToLower(pType), "message/rfc822") {
-			// Found the original message part
-			innerData, err := io.ReadAll(part)
-			if err != nil {
-				return "", fmt.Errorf("read inner part: %w", err)
-			}
-
-			innerMsg, err := mail.ReadMessage(bytes.NewReader(innerData))
-			if err != nil {
-				return "", fmt.Errorf("read inner message: %w", err)
-			}
-
-			from, err := mail.ParseAddress(innerMsg.Header.Get("From"))
-			if err != nil {
-				return "", fmt.Errorf("parse original From: %w", err)
-			}
-			return from.Address, nil
-		}
+	original, err := findOriginalMessage(msg.Body, params["boundary"], 0)
+	if err != nil {
+		return "", err
 	}
 
-	return "", fmt.Errorf("no message/rfc822 part found")
+	// A header-only part may end without the blank line that ends a header,
+	// which ReadMessage accepts, but must not start with one.
+	innerMsg, err := mail.ReadMessage(bytes.NewReader(bytes.TrimLeft(original, "\r\n")))
+	if err != nil {
+		return "", fmt.Errorf("read inner message: %w", err)
+	}
+
+	from, err := mail.ParseAddress(innerMsg.Header.Get("From"))
+	if err != nil {
+		return "", fmt.Errorf("parse original From: %w", err)
+	}
+	return from.Address, nil
+}
+
+// findOriginalMessage walks the multipart body depth first and returns the
+// content of the first part in originalMessageTypes. It doesn't look inside
+// that part, so a message attached to the original message is never used.
+// A nested multipart that can't be read is skipped.
+func findOriginalMessage(body io.Reader, boundary string, depth int) ([]byte, error) {
+	if boundary == "" || depth > maxMIMEDepth {
+		return nil, errNoOriginalMessage
+	}
+
+	mr := multipart.NewReader(body, boundary)
+	for {
+		// NextPart decodes quoted-printable parts.
+		part, err := mr.NextPart()
+		if err == io.EOF {
+			return nil, errNoOriginalMessage
+		}
+		if err != nil {
+			return nil, fmt.Errorf("next part: %w", err)
+		}
+
+		// ParseMediaType returns the media type even if a parameter is invalid.
+		mediaType, params, _ := mime.ParseMediaType(part.Header.Get("Content-Type"))
+
+		switch {
+		case originalMessageTypes[mediaType]:
+			var r io.Reader = part
+			if strings.EqualFold(strings.TrimSpace(part.Header.Get("Content-Transfer-Encoding")), "base64") {
+				r = base64.NewDecoder(base64.StdEncoding, part)
+			}
+			content, err := io.ReadAll(r)
+			if err != nil {
+				return nil, fmt.Errorf("read inner part: %w", err)
+			}
+			return content, nil
+		case strings.HasPrefix(mediaType, "multipart/"):
+			if content, err := findOriginalMessage(part, params["boundary"], depth+1); err == nil {
+				return content, nil
+			}
+		}
+	}
 }

@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@preline/accordion": "^3.1.0",
-    "@preline/dropdown": "^5.0.0",
+    "@preline/dropdown": "^2.1.0",
     "@preline/overlay": "^5.0.0",
     "@preline/select": "^2.5.2",
     "@preline/tabs": "^2.5.0",

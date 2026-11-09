@@ -226,6 +226,26 @@
   resolved "https://registry.yarnpkg.com/@esbuild/win32-x64/-/win32-x64-0.25.12.tgz#9bdad8176be7811ad148d1f8772359041f46c6c5"
   integrity sha512-alJC0uCZpTFrSL0CCDjcgleBXPnCrEAhTBILpeAp7M/OFgoqtAetfBzX0xM00MUsVVPpVjlPuMbREqnZCXaTnA==
 
+"@floating-ui/core@^1.8.0":
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/@floating-ui/core/-/core-1.8.0.tgz#d01c0bbea02e4a57f6fd7d5de6fc2c5c7dca40e1"
+  integrity sha512-0CIZ5itps/8x7BG8dEIhs53BvCUH2PCoogtakwRTut+Arm58sJooJ0AuZhLw2HJYIR5cMLNPBSS728sPho2khQ==
+  dependencies:
+    "@floating-ui/utils" "^0.2.12"
+
+"@floating-ui/dom@^1.6.13":
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/@floating-ui/dom/-/dom-1.8.0.tgz#8a20e6facbe2456afdbeb6c8b968a72df689cf63"
+  integrity sha512-yXSrzeHZBTZadLOlfyhCkJHNeLJnHRnRInwdZ40L7ZiaAtrBwoYlsDrX3v5zB1Utk7CLfzcOVnVVWoXEky7Ceg==
+  dependencies:
+    "@floating-ui/core" "^1.8.0"
+    "@floating-ui/utils" "^0.2.12"
+
+"@floating-ui/utils@^0.2.12":
+  version "0.2.12"
+  resolved "https://registry.yarnpkg.com/@floating-ui/utils/-/utils-0.2.12.tgz#afefe785949f16ac4cdd1e695935a321572dd56a"
+  integrity sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww==
+
 "@jridgewell/gen-mapping@^0.3.2":
   version "0.3.5"
   resolved "https://registry.yarnpkg.com/@jridgewell/gen-mapping/-/gen-mapping-0.3.5.tgz#dcce6aff74bdf6dad1a95802b69b04a2fcb1fb36"
@@ -302,10 +322,12 @@
   resolved "https://registry.yarnpkg.com/@preline/accordion/-/accordion-3.1.0.tgz#14609555dd345bc026b8623b140a043c784c757d"
   integrity sha512-1utT5mdxlzKXmltqlgeq1ESQq38Egs7eksurSSrmd+BabNW2d7xUlXJihZEVKBXLpqV1V9xc4JN+cOWR1TvDew==
 
-"@preline/dropdown@^2.1.0":
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/@preline/dropdown/-/dropdown-2.3.0.tgz#778c1c6899f0657841b6f170138da5eb9b3d2cee"
-  integrity sha512-tLcQS3Lzhmu7hW3XJVE2hSxe3b7pgtPtbKS3KanBOLTIDXu4XjFt45enolCYnsn64tOEsfhGnix/VNTo4kttyw==
+"@preline/dropdown@^5.0.0":
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/@preline/dropdown/-/dropdown-5.0.0.tgz#97b3a36cd6c67351ab87108e00fb882e8104ff64"
+  integrity sha512-FRdATedqfvfqepVRiM9szUzSfXyWCQxAmhAxXRrqkTozfnWcnz7m4cZ/0LztwS2sWZ4AjGxITgLjUeOoq73KlA==
+  dependencies:
+    "@floating-ui/dom" "^1.6.13"
 
 "@preline/overlay@^5.0.0":
   version "5.0.0"

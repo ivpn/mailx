@@ -488,10 +488,10 @@
   resolved "https://registry.yarnpkg.com/@preline/accordion/-/accordion-3.2.3.tgz#20e31cbf3a5328b19a4d89ace96bdab6e2465abd"
   integrity sha512-bxD40aYgnsyuxPNmFN5+4EKAna9PCXpxpA/MrY3j5zpkTyBRxcEykucLE/aPTL0LrUd8/ifwoIERRSVcL7GTFA==
 
-"@preline/overlay@^3.2.3":
-  version "3.2.3"
-  resolved "https://registry.yarnpkg.com/@preline/overlay/-/overlay-3.2.3.tgz#e85f5c4c007cbc979cad52d4a5b6a3abf6bb9247"
-  integrity sha512-/MI5++XAezbVFReVw65KxLeiDJL62lWDywPxvWmH/EHMyOQ/N3d9SXC/VBQ/nyozQOwckv1ym2vw0wGbTfI+5w==
+"@preline/overlay@^5.0.0":
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/@preline/overlay/-/overlay-5.0.0.tgz#08d14d465d7fb7baf2cd7c5750e47b1a4db297da"
+  integrity sha512-TW6IcuUADh2lz93+TWcoliqCxlf4P9IFQaIPFP7fn3uFadYvWYzh9NMj5UrWeImmQ3szc3FM8/07z1Z+mvLYug==
 
 "@preline/select@^3.2.3":
   version "3.2.3"

@@ -299,10 +299,10 @@
   resolved "https://registry.yarnpkg.com/@preline/dropdown/-/dropdown-2.3.0.tgz#778c1c6899f0657841b6f170138da5eb9b3d2cee"
   integrity sha512-tLcQS3Lzhmu7hW3XJVE2hSxe3b7pgtPtbKS3KanBOLTIDXu4XjFt45enolCYnsn64tOEsfhGnix/VNTo4kttyw==
 
-"@preline/overlay@^2.1.0":
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/@preline/overlay/-/overlay-2.3.0.tgz#8aa47c4374d369fb8aa715232eb36853e37d7a94"
-  integrity sha512-aN9mR81RHEnh8Tg/WTRwdqwrX2JxObV2CMR61Q8hJphDLaZFZT2yPcnMaXawFS+cO839Wd+VvZDSeBFE1DYpEg==
+"@preline/overlay@^5.0.0":
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/@preline/overlay/-/overlay-5.0.0.tgz#08d14d465d7fb7baf2cd7c5750e47b1a4db297da"
+  integrity sha512-TW6IcuUADh2lz93+TWcoliqCxlf4P9IFQaIPFP7fn3uFadYvWYzh9NMj5UrWeImmQ3szc3FM8/07z1Z+mvLYug==
 
 "@preline/select@^2.5.2":
   version "2.5.2"

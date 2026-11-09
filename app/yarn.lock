@@ -317,10 +317,10 @@
   resolved "https://registry.yarnpkg.com/@preline/select/-/select-2.5.2.tgz#107c5af409043ab3169ec7f525fa33fccaf9517b"
   integrity sha512-NnxpAhVcYynZNG+8ymGOITtPVHVvJsRdT50QM0MOz+eTf2JQlhMYknv8m8CQTSuU0acAeP28v4VUnHG80tMw/Q==
 
-"@preline/tabs@^2.5.0":
-  version "2.6.0"
-  resolved "https://registry.yarnpkg.com/@preline/tabs/-/tabs-2.6.0.tgz#7249864c42524652a19475730ffae4c87a243133"
-  integrity sha512-7zL1TAwRHjYyhMAX7HrJ56Xa8wgTnWBXl+5PsGKJsAeHrv09k5DbRKLYvAMbAROXg/ZRz8Z5Dko96/AUhuNecg==
+"@preline/tabs@^5.0.0":
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/@preline/tabs/-/tabs-5.0.0.tgz#8b9217fa0f430ccf96791cf16602ef17b6362b61"
+  integrity sha512-1GX6+E+2e/50NwHnqI/Qucg02nFvoEfLSkaaZFbC4fRsGHceOd70GiA2InMGcqTqm8WuU/uJBEITNs2o9tTF9A==
 
 "@preline/theme-switch@^2.4.1":
   version "2.4.1"

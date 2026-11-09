@@ -48,6 +48,7 @@ cp config/postfix-header-checks.cf.sample docker-data/dms/config/postfix-header-
 cp config/postfix-sender-access.cf.sample docker-data/dms/config/postfix-sender-access.cf
 cp config/postfix-aliases.cf.sample docker-data/dms/config/postfix-aliases.cf
 cp config/user-patches.sh.sample docker-data/dms/config/user-patches.sh
+cp config/fail2ban-jail.cf.sample docker-data/dms/config/fail2ban-jail.cf
 cp config/rspamd/override.d/milter_headers.conf.sample docker-data/dms/config/rspamd/override.d/milter_headers.conf
 ```
 
@@ -56,6 +57,7 @@ cp config/rspamd/override.d/milter_headers.conf.sample docker-data/dms/config/rs
 > - api/.env
 > - app/src/env.json
 > - mailserver/.env
+> - mailserver/docker-data/dms/config/fail2ban-jail.cf: list every API server's IP in `ignoreip`. Otherwise a few failed SMTP logins from an API server get its IP banned, which blocks both the mail it sends and inbound mail delivered to the API.
 > - create and configure `config.json` (registry credentials for daemon): `cp config.json.sample config.json`
 
 > [!TIP]

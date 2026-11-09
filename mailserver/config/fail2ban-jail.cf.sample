@@ -1,0 +1,6 @@
+# Never ban the API servers. They log in to submission as the SMTP user, and
+# their IPs also serve the API that curl_email delivers to, so a ban after a
+# few failed logins blocks both outgoing and incoming mail.
+# List every API server's IP, space-separated.
+[DEFAULT]
+ignoreip = 127.0.0.1/8 192.0.2.10 192.0.2.11

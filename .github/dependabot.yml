@@ -17,6 +17,11 @@ updates:
       - /wxt
     schedule:
       interval: weekly
+    ignore:
+      # Tailwind v4 is a breaking migration (CSS-based config, preline v2
+      # plugin incompatible, preflight changes); stay on v3 until planned.
+      - dependency-name: tailwindcss
+        update-types: ["version-update:semver-major"]
 
   # Base images in the Dockerfiles are pinned by tag + digest; this keeps the
   # digests from going stale.

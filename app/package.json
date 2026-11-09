@@ -12,7 +12,7 @@
   "dependencies": {
     "@preline/accordion": "^3.1.0",
     "@preline/dropdown": "^2.1.0",
-    "@preline/overlay": "^2.1.0",
+    "@preline/overlay": "^5.0.0",
     "@preline/select": "^2.5.2",
     "@preline/tabs": "^2.5.0",
     "@preline/theme-switch": "^2.4.1",

@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@wxt-dev/module-vue": "^1.0.2",
-    "autoprefixer": "^10.4.22",
+    "autoprefixer": "^10.6.2",
     "postcss": "^8.5.23",
     "tailwindcss": "4",
     "typescript": "^5.9.2",

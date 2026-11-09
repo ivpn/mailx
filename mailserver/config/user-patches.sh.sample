@@ -1,7 +1,12 @@
-# SASL config
-echo "pwcheck_method: auxprop
+# SASL config. DMS 16 writes /etc/sasl2/smtpd.conf (saslauthd, PLAIN/LOGIN) when
+# ENABLE_SASLAUTHD=1, and Postfix reads it instead of /etc/postfix/sasl/smtpd.conf,
+# so the API's sasldb login fails. Write the same config to both paths.
+for dir in /etc/postfix/sasl /etc/sasl2; do
+  mkdir -p "$dir"
+  echo "pwcheck_method: auxprop
 auxprop_plugin: sasldb
-mech_list: CRAM-MD5" > /etc/postfix/sasl/smtpd.conf
+mech_list: CRAM-MD5" > "$dir/smtpd.conf"
+done
 
 echo $SMTP_PASS | saslpasswd2 -c -u "$DOMAIN" $SMTP_USER
 

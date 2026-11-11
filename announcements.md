@@ -1,5 +1,27 @@
 # Announcements
 
+## New in Mailx: custom rules, blocklist, alias pausing and tracker blocking - 2026-11-11
+
+Our recent update to Mailx is a major one, with multiple new features and numerous fixes. Details:
+
+### Custom rules and blocklist
+You can now set up rules on the new "Rules" page to match specific senders, subjects, aliases or attachments, then instruct Mailx to block/forward mail or change the subject. We have also added a "Blocklist" page, where you can block a sender address or a whole domain. Blocked mail is discarded without a bounce.
+
+### Pause aliases
+You can now pause an alias for hours, days or weeks. Forwards sent while it is paused are discarded, not queued, but replies and sends still work.
+
+### Email tracker blocking and unsubscribe behaviour
+Mailx now removes tracking pixels from forwarded mail, and it is on by default. You can turn it off under "Email Trackers" in Settings. The Mailx banner tells you how many trackers were removed and adds a link to a detailed report (not stored on our servers).
+
+You can now also choose what your mail client's "Unsubscribe" button does on forwards, under "Unsubscribe Behaviour" in Settings. By default it deactivates the alias when the sender has no usable unsubscribe link.
+
+### Delivery and PGP fixes
+We fixed several cases where mail was silently dropped: Bcc'd mail, Gmail auto-forwards, and replies and sends to "+" addresses. Sender-encrypted PGP/MIME is now forwarded as-is, PGP/Inline encrypts attachments, and reply threading is now fixed.
+
+This release also includes fixes from an internal security audit in October 2026.
+
+Release notes with details: [https://github.com/ivpn/mailx/releases/tag/1.15.0](https://github.com/ivpn/mailx/releases/tag/1.15.0)
+
 ## New in Mailx: passkey login without email, CSV import - 2026-10-01
 
 ### Passkey login without email

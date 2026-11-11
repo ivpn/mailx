@@ -25,7 +25,7 @@
     "@tailwindcss/forms": "^0.5.11",
     "mitt": "^3.0.1",
     "preline": "^2.1.0",
-    "vue": "^3.5.42"
+    "vue": "^3.5.45"
   },
   "devDependencies": {
     "@wxt-dev/module-vue": "^1.0.2",

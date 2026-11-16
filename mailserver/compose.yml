@@ -1,6 +1,6 @@
 services:
   mailserver:
-    image: ghcr.io/docker-mailserver/docker-mailserver:17.0.0@sha256:b9a5f5045b4dae139201281f68f976b7ae7a5f451e3e61aaa935ad6def026bcb
+    image: ghcr.io/docker-mailserver/docker-mailserver:17.0.0@sha256:6cd2d4dbfb41ce3b8108968d266fb41b950ad27220979c67bda8a31bd1f6611d
     container_name: mailserver
     hostname: ${DMS_HOSTNAME}
     env_file: mailserver.env

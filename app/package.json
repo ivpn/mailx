@@ -16,12 +16,12 @@
     "@preline/select": "^2.5.2",
     "@preline/tabs": "^2.5.0",
     "@preline/theme-switch": "^2.4.1",
-    "@preline/tooltip": "^2.1.0",
+    "@preline/tooltip": "^5.1.0",
     "@simplewebauthn/browser": "14.0.0",
     "@tailwindcss/forms": "^0.5.11",
     "apexcharts": "^8.7.0",
     "axios": "^1.21.0",
-    "date-fns": "^4.1.0",
+    "date-fns": "^4.4.0",
     "jwt-decode": "^4.0.0",
     "mitt": "^3.0.1",
     "postcss-import": "^16.1.0",
@@ -35,15 +35,15 @@
     "@types/qrcode": "^1.5.6",
     "autoprefixer": "^10.6.2",
     "@vitejs/plugin-vue": "^6.0.10",
-    "jsdom": "^31.0.0",
+    "jsdom": "^31.0.1",
     "postcss": "^8.5.32",
     "tailwindcss": "^3.4.19",
     "typescript": "5.6.3",
-    "vite": "^8.3.6",
+    "vite": "^8.3.8",
     "vitest": "^5.1.0",
-    "vue-tsc": "3.1.3"
+    "vue-tsc": "3.3.14"
   },
   "resolutions": {
-    "vite": "^8.3.6"
+    "vite": "^8.3.8"
   }
 }

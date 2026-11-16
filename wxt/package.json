@@ -21,7 +21,7 @@
     "@preline/accordion": "^3.2.3",
     "@preline/overlay": "^5.0.0",
     "@preline/select": "^3.2.3",
-    "@preline/tooltip": "^5.0.0",
+    "@preline/tooltip": "^5.1.0",
     "@tailwindcss/forms": "^0.5.11",
     "mitt": "^3.0.1",
     "preline": "^2.1.0",
@@ -33,7 +33,7 @@
     "postcss": "^8.5.32",
     "tailwindcss": "3",
     "typescript": "^5.9.2",
-    "vue-tsc": "^3.0.6",
+    "vue-tsc": "^3.3.14",
     "wxt": "^0.20.27"
   },
   "resolutions": {

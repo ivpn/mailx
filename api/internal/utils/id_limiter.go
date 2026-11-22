@@ -40,7 +40,7 @@ func (l *IDLimiter) IsAllowed() bool {
 	if err != nil {
 		failedAttemptsInt = 0
 	}
-	if failedAttemptsInt > l.Max {
+	if failedAttemptsInt >= l.Max {
 		return false
 	}
 

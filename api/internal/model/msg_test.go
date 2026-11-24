@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"net/mail"
 	"strings"
 	"testing"
@@ -247,6 +248,96 @@ func TestExtractOriginalFrom(t *testing.T) {
 			want:    "",
 			wantErr: true,
 		},
+		{
+			name:    "headers-only bounce with text/rfc822-headers (RFC 6522, RET=HDRS)",
+			data:    []byte("Content-Type: multipart/report; report-type=delivery-status; boundary=\"B\"\r\n\r\n--B\r\nContent-Type: text/plain\r\n\r\nDelivery failed\r\n--B\r\nContent-Type: message/delivery-status\r\n\r\nReporting-MTA: dns; mx.example.net\r\n\r\nFinal-Recipient: rfc822; gone@example.org\r\nAction: failed\r\nStatus: 5.1.1\r\n\r\n--B\r\nContent-Description: Undelivered Message Headers\r\nContent-Type: text/rfc822-headers\r\n\r\nReturn-Path: <alias+gone=example.org@mailx.net>\r\nFrom: Alias <alias@mailx.net>\r\nTo: gone@example.org\r\nSubject: Hello\r\n\r\n--B--\r\n"),
+			want:    "alias@mailx.net",
+			wantErr: false,
+		},
+		{
+			name:    "text/rfc822-headers without trailing blank line, with folded header",
+			data:    []byte("Content-Type: multipart/report; boundary=B\r\n\r\n--B\r\nContent-Type: text/rfc822-headers; charset=us-ascii\r\n\r\nSubject: a long\r\n subject\r\nFrom: alias@mailx.net\r\n--B--\r\n"),
+			want:    "alias@mailx.net",
+			wantErr: false,
+		},
+		{
+			name:    "text/rfc822-headers starting with a blank line",
+			data:    []byte("Content-Type: multipart/report; boundary=B\r\n\r\n--B\r\nContent-Type: text/rfc822-headers\r\n\r\n\r\nFrom: alias@mailx.net\r\nTo: x@example.org\r\n--B--\r\n"),
+			want:    "alias@mailx.net",
+			wantErr: false,
+		},
+		{
+			name:    "message/global part (RFC 6532)",
+			data:    []byte("Content-Type: multipart/report; boundary=B\r\n\r\n--B\r\nContent-Type: message/global\r\n\r\nFrom: alias@mailx.net\r\nTo: user@例え.jp\r\n\r\nBody\r\n--B--\r\n"),
+			want:    "alias@mailx.net",
+			wantErr: false,
+		},
+		{
+			name:    "message/global-headers part (RFC 6533)",
+			data:    []byte("Content-Type: multipart/report; boundary=B\r\n\r\n--B\r\nContent-Type: message/global-headers\r\n\r\nFrom: alias@mailx.net\r\n\r\n--B--\r\n"),
+			want:    "alias@mailx.net",
+			wantErr: false,
+		},
+		{
+			name:    "multipart/report nested in multipart/mixed",
+			data:    []byte("Content-Type: multipart/mixed; boundary=OUTER\r\n\r\n--OUTER\r\nContent-Type: text/plain\r\n\r\nSee the report below\r\n--OUTER\r\nContent-Type: multipart/report; report-type=delivery-status; boundary=INNER\r\n\r\n--INNER\r\nContent-Type: message/delivery-status\r\n\r\nStatus: 5.1.1\r\n\r\n--INNER\r\nContent-Type: message/rfc822\r\n\r\nFrom: alias@mailx.net\r\nTo: gone@example.org\r\n\r\nBody\r\n--INNER--\r\n--OUTER--\r\n"),
+			want:    "alias@mailx.net",
+			wantErr: false,
+		},
+		{
+			name:    "headers-only part nested in multipart/mixed",
+			data:    []byte("Content-Type: multipart/mixed; boundary=OUTER\r\n\r\n--OUTER\r\nContent-Type: multipart/report; boundary=INNER\r\n\r\n--INNER\r\nContent-Type: text/rfc822-headers\r\n\r\nFrom: alias@mailx.net\r\n--INNER--\r\n--OUTER--\r\n"),
+			want:    "alias@mailx.net",
+			wantErr: false,
+		},
+		{
+			name:    "nested multipart without original is skipped, later sibling is used",
+			data:    []byte("Content-Type: multipart/mixed; boundary=OUTER\r\n\r\n--OUTER\r\nContent-Type: multipart/alternative; boundary=ALT\r\n\r\n--ALT\r\nContent-Type: text/plain\r\n\r\nnotice\r\n--ALT\r\nContent-Type: text/html\r\n\r\n<p>notice</p>\r\n--ALT--\r\n--OUTER\r\nContent-Type: message/rfc822\r\n\r\nFrom: alias@mailx.net\r\n\r\nBody\r\n--OUTER--\r\n"),
+			want:    "alias@mailx.net",
+			wantErr: false,
+		},
+		{
+			name:    "nested multipart without boundary is skipped",
+			data:    []byte("Content-Type: multipart/mixed; boundary=OUTER\r\n\r\n--OUTER\r\nContent-Type: multipart/report\r\n\r\nno boundary\r\n--OUTER\r\nContent-Type: text/rfc822-headers\r\n\r\nFrom: alias@mailx.net\r\n--OUTER--\r\n"),
+			want:    "alias@mailx.net",
+			wantErr: false,
+		},
+		{
+			name:    "message attached to the original message is not used",
+			data:    []byte("Content-Type: multipart/report; boundary=B\r\n\r\n--B\r\nContent-Type: message/rfc822\r\n\r\nFrom: alias@mailx.net\r\nContent-Type: multipart/mixed; boundary=ORIG\r\n\r\n--ORIG\r\nContent-Type: message/rfc822\r\n\r\nFrom: someone-else@example.org\r\n\r\nForwarded\r\n--ORIG--\r\n--B--\r\n"),
+			want:    "alias@mailx.net",
+			wantErr: false,
+		},
+		{
+			name:    "base64-encoded message/rfc822 part",
+			data:    []byte("Content-Type: multipart/report; boundary=B\r\n\r\n--B\r\nContent-Type: message/rfc822\r\nContent-Transfer-Encoding: base64\r\n\r\n" + "RnJvbTogYWxpYXNAbWFpbHgubmV0DQpUbzogZ29uZUBleGFtcGxlLm9yZw0KDQpCb2R5DQo=\r\n--B--\r\n"),
+			want:    "alias@mailx.net",
+			wantErr: false,
+		},
+		{
+			name:    "quoted-printable text/rfc822-headers part",
+			data:    []byte("Content-Type: multipart/report; boundary=B\r\n\r\n--B\r\nContent-Type: text/rfc822-headers\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\nFrom: =41lias <alias@mailx.net>\r\n--B--\r\n"),
+			want:    "alias@mailx.net",
+			wantErr: false,
+		},
+		{
+			name:    "original part with invalid parameter is still used",
+			data:    []byte("Content-Type: multipart/report; boundary=B\r\n\r\n--B\r\nContent-Type: text/rfc822-headers; charset\r\n\r\nFrom: alias@mailx.net\r\n--B--\r\n"),
+			want:    "alias@mailx.net",
+			wantErr: false,
+		},
+		{
+			name:    "text/rfc822-headers part with missing From header",
+			data:    []byte("Content-Type: multipart/report; boundary=B\r\n\r\n--B\r\nContent-Type: text/rfc822-headers\r\n\r\nTo: gone@example.org\r\nSubject: Hello\r\n--B--\r\n"),
+			want:    "",
+			wantErr: true,
+		},
+		{
+			name:    "empty text/rfc822-headers part",
+			data:    []byte("Content-Type: multipart/report; boundary=B\r\n\r\n--B\r\nContent-Type: text/rfc822-headers\r\n\r\n\r\n--B--\r\n"),
+			want:    "",
+			wantErr: true,
+		},
 	}
 
 	for _, tt := range tests {
@@ -260,6 +351,57 @@ func TestExtractOriginalFrom(t *testing.T) {
 				t.Errorf("ExtractOriginalFrom() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+// nestedBounce wraps a text/rfc822-headers part in depth levels of
+// multipart/mixed below the top-level multipart/report.
+func nestedBounce(depth int) []byte {
+	part := "Content-Type: text/rfc822-headers\r\n\r\nFrom: alias@mailx.net\r\n"
+	for i := range depth {
+		b := fmt.Sprintf("N%d", i)
+		part = fmt.Sprintf("Content-Type: multipart/mixed; boundary=%s\r\n\r\n--%s\r\n%s\r\n--%s--\r\n", b, b, part, b)
+	}
+	return []byte("Content-Type: multipart/report; boundary=TOP\r\n\r\n--TOP\r\n" + part + "\r\n--TOP--\r\n")
+}
+
+func TestExtractOriginalFrom_NestingLimit(t *testing.T) {
+	got, err := ExtractOriginalFrom(nestedBounce(maxMIMEDepth))
+	if err != nil || got != "alias@mailx.net" {
+		t.Errorf("depth %d: got %q, %v; want alias@mailx.net", maxMIMEDepth, got, err)
+	}
+
+	if got, err := ExtractOriginalFrom(nestedBounce(maxMIMEDepth + 1)); err == nil {
+		t.Errorf("depth %d: got %q, want error", maxMIMEDepth+1, got)
+	}
+
+	// Deep nesting must stop at the limit instead of walking every level.
+	if _, err := ExtractOriginalFrom(nestedBounce(5000)); err == nil {
+		t.Error("depth 5000: want error")
+	}
+}
+
+func TestParseMsg_HeadersOnlyBounce(t *testing.T) {
+	data := "From: MAILER-DAEMON@mx.example.org (Mail Delivery System)\r\n" +
+		"To: alias+gone=example.org@mailx.net\r\n" +
+		"Return-Path: <>\r\n" +
+		"Subject: Undelivered Mail Returned to Sender\r\n" +
+		"Auto-Submitted: auto-replied\r\n" +
+		"Content-Type: multipart/report; report-type=delivery-status; boundary=\"B\"\r\n\r\n" +
+		"--B\r\nContent-Type: text/plain\r\n\r\nI'm sorry to have to inform you...\r\n\r\n" +
+		"--B\r\nContent-Type: message/delivery-status\r\n\r\nReporting-MTA: dns; mx.example.org\r\n\r\nFinal-Recipient: rfc822; gone@example.org\r\nAction: failed\r\nStatus: 5.1.1\r\n\r\n" +
+		"--B\r\nContent-Type: text/rfc822-headers\r\n\r\nFrom: Alias <alias@mailx.net>\r\nTo: gone@example.org\r\nSubject: Hello\r\n\r\n" +
+		"--B--\r\n"
+
+	msg, err := ParseMsg([]byte(data))
+	if err != nil {
+		t.Fatalf("ParseMsg() error = %v", err)
+	}
+	if msg.Type != FailBounce {
+		t.Errorf("Type = %v, want FailBounce", msg.Type)
+	}
+	if msg.From != "alias@mailx.net" {
+		t.Errorf("From = %q, want alias@mailx.net", msg.From)
 	}
 }
 

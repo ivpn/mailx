@@ -652,6 +652,75 @@ func TestParseMsg(t *testing.T) {
 				EnvelopeRecipient: "alias1@mailx.net",
 			}},
 		{
+			name: "missing To header parses with empty To",
+			data: "Delivered-To: alias1@mailx.net\r\nFrom: sender@example.com\r\nSubject: Test\r\n\r\nBody",
+			want: Msg{
+				From:              "sender@example.com",
+				To:                []string{},
+				Subject:           "Test",
+				Body:              "Body",
+				Type:              Send,
+				EnvelopeRecipient: "alias1@mailx.net",
+			}},
+		{
+			name: "blank To header parses with empty To",
+			data: "Delivered-To: alias1@mailx.net\r\nFrom: sender@example.com\r\nTo: \r\nSubject: Test\r\n\r\nBody",
+			want: Msg{
+				From:              "sender@example.com",
+				To:                []string{},
+				Subject:           "Test",
+				Body:              "Body",
+				Type:              Send,
+				EnvelopeRecipient: "alias1@mailx.net",
+			}},
+		{
+			name: "undisclosed-recipients group in To parses with empty To",
+			data: "Delivered-To: alias1@mailx.net\r\nFrom: sender@example.com\r\nTo: undisclosed-recipients:;\r\nSubject: Test\r\n\r\nBody",
+			want: Msg{
+				From:              "sender@example.com",
+				To:                []string{},
+				Subject:           "Test",
+				Body:              "Body",
+				Type:              Send,
+				EnvelopeRecipient: "alias1@mailx.net",
+			}},
+		{
+			name: "group with members in To yields the members",
+			data: "From: sender@example.com\r\nTo: Team: alias1@mailx.net, alias2@mailx.net;\r\nSubject: Test\r\n\r\nBody",
+			want: Msg{
+				From:    "sender@example.com",
+				To:      []string{"alias1@mailx.net", "alias2@mailx.net"},
+				Subject: "Test",
+				Body:    "Body",
+				Type:    Send,
+			}},
+		{
+			name: "Outlook-style semicolon-separated To still parses",
+			data: "From: sender@example.com\r\nTo: alias1@mailx.net; alias2@mailx.net;\r\nSubject: Test\r\n\r\nBody",
+			want: Msg{
+				From:    "sender@example.com",
+				To:      []string{"alias1@mailx.net", "alias2@mailx.net"},
+				Subject: "Test",
+				Body:    "Body",
+				Type:    Send,
+			}},
+		{
+			name: "To header with only a semicolon parses with empty To",
+			data: "From: sender@example.com\r\nTo: ;\r\nSubject: Test\r\n\r\nBody",
+			want: Msg{
+				From:    "sender@example.com",
+				To:      []string{},
+				Subject: "Test",
+				Body:    "Body",
+				Type:    Send,
+			}},
+		{
+			name:    "malformed To header still returns an error",
+			data:    "From: sender@example.com\r\nTo: <not-an-address\r\nSubject: Test\r\n\r\nBody",
+			want:    Msg{},
+			wantErr: true,
+		},
+		{
 			name: "Delivered-To, X-Original-To and Received headers all absent leaves EnvelopeRecipient empty",
 			data: "From: sender@example.com\r\nTo: alias1@mailx.net\r\nSubject: Test\r\n\r\nBody",
 			want: Msg{

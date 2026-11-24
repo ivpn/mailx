@@ -55,13 +55,9 @@ func ParseMsg(data []byte) (Msg, error) {
 
 	subject := utils.DecodeHeaderWithCharset(msg.Header.Get("Subject"))
 
-	to := make([]string, 0)
-	addresses, err := mail.ParseAddressList(utils.NormalizeAddressSeparators(utils.DecodeHeaderWithCharset(msg.Header.Get("To"))))
+	to, err := parseToHeader(utils.DecodeHeaderWithCharset(msg.Header.Get("To")))
 	if err != nil {
 		return Msg{}, fmt.Errorf("error parsing To header: %w", err)
-	}
-	for _, address := range addresses {
-		to = append(to, address.Address)
 	}
 
 	deliveredTo := ""
@@ -126,6 +122,37 @@ func ParseMsg(data []byte) (Msg, error) {
 		ListUnsubscribePost: strings.TrimSpace(msg.Header.Get("List-Unsubscribe-Post")),
 		ListID:              strings.TrimSpace(msg.Header.Get("List-Id")),
 	}, nil
+}
+
+// parseToHeader returns the addresses in a decoded To header. A missing or blank
+// header, or an empty group such as "undisclosed-recipients:;" (Bcc-only sends,
+// some newsletters), is valid mail and yields no addresses, leaving the envelope
+// recipient to pick the alias; net/mail would otherwise reject the blank header
+// with "mail: no address". The header is parsed as-is first so group syntax and
+// quoted semicolons survive, then retried with Outlook-style ";" separators
+// turned into commas.
+func parseToHeader(header string) ([]string, error) {
+	to := make([]string, 0)
+	if strings.TrimSpace(header) == "" {
+		return to, nil
+	}
+
+	addresses, err := mail.ParseAddressList(header)
+	if err != nil {
+		normalized := utils.NormalizeAddressSeparators(header)
+		if normalized == "" {
+			return to, nil
+		}
+		addresses, err = mail.ParseAddressList(normalized)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	for _, address := range addresses {
+		to = append(to, address.Address)
+	}
+	return to, nil
 }
 
 // isReply checks whether the given email is a reply.

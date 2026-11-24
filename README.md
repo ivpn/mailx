@@ -46,7 +46,6 @@ mkdir -p docker-data/dms/config/rspamd/override.d
 cp config/postfix-main.cf.sample docker-data/dms/config/postfix-main.cf
 cp config/postfix-header-checks.cf.sample docker-data/dms/config/postfix-header-checks.cf
 cp config/postfix-sender-access.cf.sample docker-data/dms/config/postfix-sender-access.cf
-cp config/postfix-relay-domains.cf.sample docker-data/dms/config/postfix-relay-domains.cf
 cp config/postfix-aliases.cf.sample docker-data/dms/config/postfix-aliases.cf
 cp config/user-patches.sh.sample docker-data/dms/config/user-patches.sh
 cp config/fail2ban-jail.cf.sample docker-data/dms/config/fail2ban-jail.cf

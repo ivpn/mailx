@@ -14,7 +14,11 @@ non_smtpd_milters = $rspamd_milter
 mydestination = $myhostname, localhost
 local_recipient_maps =
 smtpd_policy_service_timeout = 10s
-relay_domains = regexp:/tmp/docker-mailserver/postfix-relay-domains.cf
+# Only our domains (DOMAINS plus verified custom domains, answered by the daemon)
+# are relay domains, and all their mail goes to the API. That includes bounces
+# Postfix generates itself, which never pass the smtpd policy FILTER.
+relay_domains = socketmap:inet:daemon:10026:relay
+relay_transport = curl_email
 
 smtpd_relay_restrictions =
     permit_mynetworks,

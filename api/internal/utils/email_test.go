@@ -563,6 +563,17 @@ func TestSelectTargets(t *testing.T) {
 			fromEnvelope: true,
 			want:         []string{"alias1@example.com"},
 		},
+		{
+			name:        "header Delivered-To with empty To targets Delivered-To",
+			to:          []string{},
+			deliveredTo: "alias1@example.com",
+			want:        []string{"alias1@example.com"},
+		},
+		{
+			name: "empty To and no Delivered-To returns no targets",
+			to:   []string{},
+			want: []string{},
+		},
 	}
 
 	for _, tt := range tests {

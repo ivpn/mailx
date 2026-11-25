@@ -6,7 +6,7 @@ require (
 	github.com/ProtonMail/gopenpgp/v3 v3.5.2
 	github.com/alexedwards/argon2id v1.0.0
 	github.com/go-playground/validator/v10 v10.30.6
-	github.com/go-sql-driver/mysql v1.10.1
+	github.com/go-sql-driver/mysql v1.10.2
 	github.com/go-webauthn/webauthn v0.18.2
 	github.com/gofiber/fiber/v2 v2.52.16
 	github.com/gofiber/swagger v1.1.1

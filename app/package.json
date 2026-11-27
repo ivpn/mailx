@@ -24,7 +24,7 @@
     "date-fns": "^4.4.0",
     "jwt-decode": "^4.0.0",
     "mitt": "^3.0.1",
-    "postcss-import": "^16.1.0",
+    "postcss-import": "^17.0.1",
     "preline": "^2.1.0",
     "qrcode": "^1.5.4",
     "vue": "^3.5.42",
